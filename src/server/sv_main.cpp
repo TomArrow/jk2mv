@@ -24,6 +24,10 @@ cvar_t	*sv_killserver;			// menu system can set to 1 to shut server down
 cvar_t	*sv_mapname;
 cvar_t	*sv_mapChecksum;
 cvar_t	*sv_serverid;
+cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
+cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
+cvar_t	*sv_enforceSnaps;
+cvar_t	*sv_minRate;
 cvar_t	*sv_maxRate;
 cvar_t	*sv_maxOOBRate;
 cvar_t	*sv_minPing;
@@ -1039,6 +1043,61 @@ qboolean SV_CheckPaused( void ) {
 
 	sv_paused->integer = 1;
 	return qtrue;
+}
+
+
+void SV_CheckCvars(void) {
+	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMax = -1;
+	static int lastModEnforceSnaps = -1;
+	qboolean changed = qfalse;
+
+	if (sv_hostname->modificationCount != lastModHostname) {
+		char hostname[MAX_INFO_STRING];
+		char *c = hostname;
+		lastModHostname = sv_hostname->modificationCount;
+
+		strcpy(hostname, sv_hostname->string);
+		while (*c)
+		{
+			if ((*c == '\\') || (*c == ';') || (*c == '"'))
+			{
+				*c = '.';
+				changed = qtrue;
+			}
+			c++;
+		}
+		if (changed)
+		{
+			Cvar_Set("sv_hostname", hostname);
+		}
+	}
+
+	// check limits on client "snaps" value based on server framerate and snapshot rate
+	if (sv_fps->modificationCount != lastModFramerate ||
+		sv_minSnaps->modificationCount != lastModSnapsMin ||
+		sv_maxSnaps->modificationCount != lastModSnapsMax ||
+		sv_enforceSnaps->modificationCount != lastModEnforceSnaps)
+	{
+		client_t *cl;
+		int minSnaps = sv_minSnaps->integer > 0 ? Com_Clampi(1, sv_maxSnaps->integer, sv_minSnaps->integer) : 1; // between 1 and sv_maxSnaps ( 1 <-> 40 )
+		int maxSnaps = sv_maxSnaps->integer > 0 ? MIN(sv_fps->integer, sv_maxSnaps->integer) : sv_fps->integer;  // can't produce more than sv_fps snapshots/sec, but can send less than sv_fps snapshots/sec
+		int i, val;
+
+		lastModFramerate = sv_fps->modificationCount;
+		lastModSnapsMin = sv_minSnaps->modificationCount;
+		lastModSnapsMax = sv_maxSnaps->modificationCount;
+		lastModEnforceSnaps = sv_enforceSnaps->modificationCount;
+
+		for (i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++) {
+			val = 1000/Com_Clampi(minSnaps, maxSnaps, (sv_enforceSnaps->integer ? sv_fps->integer : cl->wishSnaps) );
+
+			if (val != cl->snapshotMsec) {
+				// Reset last sent snapshot so we avoid desync between server frame time and snapshot send time
+				cl->nextSnapshotTime = -1;
+				cl->snapshotMsec = val;
+			}
+		}
+	}
 }
 
 /*
