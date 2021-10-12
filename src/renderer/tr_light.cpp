@@ -272,9 +272,9 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 			VectorMA( direction, factor, normal, direction );
 		}
 
-		if ( totalFactor > 0 && totalFactor < 0.99 )
+		if ( totalFactor > 0 && totalFactor < 0.99f )
 		{
-			totalFactor = 1.0 / totalFactor;
+			totalFactor = 1.0f / totalFactor;
 			VectorScale( ent->ambientLight, totalFactor, ent->ambientLight );
 			VectorScale( ent->directedLight, totalFactor, ent->directedLight );
 		}
@@ -299,7 +299,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 			float	v;
 
 			v = lightOrigin[i]*tr.world->lightGridInverseSize[i];
-			pos[i] = floor( v );
+			pos[i] = floorf( v );
 			frac[i] = v - pos[i];
 			if ( pos[i] < 0 ) {
 				pos[i] = 0;
@@ -330,13 +330,20 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 			gridPos = startGridPos;
 			for ( j = 0 ; j < 3 ; j++ ) {
 				if ( i & (1<<j) ) {
+					if ( pos[j] + 1 > tr.world->lightGridBounds[j] - 1 ) {
+						break; // ignore values outside lightgrid
+					}
 					factor *= frac[j];
 					gridPos += gridStep[j];
 				} else {
-					factor *= (1.0 - frac[j]);
+					factor *= (1.0f - frac[j]);
 				}
 			}
 
+			if (j != 3)
+			{
+				continue;
+			}
 			if (gridPos >= tr.world->lightGridArray + tr.world->numGridArrayElements)
 			{//we've gone off the array somehow
 				continue;
@@ -385,9 +392,9 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 			VectorMA( direction, factor, normal, direction );
 		}
 
-		if ( totalFactor > 0 && totalFactor < 0.99 )
+		if ( totalFactor > 0 && totalFactor < 0.99f )
 		{
-			totalFactor = 1.0 / totalFactor;
+			totalFactor = 1.0f / totalFactor;
 			VectorScale( ent->ambientLight, totalFactor, ent->ambientLight );
 			VectorScale( ent->directedLight, totalFactor, ent->directedLight );
 		}

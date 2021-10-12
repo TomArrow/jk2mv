@@ -16,6 +16,8 @@
 #include "copyright.h"
 
 
+static const char sKEY_MAXVOL[]="#MAXVOL";	// formerly #defines
+static const char sKEY_UNCOMP[]="#UNCOMP";	//    "        "
 
 // maybe I'm re-inventing the wheel, here, but I can't see any functions that already do this, so...
 //
@@ -66,8 +68,8 @@ void R_CheckMP3s( const char *psDir )
 //	Com_Printf(va("Scanning Dir: %s\n",psDir));
 	Com_Printf(".");	// stops useful info scrolling off screen
 
-	char	**sysFiles, **dirFiles;
-	int		numSysFiles, i, numdirs;
+	const char	**sysFiles, **dirFiles;
+	int			numSysFiles, i, numdirs;
 
 	dirFiles = FS_ListFiles( psDir, "/", &numdirs);
 	if (numdirs > 2)
@@ -142,7 +144,7 @@ void R_CheckMP3s( const char *psDir )
 							iActualUnpackedSize = MP3_UnpackRawPCM( sFilename, pbData, iSize, pbUnpackBuffer );
 							if (iActualUnpackedSize != iRawPCMDataSize)
 							{
-								Com_Error(ERR_DROP, "******* Whoah! MP3 %s unpacked to %d bytes, but size calc said %d!\n",sFilename,iActualUnpackedSize,iRawPCMDataSize);
+								Com_Error(ERR_DROP, "******* Whoah! MP3 %s unpacked to %d bytes, but size calc said %d!",sFilename,iActualUnpackedSize,iRawPCMDataSize);
 							}
 
 							// fake up a WAV structure so I can use the other post-load sound code such as volume calc for lip-synching
@@ -236,7 +238,7 @@ void R_CheckMP3s( const char *psDir )
 					}
 					else
 					{
-						Com_Error(ERR_DROP, "******* This MP3 should be deleted: %s\n",sFilename);
+						Com_Error(ERR_DROP, "******* This MP3 should be deleted: %s",sFilename);
 					}
 				}
 				else
@@ -264,7 +266,7 @@ void R_CheckMP3s( const char *psDir )
 void S_MP3_CalcVols_f( void )
 {
 	char sStartDir[MAX_QPATH] = {"sound"};
-	const char sUsage[] = "Usage: mp3_calcvols [-rescan] [startdir (default='sound')]\n";
+	static const char sUsage[] = "Usage: mp3_calcvols [-rescan] [startdir (default='sound')]\n";
 
 	if (Cmd_Argc()>4)	// 3 optional arguments
 	{
@@ -303,7 +305,7 @@ void S_MP3_CalcVols_f( void )
 			}
 			continue;
 		}
-		strcpy(sStartDir,Cmd_Argv(i));
+		Q_strncpyz(sStartDir, Cmd_Argv(i), sizeof(sStartDir));
 	}
 
 	Com_Printf("Starting Scan for Updates in Dir: %s\n",sStartDir);
@@ -455,11 +457,6 @@ qboolean MP3_FakeUpWAVInfo( const char *psLocalFilename, void *pvData, int iData
 	return psError ? qfalse : qtrue;
 }
 
-
-
-const char sKEY_MAXVOL[]="#MAXVOL";	// formerly #defines
-const char sKEY_UNCOMP[]="#UNCOMP";	//    "        "
-
 // returns qtrue for success...
 //
 qboolean MP3_ReadSpecialTagInfo(byte *pbLoadedFile, int iLoadedFileLen,		// (in)
@@ -528,7 +525,7 @@ qboolean MP3_ReadSpecialTagInfo(byte *pbLoadedFile, int iLoadedFileLen,		// (in)
 cvar_t* cv_MP3overhead = NULL;
 void MP3_InitCvars(void)
 {
-	cv_MP3overhead = Cvar_Get("s_mp3overhead", va("%d", sizeof(MP3STREAM) + FUZZY_AMOUNT), CVAR_ARCHIVE | CVAR_GLOBAL);
+	cv_MP3overhead = Cvar_Get("s_mp3overhead", va("%d", (int)(sizeof(MP3STREAM) + FUZZY_AMOUNT)), CVAR_ARCHIVE | CVAR_GLOBAL);
 
 #ifdef USE_OPENAL
 	extern int s_UseOpenAL;

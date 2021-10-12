@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#define	DEBUG_VM
 #ifdef DEBUG_VM
-static char	*opnames[256] = {
+static const char * const opnames[256] = {
 	"OP_UNDEF",
 
 	"OP_IGNORE",
@@ -150,6 +150,14 @@ char *VM_Indent( vm_t *vm ) {
 	return string + 2 * ( 20 - vm->callLevel );
 }
 
+/*
+====================
+VM_StackTrace
+
+Call with (programCounter, programStack) inside of VM_CallInterpreted
+and with (*(int *)&image[programStack], stomped) inside of a systemCall.
+====================
+*/
 void VM_StackTrace( vm_t *vm, int programCounter, int programStack ) {
 	int		count;
 
@@ -365,7 +373,7 @@ int	VM_CallInterpreted( vm_t *vm, int *args ) {
 	// that as long as opStack is valid, opStack-1 will
 	// not corrupt anything
 	opStack = (int *)PADP(stack, 16);
-	*opStack = 0xDEADBEEF;
+	*(unsigned *)opStack = 0xDEADBEEFu;
 	opStackOfs = 0;
 
 //	vm_debugLevel=2;
@@ -385,7 +393,7 @@ nextInstruction2:
 		opcode = codeImage[ programCounter++ ];
 
 #ifdef DEBUG_VM
-		if ( (unsigned)programCounter >= vm->codeLength ) {
+		if ( (unsigned)programCounter >= (unsigned)vm->codeLength ) {
 			Com_Error( ERR_DROP, "VM pc out of range" );
 			return 0;
 		}
@@ -507,8 +515,7 @@ nextInstruction2:
 					if (sizeof(intptr_t) != sizeof(int)) {
 						intptr_t argarr[ MAX_VMSYSCALL_ARGS ];
 						int *imagePtr = (int *)&image[ programStack ];
-						int i;
-						for (i = 0; i < ARRAY_LEN(argarr); ++i) {
+						for (size_t i = 0; i < ARRAY_LEN(argarr); ++i) {
 							argarr[i] = *(++imagePtr);
 						}
 						r = vm->systemCall( argarr );
@@ -534,7 +541,7 @@ nextInstruction2:
 					Com_Printf( "%s<--- %s\n", DEBUGSTR, VM_ValueToSymbol( vm, programCounter ) );
 				}
 #endif
-			} else if ( (unsigned)programCounter >= vm->instructionCount ) {
+			} else if ( programCounter >= vm->instructionCount ) {
 				Com_Error( ERR_DROP, "VM program counter out of range in OP_CALL" );
 				return 0;
 			} else {
@@ -611,7 +618,7 @@ nextInstruction2:
 			// check for leaving the VM
 			if ( programCounter == -1 ) {
 				goto done;
-			} else if ( (unsigned)programCounter >= vm->codeLength ) {
+			} else if ( (unsigned)programCounter >= (unsigned)vm->codeLength ) {
 				Com_Error( ERR_DROP, "VM program counter out of range in OP_LEAVE" );
 				return 0;
 			}
@@ -624,7 +631,7 @@ nextInstruction2:
 		*/
 
 		case OP_JUMP:
-			if ( (unsigned)r0 >= vm->instructionCount )
+			if ( (unsigned)r0 >= (unsigned)vm->instructionCount )
 			{
 				Com_Error( ERR_DROP, "VM program counter out of range in OP_JUMP" );
 				return 0;
@@ -899,7 +906,7 @@ nextInstruction2:
 			((float *) opStack)[opStackOfs] = (float) opStack[opStackOfs];
 			goto nextInstruction;
 		case OP_CVFI:
-			opStack[opStackOfs] = Q_ftol(((float *) opStack)[opStackOfs]);
+			opStack[opStackOfs] = (int) ((float *) opStack)[opStackOfs];
 			goto nextInstruction;
 		case OP_SEX8:
 			opStack[opStackOfs] = (signed char) opStack[opStackOfs];
@@ -913,7 +920,7 @@ nextInstruction2:
 done:
 	vm->currentlyInterpreting = qfalse;
 
-	if (opStackOfs != 1 || *opStack != 0xDEADBEEF)
+	if (opStackOfs != 1 || *(unsigned *)opStack != 0xDEADBEEFu)
 		Com_Error(ERR_DROP, "Interpreter error: opStack[0] = %X, opStackOfs = %d", opStack[0], opStackOfs);
 
 	vm->programStack = stackOnEntry;

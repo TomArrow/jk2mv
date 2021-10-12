@@ -41,7 +41,7 @@ typedef struct {
 	// a scene is built up by calls to R_ClearScene and the various R_Add functions.
 	// Nothing is drawn until R_RenderScene is called.
 	void	(*ClearScene)( void );
-	void	(*AddRefEntityToScene)( const refEntity_t *re );
+	void	(*AddRefEntityToScene)( const refEntity_t *re, qboolean intShaderTime );
 	void	(*AddMiniRefEntityToScene)( const miniRefEntity_t *re );
 	void	(*AddPolyToScene)( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
 	int		(*LightForPoint)( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
@@ -49,26 +49,27 @@ typedef struct {
 	void	(*AddAdditiveLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
 	void	(*RenderScene)( const refdef_t *fd );
 
-	void	(*SetColor)( const float *rgba );	// NULL = 1,1,1,1
-	void	(*DrawStretchPic) ( float x, float y, float w, float h,
-		float s1, float t1, float s2, float t2, qhandle_t hShader );	// 0 = white
-	void	(*DrawRotatePic) ( float x, float y, float w, float h,
-		float s1, float t1, float s2, float t2, float a1, qhandle_t hShader );	// 0 = white
-	void	(*DrawRotatePic2) ( float x, float y, float w, float h,
-		float s1, float t1, float s2, float t2, float a1, qhandle_t hShader );	// 0 = white
+	void	(*SetColor)( const vec4_t rgba );	// NULL = 1,1,1,1
+	void	(*DrawStretchPic) ( float x, float y, float w, float h, float s1, float t1,
+		float s2, float t2, qhandle_t hShader, float xadjust, float yadjust );	// 0 = white
+	void	(*DrawRotatePic) ( float x, float y, float w, float h, float s1, float t1,
+		float s2, float t2, float a1, qhandle_t hShader, float xadjust, float yadjust );	// 0 = white
+	void	(*DrawRotatePic2) ( float x, float y, float w, float h, float s1, float t1,
+		float s2, float t2, float a1, qhandle_t hShader, float xadjust, float yadjust );	// 0 = white
 
 	// Draw images for cinematic rendering, pass as 32 bit rgba
 	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty);
 	void	(*UploadCinematic) (int cols, int rows, const byte *data, int client, qboolean dirty);
 
-	void	(*BeginFrame)( stereoFrame_t stereoFrame );
+	void	(*BeginFrame)( stereoFrame_t stereoFrame, qboolean skipBackend );
+	void	(*EndFrame)( void );
 
 	// if the pointers are not NULL, timing info will be returned
-	void	(*EndFrame)( int *frontEndMsec, int *backEndMsec );
+	void	(*SwapBuffers)( int *frontEndMsec, int *backEndMsec );
 
 
 	int		(*MarkFragments)( int numPoints, const vec3_t *points, const vec3_t projection,
-				   int maxPoints, vec3_t pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
+				   int maxPoints, vec3_t *pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
 
 	int		(*LerpTag)( orientation_t *tag,  qhandle_t model, int startFrame, int endFrame,
 					 float frac, const char *tagName );
@@ -79,10 +80,11 @@ typedef struct {
 #endif
 
 	qhandle_t (*RegisterFont)( const char *fontName );
-	int		(*Font_StrLenPixels) (const char *text, const int iFontIndex, const float scale);
+	int		(*Font_StrLenPixels) (const char *text, const int iFontIndex, const float scale, float xadjust, float yadjust);
 	int		(*Font_StrLenChars) (const char *text);
-	int		(*Font_HeightPixels)(const int iFontIndex, const float scale);
-	void	(*Font_DrawString)(int ox, int oy, const char *text, const float *rgba, const int setIndex, int iCharLimit, const float scale);
+	int		(*Font_HeightPixels)(const int iFontIndex, const float scale, float xadjust, float yadjust);
+	void	(*Font_DrawString)(int ox, int oy, const char *text, const vec4_t rgba,
+		const int setIndex, int iCharLimit, const float scale, float xadjust, float yadjust);
 	qboolean (*Language_IsAsian)(void);
 	qboolean (*Language_UsesSpaces)(void);
 	unsigned int (*AnyLanguage_ReadCharFromString)( const char *psText, int *piAdvanceCount, qboolean *pbIsTrailingPunctuation/* = NULL*/ );
@@ -95,6 +97,9 @@ typedef struct {
 	void (*SetLightStyle)(int style, int color);
 
 	void	(*GetBModelVerts)( int bmodelIndex, vec3_t *vec, vec3_t normal );
+
+	int (*CaptureFrameRaw)( byte *buffer, int bufSize, int padding );
+	int (*CaptureFrameJPEG)( byte *buffer, int bufSize, int quality );
 } refexport_t;
 
 //
@@ -102,10 +107,10 @@ typedef struct {
 //
 typedef struct {
 	// print message on the local console
-	void	(QDECL *Printf)( int printLevel, const char *fmt, ...);
+	void	(QDECL *Printf)( int printLevel, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 	// abort the game
-	Q_PTR_NORETURN void	(QDECL *Error)( int errorLevel, const char *fmt, ...);
+	Q_PTR_NORETURN void	(QDECL *Error)( errorParm_t errorLevel, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 	// milliseconds should only be used for profiling, never
 	// for anything game related.  Get time from the refdef
@@ -136,7 +141,7 @@ typedef struct {
 	int		(*Cmd_Argc) (void);
 	char	*(*Cmd_Argv) (int i);
 
-	void	(*Cmd_ExecuteText) (int exec_when, const char *text);
+	void	(*Cmd_ExecuteText) (cbufExec_t exec_when, const char *text);
 
 	// visualization for debugging collision detection
 	void	(*CM_DrawDebugSurface)( void (*drawPoly)(int color, int numPoints, float *points) );
@@ -146,8 +151,8 @@ typedef struct {
 	int		(*FS_FileIsInPAK)( const char *name, int *pCheckSum );
 	int		(*FS_ReadFile)( const char *name, void **buf );
 	void	(*FS_FreeFile)( void *buf );
-	char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
-	void	(*FS_FreeFileList)( char **filelist );
+	const char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
+	void	(*FS_FreeFileList)( const char **filelist );
 	void	(*FS_WriteFile)( const char *qpath, const void *buffer, int size );
 	qboolean (*FS_FileExists)( const char *file );
 

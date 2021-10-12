@@ -12,6 +12,10 @@
 		descScale               0.7
 		descColor               .235 .882 .847 1
 		descAlignment           ITEM_ALIGN_CENTER
+		onClose 
+		{
+			close					ingame_setup ;
+		}
 
 		//----------------------------------------------------------------------------------------------
 		//
@@ -180,5 +184,19 @@
 		//
 		//----------------------------------------------------------------------------------------------
 
+		// Placeholder text, remove when adding your own options
+		itemDef
+		{
+			text				@MV_MOD_OPTIONS_EMPTY
+			type				ITEM_TYPE_TEXT
+			textalign           ITEM_ALIGN_LEFT
+			rect				20 20 300 20
+			font				2
+			textscale			.7
+			backcolor			0 0 1 0
+			forecolor			.433 .703 .722 1
+			visible				1
+			autowrapped
+		}
 	}
 }

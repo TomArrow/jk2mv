@@ -90,7 +90,7 @@ void BotDumpCharacter(bot_character_t *ch)
 	int i;
 
 	Log_Write("%s", ch->filename);
-	Log_Write("skill %d\n", ch->skill);
+	Log_Write("skill %f\n", ch->skill);
 	Log_Write("{\n");
 	for (i = 0; i < MAX_CHARACTERISTICS; i++)
 	{
@@ -192,7 +192,7 @@ void BotDefaultCharacteristics(bot_character_t *ch, bot_character_t *defaultch)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill)
+bot_character_t *BotLoadCharacterFromFile(const char *charfile, int skill)
 {
 	int indent, index, foundcharacter;
 	bot_character_t *ch;
@@ -230,7 +230,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill)
 				return NULL;
 			} //end if
 			//if it's the correct skill
-			if (skill < 0 || token.intvalue == skill)
+			if (skill < 0 || token.intvalue == (unsigned long)skill)
 			{
 				foundcharacter = qtrue;
 				ch->skill = token.intvalue;
@@ -342,7 +342,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int BotFindCachedCharacter(char *charfile, float skill)
+int BotFindCachedCharacter(const char *charfile, float skill)
 {
 	int handle;
 
@@ -350,7 +350,7 @@ int BotFindCachedCharacter(char *charfile, float skill)
 	{
 		if ( !botcharacters[handle] ) continue;
 		if ( strcmp( botcharacters[handle]->filename, charfile ) == 0 &&
-			(skill < 0 || fabs(botcharacters[handle]->skill - skill) < 0.01) )
+			(skill < 0 || fabsf(botcharacters[handle]->skill - skill) < 0.01f) )
 		{
 			return handle;
 		} //end if
@@ -363,7 +363,7 @@ int BotFindCachedCharacter(char *charfile, float skill)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int BotLoadCachedCharacter(char *charfile, float skill, int reload)
+int BotLoadCachedCharacter(const char *charfile, float skill, int reload)
 {
 	int handle, cachedhandle, intskill;
 	bot_character_t *ch = NULL;
@@ -476,7 +476,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int BotLoadCharacterSkill(char *charfile, float skill)
+int BotLoadCharacterSkill(const char *charfile, float skill)
 {
 	int ch, defaultch;
 
@@ -548,7 +548,7 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int BotLoadCharacter(char *charfile, float skill)
+int BotLoadCharacter(const char *charfile, float skill)
 {
 	int firstskill, secondskill, handle;
 

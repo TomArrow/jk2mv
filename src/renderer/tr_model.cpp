@@ -2,7 +2,7 @@
 
 #include "tr_local.h"
 
-#include "../qcommon/sstring.h"	// #include <string>
+#include <string>
 #include <vector>
 #include <map>
 
@@ -57,7 +57,7 @@ struct CachedEndianedModelBinary_s
 	}
 };
 typedef struct CachedEndianedModelBinary_s CachedEndianedModelBinary_t;
-typedef map <sstring_t,CachedEndianedModelBinary_t>	CachedModels_t;
+typedef map <string,CachedEndianedModelBinary_t>	CachedModels_t;
 CachedModels_t CachedModels;	// the important cache item.
 
 void RE_RegisterModels_StoreShaderRequest(const char *psModelFileName, const char *psShaderName, int *piShaderIndexPoke)
@@ -119,9 +119,9 @@ qboolean RE_RegisterModels_GetDiskFile( const char *psModelFileName, void **ppvB
 	Q_strncpyz(sModelName,psModelFileName,sizeof(sModelName));
 	Q_strlwr  (sModelName);
 
-	CachedEndianedModelBinary_t &ModelBin = CachedModels[sModelName];
+	CachedModels_t::iterator itModel = CachedModels.find(sModelName);
 
-	if (ModelBin.pModelDiskImage == NULL)
+	if (itModel == CachedModels.end())
 	{
 		// didn't have it cached, so try the disk...
 		//
@@ -152,7 +152,7 @@ qboolean RE_RegisterModels_GetDiskFile( const char *psModelFileName, void **ppvB
 	}
 	else
 	{
-		*ppvBuffer = ModelBin.pModelDiskImage;
+		*ppvBuffer = itModel->second.pModelDiskImage;
 		*pqbAlreadyCached = qtrue;
 		return qtrue;
 	}
@@ -310,6 +310,8 @@ extern qboolean gbInsideRegisterModel;
 qboolean RE_RegisterModels_LevelLoadEnd(qboolean bDeleteEverythingNotUsedThisLevel /* = qfalse */)
 {
 	qboolean bAtLeastoneModelFreed = qfalse;
+	int iLoadedModelBytes	=	GetModelDataAllocSize();
+	const int iMaxModelBytes=	r_modelpoolmegs->integer * 1024 * 1024;
 
 	ri.Printf( PRINT_DEVELOPER, "RE_RegisterModels_LevelLoadEnd():\n");
 
@@ -319,14 +321,10 @@ qboolean RE_RegisterModels_LevelLoadEnd(qboolean bDeleteEverythingNotUsedThisLev
 	}
 	else
 	{
-		int iLoadedModelBytes	=	GetModelDataAllocSize();
-		const int iMaxModelBytes=	r_modelpoolmegs->integer * 1024 * 1024;
+		CachedModels_t::iterator itModel = CachedModels.begin();
 
-		qboolean bEraseOccured = qfalse;
-		for (CachedModels_t::iterator itModel = CachedModels.begin(); itModel != CachedModels.end() && ( bDeleteEverythingNotUsedThisLevel || iLoadedModelBytes > iMaxModelBytes ); bEraseOccured?itModel:++itModel)
+		while ( itModel != CachedModels.end() && ( bDeleteEverythingNotUsedThisLevel || iLoadedModelBytes > iMaxModelBytes ) )
 		{
-			bEraseOccured = qfalse;
-
 			CachedEndianedModelBinary_t &CachedModel = (*itModel).second;
 
 			qboolean bDeleteThis = qfalse;
@@ -345,32 +343,20 @@ qboolean RE_RegisterModels_LevelLoadEnd(qboolean bDeleteEverythingNotUsedThisLev
 			if (bDeleteThis)
 			{
 				const char *psModelName = (*itModel).first.c_str();
-				ri.Printf( PRINT_DEVELOPER, "Dumping \"%s\"", psModelName);
-
-	#ifdef _DEBUG
-				ri.Printf( PRINT_DEVELOPER, ", used on lvl %d\n",CachedModel.iLastLevelUsedOn);
-	#endif
+				ri.Printf( PRINT_DEVELOPER, "Dumping \"%s\", used on lvl %d\n", psModelName, CachedModel.iLastLevelUsedOn);
 
 				if (CachedModel.pModelDiskImage) {
 					ri.Free(CachedModel.pModelDiskImage);
 					//CachedModel.pModelDiskImage = NULL;	// REM for reference, erase() call below negates the need for it.
 					bAtLeastoneModelFreed = qtrue;
 				}
-#ifndef __linux__
+
 				itModel = CachedModels.erase(itModel);
-				bEraseOccured = qtrue;
-#else
-				// Both MS and Dinkumware got the map::erase wrong
-				// The STL has the return type as a void
-				CachedModels_t::iterator itTemp;
-				itTemp = itModel;
-				itModel++;
-				CachedModels.erase(itTemp);
-
-#endif
-
 				iLoadedModelBytes = GetModelDataAllocSize();
+				continue;
 			}
+
+			++itModel;
 		}
 	}
 
@@ -390,11 +376,10 @@ static void RE_RegisterModels_DumpNonPure(void)
 {
 	Com_DPrintf( "RE_RegisterModels_DumpNonPure():\n");
 
-	qboolean bEraseOccured = qfalse;
-	for (CachedModels_t::iterator itModel = CachedModels.begin(); itModel != CachedModels.end(); bEraseOccured?itModel:++itModel)
-	{
-		bEraseOccured = qfalse;
+	CachedModels_t::iterator itModel = CachedModels.begin();
 
+	while ( itModel != CachedModels.end() )
+	{
 		const char *psModelName = (*itModel).first.c_str();
 		CachedEndianedModelBinary_t &CachedModel = (*itModel).second;
 
@@ -413,20 +398,13 @@ static void RE_RegisterModels_DumpNonPure(void)
 					Z_Free(CachedModel.pModelDiskImage);
 					//CachedModel.pModelDiskImage = NULL;	// REM for reference, erase() call below negates the need for it.
 				}
-#ifndef __linux__
-				itModel = CachedModels.erase(itModel);
-				bEraseOccured = qtrue;
-#else
-				// Both MS and Dinkumware got the map::erase wrong
-				// The STL has the return type as a void
-				CachedModels_t::iterator itTemp;
-				itTemp = itModel;
-				itModel++;
-				CachedModels.erase(itTemp);
 
-#endif
+				itModel = CachedModels.erase(itModel);
+				continue;
 			}
 		}
+
+		++itModel;
 	}
 
 	Com_DPrintf( "RE_RegisterModels_DumpNonPure(): Ok\n");
@@ -445,6 +423,8 @@ void RE_RegisterModels_Info_f( void )
 
 		#ifdef _DEBUG
 		ri.Printf( PRINT_ALL, ", lvl %d\n",CachedModel.iLastLevelUsedOn);
+		#else
+		ri.Printf( PRINT_ALL, "\n");
 		#endif
 
 		iTotalBytes += CachedModel.iAllocSize;
@@ -457,7 +437,6 @@ void RE_RegisterModels_Info_f( void )
 //
 static void RE_RegisterModels_DeleteAll(void)
 {
-#ifndef __linux__
 	for (CachedModels_t::iterator itModel = CachedModels.begin(); itModel != CachedModels.end(); )
 	{
 		CachedEndianedModelBinary_t &CachedModel = (*itModel).second;
@@ -468,9 +447,6 @@ static void RE_RegisterModels_DeleteAll(void)
 
 		itModel = CachedModels.erase(itModel);
 	}
-#else
-	CachedModels.erase(CachedModels.begin(),CachedModels.end());
-#endif
 }
 
 
@@ -1526,7 +1502,7 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 	// NOTE: this sucks, for some reason the first stretch pic is never drawn
 	// without this we'd see a white flash on a level load because the very
 	// first time the level shot would not be drawn
-	RE_StretchPic(0, 0, 0, 0, 0, 0, 1, 1, 0);
+	RE_StretchPic(0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1);
 }
 
 //=============================================================================
@@ -1612,10 +1588,8 @@ static md3Tag_t *R_GetTag( md3Header_t *mod, int frame, const char *tagName ) {
 	md3Tag_t		*tag;
 	int				i;
 
-	if ( frame >= mod->numFrames ) {
-		// it is possible to have a bad frame while changing models, so don't error
-		frame = mod->numFrames - 1;
-	}
+	// it is possible to have a bad frame while changing models, so don't error
+	frame = Com_Clampi( 0, mod->numFrames - 1, frame );
 
 	tag = (md3Tag_t *)((byte *)mod + mod->ofsTags) + frame * mod->numTags;
 	for ( i = 0 ; i < mod->numTags ; i++, tag++ ) {

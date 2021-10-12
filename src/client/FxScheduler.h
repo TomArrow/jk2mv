@@ -382,6 +382,14 @@ struct SEffectTemplate
 	int		mPrimitiveCount;
 	CPrimitiveTemplate	*mPrimitives[FX_MAX_EFFECT_COMPONENTS];
 
+	SEffectTemplate() :
+		mInUse(),
+		mCopy(),
+		mEffectName(),
+		mPrimitiveCount(),
+		mPrimitives()
+	{}
+
 	bool operator == (const char * name) const
 	{
 		return !Q_stricmp( mEffectName, name );
@@ -457,7 +465,7 @@ private:
 	void	AddPrimitiveToEffect( SEffectTemplate *fx, CPrimitiveTemplate *prim );
 	int		ParseEffect( const char *file, CGPGroup *base );
 
-	void	CreateEffect( CPrimitiveTemplate *fx, vec3_t origin, vec3_t axis[3], int lateTime, CCloud *effectCloud);
+	void	CreateEffect( CPrimitiveTemplate *fx, const vec3_t origin, const vec3_t axis[3], int lateTime, CCloud *effectCloud);
 
 #ifndef EFFECTSED
 #ifndef CHC // Sof2 only
@@ -487,13 +495,13 @@ public:
 #endif
 
 	// Nasty overloaded madness
-	void	PlayEffect( int id, vec3_t org );							// uses a default up axis
-	void	PlayEffect( int id, vec3_t org, vec3_t fwd );				// builds arbitrary perp. right vector, does a cross product to define up
-	void	PlayEffect( int id, vec3_t origin, vec3_t axis[3], const int boltInfo=-1, const int entNum=-1 );
-	void	PlayEffect( const char *file, vec3_t org );					// uses a default up axis
-	void	PlayEffect( const char *file, vec3_t org, vec3_t fwd );		// builds arbitrary perp. right vector, does a cross product to define up
-	void	PlayEffect( const char *file, vec3_t origin,
-				vec3_t axis[3], const int boltInfo, const int entNum );
+	void	PlayEffect( int id, const vec3_t org );							// uses a default up axis
+	void	PlayEffect( int id, const vec3_t org, const vec3_t fwd );				// builds arbitrary perp. right vector, does a cross product to define up
+	void	PlayEffect( int id, const vec3_t origin, const vec3_t axis[3], const int boltInfo=-1, const int entNum=-1 );
+	void	PlayEffect( const char *file, const vec3_t org );					// uses a default up axis
+	void	PlayEffect( const char *file, const vec3_t org, const vec3_t fwd );		// builds arbitrary perp. right vector, does a cross product to define up
+	void	PlayEffect( const char *file, const vec3_t origin,
+				const vec3_t axis[3], const int boltInfo, const int entNum );
 
 #ifndef EFFECTSED
 #ifndef CHC // SOF2 only

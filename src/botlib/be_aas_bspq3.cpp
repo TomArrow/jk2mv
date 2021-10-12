@@ -127,7 +127,7 @@ void PrintContents(int contents)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-bsp_trace_t AAS_Trace(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask)
+bsp_trace_t AAS_Trace(const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passent, int contentmask)
 {
 	bsp_trace_t bsptrace;
 	botimport.Trace(&bsptrace, start, mins, maxs, end, passent, contentmask);
@@ -140,7 +140,7 @@ bsp_trace_t AAS_Trace(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int pa
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_PointContents(vec3_t point)
+int AAS_PointContents(const vec3_t point)
 {
 	return botimport.PointContents(point);
 } //end of the function AAS_PointContents
@@ -173,7 +173,7 @@ qboolean AAS_EntityCollision(int entnum,
 //===========================================================================
 qboolean AAS_inPVS(vec3_t p1, vec3_t p2)
 {
-	return (qboolean)botimport.inPVS(p1, p2);
+	return (qboolean)!!botimport.inPVS(p1, p2);
 } //end of the function AAS_InPVS
 //===========================================================================
 // returns true if in Potentially Visible Set
@@ -259,7 +259,7 @@ int AAS_BSPEntityInRange(int ent)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int AAS_ValueForBSPEpairKey(int ent, char *key, char *value, int size)
+int AAS_ValueForBSPEpairKey(int ent, const char *key, char *value, int size)
 {
 	bsp_epair_t *epair;
 
@@ -282,7 +282,7 @@ int AAS_ValueForBSPEpairKey(int ent, char *key, char *value, int size)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_VectorForBSPEpairKey(int ent, char *key, vec3_t v)
+int AAS_VectorForBSPEpairKey(int ent, const char *key, vec3_t v)
 {
 	char buf[MAX_EPAIRKEY];
 	double v1, v2, v3;
@@ -291,7 +291,7 @@ int AAS_VectorForBSPEpairKey(int ent, char *key, vec3_t v)
 	if (!AAS_ValueForBSPEpairKey(ent, key, buf, MAX_EPAIRKEY)) return qfalse;
 	//scanf into doubles, then assign, so it is vec_t size independent
 	v1 = v2 = v3 = 0;
-	sscanf(buf, "%lf %lf %lf", &v1, &v2, &v3);
+	if ( sscanf(buf, "%lf %lf %lf", &v1, &v2, &v3) != 3 ) return qfalse;
 	v[0] = v1;
 	v[1] = v2;
 	v[2] = v3;
@@ -303,7 +303,7 @@ int AAS_VectorForBSPEpairKey(int ent, char *key, vec3_t v)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_FloatForBSPEpairKey(int ent, char *key, float *value)
+int AAS_FloatForBSPEpairKey(int ent, const char *key, float *value)
 {
 	char buf[MAX_EPAIRKEY];
 
@@ -318,7 +318,7 @@ int AAS_FloatForBSPEpairKey(int ent, char *key, float *value)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_IntForBSPEpairKey(int ent, char *key, int *value)
+int AAS_IntForBSPEpairKey(int ent, const char *key, int *value)
 {
 	char buf[MAX_EPAIRKEY];
 

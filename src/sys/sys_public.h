@@ -18,7 +18,10 @@ typedef struct netadr_s
 {
 	netadrtype_t	type;
 
-	byte			ip[4];
+	union {
+		byte			ip[4];
+		int32_t			ipi;
+	};
 	uint16_t		port;
 } netadr_t;
 
@@ -73,7 +76,7 @@ void	Sys_UnloadModuleLibrary(void *dllHandle);
 
 char	*Sys_GetCurrentUser( void );
 
-Q_NORETURN void Sys_Error( const char *error, ... );
+Q_NORETURN void Sys_Error( const char *error, ... ) __attribute__ ((format (printf, 1, 2)));
 Q_NORETURN void Sys_Quit (void);
 char	*Sys_GetClipboardData( void );	// note that this isn't journaled...
 
@@ -104,6 +107,7 @@ void		Sys_ShowIP(void);
 
 qboolean	Sys_Mkdir( const char *path );
 char	*Sys_Cwd( void );
+int			Sys_PID( void );
 
 char *Sys_DefaultInstallPath(void);
 char *Sys_DefaultAssetsPath();
@@ -118,8 +122,8 @@ const char *Sys_Basename( char *path );
 
 bool Sys_PathCmp( const char *path1, const char *path2 );
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs );
-void	Sys_FreeFileList( char **fileList );
+const char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs );
+void	Sys_FreeFileList( const char **fileList );
 //rwwRMG - changed to fileList to not conflict with list type
 
 time_t Sys_FileTime( const char *path );
@@ -127,6 +131,12 @@ time_t Sys_FileTime( const char *path );
 qboolean Sys_LowPhysicalMemory();
 
 void Sys_SetProcessorAffinity( void );
+
+int Sys_FLock(int fd, flockCmd_t cmd, qboolean nb);
+void Sys_PrintBacktrace(void);
+
+char *Sys_ResolvePath( char *path );
+char *Sys_RealPath( char *path );
 
 typedef enum graphicsApi_e
 {
@@ -169,10 +179,19 @@ typedef struct windowDesc_s
 	} gl;
 } windowDesc_t;
 
+typedef enum {
+	TBS_NORMAL,
+	TBS_ERROR,
+	TBS_NOTIFY,
+	TBS_INDETERMINATE,
+	TBS_PROGRESS
+} tbstate_t;
+
 window_t	WIN_Init( const windowDesc_t *desc, glconfig_t *glConfig );
 void		WIN_InitGammaMethod(glconfig_t *glConfig);
 void		WIN_Present( window_t *window );
 void		WIN_SetGamma( glconfig_t *glConfig, byte red[256], byte green[256], byte blue[256] );
+void		WIN_SetTaskbarState(tbstate_t state, uint64_t current, uint64_t total);
 void		WIN_Shutdown( void );
 void *		WIN_GL_GetProcAddress( const char *proc );
 void		GLimp_Minimize(void);

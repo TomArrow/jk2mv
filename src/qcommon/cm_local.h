@@ -1,6 +1,7 @@
 
-#include "../qcommon/q_shared.h"
 #include "qcommon.h"
+#include "qfiles.h"
+#include "cm_public.h"
 #include "cm_polylib.h"
 
 #define	MAX_SUBMODELS			256
@@ -133,7 +134,7 @@ typedef struct {
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues
-#define	SURFACE_CLIP_EPSILON	(0.125)
+#define	SURFACE_CLIP_EPSILON	0.125f
 
 extern	clipMap_t	cm;
 extern	int			c_pointcontents;

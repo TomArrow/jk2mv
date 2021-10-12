@@ -66,7 +66,8 @@ typedef struct {
 	int					mcomp[256];
 	byte				*qStatus[2][32768];
 
-	int				oldXOff, oldYOff, oldysize, oldxsize;
+	int					oldXOff, oldYOff;
+	unsigned int		oldysize, oldxsize;
 
 	int					currentHandle;
 } cinematics_t;
@@ -78,8 +79,8 @@ typedef struct {
 	qboolean			looping, holdAtEnd, dirty, alterGameState, silent, shader;
 	fileHandle_t		iFile;
 	e_status			status;
-	unsigned int		startTime;
-	unsigned int		lastTime;
+	int				startTime;
+	int				lastTime;
 	int				tfps;
 	int				RoQPlayed;
 	int				ROQSize;
@@ -560,8 +561,9 @@ static unsigned short yuv_to_rgb(int y, int u, int v)
 	g = (YY + ROQ_UG_tab[u] + ROQ_VG_tab[v]) >> 8;
 	b = (YY + ROQ_UB_tab[u]) >> 9;
 
-	if (r<0) r = 0; if (g<0) g = 0; if (b<0) b = 0;
-	if (r > 31) r = 31; if (g > 63) g = 63; if (b > 31) b = 31;
+	r = Com_Clampi(0, 31, r);
+	g = Com_Clampi(0, 63, g);
+	b = Com_Clampi(0, 31, b);
 
 	return (unsigned short)((r << 11) + (g << 5) + (b));
 }
@@ -581,8 +583,9 @@ static unsigned int yuv_to_rgb24(int y, int u, int v)
 	g = (YY + ROQ_UG_tab[u] + ROQ_VG_tab[v]) >> 6;
 	b = (YY + ROQ_UB_tab[u]) >> 6;
 
-	if (r<0) r = 0; if (g<0) g = 0; if (b<0) b = 0;
-	if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+	r = Com_Clampi(0, 255, r);
+	g = Com_Clampi(0, 255, g);
+	b = Com_Clampi(0, 255, b);
 
 	return LittleLong((r) | (g << 8) | (b << 16) | (255 << 24));
 }
@@ -1145,12 +1148,12 @@ redump:
 		if (cinTable[currentHandle].numQuads == -1) {
 			readQuadInfo(framedata);
 			setupQuad(0, 0);
-			cinTable[currentHandle].startTime = cinTable[currentHandle].lastTime = Sys_Milliseconds()*com_timescale->value;
+			cinTable[currentHandle].startTime = cinTable[currentHandle].lastTime = CL_ScaledMilliseconds();
 		}
 		if (cinTable[currentHandle].numQuads != 1) cinTable[currentHandle].numQuads = 0;
 		break;
 	case	ROQ_PACKET:
-		cinTable[currentHandle].inMemory = (qboolean)cinTable[currentHandle].roq_flags;
+		cinTable[currentHandle].inMemory = (qboolean)!!cinTable[currentHandle].roq_flags;
 		cinTable[currentHandle].RoQFrameSize = 0;		   // for header
 		break;
 	case	ROQ_QUAD_HANG:
@@ -1195,7 +1198,7 @@ redump:
 	}
 	if (cinTable[currentHandle].inMemory && (cinTable[currentHandle].status != FMV_EOF))
 	{
-		cinTable[currentHandle].inMemory = (qboolean)(((int)cinTable[currentHandle].inMemory) - 1);
+		cinTable[currentHandle].inMemory = qfalse;
 		framedata += 8;
 		goto redump;
 	}
@@ -1217,7 +1220,7 @@ redump:
 
 static void RoQ_init(void)
 {
-	cinTable[currentHandle].startTime = cinTable[currentHandle].lastTime = Sys_Milliseconds()*com_timescale->value;
+	cinTable[currentHandle].startTime = cinTable[currentHandle].lastTime = CL_ScaledMilliseconds();
 
 	cinTable[currentHandle].RoQPlayed = 24;
 
@@ -1348,11 +1351,11 @@ e_status CIN_RunCinematic(int handle)
 		return cinTable[currentHandle].status;
 	}
 
-	thisTime = Sys_Milliseconds()*com_timescale->value;
+	thisTime = CL_ScaledMilliseconds();
 	if (cinTable[currentHandle].shader && (abs((int)(thisTime - cinTable[currentHandle].lastTime)))>100) {
 		cinTable[currentHandle].startTime += thisTime - cinTable[currentHandle].lastTime;
 	}
-	cinTable[currentHandle].tfps = ((((Sys_Milliseconds()*com_timescale->value) - cinTable[currentHandle].startTime)*cinTable[currentHandle].roqFPS) / 1000);
+	cinTable[currentHandle].tfps = (((CL_ScaledMilliseconds() - cinTable[currentHandle].startTime)*cinTable[currentHandle].roqFPS) / 1000);
 
 	start = cinTable[currentHandle].startTime;
 	while ((cinTable[currentHandle].tfps != cinTable[currentHandle].numQuads)
@@ -1360,7 +1363,7 @@ e_status CIN_RunCinematic(int handle)
 	{
 		RoQInterrupt();
 		if (start != cinTable[currentHandle].startTime) {
-			cinTable[currentHandle].tfps = ((((Sys_Milliseconds()*com_timescale->value)
+			cinTable[currentHandle].tfps = (((CL_ScaledMilliseconds()
 				- cinTable[currentHandle].startTime)*cinTable[currentHandle].roqFPS) / 1000);
 			start = cinTable[currentHandle].startTime;
 		}
@@ -1377,6 +1380,7 @@ e_status CIN_RunCinematic(int handle)
 			RoQReset();
 		} else {
 			RoQShutdown();
+			return FMV_EOF;
 		}
 	}
 

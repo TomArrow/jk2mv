@@ -21,7 +21,9 @@
 //	#include "../qcommon/palette.h"
 #endif
 
+#include <list>
 
+using namespace std;
 
 #ifdef _STRIPED_
 
@@ -48,7 +50,7 @@ void LogFile(char *Text, ...)
 	FILE	*FH;
 
 	va_start (argptr,Text);
-	vsprintf (Buffer,Text,argptr);
+	Q_vsnprintf (Buffer,sizeof(Buffer),Text,argptr);
 	va_end (argptr);
 
 	FH = fopen("c:\\striped.log", "r+");
@@ -103,7 +105,7 @@ enum
 };
 
 
-char *Tokens[TK_END] =
+static const char * const Tokens[TK_END] =
 {
 	"VERSION",
 	"ID",
@@ -139,7 +141,7 @@ char *Tokens[TK_END] =
 };
 
 
-sFlagPair FlagPairs[] =
+const sFlagPair FlagPairs[] =
 {
 	{ TK_SP_FLAG1,		SP_FLAG1 },
 	{ TK_SP_FLAG2,		SP_FLAG2 },
@@ -154,7 +156,7 @@ sFlagPair FlagPairs[] =
 	{ TK_INVALID,				0 }
 };
 
-sFlagPair LanguagePairs[] =
+const sFlagPair LanguagePairs[] =
 {
 	{ TK_TEXT_LANGUAGE1,	SP_LANGUAGE_ENGLISH },
 	{ TK_TEXT_LANGUAGE2,	SP_LANGUAGE_FRENCH },
@@ -498,7 +500,7 @@ void cStrings::SetReference(char *newReference)
 
 bool cStrings::UnderstandToken(int token, char *data)
 {
-	sFlagPair		*FlagPair;
+	const sFlagPair		*FlagPair;
 
 	switch(token)
 	{
@@ -535,7 +537,7 @@ bool cStrings::UnderstandToken(int token, char *data)
 
 bool cStrings::SubSave(FILE *FH)
 {
-	sFlagPair	*FlagPair;
+	const sFlagPair	*FlagPair;
 
 	if (Flags)
 	{
@@ -649,7 +651,7 @@ void cStringsED::Clear(void)
 	}
 }
 
-void cStringsED::SetText(int index, char *newText)
+void cStringsED::SetText(unsigned int index, char *newText)
 {
 	if (Text[index])
 	{
@@ -886,7 +888,7 @@ static void FixIllegalChars(char *psText)
 
 bool cStringsSingle::UnderstandToken(int token, char *data)
 {
-	sFlagPair		*LanguagePair;
+	const sFlagPair		*LanguagePair;
 
 //	switch(token)
 //	{
@@ -907,7 +909,7 @@ bool cStringsSingle::UnderstandToken(int token, char *data)
 					SetText(data);
 					return true;
 				}
-				else if (LanguagePair->Name == token && LanguagePair->Value == (int)sp_language->value)
+				else if (LanguagePair->Name == token && (int)LanguagePair->Value == sp_language->integer)
 				{
 					if (LanguagePair->Name == TK_TEXT_LANGUAGE1 ||
 						LanguagePair->Name == TK_TEXT_LANGUAGE2 ||
@@ -1406,14 +1408,14 @@ cStringsSingle *cStringPackageSingle::FindString(char *ReferenceLookup)
 int cStringPackageSingle::FindStringID(const char *ReferenceLookup)
 {
 	map<string, int>::iterator	i;
-	int							size;
+	size_t						size;
 
 	if (!Reference)
 	{
 		return -1;
 	}
 
-	size = (int)strlen(Reference);
+	size = strlen(Reference);
 	if (strlen(ReferenceLookup) < size+2)
 	{
 		return -1;
@@ -1576,7 +1578,7 @@ void SP_Unload(unsigned char Registration)
 	for(i = SP_ListByName.begin(); i != SP_ListByName.end(); i = next)
 	{
 		next = i;
-		next++;
+		++next;
 
 		if ((*i).second->UnRegister(Registration))
 		{
@@ -1601,7 +1603,7 @@ int SP_GetStringID(const char *inReference)
 	Q_strncpyz(Reference, inReference, MAX_QPATH);
 	Q_strupr(Reference);
 
-	for(i = SP_ListByID.begin(); i != SP_ListByID.end(); i++)
+	for(i = SP_ListByID.begin(); i != SP_ListByID.end(); ++i)
 	{
 		ID = (*i).second->FindStringID(Reference);
 		if (ID >= 0)
@@ -1642,7 +1644,7 @@ cStringsSingle *SP_GetString(unsigned short ID)
 
 	if (!string)
 	{
-		Com_Error(ERR_DROP, "String ID %04x not defined\n", ID);
+		Com_Error(ERR_DROP, "String ID %04x not defined", ID);
 	}
 
 	return string;
@@ -1691,6 +1693,30 @@ const char *SP_GetStringTextString(const char *Reference)
 	return SP_GetStringText(index);
 }
 
+const qboolean SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize)
+{
+	if (dstsize <= 0)
+	{
+		return qfalse;
+	}
+
+	int index = SP_GetStringID(Reference);
+
+	if (index != -1)
+	{
+		cStringsSingle	*string = SP_GetString(index);;
+		char			*value = string->GetText();;
+
+		if (value)
+		{
+			Q_strncpyz(dst, value, dstsize);
+			return qtrue;
+		}
+	}
+
+	Q_strncpyz(dst, "??", dstsize);
+	return qfalse;
+}
 
 static void SP_UpdateLanguage(void)
 {
@@ -1699,7 +1725,7 @@ static void SP_UpdateLanguage(void)
 	list<cStringPackageID>::iterator						spit;
 
 	// Grab all SP ids
-	for(it = SP_ListByID.begin(); it != SP_ListByID.end(); it++)
+	for(it = SP_ListByID.begin(); it != SP_ListByID.end(); ++it)
 	{
 		sps.push_back(cStringPackageID((*it).second->GetName(), (*it).second->GetRegistration()));
 	}
@@ -1707,7 +1733,7 @@ static void SP_UpdateLanguage(void)
 	SP_Unload(SP_REGISTER_CLIENT | SP_REGISTER_SERVER | SP_REGISTER_MENU | SP_REGISTER_REQUIRED);
 
 	// Reinitialise with new language
-	for(spit = sps.begin(); spit != sps.end(); spit++)
+	for(spit = sps.begin(); spit != sps.end(); ++spit)
 	{
 		SP_Register((*spit).GetName(), (*spit).GetReg());
 	}
@@ -1716,7 +1742,7 @@ static void SP_UpdateLanguage(void)
 
 void SP_Init(void)
 {
-	sp_language = Cvar_Get("sp_language", va("%d", SP_LANGUAGE_ENGLISH), CVAR_ARCHIVE | CVAR_NORESTART);
+	sp_language = Cvar_Get("sp_language", va("%d", SP_LANGUAGE_ENGLISH), CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
 	sp_show_strip = Cvar_Get ("sp_show_strip", "0", 0);
 
 	SP_UpdateLanguage();

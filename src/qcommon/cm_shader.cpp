@@ -72,10 +72,10 @@ a single large text block that can be scanned for shader names
 
 void CM_LoadShaderFiles( void )
 {
-	char	**shaderFiles1;
+	const char	**shaderFiles1;
 	int		numShaders1;
 #ifndef FINAL_BUILD
-	char	**shaderFiles2;
+	const char	**shaderFiles2;
 	int		numShaders2;
 #endif
 	char	*buffers[MAX_SHADER_FILES];
@@ -283,7 +283,7 @@ void SV_ParseSurfaceParm( CCMShader * shader, const char **text )
 ParseMaterial
 =================
 */
-const char *svMaterialNames[MATERIAL_LAST] =
+static const char * const svMaterialNames[MATERIAL_LAST] =
 {
 	MATERIALS
 };
@@ -421,9 +421,9 @@ static void CM_ParseShader( CCMShader *shader, const char **text )
 			token = COM_ParseExt( text, qfalse );
 			b = DEG2RAD(atof( token ));
 
-			shader->sunDirection[0] = cos( a ) * cos( b );
-			shader->sunDirection[1] = sin( a ) * cos( b );
-			shader->sunDirection[2] = sin( b );
+			shader->sunDirection[0] = cosf( a ) * cosf( b );
+			shader->sunDirection[1] = sinf( a ) * cosf( b );
+			shader->sunDirection[2] = sinf( b );
 		}
 		else if ( !Q_stricmp( token, "surfaceParm" ) )
 		{

@@ -226,7 +226,7 @@ void QDECL ScriptError(script_t *script, char *str, ...)
 	if (script->flags & SCFL_NOERRORS) return;
 
 	va_start(ap, str);
-	vsprintf(text, str, ap);
+	Q_vsnprintf(text, sizeof(text), str, ap);
 	va_end(ap);
 #ifdef BOTLIB
 	botimport.Print(PRT_ERROR, "file %s, line %d: %s\n", script->filename, script->line, text);
@@ -252,7 +252,7 @@ void QDECL ScriptWarning(script_t *script, char *str, ...)
 	if (script->flags & SCFL_NOWARNINGS) return;
 
 	va_start(ap, str);
-	vsprintf(text, str, ap);
+	Q_vsnprintf(text, sizeof(text), str, ap);
 	va_end(ap);
 #ifdef BOTLIB
 	botimport.Print(PRT_WARNING, "file %s, line %d: %s\n", script->filename, script->line, text);
@@ -980,7 +980,7 @@ int PS_ExpectTokenType(script_t *script, int type, int subtype, token_t *token)
 		if (token->subtype != subtype)
 		{
 			ScriptError(script, "expected %s, found %s",
-							script->punctuations[subtype], token->string);
+							script->punctuations[subtype].p, token->string);
 			return 0;
 		} //end if
 	} //end else if
@@ -1369,7 +1369,7 @@ int MV_MenuPatchFile(const char *in, unsigned long inhash, const char *patch, ch
 					currline.vline = 0;
 					*it = currline;
 
-					it++;
+					++it;
 					currline = patchfile.at(++i);
 				}
 			} else {
@@ -1379,12 +1379,12 @@ int MV_MenuPatchFile(const char *in, unsigned long inhash, const char *patch, ch
 	}
 
 	int outlen = 0;
-	for (int i = 0; i < menufile.size(); i++) {
+	for (size_t i = 0; i < menufile.size(); i++) {
 		outlen += (int)menufile.at(i).str.length() + 1; // text + ( \n or 0x00 )
 	}
 
 	*out = (char *)GetMemory(outlen + 1);
-	for (int i = 0; i < menufile.size(); i++) {
+	for (size_t i = 0; i < menufile.size(); i++) {
 		strcat(*out, menufile.at(i).str.c_str());
 		strcat(*out, "\n");
 	}
@@ -1525,7 +1525,7 @@ script_t *LoadScriptFile(const char *filename) {
 // Returns:				-
 // Changes Globals:		-
 //============================================================================
-script_t *LoadScriptMemory(char *ptr, int length, char *name)
+script_t *LoadScriptMemory(const char *ptr, int length, const char *name)
 {
 	void *buffer;
 	script_t *script;

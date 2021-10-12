@@ -3,7 +3,7 @@
 #include "tr_local.h"
 
 
-#define	WAVEVALUE( table, base, amplitude, phase, freq )  ((base) + table[ Q_ftol( ( ( (phase) + tess.shaderTime * (freq) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * (amplitude))
+#define	WAVEVALUE( table, base, amplitude, phase, freq )  ((base) + table[ Q_dtol( ( ( (phase) + tess.shaderTime * (freq) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * (amplitude))
 
 static float *TableForFunc( genFunc_t func )
 {
@@ -24,7 +24,7 @@ static float *TableForFunc( genFunc_t func )
 		break;
 	}
 
-	ri.Error( ERR_DROP, "TableForFunc called with invalid function '%d' in shader '%s'\n", func, tess.shader->name );
+	ri.Error( ERR_DROP, "TableForFunc called with invalid function '%d' in shader '%s'", func, tess.shader->name );
 	return NULL;
 }
 
@@ -232,15 +232,14 @@ void RB_CalcBulgeVertexes( deformStage_t *ds )
 	{
 		// I guess do some extra dumb stuff..the fact that it uses ST seems bad though because skin pages may be set up in certain ways that can cause
 		//	very noticeable seams on sufaces ( like on the huge ion_cannon ).
-		const float *st = ( const float * ) tess.texCoords[0];
-		float		now;
-		int			off;
+		double		now;
+		int64_t		off;
 
-		now = backEnd.refdef.time * ds->bulgeSpeed * 0.001f;
+		now = backEnd.refdef.time * 0.001 * ds->bulgeSpeed;
 
-		for ( i = 0; i < tess.numVertexes; i++, xyz += 4, st += 2 * NUM_TEX_COORDS, normal += 4 )
+		for ( i = 0; i < tess.numVertexes; i++, xyz += 4, normal += 4 )
 		{
-			off = (float)( FUNCTABLE_SIZE / (M_PI*2) ) * ( st[0] * ds->bulgeWidth + now );
+			off = ( FUNCTABLE_SIZE / (M_PI * 2) ) * ( tess.texCoords[0][i][0] * ds->bulgeWidth + now );
 
 			scale = tr.sinTable[ off & FUNCTABLE_MASK ] * ds->bulgeHeight;
 
@@ -447,7 +446,7 @@ Autosprite2Deform
 Autosprite2 will pivot a rectangular quad along the center of its long axis
 =====================
 */
-int edgeVerts[6][2] = {
+static const int edgeVerts[6][2] = {
 	{ 0, 1 },
 	{ 0, 2 },
 	{ 0, 3 },
@@ -536,13 +535,13 @@ static void Autosprite2Deform( void ) {
 			v1 = xyz + 4 * edgeVerts[nums[j]][0];
 			v2 = xyz + 4 * edgeVerts[nums[j]][1];
 
-			l = 0.5 * sqrt( lengths[j] );
+			l = 0.5f * sqrtf( lengths[j] );
 
 			// we need to see which direction this edge
 			// is used to determine direction of projection
 			for ( k = 0 ; k < 5 ; k++ ) {
-				if ( tess.indexes[ indexes + k ] == i + edgeVerts[nums[j]][0]
-					&& tess.indexes[ indexes + k + 1 ] == i + edgeVerts[nums[j]][1] ) {
+				if ( tess.indexes[ indexes + k ] == (glIndex_t)(i + edgeVerts[nums[j]][0])
+					&& tess.indexes[ indexes + k + 1 ] == (glIndex_t)(i + edgeVerts[nums[j]][1]) ) {
 					break;
 				}
 			}
@@ -570,7 +569,7 @@ void RB_DeformTessGeometry( void ) {
 	deformStage_t	*ds;
 
 	for ( i = 0 ; i < tess.shader->numDeforms ; i++ ) {
-		ds = &tess.shader->deforms[ i ];
+		ds = tess.shader->deforms[ i ];
 
 		switch ( ds->deformation ) {
         case DEFORM_NONE:
@@ -757,7 +756,7 @@ void RB_CalcModulateColorsByFog( unsigned char *colors ) {
 	RB_CalcFogTexCoords( texCoords[0] );
 
 	for ( i = 0; i < tess.numVertexes; i++, colors += 4 ) {
-		float f = 1.0 - R_FogFactor( texCoords[i][0], texCoords[i][1] );
+		float f = 1.0f - R_FogFactor( texCoords[i][0], texCoords[i][1] );
 		colors[0] *= f;
 		colors[1] *= f;
 		colors[2] *= f;
@@ -777,7 +776,7 @@ void RB_CalcModulateAlphasByFog( unsigned char *colors ) {
 	RB_CalcFogTexCoords( texCoords[0] );
 
 	for ( i = 0; i < tess.numVertexes; i++, colors += 4 ) {
-		float f = 1.0 - R_FogFactor( texCoords[i][0], texCoords[i][1] );
+		float f = 1.0f - R_FogFactor( texCoords[i][0], texCoords[i][1] );
 		colors[3] *= f;
 	}
 }
@@ -795,7 +794,7 @@ void RB_CalcModulateRGBAsByFog( unsigned char *colors ) {
 	RB_CalcFogTexCoords( texCoords[0] );
 
 	for ( i = 0; i < tess.numVertexes; i++, colors += 4 ) {
-		float f = 1.0 - R_FogFactor( texCoords[i][0], texCoords[i][1] );
+		float f = 1.0f - R_FogFactor( texCoords[i][0], texCoords[i][1] );
 		colors[0] *= f;
 		colors[1] *= f;
 		colors[2] *= f;
@@ -858,6 +857,8 @@ void RB_CalcFogTexCoords( float *st ) {
 
 		eyeT = DotProduct( backEnd.ori.viewOrigin, fogDepthVector ) + fogDepthVector[3];
 	} else {
+		fogDepthVector[0] = fogDepthVector[1] = fogDepthVector[2] = fogDepthVector[3] = 0.0f;
+
 		eyeT = 1;	// non-surface fog always has eye inside
 	}
 
@@ -870,27 +871,26 @@ void RB_CalcFogTexCoords( float *st ) {
 		eyeOutside = qfalse;
 	}
 
-	fogDistanceVector[3] += 1.0/512;
+	fogDistanceVector[3] += 1.0f/512;
 
 	// calculate density for each point
 	for (i = 0, v = tess.xyz[0] ; i < tess.numVertexes ; i++, v += 4) {
 		// calculate the length in fog
-		assert( fog->hasSurface );
 		s = DotProduct( v, fogDistanceVector ) + fogDistanceVector[3];
 		t = DotProduct( v, fogDepthVector ) + fogDepthVector[3];
 
 		// partially clipped fogs use the T axis
 		if ( eyeOutside ) {
-			if ( t < 1.0 ) {
-				t = 1.0/32;	// point is outside, so no fogging
+			if ( t < 1.0f || t == eyeT ) {
+				t = 1.0f/32;	// point is outside, so no fogging
 			} else {
-				t = 1.0/32 + 30.0/32 * t / ( t - eyeT );	// cut the distance at the fog plane
+				t = 1.0f/32 + 30.0f/32 * t / ( t - eyeT );	// cut the distance at the fog plane
 			}
 		} else {
 			if ( t < 0 ) {
-				t = 1.0/32;	// point is outside, so no fogging
+				t = 1.0f/32;	// point is outside, so no fogging
 			} else {
-				t = 31.0/32;
+				t = 31.0f/32;
 			}
 		}
 
@@ -926,8 +926,8 @@ void RB_CalcEnvironmentTexCoords( float *st )
 		reflected[1] = normal[1]*2*d - viewer[1];
 		reflected[2] = normal[2]*2*d - viewer[2];
 
-		st[0] = 0.5 + reflected[1] * 0.5;
-		st[1] = 0.5 - reflected[2] * 0.5;
+		st[0] = 0.5f + reflected[1] * 0.5f;
+		st[1] = 0.5f - reflected[2] * 0.5f;
 	}
 }
 
@@ -937,7 +937,7 @@ void RB_CalcEnvironmentTexCoords( float *st )
 void RB_CalcTurbulentTexCoords( const waveForm_t *wf, float *st )
 {
 	int i;
-	float now;
+	double now;
 
 	now = ( wf->phase + tess.shaderTime * wf->frequency );
 
@@ -946,8 +946,8 @@ void RB_CalcTurbulentTexCoords( const waveForm_t *wf, float *st )
 		float s = st[0];
 		float t = st[1];
 
-		st[0] = s + tr.sinTable[ ( ( int ) ( ( ( tess.xyz[i][0] + tess.xyz[i][2] )* 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
-		st[1] = t + tr.sinTable[ ( ( int ) ( ( tess.xyz[i][1] * 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
+		st[0] = s + tr.sinTable[ ( ( int64_t ) ( ( ( tess.xyz[i][0] + tess.xyz[i][2] )* (1.0 / 128 * 0.125) + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
+		st[1] = t + tr.sinTable[ ( ( int64_t ) ( ( tess.xyz[i][1] * (1.0 / 128 * 0.125) + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
 	}
 }
 
@@ -971,8 +971,8 @@ void RB_CalcScaleTexCoords( const float scale[2], float *st )
 void RB_CalcScrollTexCoords( const float scrollSpeed[2], float *st )
 {
 	int i;
-	float timeScale = tess.shaderTime;
-	float adjustedScrollS, adjustedScrollT;
+	double timeScale = tess.shaderTime;
+	double adjustedScrollS, adjustedScrollT;
 
 	adjustedScrollS = scrollSpeed[0] * timeScale;
 	adjustedScrollT = scrollSpeed[1] * timeScale;
@@ -1011,25 +1011,25 @@ void RB_CalcTransformTexCoords( const texModInfo_t *tmi, float *st  )
 */
 void RB_CalcRotateTexCoords( float degsPerSecond, float *st )
 {
-	float timeScale = tess.shaderTime;
-	float degs;
-	int index;
+	double timeScale = tess.shaderTime;
+	double degs;
+	int64_t index;
 	float sinValue, cosValue;
 	texModInfo_t tmi;
 
 	degs = -degsPerSecond * timeScale;
-	index = degs * ( FUNCTABLE_SIZE / 360.0f );
+	index = degs * ( FUNCTABLE_SIZE / 360.0 );
 
 	sinValue = tr.sinTable[ index & FUNCTABLE_MASK ];
 	cosValue = tr.sinTable[ ( index + FUNCTABLE_SIZE / 4 ) & FUNCTABLE_MASK ];
 
 	tmi.matrix[0][0] = cosValue;
 	tmi.matrix[1][0] = -sinValue;
-	tmi.translate[0] = 0.5 - 0.5 * cosValue + 0.5 * sinValue;
+	tmi.translate[0] = 0.5f - 0.5f * cosValue + 0.5f * sinValue;
 
 	tmi.matrix[0][1] = sinValue;
 	tmi.matrix[1][1] = cosValue;
-	tmi.translate[1] = 0.5 - 0.5 * sinValue - 0.5 * cosValue;
+	tmi.translate[1] = 0.5f - 0.5f * sinValue - 0.5f * cosValue;
 
 	RB_CalcTransformTexCoords( &tmi, st );
 }

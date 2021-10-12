@@ -6,10 +6,10 @@
 #define SERVER_H_INC
 
 
-#include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../game/g_public.h"
 #include "../game/bg_public.h"
+#include "../qcommon/cm_public.h"
 
 #include "../api/mvapi.h"
 
@@ -48,20 +48,21 @@ typedef struct {
 	int				timeResidual;		// <= 1000 / sv_frame->value
 	int				nextFrameTime;		// when time > nextFrameTime, process world
 	struct cmodel_s	*models[MAX_MODELS];
-	char			*configstrings[MAX_CONFIGSTRINGS];
+	const char		*configstrings[MAX_CONFIGSTRINGS];
 	svEntity_t		svEntities[MAX_GENTITIES];
 
-	char			*entityParsePoint;	// used during game VM init
+	const char		*entityParsePoint;	// used during game VM init
 
 	// the game virtual machine will update these on init and changes
 	sharedEntity_t	*gentities;
 	int				gentitySize;
 	int				num_entities;		// current number, <= MAX_GENTITIES
 
-	playerState_t	*gameClients;
+	void			*gameClients;
 	int				gameClientSize;		// will be > sizeof(playerState_t) due to game private data
 
 	int				restartTime;
+	int				time;				// game module physics time
 
 	int				http_port;
 	int				saberBlockCounter;	// for mv_fixturretcrash
@@ -70,7 +71,10 @@ typedef struct {
 	mvsharedEntity_t *gentitiesMV;
 	int				  gentitySizeMV;
 
-	mvfix_t			fixes;
+	int				fixes;
+	int				resetServerTime;	// Reset sv.time on map change.
+										// 0 = cvar, 1 = always, 2 = never
+	qboolean		vmPlayerSnapshots;
 } server_t;
 
 typedef struct {
@@ -108,10 +112,15 @@ typedef enum {
 	CS_ACTIVE		// client is fully in game
 } clientState_t;
 
+typedef struct leakyBucket_s {
+	int					lastTime;
+	unsigned short		burst;
+} leakyBucket_t;
 
 typedef struct client_s {
 	clientState_t	state;
 	char			userinfo[MAX_INFO_STRING];		// name, etc
+	char			userinfoPostponed[MAX_INFO_STRING];
 
 	char			reliableCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
 	int				reliableSequence;		// last added reliable message, not necesarily sent or acknowledged yet
@@ -155,6 +164,8 @@ typedef struct client_s {
 	int				snapshotMsec;		// requests a snapshot every snapshotMsec unless rate choked
 	int				pureAuthentic;
 	netchan_t		netchan;
+	int				oldServerTime;		// client server time before map change
+	leakyBucket_t	cmdBucket;			// for command flood protection
 
 	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
@@ -172,15 +183,12 @@ typedef struct client_s {
 // while not allowing a single ip to grab all challenge resources
 #define MAX_CHALLENGES_MULTI (MAX_CHALLENGES / 2)
 
-#define	AUTHORIZE_TIMEOUT	5000
-
 typedef struct challenge_s {
 	netadr_t	adr;
 	int			challenge;
 	int			clientChallenge;		// challenge number coming from the client
 	int			time;				// time the last packet was sent to the autherize server
 	int			pingTime;			// time the challenge response was sent to client
-	int			firstTime;			// time the adr was first used, for authorize timeout checks
 	qboolean	wasrefused;
 	qboolean	connected;
 } challenge_t;
@@ -205,7 +213,10 @@ typedef struct {
 	challenge_t	challenges[MAX_CHALLENGES];	// to prevent invalid IPs from connecting
 	netadr_t	redirectAddress;			// for rcon return messages
 
-	netadr_t	authorizeAddress;			// for rcon return messages
+	struct {
+		bool enabled;
+		int disableUntil;
+	} hibernation;							// handle hibernation mode data
 } serverStatic_t;
 
 //=============================================================================
@@ -233,7 +244,12 @@ extern	cvar_t	*sv_killserver;
 extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
+extern	cvar_t	*sv_minSnaps;
+extern	cvar_t	*sv_maxSnaps;
+extern	cvar_t	*sv_enforceSnaps;
+extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
+extern	cvar_t	*sv_maxOOBRate;
 extern	cvar_t	*sv_minPing;
 extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
@@ -242,6 +258,11 @@ extern	cvar_t	*sv_floodProtect;
 extern	cvar_t	*sv_allowAnonymous;
 extern	cvar_t	*sv_needpass;
 extern	cvar_t	*mv_serverversion;
+extern	cvar_t	*sv_hibernateFps;
+extern	cvar_t	*mv_apiConnectionless;
+extern	cvar_t	*sv_pingFix;
+extern	cvar_t	*sv_autoWhitelist;
+extern	cvar_t	*sv_dynamicSnapshots;
 
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
@@ -252,35 +273,18 @@ extern	cvar_t	*mv_fixturretcrash;
 extern	cvar_t	*mv_blockchargejump;
 extern	cvar_t	*mv_blockspeedhack;
 extern	cvar_t	*mv_fixsaberstealing;
+extern	cvar_t	*mv_fixplayerghosting;
+
+// jk2mv engine flags
+extern	cvar_t	*mv_resetServerTime;
 
 //===========================================================
 
 //
 // sv_main.c
 //
-typedef struct leakyBucket_s leakyBucket_t;
-struct leakyBucket_s {
-	netadrtype_t	type;
-
-	union {
-		byte	_4[4];
-	} ipv;
-
-	int					lastTime;
-	signed char			burst;
-
-	int					hash;
-
-	leakyBucket_t *prev, *next;
-};
-
-extern leakyBucket_t outboundLeakyBucket;
-
-qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period);
-qboolean SVC_RateLimitAddress(netadr_t from, int burst, int period);
-
 void SV_FinalMessage (char *message);
-void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
+void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 
 void SV_AddOperatorCommands (void);
@@ -290,10 +294,14 @@ void SV_RemoveOperatorCommands (void);
 void SV_MasterHeartbeat (void);
 void SV_MasterShutdown (void);
 
-qboolean MVAPI_GetConnectionlessPacket(mvaddr_t *addr, char *buf, unsigned int bufsize);
+qboolean MVAPI_GetConnectionlessPacket(mvaddr_t *addr, char *buf, int bufsize);
 qboolean MVAPI_SendConnectionlessPacket(const mvaddr_t *addr, const char *message);
 qboolean MVAPI_DisableStructConversion(qboolean disable);
 extern qboolean mvStructConversionDisabled;
+
+qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period, int now);
+void SVC_LoadWhitelist( void );
+void SVC_WhitelistAdr( netadr_t adr );
 
 //
 // sv_init.c
@@ -317,8 +325,6 @@ void SV_GetChallenge( netadr_t from );
 
 void SV_DirectConnect( netadr_t from );
 
-void SV_AuthorizeIpPacket( netadr_t from );
-
 void SV_SendClientMapChange( client_t *client );
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg );
 void SV_UserinfoChanged( client_t *cl );
@@ -327,9 +333,14 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
 void SV_DropClient( client_t *drop, const char *reason );
 
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK );
-void SV_ClientThink (client_t *cl, usercmd_t *cmd);
+void SV_ClientThink (int client, const usercmd_t *cmd);
 
 void SV_WriteDownloadToClient( client_t *cl , msg_t *msg );
+void SV_CloseDownload( client_t *cl );
+
+int SV_ClientRate( client_t *client );
+int SV_ClientSnaps( client_t *client );
+void SV_ClientUpdateSnaps( client_t *client );
 
 //
 // sv_ccmds.c
@@ -341,6 +352,7 @@ void SV_Heartbeat_f( void );
 //
 void SV_AddServerCommand( client_t *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
+qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, client_t *client );
 void SV_SendClientMessages( void );
@@ -360,7 +372,8 @@ void		SV_ShutdownGameProgs ( void );
 void		SV_RestartGameProgs( void );
 qboolean	SV_inPVS (const vec3_t p1, const vec3_t p2);
 
-qboolean SV_MVAPI_ControlFixes(mvfix_t fixes);
+qboolean SV_MVAPI_ControlFixes(int fixes);
+qboolean SV_MVAPI_EnablePlayerSnapshots(qboolean enable);
 
 //
 // sv_bot.c
@@ -373,12 +386,12 @@ void		SV_BotInitCvars(void);
 int			SV_BotLibSetup( void );
 int			SV_BotLibShutdown( void );
 int			SV_BotGetSnapshotEntity( int client, int ent );
-int			SV_BotGetConsoleMessage( int client, char *buf, int size );
+qboolean	SV_BotGetConsoleMessage( int client, char *buf, int size );
 
 void *Bot_GetMemoryGame(int size);
 void Bot_FreeMemoryGame(void *ptr);
 
-int BotImport_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
+int BotImport_DebugPolygonCreate(int color, int numPoints, const vec3_t *points);
 void BotImport_DebugPolygonDelete(int id);
 
 //============================================================
@@ -420,7 +433,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule, int traceFlags, int useLod );
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod );
 // mins and maxs are relative
 
 // if the entire move stays in a solid volume, trace.allsolid will be set,
@@ -432,7 +445,7 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 // passEntityNum is explicitly excluded from clipping checks (normally ENTITYNUM_NONE)
 
 
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, int capsule );
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule );
 // clip to a specific entity
 
 //

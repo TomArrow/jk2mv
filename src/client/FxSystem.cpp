@@ -38,14 +38,14 @@ void SFxHelper::Print( const char *msg, ... )
 	char		text[1024];
 
 	va_start( argptr, msg );
-	vsprintf( text, msg, argptr );
+	Q_vsnprintf( text, sizeof(text), msg, argptr );
 	va_end( argptr );
 
 	Com_DPrintf( "%s", text );
 }
 
 //------------------------------------------------------
-void SFxHelper::AdjustTime_Pos( int time, vec3_t refdef_vieworg, vec3_t refdef_viewaxis[3] )
+void SFxHelper::AdjustTime_Pos( int time, const vec3_t refdef_vieworg, const vec3_t refdef_viewaxis[3] )
 {
 	if ( fx_freeze.integer )
 	{

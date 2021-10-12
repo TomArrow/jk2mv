@@ -3,8 +3,17 @@
 #include <float.h>
 #include <io.h>
 #include <shlobj.h>
+#include <Shobjidl.h>
+#include <mv_setup.h>
+#include <signal.h>
+#include <string>
+#include <StackWalker.h>
+#include "con_local.h"
+#include "../qcommon/vm_local.h"
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
+
+void Sys_CrashSignalHandler(int signal);
 
 char *Sys_GetCurrentUser( void )
 {
@@ -102,7 +111,7 @@ DIRECTORY SCANNING
 
 #define	MAX_FOUND_FILES	0x1000
 
-void Sys_ListFilteredFiles(const char *basedir, char *subdirs, char *filter, char **psList, int *numfiles) {
+static void Sys_ListFilteredFiles(const char *basedir, char *subdirs, char *filter, const char **psList, int *numfiles) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	HANDLE		findhandle;
@@ -140,39 +149,26 @@ void Sys_ListFilteredFiles(const char *basedir, char *subdirs, char *filter, cha
 		Com_sprintf(filename, sizeof(filename), "%s\\%s", subdirs, findinfo.cFileName);
 		if (!Com_FilterPath(filter, filename, qfalse))
 			continue;
-		psList[*numfiles] = CopyString(filename);
+		psList[*numfiles] = CopyString(filename, TAG_LISTFILES);
 		(*numfiles)++;
 	} while (FindNextFileA(findhandle, &findinfo) != 0);
 
 	FindClose(findhandle);
 }
 
-static qboolean strgtr(const char *s0, const char *s1) {
-	int l0, l1, i;
+/*
+================
+Sys_ListFiles
 
-	l0 = (int)strlen(s0);
-	l1 = (int)strlen(s1);
-
-	if (l1<l0) {
-		l0 = l1;
-	}
-
-	for (i = 0; i<l0; i++) {
-		if (s1[i] > s0[i]) {
-			return qtrue;
-		}
-		if (s1[i] < s0[i]) {
-			return qfalse;
-		}
-	}
-	return qfalse;
-}
-
-char **Sys_ListFiles(const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs) {
+Both level pointers in return value must be freed using Z_Free()
+unless they are NULL pointers
+================
+*/
+const char **Sys_ListFiles(const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs) {
 	char		search[MAX_OSPATH];
 	int			nfiles;
-	char		**listCopy;
-	char		*list[MAX_FOUND_FILES];
+	const char	**listCopy;
+	const char	*list[MAX_FOUND_FILES];
 	HANDLE		findhandle;
 	WIN32_FIND_DATAA findinfo;
 	int			flag;
@@ -189,7 +185,7 @@ char **Sys_ListFiles(const char *directory, const char *extension, char *filter,
 		if (!nfiles)
 			return NULL;
 
-		listCopy = (char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
+		listCopy = (const char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
 		for (i = 0; i < nfiles; i++) {
 			listCopy[i] = list[i];
 		}
@@ -226,7 +222,7 @@ char **Sys_ListFiles(const char *directory, const char *extension, char *filter,
 			if (nfiles == MAX_FOUND_FILES - 1) {
 				break;
 			}
-			list[nfiles] = CopyString(findinfo.cFileName);
+			list[nfiles] = CopyString(findinfo.cFileName, TAG_LISTFILES);
 			nfiles++;
 		}
 	} while (FindNextFileA(findhandle, &findinfo) != 0);
@@ -242,28 +238,16 @@ char **Sys_ListFiles(const char *directory, const char *extension, char *filter,
 		return NULL;
 	}
 
-	listCopy = (char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
+	listCopy = (const char **)Z_Malloc((nfiles + 1) * sizeof(*listCopy), TAG_LISTFILES);
 	for (i = 0; i < nfiles; i++) {
 		listCopy[i] = list[i];
 	}
 	listCopy[i] = NULL;
 
-	do {
-		flag = 0;
-		for (i = 1; i<nfiles; i++) {
-			if (strgtr(listCopy[i - 1], listCopy[i])) {
-				char *temp = listCopy[i];
-				listCopy[i] = listCopy[i - 1];
-				listCopy[i - 1] = temp;
-				flag = 1;
-			}
-		}
-	} while (flag);
-
 	return listCopy;
 }
 
-void	Sys_FreeFileList(char **psList) {
+void	Sys_FreeFileList(const char **psList) {
 	int		i;
 
 	if (!psList) {
@@ -271,7 +255,7 @@ void	Sys_FreeFileList(char **psList) {
 	}
 
 	for (i = 0; psList[i]; i++) {
-		Z_Free(psList[i]);
+		Z_Free((void *)psList[i]);
 	}
 
 	Z_Free(psList);
@@ -313,7 +297,7 @@ Used to load a module (jk2mpgame, cgame, ui) dll
 void *Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, intptr_t(QDECL **entryPoint)(int, ...), intptr_t(QDECL *systemcalls)(intptr_t, ...)) {
 	HMODULE	libHandle;
 	void	(QDECL *dllEntry)(intptr_t(QDECL *syscallptr)(intptr_t, ...));
-	char	*path, *filePath;
+	const char	*path, *filePath;
 	char	filename[MAX_QPATH];
 
 	Com_sprintf(filename, sizeof(filename), "%s_" ARCH_STRING "." LIBRARY_EXTENSION, name);
@@ -410,7 +394,9 @@ int Sys_Milliseconds2(void) {
 
 static UINT timerResolution = 0;
 
-void Sys_PlatformInit(void) {
+ITaskbarList3 *win_taskbar;
+
+void Sys_PlatformInit(int argc, char *argv[]) {
 	TIMECAPS ptc;
 	if (timeGetDevCaps(&ptc, sizeof(ptc)) == MMSYSERR_NOERROR)
 	{
@@ -425,7 +411,72 @@ void Sys_PlatformInit(void) {
 		timeBeginPeriod(timerResolution);
 	} else
 		timerResolution = 0;
+
+#ifndef DEDICATED
+	// Win7+ Taskbar features
+	CoInitialize(NULL);
+	CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList3, (void **)&win_taskbar);
+#endif
 }
+
+void Sys_SetTaskbarState(void *win_handle, tbstate_t state, uint64_t current, uint64_t total) {
+	if (!win_taskbar) return;
+
+	HWND hwnd = (HWND)win_handle;
+
+	switch (state) {
+	case TBS_NORMAL:
+		win_taskbar->SetProgressState(hwnd, TBPF_NOPROGRESS);
+		break;
+	case TBS_ERROR:
+		win_taskbar->SetProgressValue(hwnd, 100, 100);
+		win_taskbar->SetProgressState(hwnd, TBPF_ERROR);
+		break;
+	case TBS_INDETERMINATE:
+		win_taskbar->SetProgressState(hwnd, TBPF_INDETERMINATE);
+		break;
+	case TBS_PROGRESS:
+		win_taskbar->SetProgressState(hwnd, TBPF_NORMAL);
+		win_taskbar->SetProgressValue(hwnd, current, total);
+		break;
+	case TBS_NOTIFY:
+		FlashWindow(hwnd, FALSE);
+		break;
+	}
+}
+
+int Sys_FLock(int fd, flockCmd_t cmd, qboolean nb) {
+	HANDLE h = (HANDLE) _get_osfhandle(fd);
+	OVERLAPPED ovlp = { 0 };
+	DWORD lower = 1;
+	DWORD upper = 0;
+	DWORD flags = 0;
+	int res;
+
+	if (h == INVALID_HANDLE_VALUE) {
+		return -1;
+	}
+
+	if (nb) {
+		flags |= LOCKFILE_FAIL_IMMEDIATELY;
+	}
+
+	switch (cmd) {
+	case FLOCK_EX:
+		flags |= LOCKFILE_EXCLUSIVE_LOCK;
+		// fall-through
+	case FLOCK_SH:
+		res = LockFileEx(h, flags, 0, lower, upper, &ovlp);
+		break;
+	case FLOCK_UN:
+		res = UnlockFile(h, 0, 0, lower, upper);
+		break;
+	}
+
+	return res ? 0 : -1;
+}
+
+void Sys_PrintBacktrace(void) {}
 
 void Sys_PlatformExit(void)
 {
@@ -448,32 +499,6 @@ void Sys_PlatformExit(void)
   #define ESP "%%esp"
   #define EDI "%%edi"
 #endif
-
-long Q_ftol(float f) {
-    long retval;
-
-    __asm__ volatile (
-        "cvttss2si %1, %0\n"
-        : "=r" (retval)
-        : "x" (f)
-    );
-
-    return retval;
-}
-
-int Q_VMftol() {
-    int retval;
-
-    __asm__ volatile (
-        "movss (" EDI ", " EBX ", 4), %%xmm0\n"
-        "cvttss2si %%xmm0, %0\n"
-        : "=r" (retval)
-        :
-        : "%xmm0"
-    );
-
-    return retval;
-}
 
 static unsigned char ssemask[16] __attribute__((aligned(16))) = {
 	"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00"
@@ -498,3 +523,182 @@ void Sys_SnapVector(vec3_t vec) {
 
 }
 #endif
+
+/*
+==============================================================
+
+Crash Handling
+
+==============================================================
+*/
+#if defined(_MSC_VER) && !defined(_DEBUG)
+
+DWORD exception_type;
+std::string callstack_str, modules_str;
+
+class MVStackWalker : public StackWalker
+{
+public:
+	MVStackWalker() : StackWalker(RetrieveSymbol | RetrieveLine | SymBuildPath, VM_SymbolForCompiledPointer) {}
+protected:
+	virtual void OnOutput(LPCSTR szText) {
+		switch (otype) {
+		case OutputType::OTYPE_MODULE:
+			modules_str.append(szText);
+			break;
+		case OutputType::OTYPE_CALLSTACK:
+			callstack_str.append(szText);
+			break;
+		}
+	}
+
+	virtual void OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr) {}
+};
+
+LONG WINAPI Sys_NoteException(EXCEPTION_POINTERS* pExp, DWORD dwExpCode) {
+	callstack_str.clear();
+	modules_str.clear();
+	exception_type = dwExpCode;
+
+	MVStackWalker sw;
+	sw.ShowCallstack(GetCurrentThread(), pExp->ContextRecord);
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+void Sys_WriteCrashlog() {
+	time_t		rawtime;
+	char		timeStr[32];
+	char		crashlogName[MAX_OSPATH];
+	char		*path;
+	FILE		*f = NULL;
+
+	time(&rawtime);
+	strftime(timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", localtime(&rawtime)); // or gmtime
+	Com_sprintf(crashlogName, sizeof(crashlogName), "crashlog-%s.txt", timeStr);
+	path = FS_BuildOSPath(Sys_DefaultHomePath(), crashlogName);
+
+	FS_CreatePath(Sys_DefaultHomePath());
+	f = fopen(path, "wb");
+
+	if (f == NULL) {
+		f = fopen(crashlogName, "wb");
+		path = crashlogName;
+	}
+
+	if (f == NULL) {
+		f = stderr;
+		path = "stderr";
+	}
+
+	fprintf(f, "---JK2MV Crashlog-----------------------\n");
+	fprintf(f, "Date:               %s", ctime(&rawtime));
+	fprintf(f, "Build Version:      " JK2MV_VERSION "\n");
+#if defined(PORTABLE)
+	fprintf(f, "Build Type:         Portable");
+#else
+	fprintf(f, "Build Type:         Installed");
+#endif
+#if defined(DEDICATED)
+	fprintf(f, ", Dedicated\n");
+#else
+	fprintf(f, ", Client\n");
+#endif
+	fprintf(f, "Build Date:         " __DATE__ " " __TIME__ "\n");
+	fprintf(f, "Build Platform:     " PLATFORM_STRING "\n");
+
+	fprintf(f, "\n");
+
+	fprintf(f, "Exception Type: ");
+	switch (exception_type) {
+	case EXCEPTION_ACCESS_VIOLATION:         fprintf(f, "Access Violation"); break;
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:    fprintf(f, "Range Check"); break;
+	case EXCEPTION_BREAKPOINT:               fprintf(f, "Breakpoint"); break;
+	case EXCEPTION_DATATYPE_MISALIGNMENT:    fprintf(f, "Datatype misaligment"); break;
+	case EXCEPTION_ILLEGAL_INSTRUCTION:      fprintf(f, "Illegal instruction"); break;
+	case EXCEPTION_INT_DIVIDE_BY_ZERO:       fprintf(f, "Divide by zero"); break;
+	case EXCEPTION_INT_OVERFLOW:             fprintf(f, "Integer overflow"); break;
+	case EXCEPTION_PRIV_INSTRUCTION:         fprintf(f, "Privileged instruction"); break;
+	case EXCEPTION_STACK_OVERFLOW:           fprintf(f, "Stack overflow"); break;
+	default: fprintf(f, "Unknown (%d)", exception_type);
+	}
+	fprintf(f, "\n");
+
+	fprintf(f, "\n");
+	fprintf(f, "\n");
+
+	fprintf(f, "---Modules------------------------------\n");
+	fprintf(f, modules_str.c_str());
+
+	fprintf(f, "\n");
+	fprintf(f, "\n");
+
+	fprintf(f, "---Callstack----------------------------\n");
+	fprintf(f, callstack_str.c_str());
+
+	fprintf(f, "\n");
+	fprintf(f, "\n");
+
+	fprintf(f, "---Console Log--------------------------\n");
+	ConsoleLogWriteOut(f);
+
+	fclose(f);
+
+	char *err_msg = va("JK2MV just crashed. :( Sorry for that.\n\n"
+		"A crashlog has been written to the file %s.\n\n"
+		"If you think this needs to be fixed, send this file to the JK2MV developers.", path);
+#ifndef DEDICATED
+	MessageBoxA(NULL, err_msg, "JK2MV Crashed", MB_OK | MB_ICONERROR | MB_TOPMOST);
+#else
+	fprintf(stderr, err_msg);
+#endif
+}
+
+#endif
+
+/*
+===============
+Sys_ResolvePath
+===============
+*/
+char *Sys_ResolvePath( char *path )
+{
+	static char resolvedPath[MAX_PATH];
+
+	if ( !GetFullPathNameA((LPCSTR)path, sizeof(resolvedPath), (LPSTR)resolvedPath, NULL) )
+		return "";
+
+	return resolvedPath;
+}
+
+/*
+===============
+Sys_RealPath
+===============
+*/
+char *Sys_RealPath( char *path )
+{
+	static char realPath[MAX_PATH];
+	HANDLE fileHandle;
+	DWORD len;
+
+	// Get a handle to later resolve symlinks
+	fileHandle = CreateFileA( (LPCSTR)path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+
+	// If we can't access it return the original instead
+	if( fileHandle == INVALID_HANDLE_VALUE)
+		return path;
+
+	// Get the resolvedName from the handle
+	len = GetFinalPathNameByHandleA( fileHandle, (LPSTR)realPath, sizeof(realPath), VOLUME_NAME_NT );
+
+	// If it's longer than we can store return "" to disable access
+	if( len >= sizeof(realPath) )
+		return "";
+
+	// Close the handle
+	CloseHandle( fileHandle );
+
+	return realPath;
+}
+

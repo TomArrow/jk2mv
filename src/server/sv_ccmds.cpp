@@ -231,7 +231,7 @@ This allows fair starts with variable load times.
 static void SV_MapRestart_f( void ) {
 	int			i;
 	client_t	*client;
-	char		*denied;
+	const char	*denied;
 	qboolean	isBot;
 	int			delay;
 
@@ -257,7 +257,7 @@ static void SV_MapRestart_f( void ) {
 		delay = 5;
 	}
 	if( delay && (!Cvar_VariableValue("g_doWarmup") || Cvar_VariableValue("g_gametype") == GT_TOURNAMENT) ) {
-		sv.restartTime = svs.time + delay * 1000;
+		sv.restartTime = sv.time + delay * 1000;
 		SV_SetConfigstring( CS_WARMUP, va("%i", sv.restartTime) );
 		return;
 	}
@@ -284,6 +284,15 @@ static void SV_MapRestart_f( void ) {
 	sv.serverId = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
+	// if a map_restart occurs while a client is changing maps, we need
+	// to give them the correct time so that when they finish loading
+	// they don't violate the backwards time check in cl_cgame.c
+	for (i=0 ; i<sv_maxclients->integer ; i++) {
+		if (svs.clients[i].state == CS_PRIMED) {
+			svs.clients[i].oldServerTime = sv.restartTime;
+		}
+	}
+
 	// reset all the vm data in place without changing memory allocation
 	// note that we do NOT set sv.state = SS_LOADING, so configstrings that
 	// had been changed from their default values will generate broadcast updates
@@ -294,7 +303,8 @@ static void SV_MapRestart_f( void ) {
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
-		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+		sv.time += 100;
 		svs.time += 100;
 	}
 
@@ -320,7 +330,7 @@ static void SV_MapRestart_f( void ) {
 		SV_AddServerCommand( client, "map_restart\n" );
 
 		// connect the client again, without the firstTime flag
-		denied = (char *)VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
+		denied = (const char *)VM_ExplicitArgString( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
 		if ( denied ) {
 			// this generally shouldn't happen, because the client
 			// was connected before the level change
@@ -335,7 +345,8 @@ static void SV_MapRestart_f( void ) {
 	}
 
 	// run another frame to allow things to look at all the players
-	VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+	VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+	sv.time += 100;
 	svs.time += 100;
 }
 
@@ -605,13 +616,17 @@ static void SV_Status_f( void )
 		s = NET_AdrToString( cl->netchan.remoteAddress );
 
 		// Count the length of the visible characters in the name and if it's less than 15 fill the rest with spaces
-		k = MV_StrlenSkipColors(cl->name);
+		k = Q_PrintStrlen(cl->name, MV_USE102COLOR);
 		if ( k < 0 ) k = 0; // Should never happen
 		for( j = 0; j < (15 - k); j++ ) spaces[j] = ' ';
 		spaces[j] = 0;
 
-		if (!avoidTruncation) MV_CopyStringWithColors( cl->name, displayName, sizeof(displayName), 15 ); // Limit the visible length of the name to 15 characters (not counting colors)
-		else				  Q_strncpyz( displayName, cl->name, sizeof(displayName) );
+		if (!avoidTruncation) {
+			// Limit the visible length of the name to 15 characters (not counting colors)
+			Q_PrintStrCopy( displayName, cl->name, sizeof(displayName), 0, 15, MV_USE102COLOR );
+		} else {
+			Q_strncpyz( displayName, cl->name, sizeof(displayName) );
+		}
 
 		Com_Printf ("%3i %5i %s %s^7%s %7i %21s %5i %5i\n",
 			i,
@@ -622,7 +637,7 @@ static void SV_Status_f( void )
 			svs.time - cl->lastPacketTime,
 			s,
 			cl->netchan.qport,
-			cl->rate
+			SV_ClientRate(cl)
 			);
 	}
 	Com_Printf ("\n");
@@ -665,7 +680,7 @@ static void SV_ConSay_f(void) {
 	SV_SendServerCommand(NULL, "chat \"%s\n\"", text);
 }
 
-static const char *forceToggleNamePrints[] =
+static const char * const forceToggleNamePrints[] =
 {
 	"HEAL",//FP_HEAL
 	"JUMP",//FP_LEVITATION
@@ -827,6 +842,28 @@ static void SV_KillServer_f( void ) {
 	SV_Shutdown( "killserver" );
 }
 
+/*
+=================
+SV_WhitelistIP_f
+=================
+*/
+static void SV_WhitelistIP_f( void ) {
+	if ( Cmd_Argc() < 2 ) {
+		Com_Printf ("Usage: whitelistip <ip>...\n");
+		return;
+	}
+
+	for ( int i = 1; i < Cmd_Argc(); i++ ) {
+		netadr_t	adr;
+
+		if ( NET_StringToAdr( Cmd_Argv(i), &adr ) ) {
+			SVC_WhitelistAdr( adr );
+		} else {
+			Com_Printf("Incorrect IP address: %s\n", Cmd_Argv(i));
+		}
+	}
+}
+
 //===========================================================
 
 /*
@@ -836,7 +873,7 @@ SV_CompleteMapName
 */
 static void SV_CompleteMapName( char *args, int argNum ) { // for auto-complete (copied from OpenJK)
 	if ( argNum == 2 )
-		Field_CompleteFilename( "maps", "bsp", qtrue );
+		Field_CompleteFilename( "maps", ".bsp", qtrue );
 }
 
 /*
@@ -863,7 +900,6 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand ("sectorlist", SV_SectorList_f);
 	Cmd_AddCommand ("map", SV_Map_f);
 	Cmd_SetCommandCompletionFunc( "map", SV_CompleteMapName );
-#ifndef PRE_RELEASE_DEMO
 	Cmd_AddCommand ("devmap", SV_Map_f);
 	Cmd_SetCommandCompletionFunc( "devmap", SV_CompleteMapName );
 	Cmd_AddCommand ("spmap", SV_Map_f);
@@ -873,14 +909,11 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_SetCommandCompletionFunc( "devmapmdl", SV_CompleteMapName );
 	Cmd_AddCommand ("devmapall", SV_Map_f);
 	Cmd_SetCommandCompletionFunc( "devmapall", SV_CompleteMapName );
-#endif
 	Cmd_AddCommand ("killserver", SV_KillServer_f);
-//	if( com_dedicated->integer )
-	{
-		Cmd_AddCommand ("svsay", SV_ConSay_f);
-	}
-
+	Cmd_AddCommand ("svsay", SV_ConSay_f);
 	Cmd_AddCommand ("forcetoggle", SV_ForceToggle_f);
+
+	Cmd_AddCommand("whitelistip", SV_WhitelistIP_f);
 }
 
 /*

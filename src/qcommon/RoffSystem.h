@@ -9,13 +9,8 @@
 	#include "../qcommon/q_shared.h"	//needs to be in here for entityState_t
 #endif
 
-#if !defined(SERVER_H_INC)
-	#include "../server/server.h"
-#endif
-
 #include <vector>
 #include <map>
-using namespace std;
 
 // ROFF Defines
 //-------------------
@@ -40,8 +35,8 @@ private:
 	class			CROFF;
 	struct			SROFFEntity;
 
-	typedef	map		<int, CROFF *> TROFFList;
-	typedef vector	<SROFFEntity *> TROFFEntList;
+	typedef	std::map	<int, CROFF *> TROFFList;
+	typedef std::vector	<SROFFEntity *> TROFFEntList;
 
 	TROFFList		mROFFList;				// List of cached roffs
 	int				mID;					// unique ID generator for new roff objects
@@ -110,7 +105,7 @@ private:
 		{
 			mUsedByClient = mUsedByServer = qfalse;
 		}
-		CROFF( char *file, int id );
+		CROFF( const char *file, int id );
 		~CROFF();
 
 	}; // class CROFF
@@ -162,8 +157,8 @@ public:
 
 	qboolean		Restart();						// Free up all system resources and reset the ID counter
 
-	int			Cache( char *file, qboolean isClient );			// roffs should be precached at the start of each level
-	int			GetID( char *file );			// find the roff id by filename
+	int			Cache( const char *file, qboolean isClient );			// roffs should be precached at the start of each level
+	int			GetID( const char *file );			// find the roff id by filename
 	qboolean		Unload( int id );				// when a roff is done, it can be removed to free up resources
 	qboolean	Clean(qboolean isClient);					// should be called when level is done, frees all roff resources
 	void		List(void);						// dumps a list of all cached roff files to the console

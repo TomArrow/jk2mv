@@ -35,8 +35,12 @@ void MD4Init (MD4_CTX *);
 void MD4Update (MD4_CTX *, const unsigned char *, unsigned int);
 void MD4Final (unsigned char [16], MD4_CTX *);
 
-void Com_Memset (void* dest, const int val, const size_t count);
-void Com_Memcpy (void* dest, const void* src, const size_t count);
+static inline void Com_Memset (void* dest, const int val, const size_t count) {
+	memset( dest, val, count );
+}
+static inline void Com_Memcpy (void* dest, const void* src, const size_t count) {
+	memcpy( dest, src, count );
+}
 
 /* MD4C.C - RSA Data Security, Inc., MD4 message-digest algorithm */
 /* Copyright (C) 1990-2, RSA Data Security, Inc. All rights reserved.
@@ -70,9 +74,7 @@ static void MD4Transform (UINT4 [4], const unsigned char [64]);
 static void Encode (unsigned char *, UINT4 *, unsigned int);
 static void Decode (UINT4 *, const unsigned char *, unsigned int);
 
-static unsigned char PADDING[64] = {
-0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+static const unsigned char PADDING[64] = { 0x80, 0 };
 
 /* F, G and H are basic MD4 functions. */
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
@@ -122,7 +124,7 @@ void MD4Update (MD4_CTX *context, const unsigned char *input, unsigned int input
 	/* Transform as many times as possible.*/
 	if (inputLen >= partLen)
 	{
-		Com_Memcpy((POINTER)&context->buffer[index], (POINTER)input, partLen);
+		Com_Memcpy(&context->buffer[index], input, partLen);
 		MD4Transform (context->state, context->buffer);
 
 		for (i = partLen; i + 63 < inputLen; i += 64)
@@ -134,7 +136,7 @@ void MD4Update (MD4_CTX *context, const unsigned char *input, unsigned int input
 		i = 0;
 
 	/* Buffer remaining input */
-	Com_Memcpy ((POINTER)&context->buffer[index], (POINTER)&input[i], inputLen-i);
+	Com_Memcpy (&context->buffer[index], &input[i], inputLen-i);
 }
 
 
@@ -266,7 +268,7 @@ unsigned Com_BlockChecksum (const void *buffer, int length)
 	MD4_CTX		ctx;
 
 	MD4Init (&ctx);
-	MD4Update (&ctx, (unsigned char *)buffer, length);
+	MD4Update (&ctx, (const unsigned char *)buffer, length);
 	MD4Final ( (unsigned char *)digest, &ctx);
 
 	val = digest[0] ^ digest[1] ^ digest[2] ^ digest[3];

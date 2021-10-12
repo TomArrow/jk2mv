@@ -56,8 +56,8 @@ public:
 	surfaceInfo_v		&initrootSList,
 	model_t				*initcurrentModel,
 	int					initlod,
-	vec3_t				initrayStart,
-	vec3_t				initrayEnd,
+	const vec3_t		initrayStart,
+	const vec3_t		initrayEnd,
 	CollisionRecord_t	*initcollRecMap,
 	int					initentNum,
 	int					initmodelIndex,
@@ -227,14 +227,14 @@ void R_TransformEachSurface( mdxmSurface_t	*surface, vec3_t scale, CMiniHeap *G2
 	TransformedVertsArray[surface->thisSurfaceIndex] = (size_t)TransformedVerts;
 	if (!TransformedVerts)
 	{
-		Com_Error(ERR_DROP, "Ran out of transform space gameside for Ghoul2 Models.\n");
+		Com_Error(ERR_DROP, "Ran out of transform space gameside for Ghoul2 Models.");
 	}
 
 	// whip through and actually transform each vertex
 	int *piBoneRefs = (int*) ((byte*)surface + surface->ofsBoneReferences);
 
 	// optimisation issue
-	if ((scale[0] != 1.0) || (scale[1] != 1.0) || (scale[2] != 1.0))
+	if ((scale[0] != 1.0f) || (scale[1] != 1.0f) || (scale[2] != 1.0f))
 	{
 		for ( j = pos = 0; j < numVerts; j++ )
 		{
@@ -315,7 +315,7 @@ void R_TransformEachSurface( mdxmSurface_t	*surface, vec3_t scale, CMiniHeap *G2
 	TransformedVertsArray[surface->thisSurfaceIndex] = (int)TransformedVerts;
 	if (!TransformedVerts)
 	{
-		Com_Error(ERR_DROP, "Ran out of transform space gameside for Ghoul2 Models. Please See Jake to Make space larger\n");
+		Com_Error(ERR_DROP, "Ran out of transform space gameside for Ghoul2 Models. Please See Jake to Make space larger");
 	}
 
 	// whip through and actually transform each vertex
@@ -455,9 +455,9 @@ void G2_TransformSurfaces(int surfaceNum, surfaceInfo_v &rootSList,
 }
 
 // main calling point for the model transform for collision detection. At this point all of the skeleton has been transformed.
-void G2_TransformModel(CGhoul2Info_v &ghoul2, const int frameNum, vec3_t scale, CMiniHeap *G2VertSpace, int useLod)
+void G2_TransformModel(CGhoul2Info_v &ghoul2, const int frameNum, const vec3_t scale, CMiniHeap *G2VertSpace, int useLod)
 {
-	int				i, lod;
+	int				lod;
 	model_t			*currentModel;
 	model_t			*animModel;
 	mdxaHeader_t	*aHeader;
@@ -486,7 +486,7 @@ void G2_TransformModel(CGhoul2Info_v &ghoul2, const int frameNum, vec3_t scale, 
 	}
 
 	// walk each possible model for this entity and try rendering it out
-	for (i=0; i<ghoul2.size(); i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		// don't bother with models that we don't care about.
 		if (ghoul2[i].mModelindex == -1)
@@ -546,16 +546,16 @@ static void G2_BuildHitPointST( const vec3_t A, const float SA, const float TA,
 	*s = SA * i + SB * j + SC * k;
 	*t = TA * i + TB * j + TC * k;
 
-	*s=fmod(*s, 1);
+	*s=fmodf(*s, 1);
 	if (*s< 0)
 	{
-		*s+= 1.0;
+		*s+= 1.0f;
 	}
 
-	*t=fmod(*t, 1);
+	*t=fmodf(*t, 1);
 	if (*t< 0)
 	{
-		*t+= 1.0;
+		*t+= 1.0f;
 	}
 
 }
@@ -581,7 +581,7 @@ static qboolean G2_SegmentTriangleTest( const vec3_t start, const vec3_t end,
 
 	*denom=DotProduct(ray, returnedNormal);
 
-	if (fabs(*denom)<tiny||        // triangle parallel to ray
+	if (fabsf(*denom)<tiny||        // triangle parallel to ray
 		(!backFaces && *denom>0)||		// not accepting back faces
 		(!frontFaces && *denom<0))		//not accepting front faces
 	{
@@ -692,8 +692,8 @@ static bool G2_RadiusTracePolys( const mdxmSurface_t *surface, const vec3_t rayS
 	VectorNormalize(basis1);
 	VectorNormalize(basis2);
 
-	const float c=cos(0.0f);//theta
-	const float s=sin(0.0f);//theta
+	const float c=cosf(0.0f);//theta
+	const float s=sinf(0.0f);//theta
 
 	VectorScale(basis1, 0.5f * c / fRadius,taxis);
 	VectorMA(taxis,     0.5f * s / fRadius,basis2,taxis);
@@ -758,7 +758,7 @@ static bool G2_RadiusTracePolys( const mdxmSurface_t *surface, const vec3_t rayS
 		return false; // completely off the gore splotch  (so presumably hit nothing? -Ste)
 	}
 	const int numTris = surface->numTriangles;
-	const mdxmTriangle_t * const tris = (mdxmTriangle_t *) ((byte *)surface + surface->ofsTriangles);
+	const mdxmTriangle_t * const tris = (const mdxmTriangle_t *) ((const byte *)surface + surface->ofsTriangles);
 
 	for ( j = 0; j < numTris; j++ )
 	{
@@ -852,7 +852,7 @@ bool G2_TracePolys( const mdxmSurface_t *surface, const vec3_t rayStart, const v
 	int		j, numTris;
 
 	// whip through and actually transform each vertex
-	const mdxmTriangle_t *tris = (mdxmTriangle_t *) ((byte *)surface + surface->ofsTriangles);
+	const mdxmTriangle_t *tris = (const mdxmTriangle_t *) ((const byte *)surface + surface->ofsTriangles);
 	const float *verts = (float *)TransformedVertsArray[surface->thisSurfaceIndex];
 	numTris = surface->numTriangles;
 
@@ -979,9 +979,9 @@ void G2_TraceSurfaces(CTraceSurface &TS)
 {
 	int	i;
 	// back track and get the surfinfo struct for this surface
-	const mdxmSurface_t				*surface = (mdxmSurface_t *)G2_FindSurface((void *)TS.currentModel, TS.surfaceNum, TS.lod);
-	const mdxmHierarchyOffsets_t	*surfIndexes = (mdxmHierarchyOffsets_t *)((byte *)TS.currentModel->mdxm + sizeof(mdxmHeader_t));
-	const mdxmSurfHierarchy_t		*surfInfo = (mdxmSurfHierarchy_t *)((byte *)surfIndexes + surfIndexes->offsets[surface->thisSurfaceIndex]);
+	const mdxmSurface_t				*surface = (const mdxmSurface_t *)G2_FindSurface((void *)TS.currentModel, TS.surfaceNum, TS.lod);
+	const mdxmHierarchyOffsets_t	*surfIndexes = (const mdxmHierarchyOffsets_t *)((byte *)TS.currentModel->mdxm + sizeof(mdxmHeader_t));
+	const mdxmSurfHierarchy_t		*surfInfo = (const mdxmSurfHierarchy_t *)((const byte *)surfIndexes + surfIndexes->offsets[surface->thisSurfaceIndex]);
 
 	// see if we have an override surface in the surface list
 	const surfaceInfo_t	*surfOverride = G2_FindOverrideSurface(TS.surfaceNum, TS.rootSList);
@@ -1005,7 +1005,7 @@ void G2_TraceSurfaces(CTraceSurface &TS)
 	if (!offFlags)
 	{
 #ifdef G2_COLLISION_ENABLED
-		if (!(fabs(TS.m_fRadius) < 0.1))	// if not a point-trace
+		if (!(fabsf(TS.m_fRadius) < 0.1f))	// if not a point-trace
 		{
 			// .. then use radius check
 			//
@@ -1046,9 +1046,9 @@ void G2_TraceSurfaces(CTraceSurface &TS)
 
 }
 
-void G2_TraceModels(CGhoul2Info_v &ghoul2, vec3_t rayStart, vec3_t rayEnd, CollisionRecord_t *collRecMap, int entNum, int traceFlags, int useLod, float fRadius)
+void G2_TraceModels(CGhoul2Info_v &ghoul2, const vec3_t rayStart, const vec3_t rayEnd, CollisionRecord_t *collRecMap, int entNum, int traceFlags, int useLod, float fRadius)
 {
-	int				i, lod;
+	int				lod;
 	model_t			*currentModel;
 	model_t			*animModel;
 	mdxaHeader_t	*aHeader;
@@ -1056,7 +1056,7 @@ void G2_TraceModels(CGhoul2Info_v &ghoul2, vec3_t rayStart, vec3_t rayEnd, Colli
 	shader_t		*cust_shader;
 
 	// walk each possible model for this entity and try tracing against it
-	for (i=0; i<ghoul2.size(); i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		// don't bother with models that we don't care about.
 		if (ghoul2[i].mModelindex == -1)
@@ -1123,14 +1123,14 @@ void G2_TraceModels(CGhoul2Info_v &ghoul2, vec3_t rayStart, vec3_t rayEnd, Colli
 	}
 }
 
-void TransformPoint (vec3_t in, vec3_t out, mdxaBone_t *mat) {
+void TransformPoint (const vec3_t in, vec3_t out, const mdxaBone_t *mat) {
 	for (int i=0;i<3;i++)
 	{
 		out[i]= in[0]*mat->matrix[i][0] + in[1]*mat->matrix[i][1] + in[2]*mat->matrix[i][2];
 	}
 }
 
-void TransformAndTranslatePoint (vec3_t in, vec3_t out, mdxaBone_t *mat) {
+void TransformAndTranslatePoint (const vec3_t in, vec3_t out, const mdxaBone_t *mat) {
 
 	for (int i=0;i<3;i++)
 	{
@@ -1166,7 +1166,7 @@ void Create_Matrix(const float *angle, mdxaBone_t *matrix)
 }
 
 // given a matrix, generate the inverse of that matrix
-void Inverse_Matrix(mdxaBone_t *src, mdxaBone_t *dest)
+void Inverse_Matrix(const mdxaBone_t *src, mdxaBone_t *dest)
 {
 	int i, j;
 
@@ -1225,6 +1225,8 @@ void *G2_FindSurface(void *mod_t, int index, int lod)
 	return (void *)current;
 }
 
+#if 0
+
 #define SURFACE_SAVE_BLOCK_SIZE	sizeof(surfaceInfo_t)
 #define BOLT_SAVE_BLOCK_SIZE (sizeof(boltInfo_t) - sizeof(mdxaBone_t))
 #define BONE_SAVE_BLOCK_SIZE sizeof(boneInfo_t)
@@ -1251,8 +1253,7 @@ qboolean G2_SaveGhoul2Models(CGhoul2Info_v &ghoul2, char **buffer, int *size)
 	// add in count for number of ghoul2 models
 	*size += 4;
 	// start out working out the total size of the buffer we need to allocate
-	int i; // Linux GCC is forcing new scoping rules
-	for (i=0; i<ghoul2.size();i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		*size += ghoul2BlockSize;
 		// add in count for number of surfaces
@@ -1276,7 +1277,7 @@ qboolean G2_SaveGhoul2Models(CGhoul2Info_v &ghoul2, char **buffer, int *size)
 	*(int *)tempBuffer = (int)ghoul2.size();
 	tempBuffer +=4;
 
-	for (i=0; i<ghoul2.size();i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		// first save out the ghoul2 details themselves
 //		OutputDebugString(va("G2_SaveGhoul2Models(): ghoul2[%d].mModelindex = %d\n",i,ghoul2[i].mModelindex));
@@ -1288,8 +1289,7 @@ qboolean G2_SaveGhoul2Models(CGhoul2Info_v &ghoul2, char **buffer, int *size)
 		tempBuffer +=4;
 
 		// now save the all the surface list info
-		int x;
-		for (x=0; x<ghoul2[i].mSlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mSlist.size(); x++)
 		{
 			memcpy(tempBuffer, &ghoul2[i].mSlist[x], SURFACE_SAVE_BLOCK_SIZE);
 			tempBuffer += SURFACE_SAVE_BLOCK_SIZE;
@@ -1300,7 +1300,7 @@ qboolean G2_SaveGhoul2Models(CGhoul2Info_v &ghoul2, char **buffer, int *size)
 		tempBuffer +=4;
 
 		// now save the all the bone list info
-		for (x=0; x<ghoul2[i].mBlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mBlist.size(); x++)
 		{
 			memcpy(tempBuffer, &ghoul2[i].mBlist[x], BONE_SAVE_BLOCK_SIZE);
 			tempBuffer += BONE_SAVE_BLOCK_SIZE;
@@ -1311,7 +1311,7 @@ qboolean G2_SaveGhoul2Models(CGhoul2Info_v &ghoul2, char **buffer, int *size)
 		tempBuffer +=4;
 
 		// lastly save the all the bolt list info
-		for (x=0; x<ghoul2[i].mBltlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mBltlist.size(); x++)
 		{
 			memcpy(tempBuffer, &ghoul2[i].mBltlist[x], BOLT_SAVE_BLOCK_SIZE);
 			tempBuffer += BOLT_SAVE_BLOCK_SIZE;
@@ -1366,7 +1366,7 @@ void G2_LoadGhoul2Model(CGhoul2Info_v &ghoul2, char *buffer)
 	int ghoul2BlockSize = (int)((size_t)&ghoul2[0].mTransformedVertsArray - (size_t)&ghoul2[0].mModelindex);
 
 	// now we have enough instances, lets go through each one and load up the relevant details
-	for (int i=0; i<ghoul2.size(); i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		// load the ghoul2 info from the buffer
 		memcpy(&ghoul2[i].mModelindex, buffer, ghoul2BlockSize);
@@ -1385,8 +1385,7 @@ void G2_LoadGhoul2Model(CGhoul2Info_v &ghoul2, char *buffer)
 		buffer +=4;
 
 		// now load all the surfaces
-		int x;
-		for (x=0; x<ghoul2[i].mSlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mSlist.size(); x++)
 		{
 			memcpy(&ghoul2[i].mSlist[x], buffer, SURFACE_SAVE_BLOCK_SIZE);
 			buffer += SURFACE_SAVE_BLOCK_SIZE;
@@ -1397,7 +1396,7 @@ void G2_LoadGhoul2Model(CGhoul2Info_v &ghoul2, char *buffer)
 		buffer +=4;
 
 		// now load all the bones
-		for (x=0; x<ghoul2[i].mBlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mBlist.size(); x++)
 		{
 			memcpy(&ghoul2[i].mBlist[x], buffer, BONE_SAVE_BLOCK_SIZE);
 			buffer += BONE_SAVE_BLOCK_SIZE;
@@ -1408,7 +1407,7 @@ void G2_LoadGhoul2Model(CGhoul2Info_v &ghoul2, char *buffer)
 		buffer +=4;
 
 		// now load all the bolts
-		for (x=0; x<ghoul2[i].mBltlist.size(); x++)
+		for (size_t x = 0; x < ghoul2[i].mBltlist.size(); x++)
 		{
 			memcpy(&ghoul2[i].mBltlist[x], buffer, BOLT_SAVE_BLOCK_SIZE);
 			buffer += BOLT_SAVE_BLOCK_SIZE;
@@ -1416,15 +1415,17 @@ void G2_LoadGhoul2Model(CGhoul2Info_v &ghoul2, char *buffer)
 	}
 }
 
+#endif // 0
+
 void G2_LerpAngles(CGhoul2Info_v &ghoul2,CGhoul2Info_v &nextGhoul2, float interpolation)
 {
 	// loop each model
-	for (int i=0; i< ghoul2.size(); i++)
+	for (size_t i = 0; i < ghoul2.size(); i++)
 	{
 		if (ghoul2[i].mModelindex != -1)
 		{
 			// now walk the bone list
-			for (int x = 0; x < ghoul2[i].mBlist.size(); x++)
+			for (size_t x = 0; x < ghoul2[i].mBlist.size(); x++)
 			{
 				boneInfo_t	&bone = ghoul2[i].mBlist[x];
 				// sure we have one to lerp to?

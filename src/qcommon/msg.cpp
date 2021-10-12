@@ -114,11 +114,11 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 	}
 
 	// check for overflows
-	if (bits != 32) {
+	if (com_debugMessage->integer && bits != 32) {
 		if (bits > 0) {
 			if (value > ((1 << bits) - 1) || value < 0) {
 				overflows++;
-				Com_DPrintf ("MSG_WriteBits: overflow writing %d in %d bits [field %s offset %d]\n", value, bits, gLastField->name, fieldIndex);
+				Com_Printf ("MSG_WriteBits: overflow writing %d in %d bits [field %s offset %d]\n", value, bits, gLastField->name, fieldIndex);
 				assert (gLastField != &noField); // this means engine bug
 			}
 		} else {
@@ -128,7 +128,7 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 
 			if (value >  r - 1 || value < -r) {
 				overflows++;
-				Com_DPrintf ("MSG_WriteBits: overflow writing %d in %d bits [field %s offset %d]\n", value, bits, gLastField->name, fieldIndex);
+				Com_Printf ("MSG_WriteBits: overflow writing %d in %d bits [field %s offset %d]\n", value, bits, gLastField->name, fieldIndex);
 				assert (gLastField != &noField);  // this means engine bug
 			}
 		}
@@ -152,7 +152,7 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 			msg->cursize += 4;
 			msg->bit += 8;
 		} else {
-			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
+			Com_Error(ERR_DROP, "can't read %d bits", bits);
 		}
 	} else {
 		value &= (0xffffffff >> (32 - bits));
@@ -208,7 +208,7 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 			msg->readcount += 4;
 			msg->bit += 32;
 		} else {
-			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
+			Com_Error(ERR_DROP, "can't read %d bits", bits);
 		}
 	} else {
 		nbits = 0;
@@ -269,7 +269,7 @@ void MSG_WriteByte(msg_t *sb, int c) {
 void MSG_WriteData(msg_t *buf, const void *data, int length) {
 	int i;
 	for (i = 0; i<length; i++) {
-		MSG_WriteByte(buf, ((byte *)data)[i]);
+		MSG_WriteByte(buf, ((const byte *)data)[i]);
 	}
 }
 
@@ -424,7 +424,8 @@ float MSG_ReadFloat(msg_t *msg) {
 
 char *MSG_ReadString(msg_t *msg) {
 	static char	string[MAX_STRING_CHARS];
-	int		l, c;
+	size_t		l;
+	int			c;
 
 	l = 0;
 	do {
@@ -459,7 +460,8 @@ char *MSG_ReadString(msg_t *msg) {
 
 char *MSG_ReadBigString(msg_t *msg) {
 	static char	string[BIG_INFO_STRING];
-	int		l, c;
+	size_t		l;
+	int			c;
 
 	l = 0;
 	do {
@@ -572,7 +574,7 @@ delta functions with keys
 =============================================================================
 */
 
-uint32_t kbitmask[32] = {
+static const uint32_t kbitmask[32] = {
 	0x00000001, 0x00000003, 0x00000007, 0x0000000F,
 	0x0000001F, 0x0000003F, 0x0000007F, 0x000000FF,
 	0x000001FF, 0x000003FF, 0x000007FF, 0x00000FFF,
@@ -705,7 +707,11 @@ MSG_WriteDeltaUsercmd
 =====================
 */
 void MSG_WriteDeltaUsercmdKey(msg_t *msg, int key, usercmd_t *from, usercmd_t *to) {
-	if (to->serverTime - from->serverTime < 256) {
+	if (to->serverTime < from->serverTime) {
+		Com_Printf(S_COLOR_YELLOW "WARNING: Command time went backwards\n");
+		MSG_WriteBits(msg, 0, 1);
+		MSG_WriteBits(msg, to->serverTime, 32);
+	} else if (to->serverTime - from->serverTime < 256) {
 		MSG_WriteBits(msg, 1, 1);
 		MSG_WriteBits(msg, to->serverTime - from->serverTime, 8);
 	} else {
@@ -2151,7 +2157,7 @@ int msg_hData[256] =
 */
 
 // Q3 TA freq. table.
-int msg_hData[256] = {
+static const int msg_hData[256] = {
 	250315,			// 0
 	41193,			// 1
 	6292,			// 2

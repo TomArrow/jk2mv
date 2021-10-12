@@ -179,7 +179,7 @@ void GL_TexEnv( int env )
 		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 		break;
 	default:
-		ri.Error( ERR_DROP, "GL_TexEnv: invalid env '%d' passed\n", env );
+		ri.Error( ERR_DROP, "GL_TexEnv: invalid env '%d' passed", env );
 		break;
 	}
 }
@@ -254,7 +254,7 @@ void GL_State( unsigned int stateBits )
 				break;
 			default:
 				srcFactor = GL_ONE;		// to get warning to shut up
-				ri.Error( ERR_DROP, "GL_State: invalid src blend state bits\n" );
+				ri.Error( ERR_DROP, "GL_State: invalid src blend state bits" );
 				break;
 			}
 
@@ -286,7 +286,7 @@ void GL_State( unsigned int stateBits )
 				break;
 			default:
 				dstFactor = GL_ONE;		// to get warning to shut up
-				ri.Error( ERR_DROP, "GL_State: invalid dst blend state bits\n" );
+				ri.Error( ERR_DROP, "GL_State: invalid dst blend state bits" );
 				break;
 			}
 
@@ -542,8 +542,8 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				depthRange, oldDepthRange;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int				oldSort;
-	float			originalTime;
+	unsigned int	oldSort;
+	double			originalTime;
 	bool			didShadowPass = false;
 
 	if (g_bRenderGlowingObjects)
@@ -564,7 +564,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldFogNum = -1;
 	oldDepthRange = qfalse;
 	oldDlighted = qfalse;
-	oldSort = -1;
+	oldSort = (unsigned int)-1;
 	depthRange = qfalse;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
@@ -612,7 +612,12 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 			if ( entityNum != ENTITYNUM_WORLD ) {
 				backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
-				backEnd.refdef.floatTime = originalTime - backEnd.currentEntity->e.shaderTime;
+				if (backEnd.currentEntity->intShaderTime) {
+					backEnd.refdef.floatTime = originalTime - 0.001 * backEnd.currentEntity->e.shaderTime.i;
+				} else {
+					// precision loss on high server time
+					backEnd.refdef.floatTime = originalTime - backEnd.currentEntity->e.shaderTime.f;
+				}
 				// we have to reset the shaderTime as well otherwise image animations start
 				// from the wrong frame
 				tess.shaderTime = backEnd.refdef.floatTime - tess.shader->timeOffset;
@@ -743,7 +748,7 @@ void	RB_SetGL2D (void) {
 
 	// set time for 2D shaders
 	backEnd.refdef.time = ri.Milliseconds();
-	backEnd.refdef.floatTime = backEnd.refdef.time * 0.001f;
+	backEnd.refdef.floatTime = backEnd.refdef.time * 0.001;
 }
 
 
@@ -786,10 +791,10 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 		tr.scratchImage[client]->width = tr.scratchImage[client]->uploadWidth = cols;
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;
 		qglTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, cols, rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 	} else {
 		if (dirty) {
 			// otherwise, just subimage upload it so that drivers can tell we are going to be changing
@@ -828,10 +833,10 @@ void RE_UploadCinematic (int cols, int rows, const byte *data, int client, qbool
 		tr.scratchImage[client]->width = tr.scratchImage[client]->uploadWidth = cols;
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;
 		qglTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, cols, rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 	} else {
 		if (dirty) {
 			// otherwise, just subimage upload it so that drivers can tell we are going to be changing
@@ -909,140 +914,107 @@ const void *RB_StretchPic ( const void *data ) {
 	tess.xyz[ numVerts ][1] = cmd->y;
 	tess.xyz[ numVerts ][2] = 0;
 
-	tess.texCoords[ numVerts ][0][0] = cmd->s1;
-	tess.texCoords[ numVerts ][0][1] = cmd->t1;
+	tess.texCoords[0][ numVerts ][0] = cmd->s1;
+	tess.texCoords[0][ numVerts ][1] = cmd->t1;
 
 	tess.xyz[ numVerts + 1 ][0] = cmd->x + cmd->w;
 	tess.xyz[ numVerts + 1 ][1] = cmd->y;
 	tess.xyz[ numVerts + 1 ][2] = 0;
 
-	tess.texCoords[ numVerts + 1 ][0][0] = cmd->s2;
-	tess.texCoords[ numVerts + 1 ][0][1] = cmd->t1;
+	tess.texCoords[0][ numVerts + 1 ][0] = cmd->s2;
+	tess.texCoords[0][ numVerts + 1 ][1] = cmd->t1;
 
 	tess.xyz[ numVerts + 2 ][0] = cmd->x + cmd->w;
 	tess.xyz[ numVerts + 2 ][1] = cmd->y + cmd->h;
 	tess.xyz[ numVerts + 2 ][2] = 0;
 
-	tess.texCoords[ numVerts + 2 ][0][0] = cmd->s2;
-	tess.texCoords[ numVerts + 2 ][0][1] = cmd->t2;
+	tess.texCoords[0][ numVerts + 2 ][0] = cmd->s2;
+	tess.texCoords[0][ numVerts + 2 ][1] = cmd->t2;
 
 	tess.xyz[ numVerts + 3 ][0] = cmd->x;
 	tess.xyz[ numVerts + 3 ][1] = cmd->y + cmd->h;
 	tess.xyz[ numVerts + 3 ][2] = 0;
 
-	tess.texCoords[ numVerts + 3 ][0][0] = cmd->s1;
-	tess.texCoords[ numVerts + 3 ][0][1] = cmd->t2;
-
-	return (const void *)(cmd + 1);
-}
-
-
-/*
-=============
-RB_DrawRotatePic
-=============
-*/
-const void *RB_RotatePic ( const void *data )
-{
-	const rotatePicCommand_t	*cmd;
-	image_t *image;
-	shader_t *shader;
-
-	cmd = (const rotatePicCommand_t *)data;
-
-	shader = cmd->shader;
-	image = shader->stages[0]->bundle[0].image[0];
-
-	if ( image ) {
-		if ( !backEnd.projection2D ) {
-			RB_SetGL2D();
-		}
-
-		qglColor4ubv( backEnd.color2D );
-		qglPushMatrix();
-
-		qglTranslatef(cmd->x+cmd->w,cmd->y,0);
-		qglRotatef(cmd->a, 0.0, 0.0, 1.0);
-
-		GL_Bind( image );
-		qglBegin (GL_QUADS);
-		qglTexCoord2f( cmd->s1, cmd->t1);
-		qglVertex2f( -cmd->w, 0 );
-		qglTexCoord2f( cmd->s2, cmd->t1 );
-		qglVertex2f( 0, 0 );
-		qglTexCoord2f( cmd->s2, cmd->t2 );
-		qglVertex2f( 0, cmd->h );
-		qglTexCoord2f( cmd->s1, cmd->t2 );
-		qglVertex2f( -cmd->w, cmd->h );
-		qglEnd();
-
-		qglPopMatrix();
-	}
+	tess.texCoords[0][ numVerts + 3 ][0] = cmd->s1;
+	tess.texCoords[0][ numVerts + 3 ][1] = cmd->t2;
 
 	return (const void *)(cmd + 1);
 }
 
 /*
 =============
-RB_DrawRotatePic2
+RB_TransformPic
 =============
 */
-const void *RB_RotatePic2 ( const void *data )
-{
-	const rotatePicCommand_t	*cmd;
-	image_t *image;
+const void *RB_TransformPic ( const void *data ) {
+	const transformPicCommand_t	*cmd;
 	shader_t *shader;
+	int		numVerts, numIndexes;
 
-	cmd = (const rotatePicCommand_t *)data;
+	cmd = (const transformPicCommand_t *)data;
+
+	if ( !backEnd.projection2D ) {
+		RB_SetGL2D();
+	}
 
 	shader = cmd->shader;
-
-	if ( shader->stages[0] )
-	{
-		image = shader->stages[0]->bundle[0].image[0];
-
-		if ( image ) {
-			if ( !backEnd.projection2D ) {
-				RB_SetGL2D();
-			}
-
-			// Get our current blend mode, etc.
-			GL_State( shader->stages[0]->stateBits );
-
-			qglColor4ubv( backEnd.color2D );
-			qglPushMatrix();
-
-			// rotation point is going to be around the center of the passed in coordinates
-			qglTranslatef( cmd->x, cmd->y, 0 );
-			qglRotatef( cmd->a, 0.0, 0.0, 1.0 );
-
-			GL_Bind( image );
-			qglBegin( GL_QUADS );
-				qglTexCoord2f( cmd->s1, cmd->t1);
-				qglVertex2f( -cmd->w * 0.5f, -cmd->h * 0.5f );
-
-				qglTexCoord2f( cmd->s2, cmd->t1 );
-				qglVertex2f( cmd->w * 0.5f, -cmd->h * 0.5f );
-
-				qglTexCoord2f( cmd->s2, cmd->t2 );
-				qglVertex2f( cmd->w * 0.5f, cmd->h * 0.5f );
-
-				qglTexCoord2f( cmd->s1, cmd->t2 );
-				qglVertex2f( -cmd->w * 0.5f, cmd->h * 0.5f );
-			qglEnd();
-
-			qglPopMatrix();
-
-			// Hmmm, this is not too cool
-			GL_State( GLS_DEPTHTEST_DISABLE |
-				  GLS_SRCBLEND_SRC_ALPHA |
-				  GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA );
+	if ( shader != tess.shader ) {
+		if ( tess.numIndexes ) {
+			RB_EndSurface();
 		}
+		backEnd.currentEntity = &backEnd.entity2D;
+		RB_BeginSurface( shader, 0 );
 	}
+
+	RB_CHECKOVERFLOW( 4, 6 );
+	numVerts = tess.numVertexes;
+	numIndexes = tess.numIndexes;
+
+	tess.numVertexes += 4;
+	tess.numIndexes += 6;
+
+	tess.indexes[ numIndexes ] = numVerts + 3;
+	tess.indexes[ numIndexes + 1 ] = numVerts + 0;
+	tess.indexes[ numIndexes + 2 ] = numVerts + 2;
+	tess.indexes[ numIndexes + 3 ] = numVerts + 2;
+	tess.indexes[ numIndexes + 4 ] = numVerts + 0;
+	tess.indexes[ numIndexes + 5 ] = numVerts + 1;
+
+	tess.vertexColorsui[ numVerts ] =
+		tess.vertexColorsui[ numVerts + 1 ] =
+		tess.vertexColorsui[ numVerts + 2 ] =
+		tess.vertexColorsui[ numVerts + 3 ] = backEnd.color2Dui;
+
+	tess.xyz[ numVerts ][0] = cmd->x;
+	tess.xyz[ numVerts ][1] = cmd->y;
+	tess.xyz[ numVerts ][2] = 0;
+
+	tess.texCoords[0][ numVerts ][0] = cmd->s1;
+	tess.texCoords[0][ numVerts ][1] = cmd->t1;
+
+	tess.xyz[ numVerts + 1 ][0] = cmd->x + cmd->m[0][0];
+	tess.xyz[ numVerts + 1 ][1] = cmd->y + cmd->m[1][0];
+	tess.xyz[ numVerts + 1 ][2] = 0;
+
+	tess.texCoords[0][ numVerts + 1 ][0] = cmd->s2;
+	tess.texCoords[0][ numVerts + 1 ][1] = cmd->t1;
+
+	tess.xyz[ numVerts + 2 ][0] = cmd->x + cmd->m[0][0] + cmd->m[0][1];
+	tess.xyz[ numVerts + 2 ][1] = cmd->y + cmd->m[1][0] + cmd->m[1][1];
+	tess.xyz[ numVerts + 2 ][2] = 0;
+
+	tess.texCoords[0][ numVerts + 2 ][0] = cmd->s2;
+	tess.texCoords[0][ numVerts + 2 ][1] = cmd->t2;
+
+	tess.xyz[ numVerts + 3 ][0] = cmd->x + cmd->m[0][1];
+	tess.xyz[ numVerts + 3 ][1] = cmd->y + cmd->m[1][1];
+	tess.xyz[ numVerts + 3 ][2] = 0;
+
+	tess.texCoords[0][ numVerts + 3 ][0] = cmd->s1;
+	tess.texCoords[0][ numVerts + 3 ][1] = cmd->t2;
 
 	return (const void *)(cmd + 1);
 }
-
 
 /*
 =============
@@ -1138,6 +1110,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 	cmd = (const drawBufferCommand_t *)data;
 
 	qglDrawBuffer( cmd->buffer );
+	qglReadBuffer( cmd->buffer );
 
 	// clear screen for debugging
 	if (tr.world && tr.world->globalFog != -1)
@@ -1192,8 +1165,8 @@ void RB_ShowImages( void ) {
 
 		// show in proportional size in mode 2
 		if ( r_showImages->integer == 2 ) {
-			w *= image->uploadWidth / 512.0;
-			h *= image->uploadHeight / 512.0;
+			w *= image->uploadWidth / 512.0f;
+			h *= image->uploadHeight / 512.0f;
 		}
 
 		GL_Bind( image );
@@ -1232,55 +1205,10 @@ const void	*RB_SwapBuffers( const void *data ) {
 		RB_EndSurface();
 	}
 
-	// gamma correction
-	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
-		RB_SetGL2D();
-
-		qglEnable(GL_VERTEX_PROGRAM_ARB);
-		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, tr.gammaVertexShader);
-		qglEnable(GL_FRAGMENT_PROGRAM_ARB);
-		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
-
-		GL_SelectTexture(0);
-		qglEnable(GL_TEXTURE_RECTANGLE_ARB);
-		qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, tr.sceneImage);
-		qglCopyTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, 0, 0, glConfig.vidWidth, glConfig.vidHeight, 0);
-		qglDisable(GL_TEXTURE_RECTANGLE_ARB);
-
-		GL_SelectTexture(1);
-		qglEnable(GL_TEXTURE_3D);
-		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
-
-		qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		qglClear(GL_COLOR_BUFFER_BIT);
-
-		qglBegin(GL_QUADS);
-			qglTexCoord2f(0.0f, 0.0f);
-			qglVertex2f(-1.0f, -1.0f);
-
-			qglTexCoord2f(0.0f, (float)glConfig.vidHeight);
-			qglVertex2f(-1.0f, 1.0f);
-
-			qglTexCoord2f((float)glConfig.vidWidth, (float)glConfig.vidHeight);
-			qglVertex2f(1.0f, 1.0f);
-
-			qglTexCoord2f((float)glConfig.vidWidth, 0.0f);
-			qglVertex2f(1.0f, -1.0f);
-		qglEnd();
-
-		qglDisable(GL_VERTEX_PROGRAM_ARB);
-		qglDisable(GL_FRAGMENT_PROGRAM_ARB);
-
-		qglDisable(GL_TEXTURE_3D);
-		GL_SelectTexture(0);
-	}
-
 	// texture swapping test
 	if (r_showImages->integer) {
 		RB_ShowImages();
 	}
-
-	RB_RenderWorldEffects();
 
 	cmd = (const swapBuffersCommand_t *)data;
 
@@ -1316,6 +1244,116 @@ const void	*RB_SwapBuffers( const void *data ) {
 }
 
 /*
+==================
+RB_WorldEffects
+==================
+*/
+const void *RB_WorldEffects( const void *data )
+{
+	const worldEffectsCommand_t	*cmd;
+
+	cmd = (const worldEffectsCommand_t *)data;
+
+	// finish any 2D drawing if needed
+	if ( tess.numIndexes ) {
+		RB_EndSurface();
+	}
+
+	RB_RenderWorldEffects();
+
+	return (const void *)(cmd + 1);
+}
+
+/*
+==================
+RB_GammaCorrection
+==================
+*/
+const void *RB_GammaCorrection( const void *data )
+{
+	const gammaCorrectionCommand_t	*cmd;
+
+	cmd = (const gammaCorrectionCommand_t *)data;
+
+	// finish any 2D drawing if needed
+	if ( tess.numIndexes ) {
+		RB_EndSurface();
+	}
+
+	RB_SetGL2D();
+
+	qglEnable(GL_VERTEX_PROGRAM_ARB);
+	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, tr.gammaVertexShader);
+	qglEnable(GL_FRAGMENT_PROGRAM_ARB);
+	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
+
+	GL_SelectTexture(0);
+	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
+	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, tr.sceneImage);
+	qglCopyTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, 0, 0, glConfig.vidWidth, glConfig.vidHeight, 0);
+	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+	GL_SelectTexture(1);
+	qglEnable(GL_TEXTURE_3D);
+	qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
+
+	qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	qglClear(GL_COLOR_BUFFER_BIT);
+
+	qglBegin(GL_QUADS);
+	qglTexCoord2f(0.0f, 0.0f);
+	qglVertex2f(-1.0f, -1.0f);
+
+	qglTexCoord2f(0.0f, (float)glConfig.vidHeight);
+	qglVertex2f(-1.0f, 1.0f);
+
+	qglTexCoord2f((float)glConfig.vidWidth, (float)glConfig.vidHeight);
+	qglVertex2f(1.0f, 1.0f);
+
+	qglTexCoord2f((float)glConfig.vidWidth, 0.0f);
+	qglVertex2f(1.0f, -1.0f);
+	qglEnd();
+
+	qglDisable(GL_VERTEX_PROGRAM_ARB);
+	qglDisable(GL_FRAGMENT_PROGRAM_ARB);
+
+	qglDisable(GL_TEXTURE_3D);
+	GL_SelectTexture(0);
+
+	return (const void *)(cmd + 1);
+}
+
+/*
+==================
+RB_ReadPixels
+==================
+*/
+const void *RB_ReadPixels( const void *data )
+{
+	const readPixelsCommand_t	*cmd;
+	int		memcount;
+
+	cmd = (const readPixelsCommand_t *)data;
+
+	// finish any 2D drawing if needed
+	if ( tess.numIndexes ) {
+		RB_EndSurface();
+	}
+
+	memcount = PAD(glConfig.vidWidth * 3, cmd->padding) * glConfig.vidHeight;
+
+	if ( cmd->bufSize < memcount ) {
+		ri.Error( ERR_DROP, "RB_ReadPixels: buffer too small\n" );
+	}
+
+	qglPixelStorei(GL_PACK_ALIGNMENT, cmd->padding);
+	qglReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight,
+		cmd->format, GL_UNSIGNED_BYTE, cmd->buffer);
+
+	return (const void *)(cmd + 1);
+}
+
+/*
 ====================
 RB_ExecuteRenderCommands
 
@@ -1324,11 +1362,13 @@ smp extensions, or asyncronously by another thread.
 ====================
 */
 void RB_ExecuteRenderCommands( const void *data ) {
-	int		t1, t2;
+	int			t1, t2;
 
 	t1 = ri.Milliseconds()*Cvar_VariableValue("timescale");
 
-	while (1) {
+	while ( 1 ) {
+		data = PADP( data, sizeof( void * ) );
+
 		switch ( *(const int *)data ) {
 		case RC_SET_COLOR:
 			data = RB_SetColor( data );
@@ -1336,11 +1376,8 @@ void RB_ExecuteRenderCommands( const void *data ) {
 		case RC_STRETCH_PIC:
 			data = RB_StretchPic( data );
 			break;
-		case RC_ROTATE_PIC:
-			data = RB_RotatePic( data );
-			break;
-		case RC_ROTATE_PIC2:
-			data = RB_RotatePic2( data );
+		case RC_TRANSFORM_PIC:
+			data = RB_TransformPic( data );
 			break;
 		case RC_DRAW_SURFS:
 			data = RB_DrawSurfs( data );
@@ -1351,16 +1388,24 @@ void RB_ExecuteRenderCommands( const void *data ) {
 		case RC_SWAP_BUFFERS:
 			data = RB_SwapBuffers( data );
 			break;
-
+		case RC_WORLD_EFFECTS:
+			data = RB_WorldEffects( data );
+			break;
+		case RC_GAMMA_CORRECTION:
+			data = RB_GammaCorrection( data );
+			break;
+		case RC_READ_PIXELS:
+			data = RB_ReadPixels( data );
+			break;
 		case RC_END_OF_LIST:
-		default:
 			// stop rendering
 			t2 = ri.Milliseconds()*Cvar_VariableValue("timescale");
 			backEnd.pc.msec = t2 - t1;
 			return;
+		default:
+			ri.Error(ERR_DROP, "Unknown render command");
 		}
 	}
-
 }
 
 // What Pixel Shader type is currently active (regcoms or fragment programs).
@@ -1438,8 +1483,8 @@ static void RB_BlurGlowTexture()
 
 	// NOTE: The 0.25 is because we're blending 4 textures (so = 1.0) and we want a relatively normalized pixel
 	// intensity distribution, but this won't happen anyways if intensity is higher than 1.0.
-	float fBlurDistribution = r_DynamicGlowIntensity->value * 0.25f;
-	float fBlurWeight[4] = { fBlurDistribution, fBlurDistribution, fBlurDistribution, 1.0f };
+	const float fBlurDistribution = r_DynamicGlowIntensity->value * 0.25f;
+	const float fBlurWeight[4] = { fBlurDistribution, fBlurDistribution, fBlurDistribution, 1.0f };
 
 	// Enable and set the Vertex Program.
 	qglEnable( GL_VERTEX_PROGRAM_ARB );

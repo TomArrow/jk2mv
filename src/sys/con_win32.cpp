@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
+#include "../server/server.h"
 #include "con_local.h"
 #include "sys_local.h"
 #define WIN32_LEAN_AND_MEAN
@@ -71,7 +72,7 @@ static WORD CON_ColorCharToAttrib( char color, bool extendedColors ) {
 	}
 	else
 	{
-		float *rgba;
+		const float *rgba;
 		int colIndex = (extendedColors ? ColorIndex_Extended(color) : ColorIndex(color));
 		if ( colIndex > 7 ) colIndex = COLOR_JK2MV_FALLBACK;
 		rgba = g_color_table[ colIndex ];
@@ -404,7 +405,7 @@ char *CON_Input( void )
 	INPUT_RECORD buff[ MAX_EDIT_LINE ];
 	DWORD count = 0, events = 0;
 	WORD key = 0;
-	int i;
+	DWORD i;
 	int newlinepos = -1;
 
 	if( !GetNumberOfConsoleInputEvents( qconsole_hin, &events ) )
@@ -412,6 +413,9 @@ char *CON_Input( void )
 
 	if( events < 1 )
 		return NULL;
+
+	// disable hibernation for ten seconds to workaround console input lagg
+	svs.hibernation.disableUntil = svs.time + 10000;
 
 	// if we have overflowed, start dropping oldest input events
 	if( events >= MAX_EDIT_LINE )

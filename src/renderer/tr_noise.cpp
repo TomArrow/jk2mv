@@ -12,9 +12,9 @@ static int s_noise_perm[NOISE_SIZE];
 
 #define LERP( a, b, w ) ( a * ( 1.0f - w ) + b * w )
 
-static float GetNoiseValue( int x, int y, int z, int t )
+static float GetNoiseValue( int x, int y, int z, int64_t t )
 {
-	int index = INDEX( ( int ) x, ( int ) y, ( int ) z, ( int ) t );
+	int index = INDEX( x, y, z, t );
 
 	return s_noise_table[index];
 }
@@ -34,27 +34,28 @@ void R_NoiseInit( void )
 
 	for ( i = 0; i < NOISE_SIZE; i++ )
 	{
-		s_noise_table[i] = ( float ) ( ( ( rand() / ( float ) RAND_MAX ) * 2.0 - 1.0 ) );
+		s_noise_table[i] = ( float ) ( ( ( rand() / ( float ) RAND_MAX ) * 2.0f - 1.0f ) );
 		s_noise_perm[i] = ( unsigned char ) ( rand() / ( float ) RAND_MAX * 255 );
 	}
 }
 
-float R_NoiseGet4f( float x, float y, float z, float t )
+float R_NoiseGet4f( float x, float y, float z, double t )
 {
 	int i;
-	int ix, iy, iz, it;
+	int ix, iy, iz;
+	int64_t it;
 	float fx, fy, fz, ft;
 	float front[4];
 	float back[4];
 	float fvalue, bvalue, value[2], finalvalue;
 
-	ix = ( int ) floor( x );
+	ix = ( int ) floorf( x );
 	fx = x - ix;
-	iy = ( int ) floor( y );
+	iy = ( int ) floorf( y );
 	fy = y - iy;
-	iz = ( int ) floor( z );
+	iz = ( int ) floorf( z );
 	fz = z - iz;
-	it = ( int ) floor( t );
+	it = ( int64_t ) floor( t );
 	ft = t - it;
 
 	for ( i = 0; i < 2; i++ )

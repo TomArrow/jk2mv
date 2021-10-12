@@ -7,7 +7,7 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
-char *svc_strings[256] = {
+static const char * const svc_strings[256] = {
 	"svc_bad",
 
 	"svc_nop",
@@ -20,13 +20,11 @@ char *svc_strings[256] = {
 	"svc_mapchange",
 };
 
-void SHOWNET( msg_t *msg, char *s) {
+static void SHOWNET( const msg_t *msg, const char *s) {
 	if ( cl_shownet->integer >= 2) {
 		Com_Printf ("%3i:%s\n", msg->readcount-1, s);
 	}
 }
-
-void CL_SP_Print(const word ID, byte *Data); //, char* color)
 
 /*
 =========================================================================
@@ -323,7 +321,11 @@ void CL_SystemInfoChanged( void ) {
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
 
-	// don't set any vars when playing a demo
+	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
+	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
+	FS_PureServerSetReferencedPaks( s, t );
+
+	// don't set any other vars when playing a demo
 	if ( clc.demoplaying ) {
 		return;
 	}
@@ -338,10 +340,6 @@ void CL_SystemInfoChanged( void ) {
 	s = Info_ValueForKey( systemInfo, "sv_paks" );
 	t = Info_ValueForKey( systemInfo, "sv_pakNames" );
 	FS_PureServerSetLoadedPaks( s, t );
-
-	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
-	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
-	FS_PureServerSetReferencedPaks( s, t );
 
 	gameSet = qfalse;
 	// scan through all the variables in the systeminfo and locally set cvars to match
@@ -441,16 +439,19 @@ void CL_ParseGamestate( msg_t *msg ) {
 				Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 			}
 
-			if ( demoCheckFor103 && i == CS_SERVERINFO ) {
-				//This is the big serverinfo string containing the value of the "version" cvar of the server.
-				//If we are about to play a demo, we can use this information to ascertain whether this demo was recorded on
-				//a 1.03 server.
-				if ( CL_ServerVersionIs103( Info_ValueForKey(s, "version") ) ) {
-					//A 1.03 demo - set the proper game version internally so parsing snapshots etc won't fail
-					MV_SetCurrentGameversion( VERSION_1_03 );
-				}
+			if ( i == CS_SERVERINFO ) {
+				if ( demoCheckFor103 ) {
+					//This is the big serverinfo string containing the value of the "version" cvar of the server.
+					//If we are about to play a demo, we can use this information to ascertain whether this demo was recorded on
+					//a 1.03 server.
+					if ( CL_ServerVersionIs103( Info_ValueForKey(s, "version") ) ) {
+						//A 1.03 demo - set the proper game version internally so parsing snapshots etc won't fail
+						MV_SetCurrentGameversion( VERSION_1_03 );
+					}
 
-				demoCheckFor103 = false; //No need to check this again while playing the demo.
+					demoCheckFor103 = false; //No need to check this again while playing the demo.
+				}
+				clc.udpdl = atoi( Info_ValueForKey(s, "sv_allowDownload") );
 			}
 
 			// append it to the gameState string buffer
@@ -537,7 +538,7 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 	}
 
 	size = MSG_ReadShort(msg);
-	if (size < 0 || size > sizeof(data)) {
+	if ((unsigned)size > sizeof(data)) {
 		Com_Error(ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk", size);
 		return;
 	}
@@ -572,6 +573,7 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 
 	// So UI gets access to it
 	Cvar_SetValue( "cl_downloadCount", clc.downloadCount );
+	WIN_SetTaskbarState(TBS_PROGRESS, clc.downloadCount, clc.downloadSize);
 
 	if (!size) { // A zero length block means EOF
 		if (clc.download) {
@@ -613,6 +615,8 @@ void CL_EndHTTPDownload(dlHandle_t handle, qboolean success, const char *err_msg
 	*clc.downloadTempName = *clc.downloadName = 0;
 	Cvar_Set("cl_downloadName", "");
 
+	WIN_SetTaskbarState(TBS_NORMAL, 0, 0);
+
 	CL_NextDownload();
 }
 
@@ -627,6 +631,8 @@ void CL_ProcessHTTPDownload(size_t dltotal, size_t dlnow) {
 	if (dltotal && dlnow) {
 		Cvar_SetValue("cl_downloadSize", (int)dltotal);
 		Cvar_SetValue("cl_downloadCount", (int)dlnow);
+
+		WIN_SetTaskbarState(TBS_PROGRESS, dlnow, dltotal);
 	}
 }
 
@@ -653,6 +659,8 @@ void CL_KillDownload() {
 	}
 	*clc.downloadTempName = *clc.downloadName = 0;
 	Cvar_Set("cl_downloadName", "");
+
+	WIN_SetTaskbarState(TBS_NORMAL, 0, 0);
 }
 
 /*
@@ -739,7 +747,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 	// other commands
 		switch ( cmd ) {
 		default:
-			Com_Error (ERR_DROP,"CL_ParseServerMessage: Illegible server message\n");
+			Com_Error (ERR_DROP,"CL_ParseServerMessage: Illegible server message");
 			break;
 		case svc_nop:
 			break;
@@ -771,7 +779,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 extern int			scr_center_y;
 void SCR_CenterPrint (char *str);//, PalIdx_t colour)
 
-void CL_SP_Print(const word ID, byte *Data) //, char* color)
+void CL_SP_Print(const word ID, intptr_t Data) //, char* color)
 {
 	cStringsSingle	*String;
 	unsigned int	Flags;
@@ -782,8 +790,38 @@ void CL_SP_Print(const word ID, byte *Data) //, char* color)
 	{
 		Text = String->GetText();
 		if (Data)
-		{
-			Com_sprintf(temp, sizeof(temp), Text, Data);
+		{	// replacement for unsafe printf - supports %d, %i and %s
+			const char	*p, *tail;
+			char		head[1024];
+			qboolean	done = qfalse;
+
+			Q_strncpyz(head, Text, sizeof(head));
+			Q_strncpyz(temp, Text, sizeof(head));
+
+			while((p = strchr(Text, '%')) && !done) {
+				switch(p[1]) {
+				case 's':
+					head[p - Text] = '\0';
+					tail = p + 2;
+					Com_sprintf(temp, sizeof(temp), "%s%s%s", head, (char *)VM_ArgString(CG_SP_PRINT, Data), tail);
+					done = qtrue;
+					break;
+				case 'd':
+				case 'i':
+					head[p - Text] = '\0';
+					tail = p + 2;
+					Com_sprintf(temp, sizeof(temp), "%s%d%s", head, *(int *)VM_ArgPtr(CG_SP_PRINT, Data, sizeof(int)), tail);
+					done = qtrue;
+					break;
+				case '\0':
+					done = qtrue;
+					break;
+				default:
+					p += 2;
+					break;
+				}
+			}
+
 			Text = temp;
 		}
 

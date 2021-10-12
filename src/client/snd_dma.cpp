@@ -107,8 +107,9 @@ channel_t   s_channels[MAX_CHANNELS];
 channel_t   loop_channels[MAX_CHANNELS];
 int			numLoopChannels;
 
-static int	s_soundStarted;
-qboolean	s_soundMuted;
+static qboolean	s_soundStarted;
+qboolean		s_soundMuted;
+static int		s_lastMuteModCount;
 
 dma_t		dma;
 
@@ -138,8 +139,9 @@ cvar_t		*s_musicVolume;
 cvar_t		*s_musicMult;
 cvar_t		*s_separation;
 cvar_t		*s_doppler;
-cvar_t		*s_language;
-
+cvar_t		*s_s_language;
+cvar_t		*s_muteWhenMinimized;
+cvar_t		*s_muteWhenUnfocused;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
 static	channel_t		*freelist = NULL;
@@ -253,7 +255,6 @@ void S_SoundInfo_f(void) {
 		Com_Printf("%5d samplebits\n", dma.samplebits);
 		Com_Printf("%5d submission_chunk\n", dma.submission_chunk);
 		Com_Printf("%5d speed\n", dma.speed);
-		Com_Printf("0x%x dma buffer\n", dma.buffer);
 		if ( tMusic_Info[eBGRNDTRACK_SLOW].s_backgroundFile ) {
 			Com_Printf("Background file: %s\n", sMusic_BackgroundLoop );
 		} else {
@@ -303,7 +304,11 @@ void S_Init( void )
 	s_show = Cvar_Get ("s_show", "0", CVAR_CHEAT);
 	s_testsound = Cvar_Get ("s_testsound", "0", CVAR_CHEAT);
 
-	s_language = Cvar_Get("s_language", "english", CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
+	s_s_language = Cvar_Get("s_language", "english", CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
+	s_muteWhenUnfocused = Cvar_Get("s_muteWhenUnfocused", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	s_muteWhenMinimized = Cvar_Get("s_muteWhenMinimized", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+
+	s_lastMuteModCount = -1;
 
 	MP3_InitCvars();
 
@@ -340,7 +345,7 @@ void S_Init( void )
 		if (alcGetError(ALCDevice) != ALC_NO_ERROR)
 			return;
 
-		s_soundStarted = 1;
+		s_soundStarted = qtrue;
 		s_soundMuted = qtrue;
 		s_soundtime = 0;
 		s_paintedtime = 0;
@@ -423,14 +428,14 @@ void S_Init( void )
 		return;
 	}
 	else
-	{
 	#endif
-		r = SNDDMA_Init();
+	{
+		r = SNDDMA_Init(s_khz->integer);
 		Com_Printf("------------------------------------\n");
 
 		if ( r ) {
-		s_soundStarted = 1;
-		s_soundMuted = (qboolean)1;
+		s_soundStarted = qtrue;
+		s_soundMuted = qtrue;
 //		s_numSfx = 0;
 
 		s_soundtime = 0;
@@ -440,9 +445,7 @@ void S_Init( void )
 
 		S_SoundInfo_f();
 		}
-		#ifdef USE_OPENAL
 	}
-	#endif
 }
 
 /*
@@ -582,13 +585,13 @@ void S_Shutdown( void )
 	}
 #endif
 
-	s_soundStarted = 0;
+	s_soundStarted = qfalse;
 
     Cmd_RemoveCommand("play");
 	Cmd_RemoveCommand("music");
-	Cmd_RemoveCommand("stopsound");
 	Cmd_RemoveCommand("soundlist");
 	Cmd_RemoveCommand("soundinfo");
+	Cmd_RemoveCommand("soundstop");
 }
 
 
@@ -634,10 +637,10 @@ sfx_t *S_FindName( const char *name ) {
 	sfx_t	*sfx;
 
 	if (!name) {
-		Com_Error (ERR_FATAL, "S_FindName: NULL\n");
+		Com_Error (ERR_FATAL, "S_FindName: NULL");
 	}
 	if (!name[0]) {
-		Com_Error (ERR_FATAL, "S_FindName: empty name\n");
+		Com_Error (ERR_FATAL, "S_FindName: empty name");
 	}
 
 	if (strlen(name) >= MAX_QPATH) {
@@ -828,15 +831,15 @@ sfxHandle_t	S_RegisterSound( const char *name)
 
 	if (!name)
 	{
-		Com_Error (ERR_FATAL, "S_RegisterSound: NULL name\n");
+		Com_Error (ERR_FATAL, "S_RegisterSound: NULL name");
 	}
 	if (!name[0])
 	{
-		Com_Error (ERR_FATAL, "S_RegisterSound: empty name\n");
+		Com_Error (ERR_FATAL, "S_RegisterSound: empty name");
 	}
 
 	if ( strlen( name ) >= MAX_QPATH ) {
-		Com_Error (ERR_FATAL, "S_RegisterSound: Sound name exceeds MAX_QPATH - %s\n", name );
+		Com_Error (ERR_FATAL, "S_RegisterSound: Sound name exceeds MAX_QPATH - %s", name );
 		return 0;
 	}
 
@@ -929,8 +932,8 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 	}
 	else
 	{
-		rscale = 0.5 * (1.0 + dot);
-		lscale = 0.5 * (1.0 - dot);
+		rscale = 0.5f * (1.0f + dot);
+		lscale = 0.5f * (1.0f - dot);
 		//rscale = s_separation->value + ( 1.0 - s_separation->value ) * dot;
 		//lscale = s_separation->value - ( 1.0 - s_separation->value ) * dot;
 		if ( rscale < 0 ) {
@@ -942,12 +945,12 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 	}
 
 	// add in distance effect
-	scale = (1.0 - dist) * rscale;
+	scale = (1.0f - dist) * rscale;
 	*right_vol = (master_vol * scale);
 	if (*right_vol < 0)
 		*right_vol = 0;
 
-	scale = (1.0 - dist) * lscale;
+	scale = (1.0f - dist) * lscale;
 	*left_vol = (master_vol * scale);
 	if (*left_vol < 0)
 		*left_vol = 0;
@@ -1255,7 +1258,7 @@ if pos is NULL, the sound will be dynamically sourced from the entity
 Entchannel 0 will never override a playing sound
 ====================
 */
-void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) {
+void S_StartSound(const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) {
 	channel_t	*ch;
 	sfx_t		*sfx;
 	int			i;
@@ -1433,7 +1436,7 @@ void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW, "S_StartLocalSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "S_StartLocalSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -1541,6 +1544,43 @@ void S_StopAllSounds(void)
 }
 
 /*
+===============
+S_Activate
+
+(De)activates sound playback
+===============
+*/
+void S_Activate(qboolean activate)
+{
+#ifdef USE_OPENAL
+	if (s_UseOpenAL)
+	{
+		S_MuteAllSounds((qboolean)!activate);
+	}
+	else
+#endif
+	{
+		SNDDMA_Activate(activate);
+	}
+}
+
+void S_CheckMuteWhenMinimized(void)
+{
+	if (com_minimized->modificationCount +
+		com_unfocused->modificationCount != s_lastMuteModCount)
+	{
+		int disable =
+			(com_minimized->integer && s_muteWhenMinimized->integer) ||
+			(com_unfocused->integer && s_muteWhenUnfocused->integer);
+
+		S_Activate((qboolean)!disable);
+
+		s_lastMuteModCount = com_minimized->modificationCount +
+			com_unfocused->modificationCount;
+	}
+}
+
+/*
 ==============================================================
 
 continuous looping sounds are added each frame
@@ -1549,6 +1589,11 @@ continuous looping sounds are added each frame
 */
 
 void S_StopLoopingSound(int entityNum) {
+	if ( entityNum < 0 || MAX_GENTITIES <= entityNum ) {
+		Com_DPrintf( S_COLOR_YELLOW "S_StopLoopingSound: bad entitynum %i\n", entityNum );
+		return;
+	}
+
 	loopSounds[entityNum].active = qfalse;
 //	loopSounds[entityNum].sfx = 0;
 	loopSounds[entityNum].kill = qfalse;
@@ -1598,6 +1643,11 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 
 	if ( !sfx->iSoundLengthInSamples ) {
 		Com_Error( ERR_DROP, "%s has length 0", sfx->sSoundName );
+	}
+
+	if ( entityNum < 0 || MAX_GENTITIES <= entityNum ) {
+		Com_DPrintf( S_COLOR_YELLOW "S_AddLoopingSound: bad entitynum %i\n", entityNum );
+		return;
 	}
 
 	VectorCopy( origin, loopSounds[entityNum].origin );
@@ -1675,7 +1725,7 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t vel
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW, "S_AddRealLoopingSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "S_AddRealLoopingSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -1689,6 +1739,12 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t vel
 	if ( !sfx->iSoundLengthInSamples ) {
 		Com_Error( ERR_DROP, "%s has length 0", sfx->sSoundName );
 	}
+
+	if ( entityNum < 0 || MAX_GENTITIES <= entityNum ) {
+		Com_DPrintf( S_COLOR_YELLOW "S_AddRealLoopingSound: bad entitynum %i\n", entityNum );
+		return;
+	}
+
 	VectorCopy( origin, loopSounds[entityNum].origin );
 	VectorCopy( velocity, loopSounds[entityNum].velocity );
 	loopSounds[entityNum].sfx = sfx;
@@ -1725,7 +1781,7 @@ static qboolean LoopSound_ChannelInit(loopSound_t *pLoopSound, int iLeftVol, int
 	//
 	if (pLoopSound->sfx->pMP3StreamHeader)
 	{
-		Com_Error( ERR_DROP, "LoopSound_ChannelInit(): Cannot use streamed MP3 files here for random access (%s)\n",pLoopSound->sfx->sSoundName );
+		Com_Error( ERR_DROP, "LoopSound_ChannelInit(): Cannot use streamed MP3 files here for random access (%s)",pLoopSound->sfx->sSoundName );
 	}
 	else
 	{
@@ -1826,7 +1882,7 @@ If raw data has been loaded in little endien binary form, this must be done.
 If raw data was calculated, as with ADPCM, this should not be called.
 =================
 */
-void S_ByteSwapRawSamples( int samples, int width, int s_channels, const byte *data ) {
+static void S_ByteSwapRawSamples( int samples, int width, int s_channels, byte *data ) {
 	int		i;
 
 	if ( width != 2 ) {
@@ -1877,14 +1933,14 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 //Com_Printf ("%i < %i < %i\n", s_soundtime, s_paintedtime, s_rawend);
 	if (s_channels == 2 && width == 2)
 	{
-		if (scale == 1.0)
+		if (scale == 1.0f)
 		{	// optimized case
 			for (i=0 ; i<samples ; i++)
 			{
 				dst = s_rawend&(MAX_RAW_SAMPLES-1);
 				s_rawend++;
-				s_rawsamples[dst].left = ((short *)data)[i*2] * intVolume;
-				s_rawsamples[dst].right = ((short *)data)[i*2+1] * intVolume;
+				s_rawsamples[dst].left = ((const short *)data)[i*2] * intVolume;
+				s_rawsamples[dst].right = ((const short *)data)[i*2+1] * intVolume;
 			}
 		}
 		else
@@ -1896,8 +1952,8 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 					break;
 				dst = s_rawend&(MAX_RAW_SAMPLES-1);
 				s_rawend++;
-				s_rawsamples[dst].left = ((short *)data)[src*2] * intVolume;
-				s_rawsamples[dst].right = ((short *)data)[src*2+1] * intVolume;
+				s_rawsamples[dst].left = ((const short *)data)[src*2] * intVolume;
+				s_rawsamples[dst].right = ((const short *)data)[src*2+1] * intVolume;
 			}
 		}
 	}
@@ -1910,8 +1966,8 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 				break;
 			dst = s_rawend&(MAX_RAW_SAMPLES-1);
 			s_rawend++;
-			s_rawsamples[dst].left = ((short *)data)[src] * intVolume;
-			s_rawsamples[dst].right = ((short *)data)[src] * intVolume;
+			s_rawsamples[dst].left = ((const short *)data)[src] * intVolume;
+			s_rawsamples[dst].right = ((const short *)data)[src] * intVolume;
 		}
 	}
 	else if (s_channels == 2 && width == 1)
@@ -1925,8 +1981,8 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 				break;
 			dst = s_rawend&(MAX_RAW_SAMPLES-1);
 			s_rawend++;
-			s_rawsamples[dst].left = ((char *)data)[src*2] * intVolume;
-			s_rawsamples[dst].right = ((char *)data)[src*2+1] * intVolume;
+			s_rawsamples[dst].left = ((const char *)data)[src*2] * intVolume;
+			s_rawsamples[dst].right = ((const char *)data)[src*2+1] * intVolume;
 		}
 	}
 	else if (s_channels == 1 && width == 1)
@@ -1940,8 +1996,8 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 				break;
 			dst = s_rawend&(MAX_RAW_SAMPLES-1);
 			s_rawend++;
-			s_rawsamples[dst].left = (((byte *)data)[src]-128) * intVolume;
-			s_rawsamples[dst].right = (((byte *)data)[src]-128) * intVolume;
+			s_rawsamples[dst].left = (((const byte *)data)[src]-128) * intVolume;
+			s_rawsamples[dst].right = (((const byte *)data)[src]-128) * intVolume;
 		}
 	}
 
@@ -1967,7 +2023,7 @@ void S_UpdateEntityPosition( int entityNum, const vec3_t origin )
 	channel_t *ch;
 	int i;
 
-	if ( entityNum < 0 || entityNum > MAX_GENTITIES ) {
+	if ( entityNum < 0 || entityNum >= MAX_GENTITIES ) {
 		Com_Error( ERR_DROP, "S_UpdateEntityPosition: bad entitynum %i", entityNum );
 	}
 
@@ -2193,6 +2249,8 @@ void S_Update( void ) {
 		return;
 	}
 
+	S_CheckMuteWhenMinimized();
+
 #ifdef USE_OPENAL
 	if (s_UseOpenAL)
 	{
@@ -2222,7 +2280,7 @@ void S_Update( void ) {
 			ch = s_channels;
 			for (i=0 ; i<MAX_CHANNELS; i++, ch++) {
 				if (ch->thesfx && (ch->leftvol || ch->rightvol) ) {
-					Com_Printf ("%f %f %s\n", ch->leftvol, ch->rightvol, ch->thesfx->sSoundName);
+					Com_Printf ("%d %d %s\n", ch->leftvol, ch->rightvol, ch->thesfx->sSoundName);
 					total++;
 				}
 			}
@@ -2269,6 +2327,22 @@ void S_GetSoundtime(void)
 	}
 	oldsamplepos = samplepos;
 
+	// with updated `buffers` it seems to synchronize better when done
+	if (CL_VideoRecording() && cl_aviFrameRate->integer)
+	{
+		static double	overflow = 0.0f;
+		double			frameSamples;
+		int				samples;
+
+		frameSamples = (double) dma.speed / cl_aviFrameRate->integer + overflow;
+		samples = floor(frameSamples);
+		overflow = frameSamples - samples;
+
+		s_soundtime += samples;
+
+		return;
+	}
+
 	s_soundtime = buffers*fullsamples + samplepos/dma.channels;
 
 #if 0
@@ -2289,7 +2363,7 @@ void S_GetSoundtime(void)
 
 
 void S_Update_(void) {
-	unsigned        endtime;
+	int				endtime;
 	int				samps;
 	static			float	lastTime = 0.0f;
 	float			ma, op;
@@ -2488,7 +2562,7 @@ void S_Update_(void) {
 		}
 
 		ma = s_mixahead->value * dma.speed;
-		op = s_mixPreStep->value + sane*dma.speed*0.01;
+		op = s_mixPreStep->value + sane*dma.speed*0.01f;
 
 		if (op < ma) {
 			ma = op;
@@ -2498,21 +2572,14 @@ void S_Update_(void) {
 		endtime = s_soundtime + ma;
 
 		// mix to an even submission block size
-		endtime = (endtime + dma.submission_chunk-1)
-			& ~(dma.submission_chunk-1);
+		endtime = PAD(endtime, dma.submission_chunk);
 
 		// never mix more than the complete buffer
 		samps = dma.samples >> (dma.channels-1);
 		if (endtime - s_soundtime > samps)
 			endtime = s_soundtime + samps;
 
-
-
-		SNDDMA_BeginPainting ();
-
 		S_PaintChannels (endtime);
-
-		SNDDMA_Submit ();
 
 		lastTime = thisTime;
 	}
@@ -2847,20 +2914,7 @@ void UpdateRawSamples()
 		if (state != AL_PLAYING)
 		{
 			// Stopped playing ... due to buffer underrun
-			// Unqueue any buffers still on the Source (they will be PROCESSED), and restart playback
-			alGetSourcei(s_channels[0].alSource, AL_BUFFERS_PROCESSED, &processed);
-
-			while (processed)
-			{
-				alSourceUnqueueBuffers(s_channels[0].alSource, 1, &buffer);
-				processed--;
-				alGetBufferi(buffer, AL_SIZE, &size);
-				alDeleteBuffers(1, &buffer);
-
-				// Update sg.soundtime (+= number of samples played (number of bytes / 4))
-				s_soundtime += (size >> 2);
-			}
-
+			// Restart playback - old buffers were already unqueued
 			alSourcePlay(s_channels[0].alSource);
 		}
 	}
@@ -2914,7 +2968,7 @@ static void S_Music_f( void ) {
 
 // this table needs to be in-sync with the typedef'd enum "SoundCompressionMethod_t"...	-ste
 //
-static const char *sSoundCompressionMethodStrings[ct_NUMBEROF] =
+static const char * const sSoundCompressionMethodStrings[ct_NUMBEROF] =
 {
 	"16b",	// ct_16
 	"mp3"	// ct_MP3
@@ -2927,11 +2981,11 @@ void S_SoundList_f( void ) {
 	total = 0;
 
 	Com_Printf("\n");
-	Com_Printf("					InMemory?\n");
-	Com_Printf("					|\n");
-	Com_Printf("					|  LevelLastUsedOn\n");
-	Com_Printf("					|  |\n");
-	Com_Printf("					|  |\n");
+	Com_Printf("                    InMemory?\n");
+	Com_Printf("                    |\n");
+	Com_Printf("                    |  LevelLastUsedOn\n");
+	Com_Printf("                    |  |\n");
+	Com_Printf("                    |  |\n");
 	Com_Printf(" Slot   Bytes Type  |  |   Name\n");
 //	Com_Printf(" Slot   Bytes Type  InMem?   Name\n");
 
@@ -3261,8 +3315,8 @@ static void S_StartBackgroundTrack_Actual( MusicInfo_t *pMusicInfo, const char *
 
 
 
-static char gsIntroMusic[MAX_QPATH]={0};
-static char gsLoopMusic [MAX_QPATH]={0};
+static char gsIntroMusic[MAX_QPATH];
+static char gsLoopMusic [MAX_QPATH];
 
 void S_RestartMusic( void )
 {
@@ -3377,6 +3431,11 @@ static qboolean S_UpdateBackgroundTrack_Actual( MusicInfo_t *pMusicInfo )
 		// decide how much data needs to be read from the file
 		fileSamples = bufferSamples * pMusicInfo->s_backgroundInfo.rate / dma.speed;
 
+		// don't try to play if there are no more samples in the file
+		if ( !fileSamples ) {
+			return qfalse;
+		}
+
 		// don't try and read past the end of the file
 		if ( fileSamples > pMusicInfo->s_backgroundSamples ) {
 			fileSamples = pMusicInfo->s_backgroundSamples;
@@ -3384,7 +3443,7 @@ static qboolean S_UpdateBackgroundTrack_Actual( MusicInfo_t *pMusicInfo )
 
 		// our max buffer size
 		fileBytes = fileSamples * (pMusicInfo->s_backgroundInfo.width * pMusicInfo->s_backgroundInfo.channels);
-		if (fileBytes > RAWSIZE ) {
+		if (fileBytes > (int)RAWSIZE ) {
 			fileBytes = RAWSIZE;
 			fileSamples = fileBytes / (pMusicInfo->s_backgroundInfo.width * pMusicInfo->s_backgroundInfo.channels);
 		}
@@ -3455,7 +3514,7 @@ static qboolean S_UpdateBackgroundTrack_Actual( MusicInfo_t *pMusicInfo )
 
 			if (S_FileExists( sTestName ))
 			{
-				S_StartBackgroundTrack_Actual( pMusicInfo, sMusic_BackgroundLoop, sMusic_BackgroundLoop );
+				S_StartBackgroundTrack_Actual( pMusicInfo, sTestName, sTestName );
 			}
 			else
 			{
@@ -3804,6 +3863,11 @@ bool LoadEALFile(char *szEALFilename)
 
 	// Load EAL file from PAK file
 	result = FS_ReadFile(szEALFilename, (void **)&ealData);
+	if (result == -1)
+	{
+		Com_DPrintf("LoadEALFile: Couldn't open %s\n", szEALFilename);
+	}
+
 	if ((ealData) && (result != -1))
 	{
 		hr = s_lpEAXManager->LoadDataSet(ealData, EMFLAG_LOADFROMMEMORY);
@@ -4081,7 +4145,7 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->flEnvironmentSize == lpFinish->flEnvironmentSize)
 		lpResult->flEnvironmentSize = lpStart->flEnvironmentSize;
 	else
-		lpResult->flEnvironmentSize = (float)exp( (log(lpStart->flEnvironmentSize) * flInvRatio) + (log(lpFinish->flEnvironmentSize) * flRatio) );
+		lpResult->flEnvironmentSize = expf( (logf(lpStart->flEnvironmentSize) * flInvRatio) + (logf(lpFinish->flEnvironmentSize) * flRatio) );
 
 	// Environment Diffusion
 	if (lpStart->flEnvironmentDiffusion == lpFinish->flEnvironmentDiffusion)
@@ -4093,49 +4157,49 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->lRoom == lpFinish->lRoom)
 		lpResult->lRoom = lpStart->lRoom;
 	else
-		lpResult->lRoom = (int)( ((float)lpStart->lRoom * flInvRatio) + ((float)lpFinish->lRoom * flRatio) );
+		lpResult->lRoom = lpStart->lRoom * flInvRatio + lpFinish->lRoom * flRatio;
 
 	// Room HF
 	if (lpStart->lRoomHF == lpFinish->lRoomHF)
 		lpResult->lRoomHF = lpStart->lRoomHF;
 	else
-		lpResult->lRoomHF = (int)( ((float)lpStart->lRoomHF * flInvRatio) + ((float)lpFinish->lRoomHF * flRatio) );
+		lpResult->lRoomHF = lpStart->lRoomHF * flInvRatio + lpFinish->lRoomHF * flRatio;
 
 	// Room LF
 	if (lpStart->lRoomLF == lpFinish->lRoomLF)
 		lpResult->lRoomLF = lpStart->lRoomLF;
 	else
-		lpResult->lRoomLF = (int)( ((float)lpStart->lRoomLF * flInvRatio) + ((float)lpFinish->lRoomLF * flRatio) );
+		lpResult->lRoomLF = lpStart->lRoomLF * flInvRatio + lpFinish->lRoomLF * flRatio;
 
 	// Decay Time
 	if (lpStart->flDecayTime == lpFinish->flDecayTime)
 		lpResult->flDecayTime = lpStart->flDecayTime;
 	else
-		lpResult->flDecayTime = (float)exp( (log(lpStart->flDecayTime) * flInvRatio) + (log(lpFinish->flDecayTime) * flRatio) );
+		lpResult->flDecayTime = expf( (logf(lpStart->flDecayTime) * flInvRatio) + (logf(lpFinish->flDecayTime) * flRatio) );
 
 	// Decay HF Ratio
 	if (lpStart->flDecayHFRatio == lpFinish->flDecayHFRatio)
 		lpResult->flDecayHFRatio = lpStart->flDecayHFRatio;
 	else
-		lpResult->flDecayHFRatio = (float)exp( (log(lpStart->flDecayHFRatio) * flInvRatio) + (log(lpFinish->flDecayHFRatio) * flRatio) );
+		lpResult->flDecayHFRatio = expf( (logf(lpStart->flDecayHFRatio) * flInvRatio) + (logf(lpFinish->flDecayHFRatio) * flRatio) );
 
 	// Decay LF Ratio
 	if (lpStart->flDecayLFRatio == lpFinish->flDecayLFRatio)
 		lpResult->flDecayLFRatio = lpStart->flDecayLFRatio;
 	else
-		lpResult->flDecayLFRatio = (float)exp( (log(lpStart->flDecayLFRatio) * flInvRatio) + (log(lpFinish->flDecayLFRatio) * flRatio) );
+		lpResult->flDecayLFRatio = expf( (logf(lpStart->flDecayLFRatio) * flInvRatio) + (logf(lpFinish->flDecayLFRatio) * flRatio) );
 
 	// Reflections
 	if (lpStart->lReflections == lpFinish->lReflections)
 		lpResult->lReflections = lpStart->lReflections;
 	else
-		lpResult->lReflections = (int)( ((float)lpStart->lReflections * flInvRatio) + ((float)lpFinish->lReflections * flRatio) );
+		lpResult->lReflections = lpStart->lReflections * flInvRatio + lpFinish->lReflections * flRatio;
 
 	// Reflections Delay
 	if (lpStart->flReflectionsDelay == lpFinish->flReflectionsDelay)
 		lpResult->flReflectionsDelay = lpStart->flReflectionsDelay;
 	else
-		lpResult->flReflectionsDelay = (float)exp( (log(lpStart->flReflectionsDelay+0.0001) * flInvRatio) + (log(lpFinish->flReflectionsDelay+0.0001) * flRatio) );
+		lpResult->flReflectionsDelay = expf( (logf(lpStart->flReflectionsDelay+0.0001f) * flInvRatio) + (logf(lpFinish->flReflectionsDelay+0.0001f) * flRatio) );
 
 	// Reflections Pan
 
@@ -4165,13 +4229,13 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->lReverb == lpFinish->lReverb)
 		lpResult->lReverb = lpStart->lReverb;
 	else
-		lpResult->lReverb = (int)( ((float)lpStart->lReverb * flInvRatio) + ((float)lpFinish->lReverb * flRatio) );
+		lpResult->lReverb = lpStart->lReverb * flInvRatio + lpFinish->lReverb * flRatio;
 
 	// Reverb Delay
 	if (lpStart->flReverbDelay == lpFinish->flReverbDelay)
 		lpResult->flReverbDelay = lpStart->flReverbDelay;
 	else
-		lpResult->flReverbDelay = (float)exp( (log(lpStart->flReverbDelay+0.0001) * flInvRatio) + (log(lpFinish->flReverbDelay+0.0001) * flRatio) );
+		lpResult->flReverbDelay = expf( (logf(lpStart->flReverbDelay+0.0001f) * flInvRatio) + (logf(lpFinish->flReverbDelay+0.0001f) * flRatio) );
 
 	// Reverb Pan
 
@@ -4201,7 +4265,7 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->flEchoTime == lpFinish->flEchoTime)
 		lpResult->flEchoTime = lpStart->flEchoTime;
 	else
-		lpResult->flEchoTime = (float)exp( (log(lpStart->flEchoTime) * flInvRatio) + (log(lpFinish->flEchoTime) * flRatio) );
+		lpResult->flEchoTime = expf( (logf(lpStart->flEchoTime) * flInvRatio) + (logf(lpFinish->flEchoTime) * flRatio) );
 
 	// Echo Depth
 	if (lpStart->flEchoDepth == lpFinish->flEchoDepth)
@@ -4213,7 +4277,7 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->flModulationTime == lpFinish->flModulationTime)
 		lpResult->flModulationTime = lpStart->flModulationTime;
 	else
-		lpResult->flModulationTime = (float)exp( (log(lpStart->flModulationTime) * flInvRatio) + (log(lpFinish->flModulationTime) * flRatio) );
+		lpResult->flModulationTime = expf( (logf(lpStart->flModulationTime) * flInvRatio) + (logf(lpFinish->flModulationTime) * flRatio) );
 
 	// Modulation Depth
 	if (lpStart->flModulationDepth == lpFinish->flModulationDepth)
@@ -4231,13 +4295,13 @@ bool EAX3ListenerInterpolate(LPEAXLISTENERPROPERTIES lpStart, LPEAXLISTENERPROPE
 	if (lpStart->flHFReference == lpFinish->flHFReference)
 		lpResult->flHFReference = lpStart->flHFReference;
 	else
-		lpResult->flHFReference = (float)exp( (log(lpStart->flHFReference) * flInvRatio) + (log(lpFinish->flHFReference) * flRatio) );
+		lpResult->flHFReference = expf( (logf(lpStart->flHFReference) * flInvRatio) + (logf(lpFinish->flHFReference) * flRatio) );
 
 	// LF Reference
 	if (lpStart->flLFReference == lpFinish->flLFReference)
 		lpResult->flLFReference = lpStart->flLFReference;
 	else
-		lpResult->flLFReference = (float)exp( (log(lpStart->flLFReference) * flInvRatio) + (log(lpFinish->flLFReference) * flRatio) );
+		lpResult->flLFReference = expf( (logf(lpStart->flLFReference) * flInvRatio) + (logf(lpFinish->flLFReference) * flRatio) );
 
 	// Room Rolloff Factor
 	if (lpStart->flRoomRolloffFactor == lpFinish->flRoomRolloffFactor)
@@ -4343,7 +4407,7 @@ void Clamp(EAXVECTOR *eaxVector)
 	float flMagnitude;
 	float flInvMagnitude;
 
-	flMagnitude = (float)sqrt((eaxVector->x*eaxVector->x) + (eaxVector->y*eaxVector->y) + (eaxVector->z*eaxVector->z));
+	flMagnitude = sqrtf((eaxVector->x*eaxVector->x) + (eaxVector->y*eaxVector->y) + (eaxVector->z*eaxVector->z));
 
 	if (flMagnitude <= 1.0f)
 		return;

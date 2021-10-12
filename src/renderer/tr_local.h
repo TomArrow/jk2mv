@@ -1,9 +1,8 @@
 #ifndef TR_LOCAL_H
 #define TR_LOCAL_H
 
-#include "../qcommon/q_shared.h"
-#include "../qcommon/qfiles.h"
 #include "../qcommon/qcommon.h"
+#include "../qcommon/qfiles.h"
 #include "tr_public.h"
 
 #ifndef DEDICATED
@@ -22,7 +21,7 @@ typedef unsigned int glIndex_t;
 // parallel on a dual cpu machine
 #define	SMP_FRAMES		2
 
-#define	MAX_SHADERS				2048
+#define	MAX_SHADERS				16384 // 14 bit, matching jka
 
 #define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32
@@ -81,6 +80,7 @@ typedef struct {
 	vec3_t		ambientLight;	// color normalized to 0-255
 	int			ambientLightInt;	// 32 bit rgba packed
 	vec3_t		directedLight;
+	qboolean	intShaderTime;
 } trRefEntity_t;
 
 
@@ -92,14 +92,13 @@ typedef struct {
 } orientationr_t;
 
 typedef struct {
-	char *name;
+	const char *name;
 	int	minimize, maximize;
 } textureMode_t;
 
 extern	int				gl_filter_min, gl_filter_max;
-extern	textureMode_t	modes[];
 
-textureMode_t *GetTextureMode( const char *name );
+const textureMode_t *GetTextureMode( const char *name );
 
 #define MAX_MIP_LEVELS 10
 
@@ -108,7 +107,7 @@ typedef struct {
 	qboolean		noPicMip;			// for images that must always be full resolution
 	qboolean		noLightScale;		// don't scale gamma/intensity. Included in noMipMaps
 	qboolean		noTC;				// for images that don't want to be texture compressed (eg skies)
-	textureMode_t	*textureMode;		// NULL = follow r_texturemode
+	const textureMode_t	*textureMode;		// NULL = follow r_texturemode
 } upload_t;
 
 typedef struct image_s {
@@ -473,7 +472,7 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 	int			numDeforms;
-	deformStage_t	deforms[MAX_SHADER_DEFORMS];
+	deformStage_t	*deforms[MAX_SHADER_DEFORMS];
 
 	int			numUnfoggedPasses;
 	int			lastNonDetailStage;
@@ -481,8 +480,8 @@ Ghoul2 Insert End
 
 	void		(*optimalStageIteratorFunc)( void );
 
-	float clampTime;                                  // time this shader is clamped to
-	float timeOffset;                                 // current time offset for this shader
+	double		clampTime;                                  // time this shader is clamped to
+	double		timeOffset;                                 // current time offset for this shader
 
 	int numStates;                                    // if non-zero this is a state shader
 	struct shader_s *currentShader;                   // current state if this is a state shader
@@ -495,18 +494,8 @@ Ghoul2 Insert End
 
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
 
-	int shaderStates[MAX_STATES_PER_SHADER];          // index to valid shader states
-
 	struct	shader_s	*next;
 } shader_t;
-
-typedef struct shaderState_s {
-  char shaderName[MAX_QPATH];     // name of shader this state belongs to
-  char name[MAX_STATE_NAME];      // name of this state
-  char stateShader[MAX_QPATH];    // shader this name invokes
-  int cycleTime;                  // time this cycle lasts, <= 0 is forever
-  shader_t *shader;
-} shaderState_t;
 
 /*
 Ghoul2 Insert Start
@@ -545,7 +534,7 @@ typedef struct {
 	byte		areamask[MAX_MAP_AREA_BYTES];
 	qboolean	areamaskModified;	// qtrue if areamask changed since last scene
 
-	float		floatTime;			// tr.refdef.time / 1000.0
+	double		floatTime;			// tr.refdef.time / 1000.0
 
 	// text messages for deform text shaders
 	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
@@ -863,7 +852,7 @@ typedef struct {
 	byte		*novis;			// clusterBytes of 0xff
 
 	char		*entityString;
-	char		*entityParsePoint;
+	const char	*entityParsePoint;
 } world_t;
 
 //======================================================================
@@ -939,14 +928,14 @@ compared quickly during the qsorting process
 
 the bits are allocated as follows:
 
-21 - 31	: sorted shader index
-11 - 20	: entity index
-2 - 6	: fog index
-//2		: used to be clipped flag REMOVED - 03.21.00 rad
-0 - 1	: dlightmap index
+31      : unused
+17 - 30 : sorted shader index
+7 - 16  : entity index
+2 - 6   : fog index
+0 - 1   : dlightmap index
 */
-#define	QSORT_SHADERNUM_SHIFT	21
-#define	QSORT_ENTITYNUM_SHIFT	11
+#define	QSORT_SHADERNUM_SHIFT	17	// MAX_SHADERS  (14 bit)
+#define	QSORT_ENTITYNUM_SHIFT	7	// MAX_ENTITIES (10 bit)
 #define	QSORT_FOGNUM_SHIFT		2
 
 /*
@@ -1025,6 +1014,7 @@ typedef struct {
 */
 typedef struct {
 	qboolean				registered;		// cleared at shutdown, set at beginRegistration
+	qboolean				skipBackend;	// don't execute backend commands
 
 	int						visCount;		// incremented every time a new vis cluster is entered
 	int						frameCount;		// incremented every frame
@@ -1123,6 +1113,18 @@ typedef struct {
 	float					sawToothTable[FUNCTABLE_SIZE];
 	float					inverseSawToothTable[FUNCTABLE_SIZE];
 	float					fogTable[FOG_TABLE_SIZE];
+
+	qboolean				screenshotTGA;
+	qboolean				screenshotTGASilent;
+	char					screenshotTGAName[MAX_OSPATH];
+
+	qboolean				screenshotJPEG;
+	qboolean				screenshotJPEGSilent;
+	char					screenshotJPEGName[MAX_OSPATH];
+	int						screenshotJPEGQuality;
+
+	qboolean				levelshot;
+	char					levelshotName[MAX_OSPATH];
 
 	// gamma correction
 	GLuint gammaVertexShader, gammaPixelShader;
@@ -1238,7 +1240,6 @@ extern	cvar_t	*r_colorMipLevels;				// development aid to see texture mip usage
 extern	cvar_t	*r_picmip;						// controls picmip values
 extern	cvar_t	*r_finish;
 extern	cvar_t	*r_drawBuffer;
-extern	cvar_t	*r_swapInterval;
 extern	cvar_t	*r_textureMode;
 extern	cvar_t	*r_offsetFactor;
 extern	cvar_t	*r_offsetUnits;
@@ -1282,9 +1283,6 @@ extern	cvar_t	*r_printShaders;
 extern	cvar_t	*r_convertModelBones;
 extern	cvar_t	*r_loadSkinsJKA;
 
-extern cvar_t	*r_customwidth;
-extern cvar_t	*r_customheight;
-
 /*
 Ghoul2 Insert Start
 */
@@ -1297,9 +1295,10 @@ extern	cvar_t *r_consoleFont;
 extern	cvar_t *r_fontSharpness;
 extern	cvar_t *r_textureLODBias;
 extern	cvar_t *r_saberGlow;
+extern	cvar_t *r_environmentMapping;
 //====================================================================
 
-float R_NoiseGet4f( float x, float y, float z, float t );
+float R_NoiseGet4f( float x, float y, float z, double t );
 void  R_NoiseInit( void );
 
 void R_SwapBuffers( int );
@@ -1384,7 +1383,7 @@ void	GL_Cull( int cullType );
 void	RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty);
 void	RE_UploadCinematic (int cols, int rows, const byte *data, int client, qboolean dirty);
 
-void		RE_BeginFrame( stereoFrame_t stereoFrame );
+void		RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBacken );
 void		RE_BeginRegistration( glconfig_t *glconfig );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
@@ -1415,12 +1414,12 @@ model_t		*R_AllocModel( void );
 void		R_Init( void );
 void R_LoadImage( const char *name, byte **pic, int *width, int *height );
 image_t		*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, qboolean allowTC, int glWrapClampMode );
-image_t		*R_FindImageFileNew( const char *name, upload_t *upload, int glWrapClampMode );
+image_t		*R_FindImageFileNew( const char *name, const upload_t *upload, int glWrapClampMode );
 
 image_t		*R_CreateImage( const char *name, byte *data, int width, int height, qboolean mipmap
 					, qboolean allowPicmip, qboolean allowTC, int wrapClampMode );
 image_t *R_CreateImageNew( const char *name, byte * const *mipmaps, qboolean customMip, int width, int height,
-	upload_t *upload, int glWrapClampMode );
+	const upload_t *upload, int glWrapClampMode );
 qboolean	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 void		R_SetColorMappings( void );
@@ -1437,7 +1436,6 @@ void	R_DeleteTextures( void );
 float	R_SumOfUsedImages( qboolean bUseFormat );
 void	R_InitSkins( void );
 skin_t	*R_GetSkinByHandle( qhandle_t hSkin );
-
 
 //
 // tr_shader.c
@@ -1494,9 +1492,9 @@ typedef struct stageVars
 struct shaderCommands_s
 {
 	glIndex_t	indexes[SHADER_MAX_INDEXES];
-	vec4_t		xyz[SHADER_MAX_VERTEXES];
-	vec4_t		normal[SHADER_MAX_VERTEXES];
-	vec2_t		texCoords[SHADER_MAX_VERTEXES][NUM_TEX_COORDS];
+	alignas(16) vec4_t		xyz[SHADER_MAX_VERTEXES];
+	alignas(16) vec4_t		normal[SHADER_MAX_VERTEXES];
+	vec2_t		texCoords[NUM_TEX_COORDS][SHADER_MAX_VERTEXES];
 	union {
 		color4ub_t	vertexColors[SHADER_MAX_VERTEXES];
 		uint32_t	vertexColorsui[SHADER_MAX_VERTEXES];
@@ -1509,7 +1507,7 @@ struct shaderCommands_s
 	color4ub_t	constantColor255[SHADER_MAX_VERTEXES];
 
 	shader_t	*shader;
-  float   shaderTime;
+	double		shaderTime;
 	int			fogNum;
 
 	int			dlightBits;	// or together of all vertexDlightBits
@@ -1546,7 +1544,6 @@ void RB_AddQuadStamp( vec3_t origin, vec3_t left, vec3_t up, byte *color );
 void RB_AddQuadStampExt( vec3_t origin, vec3_t left, vec3_t up, byte *color, float s1, float t1, float s2, float t2 );
 
 void RB_ShowImages( void );
-
 
 /*
 ============================================================
@@ -1647,7 +1644,7 @@ MARKERS, POLYGON PROJECTION ON WORLD POLYGONS
 */
 
 int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projection,
-				   int maxPoints, vec3_t pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
+				   int maxPoints, vec3_t *pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
 
 
 /*
@@ -1660,7 +1657,7 @@ SCENE GENERATION
 
 void R_InitNextFrame(void);
 void RE_ClearScene( void );
-void RE_AddRefEntityToScene( const refEntity_t *ent );
+void RE_AddRefEntityToScene( const refEntity_t *ent, qboolean intShaderTime );
 void RE_AddMiniRefEntityToScene( const miniRefEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
@@ -1799,11 +1796,10 @@ typedef struct {
 	int		commandId;
 	shader_t	*shader;
 	float	x, y;
-	float	w, h;
+	float	m[2][2];
 	float	s1, t1;
 	float	s2, t2;
-	float	a;
-} rotatePicCommand_t;
+} transformPicCommand_t;
 
 typedef struct {
 	int		commandId;
@@ -1813,15 +1809,33 @@ typedef struct {
 	int		numDrawSurfs;
 } drawSurfsCommand_t;
 
+typedef struct {
+	int		commandId;
+} worldEffectsCommand_t;
+
+typedef struct {
+	int		commandId;
+} gammaCorrectionCommand_t;
+
+typedef struct {
+	int		commandId;
+	byte	*buffer;
+	int		bufSize;
+	int		padding;
+	GLenum	format;
+} readPixelsCommand_t;
+
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
 	RC_STRETCH_PIC,
-	RC_ROTATE_PIC,
-	RC_ROTATE_PIC2,
+	RC_TRANSFORM_PIC,
 	RC_DRAW_SURFS,
 	RC_DRAW_BUFFER,
-	RC_SWAP_BUFFERS
+	RC_SWAP_BUFFERS,
+	RC_WORLD_EFFECTS,
+	RC_GAMMA_CORRECTION,
+	RC_READ_PIXELS,
 } renderCommand_t;
 
 
@@ -1855,29 +1869,39 @@ extern	volatile renderCommandList_t	*renderCommandList;
 extern	volatile qboolean	renderThreadActive;
 
 
-void *R_GetCommandBuffer( int bytes );
+void *R_GetCommandBuffer( unsigned int bytes );
 void R_SyncRenderThread(void);
 void RB_ExecuteRenderCommands( const void *data );
 
 void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 
-void RE_SetColor( const float *rgba );
-void RE_StretchPic ( float x, float y, float w, float h,
-					  float s1, float t1, float s2, float t2, qhandle_t hShader );
-void RE_RotatePic ( float x, float y, float w, float h,
-					  float s1, float t1, float s2, float t2,float a, qhandle_t hShader );
-void RE_RotatePic2 ( float x, float y, float w, float h,
-					  float s1, float t1, float s2, float t2,float a, qhandle_t hShader );
+void RE_SetColor( const vec4_t rgba );
+void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,
+	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust );
+void RE_RotatePic ( float x, float y, float w, float h, float s1, float t1,
+	float s2, float t2,float a, qhandle_t hShader, float xadjust, float yadjust );
+void RE_RotatePic2 ( float x, float y, float w, float h, float s1, float t1,
+	float s2, float t2,float a, qhandle_t hShader, float xadjust, float yadjust );
 void RE_BeginFrame( stereoFrame_t stereoFrame );
-void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
+void RE_EndFrame( void );
+void RE_SwapBuffers( int *frontEndMsec, int *backEndMsec );
+void RE_RenderWorldEffects( void );
+void RE_GammaCorrection( void );
 void SaveJPG(const char * filename, int quality, int image_width, int image_height, byte *image_buffer, int padding);
+size_t SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality, int image_width,
+	int image_height, byte *image_buffer, int padding);
+int RE_CaptureFrameRaw( byte *buffer, int bufSize, int padding );
+int RE_CaptureFrameJPEG( byte *buffer, int bufSize, int quality );
+void RE_TakeScreenshotJPEG( const char *filename, int quality, qboolean silent );
+void RE_TakeScreenshotTGA( const char *filename, qboolean silent );
+void RE_TakeLevelshot( const char *filename );
 
 /*
 Ghoul2 Insert Start
 */
 // tr_ghoul2.cpp
 void		Create_Matrix(const float *angle, mdxaBone_t *matrix);
-void		Multiply_3x4Matrix(mdxaBone_t *out, mdxaBone_t *in2, mdxaBone_t *in);
+void		Multiply_3x4Matrix(mdxaBone_t *out, const mdxaBone_t *in2, const mdxaBone_t *in);
 extern qboolean R_LoadMDXM (model_t *mod, void *buffer, const char *name, qboolean bAlreadyCached );
 extern qboolean R_LoadMDXA (model_t *mod, void *buffer, const char *name, qboolean bAlreadyCached );
 bool LoadTGAPalletteImage ( const char *name, byte **pic, int *width, int *height);
@@ -1889,4 +1913,18 @@ Ghoul2 Insert End
 // tr_surfacesprites
 void RB_DrawSurfaceSprites( shaderStage_t *stage, shaderCommands_t *input);
 #endif
+
+static inline int Q_ftol( float f ) {
+#if 0 // original win32 client
+	return lrintf( f );
+#else // original mac client, jk2mv so far
+	return (int) f;
+#endif
+}
+
+// must match Q_ftol behaviour!
+static inline int64_t Q_dtol( double f ) {
+	return (int64_t) f;
+}
+
 #endif //TR_LOCAL_H

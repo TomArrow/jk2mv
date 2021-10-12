@@ -6,7 +6,7 @@
 
 qboolean gbInsideLoadSound = qfalse; // important to default to this!!!
 
-qboolean SNDDMA_Init(void)
+qboolean SNDDMA_Init(int khz)
 {
 	return qfalse;
 }
@@ -25,6 +25,10 @@ void SNDDMA_BeginPainting (void)
 }
 
 void SNDDMA_Submit(void)
+{
+}
+
+void SNDDMA_Activate(qboolean activate)
 {
 }
 

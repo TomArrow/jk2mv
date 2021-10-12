@@ -9,20 +9,6 @@
 #define UI_API_15_VERSION	6
 #define UI_API_16_VERSION	7
 
-typedef enum {
-	DL_ACCEPT,
-	DL_ABORT,
-	DL_ABORT_BLACKLIST,
-} dldecision_t;
-
-typedef struct {
-	char name[256];
-	time_t time;
-
-	int checkksum;
-	qboolean blacklisted;
-} dlfile_t;
-
 typedef struct {
 	connstate_t		connState;
 	int				connectPacketCount;
@@ -159,11 +145,6 @@ Ghoul2 Insert Start
 /*
 Ghoul2 Insert End
 */
-
-	UI_MV_CONTINUE_DOWNLOAD,
-	UI_MV_GETDLLIST,
-	UI_MV_RMDLPREFIX,
-	UI_MV_DELDLFILE,
 } uiImport_t;
 
 typedef enum {

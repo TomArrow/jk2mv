@@ -131,7 +131,7 @@ int Cvar_VariableIntegerValue( const char *var_name ) {
 Cvar_VariableString
 ============
 */
-char *Cvar_VariableString( const char *var_name ) {
+const char *Cvar_VariableString( const char *var_name ) {
 	cvar_t *var;
 
 	var = Cvar_FindVar (var_name);
@@ -235,19 +235,19 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 		if ( ( var->flags & CVAR_USER_CREATED ) && !( flags & CVAR_USER_CREATED )
 			&& var_value[0] ) {
 			var->flags &= ~CVAR_USER_CREATED;
-			Z_Free( var->resetString );
+			Z_Free( (void *)var->resetString );
 			var->resetString = CopyString( var_value );
-
-			// ZOID--needs to be set so that cvars the game sets as
-			// SERVERINFO get sent to clients
-			cvar_modifiedFlags |= flags;
 		}
 
 		var->flags |= flags;
+		// ZOID--needs to be set so that cvars the game sets as
+		// SERVERINFO get sent to clients
+		cvar_modifiedFlags |= flags;
+
 		// only allow one non-empty reset string without a warning
 		if ( !var->resetString[0] ) {
 			// we don't have a reset string yet
-			Z_Free( var->resetString );
+			Z_Free( (void *)var->resetString );
 			var->resetString = CopyString( var_value );
 		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
 			Com_DPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
@@ -255,12 +255,12 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 		}
 		// if we have a latched string, take that value now
 		if ( var->latchedString ) {
-			char *s;
+			const char *s;
 
 			s = var->latchedString;
 			var->latchedString = NULL;	// otherwise cvar_set2 would free it
 			Cvar_Set2( var_name, s, qtrue );
-			Z_Free( s );
+			Z_Free( (void *)s );
 		}
 
 // use a CVAR_SET for rom sets, get won't override
@@ -285,8 +285,14 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	var->string = CopyString (var_value);
 	var->modified = qtrue;
 	var->modificationCount = 1;
+#if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
 	var->integer = atoi(var->string);
+#else
+	double strValue = strtod(var->string, NULL);
+	var->value = strValue;
+	var->integer = strValue;
+#endif
 	var->resetString = CopyString( var_value );
 
 	// link the variable in
@@ -294,6 +300,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	cvar_vars = var;
 
 	var->flags = flags;
+	cvar_modifiedFlags |= flags;
 
 	hash = generateHashValue(var_name);
 	var->hashNext = hashTable[hash];
@@ -358,7 +365,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 
 		if ( (var->flags & CVAR_LATCH) && var->latchedString ) {
 			Com_Printf("Cvar %s is no longer latched to \"%s\".\n", var->name, var->latchedString);
-			Z_Free (var->latchedString);
+			Z_Free ((void *)var->latchedString);
 			var->latchedString = NULL;
 			var->modified = qtrue;
 			var->modificationCount++;
@@ -393,7 +400,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 					Com_Printf("Cvar %s is already latched to \"%s\".\n", var->name, value);
 					return var;
 				}
-				Z_Free (var->latchedString);
+				Z_Free ((void *)var->latchedString);
 			}
 			else
 			{
@@ -419,7 +426,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 	{
 		if (var->latchedString)
 		{
-			Z_Free (var->latchedString);
+			Z_Free ((void *)var->latchedString);
 			var->latchedString = NULL;
 		}
 	}
@@ -430,11 +437,17 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 	var->modified = qtrue;
 	var->modificationCount++;
 
-	Z_Free (var->string);	// free the old value string
+	Z_Free ((void *)var->string);	// free the old value string
 
 	var->string = CopyString(value);
+#if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
 	var->integer = atoi (var->string);
+#else
+	double strValue = strtod(var->string, NULL);
+	var->value = strValue;
+	var->integer = strValue;
+#endif
 
 	return var;
 }
@@ -517,7 +530,7 @@ void Cvar_SetCheatState( void ) {
 			// because of a different var->latchedString
 			if (var->latchedString)
 			{
-				Z_Free(var->latchedString);
+				Z_Free((void *)var->latchedString);
 				var->latchedString = NULL;
 			}
 			if (strcmp(var->resetString,var->string)) {
@@ -618,7 +631,7 @@ static void Cvar_PrintFlags (cvar_t* cv) {
 		//discard CVAR_TEMP flag because it is useless /not used for anything
 		Q_strcat(buf, sizeof(buf), "none");
 	else {
-		for (int i = 0; i < numCvarFlags; ++i) {
+		for (size_t i = 0; i < numCvarFlags; ++i) {
 			if (cv->flags & cvarflags[i].i)
 				Q_strcat(buf, sizeof(buf), va("%s, ", cvarflags[i].s));
 		}
@@ -791,9 +804,9 @@ with the archive flag set to qtrue.
 ============
 */
 
-static int Cvar_CvarCmp(const void *p1, const void *p2) {
-    const cvar_t **e1 = (const cvar_t **)p1;
-    const cvar_t **e2 = (const cvar_t **)p2;
+static int QDECL Cvar_CvarCmp(const void *p1, const void *p2) {
+    const cvar_t * const *e1 = (const cvar_t * const *)p1;
+    const cvar_t * const *e2 = (const cvar_t * const *)p2;
 
 	return strcmp( (*e1)->name, (*e2)->name );
 }
@@ -804,7 +817,7 @@ void Cvar_WriteVariables( fileHandle_t f, qboolean locals ) {
 	cvar_t *sortedCvars[MAX_CVARS];
 
 	int i;
-	size_t numSorted = 0;
+	int numSorted = 0;
 	for (var = cvar_vars ; var ; var = var->next) {
 		if((var->flags & CVAR_ARCHIVE) &&
 				( ( locals && !(var->flags & CVAR_GLOBAL) ) || ( !locals && (var->flags & CVAR_GLOBAL) ) ) ) {
@@ -848,7 +861,7 @@ void Cvar_List_f( void ) {
 
 	cvar_t *sortedCvars[MAX_CVARS];
 
-	size_t numSorted = 0;
+	int numSorted = 0;
 	for (var = cvar_vars ; var ; var = var->next) {
 		// Dont show internal cvars
 		if ( var->flags & CVAR_INTERNAL )
@@ -941,16 +954,16 @@ void Cvar_Restart_f( void ) {
 		if ( var->flags & CVAR_USER_CREATED ) {
 			*prev = var->next;
 			if ( var->name ) {
-				Z_Free( var->name );
+				Z_Free( (void *)var->name );
 			}
 			if ( var->string ) {
-				Z_Free( var->string );
+				Z_Free( (void *)var->string );
 			}
 			if ( var->latchedString ) {
-				Z_Free( var->latchedString );
+				Z_Free( (void *)var->latchedString );
 			}
 			if ( var->resetString ) {
-				Z_Free( var->resetString );
+				Z_Free( (void *)var->resetString );
 			}
 			// clear the var completely, since we
 			// can't remove the index from the list
@@ -1066,7 +1079,7 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 	cvar_t	*cv = NULL; // bk001129
 	assert(vmCvar); // bk
 
-	if ( (unsigned)vmCvar->handle >= cvar_numIndexes ) {
+	if ( (unsigned)vmCvar->handle >= (unsigned)cvar_numIndexes ) {
 		Com_Error( ERR_DROP, "Cvar_Update: handle out of range" );
 	}
 
@@ -1083,10 +1096,9 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 	vmCvar->modificationCount = cv->modificationCount;
 	// bk001129 - mismatches.
 	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING )
-	  Com_Error( ERR_DROP, "Cvar_Update: src %s length %d exceeds MAX_CVAR_VALUE_STRING",
-			 cv->string,
-			 strlen(cv->string),
-			 sizeof(vmCvar->string) );
+	  Com_Printf( "Cvar_Update: src \"%s\" length %d exceeds MAX_CVAR_VALUE_STRING\n",
+		  cv->string,
+		  (int)strlen(cv->string) );
 	// bk001212 - Q_strncpyz guarantees zero padding and dest[MAX_CVAR_VALUE_STRING-1]==0
 	// bk001129 - paranoia. Never trust the destination string.
 	// bk001129 - beware, sizeof(char*) is always 4 (for cv->string).

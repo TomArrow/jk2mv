@@ -6,6 +6,8 @@
 #ifndef FX_SYSTEM_H_INC
 #define FX_SYSTEM_H_INC
 
+#include "snd_public.h"
+
 #ifdef CHC
 	#define irand	Q_irand
 	#define flrand	Q_flrand
@@ -26,7 +28,7 @@ inline void Vector2Set(vec2_t a,float b,float c)
 	a[1] = c;
 }
 
-inline void Vector2Copy(vec2_t src,vec2_t dst)
+inline void Vector2Copy(const vec2_t src,vec2_t dst)
 {
 	dst[0] = src[0];
 	dst[1] = src[1];
@@ -69,24 +71,24 @@ public:
 	inline	int	GetFrameTime(void) { return mFrameTime; }
 
 	void	ReInit(void);
-	void	AdjustTime_Pos( int time, vec3_t refdef_vieworg, vec3_t refdef_viewaxis[3] );
+	void	AdjustTime_Pos( int time, const vec3_t refdef_vieworg, const vec3_t refdef_viewaxis[3] );
 
 	// These functions are wrapped and used by the fx system in case it makes things a bit more portable
-	void	Print( const char *msg, ... );
+	void	Print( const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
 
 	// File handling
 	inline	int		OpenFile( const char *path, fileHandle_t *fh, int mode )
 	{
-		return FS_FOpenFileByMode( path, fh, FS_READ );
+		return FS_FOpenFileByMode( path, fh, FS_READ, MODULE_FX );
 	}
 	inline	int		ReadFile( void *data, int len, fileHandle_t fh )
 	{
-		FS_Read2( data, len, fh );
+		FS_Read2( data, len, fh, MODULE_FX );
 		return 1;
 	}
 	inline	void	CloseFile( fileHandle_t fh )
 	{
-		FS_FCloseFile( fh );
+		FS_FCloseFile( fh, MODULE_FX );
 	}
 
 	// Sound
@@ -100,7 +102,7 @@ public:
 	}
 
 	// Physics/collision
-	inline	void	Trace( trace_t &tr, vec3_t start, vec3_t min, vec3_t max, vec3_t end, int skipEntNum, int flags )
+	inline	void	Trace( trace_t &tr, const vec3_t start, const vec3_t min, const vec3_t max, const vec3_t end, int skipEntNum, int flags )
 	{
 		//VM_Call( cgvm, CG_TRACE, tr, start, min, max, end, skipEntNum, flags );
 		TCGTrace		*td = (TCGTrace *)cl.mSharedMemory;
@@ -129,7 +131,7 @@ public:
 #ifdef _DEBUG
 		mMainRefs++;
 #endif
-		re.AddRefEntityToScene( ent );
+		re.AddRefEntityToScene( ent, qtrue );
 	}
 	inline	void	AddFxToScene( miniRefEntity_t *ent )
 	{

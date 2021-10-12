@@ -43,7 +43,7 @@ void QDECL AAS_Error(char *fmt, ...)
 	va_list arglist;
 
 	va_start(arglist, fmt);
-	vsprintf(str, fmt, arglist);
+	Q_vsnprintf(str, sizeof(str), fmt, arglist);
 	va_end(arglist);
 	botimport.Print(PRT_FATAL, "%s", str);
 } //end of the function AAS_Error
@@ -274,7 +274,7 @@ float AAS_Time(void)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-void AAS_ProjectPointOntoVector( vec3_t point, vec3_t vStart, vec3_t vEnd, vec3_t vProj )
+void AAS_ProjectPointOntoVector( const vec3_t point, const vec3_t vStart, const vec3_t vEnd, vec3_t vProj )
 {
 	vec3_t pVec, vec;
 

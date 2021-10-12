@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
+#include "../server/server.h"
 #include "sys_local.h"
 #include "con_local.h"
 
@@ -365,6 +366,10 @@ char *CON_Input( void )
 		if (avail != -1)
 		{
 			// we have something
+
+			// disable hibernation for ten seconds to workaround console input lagg
+			svs.hibernation.disableUntil = svs.time + 10000;
+
 			// backspace?
 			// NOTE TTimo testing a lot of values .. seems it's the only way to get it to work everywhere
 			if ((key == TTY_erase) || (key == 127) || (key == 8))
@@ -572,7 +577,7 @@ void Sys_AnsiColorPrint( const char *msg, bool extendedColors )
 			{
 				// Print the color code
 				int colIndex = (extendedColors ? ColorIndex_Extended(*(msg+1)) : ColorIndex(*(msg+1)));
-				if ( colIndex >= (sizeof(q3ToAnsi)/sizeof(q3ToAnsi[0])) ) colIndex = COLOR_JK2MV_FALLBACK;
+				if ( colIndex >= (int)ARRAY_LEN(q3ToAnsi) ) colIndex = COLOR_JK2MV_FALLBACK;
 				Com_sprintf( buffer, sizeof( buffer ), "\033[%dm",
 					q3ToAnsi[colIndex] );
 				fputs( buffer, stderr );

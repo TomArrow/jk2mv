@@ -189,6 +189,7 @@ cvar_t *r_consoleFont;
 cvar_t *r_fontSharpness;
 cvar_t *r_textureLODBias;
 cvar_t *r_saberGlow;
+cvar_t *r_environmentMapping;
 
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
@@ -378,7 +379,7 @@ static void GLimp_InitExtensions(void) {
 
 	// GL_EXT_texture_env_add
 	glConfig.textureEnvAddAvailable = qfalse;
-	if (GL_CheckForExtension("EXT_texture_env_add")) {
+	if (GL_CheckForExtension("GL_EXT_texture_env_add")) {
 		if (r_ext_texture_env_add->integer) {
 			glConfig.textureEnvAddAvailable = qtrue;
 			Com_Printf("...using GL_EXT_texture_env_add\n");
@@ -392,12 +393,12 @@ static void GLimp_InitExtensions(void) {
 	
 	// GL_EXT_texture_filter_anisotropic
 	glConfig.textureFilterAnisotropicMax = 1.0f;
-	if ( GL_CheckForExtension( "EXT_texture_filter_anisotropic" ) )
+	if ( GL_CheckForExtension( "GL_EXT_texture_filter_anisotropic" ) )
 	{
 		qglGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &glConfig.textureFilterAnisotropicMax );
 		Com_Printf ("...GL_EXT_texture_filter_anisotropic available\n" );
 
-		if ( r_ext_texture_filter_anisotropic->value > 0.0f )
+		if ( r_ext_texture_filter_anisotropic->value > 1.0f )
 		{
 			Com_Printf ("...using GL_EXT_texture_filter_anisotropic\n" );
 		}
@@ -609,7 +610,7 @@ static void GLimp_InitExtensions(void) {
 
 	// GL_EXT_texture_lod_bias
 	glConfig.textureLODBiasAvailable = qfalse;
-	if (GL_CheckForExtension("EXT_texture_lod_bias")) {
+	if (GL_CheckForExtension("GL_EXT_texture_lod_bias")) {
 		glConfig.textureLODBiasAvailable = qtrue;
 		Com_Printf ("...GL_EXT_texture_lod_bias available\n" );
 	} else {
@@ -632,13 +633,13 @@ static void InitOpenGL(void) {
 
         glWindow = WIN_Init(&windowDesc, &glConfig);
 
-		Com_Printf("GL_RENDERER: %s\n", (char *)qglGetString(GL_RENDERER));
+		Com_Printf("GL_RENDERER: %s\n", (const char *)qglGetString(GL_RENDERER));
 
 		// get our config strings
-		glConfig.vendor_string = (char *)qglGetString(GL_VENDOR);
-		glConfig.renderer_string = (char *)qglGetString(GL_RENDERER);
-		glConfig.version_string = (char *)qglGetString(GL_VERSION);
-		glConfig.extensions_string = (char *)qglGetString(GL_EXTENSIONS);
+		glConfig.vendor_string = (const char *)qglGetString(GL_VENDOR);
+		glConfig.renderer_string = (const char *)qglGetString(GL_RENDERER);
+		glConfig.version_string = (const char *)qglGetString(GL_VERSION);
+		glConfig.extensions_string = (const char *)qglGetString(GL_EXTENSIONS);
 
 		// OpenGL driver constants
 		qglGetIntegerv(GL_MAX_TEXTURE_SIZE, &glConfig.maxTextureSize);
@@ -668,11 +669,11 @@ void GL_CheckErrors( void ) {
 	int		err;
 	char	s[64];
 
-	err = qglGetError();
-	if ( err == GL_NO_ERROR ) {
+	if ( r_ignoreGLErrors->integer ) {
 		return;
 	}
-	if ( r_ignoreGLErrors->integer ) {
+	err = qglGetError();
+	if ( err == GL_NO_ERROR ) {
 		return;
 	}
 	switch( err ) {
@@ -695,7 +696,7 @@ void GL_CheckErrors( void ) {
 			strcpy( s, "GL_OUT_OF_MEMORY" );
 			break;
 		default:
-			Com_sprintf( s, sizeof(s), "%i", err);
+			Com_sprintf( s, sizeof(s), "0x%x", err);
 			break;
 	}
 
@@ -712,105 +713,6 @@ void GL_CheckErrors( void ) {
 ==============================================================================
 */
 #ifndef DEDICATED
-/*
-==================
-R_TakeScreenshot
-==================
-*/
-
-byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *padlen)
-{
-	byte *buffer, *bufstart;
-	int padwidth, linelen;
-	GLint packAlign;
-
-	qglGetIntegerv(GL_PACK_ALIGNMENT, &packAlign);
-
-	linelen = width * 3;
-	padwidth = PAD(linelen, packAlign);
-
-	// Allocate a few more bytes so that we can choose an alignment we like
-	buffer = (byte *)Hunk_AllocateTempMemory((int)(padwidth * height + *offset + packAlign - 1));
-
-	bufstart = (byte *)PADP((intptr_t)buffer + *offset, packAlign);
-	qglReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, bufstart);
-
-	*offset = bufstart - buffer;
-	*padlen = padwidth - linelen;
-
-	return buffer;
-}
-
-void R_TakeScreenshot(int x, int y, int width, int height, char *fileName) {
-	byte *allbuf, *buffer;
-	byte *srcptr, *destptr;
-	byte *endline, *endmem;
-	byte temp;
-
-	int linelen, padlen;
-	size_t offset = 18, memcount;
-
-	allbuf = RB_ReadPixels(x, y, width, height, &offset, &padlen);
-	buffer = allbuf + offset - 18;
-
-	Com_Memset(buffer, 0, 18);
-	buffer[2] = 2;		// uncompressed type
-	buffer[12] = width & 255;
-	buffer[13] = width >> 8;
-	buffer[14] = height & 255;
-	buffer[15] = height >> 8;
-	buffer[16] = 24;	// pixel size
-
-	// swap rgb to bgr and remove padding from line endings
-	linelen = width * 3;
-
-	srcptr = destptr = allbuf + offset;
-	endmem = srcptr + (linelen + padlen) * height;
-
-	while (srcptr < endmem)
-	{
-		endline = srcptr + linelen;
-
-		while (srcptr < endline)
-		{
-			temp = srcptr[0];
-			*destptr++ = srcptr[2];
-			*destptr++ = srcptr[1];
-			*destptr++ = temp;
-
-			srcptr += 3;
-		}
-
-		// Skip the pad
-		srcptr += padlen;
-	}
-
-	memcount = linelen * height;
-
-	// gamma correct
-	if (r_gammamethod->integer == GAMMA_HARDWARE)
-		R_GammaCorrect(allbuf + offset, (int)memcount);
-
-	ri.FS_WriteFile(fileName, buffer, (int)memcount + 18);
-
-	ri.Hunk_FreeTempMemory(allbuf);
-}
-
-void R_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName) {
-	byte *buffer;
-	size_t offset = 0, memcount;
-	int padlen;
-
-	buffer = RB_ReadPixels(x, y, width, height, &offset, &padlen);
-	memcount = (width * 3 + padlen) * height;
-
-	// gamma correct
-	if (r_gammamethod->integer == GAMMA_HARDWARE)
-		R_GammaCorrect(buffer + offset, (int)memcount);
-
-	SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
-	ri.Hunk_FreeTempMemory(buffer);
-}
 
 /*
 ==================
@@ -845,64 +747,10 @@ levelshots are specialized 256*256 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
-#define LEVELSHOTSIZE 256
 static void R_LevelShot( void ) {
-	char		checkname[MAX_OSPATH];
-	byte		*buffer;
-	byte		*source;
-	byte		*src, *dst;
-	int			x, y;
-	int			r, g, b;
-	float		xScale, yScale;
-	int			xx, yy;
 
-	sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
-
-	source = (unsigned char *)ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight * 3 );
-
-	buffer = (unsigned char *)ri.Hunk_AllocateTempMemory( LEVELSHOTSIZE * LEVELSHOTSIZE*3 + 18);
-	Com_Memset (buffer, 0, 18);
-	buffer[2] = 2;		// uncompressed type
-	buffer[12] = LEVELSHOTSIZE & 255;
-	buffer[13] = LEVELSHOTSIZE >> 8;
-	buffer[14] = LEVELSHOTSIZE & 255;
-	buffer[15] = LEVELSHOTSIZE >> 8;
-	buffer[16] = 24;	// pixel size
-
-	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB, GL_UNSIGNED_BYTE, source );
-
-	// resample from source
-	xScale = glConfig.vidWidth / (4.0*LEVELSHOTSIZE);
-	yScale = glConfig.vidHeight / (3.0*LEVELSHOTSIZE);
-	for ( y = 0 ; y < LEVELSHOTSIZE ; y++ ) {
-		for ( x = 0 ; x < LEVELSHOTSIZE ; x++ ) {
-			r = g = b = 0;
-			for ( yy = 0 ; yy < 3 ; yy++ ) {
-				for ( xx = 0 ; xx < 4 ; xx++ ) {
-					src = source + 3 * ( glConfig.vidWidth * (int)( (y*3+yy)*yScale ) + (int)( (x*4+xx)*xScale ) );
-					r += src[0];
-					g += src[1];
-					b += src[2];
-				}
-			}
-			dst = buffer + 18 + 3 * ( y * LEVELSHOTSIZE + x );
-			dst[0] = b / 12;
-			dst[1] = g / 12;
-			dst[2] = r / 12;
-		}
-	}
-
-	// gamma correct
-	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE) {
-		R_GammaCorrect( buffer + 18, LEVELSHOTSIZE * LEVELSHOTSIZE * 3 );
-	}
-
-	ri.FS_WriteFile( checkname, buffer, LEVELSHOTSIZE * LEVELSHOTSIZE*3 + 18 );
-
-	ri.Hunk_FreeTempMemory( buffer );
-	ri.Hunk_FreeTempMemory( source );
-
-	ri.Printf( PRINT_ALL, "Wrote %s\n", checkname );
+	Com_sprintf(tr.levelshotName, sizeof(tr.levelshotName), "levelshots/%s.tga", tr.world->baseName);
+	tr.levelshot = qtrue;
 }
 
 /*
@@ -963,12 +811,9 @@ void R_ScreenShotTGA_f (void) {
 		lastNumber++;
 	}
 
-
-	R_TakeScreenshot( 0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname );
-
-	if ( !silent ) {
-		ri.Printf (PRINT_ALL, "Wrote %s\n", checkname);
-	}
+	Q_strncpyz(tr.screenshotTGAName, checkname, sizeof(tr.screenshotTGAName));
+	tr.screenshotTGA = qtrue;
+	tr.screenshotTGASilent = silent;
 }
 
 //jpeg  vession
@@ -1017,12 +862,10 @@ void R_ScreenShot_f (void) {
 		lastNumber++;
 	}
 
-
-	R_TakeScreenshotJPEG( 0, 0, glConfig.vidWidth, glConfig.vidHeight, checkname );
-
-	if ( !silent ) {
-		ri.Printf (PRINT_ALL, "Wrote %s\n", checkname);
-	}
+	Q_strncpyz(tr.screenshotJPEGName, checkname, sizeof(tr.screenshotJPEGName));
+	tr.screenshotJPEG = qtrue;
+	tr.screenshotJPEGQuality = r_screenshotJpegQuality->integer;
+	tr.screenshotJPEGSilent = silent;
 }
 
 //============================================================================
@@ -1051,6 +894,10 @@ void GL_SetDefaultState( void )
 	qglEnable(GL_TEXTURE_2D);
 	GL_TextureMode( r_textureMode->string );
 	GL_TexEnv( GL_MODULATE );
+
+	if ( glConfig.textureLODBiasAvailable ) {
+		qglTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, r_textureLODBias->value );
+	}
 
 	qglShadeModel( GL_SMOOTH );
 	qglDepthFunc( GL_LEQUAL );
@@ -1081,18 +928,18 @@ GfxInfo_f
 extern bool g_bTextureRectangleHack;
 void GfxInfo_f( void )
 {
-	const char *enablestrings[] =
+	const char * const enablestrings[] =
 	{
 		"disabled",
 		"enabled"
 	};
-	const char *fsstrings[] =
+	const char * const fsstrings[] =
 	{
 		"windowed",
 		"fullscreen"
 	};
 
-	const char *tc_table[] =
+	const char * const tc_table[] =
 	{
 		"None",
 		"GL_S3_s3tc",
@@ -1115,6 +962,8 @@ void GfxInfo_f( void )
 	{
 		ri.Printf( PRINT_ALL, "N/A\n" );
 	}
+
+	ri.Printf(PRINT_ALL, "Display Scale: %d%%\n", (int)glConfig.displayScale * 100);
 
 	// gamma correction
 	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
@@ -1160,9 +1009,9 @@ void GfxInfo_f( void )
 	ri.Printf( PRINT_ALL, "compressed textures: %s\n", enablestrings[glConfig.textureCompression != TC_NONE] );
 	ri.Printf( PRINT_ALL, "compressed lightmaps: %s\n", enablestrings[(r_ext_compressed_lightmaps->integer != 0 && glConfig.textureCompression != TC_NONE)] );
 	ri.Printf( PRINT_ALL, "texture compression method: %s\n", tc_table[glConfig.textureCompression] );
-	if (glConfig.textureFilterAnisotropicMax > 1.0f && r_ext_texture_filter_anisotropic->value > 0.0f) {
+	if (glConfig.textureFilterAnisotropicMax >= 2.0f && r_ext_texture_filter_anisotropic->value > 1.0f) {
 		float aniso = r_ext_texture_filter_anisotropic->value;
-		aniso = Com_Clamp(2.0f, glConfig.textureFilterAnisotropicMax, aniso);
+		aniso = Com_Clamp(1.0f, glConfig.textureFilterAnisotropicMax, aniso);
 		ri.Printf( PRINT_ALL, "anisotropic filtering: %s (level: %.1f)\n", enablestrings[1], aniso );
 	} else {
 		ri.Printf( PRINT_ALL, "anisotropic filtering: %s\n", enablestrings[0] );
@@ -1337,7 +1186,7 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 
-	r_modelpoolmegs = Cvar_Get("r_modelpoolmegs", "10", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_modelpoolmegs = Cvar_Get("r_modelpoolmegs", "20", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
@@ -1361,6 +1210,7 @@ Ghoul2 Insert End
 	r_fontSharpness = ri.Cvar_Get("r_fontSharpness", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_textureLODBias = ri.Cvar_Get("r_textureLODBias", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_saberGlow = ri.Cvar_Get("r_saberGlow", "1", CVAR_ARCHIVE | CVAR_LATCH);
+	r_environmentMapping = ri.Cvar_Get("r_environmentMapping", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 }
 
 #ifdef G2_COLLISION_ENABLED
@@ -1395,7 +1245,7 @@ void R_Init( void ) {
 	//
 	for ( i = 0; i < FUNCTABLE_SIZE; i++ )
 	{
-		tr.sinTable[i]		= sin( DEG2RAD( i * 360.0f / ( ( float ) ( FUNCTABLE_SIZE - 1 ) ) ) );
+		tr.sinTable[i]		= sinf( DEG2RAD( i * 360.0f / ( ( float ) ( FUNCTABLE_SIZE - 1 ) ) ) );
 		tr.squareTable[i]	= ( i < FUNCTABLE_SIZE/2 ) ? 1.0f : -1.0f;
 		tr.sawToothTable[i] = (float)i / FUNCTABLE_SIZE;
 		tr.inverseSawToothTable[i] = 1.0f - tr.sawToothTable[i];
@@ -1460,9 +1310,7 @@ void R_Init( void ) {
 	}
 #endif
 
-	int	err = qglGetError();
-	if ( err != GL_NO_ERROR )
-		ri.Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
+	GL_CheckErrors();
 #endif
 	ri.Printf( PRINT_ALL, "----- finished R_Init -----\n" );
 }
@@ -1580,7 +1428,7 @@ void RE_EndRegistration( void ) {
 
 void RE_GetLightStyle(int style, color4ub_t color)
 {
-	if (style >= MAX_LIGHT_STYLES)
+	if ((unsigned)style >= (unsigned)MAX_LIGHT_STYLES)
 	{
 		ri.Error( ERR_FATAL, "RE_GetLightStyle: %d is out of range", (int)style );
 		return;
@@ -1591,7 +1439,7 @@ void RE_GetLightStyle(int style, color4ub_t color)
 
 void RE_SetLightStyle(int style, int color)
 {
-	if (style >= MAX_LIGHT_STYLES)
+	if ((unsigned)style >= (unsigned)MAX_LIGHT_STYLES)
 	{
 		ri.Error( ERR_FATAL, "RE_SetLightStyle: %d is out of range", (int)style );
 		return;
@@ -1635,6 +1483,7 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	re.BeginFrame = RE_BeginFrame;
 	re.EndFrame = RE_EndFrame;
+	re.SwapBuffers = RE_SwapBuffers;
 
 	re.MarkFragments = R_MarkFragments;
 	re.LerpTag = R_LerpTag;
@@ -1674,6 +1523,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.SetLightStyle = RE_SetLightStyle;
 
 	re.GetBModelVerts = RE_GetBModelVerts;
+
+	re.CaptureFrameRaw = RE_CaptureFrameRaw;
+	re.CaptureFrameJPEG = RE_CaptureFrameJPEG;
 #endif //!DEDICATED
 	return &re;
 }

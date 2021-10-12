@@ -4,14 +4,12 @@
 #include "tr_local.h"
 //#include "../qcommon/qcommon.h"
 
-#include "../qcommon/sstring.h"	// stl string class won't compile in here (MS shite), so use Gil's.
 #include "tr_local.h"
 #include "tr_font.h"
 
 #include <vector>
 #include <map>
-//#include <list>
-//#include <string>
+#include <string>
 
 using namespace std;
 
@@ -23,7 +21,7 @@ inline int Round(float value)
 
 int							fontIndex;	// entry 0 is reserved index for missing/invalid, else ++ with each new font registered
 vector<CFontInfo *>			fontArray;
-typedef map<sstring_t, int>	fontIndexMap_t;
+typedef map<string, int>	fontIndexMap_t;
 							fontIndexMap_t fontIndexMap;
 //paletteRGBA_c				lastcolour;
 
@@ -359,6 +357,8 @@ CFontInfo::CFontInfo(const char *fontName)
 	void		*buff;
 	dfontdat_t	*fontdat;
 
+	COM_StripExtension(fontName, m_sFontName, sizeof(m_sFontName));	// so we get better error printing if failed to load shader (ie lose ".fontdat")
+
 	len = ri.FS_ReadFile(fontName, NULL);
 	if (len == sizeof(dfontdat_t))
 	{
@@ -377,16 +377,18 @@ CFontInfo::CFontInfo(const char *fontName)
 		mbRoundCalcs = !!strstr(fontName,"ergo");
 
 		ri.FS_FreeFile(buff);
+
+		mShader = RE_RegisterShaderNoMip(m_sFontName);
 	}
 	else
 	{
+		if (len >= 0)
+			ri.Printf( PRINT_WARNING, "CFontInfo: Invalid font data %s\n", fontName );
+
 		mHeight = 0;
 		mShader = 0;
 		mPointSize = 0;
 	}
-
-	COM_StripExtension(fontName, m_sFontName, sizeof(m_sFontName));	// so we get better error printing if failed to load shader (ie lose ".fontdat")
-	mShader = RE_RegisterShaderNoMip(m_sFontName);
 
 	FlagNoAsianGlyphs();
 	UpdateAsianIfNeeded(true);
@@ -693,13 +695,14 @@ CFontInfo *GetFont(int index)
 	return(NULL);
 }
 
-CFontInfo *RE_Font_GetVariant(CFontInfo *font, float *scale) {
+CFontInfo *RE_Font_GetVariant(CFontInfo *font, float *scale, float xadjust, float yadjust) {
 	int variants = font->GetNumVariants();
 
 	if (variants > 0) {
 		CFontInfo *variant;
 		int requestedSize = font->GetPointSize() * *scale *
-		  r_fontSharpness->value * glConfig.vidHeight / 480.0f;
+			r_fontSharpness->value * glConfig.vidHeight *
+			(yadjust / SCREEN_HEIGHT);
 
 		if (requestedSize <= font->GetPointSize())
 			return font;
@@ -718,11 +721,11 @@ CFontInfo *RE_Font_GetVariant(CFontInfo *font, float *scale) {
 	return font;
 }
 
-int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale)
+int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale, float xadjust, float yadjust)
 {			
-	int			i = 0;
+	size_t		i = 0;
 	CFontInfo	*curfont;
-	char		parseText[8192] = {0};
+	char		parseText[8192];
 	float 		fTotalWidth = 0.0f;
 
 	//It gets confused about ^blah here too and reports an inaccurate length as a result
@@ -748,7 +751,7 @@ int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale
 		return(0);
 	}
 
-	curfont = RE_Font_GetVariant(curfont, &fScale);
+	curfont = RE_Font_GetVariant(curfont, &fScale, xadjust, yadjust);
 
 	float fScaleA = fScale;
 	if (Language_IsAsian())
@@ -789,7 +792,7 @@ int RE_Font_StrLenChars(const char *psText)
 
 		switch (uiChar)
 		{
-			case '^':					psText++;	break;	// colour code (note next-char skip)
+			case '^':	if ( *psText ) psText++;	break;	// colour code (note next-char skip)
 			case 10:								break;	// linefeed
 			case 13:								break;	// return
 			default:	iCharCount++;				break;
@@ -799,14 +802,14 @@ int RE_Font_StrLenChars(const char *psText)
 	return iCharCount;
 }
 
-int RE_Font_HeightPixels(const int iFontHandle, float fScale)
+int RE_Font_HeightPixels(const int iFontHandle, float fScale, float xadjust, float yadjust)
 {
 	CFontInfo	*curfont;
 
 	curfont = GetFont(iFontHandle);
 	if(curfont)
 	{
-		curfont = RE_Font_GetVariant(curfont, &fScale);
+		curfont = RE_Font_GetVariant(curfont, &fScale, xadjust, yadjust);
 		return(Round(curfont->GetPointSize() * fScale));
 	}
 	return(0);
@@ -814,9 +817,12 @@ int RE_Font_HeightPixels(const int iFontHandle, float fScale)
 
 // iCharLimit is -1 for "all of string", else MBCS char count...
 //
+// ox, oy are in virtual screen coordinates
+// xadjust is 640 / virtual screen width
+// yadjust is 480 / virtual screen height
 qboolean gbInShadow = qfalse;	// MUST default to this
 extern cvar_t	*mv_coloredTextShadows;
-void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, int iFontHandle, int iCharLimit, float fScale)
+void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, int iFontHandle, int iCharLimit, float fScale, float xadjust, float yadjust)
 {
 	int					colour, offset;
 	float				fox, foy, fx, fy;
@@ -838,7 +844,7 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, i
 		return;
 	}
 
-	curfont = RE_Font_GetVariant(curfont, &fScale);
+	curfont = RE_Font_GetVariant(curfont, &fScale, xadjust, yadjust);
 	iFontHandle = curfont->GetHandle() | (iFontHandle & ~SET_MASK);
 
 	float fScaleA = fScale;
@@ -873,7 +879,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, i
 			}
 			dropShadowText[r] = 0;
 
-			RE_Font_DrawString(ox + offset, oy + offset, dropShadowText, v4DKGREY2, iFontHandle & SET_MASK, iCharLimit, fScale);
+			RE_Font_DrawString(ox + offset, oy + offset, dropShadowText, v4DKGREY2,
+				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
 		}
 		else
 		{
@@ -882,7 +889,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, i
 			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
 			gbInShadow = qtrue;
-			RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2, iFontHandle & SET_MASK, iCharLimit, fScale);
+			RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
+				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
 			gbInShadow = qfalse;
 		}
 	}
@@ -907,6 +915,7 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, i
 		switch( uiLetter )
 		{
 		case '^':
+			if ( !*psText ) break; // If we were given a string ending with '^'
 			colour = ColorIndex(*psText);
 			if (!gbInShadow)
 			{
@@ -939,18 +948,18 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const float *rgba, i
 			// this 'mbRoundCalcs' stuff is crap, but the only way to make the font code work. Sigh...
 			//
 			float fThisScale = uiLetter > 255 ? fScaleA : fScale;
-			fy = foy - ((float)pLetter->baseline * fThisScale);	//fixed
+			fy = foy - (pLetter->baseline * fThisScale);	//fixed
 
-			RE_StretchPic ( fx + (float)pLetter->horizOffset * fThisScale, // float x
+			RE_StretchPic ( fx + pLetter->horizOffset * fThisScale, // float x
 							(uiLetter > 255) ? fy - iAsianYAdjust : fy,	// float y
-							(float)pLetter->width * fThisScale,	// float w
-							(float)pLetter->height * fThisScale, // float h
+							pLetter->width * fThisScale,	// float w
+							pLetter->height * fThisScale, // float h
 							pLetter->s,						// float s1
 							pLetter->t,						// float t1
 							pLetter->s2,					// float s2
 							pLetter->t2,					// float t2
-							hShader							// qhandle_t hShader
-							);
+							hShader,						// qhandle_t hShader
+							xadjust, yadjust);
 
 			fx += (float)pLetter->horizAdvance * fThisScale;
 			break;
@@ -1021,6 +1030,8 @@ int RE_RegisterFont(const char *psName) {
 				}
 			}
 		}
+	} else {
+		ri.Printf( PRINT_WARNING, "RE_RegisterFont: Couldn't find font %s\n", psName );
 	}
 
 	return oriFontHandle;

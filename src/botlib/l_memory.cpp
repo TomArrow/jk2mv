@@ -85,6 +85,7 @@ void *GetMemory(unsigned long size)
 	memoryblock_t *block;
   assert(botimport.GetMemory); // bk001129 - was NULL'ed
 	ptr = botimport.GetMemory(size + sizeof(memoryblock_t));
+  assert(ptr);
 	block = (memoryblock_t *) ptr;
 	block->id = MEM_ID;
 	block->ptr = (char *) ptr + sizeof(memoryblock_t);
@@ -328,11 +329,11 @@ void *GetMemory(unsigned long size)
 	void *ptr;
 	unsigned long int *memid;
 
-	ptr = botimport.GetMemory(size + Q_ALIGNOF(Q_MAX_ALIGN));
+	ptr = botimport.GetMemory(size + alignof(Q_MAX_ALIGN));
 	if (!ptr) return NULL;
 	memid = (unsigned long int *) ptr;
 	*memid = MEM_ID;
-	return (unsigned long int *) ((char *) ptr + Q_ALIGNOF(Q_MAX_ALIGN));
+	return (unsigned long int *) ((char *) ptr + alignof(Q_MAX_ALIGN));
 } //end of the function GetMemory
 //===========================================================================
 //
@@ -370,11 +371,11 @@ void *GetHunkMemory(unsigned long size)
 	void *ptr;
 	unsigned long int *memid;
 
-	ptr = botimport.HunkAlloc(size + Q_ALIGNOF(Q_MAX_ALIGN));
+	ptr = botimport.HunkAlloc(size + alignof(Q_MAX_ALIGN));
 	if (!ptr) return NULL;
 	memid = (unsigned long int *) ptr;
 	*memid = HUNK_ID;
-	return (unsigned long int *) ((char *) ptr + Q_ALIGNOF(Q_MAX_ALIGN));
+	return (unsigned long int *) ((char *) ptr + alignof(Q_MAX_ALIGN));
 } //end of the function GetHunkMemory
 //===========================================================================
 //
@@ -407,7 +408,7 @@ void FreeMemory(void *ptr)
 {
 	unsigned long int *memid;
 
-	memid = (unsigned long int *) ((char *) ptr - Q_ALIGNOF(Q_MAX_ALIGN));
+	memid = (unsigned long int *) ((char *) ptr - alignof(Q_MAX_ALIGN));
 
 	if (*memid == MEM_ID)
 	{

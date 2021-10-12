@@ -3,9 +3,9 @@ if(NOT InMV)
 	message(FATAL_ERROR "Use the top-level cmake script!")
 endif(NOT InMV)
 
-# mv_setup.h preparation
-set(MVGLOBALIncludeDirs ${MVGLOBALIncludeDirs} ${CMAKE_BINARY_DIR})
-configure_file("mv_setup.h.in" "${CMAKE_BINARY_DIR}/mv_setup.h" @ONLY)
+if(BuildMVSDK)
+	add_subdirectory("mvsdk")
+endif()
 
 if (BuildMVMP OR BuildMVDED)
 	# Libraries
@@ -143,7 +143,6 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/hstring.h"
 		"qcommon/qcommon.h"
 		"qcommon/qfiles.h"
-		"qcommon/sstring.h"
 		"qcommon/q_shared.h"
 		"qcommon/strip.h"
 		"qcommon/tags.h"
@@ -155,7 +154,6 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/cm_load.cpp"
 		"qcommon/cm_patch.cpp"
 		"qcommon/cm_polylib.cpp"
-		"qcommon/cm_shader.cpp"
 		"qcommon/cm_test.cpp"
 		"qcommon/cm_trace.cpp"
 		"qcommon/cmd.cpp"
@@ -176,11 +174,11 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/vm_interpreted.cpp"
 	)
 
-	if(X86)
+	if(ARCH_X86)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_x86.cpp"
 		)
-	elseif(ARM)
+	elseif(ARCH_ARM)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_arm.cpp"
 		)
@@ -210,14 +208,29 @@ if (BuildMVMP OR BuildMVDED)
 	source_group("renderer" FILES ${MVMPDEDRendererFiles})
 	set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDRendererFiles})
 
+	# Crashlog utilities
+
 	if(MSVC)
 		set(MVMPDEDWIN32Files
+			"${LIBDir}/StackWalker/include/StackWalker.h"
+
+			"${LIBDir}/StackWalker/StackWalker.cpp"
+
 			"win32/q3asm.asm"
 		)
 		source_group("win32" FILES ${MVMPDEDWIN32Files})
+		set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} "${LIBDir}/StackWalker/include")
 		set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDWIN32Files})
 	endif()
-	
+
+	if(NOT WIN32)
+		find_package(Backtrace)
+		if(Backtrace_FOUND)
+			set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${Backtrace_INCLUDE_DIRS})
+			set(MVMPDEDLibraries ${MVMPDEDLibraries} ${Backtrace_LIBRARIES})
+		endif()
+	endif()
+
 	if(WIN32)
 		set(MVMPDEDSysFiles
 			"sys/sys_public.h"
@@ -248,32 +261,15 @@ if (BuildMVMP OR BuildMVDED)
 	
 	set(MVMPDEDApiFiles
 		"api/mvapi.h"
+		"api/mvmenu.h"
 	)
 	source_group("api" FILES ${MVMPDEDApiFiles})
 	set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDApiFiles})
-	
-	# generate assetsmv.pk3
-	include(InstallZIP)
-	if(NOT ZIP_EXECUTABLE)
-		message(FATAL_ERROR "No ZIP executable found! Install 7zip, WinZIP or WinRAR.")
-	endif()
-	
-	add_zip_command("${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3"
-		DIR "${CMAKE_SOURCE_DIR}/assets"
-		FILES "*"
-	)
-	add_custom_target(assets
-		ALL
-		DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3"
-	)
-	
-	# installation
-	if(WIN32)
-		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3 DESTINATION "base")
-	elseif(NOT APPLE)
-		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3 DESTINATION "share/jk2mv/base")
-	endif()
 endif()
+
+# mv_setup.h preparation
+set(MVGLOBALIncludeDirs ${MVGLOBALIncludeDirs} ${CMAKE_BINARY_DIR})
+configure_file("mv_setup.h.in" "${CMAKE_BINARY_DIR}/mv_setup.h" @ONLY)
 
 # jk2mvmp
 if (BuildMVMP)
@@ -293,11 +289,10 @@ if (BuildMVMP)
 
 	if(UseInternalOpenAL)
 		# OpenAL
-		find_library(OpenALLib NAMES "softoal_${Architecture}" PATHS "${LIBDir}/OpenAL")
-		if(NOT OpenALLib)
-			message(FATAL_ERROR "softoal library not found!")
-		endif()
-		set(MVMPLibraries ${MVMPLibraries} ${OpenALLib})
+		set(MVMPLibraries ${MVMPLibraries}
+			${LIBDir}/OpenAL/lib/${Architecture}/OpenAL32.lib
+		)
+		
 		set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/OpenAL/include")
 	else()
 		# OpenAL
@@ -309,17 +304,15 @@ if (BuildMVMP)
 		set(MVMPLibraries ${MVMPLibraries} ${OPENAL_LIBRARY})
 	endif()
 	
+	# SDL2
 	if(UseInternalSDL2)
-		# SDL2
-		find_library(SDL2Lib NAMES "SDL2_${Architecture}" PATHS "${LIBDir}/SDL2")
-		if(NOT SDL2Lib)
-			message(FATAL_ERROR "SDL2 library not found!")
-		endif()
+		set(MVMPLibraries ${MVMPLibraries}
+			${LIBDir}/SDL2/lib/${Architecture}/SDL2main.lib
+			${LIBDir}/SDL2/lib/${Architecture}/SDL2.lib
+		)
 		
-		set(MVMPLibraries ${MVMPLibraries} ${SDL2Lib})
 		set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/SDL2/include")
 	else()
-		# SDL2
 		find_package(SDL2)
 		if(NOT SDL2_FOUND)
 			message(FATAL_ERROR "libsdl2 dev files not found!")
@@ -368,6 +361,7 @@ if (BuildMVMP)
 		"client/FxSystem.cpp"
 		"client/FxTemplate.cpp"
 		"client/FxUtil.cpp"
+		"client/cl_avi.cpp"
 		"client/cl_cgame.cpp"
 		"client/cl_cin.cpp"
 		"client/cl_console.cpp"
@@ -456,6 +450,7 @@ if (BuildMVMP)
 		set(MVMPWIN32Files
 			"win32/resource.h"
 			"win32/mv.rc"
+			"win32/dpi_scaling.manifest"
 		)
 		source_group("win32" FILES ${MVMPWIN32Files})
 		set(MVMPFiles ${MVMPFiles} ${MVMPWIN32Files})
@@ -477,7 +472,7 @@ if (BuildMVMP)
 	# Project
 	if(WIN32)
 		add_executable(${MVMP} WIN32 ${MVMPFiles})
-	elseif(APPLE)
+	elseif(APPLE AND NOT BuildPortableVersion)
 		set(MACOSX_BUNDLE_BUNDLE_NAME ${ProjectName})
 		set(MACOSX_BUNDLE_DISPLAY_NAME ${ProjectName})
 		set(MACOSX_BUNDLE_ICON_FILE "mv.icns")
@@ -494,26 +489,25 @@ if (BuildMVMP)
 		# copy over openal & sdl dll
 		add_custom_command(TARGET ${MVMP} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${LIBDir}/OpenAL/softoal_${Architecture}.dll"
+			"${LIBDir}/OpenAL/bin/${Architecture}/OpenAL32.dll"
 			$<TARGET_FILE_DIR:${MVMP}>
 		)
 		
 		add_custom_command(TARGET ${MVMP} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			"${LIBDir}/SDL2/SDL2_${Architecture}.dll"
+			"${LIBDir}/SDL2/bin/${Architecture}/SDL2.dll"
 			$<TARGET_FILE_DIR:${MVMP}>
 		)
 	endif()
-	
-	# copy assetsmv.pk3 to the output directory (for debugging)
-	add_custom_command(TARGET ${MVMP} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3"
-		"$<TARGET_FILE_DIR:${MVMP}>/base/assetsmv.pk3"
+
+	target_compile_definitions(${MVMP}
+		PRIVATE ${GlobalDefines}
+		PRIVATE $<$<CONFIG:Debug>:${DebugDefines}>
+		PRIVATE $<$<CONFIG:Release>:${ReleaseDefines}>
+		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
 	)
-	
-	set_target_properties(${MVMP} PROPERTIES COMPILE_DEFINITIONS_RELEASE "${ReleaseDefines};${GlobalDefines}")
-	set_target_properties(${MVMP} PROPERTIES COMPILE_DEFINITIONS_DEBUG "${DebugDefines};${GlobalDefines}")
+
+	set_target_properties(${MVMP} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVMP} PROPERTIES INCLUDE_DIRECTORIES "${MVMPIncludeDirs}")
 	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 	set_target_properties(${MVMP} PROPERTIES PROJECT_LABEL "jk2mvmp")
@@ -521,12 +515,13 @@ if (BuildMVMP)
 	# installation
 	if(MSVC)
 		install(TARGETS ${MVMP} RUNTIME DESTINATION ".")
-		install(FILES "${LIBDir}/OpenAL/softoal_${Architecture}.dll" DESTINATION ".")
-		install(FILES "${LIBDir}/SDL2/SDL2_${Architecture}.dll" DESTINATION ".")
+		install(FILES $<TARGET_PDB_FILE:${MVMP}> DESTINATION "." OPTIONAL)
+		install(FILES "${LIBDir}/OpenAL/bin/${Architecture}/OpenAL32.dll" DESTINATION ".")
+		install(FILES "${LIBDir}/SDL2/bin/${Architecture}/SDL2.dll" DESTINATION ".")
 		if(NOT BuildPortableVersion)
 			install(FILES "${RESDir}/mv.ico" DESTINATION ".")
 		endif()
-	elseif(APPLE)
+	elseif(APPLE AND NOT BuildPortableVersion)
 		install(TARGETS ${MVMP} BUNDLE DESTINATION ".")
 
 		# copy over frameworks into the app
@@ -538,14 +533,93 @@ if (BuildMVMP)
 			fixup_bundle(\"${APPS}\" \"\" \"\")
 		")
 	else()
-		install(TARGETS ${MVMP} RUNTIME DESTINATION "bin")
-		install(FILES ${RESDir}/jk2mv.desktop DESTINATION "share/applications")
-		install(FILES ${RESDir}/jk2mv.png DESTINATION "share/pixmaps")
+		if(BuildPortableVersion)
+			install(TARGETS ${MVMP} RUNTIME DESTINATION ".")
+		else()
+			install(TARGETS ${MVMP} RUNTIME DESTINATION "bin")
+			install(FILES ${RESDir}/org.mvdevs.jk2mv.desktop DESTINATION "share/applications")
+			install(FILES ${RESDir}/org.mvdevs.jk2mv.48.png RENAME org.mvdevs.jk2mv.png DESTINATION "share/icons/hicolor/48x48/apps")
+			install(FILES ${RESDir}/org.mvdevs.jk2mv.256.png RENAME org.mvdevs.jk2mv.png DESTINATION "share/icons/hicolor/256x256/apps")
+			install(FILES ${RESDir}/org.mvdevs.jk2mv.appdata.xml DESTINATION "share/metainfo")
+		endif()
 	endif()
 
 	# jk2mvmenu and assetsmv are required to run JK2MV
-	add_dependencies(${MVMP} ${MVMENU} assets)
-	add_subdirectory("menu")
+	add_dependencies(${MVMP} ${MVMENU} assetsmv)
+
+	if(BuildMVSDK)
+		add_dependencies(${MVMP} assetsmv2)
+	endif()
+
+	# mvmenu is now built from source conainted in the mvsdk submodule
+	set(MVMENUDefines "GAME_EXPORTS")
+	set(MVMENUDefines "JK2MV_MENU")
+	set(MVMENUIncludeDirs ${MVGLOBALIncludeDirs})
+
+	set(MVMENUFiles
+		"mvsdk/code/api/mvapi.h"
+
+		"mvsdk/code/ui/keycodes.h"
+		"mvsdk/code/ui/ui_force.h"
+		"mvsdk/code/ui/ui_local.h"
+		"mvsdk/code/ui/ui_public.h"
+		"mvsdk/code/ui/ui_shared.h"
+		"mvsdk/code/ui/ui_multiversion.h"
+		"mvsdk/code/ui/ui_multiversion_syscalls.h"
+
+		"mvsdk/code/game/bg_weapons.h"
+		"mvsdk/code/game/q_shared.h"
+		"mvsdk/code/game/bg_multiversion.h"
+
+		"mvsdk/code/ui/ui_main.c" # keep this on top (qvm compiler needs VM_Main as the first compiled function)
+		"mvsdk/code/ui/ui_atoms.c"
+		"mvsdk/code/ui/ui_force.c"
+		"mvsdk/code/ui/ui_gameinfo.c"
+		"mvsdk/code/ui/ui_shared.c"
+		"mvsdk/code/ui/ui_multiversion.c"
+
+		"mvsdk/code/game/bg_misc.c"
+		"mvsdk/code/game/bg_weapons.c"
+		"mvsdk/code/game/q_math.c"
+		"mvsdk/code/game/q_shared.c"
+		"mvsdk/code/ui/ui_multiversion_syscalls.c"
+		"mvsdk/code/game/bg_multiversion.c"
+
+		"mvsdk/code/ui/ui_syscalls.c"
+	)
+
+	add_library(${MVMENU} SHARED ${MVMENUFiles})
+
+
+	set_target_properties(${MVMENU} PROPERTIES PREFIX "") # remove "lib" prefix for library files
+
+	target_compile_definitions(${MVMENU}
+		PRIVATE ${GlobalDefines} ${MVMENUDefines}
+		PRIVATE $<$<CONFIG:Debug>:${DebugDefines}>
+		PRIVATE $<$<CONFIG:Release>:${ReleaseDefines}>
+		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
+	)
+
+	set_target_properties(${MVMENU} PROPERTIES C_STANDARD 90)
+	set_target_properties(${MVMENU} PROPERTIES INCLUDE_DIRECTORIES "${MVMENUIncludeDirs}")
+	set_target_properties(${MVMENU} PROPERTIES PROJECT_LABEL "jk2mvmenu")
+
+	if(BuildPortableVersion)
+		if(WIN32)
+			install(TARGETS ${MVMENU} RUNTIME DESTINATION ".")
+		else()
+			install(TARGETS ${MVMENU} LIBRARY DESTINATION ".")
+		endif()
+	else()
+		if(WIN32)
+			install(TARGETS ${MVMENU} RUNTIME DESTINATION ".")
+			install(FILES $<TARGET_PDB_FILE:${MVMENU}> DESTINATION "." OPTIONAL)
+		elseif(APPLE)
+			install(TARGETS ${MVMENU} LIBRARY DESTINATION "${MVMP}.app/Contents/MacOS")
+		else()
+			install(TARGETS ${MVMENU} LIBRARY DESTINATION "lib")
+		endif()
+	endif()
 endif()
 
 # jk2mvded
@@ -569,26 +643,32 @@ if (BuildMVDED)
 
 	# Project
 	add_executable(${MVDED} ${MVDEDFiles})
-
-	# copy assetsmv.pk3 to the output directory (for debugging)
-	add_custom_command(TARGET ${MVDED} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		"${CMAKE_CURRENT_BINARY_DIR}/assetsmv.pk3"
-		"$<TARGET_FILE_DIR:${MVDED}>/base/assetsmv.pk3"
-	)
 	
-	set_target_properties(${MVDED} PROPERTIES COMPILE_DEFINITIONS_RELEASE "${ReleaseDefines};${GlobalDefines};${MVDEDDefines}")
-	set_target_properties(${MVDED} PROPERTIES COMPILE_DEFINITIONS_DEBUG "${DebugDefines};${GlobalDefines};${MVDEDDefines}")
+	target_compile_definitions(${MVDED}
+		PRIVATE ${GlobalDefines} ${MVDEDDefines}
+		PRIVATE $<$<CONFIG:Debug>:${DebugDefines}>
+		PRIVATE $<$<CONFIG:Release>:${ReleaseDefines}>
+		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
+	)
+
+	set_target_properties(${MVDED} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVDED} PROPERTIES INCLUDE_DIRECTORIES "${MVDEDIncludeDirs}")
 	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "jk2mvded")
-	
+
+	add_dependencies(${MVDED} assetsmv)
+
+	if(BuildMVSDK)
+		add_dependencies(${MVDED} assetsmv2)
+	endif()
+
 	# installation
-	if(WIN32 OR APPLE)
+	if(WIN32 OR APPLE OR BuildPortableVersion)
 		install(TARGETS ${MVDED} RUNTIME DESTINATION ".")
+		if (WIN32)
+			install(FILES $<TARGET_PDB_FILE:${MVDED}> DESTINATION "." OPTIONAL)
+		endif()
 	else()
 		install(TARGETS ${MVDED} RUNTIME DESTINATION "bin")
 	endif()
-	
-	add_dependencies(${MVDED} assets)
 endif()

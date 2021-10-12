@@ -13,10 +13,6 @@ using namespace std;
 
 #include <string>
 #include <map>
-#include <list>
-
-using namespace std;
-
 
 #define STRIP_VERSION	1
 
@@ -132,7 +128,7 @@ public:
 	virtual void	Clear(void);
 
 	void			SetUsed(bool newUsed = true) { Used = newUsed; }
-	void			SetText(int index, char *newText);
+	void			SetText(unsigned int index, char *newText);
 	void			SetNotes(char *newNotes);
 
 	bool			GetUsed(void) { return Used; }
@@ -173,7 +169,7 @@ public:
 class cStringPackageID
 {
 private:
-	string	name;
+	std::string	name;
 	byte	reg;
 public:
 	cStringPackageID(const char *in_name, byte in_reg) { name = in_name; reg = in_reg; }
@@ -187,7 +183,7 @@ class cStringPackage
 protected:
 	unsigned char	ID;
 	unsigned char	Registration;
-	string			name;
+	std::string		name;
 	char			*Reference;
 
 public:
@@ -246,7 +242,7 @@ class cStringPackageSingle : public cStringPackage
 {
 private:
 	cStringsSingle		Strings[MAX_STRINGS];
-	map<string, int>	ReferenceTable;
+	std::map<std::string, int>	ReferenceTable;
 
 public:
 					cStringPackageSingle(const char *in, unsigned char initID = 0, char *initReference = NULL);
@@ -269,8 +265,8 @@ typedef struct sFlagPair
 	unsigned int	Value;
 } tFlagPair;
 
-extern sFlagPair FlagPairs[];
-extern sFlagPair LanguagePairs[];
+extern const sFlagPair FlagPairs[];
+extern const sFlagPair LanguagePairs[];
 
 #ifdef _STRIPED_
 
@@ -299,6 +295,7 @@ cStringsSingle			*SP_GetString(unsigned short ID);
 cStringsSingle			*SP_GetString(const char *Reference);
 const char				*SP_GetStringText(unsigned short ID);
 const char				*SP_GetStringTextString(const char *Reference);
+const qboolean			SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize);
 
 // Initialization
 void					SP_Init(void);

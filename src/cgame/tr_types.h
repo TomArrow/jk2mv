@@ -64,6 +64,18 @@ typedef struct poly_s {
 	polyVert_t			*verts;
 } poly_t;
 
+typedef struct
+{
+	int		isValid;
+	g2handle_t	ghoul2;
+	int		modelNum;
+	int		boltNum;
+	vec3_t	angles;
+	vec3_t	origin;
+	vec3_t	scale;
+	int		entNum;
+} sharedBoltInterface_t;
+
 typedef enum {
 	RT_MODEL,
 	RT_POLY,
@@ -111,7 +123,7 @@ typedef struct miniRefEntity_s
 	float				rotation;			// size 2 for RT_CYLINDER or number of verts in RT_ELECTRICITY
 
 	// misc
-	float		shaderTime;			// subtracted from refdef time to control effect start times
+	int			shaderTime;			// subtracted from refdef time to control effect start times
 	int			frame;				// also used as MODEL_BEAM's diameter
 
 } miniRefEntity_t;
@@ -149,7 +161,10 @@ typedef struct {
 	float				rotation;
 
 	// misc
-	float		shaderTime;			// subtracted from refdef time to control effect start times
+	union {
+		float		f;
+		int			i;
+	} shaderTime;					// subtracted from refdef time to control effect start times
 	int			frame;				// also used as MODEL_BEAM's diameter
 	//
 	//
@@ -233,8 +248,8 @@ Ghoul2 Insert Start
 	vec3_t		angles;				// rotation angles - used for Ghoul2
 
 	vec3_t		modelScale;			// axis scale for models
-//	CGhoul2Info_v	*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
-	void		*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
+//	void		*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
+	g2handle_t	ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
 /*
 Ghoul2 Insert End
 */
@@ -317,10 +332,10 @@ typedef struct {
 } vmglconfig_t;
 
 typedef struct {
-	char					*renderer_string;
-	char					*vendor_string;
-	char					*version_string;
-	char					*extensions_string;
+	const char				*renderer_string;
+	const char				*vendor_string;
+	const char				*version_string;
+	const char				*extensions_string;
 
 	int						maxTextureSize;			// queried from GL
 	int						maxActiveTextures;		// multitexture ability
@@ -340,6 +355,7 @@ typedef struct {
 	// normal screens should be 4/3, but wide aspect monitors may be 16/9
 	float					windowAspect;
 
+	float					displayScale;
 	int						displayFrequency;
 
 	// synonymous with "does rendering consume the entire screen?", therefore

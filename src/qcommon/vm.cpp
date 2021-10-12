@@ -42,11 +42,11 @@ int		vm_debugLevel;
 
 #define MAX_APINUM	1000
 qboolean vm_profileInclusive;
+static vmSymbol_t nullSymbol;
 
 // used by Com_Error to get rid of running vm's before longjmp
 static int forced_unload;
 
-#define	MAX_VM		3
 vm_t	vmTable[MAX_VM];
 
 
@@ -83,6 +83,24 @@ void VM_Init( void ) {
 	Com_Memset( vmTable, 0, sizeof( vmTable ) );
 }
 
+/*
+===============
+VM_ValueToInstr
+
+Calculates QVM instruction number for program counter value
+===============
+*/
+static int VM_ValueToInstr( vm_t *vm, int value ) {
+	intptr_t instrOffs = vm->instructionPointers[0] - vm->entryOfs;
+
+	for (int i = 0; i < vm->instructionCount; i++) {
+		if (vm->instructionPointers[i] - instrOffs > value) {
+			return i - 1;
+		}
+	}
+
+	return vm->instructionCount;
+}
 
 /*
 ===============
@@ -92,20 +110,26 @@ Assumes a program counter value
 ===============
 */
 const char *VM_ValueToSymbol( vm_t *vm, int value ) {
-	vmSymbol_t	*sym;
 	static char		text[MAX_TOKEN_CHARS];
+	vmSymbol_t		*sym;
 
-	if ( !vm->symbolTable ) {
-		return "NO SYMBOLS";
+	sym = VM_ValueToFunctionSymbol( vm, value );
+
+	if ( sym == &nullSymbol ) {
+		Com_sprintf( text, sizeof( text ), "%s(vmMain+%d) [%#x]",
+			vm->name, VM_ValueToInstr( vm, value ), value );
+		return text;
 	}
 
-	sym = vm->symbolTable[value];
-
-	if ( value == sym->symValue ) {
-		return sym->symName;
+	// predefined helper routines
+	if (value < vm->entryOfs) {
+		Com_sprintf( text, sizeof( text ), "%s(%s+%#x) [%#x]",
+			vm->name, sym->symName, value - sym->symValue, value );
+		return text;
 	}
 
-	Com_sprintf( text, sizeof( text ), "%s+%i", sym->symName, value - sym->symValue );
+	Com_sprintf( text, sizeof( text ), "%s(%s+%d) [%#x]", vm->name, sym->symName,
+		VM_ValueToInstr( vm, value ) - sym->symInstr, value );
 
 	return text;
 }
@@ -118,13 +142,28 @@ For profiling, find the symbol behind this value
 ===============
 */
 vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value ) {
-	static vmSymbol_t	nullSym;
-
-	if ( !vm->symbolTable ) {
-		return &nullSym;
+	if ( (unsigned)vm->codeLength <= (unsigned)value ) {
+		return &nullSymbol;
 	}
 
-	return vm->symbolTable[value];
+	if ( vm->symbolTable ) {
+		return vm->symbolTable[value];
+	}
+
+	if ( vm->symbols ) {
+		vmSymbol_t *sym;
+
+		for ( sym = vm->symbols; sym->next; sym = sym->next ) {
+			if ( sym->next->symValue > value && value >= sym->symValue ) {
+				return sym;
+			}
+		}
+		if ( sym->symValue <= value ) {
+			return sym;
+		}
+	}
+
+	return &nullSymbol;
 }
 
 
@@ -150,31 +189,19 @@ int VM_SymbolToValue( vm_t *vm, const char *symbol ) {
 VM_SymbolForCompiledPointer
 =====================
 */
-#if 0 // VM_ValueToSymbol takes compiled pointer as an argument now
-const char *VM_SymbolForCompiledPointer( vm_t *vm, void *code ) {
-	int			i;
+const char *VM_SymbolForCompiledPointer( void *code ) {
+	for ( int i = 0; i < MAX_VM; i++ ) {
+		vm_t *vm = &vmTable[i];
 
-	if ( code < (void *)vm->codeBase ) {
-		return "Before code block";
-	}
-	if ( code >= (void *)(vm->codeBase + vm->codeLength) ) {
-		return "After code block";
-	}
-
-	// find which original instruction it is after
-	for ( i = 0 ; i < vm->codeLength ; i++ ) {
-		if ( (void *)vm->instructionPointers[i] > code ) {
-			break;
+		if ( vm->compiled ) {
+			if ( vm->codeBase <= code && code < vm->codeBase + vm->codeLength ) {
+				return VM_ValueToSymbol( vm, (byte *)code - vm->codeBase );
+			}
 		}
 	}
-	i--;
 
-	// now look up the bytecode instruction pointer
-	return VM_ValueToSymbol( vm, i );
+	return NULL;
 }
-#endif
-
-
 
 /*
 ===============
@@ -204,6 +231,42 @@ int	ParseHex( const char *text ) {
 	return value;
 }
 
+static void VM_GeneratePerfMap(vm_t *vm) {
+#ifdef __linux__
+		// generate perf .map file for profiling compiled QVM
+		char		mapFile[MAX_OSPATH];
+		FILE		*f;
+		void		*address;
+		int			length;
+
+		if ( !vm->symbols ) {
+			return;
+		}
+
+		Com_sprintf( mapFile, sizeof(mapFile), "/tmp/perf-%d.map", Sys_PID() );
+
+		if ( (f = fopen( mapFile, "a" )) == NULL ) {
+			Com_Printf( S_COLOR_YELLOW "WARNING: couldn't open %s\n", mapFile );
+			return;
+		}
+
+		// perf .map format: "hex_address hex_length name\n"
+		for ( vmSymbol_t *sym = vm->symbols; sym; sym = sym->next ) {
+			address = vm->codeBase + sym->symValue;
+
+			if ( sym->next ) {
+				length = sym->next->symValue - sym->symValue;
+			} else {
+				length = vm->codeLength - sym->symValue;
+			}
+
+			fprintf( f, "%lx %x %s\n", (unsigned long)(vm->codeBase + sym->symValue), length, sym->symName );
+		}
+
+		fclose( f );
+#endif // __linux__
+}
+
 /*
 ===============
 VM_LoadSymbols
@@ -214,109 +277,185 @@ void VM_LoadSymbols( vm_t *vm ) {
 		char	*c;
 		void	*v;
 	} mapfile;
-	const char *text_p;
-	char *token;
-	char	name[MAX_QPATH];
-	char	symbols[MAX_QPATH];
+	char		name[MAX_QPATH];
+	char		symbols[MAX_QPATH];
+
+	if ( vm->dllHandle ) {
+		return;
+	}
+
+	//
+	// add symbols for vm_x86 predefined procedures
+	//
+
 	vmSymbol_t	**prev, *sym;
-	int		count;
-	int		value;
-	int		chars;
-	int		segment;
-	int		numInstructions;
-	int		i;
 
-	if ( vm->compiled ) {
-		return;
-	}
-
-	// don't load symbols if not developer
-	if ( !com_developer->integer ) {
-		return;
-	}
-
-	COM_StripExtension(vm->name, name, sizeof(name));
-	Com_sprintf( symbols, sizeof( symbols ), "vm/%s.map", name );
-	FS_ReadFile( symbols, &mapfile.v );
-	if ( !mapfile.c ) {
-		Com_Printf( "Couldn't load symbol file: %s\n", symbols );
-		return;
-	}
-
-	numInstructions = vm->instructionCount;
-
-	// 1000 for negative system calls
-	vm->symbolTable = (vmSymbol_t **)Hunk_Alloc( (MAX_APINUM + vm->codeLength) * sizeof(*vm->symbolTable), h_high ) + MAX_APINUM;
-
-	// parse the symbols
-	text_p = mapfile.c;
 	prev = &vm->symbols;
-	count = 0;
 
-	while ( 1 ) {
-		token = COM_Parse( &text_p );
-		if ( !token[0] ) {
-			break;
-		}
-		segment = ParseHex( token );
-		if ( segment ) {
-			COM_Parse( &text_p );
-			COM_Parse( &text_p );
-			continue;		// only load code segment values
-		}
+	if ( vm->callProcOfs ) {
+		const char	*symName;
 
-		token = COM_Parse( &text_p );
-		if ( !token[0] ) {
-			Com_Printf( "WARNING: incomplete line at end of file\n" );
-			break;
-		}
-		value = ParseHex( token );
+		symName = "CallDoSyscall";
+		sym = *prev = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + strlen( symName ), h_high );
+		Q_strncpyz( sym->symName, symName, strlen( symName ) + 1 );
+		sym->symValue = 0;
 
-		token = COM_Parse( &text_p );
-		if ( !token[0] ) {
-			Com_Printf( "WARNING: incomplete line at end of file\n" );
-			break;
-		}
-		chars = (int)strlen( token );
-		sym = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + chars, h_high );
-		*prev = sym;
+		symName = "CallProcedure";
+		sym = sym->next = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + strlen( symName ), h_high );
+		Q_strncpyz( sym->symName, symName, strlen( symName ) + 1 );
+		sym->symValue = vm->callProcOfs;
+
+		// "CallProcedureSyscall" used by ioq3 optimizer, tail of "CallProcedure"
+		symName = "CallProcedure";
+		sym = sym->next = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + strlen( symName ), h_high );
+		Q_strncpyz( sym->symName, symName, strlen( symName ) + 1 );
+		sym->symValue = vm->callProcOfsSyscall;
+
+		vm->numSymbols = 3;
 		prev = &sym->next;
 		sym->next = NULL;
-
-		// convert value from an instruction number to a code offset
-		if ( value >= 0 && value < numInstructions ) {
-			value = (int)vm->instructionPointers[value];
-		}
-
-		sym->symValue = value;
-		Q_strncpyz( sym->symName, token, chars + 1 );
-
-		// _stackStart and _stackEnd are marked as functions for some reason
-		if (value < vm->codeLength) {
-			vm->symbolTable[value] = sym;
-		}
-
-		count++;
 	}
 
-	// direct code to function who owns it
-	static vmSymbol_t invalidSym;
-	sym = &invalidSym;
-	for ( i = -MAX_APINUM; i < 0; i++ ) {
-		if ( vm->symbolTable[i] == NULL ) {
+	//
+	// parse symbols
+	//
+
+	fileHandle_t	f;
+	unsigned long	crc = 0;
+	const char		*mapFile = NULL;
+
+	// load predefined map files for retail modules
+	COM_StripExtension(vm->name, name, sizeof(name));
+	Com_sprintf(symbols, sizeof( symbols ), "vm/%s.qvm", name);
+	FS_FOpenFileReadHash(symbols, &f, qfalse, &crc);
+	FS_FCloseFile(f);
+
+#define CRC_ASSETS0_JK2MPGAME_QVM	1115512220
+#define CRC_ASSETS2_JK2MPGAME_QVM	2662605590
+#define CRC_ASSETS5_JK2MPGAME_QVM	1353136214
+#define CRC_ASSETS0_CGAME_QVM		1542843754
+#define CRC_ASSETS2_CGAME_QVM		3929377845
+#define CRC_ASSETS5_CGAME_QVM		3922670639
+#define CRC_ASSETS0_UI_QVM			2109062948
+#define CRC_ASSETS2_UI_QVM			2883122120
+#define CRC_ASSETS5_UI_QVM			14163
+
+	switch (crc) {
+	case CRC_ASSETS0_JK2MPGAME_QVM:	mapFile = "vm/jk2mpgame_102.map";	break;
+	case CRC_ASSETS2_JK2MPGAME_QVM:	mapFile = "vm/jk2mpgame_103.map";	break;
+	case CRC_ASSETS5_JK2MPGAME_QVM:	mapFile = "vm/jk2mpgame_104.map";	break;
+	case CRC_ASSETS0_CGAME_QVM:		mapFile = "vm/cgame_102.map";		break;
+	case CRC_ASSETS2_CGAME_QVM:		mapFile = "vm/cgame_103.map";		break;
+	case CRC_ASSETS5_CGAME_QVM:		mapFile = "vm/cgame_104.map";		break;
+	case CRC_ASSETS0_UI_QVM:		mapFile = "vm/ui_102.map";			break;
+	case CRC_ASSETS2_UI_QVM:		mapFile = "vm/ui_103.map";			break;
+	case CRC_ASSETS5_UI_QVM:		mapFile = "vm/ui_104.map";			break;
+	}
+
+	if (mapFile) {
+		Q_strncpyz(symbols, mapFile, sizeof(symbols));
+	} else {
+		Com_sprintf(symbols, sizeof(symbols), "vm/%s.map", name);
+	}
+
+	FS_ReadFile( symbols, &mapfile.v );
+
+	if ( mapfile.c ) {
+		const char *text_p;
+		const char *token;
+		int			chars;
+		int			segment;
+		int			value;
+		int			count = 0;
+
+		text_p = mapfile.c;
+
+		while ( 1 ) {
+			token = COM_Parse( &text_p );
+			if ( !token[0] ) {
+				break;
+			}
+			segment = ParseHex( token );
+			if ( segment ) {
+				COM_Parse( &text_p );
+				COM_Parse( &text_p );
+				continue;		// only load code segment values
+			}
+
+			token = COM_Parse( &text_p );
+			if ( !token[0] ) {
+				Com_Printf( "WARNING: incomplete line at end of file\n" );
+				break;
+			}
+			value = ParseHex( token );
+			if ( value < 0 || vm->instructionCount <= value ) {
+				COM_Parse( &text_p );
+				continue;		// don't load syscalls
+			}
+
+			token = COM_Parse( &text_p );
+			if ( !token[0] ) {
+				Com_Printf( "WARNING: incomplete line at end of file\n" );
+				break;
+			}
+
+
+			chars = (int)strlen( token );
+			sym = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + chars, h_high );
+			*prev = sym;
+			prev = &sym->next;
+			sym->next = NULL;
+			sym->symInstr = value;
+			sym->symValue = vm->instructionPointers[value] - vm->instructionPointers[0] + vm->entryOfs;
+			Q_strncpyz( sym->symName, token, chars + 1 );
+
+			count++;
+		}
+
+		vm->numSymbols += count;
+		Com_Printf( "%i symbols parsed from %s\n", count, symbols );
+		FS_FreeFile( mapfile.v );
+	} else {
+		const char	*symName = "vmMain";
+		sym = *prev = (vmSymbol_t *)Hunk_Alloc( sizeof( *sym ) + strlen( symName ), h_high );
+		prev = &sym->next;
+		Q_strncpyz( sym->symName, symName, strlen( symName ) + 1 );
+		sym->symValue = vm->entryOfs;
+		vm->numSymbols += 1;
+
+		Com_Printf( "Couldn't load symbol file: %s\n", symbols );
+	}
+
+
+	if ( vm->compiled && com_developer->integer )
+	{
+		VM_GeneratePerfMap( vm );
+	}
+
+#ifdef DEBUG_VM
+	//
+	// code->symbol lookup table for profiling and debugging interpreted QVM
+	//
+
+	if ( !vm->compiled )
+	{
+		vmSymbol_t	*sym;
+
+		vm->symbolTable = (vmSymbol_t **)Hunk_Alloc( vm->codeLength * sizeof(*vm->symbolTable), h_high );
+
+		for ( sym = vm->symbols; sym; sym = sym->next ) {
+			vm->symbolTable[sym->symValue] = sym;
+		}
+
+		sym = NULL;
+		for ( int i = 0; i < vm->codeLength; i++ ) {
+			if ( vm->symbolTable[i] ) {
+				sym = vm->symbolTable[i];
+			}
 			vm->symbolTable[i] = sym;
 		}
 	}
-	for ( i = 0; i < vm->codeLength; i++ ) {
-		if ( vm->symbolTable[i] ) {
-			sym = vm->symbolTable[i];
-		}
-		vm->symbolTable[i] = sym;
-	}
-
-	vm->numSymbols = count;
-	Com_Printf( "%i symbols parsed from %s\n", count, symbols );
-	FS_FreeFile( mapfile.v );
+#endif // DEBUG_VM
 }
 
 /*
@@ -357,11 +496,11 @@ Dlls will call this directly
 
 ============
 */
-intptr_t QDECL VM_DllSyscall( intptr_t arg, ... ) {
+intptr_t QDECL __attribute__((no_sanitize_address)) VM_DllSyscall( intptr_t arg, ... ) {
 #if !id386 || defined __clang__
   // rcg010206 - see commentary above
   intptr_t args[MAX_VMSYSCALL_ARGS];
-  int i;
+  size_t i;
   va_list ap;
 
   args[0] = arg;
@@ -416,7 +555,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc)
 	if( LittleLong( header.h->vmMagic ) == VM_MAGIC ) {
 		// byte swap the header
 		// sizeof( vmHeader_t ) - sizeof( int ) is the 1.32b vm header size
-		for ( i = 0 ; i < ( sizeof( vmHeader_t ) - sizeof( int ) ) / 4 ; i++ ) {
+		for ( size_t i = 0 ; i < ( sizeof( vmHeader_t ) - sizeof( int ) ) / 4 ; i++ ) {
 			((int *)header.h)[i] = LittleLong( ((int *)header.h)[i] );
 		}
 
@@ -525,6 +664,8 @@ vm_t *VM_Restart(vm_t *vm)
 	// free the original file
 	FS_FreeFile(header);
 
+	vm->gameversion = MV_GetCurrentGameversion();
+
 	return vm;
 }
 
@@ -569,7 +710,10 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 
 	vm = &vmTable[i];
 
+	Com_Memset(vm, 0, sizeof(vm));
 	Q_strncpyz(vm->name, module, sizeof(vm->name));
+
+	vm->mvmenu = 0;
 
 	if (interpret == VMI_NATIVE) {
 		// try to load as a system dll
@@ -577,6 +721,7 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 		vm->dllHandle = Sys_LoadModuleLibrary(module, mvOverride, &vm->entryPoint, VM_DllSyscall);
 		if (vm->dllHandle) {
 			vm->systemCall = systemCalls;
+			vm->gameversion = MV_GetCurrentGameversion();
 			return vm;
 		}
 
@@ -634,6 +779,8 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 
 	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
 
+	vm->gameversion = MV_GetCurrentGameversion();
+
 	return vm;
 }
 
@@ -686,6 +833,12 @@ void VM_Clear(void) {
 	for (i=0;i<MAX_VM; i++) {
 		VM_Free(&vmTable[i]);
 	}
+
+#ifdef __linux__
+	if ( com_developer && com_developer->integer ) {
+		remove( va("/tmp/perf-%d.map", Sys_PID()) );
+	}
+#endif
 }
 
 void VM_Forced_Unload_Start(void) {
@@ -696,40 +849,148 @@ void VM_Forced_Unload_Done(void) {
 	forced_unload = 0;
 }
 
-void *VM_ArgPtr( intptr_t intValue ) {
-	if ( !intValue ) {
-		return NULL;
-	}
-	// currentVM is missing on reconnect
-	if ( currentVM==NULL )
-	  return NULL;
-
+void *VM_ArgPtr( int syscall, intptr_t intValue, int32_t size ) {
 	if ( currentVM->entryPoint ) {
-		return (void *)(currentVM->dataBase + intValue);
+		return (void *) intValue;
 	}
-	else {
-		return (void *)(currentVM->dataBase + (intValue & currentVM->dataMask));
-	}
-}
-
-void *VM_ExplicitArgPtr( vm_t *vm, intptr_t intValue ) {
 	if ( !intValue ) {
 		return NULL;
 	}
 
-	// currentVM is missing on reconnect here as well?
-	if ( currentVM==NULL )
-	  return NULL;
+	// don't drop on overflow for compatibility reasons
+	intValue &= currentVM->dataMask;
 
-	//
-	if ( vm->entryPoint ) {
-		return (void *)(vm->dataBase + intValue);
+	// Disregarding integer overflows:
+	// if ( size < 0 || currentVM->dataMask < intValue + size - 1 )
+	if ( (uint32_t)size > (uint32_t)(currentVM->dataMask - intValue + 1) ) {
+		Com_Error( ERR_DROP, "VM_ArgPtr: memory overflow in syscall %d (%s)", syscall, currentVM->name );
 	}
-	else {
-		return (void *)(vm->dataBase + (intValue & vm->dataMask));
-	}
+
+	return (void *)(currentVM->dataBase + intValue);
 }
 
+void *VM_ArgArray( int syscall, intptr_t intValue, uint32_t size, int32_t num ) {
+	if ( currentVM->entryPoint ) {
+		return (void *) intValue;
+	}
+	if ( !intValue ) {
+		return NULL;
+	}
+
+	// don't drop on overflow for compatibility reasons
+	intValue &= currentVM->dataMask;
+
+	// Disregarding integer overflows:
+	// if ( size * num < 0 || currentVM->dataMask < intValue + size * num - 1 )
+	int64_t bytes = (int64_t)size * (int64_t)num;
+	if ( (uint64_t)bytes > (uint64_t)(currentVM->dataMask - intValue + 1) ) {
+		Com_Error( ERR_DROP, "VM_ArgArray: memory overflow in syscall %d (%s)", syscall, currentVM->name );
+	}
+
+	return (void *)(currentVM->dataBase + intValue);
+}
+
+char *VM_ArgString( int syscall, intptr_t intValue ) {
+	if ( currentVM->entryPoint ) {
+		return (char *) intValue;
+	}
+	if ( !intValue ) {
+		return NULL;
+	}
+
+	intptr_t	len;
+	char		*p;
+	const int	dataMask = currentVM->dataMask;
+
+	// don't drop on overflow for compatibility reasons
+	intValue &= dataMask;
+
+	p = (char *) currentVM->dataBase + intValue;
+	len = (intptr_t) strnlen(p, dataMask + 1 - intValue);
+
+	if ( intValue + len > dataMask ) {
+		Com_Error( ERR_DROP, "VM_ArgString: memory overflow in syscall %d (%s)", syscall, currentVM->name );
+	}
+
+	return p;
+}
+
+char *VM_ExplicitArgString( vm_t *vm, intptr_t intValue ) {
+	// vm is missing on reconnect here as well?
+	if ( !vm ) {
+		return NULL;
+	}
+	if ( vm->entryPoint ) {
+		return (char *) intValue;
+	}
+	if ( !intValue ) {
+		return NULL;
+	}
+
+	intptr_t	len;
+	char		*p;
+	const int	dataMask = vm->dataMask;
+
+	// don't drop on overflow for compatibility reasons
+	intValue &= dataMask;
+
+	p = (char *) vm->dataBase + intValue;
+	len = (intptr_t) strnlen(p, dataMask + 1 - intValue);
+
+	if ( intValue + len > dataMask ) {
+		Com_Error( ERR_DROP, "VM_ExplicitArgString: memory overflow in %s", vm->name );
+	}
+
+	return p;
+}
+
+intptr_t VM_strncpy( intptr_t dest, intptr_t src, intptr_t size ) {
+	if ( currentVM->entryPoint ) {
+		return (intptr_t) strncpy( (char *)dest, (const char *)src, size );
+	}
+
+	char *dataBase = (char *)currentVM->dataBase;
+	int dataMask = currentVM->dataMask;
+
+	// don't drop on overflow for compatibility reasons
+	dest &= dataMask;
+	src &= dataMask;
+
+	size_t destSize = dataMask - dest;
+	size_t srcSize = dataMask - src;
+	destSize = MIN((size_t) size, destSize);
+	size_t n = MIN(destSize, srcSize);
+
+	strncpy( dataBase + dest, dataBase + src, n );
+
+	if ( n < destSize ) {
+		memset( dataBase + dest + n, 0, destSize - n );
+	}
+
+	return dest;
+}
+
+// needed because G_LOCATE_GAME_DATA and MVAPI_LOCATE_GAME_DATA update
+// the same sv.num_entities variable
+void VM_LocateGameDataCheck( const void *data, int entitySize, int num_entities ) {
+	if ( !data ) {
+		return;
+	}
+
+	if ( !currentVM->entryPoint ) {
+		assert( data > currentVM->dataBase );
+		uintptr_t dataEnd = (uintptr_t) currentVM->dataBase + (uintptr_t)currentVM->dataMask + 1;
+		uintptr_t maxSize = dataEnd - (uintptr_t)data;
+
+		// coming from a module so should be int32_t
+		assert( 0 < entitySize && entitySize <= INT32_MAX );
+		assert( 0 < num_entities && num_entities <= INT32_MAX );
+
+		if ( (uint64_t) entitySize * (uint64_t) num_entities > maxSize ) {
+			Com_Error( ERR_DROP, "LOCATE_GAME_DATA: memory overflow" );
+		}
+	}
+}
 
 /*
 ==============
@@ -755,11 +1016,11 @@ locals from sp
 ==============
 */
 
-intptr_t QDECL VM_Call( vm_t *vm, int callnum, ... )
+intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int callnum, ... )
 {
 	vm_t	*oldVM;
 	intptr_t r;
-	int i;
+	size_t i;
 
 	if(!vm || !vm->name[0])
 		Com_Error(ERR_FATAL, "VM_Call with NULL vm");
@@ -826,10 +1087,10 @@ intptr_t QDECL VM_Call( vm_t *vm, int callnum, ... )
 //=================================================================
 
 static int QDECL VM_ProfileSort( const void *a, const void *b ) {
-	vmSymbol_t	*sa, *sb;
+	const vmSymbol_t	*sa, *sb;
 
-	sa = *(vmSymbol_t **)a;
-	sb = *(vmSymbol_t **)b;
+	sa = *(const vmSymbol_t * const *)a;
+	sb = *(const vmSymbol_t * const *)b;
 
 	if ( sa->profileCount < sb->profileCount ) {
 		return -1;
@@ -848,26 +1109,16 @@ VM_VmProfile_f
 ==============
 */
 void VM_VmProfile_f( void ) {
-	vm_t		*vm;
+	vm_t		*vm = NULL;
 	vmSymbol_t	**sorted, *sym;
 	int			i;
 	long		total;
 	int			totalCalls;
+	int			time;
+	static int	profileTime;
 	qboolean	printHelp = qfalse;
 	qboolean	resetCounts = qfalse;
 	qboolean	printAll = qfalse;
-
-	if ( !lastVM ) {
-		Com_Printf("No VM\n");
-		return;
-	}
-
-	vm = lastVM;
-
-	if ( !vm->numSymbols ) {
-		Com_Printf("No symbols\n");
-		return;
-	}
 
 	if ( Cmd_Argc() >= 2 ) {
 		const char *arg = Cmd_Argv(1);
@@ -881,8 +1132,21 @@ void VM_VmProfile_f( void ) {
 			resetCounts = qtrue;
 			Com_Printf("Collecting inclusive function instruction counts...\n");
 		} else if ( !Q_stricmp(arg, "print") ) {
-			if ( !Q_stricmp(Cmd_Argv(2), "all") ) {
-				printAll = qtrue;
+			if (Cmd_Argc() >= 3) {
+				for ( i = 0; i < MAX_VM; i++ ) {
+					if ( !Q_stricmp(Cmd_Argv(2), vmTable[i].name) ) {
+						vm = &vmTable[i];
+						break;
+					}
+				}
+			} else {
+				// pick first VM with symbols
+				for ( i = 0; i < MAX_VM; i++ ) {
+					if ( !vmTable[i].compiled && vmTable[i].numSymbols ) {
+						vm = &vmTable[i];
+						break;
+					}
+				}
 			}
 		} else {
 			printHelp = qtrue;
@@ -892,10 +1156,14 @@ void VM_VmProfile_f( void ) {
 	}
 
 	if ( resetCounts ) {
-		for ( sym = vm->symbols ; sym ; sym = sym->next ) {
-			sym->profileCount = 0;
-			sym->callCount = 0;
-			sym->caller = NULL;
+		profileTime = Sys_Milliseconds();
+
+		for ( i = 0; i < MAX_VM; i++ ) {
+			for ( sym = vmTable[i].symbols ; sym ; sym = sym->next ) {
+				sym->profileCount = 0;
+				sym->callCount = 0;
+				sym->caller = NULL;
+			}
 		}
 		return;
 	}
@@ -903,7 +1171,16 @@ void VM_VmProfile_f( void ) {
 	if ( printHelp ) {
 		Com_Printf("Usage: vmprofile exclusive        start collecting exclusive counts\n");
 		Com_Printf("       vmprofile inclusive        start collecting inclusive counts\n");
-		Com_Printf("       vmprofile print [all]      print collected data\n");
+		Com_Printf("       vmprofile print [vm]       print collected data\n");
+		return;
+	}
+
+	if ( vm == NULL || vm->compiled ) {
+		Com_Printf("Only interpreted VM can be profiled\n");
+		return;
+	}
+	if ( vm->numSymbols <= 0 ) {
+		Com_Printf("No symbols\n");
 		return;
 	}
 
@@ -921,38 +1198,43 @@ void VM_VmProfile_f( void ) {
 	if ( vm_profileInclusive )
 		total = VM_ValueToFunctionSymbol( vm, 0 )->profileCount;
 
-	qsort( sorted, vm->numSymbols, sizeof( *sorted ), VM_ProfileSort );
+	if ( total > 0 ) {
+		qsort( sorted, vm->numSymbols, sizeof( *sorted ), VM_ProfileSort );
 
-	Com_Printf( "%4s %12s %9s Function Name\n",
-				vm_profileInclusive ? "Incl" : "Excl",
-				"Instructions", "Calls" );
+		Com_Printf( "%4s %12s %9s Function Name\n",
+			vm_profileInclusive ? "Incl" : "Excl",
+			"Instructions", "Calls" );
 
-	// todo: collect associations for generating callgraphs
-	fileHandle_t callgrind = FS_FOpenFileWrite( va("callgrind.out.%s", vm->name) );
-	// callgrind header
-	FS_Printf( callgrind,
-		"events: VM_Instructions\n"
-		"fl=vm/%s.qvm\n\n", vm->name );
+		// todo: collect associations for generating callgraphs
+		fileHandle_t callgrind = FS_FOpenFileWrite( va("callgrind.out.%s", vm->name) );
+		// callgrind header
+		FS_Printf( callgrind,
+			"events: VM_Instructions\n"
+			"fl=vm/%s.qvm\n\n", vm->name );
 
-	for ( i = 0 ; i < vm->numSymbols ; i++ ) {
-		int		perc;
+		for ( i = 0 ; i < vm->numSymbols ; i++ ) {
+			int		perc;
 
-		sym = sorted[i];
+			sym = sorted[i];
 
-		if (printAll || sym->profileCount != 0 || sym->callCount != 0) {
-			perc = 100 * sym->profileCount / total;
-			Com_Printf( "%3i%% %12li %9i %s\n", perc, sym->profileCount, sym->callCount, sym->symName );
+			if (printAll || sym->profileCount != 0 || sym->callCount != 0) {
+				perc = 100 * sym->profileCount / total;
+				Com_Printf( "%3i%% %12li %9i %s\n", perc, sym->profileCount, sym->callCount, sym->symName );
+			}
+
+			FS_Printf(callgrind,
+				"fn=%s\n"
+				"0 %li\n\n",
+				sym->symName, sym->profileCount);
 		}
 
-		FS_Printf(callgrind,
-			"fn=%s\n"
-			"0 %li\n\n",
-			sym->symName, sym->profileCount);
+		FS_FCloseFile( callgrind );
 	}
 
-	FS_FCloseFile( callgrind );
+	time = Sys_Milliseconds() - profileTime;
 
 	Com_Printf("     %12li %9i total\n", total, totalCalls );
+	Com_Printf("     %12li %9i total per second\n", 1000 * total / time, 1000 * totalCalls / time );
 
 	Z_Free( sorted );
 }
@@ -985,9 +1267,13 @@ void VM_VmInfo_f( void ) {
 			Com_Printf("    code length : %7i\n", vm->codeLength);
 			Com_Printf("    table length: %7i\n", vm->instructionCount * 4);
 			Com_Printf("    data length : %7i\n", vm->dataMask + 1);
+			if (vm->numSymbols) {
+				Com_Printf("    symbols     : %i\n", vm->numSymbols);
+			}
 		}
 
 		Com_Printf("    mvapi level : %i\n", vm->mvapilevel);
+		Com_Printf("    menu level  : %i\n", vm->mvmenu);
 	}
 }
 
@@ -1038,4 +1324,20 @@ int	VM_MVAPILevel(const vm_t *vm) {
 
 void VM_SetMVAPILevel(vm_t *vm, int level) {
 	vm->mvapilevel = level;
+}
+
+void VM_SetMVMenuLevel(vm_t *vm, int level) {
+	vm->mvmenu = level;
+}
+
+int VM_MVMenuLevel(const vm_t *vm) {
+	return vm->mvmenu;
+}
+
+mvversion_t VM_GetGameversion(const vm_t *vm) {
+	return vm->gameversion;
+}
+
+void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
+	vm->gameversion = gameversion;
 }

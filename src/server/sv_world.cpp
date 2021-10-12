@@ -103,7 +103,7 @@ worldSector_t *SV_CreateworldSector( int depth, vec3_t mins, vec3_t maxs ) {
 		anode->axis = 1;
 	}
 
-	anode->dist = 0.5 * (maxs[anode->axis] + mins[anode->axis]);
+	anode->dist = 0.5f * (maxs[anode->axis] + mins[anode->axis]);
 	VectorCopy (mins, mins1);
 	VectorCopy (mins, mins2);
 	VectorCopy (maxs, maxs1);
@@ -129,6 +129,11 @@ void SV_ClearWorld( void ) {
 
 	Com_Memset( sv_worldSectors, 0, sizeof(sv_worldSectors) );
 	sv_numworldSectors = 0;
+
+	for ( unsigned i = 0; i < ARRAY_LEN( sv.svEntities ); i++ ) {
+		sv.svEntities[i].worldSector = NULL;
+		sv.svEntities[i].nextEntityInWorldSector = NULL;
+	}
 
 	// get world map bounds
 	h = CM_InlineModel( 0 );
@@ -393,7 +398,7 @@ void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
 			continue;
 		}
 
-		if ( ap->count == ap->maxcount ) {
+		if ( ap->count >= ap->maxcount ) {
 			Com_Printf ("SV_AreaEntities: MAXCOUNT\n");
 			return;
 		}
@@ -452,7 +457,7 @@ Ghoul2 Insert Start
 
 	int			passEntityNum;
 	int			contentmask;
-	int			capsule;
+	qboolean	capsule;
 
 	int			traceFlags;
 	int			useLod;
@@ -469,10 +474,10 @@ SV_ClipToEntity
 
 ====================
 */
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, int capsule ) {
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule ) {
 	sharedEntity_t	*touch;
 	clipHandle_t	clipHandle;
-	float			*origin, *angles;
+	const float		*origin, *angles;
 
 	touch = SV_GentityNum( entityNum );
 
@@ -495,8 +500,8 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
-	CM_TransformedBoxTrace ( trace, (float *)start, (float *)end,
-		(float *)mins, (float *)maxs, clipHandle,  contentmask,
+	CM_TransformedBoxTrace ( trace, start, end,
+		mins, maxs, clipHandle,  contentmask,
 		origin, angles, capsule);
 
 	if ( trace->fraction < 1 ) {
@@ -518,23 +523,26 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 	int			passOwnerNum;
 	trace_t		trace, oldTrace;
 	clipHandle_t	clipHandle;
-	float		*origin, *angles;
+	const float		*origin, *angles;
 	int			thisOwnerShared = 1;
 
 	num = SV_AreaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
 
-	if ( clip->passEntityNum != ENTITYNUM_NONE ) {
-		passOwnerNum = ( SV_GentityNum( clip->passEntityNum ) )->r.ownerNum;
+	if ( clip->passEntityNum < 0 ) {
+		passOwnerNum = -1;	// common bad API usage in original modules
+	} else if ( clip->passEntityNum != ENTITYNUM_NONE ) {
+		const sharedEntity_t *passEnt = SV_GentityNum( clip->passEntityNum );
+
+		passOwnerNum = passEnt->r.ownerNum;
 		if ( passOwnerNum == ENTITYNUM_NONE ) {
 			passOwnerNum = -1;
 		}
+		if ( passEnt->r.svFlags & SVF_OWNERNOTSHARED )
+		{
+			thisOwnerShared = 0;
+		}
 	} else {
 		passOwnerNum = -1;
-	}
-
-	if ( SV_GentityNum(clip->passEntityNum)->r.svFlags & SVF_OWNERNOTSHARED )
-	{
-		thisOwnerShared = 0;
 	}
 
 	for ( i=0 ; i<num ; i++ ) {
@@ -591,8 +599,8 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
-		CM_TransformedBoxTrace ( &trace, (float *)clip->start, (float *)clip->end,
-			(float *)clip->mins, (float *)clip->maxs, clipHandle,  clip->contentmask,
+		CM_TransformedBoxTrace ( &trace, clip->start, clip->end,
+			clip->mins, clip->maxs, clipHandle,  clip->contentmask,
 			origin, angles, clip->capsule);
 
 /*
@@ -650,8 +658,8 @@ Ghoul2 Insert Start
 					}
 				}
 
-				G2API_CollisionDetect(&clip->trace.G2CollisionMap[0], *((CGhoul2Info_v *)touch->s.ghoul2),
-					touch->s.angles, touch->s.origin, svs.time, touch->s.number, clip->start, clip->end, touch->s.modelScale, G2VertSpaceServer, clip->traceFlags, clip->useLod);
+				G2API_CollisionDetect(&clip->trace.G2CollisionMap[0], *touch->s.ghoul2),
+					touch->s.angles, touch->s.origin, sv.time, touch->s.number, clip->start, clip->end, touch->s.modelScale, G2VertSpaceServer, clip->traceFlags, clip->useLod);
 
 				// set our new trace record size
 
@@ -689,7 +697,7 @@ passEntityNum and entities owned by passEntityNum are explicitly not checked.
 /*
 Ghoul2 Insert Start
 */
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule, int traceFlags, int useLod ) {
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod ) {
 /*
 Ghoul2 Insert End
 */
@@ -707,7 +715,7 @@ Ghoul2 Insert End
 
 	// clip to world
 	CM_BoxTrace( &clip.trace, start, end, mins, maxs, 0, contentmask, capsule );
-	clip.trace.entityNum = clip.trace.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
+	clip.trace.entityNum = clip.trace.fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	if ( clip.trace.fraction == 0 ) {
 		*results = clip.trace;
 		return;		// blocked immediately by the world
@@ -763,7 +771,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 	int			i, num;
 	int			contents, c2;
 	clipHandle_t	clipHandle;
-	float		*angles;
+	const float		*angles;
 
 	// get base contents from world
 	contents = CM_PointContents( p, 0 );

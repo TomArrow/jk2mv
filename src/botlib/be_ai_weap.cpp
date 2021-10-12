@@ -203,7 +203,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 		max_projectileinfo = 32;
 		LibVarSet("max_projectileinfo", "32");
 	} //end if
-	strncpy(path, filename, MAX_PATH);
+	Q_strncpyz(path, filename, MAX_PATH);
 	PC_SetBaseFolder(BOTFILESBASEFOLDER);
 	source = LoadSourceFile(path);
 	if (!source)
@@ -345,7 +345,7 @@ void BotFreeWeaponWeights(int weaponstate)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int BotLoadWeaponWeights(int weaponstate, char *filename)
+int BotLoadWeaponWeights(int weaponstate, const char *filename)
 {
 	bot_weaponstate_t *ws;
 
@@ -385,7 +385,7 @@ void BotGetWeaponInfo(int weaponstate, int weapon, weaponinfo_t *weaponinfo)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int BotChooseBestFightWeapon(int weaponstate, int *inventory)
+int BotChooseBestFightWeapon(int weaponstate, const int *inventory)
 {
 	int i, index, bestweapon;
 	float weight, bestweight;

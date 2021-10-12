@@ -7,14 +7,14 @@
 #define	MAX_CMD_LINE	1024
 
 typedef struct {
-	byte	*data;
+	char	*data;
 	int		maxsize;
 	int		cursize;
 } cmd_t;
 
 int			cmd_wait;
 cmd_t		cmd_text;
-byte		cmd_text_buf[MAX_CMD_BUFFER];
+char		cmd_text_buf[MAX_CMD_BUFFER];
 
 
 //=============================================================================
@@ -69,7 +69,7 @@ void Cbuf_AddText( const char *text ) {
 
 	l = (int)strlen (text);
 
-	if (cmd_text.cursize + l >= cmd_text.maxsize)
+	if (cmd_text.cursize + l > cmd_text.maxsize)
 	{
 		Com_Printf ("Cbuf_AddText: overflow\n");
 		return;
@@ -89,7 +89,6 @@ Adds a \n to the text
 */
 void Cbuf_InsertText( const char *text ) {
 	int		len;
-	int		i;
 
 	len = (int)strlen( text ) + 1;
 	if ( len + cmd_text.cursize > cmd_text.maxsize ) {
@@ -98,9 +97,7 @@ void Cbuf_InsertText( const char *text ) {
 	}
 
 	// move the existing command text
-	for ( i = cmd_text.cursize - 1 ; i >= 0 ; i-- ) {
-		cmd_text.data[ i + len ] = cmd_text.data[ i ];
-	}
+	memmove( &cmd_text.data[ len ], cmd_text.data, cmd_text.cursize );
 
 	// copy the new text in
 	Com_Memcpy( cmd_text.data, text, len - 1 );
@@ -117,7 +114,7 @@ void Cbuf_InsertText( const char *text ) {
 Cbuf_ExecuteText
 ============
 */
-void Cbuf_ExecuteText (int exec_when, const char *text)
+void Cbuf_ExecuteText (cbufExec_t exec_when, const char *text)
 {
 	switch (exec_when)
 	{
@@ -161,7 +158,7 @@ void Cbuf_Execute (void)
 		}
 
 		// find a \n or ; line break
-		text = (char *)cmd_text.data;
+		text = cmd_text.data;
 
 		quotes = 0;
 		for (i=0 ; i< cmd_text.cursize ; i++)
@@ -174,8 +171,9 @@ void Cbuf_Execute (void)
 				break;
 		}
 
-		if( i >= (MAX_CMD_LINE - 1)) {
+		if( i > MAX_CMD_LINE - 1) {
 			i = MAX_CMD_LINE - 1;
+			Com_Printf( "Cbuf_Execute: command line overflowed\n" );
 		}
 
 		Com_Memcpy (line, text, i);
@@ -248,7 +246,7 @@ Inserts the current value of a variable as command text
 ===============
 */
 void Cmd_Vstr_f( void ) {
-	char	*v;
+	const char	*v;
 
 	if (Cmd_Argc () != 2) {
 		Com_Printf ("vstr <variablename> : execute a variable command\n");
@@ -284,7 +282,7 @@ void Cmd_Echo_f (void)
 typedef struct cmd_function_s
 {
 	struct cmd_function_s	*next;
-	char					*name;
+	const char				*name;
 	xcommand_t				function;
 	completionFunc_t		complete; // for auto-complete (copied from OpenJK)
 } cmd_function_t;
@@ -313,7 +311,7 @@ Cmd_Argv
 ============
 */
 char	*Cmd_Argv( int arg ) {
-	if ( (unsigned)arg >= cmd_argc ) {
+	if ( (unsigned)arg >= (unsigned)cmd_argc ) {
 		return "";
 	}
 	return cmd_argv[arg];
@@ -341,13 +339,12 @@ Returns a single string containing argv(1) to argv(argc()-1)
 */
 char	*Cmd_Args( void ) {
 	static	char		cmd_args[MAX_STRING_CHARS];
-	int		i;
 
 	cmd_args[0] = 0;
-	for ( i = 1 ; i < cmd_argc ; i++ ) {
-		strcat( cmd_args, cmd_argv[i] );
-		if ( i != cmd_argc-1 ) {
-			strcat( cmd_args, " " );
+	for ( int i = 1 ; i < cmd_argc ; i++ ) {
+		Q_strcat( cmd_args, sizeof( cmd_args ), cmd_argv[i] );
+		if ( i + 1 != cmd_argc ) {
+			Q_strcat( cmd_args, sizeof( cmd_args ), " " );
 		}
 	}
 
@@ -363,19 +360,22 @@ Returns a single string containing argv(arg) to argv(argc()-1)
 */
 char *Cmd_ArgsFrom( int arg ) {
 	static	char		cmd_args[BIG_INFO_STRING];
-	int		i;
 
 	cmd_args[0] = 0;
 	if (arg < 0)
 		arg = 0;
-	for ( i = arg ; i < cmd_argc ; i++ ) {
-		strcat( cmd_args, cmd_argv[i] );
-		if ( i != cmd_argc-1 ) {
-			strcat( cmd_args, " " );
+	for ( int i = arg ; i < cmd_argc ; i++ ) {
+		Q_strcat( cmd_args, sizeof( cmd_args ), cmd_argv[i] );
+		if ( i + 1 != cmd_argc ) {
+			Q_strcat( cmd_args, sizeof( cmd_args ), " " );
 		}
 	}
 
 	return cmd_args;
+}
+
+const char *Cmd_Cmd( void ) {
+	return cmd_cmd;
 }
 
 /*
@@ -390,6 +390,23 @@ void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 
+/*
+============
+Cmd_DropArg
+
+Drop argument from tokenized command
+Doesn't update cmd_cmd
+============
+*/
+void	Cmd_DropArg( int arg ) {
+	if ( 0 <= arg && arg < cmd_argc ) {
+		for ( ; arg < cmd_argc - 1; arg++ ) {
+			cmd_argv[arg] = cmd_argv[arg + 1];
+		}
+
+		cmd_argc--;
+	}
+}
 
 /*
 ============
@@ -437,7 +454,7 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			*back = cmd->next;
 			if (cmd->name) {
-				Z_Free(cmd->name);
+				Z_Free((void *)cmd->name);
 			}
 			Z_Free (cmd);
 			return;
@@ -469,10 +486,21 @@ A complete command line has been parsed, so try to execute it
 ============
 */
 void	Cmd_ExecuteString( const char *text ) {
+	Cmd_TokenizeString( text );
+	Cmd_Execute();
+}
+
+/*
+============
+Cmd_Execute
+
+Execute tokenized command line.
+============
+*/
+void	Cmd_Execute( void ) {
 	cmd_function_t	*cmd, **prev;
 
 	// execute the command line
-	Cmd_TokenizeString( text );
 	if ( !Cmd_Argc() ) {
 		return;		// no tokens
 	}
@@ -520,8 +548,7 @@ void	Cmd_ExecuteString( const char *text ) {
 
 	// send it as a server command if we are connected
 	// this will usually result in a chat message
-	//CL_ForwardCommandToServer ( text );
-	CL_ForwardCommandToServer ( text );
+	CL_ForwardCommandToServer ( cmd_cmd );
 }
 
 /*
@@ -530,9 +557,9 @@ Cmd_List_f
 ============
 */
 
-static int Cmd_CommandCmp(const void *p1, const void *p2) {
-    const cmd_function_t **e1 = (const cmd_function_t **)p1;
-    const cmd_function_t **e2 = (const cmd_function_t **)p2;
+static int QDECL Cmd_CommandCmp(const void *p1, const void *p2) {
+    const cmd_function_t * const *e1 = (const cmd_function_t * const *)p1;
+    const cmd_function_t * const *e2 = (const cmd_function_t * const *)p2;
 
 	return strcmp( (*e1)->name, (*e2)->name );
 }
@@ -578,7 +605,7 @@ Cmd_CompleteCfgName
 */
 void Cmd_CompleteCfgName( char *args, int argNum ) { // for auto-complete (copied from OpenJK)
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "", "cfg", qfalse );
+		Field_CompleteFilename( "", ".cfg", qfalse );
 	}
 }
 
@@ -736,8 +763,12 @@ Cmd_CompleteArgument
 */
 void Cmd_CompleteArgument( const char *command, char *args, int argNum ) {
 	for ( cmd_function_t *cmd=cmd_functions; cmd; cmd=cmd->next ) {
-		if ( !Q_stricmp( command, cmd->name ) && cmd->complete )
-			cmd->complete( args, argNum );
+		if ( !Q_stricmp( command, cmd->name ) ) {
+			if ( cmd->complete ) {
+				cmd->complete( args, argNum );
+			}
+			return;
+		}
 	}
 }
 
@@ -748,7 +779,7 @@ Cmd_CompleteTxtName
 */
 void Cmd_CompleteTxtName( char *args, int argNum ) {
 	if ( argNum == 2 )
-		Field_CompleteFilename( "", "txt", qfalse );
+		Field_CompleteFilename( "", ".txt", qfalse );
 }
 
 /*
@@ -758,8 +789,10 @@ Cmd_SetCommandCompletionFunc
 */
 void Cmd_SetCommandCompletionFunc( const char *command, completionFunc_t complete ) {
 	for ( cmd_function_t *cmd=cmd_functions; cmd; cmd=cmd->next ) {
-		if ( !Q_stricmp( command, cmd->name ) )
+		if ( !Q_stricmp( command, cmd->name ) ) {
 			cmd->complete = complete;
+			return;
+		}
 	}
 }
 

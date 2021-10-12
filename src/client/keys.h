@@ -3,7 +3,7 @@
 typedef struct {
 	qboolean	down;
 	int			repeats;		// if > 1, it is autorepeating
-	char		*binding;
+	const char	*binding;
 } qkey_t;
 
 typedef struct keyGlobals_s
@@ -33,7 +33,7 @@ typedef struct
 {
 	word	upper;
 	word	lower;
-	char	*name;
+	const char	*name;
 	int		keynum;
 	bool	menukey;
 } keyname_t;
@@ -54,10 +54,13 @@ extern	int			chat_playerNum;
 
 void Key_WriteBindings( fileHandle_t f );
 void Key_SetBinding( int keynum, const char *binding );
-char *Key_GetBinding( int keynum );
+const char *Key_GetBinding( int keynum );
 qboolean Key_IsDown( int keynum );
 int	Key_StringToKeynum(char *str);
 qboolean Key_GetOverstrikeMode( void );
 void Key_SetOverstrikeMode( qboolean state );
 void Key_ClearStates( void );
 int Key_GetKey(const char *binding);
+
+int Key_GetProtocolKey15(mvversion_t protocol, int key15);
+int Key_GetProtocolKey(mvversion_t protocol, int key16);

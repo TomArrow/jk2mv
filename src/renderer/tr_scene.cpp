@@ -113,6 +113,11 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		return;
 	}
 
+	if ( numVerts < 0 ) {
+		ri.Printf( PRINT_WARNING, "WARNING: RE_AddPolyToScene: numVerts < 0\n");
+		return;
+	}
+
 	for ( j = 0; j < numPolys; j++ ) {
 		if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
 			ri.Printf( PRINT_WARNING, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
@@ -174,7 +179,7 @@ RE_AddRefEntityToScene
 
 =====================
 */
-void RE_AddRefEntityToScene( const refEntity_t *ent ) {
+void RE_AddRefEntityToScene( const refEntity_t *ent, qboolean intShaderTime ) {
 	if ( !tr.registered ) {
 		return;
 	}
@@ -187,13 +192,14 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 
 	backEndData->entities[r_numentities].e = *ent;
 	backEndData->entities[r_numentities].lightingCalculated = qfalse;
+	backEndData->entities[r_numentities].intShaderTime = intShaderTime;
 
 #ifdef WIN32
 	if (ent->ghoul2)
 	{
-		CGhoul2Info_v	&ghoul2 = *((CGhoul2Info_v *)ent->ghoul2);
+		CGhoul2Info_v	*ghoul2 = G2API_GetGhoul2Model(ent->ghoul2);
 
-		if (!ghoul2[0].mModel)
+		if (!ghoul2 || ghoul2->empty() || !(*ghoul2)[0].mModel)
 		{
 			DebugBreak();
 		}
@@ -259,7 +265,7 @@ void RE_AddMiniRefEntityToScene( const miniRefEntity_t *ent )
 
 		memcpy(&tempEnt, ent, sizeof(*ent));
 		memset(((char *)&tempEnt)+sizeof(*ent), 0, sizeof(tempEnt) - sizeof(*ent));
-		RE_AddRefEntityToScene(&tempEnt);
+		RE_AddRefEntityToScene(&tempEnt, qtrue);
 		return;
 	}
 
@@ -422,8 +428,8 @@ void RE_RenderScene( const refdef_t *fd ) {
 		// compare the area bits
 		areaDiff = 0;
 		for (i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++) {
-			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((int *)fd->areamask)[i];
-			((int *)tr.refdef.areamask)[i] = ((int *)fd->areamask)[i];
+			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((const int *)fd->areamask)[i];
+			((int *)tr.refdef.areamask)[i] = ((const int *)fd->areamask)[i];
 		}
 
 		if ( areaDiff ) {
@@ -435,7 +441,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	// derived info
 
-	tr.refdef.floatTime = tr.refdef.time * 0.001f;
+	tr.refdef.floatTime = tr.refdef.time * 0.001;
 
 	tr.refdef.numDrawSurfs = r_firstSceneDrawSurf;
 	tr.refdef.drawSurfs = backEndData->drawSurfs;
@@ -498,6 +504,8 @@ void RE_RenderScene( const refdef_t *fd ) {
 	r_firstScenePoly = r_numpolys;
 
 	refEntParent = -1;
+
+	RE_RenderWorldEffects();
 
 	tr.frontEndMsec += ri.Milliseconds() - startTime;
 }

@@ -120,7 +120,7 @@ void QDECL SourceError(source_t *source, char *str, ...)
 	va_list ap;
 
 	va_start(ap, str);
-	vsprintf(text, str, ap);
+	Q_vsnprintf(text, sizeof(text), str, ap);
 	va_end(ap);
 #ifdef BOTLIB
 	botimport.Print(PRT_ERROR, "file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text);
@@ -144,7 +144,7 @@ void QDECL SourceWarning(source_t *source, char *str, ...)
 	va_list ap;
 
 	va_start(ap, str);
-	vsprintf(text, str, ap);
+	Q_vsnprintf(text, sizeof(text), str, ap);
 	va_end(ap);
 #ifdef BOTLIB
 	botimport.Print(PRT_WARNING, "file %s, line %d: %s\n", source->scriptstack->filename, source->scriptstack->line, text);
@@ -258,9 +258,9 @@ token_t *PC_CopyToken(token_t *token)
 	if (!t)
 	{
 #ifdef BSPC
-		Error("out of token space\n");
+		Error("out of token space");
 #else
-		Com_Error(ERR_FATAL, "out of token space\n");
+		Com_Error(ERR_FATAL, "out of token space");
 #endif
 		return NULL;
 	} //end if
@@ -666,11 +666,10 @@ void PC_AddBuiltinDefines(source_t *source)
 {
 	int i;
 	define_t *define;
-	struct builtin
-	{
-		char *string;
+	struct {
+		const char *string;
 		int mBuiltin;
-	} builtin[] = { // bk001204 - brackets
+	} const builtin[] = { // bk001204 - brackets
 		{ "__LINE__",	BUILTIN_LINE },
 		{ "__FILE__",	BUILTIN_FILE },
 		{ "__DATE__",	BUILTIN_DATE },
@@ -1320,7 +1319,7 @@ int PC_Directive_define(source_t *source)
 // Returns:					-
 // Changes Globals:		-
 //============================================================================
-define_t *PC_DefineFromString(char *string)
+static define_t *PC_DefineFromString(const char *string)
 {
 	script_t *script;
 	source_t src;
@@ -1378,7 +1377,7 @@ define_t *PC_DefineFromString(char *string)
 // Returns:					-
 // Changes Globals:		-
 //============================================================================
-int PC_AddDefine(source_t *source, char *string)
+int PC_AddDefine(source_t *source, const char *string)
 {
 	define_t *define;
 
@@ -1404,7 +1403,7 @@ int PC_AddDefine(source_t *source, char *string)
 // Returns:					-
 // Changes Globals:		-
 //============================================================================
-int PC_AddGlobalDefine(char *string)
+int PC_AddGlobalDefine(const char *string)
 {
 #if !DEFINEHASHING
 	define_t *define;
@@ -3013,7 +3012,7 @@ void PC_UnreadToken(source_t *source, token_t *token)
 //============================================================================
 void PC_SetIncludePath(source_t *source, char *path)
 {
-	strncpy(source->includepath, path, MAX_PATH);
+	Q_strncpyz(source->includepath, path, MAX_PATH);
 	//add trailing path seperator
 	if (source->includepath[strlen(source->includepath)-1] != '\\' &&
 		source->includepath[strlen(source->includepath)-1] != '/')
@@ -3059,7 +3058,7 @@ source_t *LoadSourceFile(const char *filename)
 	source = (source_t *) GetMemory(sizeof(source_t));
 	Com_Memset(source, 0, sizeof(source_t));
 
-	strncpy(source->filename, filename, MAX_PATH);
+	Q_strncpyz(source->filename, filename, MAX_PATH);
 	source->scriptstack = script;
 	source->tokens = NULL;
 	source->defines = NULL;
@@ -3078,7 +3077,7 @@ source_t *LoadSourceFile(const char *filename)
 // Returns:					-
 // Changes Globals:		-
 //============================================================================
-source_t *LoadSourceMemory(char *ptr, int length, char *name)
+source_t *LoadSourceMemory(const char *ptr, int length, const char *name)
 {
 	source_t *source;
 	script_t *script;
@@ -3092,7 +3091,7 @@ source_t *LoadSourceMemory(char *ptr, int length, char *name)
 	source = (source_t *) GetMemory(sizeof(source_t));
 	Com_Memset(source, 0, sizeof(source_t));
 
-	strncpy(source->filename, name, MAX_PATH);
+	Q_strncpyz(source->filename, name, MAX_PATH);
 	source->scriptstack = script;
 	source->tokens = NULL;
 	source->defines = NULL;
@@ -3285,7 +3284,7 @@ int PC_SourceFileAndLine(int handle, char *filename, int *line)
 	if (!sourceFiles[handle])
 		return qfalse;
 
-	strcpy(filename, sourceFiles[handle]->filename);
+	strncpy(filename, sourceFiles[handle]->filename, MAX_QPATH);
 	if (sourceFiles[handle]->scriptstack)
 		*line = sourceFiles[handle]->scriptstack->line;
 	else

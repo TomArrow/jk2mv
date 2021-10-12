@@ -1264,7 +1264,7 @@ float vectoyaw( const vec3_t vec ) {
 		yaw = 0;
 	} else {
 		if (vec[PITCH]) {
-			yaw = ( atan2( vec[YAW], vec[PITCH]) * 180 / M_PI );
+			yaw = RAD2DEG( atan2f( vec[YAW], vec[PITCH] ) );
 		} else if (vec[YAW] > 0) {
 			yaw = 90;
 		} else {
@@ -1345,7 +1345,7 @@ gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
 	for ( i = 0 ; i < bg_numItems ; i++ ) {
 		if ( (bg_itemlist[i].giType == IT_POWERUP ||
 					bg_itemlist[i].giType == IT_TEAM) &&
-			bg_itemlist[i].giTag == pw ) {
+			bg_itemlist[i].giTag == (int)pw ) {
 			return &bg_itemlist[i];
 		}
 	}
@@ -1363,7 +1363,7 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 	int		i;
 
 	for ( i = 0 ; i < bg_numItems ; i++ ) {
-		if ( bg_itemlist[i].giType == IT_HOLDABLE && bg_itemlist[i].giTag == pw ) {
+		if ( bg_itemlist[i].giType == IT_HOLDABLE && bg_itemlist[i].giTag == (int)pw ) {
 			return &bg_itemlist[i];
 		}
 	}
@@ -1384,7 +1384,7 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 	gitem_t	*it;
 
 	for ( it = bg_itemlist + 1 ; it->classname ; it++) {
-		if ( it->giType == IT_WEAPON && it->giTag == weapon ) {
+		if ( it->giType == IT_WEAPON && it->giTag == (int)weapon ) {
 			return it;
 		}
 	}
@@ -1531,7 +1531,7 @@ void BG_CycleForce(playerState_t *ps, int direction)
 	}
 }
 
-int BG_GetItemIndexByTag(int tag, int type)
+int BG_GetItemIndexByTag(int tag, itemType_t type)
 { //Get the itemlist index from the tag and type
 	int i = 0;
 
@@ -1766,7 +1766,7 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / (float) tr->trDuration;
-		phase = sin( deltaTime * M_PI * 2 );
+		phase = sinf( deltaTime * (float) M_PI * 2 );
 		VectorMA( tr->trBase, phase, tr->trDelta, result );
 		break;
 	case TR_LINEAR_STOP:
@@ -1782,7 +1782,7 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 	case TR_GRAVITY:
 		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
 		VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
-		result[2] -= 0.5 * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
+		result[2] -= 0.5f * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
 	default:
 #ifdef QAGAME
@@ -1815,8 +1815,8 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / (float) tr->trDuration;
-		phase = cos( deltaTime * M_PI * 2 );	// derivative of sin = cos
-		phase *= 0.5;
+		phase = cosf( deltaTime * (float) M_PI * 2 );	// derivative of sin = cos
+		phase *= 0.5f;
 		VectorScale( tr->trDelta, phase, result );
 		break;
 	case TR_LINEAR_STOP:
@@ -1837,7 +1837,8 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 	}
 }
 
-char *eventnames[] = {
+#ifdef _DEBUG
+static const char * const eventnames[] = {
 	"EV_NONE",
 
 	"EV_CLIENTJOIN",
@@ -1987,6 +1988,7 @@ char *eventnames[] = {
 	"EV_BODY_QUEUE_COPY"
 
 };
+#endif // _DEBUG
 
 /*
 ===============
@@ -2350,7 +2352,7 @@ void *BG_Alloc ( size_t size )
 
 	if (bg_poolSize + size > bg_poolTail)
 	{
-		Com_Error( ERR_DROP, "BG_Alloc: buffer exceeded tail (%d > %d)", bg_poolSize + size, bg_poolTail);
+		Com_Error( ERR_DROP, "BG_Alloc: buffer exceeded tail (%d > %d)", (int)(bg_poolSize + size), (int)bg_poolTail);
 		return 0;
 	}
 
@@ -2363,7 +2365,7 @@ void *BG_AllocUnaligned ( int size )
 {
 	if (bg_poolSize + size > bg_poolTail)
 	{
-		Com_Error( ERR_DROP, "BG_AllocUnaligned: buffer exceeded tail (%d > %d)", bg_poolSize + size, bg_poolTail);
+		Com_Error( ERR_DROP, "BG_AllocUnaligned: buffer exceeded tail (%d > %d)", (int)(bg_poolSize + size), (int)bg_poolTail);
 		return 0;
 	}
 
@@ -2378,7 +2380,7 @@ void *BG_TempAlloc( int size )
 
 	if (bg_poolTail - size < bg_poolSize)
 	{
-		Com_Error( ERR_DROP, "BG_TempAlloc: buffer exceeded head (%d > %d)", bg_poolTail - size, bg_poolSize);
+		Com_Error( ERR_DROP, "BG_TempAlloc: buffer exceeded head (%d > %d)", (int)(bg_poolTail - size), (int)bg_poolSize);
 		return 0;
 	}
 
@@ -2393,7 +2395,7 @@ void BG_TempFree( int size )
 
 	if (bg_poolTail+size > MAX_POOL_SIZE)
 	{
-		Com_Error( ERR_DROP, "BG_TempFree: tail greater than size (%d > %d)", bg_poolTail+size, MAX_POOL_SIZE );
+		Com_Error( ERR_DROP, "BG_TempFree: tail greater than size (%d > %d)", (int)(bg_poolTail+size), MAX_POOL_SIZE );
 	}
 
 	bg_poolTail += size;

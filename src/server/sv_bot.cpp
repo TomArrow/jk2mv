@@ -112,13 +112,14 @@ void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, float *poin
 BotImport_Print
 ==================
 */
+ __attribute__ ((format (printf, 2, 3)))
 void QDECL BotImport_Print(int type, char *fmt, ...)
 {
 	char str[2048];
 	va_list ap;
 
 	va_start(ap, fmt);
-	vsprintf(str, fmt, ap);
+	Q_vsnprintf(str, sizeof(str), fmt, ap);
 	va_end(ap);
 
 	switch(type) {
@@ -154,7 +155,9 @@ void QDECL BotImport_Print(int type, char *fmt, ...)
 BotImport_Trace
 ==================
 */
-void BotImport_Trace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask) {
+void BotImport_Trace(bsp_trace_t *bsptrace, const vec3_t start, const vec3_t mins,
+					 const vec3_t maxs, const vec3_t end, int passent, int contentmask)
+{
 	trace_t trace;
 
 	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse, 0, 10);
@@ -205,7 +208,7 @@ void BotImport_EntityTrace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec
 BotImport_PointContents
 ==================
 */
-int BotImport_PointContents(vec3_t point) {
+int BotImport_PointContents(const vec3_t point) {
 	return SV_PointContents(point, -1);
 }
 
@@ -305,7 +308,7 @@ BotImport_HunkAlloc
 */
 void *BotImport_HunkAlloc( int size ) {
 	if( Hunk_CheckMark() ) {
-		Com_Error( ERR_DROP, "SV_Bot_HunkAlloc: Alloc with marks already set\n" );
+		Com_Error( ERR_DROP, "SV_Bot_HunkAlloc: Alloc with marks already set" );
 	}
 	return Hunk_Alloc( size, h_high );
 }
@@ -315,7 +318,7 @@ void *BotImport_HunkAlloc( int size ) {
 BotImport_DebugPolygonCreate
 ==================
 */
-int BotImport_DebugPolygonCreate(int color, int numPoints, vec3_t *points) {
+int BotImport_DebugPolygonCreate(int color, int numPoints, const vec3_t *points) {
 	bot_debugpoly_t *poly;
 	int i;
 
@@ -361,6 +364,10 @@ BotImport_DebugPolygonDelete
 void BotImport_DebugPolygonDelete(int id)
 {
 	if (!debugpolygons) return;
+	if ( id < 0 || bot_maxdebugpolys <= id ) {
+		Com_DPrintf( S_COLOR_YELLOW "BotImport_DebugPlygonDelete: wrong id %d\n", id );
+		return;
+	}
 	debugpolygons[id].inuse = qfalse;
 }
 
@@ -403,7 +410,7 @@ void BotImport_DebugLineShow(int line, vec3_t start, vec3_t end, int color) {
 	VectorSubtract(end, start, dir);
 	VectorNormalize(dir);
 	dot = DotProduct(dir, up);
-	if (dot > 0.99 || dot < -0.99) VectorSet(cross, 1, 0, 0);
+	if (dot > 0.99f || dot < -0.99f) VectorSet(cross, 1, 0, 0);
 	else CrossProduct(dir, up, cross);
 
 	VectorNormalize(cross);
@@ -421,7 +428,7 @@ void BotImport_DebugLineShow(int line, vec3_t start, vec3_t end, int color) {
 SV_BotClientCommand
 ==================
 */
-void BotClientCommand( int client, char *command ) {
+void BotClientCommand( int client, const char *command ) {
 	SV_ExecuteClientCommand( &svs.clients[client], command, qtrue );
 }
 
@@ -523,6 +530,29 @@ static int bot_Z_AvailableMemory(void)
 	return iMaxBOTLIBMem - Z_MemSize( TAG_BOTLIB );
 }
 
+static int BotImport_FS_FOpenFileByMode(const char *qpath, fileHandle_t *f, fsMode_t mode) {
+	return FS_FOpenFileByMode(qpath, f, mode, MODULE_BOTLIB);
+}
+
+static int BotImport_FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, unsigned long *hash ) {
+	return FS_FOpenFileByModeHash(qpath, f, mode, hash, MODULE_BOTLIB);
+}
+
+static int BotImport_FS_Read2( void *buffer, int len, fileHandle_t f ) {
+	return FS_Read2(buffer, len, f, MODULE_BOTLIB);
+}
+
+static void BotImport_FS_FCloseFile( fileHandle_t f ) {
+	FS_FCloseFile( f, MODULE_BOTLIB );
+}
+static int BotImport_FS_Write( const void *buffer, int len, fileHandle_t h ) {
+	return FS_Write(buffer, len, h, MODULE_BOTLIB);
+}
+
+static int BotImport_FS_Seek( fileHandle_t f, int offset, int origin ) {
+	return FS_Seek(f, offset, origin, MODULE_BOTLIB);
+}
+
 /*
 ==================
 SV_BotInitBotLib
@@ -551,12 +581,12 @@ void SV_BotInitBotLib(void) {
 	botlib_import.HunkAlloc = BotImport_HunkAlloc;
 
 	// file system access
-	botlib_import.FS_FOpenFile = FS_FOpenFileByMode;
-	botlib_import.FS_FOpenFileHash = FS_FOpenFileByModeHash;
-	botlib_import.FS_Read = FS_Read2;
-	botlib_import.FS_Write = FS_Write;
-	botlib_import.FS_FCloseFile = FS_FCloseFile;
-	botlib_import.FS_Seek = FS_Seek;
+	botlib_import.FS_FOpenFile = BotImport_FS_FOpenFileByMode;
+	botlib_import.FS_FOpenFileHash = BotImport_FS_FOpenFileByModeHash;
+	botlib_import.FS_Read = BotImport_FS_Read2;
+	botlib_import.FS_Write = BotImport_FS_Write;
+	botlib_import.FS_FCloseFile = BotImport_FS_FCloseFile;
+	botlib_import.FS_Seek = BotImport_FS_Seek;
 
 	//debug lines
 	botlib_import.DebugLineCreate = BotImport_DebugLineCreate;
@@ -581,10 +611,15 @@ void SV_BotInitBotLib(void) {
 SV_BotGetConsoleMessage
 ==================
 */
-int SV_BotGetConsoleMessage( int client, char *buf, int size )
+qboolean SV_BotGetConsoleMessage( int client, char *buf, int size )
 {
 	client_t	*cl;
 	int			index;
+
+	if (client < 0 || sv_maxclients->integer <= client) {
+		Com_DPrintf( S_COLOR_YELLOW "SV_BotGetSnapshotEntity: bad clientNum %i\n", client );
+		return qfalse;
+	}
 
 	cl = &svs.clients[client];
 	cl->lastPacketTime = svs.time;
@@ -634,6 +669,11 @@ SV_BotGetSnapshotEntity
 int SV_BotGetSnapshotEntity( int client, int sequence ) {
 	client_t			*cl;
 	clientSnapshot_t	*frame;
+
+	if (client < 0 || sv_maxclients->integer <= client) {
+		Com_DPrintf( S_COLOR_YELLOW "SV_BotGetSnapshotEntity: bad clientNum %i\n", client );
+		return -1;
+	}
 
 	cl = &svs.clients[client];
 	frame = &cl->frames[cl->netchan.outgoingSequence & PACKET_MASK];

@@ -1,9 +1,10 @@
 
 #include "server.h"
 
-#include "mv_setup.h"
+#include <mv_setup.h>
 
 #include "../qcommon/q_shared.h"
+
 /*
 Ghoul2 Insert Start
 */
@@ -31,7 +32,7 @@ void SV_SetConfigstring (int index, const char *val) {
 	client_t	*client;
 
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error (ERR_DROP, "SV_SetConfigstring: bad index %i\n", index);
+		Com_Error (ERR_DROP, "SV_SetConfigstring: bad index %i", index);
 	}
 
 	if ( !val ) {
@@ -44,7 +45,7 @@ void SV_SetConfigstring (int index, const char *val) {
 	}
 
 	// change the string in sv
-	Z_Free( sv.configstrings[index] );
+	Z_Free( (void *)sv.configstrings[index] );
 	sv.configstrings[index] = CopyString( val );
 
 	// send it to all the clients if we aren't
@@ -106,7 +107,7 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize ) {
 		Com_Error( ERR_DROP, "SV_GetConfigstring: bufferSize == %i", bufferSize );
 	}
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error (ERR_DROP, "SV_GetConfigstring: bad index %i\n", index);
+		Com_Error (ERR_DROP, "SV_GetConfigstring: bad index %i", index);
 	}
 	if ( !sv.configstrings[index] ) {
 		buffer[0] = 0;
@@ -170,7 +171,7 @@ SV_SetUserinfo
 */
 void SV_SetUserinfo( int index, const char *val ) {
 	if ( index < 0 || index >= sv_maxclients->integer ) {
-		Com_Error (ERR_DROP, "SV_SetUserinfo: bad index %i\n", index);
+		Com_Error (ERR_DROP, "SV_SetUserinfo: bad index %i", index);
 	}
 
 	if ( !val ) {
@@ -194,7 +195,7 @@ void SV_GetUserinfo( int index, char *buffer, int bufferSize ) {
 		Com_Error( ERR_DROP, "SV_GetUserinfo: bufferSize == %i", bufferSize );
 	}
 	if ( index < 0 || index >= sv_maxclients->integer ) {
-		Com_Error (ERR_DROP, "SV_GetUserinfo: bad index %i\n", index);
+		Com_Error (ERR_DROP, "SV_GetUserinfo: bad index %i", index);
 	}
 	Q_strncpyz( buffer, svs.clients[ index ].userinfo, bufferSize );
 }
@@ -213,7 +214,7 @@ void SV_CreateBaseline( void ) {
 	sharedEntity_t *svent;
 	int				entnum;
 
-	for ( entnum = 1; entnum < sv.num_entities ; entnum++ ) {
+	for ( entnum = 0; entnum < sv.num_entities ; entnum++ ) {
 		svent = SV_GentityNum(entnum);
 		if (!svent->r.linked) {
 			continue;
@@ -279,23 +280,6 @@ void SV_Startup( void ) {
 	Cvar_Set( "sv_running", "1" );
 
 }
-
-/*
-Ghoul2 Insert Start
-*/
-
- void SV_InitSV(void)
-{
-	int http_port;
-
-	// clear out most of the sv struct
-	http_port = sv.http_port;
-	memset(&sv, 0, (sizeof(sv)));
-	sv.http_port = http_port;
- }
-/*
-Ghoul2 Insert End
-*/
 
 /*
 ==================
@@ -373,23 +357,13 @@ void SV_ClearServer(void) {
 
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
 		if ( sv.configstrings[i] ) {
-			Z_Free( sv.configstrings[i] );
+			Z_Free( (void *)sv.configstrings[i] );
 		}
 	}
 
 //	CM_ClearMap();
 
-	/*
-Ghoul2 Insert Start
-*/
-
-	// nope, can't do this anymore.. sv contains entitystates with STL in them.
-//	memset (&sv, 0, sizeof(sv));
- 	SV_InitSV();
-/*
-Ghoul2 Insert End
-*/
-//	Com_Memset (&sv, 0, sizeof(sv));
+	Com_Memset (&sv, 0, sizeof(sv));
 }
 
 /*
@@ -443,8 +417,6 @@ clients along with it.
 This is NOT called for map_restart
 ================
 */
-extern void FixGhoul2InfoLeaks(bool,bool);
-
 #ifdef G2_COLLISION_ENABLED
 extern CMiniHeap *G2VertSpaceServer;
 #define G2_VERT_SPACE_SERVER_SIZE 256
@@ -457,6 +429,7 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 	qboolean	isBot;
 	char		systemInfo[16384];
 	const char	*p;
+	qboolean	resetTime;
 
 	Com_Printf("------ Server Initialization ------\n");
 	Com_Printf("Server: %s\n", server);
@@ -467,8 +440,6 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 
 	// shut down the existing game if it is running
 	SV_ShutdownGameProgs();
-
-	FixGhoul2InfoLeaks(false,true);
 
 /*
 Ghoul2 Insert Start
@@ -568,10 +539,36 @@ Ghoul2 Insert End
 	Cvar_Set( "nextmap", "map_restart 0");
 //	Cvar_Set( "nextmap", va("map %s", server) );
 
+	for (i = 0; i < sv_maxclients->integer; i++) {
+		// save when the server started for each client already connected
+		if (svs.clients[i].state >= CS_CONNECTED) {
+			svs.clients[i].oldServerTime = sv.time;
+		}
+	}
+
+	// close all filehandles before FS_Restart
+	for (i = 0; i < sv_maxclients->integer; i++) {
+		SV_CloseDownload( &svs.clients[i] );
+	}
+
+	// check sv.resetServerTime before clearing sv struct
+	if (sv.resetServerTime) {
+		resetTime = (qboolean)(sv.resetServerTime == 1);
+	} else if (mv_resetServerTime->integer == 1) {
+		resetTime = (qboolean)(sv_gametype->integer != GT_TOURNAMENT);
+	} else {
+		resetTime = (qboolean)(mv_resetServerTime->integer == 2);
+	}
+
 	// wipe the entire per-level structure
 	SV_ClearServer();
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
 		sv.configstrings[i] = CopyString("");
+	}
+
+	if (!resetTime) {
+		// Keep old game module time as original engine did
+		sv.time = svs.time;
 	}
 
 	// decide which serverversion to host
@@ -614,9 +611,6 @@ Ghoul2 Insert End
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
-	// clear physics interaction links
-	SV_ClearWorld ();
-
 	// media configstring setting should be done during
 	// the loading stage, so connected clients don't have
 	// to load during actual gameplay
@@ -630,8 +624,9 @@ Ghoul2 Insert End
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
-		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-		SV_BotFrame( svs.time );
+		VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+		SV_BotFrame( sv.time );
+		sv.time += 100;
 		svs.time += 100;
 	}
 
@@ -641,7 +636,7 @@ Ghoul2 Insert End
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
 		// send the new gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
-			char	*denied;
+			const char	*denied;
 
 			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
 				if ( killBots ) {
@@ -655,7 +650,7 @@ Ghoul2 Insert End
 			}
 
 			// connect the client again
-			denied = (char *)VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
+			denied = (const char *)VM_ExplicitArgString( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
 			if ( denied ) {
 				// this generally shouldn't happen, because the client
 				// was connected before the level change
@@ -686,9 +681,12 @@ Ghoul2 Insert End
 	}
 
 	// run another frame to allow things to look at all the players
-	VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-	SV_BotFrame( svs.time );
+	VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+	SV_BotFrame( sv.time );
+	sv.time += 100;
 	svs.time += 100;
+
+	svs.hibernation.disableUntil = svs.time + 10000;
 
 	// if a dedicated server we need to touch the cgame and ui because it could be in a
 	// seperate pk3 file and the client will need to load the latest cgame.qvm
@@ -736,8 +734,6 @@ Ghoul2 Insert End
 
 	Hunk_SetMark();
 
-	Com_Printf ("-----------------------------------\n");
-
 	/* MrE: 2000-09-13: now called in CL_DownloadsComplete
 	// don't call when running dedicated
 	if ( !com_dedicated->integer ) {
@@ -746,10 +742,8 @@ Ghoul2 Insert End
 	}
 	*/
 
-	// shutdown webserver
-	if (sv.http_port && ((mv_httpdownloads->latchedString && !atoi(mv_httpdownloads->latchedString)) || mv_httpserverport->latchedString)) {
+	if (!mv_httpdownloads || mv_httpdownloads->modified || mv_httpserverport->modified) {
 		NET_HTTP_StopServer();
-		sv.http_port = 0;
 	}
 
 	// here because latched
@@ -757,14 +751,16 @@ Ghoul2 Insert End
 	mv_httpserverport = Cvar_Get("mv_httpserverport", "0", CVAR_ARCHIVE | CVAR_LATCH);
 
 	if (mv_httpdownloads->integer) {
-		if (Q_stristr(mv_httpserverport->string, "http://")) {
+		if (!Q_stricmpn(mv_httpserverport->string, "http://", strlen("http://"))) {
 			Com_Printf("HTTP Downloads: redirecting to %s\n", mv_httpserverport->string);
 		} else {
-			if (!sv.http_port) {
-				sv.http_port = NET_HTTP_StartServer(mv_httpserverport->integer);
-			}
+			sv.http_port = NET_HTTP_StartServer(mv_httpserverport->integer);
 		}
 	}
+
+	SVC_LoadWhitelist();
+
+	Com_Printf ("-----------------------------------\n");
 }
 
 
@@ -792,6 +788,9 @@ void SV_Init (void) {
 	mv_blockchargejump = Cvar_Get("mv_blockchargejump", "1", CVAR_ARCHIVE);
 	mv_blockspeedhack = Cvar_Get("mv_blockspeedhack", "1", CVAR_ARCHIVE);
 	mv_fixsaberstealing = Cvar_Get("mv_fixsaberstealing", "1", CVAR_ARCHIVE);
+	mv_fixplayerghosting = Cvar_Get("mv_fixplayerghosting", "1", CVAR_ARCHIVE);
+
+	mv_resetServerTime = Cvar_Get("mv_resetServerTime", "1", CVAR_ARCHIVE);
 
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
@@ -814,10 +813,15 @@ void SV_Init (void) {
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
-	sv_maxRate = Cvar_Get ("sv_maxRate", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
+	sv_minSnaps = Cvar_Get("sv_minSnaps", "1", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
+	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "30", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
+	sv_enforceSnaps = Cvar_Get("sv_enforceSnaps", "0", CVAR_ARCHIVE);                // 0: users choice (limited by min/max snaps); 1: sv_fps (limited by min/max snaps)	
+	sv_minRate = Cvar_Get("sv_minRate", "1000", CVAR_ARCHIVE | CVAR_SERVERINFO );    // jk2ded hardcoded min: 1000
+	sv_maxRate = Cvar_Get ("sv_maxRate", "90000", CVAR_ARCHIVE | CVAR_SERVERINFO );  // jk2ded hardcoded max: 90000
+	sv_maxOOBRate = Cvar_Get ("sv_maxOOBRate", "20", CVAR_ARCHIVE | CVAR_GLOBAL );
 	sv_minPing = Cvar_Get ("sv_minPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxPing = Cvar_Get ("sv_maxPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
-	sv_floodProtect = Cvar_Get ("sv_floodProtect", "1", CVAR_ARCHIVE | CVAR_SERVERINFO );
+	sv_floodProtect = Cvar_Get ("sv_floodProtect", "3", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_allowAnonymous = Cvar_Get ("sv_allowAnonymous", "0", CVAR_SERVERINFO);
 
 	// systeminfo
@@ -861,6 +865,12 @@ void SV_Init (void) {
 
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 
+	sv_hibernateFps = Cvar_Get("sv_hibernateFps", "4", CVAR_ARCHIVE | CVAR_GLOBAL);
+	mv_apiConnectionless = Cvar_Get("mv_apiConnectionless", "1", CVAR_ARCHIVE | CVAR_INIT | CVAR_VM_NOWRITE);
+	sv_pingFix = Cvar_Get("sv_pingFix", "1", CVAR_ARCHIVE);
+	sv_autoWhitelist = Cvar_Get("sv_autoWhitelist", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	sv_dynamicSnapshots = Cvar_Get("sv_dynamicSnapshots", "1", CVAR_ARCHIVE);
+
 	SP_Register("str_server",SP_REGISTER_REQUIRED);
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
@@ -868,6 +878,8 @@ void SV_Init (void) {
 
 	// init the botlib here because we need the pre-compiler in the UI
 	SV_BotInitBotLib();
+
+	SVC_LoadWhitelist();
 }
 
 
@@ -891,7 +903,7 @@ void SV_FinalMessage( char *message ) {
 			if (cl->state >= CS_CONNECTED) {
 				// don't send a disconnect to a local client
 				if ( cl->netchan.remoteAddress.type != NA_LOOPBACK ) {
-					SV_SendServerCommand( cl, "print \"%s\"", message );
+					SV_SendServerCommand( cl, "print \"%s\n\"", message );
 					SV_SendServerCommand( cl, "disconnect" );
 				}
 				// force a snapshot to be sent
@@ -918,7 +930,7 @@ void SV_Shutdown( char *finalmsg )
 		return;
 	}
 
-	Com_Printf( "----- Server Shutdown -----\n" );
+	Com_Printf( "----- Server Shutdown (%s) -----\n", finalmsg );
 
 	if ( svs.clients && !com_errorEntered ) {
 		SV_FinalMessage( finalmsg );

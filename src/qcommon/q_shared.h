@@ -24,6 +24,11 @@
 
  **********************************************************************/
 
+#ifndef __GNUC__
+#ifndef __attribute__
+#define __attribute__(x)
+#endif
+#endif
 
 #ifdef Q3_VM
 
@@ -43,16 +48,11 @@
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
+#include <sys/stat.h>
 
 #ifdef __cplusplus
 #	include <cstddef>
 #endif
-
-#endif
-
-#ifdef _WIN32
-
-//#pragma intrinsic( memset, memcpy )
 
 #endif
 
@@ -69,108 +69,95 @@
 #define idx64	0
 #endif
 
-#if (defined(powerc) || defined(powerpc) || defined(ppc) || defined(__ppc) || defined(__ppc__)) && !defined(C_ONLY)
+#if defined(ARCH_ARM32) && !defined __LCC__
+#define idarm32	1
+#else
+#define idarm32	0
+#endif
+
+#if (defined(powerc) || defined(powerpc) || defined(ppc) || defined(__ppc) || defined(__ppc__)) && !defined __LCC__
 #define idppc	1
 #else
 #define idppc	0
 #endif
 
-// for windows fastcall option
-
-#define	QDECL
-
-short   ShortSwap (short l);
-int		LongSwap (int l);
-float	FloatSwap (const float *f);
+// Enable SSE
+#if id386 || idx64
+#include <emmintrin.h>
+#endif
 
 //================= COMPILER-SPECIFIC DEFINES ===========================
 #ifdef _MSC_VER
-#define ID_INLINE __inline
+
+#define	QDECL	__cdecl
+#define Q_INLINE __inline
 #define Q_NORETURN __declspec(noreturn)
 #define Q_PTR_NORETURN // MSVC doesn't support noreturn function pointers
 #define q_unreachable() abort()
-#define Q_ALIGNOF(x) __alignof(x)
+#ifndef __alignof_is_defined
+#define alignof(x) __alignof(x)
+#define __alignof_is_defined 1
+#endif
+#ifndef __alignas_is_defined
+#define alignas(x) __declspec(align(x))
+#define __alignas_is_defined 1
+#endif
 #define Q_MAX_ALIGN std::max_align_t
+#define Q_EXPORT __declspec(dllexport)
+
 #elif defined __GNUC__ && !defined __clang__
-#define GCC_VERSION (__GNUC__ * 10000 \
+
+#define	QDECL
+#define GCC_VERSION (__GNUC__ * 10000			\
     + __GNUC_MINOR__ * 100 \
     + __GNUC_PATCHLEVEL__)
 
-#define ID_INLINE inline
+#define Q_INLINE inline
 #define Q_NORETURN __attribute__((noreturn))
 #define Q_PTR_NORETURN Q_NORETURN
 #define q_unreachable() __builtin_unreachable()
-
-#define Q_ALIGNOF(x) alignof(x)
 #if GCC_VERSION >= 40900 /* >= 4.9.0 */
 #	define Q_MAX_ALIGN std::max_align_t
 #else
 #	define Q_MAX_ALIGN max_align_t
 #endif
+#define Q_EXPORT __attribute__((visibility("default")))
+
 #elif defined __clang__
-#define ID_INLINE inline
+
+#define	QDECL
+#define Q_INLINE inline
 #define Q_NORETURN __attribute__((noreturn))
 #define Q_PTR_NORETURN Q_NORETURN
 #define q_unreachable() __builtin_unreachable()
-#define Q_ALIGNOF(x) alignof(x)
 #define Q_MAX_ALIGN std::max_align_t
+#define Q_EXPORT __attribute__((visibility("default")))
+
 #else
-#define ID_INLINE inline
+
+#define	QDECL
+#define Q_INLINE inline
 #define Q_NORETURN
 #define Q_PTR_NORETURN
 #define q_unreachable() abort()
-#define Q_ALIGNOF(x) alignof(x)
 #define Q_MAX_ALIGN std::max_align_t
+#define Q_EXPORT
+
+#endif
+
+#ifdef __cplusplus
+#define ID_INLINE Q_INLINE
+#else
+#define ID_INLINE static Q_INLINE
 #endif
 
 //======================= WIN32 DEFINES =================================
 
 #ifdef WIN32
 
-#define	MAC_STATIC
-
-#undef QDECL
-#define	QDECL	__cdecl
-
-// buildstring will be incorporated into the version string
-#ifdef NDEBUG
-
-#ifdef ARCH_X86
-#define ARCH_STRING "x86"
-#define	CPUSTRING	"win-x86"
-#elif defined ARCH_X86_64
-#define ARCH_STRING "x64"
-#define	CPUSTRING	"win-x64"
-#endif
-
-#else
-
-#ifdef ARCH_X86
-#define ARCH_STRING "x86"
-#define	CPUSTRING	"win-x86-debug"
-#elif defined ARCH_X86_64
-#define ARCH_STRING "x64"
-#define	CPUSTRING	"win-x64-debug"
-#endif
-
-#endif
-
+#define OS_STRING "win"
 #define LIBRARY_EXTENSION "dll"
-
-static ID_INLINE short BigShort( short l) { return ShortSwap(l); }
-#define LittleShort
-static ID_INLINE int BigLong(int l) { return LongSwap(l); }
-#define LittleLong
-static ID_INLINE float BigFloat(const float *l) { return FloatSwap(l); }
-#define LittleFloat
-
 #define	PATH_SEP '\\'
-
-#ifdef GAME_EXPORTS
-#define LIBEXPORT __declspec(dllexport)
-#else
-#define LIBEXPORT
-#endif
 
 #endif
 
@@ -178,110 +165,86 @@ static ID_INLINE float BigFloat(const float *l) { return FloatSwap(l); }
 
 #if defined(MACOS_X)
 
-#define MAC_STATIC
-#define __cdecl
-#define __declspec(x)
-
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-
-#ifdef __ppc__
-#define CPUSTRING	"macosx-ppc"
-#elif defined __i386__
-#define CPUSTRING	"macosx-i386"
-#elif defined __amd64__
-#define CPUSTRING	"macosx-x86_64"
-#else
-#define CPUSTRING	"macosx-other"
-#endif
-
-#ifdef __i386__
-#	define ARCH_STRING "i386"
-#else
-#	define ARCH_STRING "x86_64"
-#endif
-
+#define OS_STRING "macosx"
 #define LIBRARY_EXTENSION "dylib"
-
 #define	PATH_SEP	'/'
-
-#if !idppc
-inline static short BigShort( short l) { return ShortSwap(l); }
-#define LittleShort
-inline static int BigLong(int l) { return LongSwap(l); }
-#define LittleLong
-inline static float BigFloat(const float *l) { return FloatSwap(l); }
-#define LittleFloat
-#else
-#define BigShort
-inline static short LittleShort(short l) { return ShortSwap(l); }
-#define BigLong
-inline static int LittleLong (int l) { return LongSwap(l); }
-#define BigFloat
-inline static float LittleFloat (const float *l) { return FloatSwap(l); }
-#endif
 
 #endif
 
 //======================= LINUX DEFINES =================================
 
-// the mac compiler can't handle >32k of locals, so we
-// just waste space and make big arrays static...
-#ifdef __linux__
+#if defined(__linux__)
 
-// bk001205 - from Makefile
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-
-#define	MAC_STATIC // bk: FIXME
-
-#ifdef __i386__
-#define	CPUSTRING	"linux-i386"
-#elif __amd64__
-#define	CPUSTRING	"linux-amd64"
-#elif defined __axp__
-#define	CPUSTRING	"linux-alpha"
-#else
-#define	CPUSTRING	"linux-other"
-#endif
-
-#ifdef __i386__
-#	define ARCH_STRING "i386"
-#else
-#	define ARCH_STRING "amd64"
-#endif
-
+#define OS_STRING "linux"
+#define QDECL
 #define LIBRARY_EXTENSION "so"
-
 #define	PATH_SEP '/'
 
-// bk001205 - try
-#ifdef Q3_STATIC
-#define	GAME_HARD_LINKED
-#define	CGAME_HARD_LINKED
-#define	UI_HARD_LINKED
-#define	BOTLIB_HARD_LINKED
 #endif
 
-#if !idppc
-inline static short BigShort( short l) { return ShortSwap(l); }
-#define LittleShort
-inline static int BigLong(int l) { return LongSwap(l); }
-#define LittleLong
-inline static float BigFloat(const float *l) { return FloatSwap(l); }
-#define LittleFloat
-#else
-#define BigShort
-inline static short LittleShort(short l) { return ShortSwap(l); }
-#define BigLong
-inline static int LittleLong (int l) { return LongSwap(l); }
-#define BigFloat
-inline static float LittleFloat (const float *l) { return FloatSwap(l); }
-#endif
+//======================= FREEBSD DEFINES =================================
+
+#if defined(__FreeBSD__)
+
+#define OS_STRING "freebsd"
+#define QDECL
+#define LIBRARY_EXTENSION "so"
+#define	PATH_SEP '/'
 
 #endif
 
 //=============================================================
+
+#if id386
+#define ARCH_STRING "x86"
+#define Q_LITTLE_ENDIAN
+#elif idx64
+#	if WIN32
+#		define ARCH_STRING "x64"
+#	elif MACOS_X
+#		define ARCH_STRING "x86_64"
+#	else
+#		define ARCH_STRING "amd64"
+#	endif
+#define Q_LITTLE_ENDIAN
+#elif idarm32
+#define ARCH_STRING "arm"
+#define Q_LITTLE_ENDIAN
+#elif idppc
+#define ARCH_STRING "ppc"
+#define Q_BIG_ENDIAN
+#else
+#error "Architecture not supported"
+#endif
+
+#if defined(Q_LITTLE_ENDIAN)
+#define BigShort(x) ShortSwap(x)
+#define BigLong(x) LongSwap(x)
+#define BigFloat(x) FloatSwap(x)
+#define LittleShort
+#define LittleLong
+#define LittleFloat
+#endif
+
+#if defined(Q_BIG_ENDIAN)
+#define LittleShort(x) ShortSwap(x)
+#define LittleLong(x) LongSwap(x)
+#define LittleFloat(x) FloatSwap(x)
+#define BigShort
+#define BigLong
+#define BigFloat
+#endif
+
+
+#ifndef OS_STRING
+#error "Operating system not supported"
+#endif
+
+#ifdef NDEBUG
+#define	PLATFORM_STRING	OS_STRING "-" ARCH_STRING
+#else
+#define	PLATFORM_STRING	OS_STRING "-" ARCH_STRING "-debug"
+#endif
 
 //=============================================================
 
@@ -302,6 +265,7 @@ typedef int		fxHandle_t;
 typedef int		sfxHandle_t;
 typedef int		fileHandle_t;
 typedef int		clipHandle_t;
+typedef int		g2handle_t;
 
 #define G2_COLLISION_ENABLED
 
@@ -352,8 +316,16 @@ typedef enum {
 	EXEC_APPEND			// add to end of the command buffer (normal case)
 } cbufExec_t;
 
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#define MAX(x,y) ((x)>(y)?(x):(y))
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
+#ifndef MIN
+#define MIN(x,y)	((x)<(y)?(x):(y))
+#endif
+#ifndef MAX
+#define MAX(x,y)	((x)>(y)?(x):(y))
+#endif
+#define CTRL(a)		((a)-'a'+1)
 
 #define PAD(base, alignment)	(((base)+(alignment)-1) & ~((alignment)-1))
 #define PADLEN(base, alignment)	(PAD((base), (alignment)) - (base))
@@ -516,14 +488,65 @@ void *Hunk_AllocDebug( int size, ha_pref preference, char *label, char *file, in
 void *Hunk_Alloc( int size, ha_pref preference );
 #endif
 
-void Com_Memset (void* dest, const int val, const size_t count);
-void Com_Memcpy (void* dest, const void* src, const size_t count);
+ID_INLINE void Com_Memset (void* dest, const int val, const size_t count) {
+	memset( dest, val, count );
+}
+ID_INLINE void Com_Memcpy (void* dest, const void* src, const size_t count) {
+	memcpy( dest, src, count );
+}
+
+ID_INLINE float Com_Clamp( float min, float max, float value ) {
+	value = value > max ? max : value;
+	value = value < min ? min : value;
+	return value;
+}
+ID_INLINE int Com_Clampi( int min, int max, int value ) {
+	value = value > max ? max : value;
+	value = value < min ? min : value;
+	return value;
+}
 
 #define CIN_system	1
 #define CIN_loop	2
 #define	CIN_hold	4
 #define CIN_silent	8
 #define CIN_shader	16
+
+/*
+============================================================================
+
+BYTE ORDER FUNCTIONS
+
+============================================================================
+*/
+
+ID_INLINE int16_t ShortSwap(int16_t l) {
+	uint16_t us = *(uint16_t *)&l;
+
+	return
+		((us & 0x00FFu) << 8u) |
+		((us & 0xFF00u) >> 8u);
+}
+
+ID_INLINE int32_t LongSwap(int32_t l) {
+	uint32_t ui = *(uint32_t *)&l;
+
+  return
+    ((ui & 0x000000FFu) << 24u) |
+    ((ui & 0x0000FF00u) <<  8u) |
+    ((ui & 0x00FF0000u) >>  8u) |
+    ((ui & 0xFF000000u) >> 24u);
+
+}
+
+ID_INLINE float FloatSwap(const float *f) {
+	floatint_t out;
+
+	out.f = *f;
+	out.i = LongSwap(out.i);
+
+	return out.f;
+}
 
 /*
 ==============================================================
@@ -550,7 +573,7 @@ typedef	int	fixed16_t;
 #endif
 
 #define NUMVERTEXNORMALS	162
-extern	vec3_t	bytedirs[NUMVERTEXNORMALS];
+extern const vec3_t	bytedirs[NUMVERTEXNORMALS];
 
 // all drawing is done to a 640*480 virtual screen size
 // and will be automatically scaled to the real resolution
@@ -654,30 +677,29 @@ CT_HUD_ORANGE,
 CT_MAX
 } ct_table_t;
 
-extern vec4_t colorTable[CT_MAX];
+extern const vec4_t colorTable[CT_MAX];
 
-extern	vec4_t		colorBlack;
-extern	vec4_t		colorRed;
-extern	vec4_t		colorGreen;
-extern	vec4_t		colorBlue;
-extern	vec4_t		colorYellow;
-extern	vec4_t		colorMagenta;
-extern	vec4_t		colorCyan;
-extern	vec4_t		colorWhite;
-extern	vec4_t		colorLtGrey;
-extern	vec4_t		colorMdGrey;
-extern	vec4_t		colorDkGrey;
-extern	vec4_t		colorLtBlue;
-extern	vec4_t		colorDkBlue;
+extern const vec4_t		colorBlack;
+extern const vec4_t		colorRed;
+extern const vec4_t		colorGreen;
+extern const vec4_t		colorBlue;
+extern const vec4_t		colorYellow;
+extern const vec4_t		colorMagenta;
+extern const vec4_t		colorCyan;
+extern const vec4_t		colorWhite;
+extern const vec4_t		colorLtGrey;
+extern const vec4_t		colorMdGrey;
+extern const vec4_t		colorDkGrey;
+extern const vec4_t		colorLtBlue;
+extern const vec4_t		colorDkBlue;
 
 #define Q_COLOR_ESCAPE	'^'
 #define Q_COLOR_BITS 0x7
+
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
-#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
+#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString_1_02(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE ) // 1.02 ColorStrings
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
-
-#define Q_IsColorStringExt(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) >= '0' && *((p)+1) <= '7') // ^[0-7]
 
 // Default Colors
 #define COLOR_BLACK		'0'
@@ -705,9 +727,9 @@ extern	vec4_t		colorDkBlue;
 	#define COLOR_JK2MV_FALLBACK 5 // If the extended colors are not supported use this as fallback
 #endif
 
-#define COLOR_EXT_AMOUNT 16
+#define COLOR_EXT_AMOUNT 16 // can be safely raised only to 32
 #define ColorIndex(c)	( ( (c) - '0' ) & 7 )
-#define ColorIndex_Extended(c) ( ((c >= '0' && c <= '9') ? ((c) - '0') : ((c) - 'a' + 1)) % COLOR_EXT_AMOUNT )
+#define ColorIndex_Extended(c) ( ( (c) - '0' ) & (COLOR_EXT_AMOUNT - 1) ) // compatible with 1.02, 'a' & 15 = 1
 
 // Default Colors
 #define S_COLOR_BLACK	"^0"
@@ -729,18 +751,18 @@ extern	vec4_t		colorDkBlue;
 #define S_COLOR_JK2MV   "^n" // Different in Debug/Release
 #define S_COLOR_LT_TRANSPARENT "^o"
 
-extern vec4_t	g_color_table[];
+extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
 
-#define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
-#define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
+#define DEG2RAD( a ) ( (a) * (float) ( M_PI / 180.0 ) )
+#define RAD2DEG( a ) ( (a) * (float) ( 180.0 / M_PI ) )
 
 struct cplane_s;
 
-extern	vec3_t	vec3_origin;
-extern	vec3_t	axisDefault[3];
+extern const vec3_t	vec3_origin;
+extern const vec3_t	axisDefault[3];
 
 #define	nanmask (255<<23)
 
@@ -788,51 +810,7 @@ qboolean Q_isnan(float f);
 int DirToByte( vec3_t dir );
 void ByteToDir( int b, vec3_t dir );
 
-#if	1
-
-#define DotProduct(x,y)			((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
-#define VectorSubtract(a,b,c)	((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
-#define VectorAdd(a,b,c)		((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
-#define VectorCopy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
-#define	VectorScale(v, s, o)	((o)[0]=(v)[0]*(s),(o)[1]=(v)[1]*(s),(o)[2]=(v)[2]*(s))
-#define	VectorMA(v, s, b, o)	((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
-
-#else
-
-#define DotProduct(x,y)			_DotProduct(x,y)
-#define VectorSubtract(a,b,c)	_VectorSubtract(a,b,c)
-#define VectorAdd(a,b,c)		_VectorAdd(a,b,c)
-#define VectorCopy(a,b)			_VectorCopy(a,b)
-#define	VectorScale(v, s, o)	_VectorScale(v,s,o)
-#define	VectorMA(v, s, b, o)	_VectorMA(v,s,b,o)
-
-#endif
-
-#ifdef __LCC__
-#ifdef VectorCopy
-#undef VectorCopy
-// this is a little hack to get more efficient copies in our interpreter
-typedef struct {
-	float	v[3];
-} vec3struct_t;
-#define VectorCopy(a,b)	*(vec3struct_t *)b=*(vec3struct_t *)a;
-#define ID_INLINE static
-#endif
-#endif
-
-#define VectorClear(a)			((a)[0]=(a)[1]=(a)[2]=0)
-#define VectorNegate(a,b)		((b)[0]=-(a)[0],(b)[1]=-(a)[1],(b)[2]=-(a)[2])
-#define VectorSet(v, x, y, z)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z))
-#define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
-
 #define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
-// just in case you do't want to use the macros
-vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
-void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
-void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out );
-void _VectorCopy( const vec3_t in, vec3_t out );
-void _VectorScale( const vec3_t in, float scale, vec3_t out );
-void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc );
 
 unsigned ColorBytes3 (float r, float g, float b);
 unsigned ColorBytes4 (float r, float g, float b, float a);
@@ -843,100 +821,113 @@ float RadiusFromBounds( const vec3_t mins, const vec3_t maxs );
 void ClearBounds( vec3_t mins, vec3_t maxs );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 
-#ifndef __LCC__
-static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
+
+ID_INLINE void VectorSet( vec3_t v, float x, float y, float z ) {
+	v[0] = x;
+	v[1] = y;
+	v[2] = z;
+}
+
+ID_INLINE void VectorClear( vec3_t a ) {
+	a[0] = a[1] = a[2] = 0;
+}
+
+ID_INLINE void VectorNegate( const vec3_t in, vec3_t out ) {
+	out[0] = -in[0];
+	out[1] = -in[1];
+	out[2] = -in[2];
+}
+
+ID_INLINE vec_t DotProduct( const vec3_t v1, const vec3_t v2 ) {
+	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
+}
+
+ID_INLINE void VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
+	out[0] = veca[0]-vecb[0];
+	out[1] = veca[1]-vecb[1];
+	out[2] = veca[2]-vecb[2];
+}
+
+ID_INLINE void VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
+	out[0] = veca[0]+vecb[0];
+	out[1] = veca[1]+vecb[1];
+	out[2] = veca[2]+vecb[2];
+}
+
+ID_INLINE void VectorCopy( const vec3_t in, vec3_t out ) {
+	out[0] = in[0];
+	out[1] = in[1];
+	out[2] = in[2];
+}
+
+ID_INLINE void VectorScale( const vec3_t in, vec_t scale, vec3_t out ) {
+	out[0] = in[0]*scale;
+	out[1] = in[1]*scale;
+	out[2] = in[2]*scale;
+}
+
+ID_INLINE void VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc) {
+	vecc[0] = veca[0] + scale*vecb[0];
+	vecc[1] = veca[1] + scale*vecb[1];
+	vecc[2] = veca[2] + scale*vecb[2];
+}
+
+ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
 		return 0;
 	}
 	return 1;
 }
 
-static ID_INLINE vec_t VectorLength( const vec3_t v ) {
-	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+ID_INLINE vec_t VectorLength( const vec3_t v ) {
+	return (vec_t)sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
+ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
 	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
-	vec3_t	v;
-
-	VectorSubtract (p2, p1, v);
-	return VectorLength( v );
-}
-
-static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
-	vec3_t	v;
-
-	VectorSubtract (p2, p1, v);
-	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-}
-
-// fast vector normalize routine that does not check to make sure
-// that length != 0, nor does it return length, uses rsqrt approximation
-static ID_INLINE void VectorNormalizeFast( vec3_t v )
-{
-	float ilength;
-
-	ilength = Q_rsqrt( DotProduct( v, v ) );
-
-	v[0] *= ilength;
-	v[1] *= ilength;
-	v[2] *= ilength;
-}
-
-static ID_INLINE void VectorInverse( vec3_t v ){
-	v[0] = -v[0];
-	v[1] = -v[1];
-	v[2] = -v[2];
-}
-
-static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
+ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
 	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
 	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 
-#else
-int VectorCompare( const vec3_t v1, const vec3_t v2 );
-
-vec_t VectorLength( const vec3_t v );
-
-vec_t VectorLengthSquared( const vec3_t v );
-
-vec_t Distance( const vec3_t p1, const vec3_t p2 );
 
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 );
-
+vec_t VectorLength( const vec3_t v );
+vec_t VectorLengthSquared( const vec3_t v );
+vec_t Distance( const vec3_t p1, const vec3_t p2 );
 void VectorNormalizeFast( vec3_t v );
-
 void VectorInverse( vec3_t v );
-
-void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross );
-
-#endif
-
 vec_t VectorNormalize (vec3_t v);		// returns vector length
 vec_t VectorNormalize2( const vec3_t v, vec3_t out );
-void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
-int Q_log2(int val);
 
+ID_INLINE void Vector4Copy( const vec4_t in, vec4_t out ) {
+	out[0] = in[0];
+	out[1] = in[1];
+	out[2] = in[2];
+	out[3] = in[3];
+}
+
+void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
+
+int Q_log2(int val);
 float Q_acos(float c);
 
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
 float	Q_crandom( int *seed );
 
-#define qrandom()	((rand () & 0x7fff) / ((float)0x7fff))
-#define qcrandom()	(2.0 * (qrandom() - 0.5))
+#define qrandom()	((rand () & 0x7fff) * (1.0f / 0x7fff))
+#define qcrandom()	(2.0f * (qrandom() - 0.5f))
 
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
 
 void AxisClear( vec3_t axis[3] );
-void AxisCopy( vec3_t in[3], vec3_t out[3] );
+void AxisCopy( const vec3_t in[3], vec3_t out[3] );
 
 void SetPlaneSignbits( struct cplane_s *out );
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
@@ -959,19 +950,17 @@ void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 
 //int	PlaneTypeForNormal (vec3_t normal);
 
-void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
+void MatrixMultiply(const float in1[3][3], const float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 
 //=============================================
 
-float Com_Clamp( float min, float max, float value );
-int Com_Clampi(int min, int max, int value);
-
 char	*COM_SkipPath( char *pathname );
 void	COM_StripExtension(const char *in, char *out, int destsize);
-void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
+void	COM_DefaultExtension( char *path, size_t maxSize, const char *extension );
+void	COM_SanitizeExtension(char *path, size_t maxSize, const char *extension);
 
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
@@ -979,8 +968,8 @@ const char	*SkipWhitespace( const char *data, qboolean *hasNewLines );
 char	*COM_Parse( const char **data_p );
 char	*COM_ParseExt( const char **data_p, qboolean allowLineBreak );
 int		COM_Compress( char *data_p );
-void	COM_ParseError( char *format, ... );
-void	COM_ParseWarning( char *format, ... );
+void	COM_ParseError( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
+void	COM_ParseWarning( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
 qboolean COM_ParseString( const char **data, const char **s );
 qboolean COM_ParseInt( const char **data, int *i );
 qboolean COM_ParseFloat( const char **data, float *f );
@@ -1018,13 +1007,18 @@ void Parse1DMatrix (const char **buf_p, int x, float *m);
 void Parse2DMatrix (const char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 
-void	QDECL Com_sprintf (char *dest, size_t size, const char *fmt, ...);
+void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+size_t Q_vsnprintf(char *str, size_t size, const char *format, va_list ap);
+#else
+#define Q_vsnprintf vsnprintf
+#endif
 
 // for auto-complete (copied from OpenJK)
 #define TRUNCATE_LENGTH	64
 void Com_TruncateLongString( char *buffer, const char *s );
 char *Com_SkipTokens( char *s, int numTokens, char *sep );
-char *Com_SkipCharset( char *s, char *sep );
 
 
 // mode parm for FS_FOpenFile
@@ -1049,41 +1043,31 @@ int Q_isupper( int c );
 int Q_isalpha( int c );
 int Q_isdigit( int c );
 int Q_isalnum( int c );
+int Q_isascii( int c );
 
 
 // portable case insensitive compare
 int		Q_stricmp (const char *s1, const char *s2);
 int		Q_strncmp (const char *s1, const char *s2, int n);
 int		Q_stricmpn (const char *s1, const char *s2, int n);
-char	*Q_stristr(char *str, char *charset);
+char	*Q_stristr(const char *str, char *charset);
 char	*Q_strlwr( char *s1 );
 char	*Q_strupr( char *s1 );
 char	*Q_strrchr( const char* string, int c );
 
 // buffer size safe library replacements
-void	Q_strncpyz( char *dest, const char *src, size_t destsize );
-void	Q_strcat( char *dest, size_t size, const char *src );
+void	Q_strncpyz( char *dest, const char *src, int destsize );
+void	Q_strcat( char *dest, int size, const char *src );
+int		Q_strlen(const char *s);
 
 // strlen that discounts Quake color sequences
 int Q_PrintStrlen( const char *string, qboolean use102color );
+
+int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color);
+int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color);
+void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color);
 // removes color sequences from string
 char *Q_CleanStr( char *string, qboolean use102color ) ;
-
-//=============================================
-
-// 64-bit integers for global rankings interface
-// implemented as a struct for qvm compatibility
-typedef struct
-{
-	byte	b0;
-	byte	b1;
-	byte	b2;
-	byte	b3;
-	byte	b4;
-	byte	b5;
-	byte	b6;
-	byte	b7;
-} qint64;
 
 //=============================================
 /*
@@ -1098,7 +1082,7 @@ float	LittleFloat (const float *l);
 
 void	Swap_Init (void);
 */
-char	* QDECL va(const char *format, ...);
+char	* QDECL va(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
 //=============================================
 
@@ -1114,10 +1098,8 @@ qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-Q_NORETURN void	QDECL  Com_Error( int level, const char *error, ... );
-void	QDECL Com_Printf( const char *msg, ... );
-
-int Com_HexStrToInt(const char *str);
+Q_NORETURN void	QDECL  Com_Error( errorParm_t level, const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
+void	QDECL Com_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 
 /*
 ==========================================================
@@ -1156,10 +1138,10 @@ default values.
 
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s {
-	char		*name;
-	char		*string;
-	char		*resetString;		// cvar_restart will reset to this value
-	char		*latchedString;		// for CVAR_LATCH vars
+	const char	*name;
+	const char	*string;
+	const char	*resetString;		// cvar_restart will reset to this value
+	const char	*latchedString;		// for CVAR_LATCH vars
 	int			flags;
 	qboolean	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
@@ -1207,7 +1189,7 @@ PlaneTypeForNormal
 =================
 */
 
-#define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
+#define PlaneTypeForNormal(x) (x[0] == 1 ? PLANE_X : (x[1] == 1 ? PLANE_Y : (x[2] == 1 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm code too !!!
@@ -1316,8 +1298,8 @@ typedef enum {
 ========================================================================
 */
 
-#define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
-#define	SHORT2ANGLE(x)	((x)*(360.0/65536))
+#define	ANGLE2SHORT(x)	((int)((x)*(65536.0f/360.0f)) & 65535)
+#define	SHORT2ANGLE(x)	((x)*(360.0f/65536))
 
 #define	SNAPFLAG_RATE_DELAYED	1
 #define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
@@ -2260,31 +2242,6 @@ typedef enum {
 	#include "../qcommon/tags.h"
 } memtag_t;
 
-
-typedef struct
-{
-	int		isValid;
-	void	*ghoul2;
-	int		modelNum;
-	int		boltNum;
-	vec3_t	angles;
-	vec3_t	origin;
-	vec3_t	scale;
-	int		entNum;
-} sharedBoltInterface_t;
-
-typedef struct
-{
-	int		isValid;
-	uint32_t ghoul2;
-	int		modelNum;
-	int		boltNum;
-	vec3_t	angles;
-	vec3_t	origin;
-	vec3_t	scale;
-	int		entNum;
-} vmsharedBoltInterface_t;
-
 /*
 ========================================================================
 
@@ -2335,8 +2292,5 @@ typedef union byteAlias_u {
 #define STRING( a ) #a
 #define XSTRING( a ) STRING( a )
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
-
-#define Q_min(x,y) ((x)<(y)?(x):(y))
-#define Q_max(x,y) ((x)>(y)?(x):(y))
 
 #endif	// __Q_SHARED_H

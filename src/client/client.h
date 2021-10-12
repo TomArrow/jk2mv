@@ -1,14 +1,14 @@
 // client.h -- primary header for client
 
-#include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
+#include "../qcommon/cm_public.h"
 #include "../renderer/tr_public.h"
 #include "../menu/ui_public.h"
 #include "keys.h"
-#include "snd_public.h"
 #include "../cgame/cg_public.h"
 #include "../game/bg_public.h"
 #include "../api/mvapi.h"
+#include "../api/mvmenu.h"
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
@@ -211,7 +211,6 @@ typedef struct {
 	dlHandle_t	httpHandle;
 
 	char httpdl[128];
-	qboolean httpdlvalid;
 	int udpdl;
 
 	// demo information
@@ -229,6 +228,9 @@ typedef struct {
 
 	// big stuff at end of structure so most offsets are 15 bits or less
 	netchan_t	netchan;
+
+	qboolean	gotInfo;
+	qboolean	gotStatus;
 } clientConnection_t;
 
 extern	clientConnection_t clc;
@@ -269,7 +271,7 @@ typedef struct {
 	int			weaponDisable;
 	int			forceDisable;
 //	qboolean	pure;
-	int			gameVersion; // For 1.03 in the menu...
+	mvversion_t	gameVersion; // For 1.03 in the menu...
 	int			bots; // botfiltering
 } serverInfo_t;
 
@@ -329,8 +331,6 @@ typedef struct {
 	char		updateChallenge[MAX_TOKEN_CHARS];
 	char		updateInfoString[MAX_INFO_STRING];
 
-	netadr_t	authorizeServer;
-
 	// rendering info
 	glconfig_t	glconfig;
 	qhandle_t	charSetShader;
@@ -338,19 +338,31 @@ typedef struct {
 	qhandle_t	consoleShader;
 
 	qhandle_t	recordingShader;
-	float		ratioFix;
 	float		xadjust;
 	float		yadjust;
 
+	float		cgxadj;
+	float		cgyadj;
+	float		uixadj;
+	float		uiyadj;
+
 	blacklistentry_t *downloadBlacklist;
-	size_t downloadBlacklistLen;
+	int downloadBlacklistLen;
 	qboolean ignoreNextDownloadList;
 
-	mvfix_t fixes;
+	int			fixes;
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
 #define	NUM_CON_TIMES	4
+
+typedef union {
+	struct {
+		unsigned char	color;
+		char			character;
+	} f;
+	unsigned short	compare;
+} conChar_t;
 
 typedef struct {
 	qboolean	initialized;
@@ -359,7 +371,7 @@ typedef struct {
 	// length. Line's first `CON_TIMESTAMP_LEN' characters are
 	// reserved for timestamp and last character is either blank
 	// or contains `CON_WRAP_CHAR' indicating a line wrap.
-	short	text[CON_TEXTSIZE];
+	conChar_t	text[CON_TEXTSIZE];
 
 	int		current;		// line where next message will be printed
 	int		x;				// offset in current line for next print
@@ -429,6 +441,9 @@ extern	cvar_t	*m_side;
 extern	cvar_t	*m_filter;
 
 extern	cvar_t	*cl_timedemo;
+extern	cvar_t	*cl_aviFrameRate;
+extern	cvar_t	*cl_aviMotionJpeg;
+extern  cvar_t  *cl_aviMotionJpegQuality;
 
 extern	cvar_t	*cl_activeAction;
 
@@ -436,6 +451,7 @@ extern	cvar_t	*mv_allowDownload;
 extern	cvar_t	*cl_conXOffset;
 extern	cvar_t	*cl_inGameVideo;
 extern	cvar_t	*mv_consoleShiftRequirement;
+extern	cvar_t	*mv_menuOverride;
 
 extern	cvar_t	*cl_autoDemo;
 extern	cvar_t	*cl_autoDemoFormat;
@@ -447,7 +463,7 @@ extern	cvar_t	*cl_autoDemoFormat;
 //
 
 void CL_Init (void);
-void CL_FlushMemory(void);
+void CL_FlushMemory( qboolean disconnecting );
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
 
@@ -480,17 +496,10 @@ int CL_GetPingQueueCount( void );
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
 
-#ifdef USE_CD_KEY
-
-qboolean CL_CDKeyValidate( const char *key, const char *checksum );
-
-#endif // USE_CD_KEY
-
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
-void VM_AddRefEntityToScene(refEntity_t *r);
-
 void CL_GetVMGLConfig(vmglconfig_t *vmglconfig);
+int CL_ScaledMilliseconds(void);
 
 //
 // cl_input
@@ -502,10 +511,6 @@ typedef struct {
 	qboolean	active;			// current state
 	qboolean	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
-
-extern	kbutton_t	in_mlook, in_klook;
-extern 	kbutton_t 	in_strafe;
-extern 	kbutton_t 	in_speed;
 
 void CL_InitInput (void);
 void CL_SendCmd (void);
@@ -530,7 +535,7 @@ extern int cl_connectedToPureServer;
 
 void CL_SystemInfoChanged( void );
 void CL_ParseServerMessage( msg_t *msg );
-void CL_SP_Print(const word ID, byte *Data);
+void CL_SP_Print(const word ID, intptr_t Data);
 
 void CL_EndHTTPDownload(dlHandle_t handle, qboolean success, const char *err_msg);
 void CL_ProcessHTTPDownload(size_t dltotal, size_t dlnow);
@@ -582,8 +587,8 @@ void	SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader
 void	SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname );
 
 void	SCR_DrawBigString( int x, int y, const char *s, float alpha );			// draws a string with embedded color control characters with fade
-void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color );	// ignores embedded color control characters
-void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor );
+void	SCR_DrawBigStringColor( int x, int y, const char *s, const vec4_t color );	// ignores embedded color control characters
+void	SCR_DrawSmallStringExt( int x, int y, const char *string, const vec4_t setColor, qboolean forceColor );
 void	SCR_DrawSmallChar( int x, int y, int ch );
 
 
@@ -615,20 +620,18 @@ void CL_SetCGameTime( void );
 void CL_FirstSnapshot( void );
 void CL_ShaderStateChanged(void);
 
-qboolean CL_MVAPI_ControlFixes(mvfix_t fixes);
+qboolean CL_MVAPI_ControlFixes(int fixes);
 
 //
 // cl_ui.c
 //
 void CL_InitUI(qboolean mainMenu);
 void CL_ShutdownUI( void );
+void CL_InitMVMenu( void );
 int Key_GetCatcher( void );
 void Key_SetCatcher( int catcher );
 void LAN_LoadCachedServers();
 void LAN_SaveServersToCache();
-
-mvversion_t UI_GetCurrentGameversion();
-void UI_SetCurrentGameversion(mvversion_t protocol);
 
 //
 // cl_net_chan.c
@@ -644,3 +647,13 @@ extern void demoAutoSaveLast_f(void);
 extern void demoAutoComplete(void);
 extern void demoAutoRecord(void);
 extern void demoAutoInit(void);
+
+//
+// cl_avi.c
+//
+qboolean CL_OpenAVIForWriting( const char *filename );
+void CL_TakeVideoFrame( void );
+void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
+void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
+qboolean CL_CloseAVI( void );
+qboolean CL_VideoRecording( void );

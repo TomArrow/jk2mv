@@ -1,5 +1,5 @@
 #include "tr_local.h"
-
+#include "../qcommon/cm_public.h"
 
 
 /*
@@ -354,6 +354,16 @@ void RE_GetBModelVerts( int bmodelIndex, vec3_t *verts, vec3_t normal )
 	pModel = R_GetModelByHandle( bmodelIndex );
 	bmodel = pModel->bmodel;
 
+	if (!bmodel)
+	{
+		ri.Error(ERR_DROP, "RE_GetBModelVerts: non-brush model");
+	}
+
+	if (bmodel->numSurfaces == 0)
+	{
+		ri.Error(ERR_DROP, "RE_GetBModelVerts: model has no surfaces");
+	}
+
 	// Loop through all surfaces on the brush and find the best two candidates
 	for ( i = 0 ; i < bmodel->numSurfaces; i++ )
 	{
@@ -428,10 +438,10 @@ void RE_GetBModelVerts( int bmodelIndex, vec3_t *verts, vec3_t normal )
 R_RecursiveWorldNode
 ================
 */
-static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits ) {
+static void R_RecursiveWorldNode( mnode_t *node, int planeBits, unsigned int dlightBits ) {
 
 	do {
-		int			newDlights[2];
+		unsigned int	newDlights[2];
 
 		// if the node wasn't marked as potentially visible, exit
 		if (node->visframe != tr.visCount) {
@@ -718,6 +728,8 @@ R_AddWorldSurfaces
 =============
 */
 void R_AddWorldSurfaces (void) {
+	unsigned int dlightBits;
+
 	if ( !r_drawworld->integer ) {
 		return;
 	}
@@ -736,8 +748,12 @@ void R_AddWorldSurfaces (void) {
 	ClearBounds( tr.viewParms.visBounds[0], tr.viewParms.visBounds[1] );
 
 	// perform frustum culling and add all the potentially visible surfaces
-	if ( tr.refdef.num_dlights > 32 ) {
-		tr.refdef.num_dlights = 32 ;
+	if ( tr.refdef.num_dlights > MAX_DLIGHTS ) {
+		tr.refdef.num_dlights = MAX_DLIGHTS;
+		dlightBits = -1;
+	} else {
+		dlightBits = ( 1U << tr.refdef.num_dlights ) - 1;
 	}
-	R_RecursiveWorldNode( tr.world->nodes, 15, ( 1 << tr.refdef.num_dlights ) - 1 );
+
+	R_RecursiveWorldNode( tr.world->nodes, 15, dlightBits );
 }

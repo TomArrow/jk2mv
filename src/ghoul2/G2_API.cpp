@@ -19,161 +19,62 @@
 #include "../qcommon/MiniHeap.h"
 #endif
 
-#include <set>
-#include <algorithm>
+#include <map>
+// #include <algorithm>
 
-// #ifdef assert
-// #	undef assert
-// #	define assert(x) ((void)0)
-// #endif
+#ifdef assert
+#	undef assert
+#	define assert(x) ((void)0)
+#endif
 
 extern mdxaBone_t		worldMatrix;
 extern mdxaBone_t		worldMatrixInv;
 
-// normally a ghoul2 handle is a 4 byte pointer directly to CGhoul2Info_v*
-// which is saved and used inside the VM, but on 64 bit we have 8 byte pointers (can't be stored inside int32_t^^)
-// solution is to use it as an actual handle and save them in the (already there anyway) table
+typedef map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
 
-struct ghoul2entry_t {
-	CGhoul2Info_v *ghoul2info;
-	qhandle_t handle;
+static CGhoul2Info_m	ghoultable[2];
+static g2handle_t		nextGhoul2Handle = (g2handle_t)1;
+static int				maxModelIndex[2];
 
-	ghoul2entry_t(CGhoul2Info_v *ghoul2info = NULL, qhandle_t handle = 0) : ghoul2info(ghoul2info), handle(handle) { }
+// game/cgame context
+bool RicksCrazyOnServer;
 
-	bool operator<(const ghoul2entry_t &rhs) const {
-		return handle < rhs.handle;
+CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
+	CGhoul2Info_m::iterator ghlIt = ghoultable[RicksCrazyOnServer].find(g2h);
+
+	if (ghlIt == ghoultable[RicksCrazyOnServer].end())
+	{
+		return NULL;
 	}
 
-	bool operator==(const ghoul2entry_t &rhs) const {
-		return (( handle > 0 && rhs.handle > 0 && (handle == rhs.handle) ) || (ghoul2info && rhs.ghoul2info && (ghoul2info == rhs.ghoul2info)));
-	}
-};
-
-set<ghoul2entry_t>	ghoultable[2];
-
-qhandle_t currghoul2Handle = 1;
-
-// logarithmic complexity
-CGhoul2Info_v *GetGhoul2InfovByHandle(qhandle_t handle) {
-	ghoul2entry_t ventry(NULL, handle);
-
-	set<ghoul2entry_t>::iterator i = ghoultable[0].find(ventry);
-	if (i != ghoultable[0].end()) {
-		return i->ghoul2info;
-	} else {
-		i = ghoultable[1].find(ventry);
-		if (i != ghoultable[1].end()) {
-			return i->ghoul2info;
-		}
-	}
-
-	return NULL;
+	return &ghlIt->second;
 }
 
-// linear complexity
-qhandle_t GetHandleByGhoul2Infov(CGhoul2Info_v *ghoul2inf) {
-	set<ghoul2entry_t>::iterator i = std::find(ghoultable[0].begin(), ghoultable[0].end(), ghoul2inf);
-	if (i != ghoultable[0].end()) {
-		return i->handle;
-	} else {
-		i = std::find(ghoultable[1].begin(), ghoultable[1].end(), ghoul2inf);
-		if (i != ghoultable[1].end()) {
-			return i->handle;
-		}
-	}
-
-	return 0;
-}
-
-bool RicksCrazyOnServer=true;
-
-void FixGhoul2InfoLeaks(bool clearClient,bool clearServer)
+void FixGhoul2InfoLeaks(bool ricksCrazyOnServer)
 {
-	if (clearClient && ghoultable[0].size())
-	{
-		set<ghoul2entry_t>::iterator i;
-		for (i = ghoultable[0].begin(); i != ghoultable[0].end(); i++) {
-			delete i->ghoul2info;
-		}
-		ghoultable[0].clear();
-	}
-
-	if (clearServer && ghoultable[1].size())
-	{
-		set<ghoul2entry_t>::iterator i;
-		for (i = ghoultable[1].begin(); i != ghoultable[1].end(); i++) {
-			delete i->ghoul2info;
-		}
-		ghoultable[1].clear();
-	}
+	ghoultable[ricksCrazyOnServer].clear();
+	maxModelIndex[ricksCrazyOnServer] = 0;
 }
 
-
-class EasyCleaner
-{
-public:
-	~EasyCleaner()
-	{
-		FixGhoul2InfoLeaks(true,true);
-		currghoul2Handle = 1;
-	}
-};
-
-static EasyCleaner TheEasyCleaner;
-
-// this is the ONLY function to read entity states directly
-void G2API_VM_CleanGhoul2Models(qhandle_t *handle) {
-	CGhoul2Info_v *ghoul2Ptr;
-
-	ghoul2Ptr = GetGhoul2InfovByHandle(*handle);
-	G2API_CleanGhoul2Models(&ghoul2Ptr);
-	*handle = GetHandleByGhoul2Infov(ghoul2Ptr);
+void G2API_CleanGhoul2Models(g2handle_t *g2hPtr) {
+	ghoultable[RicksCrazyOnServer].erase(*g2hPtr);
+	*g2hPtr = 0;
 }
 
-void G2API_CleanGhoul2Models(CGhoul2Info_v **ghoul2Ptr) {
-	if (*ghoul2Ptr) {
-		set<ghoul2entry_t>::iterator i = std::find(ghoultable[0].begin(), ghoultable[0].end(), *ghoul2Ptr);
-		if (i != ghoultable[0].end()) {
-			delete i->ghoul2info;
-			ghoultable[0].erase(i);
-		} else {
-			i = std::find(ghoultable[1].begin(), ghoultable[1].end(), *ghoul2Ptr);
-			if (i != ghoultable[1].end()) {
-				delete i->ghoul2info;
-				ghoultable[1].erase(i);
-			}
-		}
-
-		*ghoul2Ptr = NULL;
-	}
+int G2API_GetMaxModelIndex(bool ricksCrazyOnServer) {
+	return maxModelIndex[ricksCrazyOnServer];
 }
 
 qhandle_t G2API_PrecacheGhoul2Model(const char *fileName)
 {
-	return RE_RegisterModel((char *)fileName);
+	return RE_RegisterModel(fileName);
 }
 
-void CL_InitRef( void );
-void R_Register( void );
-
-// initialise all that needs to be on a new Ghoul II model
-int G2API_VM_InitGhoul2Model(qhandle_t *hghoul2, const char *fileName, int modelIndex, qhandle_t customSkin,
-	qhandle_t customShader, int modelFlags, int lodBias) {
-	CGhoul2Info_v *ghoul2Ptr;
-	int ret;
-
-	ghoul2Ptr = GetGhoul2InfovByHandle(*hghoul2);
-	ret = G2API_InitGhoul2Model(&ghoul2Ptr, fileName, modelIndex, customSkin, customShader, modelFlags, lodBias);
-
-	*hghoul2 = GetHandleByGhoul2Infov(ghoul2Ptr);
-	return ret;
-}
-
-int G2API_InitGhoul2Model(CGhoul2Info_v **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin,
-						  qhandle_t customShader, int modelFlags, int lodBias)
+int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelIndex, qhandle_t customSkin,
+	qhandle_t customShader, int modelFlags, int lodBias)
 {
-	int				model = -1;
 	CGhoul2Info		newModel;
+	g2handle_t		g2h = *g2hPtr;
 
 	// are we actually asking for a model to be loaded.
 	if (!(strlen(fileName)))
@@ -182,74 +83,71 @@ int G2API_InitGhoul2Model(CGhoul2Info_v **ghoul2Ptr, const char *fileName, int m
 		return -1;
 	}
 
-	if (!(*ghoul2Ptr))
+	if (g2h == 0)
 	{
-		ghoul2entry_t entry;
-		*ghoul2Ptr = new CGhoul2Info_v;
-		entry.ghoul2info = *ghoul2Ptr;
-		entry.handle = currghoul2Handle++;
-
-		if (RicksCrazyOnServer) {
-			ghoultable[1].insert(entry);
-		} else {
-			ghoultable[0].insert(entry);
-		}
+		*g2hPtr = g2h = nextGhoul2Handle++;
 	}
 
-	CGhoul2Info_v &ghoul2 = *(*ghoul2Ptr);
+	CGhoul2Info_v &ghoul2 = ghoultable[RicksCrazyOnServer][g2h];
 
 	// find a free spot in the list
-	for (model=0; model< ghoul2.size(); model++)
+	for (CGhoul2Info_v::iterator it = ghoul2.begin(); it != ghoul2.end(); ++it)
 	{
-		if (ghoul2[model].mModelindex == -1)
+		if (it->mModelindex == -1)
 		{
 			// this is only valid and used on the game side. Client side ignores this
-			ghoul2[model].mModelindex = modelIndex;
+			it->mModelindex = modelIndex;
+			if (maxModelIndex[RicksCrazyOnServer] < modelIndex)
+				maxModelIndex[RicksCrazyOnServer] = modelIndex;
 				// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
-			ghoul2[model].mModel = RE_RegisterModel((char *)fileName);
-			model_t		*mod_m = R_GetModelByHandle(ghoul2[model].mModel);
+			it->mModel = RE_RegisterModel(fileName);
+			model_t		*mod_m = R_GetModelByHandle(it->mModel);
 			if (mod_m->type == MOD_BAD)
 			{
 				return -1;
 			}
 
 			// init what is necessary for this ghoul2 model
-			G2_Init_Bone_List(ghoul2[model].mBlist);
-			G2_Init_Bolt_List(ghoul2[model].mBltlist);
-			ghoul2[model].mCustomShader = customShader;
-			ghoul2[model].mCustomSkin = customSkin;
-			strcpy(ghoul2[model].mFileName, fileName);
-			ghoul2[model].mCreationID = modelFlags;
-			ghoul2[model].mLodBias = lodBias;
-			ghoul2[model].mAnimFrameDefault = 0;
-			ghoul2[model].mFlags = 0;
+			// fau - what about remaining fields?
+			G2_Init_Bone_List(it->mBlist);
+			G2_Init_Bolt_List(it->mBltlist);
+			it->mCustomShader = customShader;
+			it->mCustomSkin = customSkin;
+			Q_strncpyz(it->mFileName, fileName, sizeof(it->mFileName));
+			it->mCreationID = modelFlags;
+			it->mLodBias = lodBias;
+			it->mAnimFrameDefault = 0;
+			it->mFlags = 0;
+
+			it->mSkelFrameNum = -1;
+			it->mMeshFrameNum = -1;
 
 			// we aren't attached to anyone upfront
-			ghoul2[model].mModelBoltLink = -1;
-			return model;
+			it->mModelBoltLink = -1;
+			return it - ghoul2.begin();
 		}
 	}
 
 	// if we got this far, then we didn't find a spare position, so lets insert a new one
 	newModel.mModelindex = modelIndex;
+	if (maxModelIndex[RicksCrazyOnServer] < modelIndex)
+		maxModelIndex[RicksCrazyOnServer] = modelIndex;
 	// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 	if (customShader <= -20)
 	{ //This means the server is making the function call. And the server does not like registering models.
-		newModel.mModel = RE_RegisterServerModel((char *)fileName);
+		newModel.mModel = RE_RegisterServerModel(fileName);
 		customShader = 0;
 	}
 	else
 	{
-		newModel.mModel = RE_RegisterModel((char *)fileName);
+		newModel.mModel = RE_RegisterModel(fileName);
 	}
 	model_t		*mod_m = R_GetModelByHandle(newModel.mModel);
 	if (mod_m->type == MOD_BAD)
 	{
 		if (ghoul2.size() == 0)//very first model created
 		{//you can't have an empty vector, so let's not give it one
-			G2API_CleanGhoul2Models(ghoul2Ptr);
-			delete *ghoul2Ptr;
-			*ghoul2Ptr = 0;
+			G2API_CleanGhoul2Models(g2hPtr);
 		}
 		return -1;
 	}
@@ -259,7 +157,7 @@ int G2API_InitGhoul2Model(CGhoul2Info_v **ghoul2Ptr, const char *fileName, int m
 	G2_Init_Bolt_List(newModel.mBltlist);
 	newModel.mCustomShader = customShader;
 	newModel.mCustomSkin = customSkin;
-	strcpy(newModel.mFileName, fileName);
+	Q_strncpyz(newModel.mFileName, fileName, sizeof(newModel.mFileName));
 	newModel.mCreationID = modelFlags;
 	newModel.mLodBias = lodBias;
 	newModel.mAnimFrameDefault = 0;
@@ -269,10 +167,9 @@ int G2API_InitGhoul2Model(CGhoul2Info_v **ghoul2Ptr, const char *fileName, int m
 	newModel.mModelBoltLink = -1;
 
 	// insert into list.
-	model = (int)ghoul2.size();
 	ghoul2.push_back(newModel);
 
-	return model;
+	return ghoul2.size() - 1;
 }
 
 qboolean G2API_SetLodBias(CGhoul2Info *ghlInfo, int lodBias)
@@ -305,10 +202,12 @@ qboolean G2API_SetShader(CGhoul2Info *ghlInfo, qhandle_t customShader)
 	return qfalse;
 }
 
-qboolean G2API_SetSurfaceOnOff(CGhoul2Info_v *ghoul2, const char *surfaceName, const int flags)
+qboolean G2API_SetSurfaceOnOff(g2handle_t g2h, const char *surfaceName, const int flags)
 {
-	if (ghoul2 && ghoul2->size() > 0) {
-		CGhoul2Info &ghlInfo = ghoul2->at(0);
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && !ghoul2->empty()) {
+		CGhoul2Info &ghlInfo = ghoul2->front();
 
 		ghlInfo.mMeshFrameNum = 0;
 		return G2_SetSurfaceOnOff(ghlInfo.mFileName, ghlInfo.mSlist, surfaceName, flags);
@@ -326,13 +225,15 @@ int G2API_GetSurfaceOnOff(CGhoul2Info *ghlInfo, const char *surfaceName)
 	return -1;
 }
 
-qboolean G2API_SetRootSurface(CGhoul2Info_v *ghoul2, const int modelIndex, const char *surfaceName)
+qboolean G2API_SetRootSurface(g2handle_t g2h, const int modelIndex, const char *surfaceName)
 {
-	if (!ghoul2) {
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (!ghoul2 || ghoul2->size() <= (unsigned)modelIndex) {
 		return qfalse;
 	}
 
-	return G2_SetRootSurface(*ghoul2, modelIndex, surfaceName);
+	return G2_SetRootSurface(g2h, *ghoul2, modelIndex, surfaceName);
 }
 
 int G2API_AddSurface(CGhoul2Info *ghlInfo, int surfaceNumber, int polyNumber, float BarycentricI, float BarycentricJ, int lod )
@@ -376,11 +277,19 @@ int G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName)
 	return -1;
 }
 
-qboolean G2API_HasGhoul2ModelOnIndex(CGhoul2Info_v **ghlRemove, const int modelIndex)
+qboolean G2API_HasGhoul2ModelOnIndex(const g2handle_t *g2hPtr, const int modelIndex)
 {
-	CGhoul2Info_v &ghlInfo = **ghlRemove;
+	CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(*g2hPtr);
 
-	if (!ghlInfo.size() || (ghlInfo.size() <= modelIndex) || (ghlInfo[modelIndex].mModelindex == -1))
+	if (!ghoul2Ptr)
+	{
+		assert(0);
+		return qfalse;
+	}
+
+	CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+	if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
 	{
 		return qfalse;
 	}
@@ -388,24 +297,20 @@ qboolean G2API_HasGhoul2ModelOnIndex(CGhoul2Info_v **ghlRemove, const int modelI
 	return qtrue;
 }
 
-qboolean G2API_VM_RemoveGhoul2Model(qhandle_t *ghlRemove, const int modelIndex) {
-	CGhoul2Info_v *ghoul2Ptr;
-	qboolean ret;
-
-	ghoul2Ptr = GetGhoul2InfovByHandle(*ghlRemove);
-	ret = G2API_RemoveGhoul2Model(&ghoul2Ptr, modelIndex);
-
-	*ghlRemove = GetHandleByGhoul2Infov(ghoul2Ptr);
-	return ret;
-}
-
-qboolean G2API_RemoveGhoul2Model(CGhoul2Info_v **ghlRemove, const int modelIndex)
+qboolean G2API_RemoveGhoul2Model(g2handle_t *g2hPtr, const int modelIndex)
 {
-	assert(ghlRemove && *ghlRemove);
-	CGhoul2Info_v &ghlInfo = **ghlRemove;
+	CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(*g2hPtr);
+
+	if (!ghoul2Ptr)
+	{
+		assert(0);
+		return qfalse;
+	}
+
+	CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
 
 	// sanity check
-	if (!ghlInfo.size() || (ghlInfo.size() <= modelIndex) || (ghlInfo[modelIndex].mModelindex == -1))
+	if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
 	{
 		// if we hit this assert then we are trying to delete a ghoul2 model on a ghoul2 instance that
 		// one way or another is already gone.
@@ -413,45 +318,29 @@ qboolean G2API_RemoveGhoul2Model(CGhoul2Info_v **ghlRemove, const int modelIndex
 		return qfalse;
 	}
 
-	if (ghlInfo.size() > modelIndex)
+	CGhoul2Info &ghlInfo = ghoul2[modelIndex];
+
+	// clear out the vectors this model used.
+	ghlInfo.mBlist.clear();
+	ghlInfo.mBltlist.clear();
+	ghlInfo.mSlist.clear();
+
+	// set us to be the 'not active' state
+	ghlInfo.mModelindex = -1;
+
+	// now look through the list from the back and see if there is a block of -1's we can resize off the end of the list
+	CGhoul2Info_v::reverse_iterator it = ghoul2.rbegin();
+	while(it != ghoul2.rend() && it->mModelindex == -1)
 	{
-		// clear out the vectors this model used.
-		ghlInfo[modelIndex].mBlist.clear();
-		ghlInfo[modelIndex].mBltlist.clear();
-		ghlInfo[modelIndex].mSlist.clear();
-
-	   	 // set us to be the 'not active' state
-		ghlInfo[modelIndex].mModelindex = -1;
-
-		int newSize = (int)ghlInfo.size();
-		// now look through the list from the back and see if there is a block of -1's we can resize off the end of the list
-		for (int i=(int)ghlInfo.size()-1; i>-1; i--)
-		{
-			if (ghlInfo[i].mModelindex == -1)
-			{
-				newSize = i;
-			}
-			// once we hit one that isn't a -1, we are done.
-			else
-			{
-				break;
-			}
-		}
-		// do we need to resize?
-		if (newSize != ghlInfo.size())
-		{
-			// yes, so lets do it
-			ghlInfo.resize(newSize);
-		}
-
-		// if we are not using any space, just delete the ghoul2 vector entirely
-		if (!ghlInfo.size())
-		{
-			delete *ghlRemove;
-			*ghlRemove = NULL;
-		}
+		ghoul2.pop_back();
+		it = ghoul2.rbegin();
 	}
 
+	// if we are not using any space, just delete the ghoul2 vector entirely
+	if (ghoul2.empty())
+	{
+		G2API_CleanGhoul2Models(g2hPtr);
+	}
 
 	return qtrue;
 }
@@ -495,12 +384,12 @@ qboolean G2API_SetBoneAnimIndex(CGhoul2Info *ghlInfo, const int index, const int
 	{
 		// ensure we flush the cache
 		ghlInfo->mSkelFrameNum = 0;
- 		return G2_Set_Bone_Anim_Index(ghlInfo->mBlist, index, startFrame, endFrame, flags, animSpeed, currentTime, setFrame, blendTime);
+		return G2_Set_Bone_Anim_Index(ghlInfo->mBlist, index, startFrame, endFrame, flags, animSpeed, currentTime, setFrame, blendTime);
 	}
 	return qfalse;
 }
 
-qboolean G2API_SetBoneAnim(CGhoul2Info_v *ghoul2, const int modelIndex, const char *boneName, const int AstartFrame, const int AendFrame, const int flags, const float animSpeed, const int currentTime, const float AsetFrame, const int blendTime)
+qboolean G2API_SetBoneAnim(g2handle_t g2h, const int modelIndex, const char *boneName, const int AstartFrame, const int AendFrame, const int flags, const float animSpeed, const int currentTime, const float AsetFrame, const int blendTime)
 {
 	int endFrame=AendFrame;
 	int startFrame=AstartFrame;
@@ -535,15 +424,16 @@ qboolean G2API_SetBoneAnim(CGhoul2Info_v *ghoul2, const int modelIndex, const ch
 	{
 		setFrame=0.0f;
 	}
-	if (ghoul2 && ghoul2->size() > modelIndex)
+
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		CGhoul2Info *ghlInfo = &ghoul2->at(modelIndex);
-		if (ghlInfo)
-		{
-			// ensure we flush the cache
-			ghlInfo->mSkelFrameNum = 0;
- 			return G2_Set_Bone_Anim(ghlInfo->mFileName, ghlInfo->mBlist, boneName, startFrame, endFrame, flags, animSpeed, currentTime, setFrame, blendTime);
-		}
+		CGhoul2Info &ghlInfo = (*ghoul2)[modelIndex];
+
+		// ensure we flush the cache
+		ghlInfo.mSkelFrameNum = 0;
+		return G2_Set_Bone_Anim(ghlInfo.mFileName, ghlInfo.mBlist, boneName, startFrame, endFrame, flags, animSpeed, currentTime, setFrame, blendTime);
 	}
 	return qfalse;
 }
@@ -675,19 +565,19 @@ qboolean G2API_SetBoneAnglesIndex(CGhoul2Info *ghlInfo, const int index, const v
 	return qfalse;
 }
 
-qboolean G2API_SetBoneAngles(CGhoul2Info_v *ghoul2, const int modelIndex, const char *boneName, const vec3_t angles, const int flags,
+qboolean G2API_SetBoneAngles(g2handle_t g2h, const int modelIndex, const char *boneName, const vec3_t angles, const int flags,
 							 const Eorientations up, const Eorientations left, const Eorientations forward,
 							 qhandle_t *modelList, int blendTime, int currentTime )
 {
-	if (ghoul2 && ghoul2->size() > modelIndex)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		CGhoul2Info *ghlInfo = &ghoul2->at(modelIndex);
-		if (ghlInfo)
-		{
-				// ensure we flush the cache
-			ghlInfo->mSkelFrameNum = 0;
-			return G2_Set_Bone_Angles(ghlInfo->mFileName, ghlInfo->mBlist, boneName, angles, flags, up, left, forward, modelList, ghlInfo->mModelindex, blendTime, currentTime);
-		}
+		CGhoul2Info &ghlInfo = (*ghoul2)[modelIndex];
+
+		// ensure we flush the cache
+		ghlInfo.mSkelFrameNum = 0;
+		return G2_Set_Bone_Angles(ghlInfo.mFileName, ghlInfo.mBlist, boneName, angles, flags, up, left, forward, modelList, ghlInfo.mModelindex, blendTime, currentTime);
 	}
 	return qfalse;
 }
@@ -749,20 +639,20 @@ qboolean G2API_RemoveBone(CGhoul2Info *ghlInfo, const char *boneName)
 	return qfalse;
 }
 
-void G2API_AnimateG2Models(CGhoul2Info_v *ghoul2, float speedVar)
+void G2API_AnimateG2Models(g2handle_t g2h, float speedVar)
 {
-	int model;
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
 
 	if (!ghoul2) {
 		return;
 	}
 
 	// Walk the list and find all models that are active
-	for (model=0; model< ghoul2->size(); model++)
+	for (CGhoul2Info_v::iterator it = ghoul2->begin(); it != ghoul2->end(); ++it)
 	{
-		if (ghoul2->at(model).mModel)
+		if (it->mModel)
 		{
-			G2_Animate_Bone_List(*ghoul2, speedVar, model);
+			G2_Animate_Bone_List(it->mBlist, speedVar);
 		}
 	}
 }
@@ -771,20 +661,24 @@ qboolean G2API_RemoveBolt(CGhoul2Info *ghlInfo, const int index)
 {
 	if (ghlInfo)
 	{
+		// ensure we flush the cache
+		ghlInfo->mSkelFrameNum = 0;
  		return G2_Remove_Bolt( ghlInfo->mBltlist, index);
 	}
 	return qfalse;
 }
 
-int G2API_AddBolt(CGhoul2Info_v *ghoul2, const int modelIndex, const char *boneName)
+int G2API_AddBolt(g2handle_t g2h, const int modelIndex, const char *boneName)
 {
-	if (ghoul2 && ghoul2->size() > modelIndex)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		CGhoul2Info *ghlInfo = &ghoul2->at(modelIndex);
-		if (ghlInfo)
-		{
-			return G2_Add_Bolt(ghlInfo->mFileName, ghlInfo->mBltlist, ghlInfo->mSlist, boneName);
-		}
+		CGhoul2Info &ghlInfo = (*ghoul2)[modelIndex];
+
+		// ensure we flush the cache
+		ghlInfo.mSkelFrameNum = 0;
+		return G2_Add_Bolt(ghlInfo.mFileName, ghlInfo.mBltlist, ghlInfo.mSlist, boneName);
 	}
 	return -1;
 }
@@ -793,43 +687,56 @@ int G2API_AddBoltSurfNum(CGhoul2Info *ghlInfo, const int surfIndex)
 {
 	if (ghlInfo)
 	{
+		// ensure we flush the cache
+		ghlInfo->mSkelFrameNum = 0;
 		return G2_Add_Bolt_Surf_Num(ghlInfo->mFileName, ghlInfo->mBltlist, ghlInfo->mSlist, surfIndex);
 	}
 	return -1;
 }
 
 
-qboolean G2API_AttachG2Model(CGhoul2Info_v *ghoul2From, int modelFrom, CGhoul2Info_v *ghoul2To, int toBoltIndex, int toModel)
+qboolean G2API_AttachG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2hTo, int toBoltIndex, int toModel)
 {
 	assert( toBoltIndex >= 0 );
 	if ( toBoltIndex < 0 )
 	{
 		return qfalse;
 	}
+
+	CGhoul2Info_v *ghoul2From = G2API_GetGhoul2Model(g2hFrom);
+	CGhoul2Info_v *ghoul2To = G2API_GetGhoul2Model(g2hTo);
+
 	// make sure we have a model to attach, a model to attach to, and a bolt on that model
 	if (ghoul2From &&
 		ghoul2To &&
-		(ghoul2From->size() > modelFrom) &&
-		(ghoul2To->size() > toModel) &&
-		((ghoul2To->at(toModel).mBltlist[toBoltIndex].boneNumber != -1) || (ghoul2To->at(toModel).mBltlist[toBoltIndex].surfaceNumber != -1)))
+		(unsigned)modelFrom < ghoul2From->size() &&
+		(unsigned)toModel < ghoul2To->size())
 	{
-		// encode the bolt address into the model bolt link
-	   toModel &= MODEL_AND;
-	   toBoltIndex &= BOLT_AND;
-	   ghoul2From->at(modelFrom).mModelBoltLink = (toModel << MODEL_SHIFT)  | (toBoltIndex << BOLT_SHIFT);
-	   return qtrue;
+		if ((*ghoul2To)[toModel].mBltlist[toBoltIndex].boneNumber != -1 ||
+			(*ghoul2To)[toModel].mBltlist[toBoltIndex].surfaceNumber != -1)
+		{
+			// encode the bolt address into the model bolt link
+			toModel &= MODEL_AND;
+			toBoltIndex &= BOLT_AND;
+			(*ghoul2From)[modelFrom].mModelBoltLink = (toModel << MODEL_SHIFT)  | (toBoltIndex << BOLT_SHIFT);
+			// ensure we flush the cache
+			(*ghoul2From)[modelFrom].mSkelFrameNum = 0;
+
+			return qtrue;
+		}
 	}
 	return qfalse;
 }
 
-void G2API_SetBoltInfo(CGhoul2Info_v *ghoul2, int modelIndex, int boltInfo)
+void G2API_SetBoltInfo(g2handle_t g2h, int modelIndex, int boltInfo)
 {
-	if (ghoul2)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		if (ghoul2->size() > modelIndex)
-		{
-			ghoul2->at(modelIndex).mModelBoltLink = boltInfo;
-		}
+		(*ghoul2)[modelIndex].mModelBoltLink = boltInfo;
+			// ensure we flush the cache
+		(*ghoul2)[modelIndex].mSkelFrameNum = 0;
 	}
 }
 
@@ -838,6 +745,8 @@ qboolean G2API_DetachG2Model(CGhoul2Info *ghlInfo)
 	if (ghlInfo)
 	{
 	   ghlInfo->mModelBoltLink = -1;
+	   // ensure we flush the cache
+	   ghlInfo->mSkelFrameNum = 0;
 	   return qtrue;
 	}
 	return qfalse;
@@ -867,28 +776,34 @@ void G2API_DetachEnt(int *boltInfo)
 qboolean gG2_GBMNoReconstruct;
 qboolean gG2_GBMUseSPMethod;
 
-qboolean G2API_GetBoltMatrix_SPMethod(CGhoul2Info_v *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vec3_t angles,
-							 const vec3_t position, const int frameNum, qhandle_t *modelList, const vec3_t scale )
+qboolean G2API_GetBoltMatrix_SPMethod(g2handle_t g2h, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vec3_t angles,
+							 const vec3_t position, const int frameNum, const qhandle_t *modelList, const vec3_t scale )
 {
-	if (ghoul2 && (ghoul2->size() > modelIndex))
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		CGhoul2Info *ghlInfo = &ghoul2->at(modelIndex);
+		CGhoul2Info &ghlInfo = (*ghoul2)[modelIndex];
 
 		//assert(boltIndex < ghlInfo->mBltlist.size());
 
-		if (ghlInfo && (boltIndex < ghlInfo->mBltlist.size()) && boltIndex >= 0 )
+		if ((unsigned)boltIndex < ghlInfo.mBltlist.size())
 		{
 			// make sure we have transformed the skeleton
-			if (!gG2_GBMNoReconstruct)
+			if (ghlInfo.mSkelFrameNum != frameNum)
 			{
-				G2_ConstructGhoulSkeleton(*ghoul2, frameNum, modelList, true, angles, position, scale, false);
+				// make sure it's initialized even if noreconstruct is on
+				if (!gG2_GBMNoReconstruct || ghlInfo.mSkelFrameNum == -1)
+				{
+					G2_ConstructGhoulSkeleton(*ghoul2, frameNum, modelList, true, angles, position, scale, false);
+				}
 			}
 
 			gG2_GBMNoReconstruct = qfalse;
 
 			mdxaBone_t scaled;
 			mdxaBone_t *use;
-			use=&ghlInfo->mBltlist[boltIndex].position;
+			use = &ghlInfo.mBltlist[boltIndex].position;
 
 			if (scale[0]||scale[1]||scale[2])
 			{
@@ -923,33 +838,39 @@ qboolean G2API_GetBoltMatrix_SPMethod(CGhoul2Info_v *ghoul2, const int modelInde
 	return qfalse;
 }
 
-qboolean G2API_GetBoltMatrix(CGhoul2Info_v *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vec3_t angles, const vec3_t position, const int frameNum, qhandle_t *modelList, vec3_t scale )
+qboolean G2API_GetBoltMatrix(g2handle_t g2h, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vec3_t angles, const vec3_t position, const int frameNum, const qhandle_t *modelList, const vec3_t scale )
 {
 	if (gG2_GBMUseSPMethod)
 	{
 		gG2_GBMUseSPMethod = qfalse;
-		return G2API_GetBoltMatrix_SPMethod(ghoul2, modelIndex, boltIndex, matrix, angles, position, frameNum, modelList, scale);
+		return G2API_GetBoltMatrix_SPMethod(g2h, modelIndex, boltIndex, matrix, angles, position, frameNum, modelList, scale);
 	}
 
-	if (ghoul2 && (ghoul2->size() > modelIndex))
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		CGhoul2Info *ghlInfo = &ghoul2->at(modelIndex);
+		CGhoul2Info &ghlInfo = (*ghoul2)[modelIndex];
 
 		//assert(boltIndex < ghlInfo->mBltlist.size());
 
-		if (ghlInfo && (boltIndex < ghlInfo->mBltlist.size()) && boltIndex >= 0 )
+		if ((unsigned)boltIndex < ghlInfo.mBltlist.size())
 		{
 			// make sure we have transformed the skeleton
-			if (!gG2_GBMNoReconstruct)
+			if (ghlInfo.mSkelFrameNum != frameNum)
 			{
-				G2_ConstructGhoulSkeleton(*ghoul2, frameNum, modelList, true, angles, position, scale, false);
+				// make sure it's initialized even if noreconstruct is on
+				if (!gG2_GBMNoReconstruct || ghlInfo.mSkelFrameNum == -1)
+				{
+					G2_ConstructGhoulSkeleton(*ghoul2, frameNum, modelList, true, angles, position, scale, false);
+				}
 			}
 
 			gG2_GBMNoReconstruct = qfalse;
 
 			mdxaBone_t scaled;
 			mdxaBone_t *use;
-			use=&ghlInfo->mBltlist[boltIndex].position;
+			use = &ghlInfo.mBltlist[boltIndex].position;
 
 			if (scale[0]||scale[1]||scale[2])
 			{
@@ -997,31 +918,36 @@ qboolean G2API_GetBoltMatrix(CGhoul2Info_v *ghoul2, const int modelIndex, const 
 	return qfalse;
 }
 
-void G2API_ListSurfaces(CGhoul2Info *ghlInfo)
+void G2API_ListSurfaces(g2handle_t g2h, int modelIndex)
 {
-	if (ghlInfo)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		G2_List_Model_Surfaces(ghlInfo->mFileName);
+		G2_List_Model_Surfaces((*ghoul2)[modelIndex].mFileName);
 	}
 }
 
-void G2API_ListBones(CGhoul2Info *ghlInfo, int frame)
+void G2API_ListBones(g2handle_t g2h, int modelIndex, int frame)
 {
-	if (ghlInfo)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		G2_List_Model_Bones(ghlInfo->mFileName, frame);
+		G2_List_Model_Bones((*ghoul2)[modelIndex].mFileName, frame);
 	}
 }
 
 // decide if we have Ghoul2 models associated with this ghoul list or not
-qboolean G2API_HaveWeGhoul2Models(CGhoul2Info_v *ghoul2)
+qboolean G2API_HaveWeGhoul2Models(g2handle_t g2h)
 {
-	int i;
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
 	if (ghoul2)
 	{
-		for (i=0; i < ghoul2->size(); i++)
+		for (CGhoul2Info_v::iterator it = ghoul2->begin(); it != ghoul2->end(); ++it)
 		{
-			if (ghoul2->at(i).mModelindex != -1)
+			if (it->mModelindex != -1)
 			{
 				return qtrue;
 			}
@@ -1031,7 +957,7 @@ qboolean G2API_HaveWeGhoul2Models(CGhoul2Info_v *ghoul2)
 }
 
 // run through the Ghoul2 models and set each of the mModel values to the correct one from the cgs.gameModel offset lsit
-void G2API_SetGhoul2ModelIndexes(CGhoul2Info_v *ghoul2, qhandle_t *modelList, qhandle_t *skinList)
+void G2API_SetGhoul2ModelIndexes(g2handle_t g2h, qhandle_t *modelList, qhandle_t *skinList)
 {
 	return;
 }
@@ -1069,8 +995,8 @@ SV_QsortEntityNumbers
 =======================
 */
 static int QDECL QsortDistance( const void *a, const void *b ) {
-	const float	&ea = ((CCollisionRecord*)a)->mDistance;
-	const float	&eb = ((CCollisionRecord*)b)->mDistance;
+	const float	&ea = ((const CCollisionRecord*)a)->mDistance;
+	const float	&eb = ((const CCollisionRecord*)b)->mDistance;
 
 	if ( ea < eb ) {
 		return -1;
@@ -1079,9 +1005,10 @@ static int QDECL QsortDistance( const void *a, const void *b ) {
 }
 
 
-void G2API_CollisionDetect(CollisionRecord_t *collRecMap, CGhoul2Info_v *ghoul2, const vec3_t angles, const vec3_t position,
-										  int frameNumber, int entNum, vec3_t rayStart, vec3_t rayEnd, vec3_t scale, CMiniHeap *G2VertSpace, int traceFlags, int useLod, float fRadius)
+void G2API_CollisionDetect(CollisionRecord_t *collRecMap, g2handle_t g2h, const vec3_t angles, const vec3_t position, int frameNumber, int entNum, const vec3_t rayStart, const vec3_t rayEnd, const vec3_t scale, CMiniHeap *G2VertSpace, int traceFlags, int useLod, float fRadius)
 {
+
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
 
 	if (ghoul2)
 	{
@@ -1145,7 +1072,7 @@ int G2API_GetGhoul2ModelFlags(CGhoul2Info *ghlInfo)
 }
 
 // given a boltmatrix, return in vec a normalised vector for the axis requested in flags
-void G2API_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, Eorientations flags, vec3_t vec)
+void G2API_GiveMeVectorFromMatrix(const mdxaBone_t *boltMatrix, Eorientations flags, vec3_t vec)
 {
 	switch (flags)
 	{
@@ -1192,118 +1119,108 @@ void G2API_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, Eorientations flags, v
 // copy a model from one ghoul2 instance to another, and reset the root surface on the new model if need be
 // NOTE if modelIndex = -1 then copy all the models
 // returns the last model index in destination.  -1 equals nothing copied.
-int G2API_CopyGhoul2Instance(CGhoul2Info_v *g2From, CGhoul2Info_v *g2To, int modelIndex)
+int G2API_CopyGhoul2Instance(g2handle_t g2hFrom, g2handle_t g2hTo, int modelIndex)
 {
-	int returnval=-1;
+	CGhoul2Info_v *g2From = G2API_GetGhoul2Model(g2hFrom);
+	CGhoul2Info_v *g2To = G2API_GetGhoul2Model(g2hTo);
 
 	if (!g2From || !g2To) {
 		return -1;
 	}
-
-	int	i, model;
-	int	from = 0;
-	int	to = (int)g2From->size();
-
-	// determing if we are only copying one model or not
-	if (modelIndex != -1)
-	{
-		from = modelIndex;
-		to = modelIndex + 1;
+	if (modelIndex != -1) {
+		if (g2From->size() <= (unsigned)modelIndex) {
+			return -1;
+		}
 	}
 
-	model = 0;
+	CGhoul2Info_v::iterator from = g2From->begin();
+	CGhoul2Info_v::iterator to = g2From->end();
+
+	// determing if we are only copying one model or not
+	if (modelIndex > -1)
+	{
+		from += modelIndex;
+		to = from + 1;
+	}
+
 	// now copy the models
-	for (i=from; i<to; i++)
+	for (CGhoul2Info_v::iterator dest = g2To->begin(); from != to; ++from)
 	{
 		// find a free spot in the list
-		for (; model< g2To->size(); model++)
+		for (; dest != g2To->end(); ++dest)
 		{
-			if (g2To->at(model).mModelindex == -1)
+			if (dest->mModelindex == -1)
 			{
 				// Copy model to clear position
-				g2To->at(model) = g2From->at(i);
-
+				*dest = *from;
 				break;
 			}
 		}
 
-		if (model >= g2To->size())
-		{	// didn't find a spare slot, so new ones to add
-			break;
-		}
-	}
-
-	if (i < to)
-	{	// add in any other ones to the end
-		model = (int)g2To->size();
-		g2To->resize(model + to - i);
-
-		for(;i<to;i++)
+		if (dest == g2To->end())
 		{
-			g2To->at(model) = g2From->at(i);
-			model++;
+			// didn't find a spare slot, so new ones to add
+			g2To->push_back(*from);
+			// may be invalidated
+			dest = g2To->end() - 1;
 		}
 	}
 
-	return returnval;
+	// fau - perhaps needs forcereconstruct like G2API_CopyGhoul2Instance
+
+	return -1;
 }
 
-void G2API_CopySpecificG2Model(CGhoul2Info_v *ghoul2From, int modelFrom, CGhoul2Info_v *ghoul2To, int modelTo)
+void G2API_CopySpecificG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2hTo, int modelTo)
 {
+	CGhoul2Info_v *ghoul2From = G2API_GetGhoul2Model(g2hFrom);
+	CGhoul2Info_v *ghoul2To = G2API_GetGhoul2Model(g2hTo);
+
 	qboolean forceReconstruct = qfalse;
 
 	// have we real ghoul2 models yet?
 	if (ghoul2From && ghoul2To)
 	{
 		// assume we actually have a model to copy from
-		if (ghoul2From->size() > modelFrom)
+		if ((unsigned)modelFrom < ghoul2From->size() && 0 <= modelTo)
 		{
 			// if we don't have enough models on the to side, resize us so we do
-			if (ghoul2To->size() <= modelTo)
+			if (ghoul2To->size() <= (unsigned)modelTo)
 			{
 				ghoul2To->resize(modelTo + 1);
 				forceReconstruct = qtrue;
 			}
 			// do the copy
-			ghoul2To->at(modelTo) = ghoul2From->at(modelFrom);
+			(*ghoul2To)[modelTo] = (*ghoul2From)[modelFrom];
 
 			if (forceReconstruct)
 			{ //rww - we should really do this shouldn't we? If we don't mark a reconstruct after this,
 			  //and we do a GetBoltMatrix in the same frame, it doesn't reconstruct the skeleton and returns
 			  //a completely invalid matrix
-				ghoul2To->at(0).mSkelFrameNum = 0;
+
+				// really all of them? stay safe
+				for (CGhoul2Info_v::iterator it = ghoul2To->begin(); it != ghoul2To->end(); ++it) {
+					it->mSkelFrameNum = 0;
+				}
 			}
 		}
 	}
 }
 
 // This version will automatically copy everything about this model, and make a new one if necessary.
-void G2API_VM_DuplicateGhoul2Instance(CGhoul2Info_v *g2From, qhandle_t *g2To) {
-	CGhoul2Info_v *toptr;
-
-	toptr = GetGhoul2InfovByHandle(*g2To);
-	G2API_DuplicateGhoul2Instance(g2From, &toptr);
-	*g2To = GetHandleByGhoul2Infov(toptr);
-}
-
-void G2API_DuplicateGhoul2Instance(CGhoul2Info_v *g2From, CGhoul2Info_v **g2To)
+void G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr)
 {
-	if (!g2From || *g2To) {
+	CGhoul2Info_v *g2From = G2API_GetGhoul2Model(g2hFrom);
+	g2handle_t g2hTo;
+
+	if (!g2From || *g2hToPtr) {
 		return;
 	}
 
-	ghoul2entry_t entry;
-	*g2To = new CGhoul2Info_v;
-	entry.ghoul2info = *g2To;
-	entry.handle = currghoul2Handle++;
+	*g2hToPtr = g2hTo = nextGhoul2Handle++;
+	ghoultable[RicksCrazyOnServer][g2hTo] = CGhoul2Info_v();
 
-	if (RicksCrazyOnServer) {
-		ghoultable[1].insert(entry);
-	} else {
-		ghoultable[0].insert(entry);
-	}
-
-	G2API_CopyGhoul2Instance(g2From, *g2To, -1);
+	G2API_CopyGhoul2Instance(g2hFrom, g2hTo, -1);
 	return;
 }
 
@@ -1336,33 +1253,37 @@ int	G2API_GetSurfaceIndex(CGhoul2Info *ghlInfo, const char *surfaceName)
 	return -1;
 }
 
-char *G2API_GetGLAName(CGhoul2Info_v *ghoul2, int modelIndex)
+char *G2API_GetGLAName(g2handle_t g2h, int modelIndex)
 {
-	if (ghoul2 && (ghoul2->size() > modelIndex))
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
-		model_t	*mod = R_GetModelByHandle(RE_RegisterModel(ghoul2->at(modelIndex).mFileName));
+		model_t	*mod = R_GetModelByHandle(RE_RegisterModel((*ghoul2)[modelIndex].mFileName));
 		return mod->mdxm->animName;
 	}
 	return NULL;
 }
 
-qboolean G2API_SetNewOrigin(CGhoul2Info_v *ghoul2, const int boltIndex)
+qboolean G2API_SetNewOrigin(g2handle_t g2h, const int boltIndex)
 {
-	CGhoul2Info *ghlInfo = NULL;
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
 
-	if (ghoul2 && ghoul2->size() > 0)
+	if (ghoul2 && !ghoul2->empty())
 	{
-		ghlInfo = &ghoul2->at(0);
-	}
+		CGhoul2Info &ghlInfo = ghoul2->front();
 
-	if (ghlInfo)
-	{
-		ghlInfo->mNewOrigin = boltIndex;
-		ghlInfo->mFlags |= GHOUL2_NEWORIGIN;
+		ghlInfo.mNewOrigin = boltIndex;
+		ghlInfo.mFlags |= GHOUL2_NEWORIGIN;
+		// ensure we flush the cache
+		ghlInfo.mSkelFrameNum = 0;
+
 		return qtrue;
 	}
 	return qfalse;
 }
+
+#if 0
 
 int G2API_GetBoneIndex(CGhoul2Info *ghlInfo, const char *boneName)
 {
@@ -1373,8 +1294,10 @@ int G2API_GetBoneIndex(CGhoul2Info *ghlInfo, const char *boneName)
 	return -1;
 }
 
-qboolean G2API_SaveGhoul2Models(CGhoul2Info_v *ghoul2, char **buffer, int *size)
+qboolean G2API_SaveGhoul2Models(g2handle_t g2h, char **buffer, int *size)
 {
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
 	if (!ghoul2) {
 		return qfalse;
 	}
@@ -1382,8 +1305,10 @@ qboolean G2API_SaveGhoul2Models(CGhoul2Info_v *ghoul2, char **buffer, int *size)
 	return G2_SaveGhoul2Models(*ghoul2, buffer, size);
 }
 
-void G2API_LoadGhoul2Models(CGhoul2Info_v *ghoul2, char *buffer)
+void G2API_LoadGhoul2Models(g2handle_t g2h, char *buffer)
 {
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
 	if (!ghoul2) {
 		return;
 	}
@@ -1398,7 +1323,11 @@ void G2API_FreeSaveBuffer(char *buffer)
 
 // this is kinda sad, but I need to call the destructor in this module (exe), not the game.dll...
 //
-void G2API_LoadSaveCodeDestructGhoul2Info(CGhoul2Info_v *ghoul2)
+void G2API_LoadSaveCodeDestructGhoul2Info(g2handle_t g2h)
 {
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
 	ghoul2->~CGhoul2Info_v();	// so I can load junk over it then memset to 0 without orphaning
 }
+
+#endif // 0

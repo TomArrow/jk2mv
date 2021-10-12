@@ -3,7 +3,6 @@
 #ifndef SND_LOCAL_H
 #define SND_LOCAL_H
 
-#include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "snd_public.h"
 #include "mp3struct.h"
@@ -186,7 +185,7 @@ typedef struct {
 */
 
 // initializes cycling through a DMA buffer and returns information on it
-qboolean SNDDMA_Init(void);
+qboolean SNDDMA_Init(int khz);
 
 // gets the current DMA position
 int		SNDDMA_GetDMAPos(void);
@@ -198,6 +197,9 @@ void	SNDDMA_BeginPainting (void);
 
 void	SNDDMA_Submit(void);
 
+void	SNDDMA_Activate(qboolean activate);
+
+
 //====================================================================
 
 #define	MAX_CHANNELS			96
@@ -208,9 +210,6 @@ extern	int		numLoopChannels;
 
 extern	int		s_paintedtime;
 extern	int		s_rawend;
-extern	vec3_t	listener_forward;
-extern	vec3_t	listener_right;
-extern	vec3_t	listener_up;
 extern	dma_t	dma;
 
 #define	MAX_RAW_SAMPLES	16384

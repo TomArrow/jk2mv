@@ -73,7 +73,7 @@ void RB_SurfaceAnim( md4Surface_t *surface ) {
 	oldFrame = (md4Frame_t *)((byte *)header + header->ofsFrames +
 		backEnd.currentEntity->e.oldframe * frameSize );
 
-	RB_CheckOverflow( surface->numVerts, surface->numTriangles * 3 );
+	RB_CHECKOVERFLOW( surface->numVerts, surface->numTriangles * 3 );
 
 	triangles = (int *) ((byte *)surface + surface->ofsTriangles);
 	indexes = surface->numTriangles * 3;
@@ -130,8 +130,8 @@ void RB_SurfaceAnim( md4Surface_t *surface ) {
 		tess.normal[baseVertex + j][1] = tempNormal[1];
 		tess.normal[baseVertex + j][2] = tempNormal[2];
 
-		tess.texCoords[baseVertex + j][0][0] = v->texCoords[0];
-		tess.texCoords[baseVertex + j][0][1] = v->texCoords[1];
+		tess.texCoords[0][baseVertex + j][0] = v->texCoords[0];
+		tess.texCoords[0][baseVertex + j][1] = v->texCoords[1];
 
 		v = (md4Vertex_t *)&v->weights[v->numWeights];
 	}

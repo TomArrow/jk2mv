@@ -37,7 +37,7 @@ void CMediaHandles::operator=(const CMediaHandles &that )
 {
 	mMediaList.clear();
 
-	for ( int i = 0; i < that.mMediaList.size(); i++ )
+	for ( size_t i = 0; i < that.mMediaList.size(); i++ )
 	{
 		mMediaList.push_back( that.mMediaList[i] );
 	}
@@ -97,7 +97,7 @@ void CFxScheduler::Clean(bool bRemoveTemplates /*= true*/, int idToPreserve /*= 
 	while ( itr != mFxSchedule.end() )
 	{
 		next = itr;
-		next++;
+		++next;
 
 		if ((*itr)->mParent&&OutstandClouds.find((*itr)->mParent)!=OutstandClouds.end())
 		{
@@ -274,7 +274,7 @@ int CFxScheduler::RegisterEffect( const char *file, bool bHasCorrectPath /*= fal
 	}
 
 	// If we'll overflow our buffer, bail out--not a particularly elegant solution
-	if (len >= sizeof(data) - 1 )
+	if (len >= (int)sizeof(data) - 1 )
 	{
 		theFxHelper.CloseFile( fh );
 		return 0;
@@ -470,7 +470,7 @@ void CFxScheduler::DeletePrimitive(int id, CPrimitiveTemplate *prim)
 	while ( itr != mFxSchedule.end() )
 	{
 		next = itr;
-		next++;
+		++next;
 
 		if ( (*itr)->mpTemplate == prim )
 		{
@@ -788,7 +788,10 @@ SEffectTemplate *CFxScheduler::GetNewEffectTemplate( int *id, const char *file )
 		if ( !effect->mInUse )
 		{
 			*id = i;
-			memset( effect, 0, sizeof( SEffectTemplate ));
+
+			effect->~SEffectTemplate();
+			// call constructor in-place
+			new (effect) SEffectTemplate;
 
 			// If we are a copy, we really won't have a name that we care about saving for later
 			if ( file )
@@ -946,13 +949,13 @@ static void ReportPlayEffectError(int id)
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( int id, vec3_t origin )
+void CFxScheduler::PlayEffect( int id, const vec3_t origin )
 {
-	vec3_t	axis[3];
-
-	VectorSet( axis[0], 0, 0, 1 );
-	VectorSet( axis[1], 1, 0, 0 );
-	VectorSet( axis[2], 0, 1, 0 );
+	static const vec3_t	axis[3] = {
+		{ 0, 0, 1 },
+		{ 1, 0, 0 },
+		{ 0, 1, 0 }
+	};
 
 	PlayEffect( id, origin, axis );
 }
@@ -969,7 +972,7 @@ void CFxScheduler::PlayEffect( int id, vec3_t origin )
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( int id, vec3_t origin, vec3_t forward )
+void CFxScheduler::PlayEffect( int id, const vec3_t origin, const vec3_t forward )
 {
 	vec3_t	axis[3];
 
@@ -1001,7 +1004,7 @@ void CFxScheduler::PlayEffect( int id, vec3_t origin, vec3_t forward )
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( const char *file, vec3_t origin, vec3_t axis[3], const int boltInfo, const int entNum )
+void CFxScheduler::PlayEffect( const char *file, const vec3_t origin, const vec3_t axis[3], const int boltInfo, const int entNum )
 {
 	char	sfile[MAX_QPATH];
 
@@ -1052,6 +1055,7 @@ void CFxScheduler::PlayEffect( int id, CFxBoltInterface *obj )
 	vec3_t origin, forward;
 	vec3_t axis[3];
 
+	obj->GetOrigin(origin);
 	obj->GetForward(forward);
 
 	VectorCopy( forward, axis[0] );
@@ -1238,15 +1242,7 @@ void CFxScheduler::PlayEffect( int id, CFxBoltInterface *obj )
 						sfx->mEntNum = -1;
 						sfx->mModelNum = 0;
 #endif
-						if ( origin )
-						{
-							VectorCopy( origin, sfx->mOrigin );
-						}
-						else
-						{
-							VectorClear( sfx->mOrigin );
-						}
-
+						VectorCopy( origin, sfx->mOrigin );
 						AxisCopy( axis, sfx->mAxis );
 #if 0//#ifndef EFFECTSED#ifndef EFFECTSED
 					}
@@ -1311,14 +1307,14 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, CFxBoltInterface *obj, 
 				origin, objOrg,
 				objAng, objScale;
 
-	CGhoul2Info_v *g2Handle;
+	g2handle_t g2Handle;
 	mdxaBone_t boltMatrix;
 
 	int lateTime = 0;
 
 	g2Handle = obj->GetG2Handle();
 
-	if (!g2Handle || !G2API_HaveWeGhoul2Models((CGhoul2Info_v *)g2Handle))
+	if (!g2Handle || !G2API_HaveWeGhoul2Models(g2Handle))
 	{
 		return;
 	}
@@ -1327,7 +1323,7 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, CFxBoltInterface *obj, 
 	obj->GetForward(objAng);
 	obj->GetScale(objScale);
 
-	G2API_GetBoltMatrix((CGhoul2Info_v *)g2Handle, obj->GetModelNum(), obj->GetBoltNum(), &boltMatrix, objAng, objOrg, theFxHelper.mTime, /*MODELLIST*/NULL, objScale);
+	G2API_GetBoltMatrix(g2Handle, obj->GetModelNum(), obj->GetBoltNum(), &boltMatrix, objAng, objOrg, theFxHelper.mTime, /*MODELLIST*/NULL, objScale);
 
 	G2API_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, origin);
 	G2API_GiveMeVectorFromMatrix(&boltMatrix, NEGATIVE_Y, ang);
@@ -1384,7 +1380,7 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, CFxBoltInterface *obj, 
 		height = fx->mHeight.GetVal();
 
 		// calculate point on ellipse
-		VectorSet( temp, sin(x) * width * sin(y), cos(x) * width * sin(y), cos(y) * height ); // sinx * siny, cosx * siny, cosy
+		VectorSet( temp, sinf(x) * width * sinf(y), cosf(x) * width * sinf(y), cosf(y) * height ); // sinx * siny, cosx * siny, cosy
 		VectorAdd( org, temp, org );
 
 		if ( fx->mSpawnFlags & FX_AXIS_FROM_SPHERE )
@@ -1554,7 +1550,7 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, CFxBoltInterface *obj, 
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( int id, vec3_t origin, vec3_t axis[3], const int boltInfo, const int entNum )
+void CFxScheduler::PlayEffect( int id, const vec3_t origin, const vec3_t axis[3], const int boltInfo, const int entNum )
 {
 	SEffectTemplate			*fx;
 	CPrimitiveTemplate		*prim;
@@ -1639,6 +1635,9 @@ void CFxScheduler::PlayEffect( int id, vec3_t origin, vec3_t axis[3], const int 
 			//	can keep the primitive template around for the correct amount of time.
 			prim->mRefCount = count;
 		}
+
+		if ( count <= 0 )
+			continue;
 
 		if ( prim->mSpawnFlags & FX_EVEN_DISTRIBUTION )
 		{
@@ -1765,7 +1764,7 @@ void CFxScheduler::PlayEffect( int id, vec3_t origin, vec3_t axis[3], const int 
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( const char *file, vec3_t origin )
+void CFxScheduler::PlayEffect( const char *file, const vec3_t origin )
 {
 	char	sfile[MAX_QPATH];
 
@@ -1787,7 +1786,7 @@ void CFxScheduler::PlayEffect( const char *file, vec3_t origin )
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::PlayEffect( const char *file, vec3_t origin, vec3_t forward )
+void CFxScheduler::PlayEffect( const char *file, const vec3_t origin, const vec3_t forward )
 {
 	char	sfile[MAX_QPATH];
 
@@ -1823,7 +1822,7 @@ void CFxScheduler::AddScheduledEffects( void )
 	while ( itr != mFxSchedule.end() )
 	{
 		next = itr;
-		next++;
+		++next;
 		schedEffect = (*itr);
 		if ( *(*itr) <= theFxHelper.mTime )
 		{
@@ -1886,7 +1885,7 @@ void CFxScheduler::AddScheduledEffects( void )
 	while ( itr != mFxSchedule.end() )
 	{
 		next = itr;
-		next++;
+		++next;
 		schedEffect = (*itr);
 		if ( *(*itr) <= theFxHelper.mTime )
 		{
@@ -1957,7 +1956,9 @@ void CFxScheduler::AddScheduledEffects( void )
 					VectorCopy(data->mPoint, modelScale);
 
 					// go away and get me the bolt position for this frame please
-					doesBoltExist = G2API_GetBoltMatrix(*((CGhoul2Info_v *)VM_Call( cgvm, CG_GET_GHOUL2, (*itr)->mEntNum)), (*itr)->mModelNum, (*itr)->mBoltNum, &boltMatrix, lerpAngles, lerpOrigin, cls.realtime, (int *)VM_Call( cgvm, CG_GET_MODEL_LIST, (*itr)->mEntNum), modelScale);
+					g2handle_t g2h = *(g2handle_t *)VM_Call( cgvm, CG_GET_GHOUL2, (*itr)->mEntNum);
+					qhandle_t *modelList = (qhandle_t *)VM_Call( cgvm, CG_GET_MODEL_LIST, (*itr)->mEntNum);
+					doesBoltExist = G2API_GetBoltMatrix(g2h, (*itr)->mModelNum, (*itr)->mBoltNum, &boltMatrix, lerpAngles, lerpOrigin, theFxHelper.mTime, modelList, modelScale);
 
 					if (doesBoltExist)
 					{	// set up the axis and origin we need for the actual effect spawning
@@ -2030,7 +2031,7 @@ void CFxScheduler::AddScheduledEffects( void )
 // Return:
 //	none
 //------------------------------------------------------
-void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, vec3_t origin, vec3_t axis[3], int lateTime, CCloud *effectCloud )
+void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, const vec3_t origin, const vec3_t axis[3], int lateTime, CCloud *effectCloud )
 {
 	vec3_t	org, org2, temp,
 				vel, accel,
@@ -2091,7 +2092,7 @@ void CFxScheduler::CreateEffect( CPrimitiveTemplate *fx, vec3_t origin, vec3_t a
 		height = fx->mHeight.GetVal();
 
 		// calculate point on ellipse
-		VectorSet( temp, sin(x) * width * sin(y), cos(x) * width * sin(y), cos(y) * height ); // sinx * siny, cosx * siny, cosy
+		VectorSet( temp, sinf(x) * width * sinf(y), cosf(x) * width * sinf(y), cosf(y) * height ); // sinx * siny, cosx * siny, cosy
 		VectorAdd( org, temp, org );
 
 		if ( fx->mSpawnFlags & FX_AXIS_FROM_SPHERE )

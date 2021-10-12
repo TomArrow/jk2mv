@@ -383,9 +383,9 @@ void CL_AdjustAngles( void ) {
 	float	speed;
 
 	if ( in_speed.active ) {
-		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
+		speed = 0.001f * cls.frametime * cl_anglespeedkey->value;
 	} else {
-		speed = 0.001 * cls.frametime;
+		speed = 0.001f * cls.frametime;
 	}
 
 	if ( !in_strafe.active ) {
@@ -533,7 +533,7 @@ void CL_MouseMove( usercmd_t *cmd ) {
 	cl.mouseDx[cl.mouseIndex] = 0;
 	cl.mouseDy[cl.mouseIndex] = 0;
 
-	rate = sqrt( mx * mx + my * my ) / (float)frame_msec;
+	rate = sqrtf( mx * mx + my * my ) / frame_msec;
 	accelSensitivity = cl_sensitivity->value + rate * cl_mouseAccel->value;
 
 	// scale by FOV
@@ -769,6 +769,12 @@ void CL_CreateNewCommands( void ) {
 	}
 
 	frame_msec = com_frameTime - old_com_frameTime;
+
+	// if running over 1000fps, act as if each frame is 1ms
+	// prevents division by zero
+	if ( frame_msec < 1 ) {
+		frame_msec = 1;
+	}
 
 	// if running less than 5fps, truncate the extra time to prevent
 	// unexpected moves after a hitch

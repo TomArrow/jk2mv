@@ -2,11 +2,9 @@
 #ifndef _QCOMMON_H_
 #define _QCOMMON_H_
 
-#include <stdint.h>
-#include "../qcommon/cm_public.h"
 #include "../qcommon/q_shared.h"
 #include "../api/mvapi.h"
-#include "../menu/ui_public.h"
+#include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
 
 //============================================================================
@@ -19,7 +17,7 @@
 #define KILL_RING_SIZE		16
 
 //For determining whether to allow 1.02 color codes:
-#define MV_USE102COLOR (MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03)
+#define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
 
 typedef struct {
 	int		cursor;
@@ -48,6 +46,7 @@ void Field_AutoComplete( field_t *edit );
 void Field_AutoComplete2( field_t *field, qboolean doCommands, qboolean doCvars, qboolean doArguments );
 void Field_CompleteKeyname( void );
 void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt );
+void Field_CompleteModelname( void );
 void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qboolean doArguments );
 int Field_GetLastMatchCount();
 qboolean Field_WasComplete();
@@ -189,7 +188,7 @@ dlHandle_t	NET_HTTP_StartDownload(const char *url, const char *toPath, dl_ended_
 void		NET_HTTP_StopDownload(dlHandle_t handle);
 
 void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
-void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...);
+void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
 qboolean	NET_CompareAdr (netadr_t a, netadr_t b);
@@ -259,7 +258,6 @@ PROTOCOL
 
 #define	PORT_MASTER			28060
 #define	PORT_UPDATE			28061
-#define	PORT_AUTHORIZE		28062
 #define	PORT_SERVER			28070	//...+9 more for multiple servers
 #define	NUM_SERVER_PORTS	4		// broadcast scan this many ports after
 									// PORT_SERVER so a single machine can
@@ -331,6 +329,8 @@ typedef enum {
 	TRAP_TESTPRINTFLOAT
 } sharedTraps_t;
 
+#define	MAX_VM		3
+
 void	VM_Init( void );
 vm_t	*VM_Create(const char *module, qboolean mvOverride, intptr_t(*systemCalls)(intptr_t *), vmInterpret_t interpret);
 // module should be bare: "cgame", not "cgame.dll" or "vm/cgame.qvm"
@@ -343,17 +343,36 @@ intptr_t QDECL VM_Call(vm_t *vm, int callnum, ...);
 
 void	VM_Debug( int level );
 
-void	*VM_ArgPtr(intptr_t intValue);
+void	*VM_ArgPtr( int syscall, intptr_t intValue, int32_t size );
+void	*VM_ArgArray( int syscall, intptr_t intValue, uint32_t size, int32_t num );
+char	*VM_ArgString( int syscall, intptr_t intValue );
+intptr_t	VM_strncpy( intptr_t dest, intptr_t src, intptr_t size );
+void	VM_LocateGameDataCheck( const void *data, int entitySize, int num_entities );
 
-static ID_INLINE float _vmf(intptr_t x)
+
+ID_INLINE float _vmf(intptr_t x)
 {
 	floatint_t fi;
 	fi.i = (int)x;
 	return fi.f;
 }
-#define	VMF(x)	_vmf(args[x])
 
-void	*VM_ExplicitArgPtr(vm_t *vm, intptr_t intValue);
+// macros for vm-safe translation of SysCall arguments
+
+// float
+#define	VMF(x)				_vmf(args[x])
+// single variable of type "type"
+#define VMAV(x, type)		((type *) VM_ArgPtr(args[0], args[x], sizeof(type)))
+// single variable of incomplete "type"
+#define VMAIV(x, type, size)((type *) VM_ArgPtr(args[0], args[x], size))
+// static-length array of "type" variables
+#define VMAP(x, type, num)	((type *) VM_ArgPtr(args[0], args[x], sizeof(type) * num))
+// dynamic-length array of "type" variables
+#define VMAA(x, type, num)	((type *) VM_ArgArray(args[0], args[x], sizeof(type), num))
+// NULL-terminated string (first char is always safe to use)
+#define VMAS(x)				VM_ArgString(args[0], args[x])
+
+char	*VM_ExplicitArgString(vm_t *vm, intptr_t intValue);
 
 void	VM_Forced_Unload_Start(void);
 void	VM_Forced_Unload_Done(void);
@@ -361,12 +380,11 @@ void	VM_Forced_Unload_Done(void);
 int	VM_MVAPILevel(const vm_t *vm);
 void VM_SetMVAPILevel(vm_t *vm, int level);
 
-//Ignore __attribute__ on non-gcc platforms
-#ifndef __GNUC__
-#ifndef __attribute__
-#define __attribute__(x)
-#endif
-#endif
+void VM_SetMVMenuLevel(vm_t *vm, int level);
+int VM_MVMenuLevel(const vm_t *vm);
+
+mvversion_t VM_GetGameversion(const vm_t *vm);
+void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
 
 /*
 ==============================================================
@@ -392,7 +410,7 @@ void Cbuf_Init (void);
 void Cbuf_AddText( const char *text );
 // Adds command text at the end of the buffer, does NOT add a final \n
 
-void Cbuf_ExecuteText( int exec_when, const char *text );
+void Cbuf_ExecuteText( cbufExec_t exec_when, const char *text );
 // this can be used in place of either Cbuf_AddText or Cbuf_InsertText
 
 void Cbuf_Execute (void);
@@ -431,7 +449,9 @@ char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 char	*Cmd_Args (void);
 char	*Cmd_ArgsFrom( int arg );
+const char	*Cmd_Cmd( void );
 void	Cmd_ArgsBuffer( char *buffer, int bufferLength );
+void	Cmd_DropArg( int arg );
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv () will return an empty string, not a NULL
 // if arg > argc, so string operations are allways safe.
@@ -440,6 +460,7 @@ void	Cmd_TokenizeString( const char *text );
 // Takes a null terminated string.  Does not need to be /n terminated.
 // breaks the string up into arg tokens.
 
+void	Cmd_Execute( void );
 void	Cmd_ExecuteString( const char *text );
 // Parses a single line of text into arguments and tries to execute it
 // as if it was typed at the console
@@ -505,7 +526,7 @@ int		Cvar_VariableIntegerValue( const char *var_name );
 int		Cvar_VariableIntegerValue( const char *var_name, qboolean isVmCall );
 // returns 0 if not defined or non numeric
 
-char	*Cvar_VariableString( const char *var_name );
+const char *Cvar_VariableString( const char *var_name );
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize, qboolean isVmCall );
 // returns an empty string if not defined
@@ -569,6 +590,17 @@ issues.
 
 #define	MAX_FILE_HANDLES	256 // increased from 64 in jk2mv
 
+typedef enum {
+	MODULE_MAIN,
+	MODULE_RENDERER,
+	MODULE_FX,
+	MODULE_BOTLIB,
+	MODULE_GAME,
+	MODULE_CGAME,
+	MODULE_UI,
+	MODULE_MAX
+} module_t;
+
 qboolean FS_CopyFile( char *fromOSPath, char *toOSPath, char *newOSPath = NULL, const int newSize = 0 );
 
 qboolean FS_Initialized();
@@ -580,12 +612,16 @@ qboolean	FS_ConditionalRestart( int checksumFeed );
 void	FS_Restart( int checksumFeed );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
-char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles );
+const char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles );
 // directory should not have either a leading or trailing /
 // if extension is "/", only subdirectories will be returned
 // the returned files will not include any directories or /
+const char	**FS_ListFiles2( const char *directory, const char *extension, int *numfiles );
+// directory argument is required to be an actual directory, not a
+// path prefix. If directory argument has a trailing / then files one
+// level below are listed too.
 
-void	FS_FreeFileList( char **list );
+void	FS_FreeFileList( const char **list );
 
 qboolean FS_FileExists( const char *file );
 qboolean FS_Base_FileExists(const char *file);
@@ -596,16 +632,16 @@ int		FS_LoadStack();
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
 
-fileHandle_t	FS_FOpenFileWrite( const char *qpath );
-fileHandle_t FS_FOpenBaseFileWrite(const char *filename);
+fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN );
+fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
 // will properly create any needed paths and deal with seperater character issues
 
-int		FS_filelength( fileHandle_t f );
-fileHandle_t FS_SV_FOpenFileWrite( const char *filename );
-int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp );
+fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODULE_MAIN );
+fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
+int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE );
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash );
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN );
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -615,13 +651,13 @@ int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean un
 int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 // returns 1 if a file is in the PAK file, otherwise -1
 
-int		FS_Write( const void *buffer, int len, fileHandle_t f );
+int		FS_Write( const void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 
-int		FS_Read2( void *buffer, int len, fileHandle_t f );
-int		FS_Read( void *buffer, int len, fileHandle_t f );
+int		FS_Read2( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
+int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 // properly handles partial reads and reads from other dlls
 
-void	FS_FCloseFile( fileHandle_t f );
+void	FS_FCloseFile( fileHandle_t f, module_t module = MODULE_MAIN );
 // note: you can't just fclose from another DLL, due to MS libc issues
 
 int		FS_ReadFile( const char *qpath, void **buffer );
@@ -632,7 +668,7 @@ int		FS_ReadFile( const char *qpath, void **buffer );
 // the buffer should be considered read-only, because it may be cached
 // for other uses.
 
-void	FS_ForceFlush( fileHandle_t f );
+void	FS_ForceFlush( fileHandle_t f, module_t module = MODULE_MAIN );
 // forces flush on files we're writing to.
 
 void	FS_FreeFile( void *buffer );
@@ -641,28 +677,29 @@ void	FS_FreeFile( void *buffer );
 void	FS_WriteFile( const char *qpath, const void *buffer, int size );
 // writes a complete file, creating any subdirectories needed
 
-int		FS_filelength( fileHandle_t f );
+int		FS_filelength( fileHandle_t f, module_t module = MODULE_MAIN );
 // doesn't work for files that are opened from a pack file
 
 char	*FS_BuildOSPath(const char *base, const char *game, const char *qpath);
 char	*FS_BuildOSPath(const char *base, const char *path);
+qboolean FS_CreatePath (char *OSPath);
 
-int		FS_FTell( fileHandle_t f );
+int		FS_FTell( fileHandle_t f, module_t module = MODULE_MAIN );
 // where are we?
 
-void	FS_Flush( fileHandle_t f );
+void	FS_Flush( fileHandle_t f, module_t module = MODULE_MAIN );
 
-void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... );
+void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
 // like fprintf
 
-int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-int		FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, unsigned long *hash );
+int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode, module_t module = MODULE_MAIN );
+int		FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, unsigned long *hash, module_t module = MODULE_MAIN );
 // opens a file for reading, writing, or appending depending on the value of mode
 
-int		FS_Seek( fileHandle_t f, int offset, int origin );
+int		FS_Seek( fileHandle_t f, int offset, int origin, module_t module = MODULE_MAIN );
 // seek on a file (doesn't work for zip files!!!!!!!!)
 
-qboolean FS_FilenameCompare( const char *s1, const char *s2 );
+int		FS_FilenameCompare( const char *s1, const char *s2 );
 
 const char *FS_LoadedPakNames( void );
 const char *FS_LoadedPakChecksums( void );
@@ -697,6 +734,10 @@ int FS_GetDLList(dlfile_t *files, int maxfiles);
 qboolean FS_RMDLPrefix(const char *qpath);
 qboolean FS_DeleteDLFile(const char *qpath);
 
+void FS_HomeRemove( const char *homePath );
+qboolean FS_IsFifo( const char *filename );
+int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
+
 /*
 ==============================================================
 
@@ -728,22 +769,24 @@ MISC
 //==========================================================
 
 
-char		*CopyString( const char *in );
+const char	*CopyString( const char *in );
+const char	*CopyString( const char *in, memtag_t eTag );
 void		Info_Print( const char *s );
 
-void		Com_BeginRedirect (char *buffer, int buffersize, void (*flush)(char *));
+void		Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)(char *), qboolean silent);
 void		Com_EndRedirect( void );
-void 		QDECL Com_Printf(qboolean extendedColors, const char *fmt, ... );
-void		QDECL Com_Printf_Ext( qboolean extendedColors, const char *msg, ... );
-void 		QDECL Com_DPrintf( const char *fmt, ... );
-void		QDECL Com_OPrintf( const char *fmt, ...); // Outputs to the VC / Windows Debug window (only in debug compile)
-Q_NORETURN void QDECL  Com_Error( int code, const char *fmt, ... );
+void 		QDECL Com_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void		QDECL Com_Printf_Ext( qboolean extendedColors, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
+void 		QDECL Com_DPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void		QDECL Com_OPrintf( const char *fmt, ...) __attribute__ ((format (printf, 1, 2))); // Outputs to the VC / Windows Debug window (only in debug compile)
+Q_NORETURN void QDECL  Com_Error( errorParm_t code, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
+Q_NORETURN void Com_Quit( int signal );
 void 		Com_Quit_f( void );
 int			Com_EventLoop( void );
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 unsigned	Com_BlockChecksumKey (void *buffer, int length, int key);
-int			Com_HashKey(char *string, int maxlen);
+int			Com_HashKey(const char *string, int maxlen);
 int			Com_Filter(const char *filter, const char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
@@ -769,6 +812,9 @@ extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
+
+extern	cvar_t	*mv_apienabled;
+extern	cvar_t	*com_debugMessage;
 
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;
@@ -895,7 +941,7 @@ void CL_Disconnect( qboolean showMainMenu );
 void CL_Shutdown( void );
 void CL_Frame( int msec );
 qboolean CL_GameCommand( void );
-void CL_KeyEvent (int key, qboolean down, unsigned time);
+void CL_KeyEvent (int key, qboolean down, int time);
 
 void CL_CharEvent( int key );
 // char events are for field typing, not game control
@@ -922,7 +968,7 @@ void	CL_ForwardCommandToServer( const char *string );
 void CL_ShutdownAll( void );
 // shutdown all the client stuff
 
-void CL_FlushMemory( void );
+void CL_FlushMemory( qboolean disconnecting );
 // dump all memory on an error
 
 void CL_StartHunkUsers( void );
@@ -935,7 +981,6 @@ void S_ClearSoundBuffer( void );
 // call before filesystem access
 
 void SCR_DebugGraph (float value, int color);	// FIXME: move logging to common?
-
 
 //
 // server interface
@@ -1008,21 +1053,8 @@ extern huffman_t clientHuffTables;
 #define	CL_ENCODE_START		12
 #define CL_DECODE_START		4
 
-// multiprotocol support
-typedef enum {
-	PROTOCOL_UNDEF = 0,
-	PROTOCOL15 = 15,
-	PROTOCOL16 = 16,
-} mvprotocol_t;
-
 void MV_SetCurrentGameversion(mvversion_t version);
 mvversion_t MV_GetCurrentGameversion();
 mvprotocol_t MV_GetCurrentProtocol();
-
-void MV_CopyStringWithColors( const char *src, char *dst, int dstSize, int nonColors );
-int MV_StrlenSkipColors( const char *str );
-
-extern "C" long QDECL Q_ftol(float f);
-extern "C" int QDECL Q_VMftol();
 
 #endif // _QCOMMON_H_

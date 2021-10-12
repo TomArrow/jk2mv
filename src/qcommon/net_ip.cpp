@@ -394,7 +394,7 @@ void Sys_ShowIP(void) {
 NET_IPSocket
 ====================
 */
-SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
+static SOCKET NET_IPSocket( const char *net_interface, int port, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
 	u_long				_true = 1;
@@ -871,7 +871,7 @@ static qboolean NET_GetCvars( void ) {
 	modified += net_socksPassword->modified;
 	net_socksPassword->modified = qfalse;
 
-	net_dropsim = Cvar_Get( "net_dropsim", "", CVAR_TEMP);
+	net_dropsim = Cvar_Get( "net_dropsim", "", CVAR_TEMP | CVAR_CHEAT);
 
 	return modified ? qtrue : qfalse;
 }

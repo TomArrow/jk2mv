@@ -38,7 +38,7 @@ qboolean CL_GameCommand( void ) {
 	return qfalse;
 }
 
-void CL_KeyEvent (int key, qboolean down, unsigned time) {
+void CL_KeyEvent (int key, qboolean down, int time) {
 }
 
 qboolean UI_GameCommand( void ) {
@@ -60,7 +60,7 @@ void CL_InitKeyCommands( void ) {
 void CL_CDDialog( const char *msg ) {
 }
 
-void CL_FlushMemory( void ) {
+void CL_FlushMemory( qboolean disconnecting ) {
 }
 
 void CL_StartHunkUsers( void ) {

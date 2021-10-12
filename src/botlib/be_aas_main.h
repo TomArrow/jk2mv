@@ -17,7 +17,7 @@
 extern aas_t aasworld;
 
 //AAS error message
-void QDECL AAS_Error(char *fmt, ...);
+void QDECL AAS_Error(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 //set AAS initialized
 void AAS_SetInitialized(void);
 //setup AAS with the given number of entities and clients
@@ -41,4 +41,4 @@ int AAS_IndexFromModel(char *modelname);
 //returns the current time
 float AAS_Time(void);
 //
-void AAS_ProjectPointOntoVector( vec3_t point, vec3_t vStart, vec3_t vEnd, vec3_t vProj );
+void AAS_ProjectPointOntoVector( const  vec3_t point, const vec3_t vStart, const vec3_t vEnd, vec3_t vProj );

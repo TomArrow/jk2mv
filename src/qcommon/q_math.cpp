@@ -5,26 +5,26 @@
 #include <float.h>
 
 
-vec3_t	vec3_origin = {0,0,0};
-vec3_t	axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+const vec3_t	vec3_origin = {0,0,0};
+const vec3_t	axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
 
-vec4_t		colorBlack	= {0, 0, 0, 1};
-vec4_t		colorRed	= {1, 0, 0, 1};
-vec4_t		colorGreen	= {0, 1, 0, 1};
-vec4_t		colorBlue	= {0, 0, 1, 1};
-vec4_t		colorYellow	= {1, 1, 0, 1};
-vec4_t		colorMagenta= {1, 0, 1, 1};
-vec4_t		colorCyan	= {0, 1, 1, 1};
-vec4_t		colorWhite	= {1, 1, 1, 1};
-vec4_t		colorLtGrey	= {0.75, 0.75, 0.75, 1};
-vec4_t		colorMdGrey	= {0.5, 0.5, 0.5, 1};
-vec4_t		colorDkGrey	= {0.25, 0.25, 0.25, 1};
+const vec4_t		colorBlack	= {0, 0, 0, 1};
+const vec4_t		colorRed	= {1, 0, 0, 1};
+const vec4_t		colorGreen	= {0, 1, 0, 1};
+const vec4_t		colorBlue	= {0, 0, 1, 1};
+const vec4_t		colorYellow	= {1, 1, 0, 1};
+const vec4_t		colorMagenta= {1, 0, 1, 1};
+const vec4_t		colorCyan	= {0, 1, 1, 1};
+const vec4_t		colorWhite	= {1, 1, 1, 1};
+const vec4_t		colorLtGrey	= {0.75, 0.75, 0.75, 1};
+const vec4_t		colorMdGrey	= {0.5, 0.5, 0.5, 1};
+const vec4_t		colorDkGrey	= {0.25, 0.25, 0.25, 1};
 
-vec4_t		colorLtBlue	= {0.367f, 0.261f, 0.722f, 1};
-vec4_t		colorDkBlue	= {0.199f, 0.0f,   0.398f, 1};
+const vec4_t		colorLtBlue	= {0.367f, 0.261f, 0.722f, 1};
+const vec4_t		colorDkBlue	= {0.199f, 0.0f,   0.398f, 1};
 
-vec4_t	g_color_table[] =
+const vec4_t	g_color_table[COLOR_EXT_AMOUNT] =
 {
 	// Default colorTable
 	{0.0, 0.0, 0.0, 1.0},           // ^0 -> black
@@ -52,7 +52,7 @@ vec4_t	g_color_table[] =
 };
 
 
-vec3_t	bytedirs[NUMVERTEXNORMALS] =
+const vec3_t	bytedirs[NUMVERTEXNORMALS] =
 {
 {-0.525731f, 0.000000f, 0.850651f}, {-0.442863f, 0.238856f, 0.864188f},
 {-0.295242f, 0.000000f, 0.955423f}, {-0.309017f, 0.500000f, 0.809017f},
@@ -149,25 +149,23 @@ float	Q_random( int *seed ) {
 }
 
 float	Q_crandom( int *seed ) {
-	return 2.0 * ( Q_random( seed ) - 0.5 );
+	return 2.0f * ( Q_random( seed ) - 0.5f );
 }
 
-#ifdef __LCC__
-
-int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
-	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
-		return 0;
-	}
-	return 1;
-}
-
-vec_t VectorLength( const vec3_t v ) {
-	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-}
-
-vec_t VectorLengthSquared( const vec3_t v ) {
-	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-}
+// these declarations are for C99 inline
+extern void VectorSet( vec3_t v, float x, float y, float z );
+extern void VectorClear( vec3_t a );
+extern void VectorNegate( const vec3_t in, vec3_t out );
+extern vec_t DotProduct( const vec3_t v1, const vec3_t v2 );
+extern void VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
+extern void VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out );
+extern void VectorCopy( const vec3_t in, vec3_t out );
+extern void VectorScale( const vec3_t in, vec_t scale, vec3_t out );
+extern void VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc);
+extern int VectorCompare( const vec3_t v1, const vec3_t v2 );
+extern vec_t VectorLength( const vec3_t v );
+extern vec_t VectorLengthSquared( const vec3_t v );
+extern void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross );
 
 vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;
@@ -201,13 +199,6 @@ void VectorInverse( vec3_t v ){
 	v[1] = -v[1];
 	v[2] = -v[2];
 }
-
-void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
-	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
-	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
-	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
-}
-#endif
 
 //=======================================================
 
@@ -380,10 +371,10 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point,
 	zrot[0][0] = zrot[1][1] = zrot[2][2] = 1.0F;
 
 	rad = DEG2RAD( degrees );
-	zrot[0][0] = cos( rad );
-	zrot[0][1] = sin( rad );
-	zrot[1][0] = -sin( rad );
-	zrot[1][1] = cos( rad );
+	zrot[0][0] = cosf( rad );
+	zrot[0][1] = sinf( rad );
+	zrot[1][0] = -sinf( rad );
+	zrot[1][1] = cosf( rad );
 
 	MatrixMultiply( m, zrot, tmpmat );
 	MatrixMultiply( tmpmat, im, rot );
@@ -432,7 +423,7 @@ void vectoangles( const vec3_t value1, vec3_t angles ) {
 	}
 	else {
 		if ( value1[0] ) {
-			yaw = ( atan2 ( value1[1], value1[0] ) * 180 / M_PI );
+			yaw = RAD2DEG( atan2f( value1[1], value1[0] ) );
 		}
 		else if ( value1[1] > 0 ) {
 			yaw = 90;
@@ -444,8 +435,8 @@ void vectoangles( const vec3_t value1, vec3_t angles ) {
 			yaw += 360;
 		}
 
-		forward = sqrt ( value1[0]*value1[0] + value1[1]*value1[1] );
-		pitch = ( atan2(value1[2], forward) * 180 / M_PI );
+		forward = sqrtf( value1[0]*value1[0] + value1[1]*value1[1] );
+		pitch = RAD2DEG( atan2f( value1[2], forward ) );
 		if ( pitch < 0 ) {
 			pitch += 360;
 		}
@@ -482,7 +473,7 @@ void AxisClear( vec3_t axis[3] ) {
 	axis[2][2] = 1;
 }
 
-void AxisCopy( vec3_t in[3], vec3_t out[3] ) {
+void AxisCopy( const vec3_t in[3], vec3_t out[3] ) {
 	VectorCopy( in[0], out[0] );
 	VectorCopy( in[1], out[1] );
 	VectorCopy( in[2], out[2] );
@@ -608,7 +599,7 @@ float	AngleSubtract( float a1, float a2 ) {
 	float	a;
 
 	a = a1 - a2;
-	assert(fabs(a) < 3600);
+	assert(fabsf(a) < 3600);
 	while ( a > 180 ) {
 		a -= 360;
 	}
@@ -627,7 +618,7 @@ void AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 ) {
 
 
 float	AngleMod(float a) {
-	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);
+	a = (360.0f/65536) * ((int)(a*(65536/360.0f)) & 65535);
 	return a;
 }
 
@@ -640,7 +631,7 @@ returns angle normalized to the range [0 <= angle < 360]
 =================
 */
 float AngleNormalize360 ( float angle ) {
-	return (360.0 / 65536) * ((int)(angle * (65536 / 360.0)) & 65535);
+	return (360.0f / 65536) * ((int)(angle * (65536 / 360.0f)) & 65535);
 }
 
 
@@ -653,8 +644,8 @@ returns angle normalized to the range [-180 < angle <= 180]
 */
 float AngleNormalize180 ( float angle ) {
 	angle = AngleNormalize360( angle );
-	if ( angle > 180.0 ) {
-		angle -= 360.0;
+	if ( angle > 180.0f ) {
+		angle -= 360.0f;
 	}
 	return angle;
 }
@@ -747,8 +738,8 @@ float RadiusFromBounds( const vec3_t mins, const vec3_t maxs ) {
 	float	a, b;
 
 	for (i=0 ; i<3 ; i++) {
-		a = fabs( mins[i] );
-		b = fabs( maxs[i] );
+		a = fabsf( mins[i] );
+		b = fabsf( maxs[i] );
 		corner[i] = a > b ? a : b;
 	}
 
@@ -789,7 +780,7 @@ vec_t VectorNormalize( vec3_t v ) {
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
+	length = sqrtf(length);
 
 	if ( length ) {
 		ilength = 1/length;
@@ -805,7 +796,7 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
+	length = sqrtf(length);
 
 	if (length)
 	{
@@ -827,40 +818,7 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 
 }
 
-void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc) {
-	vecc[0] = veca[0] + scale*vecb[0];
-	vecc[1] = veca[1] + scale*vecb[1];
-	vecc[2] = veca[2] + scale*vecb[2];
-}
-
-
-vec_t _DotProduct( const vec3_t v1, const vec3_t v2 ) {
-	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
-}
-
-void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
-	out[0] = veca[0]-vecb[0];
-	out[1] = veca[1]-vecb[1];
-	out[2] = veca[2]-vecb[2];
-}
-
-void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
-	out[0] = veca[0]+vecb[0];
-	out[1] = veca[1]+vecb[1];
-	out[2] = veca[2]+vecb[2];
-}
-
-void _VectorCopy( const vec3_t in, vec3_t out ) {
-	out[0] = in[0];
-	out[1] = in[1];
-	out[2] = in[2];
-}
-
-void _VectorScale( const vec3_t in, vec_t scale, vec3_t out ) {
-	out[0] = in[0]*scale;
-	out[1] = in[1]*scale;
-	out[2] = in[2]*scale;
-}
+extern void Vector4Copy( const vec4_t in, vec4_t out );
 
 void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
 	out[0] = in[0]*scale;
@@ -906,7 +864,7 @@ int	PlaneTypeForNormal (vec3_t normal) {
 MatrixMultiply
 ================
 */
-void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]) {
+void MatrixMultiply(const float in1[3][3], const float in2[3][3], float out[3][3]) {
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
 				in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
@@ -930,18 +888,19 @@ void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]) {
 
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up) {
 	float		angle;
-	static float		sr, sp, sy, cr, cp, cy;
+	float		sr, sp, sy, cr, cp, cy;
+	// static float		sr, sp, sy, cr, cp, cy;
 	// static to help MS compiler fp bugs
 
-	angle = angles[YAW] * (M_PI*2 / 360);
-	sy = sin(angle);
-	cy = cos(angle);
-	angle = angles[PITCH] * (M_PI*2 / 360);
-	sp = sin(angle);
-	cp = cos(angle);
-	angle = angles[ROLL] * (M_PI*2 / 360);
-	sr = sin(angle);
-	cr = cos(angle);
+	angle = DEG2RAD(angles[YAW]);
+	sy = sinf(angle);
+	cy = cosf(angle);
+	angle = DEG2RAD(angles[PITCH]);
+	sp = sinf(angle);
+	cp = cosf(angle);
+	angle = DEG2RAD(angles[ROLL]);
+	sr = sinf(angle);
+	cr = cosf(angle);
 
 	if (forward)
 	{
@@ -978,10 +937,10 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	*/
 	for ( pos = 0, i = 0; i < 3; i++ )
 	{
-		if ( fabs( src[i] ) < minelem )
+		if ( fabsf( src[i] ) < minelem )
 		{
 			pos = i;
-			minelem = fabs( src[i] );
+			minelem = fabsf( src[i] );
 		}
 	}
 	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;

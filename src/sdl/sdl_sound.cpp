@@ -30,7 +30,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/snd_local.h"
 
 extern dma_t		dma;
-qboolean snd_inited = qfalse;
+static SDL_AudioDeviceID dev;
+static qboolean snd_inited = qfalse;
 
 cvar_t *s_sdlBits;
 cvar_t *s_sdlSpeed;
@@ -133,7 +134,7 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 SNDDMA_Init
 ===============
 */
-qboolean SNDDMA_Init(void)
+qboolean SNDDMA_Init(int khz)
 {
 	SDL_AudioSpec desired;
 	SDL_AudioSpec obtained;
@@ -144,7 +145,7 @@ qboolean SNDDMA_Init(void)
 
 	if (!s_sdlBits) {
 		s_sdlBits = Cvar_Get("s_sdlBits", "16", CVAR_ARCHIVE | CVAR_GLOBAL);
-		s_sdlSpeed = Cvar_Get("s_sdlSpeed", "44100", CVAR_ARCHIVE | CVAR_GLOBAL);
+		s_sdlSpeed = Cvar_Get("s_sdlSpeed", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 		s_sdlChannels = Cvar_Get("s_sdlChannels", "2", CVAR_ARCHIVE | CVAR_GLOBAL);
 		s_sdlDevSamps = Cvar_Get("s_sdlDevSamps", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 		s_sdlMixSamps = Cvar_Get("s_sdlMixSamps", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -173,7 +174,14 @@ qboolean SNDDMA_Init(void)
 		tmp = 16;
 
 	desired.freq = (int) s_sdlSpeed->value;
-	if(!desired.freq) desired.freq = 44100;
+	if (!desired.freq) {
+		switch (khz) {
+		default:
+		case 44: desired.freq = 44100; break;
+		case 22: desired.freq = 22050; break;
+		case 11: desired.freq = 11025; break;
+		}
+	}
 	desired.format = ((tmp == 16) ? AUDIO_S16SYS : AUDIO_U8);
 
 	// I dunno if this is the best idea, but I'll give it a try...
@@ -196,7 +204,8 @@ qboolean SNDDMA_Init(void)
 	desired.channels = (int) s_sdlChannels->value;
 	desired.callback = SNDDMA_AudioCallback;
 
-	if (SDL_OpenAudio(&desired, &obtained) == -1)
+	dev = SDL_OpenAudioDevice(NULL, 0, &desired, &obtained, 0);
+	if (!dev)
 	{
 		Com_Printf("SDL_OpenAudio() failed: %s\n", SDL_GetError());
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
@@ -235,7 +244,7 @@ qboolean SNDDMA_Init(void)
 	dma.buffer = (byte *)calloc(1, dmasize);
 
 	Com_Printf("Starting SDL audio callback...\n");
-	SDL_PauseAudio(0);  // start callback.
+	SDL_PauseAudioDevice(dev, 0);  // start callback.
 
 	Com_Printf("SDL audio initialized.\n");
 	snd_inited = qtrue;
@@ -260,8 +269,8 @@ SNDDMA_Shutdown
 void SNDDMA_Shutdown(void)
 {
 	Com_Printf("Closing SDL audio device...\n");
-	SDL_PauseAudio(1);
-	SDL_CloseAudio();
+	SDL_PauseAudioDevice(dev, 1);
+	SDL_CloseAudioDevice(dev);
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	free(dma.buffer);
 	dma.buffer = NULL;
@@ -279,7 +288,7 @@ Send sound to device if buffer isn't really the dma buffer
 */
 void SNDDMA_Submit(void)
 {
-	SDL_UnlockAudio();
+	SDL_UnlockAudioDevice(dev);
 }
 
 /*
@@ -289,26 +298,21 @@ SNDDMA_BeginPainting
 */
 void SNDDMA_BeginPainting (void)
 {
-	SDL_LockAudio();
+	SDL_LockAudioDevice(dev);
 }
 
-#ifdef USE_OPENAL
-extern int s_UseOpenAL;
-#endif
+/*
+===============
+SNDDMA_BeginPainting
 
-// (De)activates sound playback
-void SNDDMA_Activate( qboolean activate )
+(De)activates sound playback
+===============
+*/
+void SNDDMA_Activate(qboolean activate)
 {
-#ifdef USE_OPENAL
-	if ( s_UseOpenAL )
-	{
-		S_MuteAllSounds( (qboolean)!activate );
-	}
-#endif
+	qboolean isActive = (qboolean)(SDL_GetAudioDeviceStatus(dev) == SDL_AUDIO_PLAYING);
 
-	if (activate) {
-		S_ClearSoundBuffer();
+	if (isActive != activate) {
+		SDL_PauseAudioDevice(dev, !activate);
 	}
-
-	SDL_PauseAudio( !activate );
 }

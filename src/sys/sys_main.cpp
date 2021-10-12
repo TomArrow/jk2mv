@@ -9,12 +9,11 @@
 #else
 #include <inttypes.h>
 #endif
-#ifndef DEDICATED
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#define SDL_MAIN_HANDLED
 #endif
+#ifndef DEDICATED
 #include "SDL.h"
 #endif
 #include "../qcommon/qcommon.h"
@@ -27,6 +26,8 @@ cvar_t *com_unfocused;
 cvar_t *com_maxfps;
 cvar_t *com_maxfpsMinimized;
 cvar_t *com_maxfpsUnfocused;
+
+static volatile sig_atomic_t sys_signal = 0;
 
 /*
 ==================
@@ -121,7 +122,7 @@ static void Sys_ErrorDialog(const char *error) {
 	time(&rawtime);
 	strftime(timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", localtime(&rawtime)); // or gmtime
 	Com_sprintf(crashLogPath, sizeof(crashLogPath),
-		"%s%ccrashlog-%s.txt",
+		"%s%cerrorlog-%s.txt",
 		Sys_DefaultHomePath(), PATH_SEP, timeStr);
 
 	Sys_Mkdir(Sys_DefaultHomePath());
@@ -131,7 +132,7 @@ static void Sys_ErrorDialog(const char *error) {
 		ConsoleLogWriteOut(fp);
 		fclose(fp);
 
-		const char *errorMessage = va("%s\n\nThe crash log was written to %s", error, crashLogPath);
+		const char *errorMessage = va("%s\n\nThe error log was written to %s", error, crashLogPath);
 		if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL) < 0) {
 			fprintf(stderr, "%s", errorMessage);
 		}
@@ -140,7 +141,7 @@ static void Sys_ErrorDialog(const char *error) {
 		ConsoleLogWriteOut(stderr);
 		fflush(stderr);
 
-		const char *errorMessage = va("%s\nCould not write the crash log file, but we printed it to stderr.\n"
+		const char *errorMessage = va("%s\nCould not write the error log file, but we printed it to stderr.\n"
 			"Try running the game using a command line interface.", error);
 		if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errorMessage, NULL) < 0) {
 			// We really have hit rock bottom here :(
@@ -155,10 +156,11 @@ void Q_NORETURN QDECL Sys_Error(const char *error, ...) {
 	char    string[1024];
 
 	va_start(argptr, error);
-	vsnprintf(string, sizeof(string), error, argptr);
+	Q_vsnprintf(string, sizeof(string), error, argptr);
 	va_end(argptr);
 
 	Sys_Print(string,qfalse);
+	Sys_PrintBacktrace();
 
 	// Only print Sys_ErrorDialog for client binary. The dedicated
 	// server binary is meant to be a command line program so you would
@@ -196,43 +198,23 @@ Sys_SigHandler
 =================
 */
 void Sys_SigHandler(int signal) {
-	static qboolean signalcaught = qfalse;
-
-	if (signalcaught) {
-		fprintf(stderr, "DOUBLE SIGNAL FAULT: Received signal %d, exiting...\n",
-			signal);
-	} else {
-		signalcaught = qtrue;
-		//VM_Forced_Unload_Start();
-#ifndef DEDICATED
-		CL_Shutdown();
-		//CL_Shutdown(va("Received signal %d", signal), qtrue, qtrue);
-#endif
-		SV_Shutdown(va("Received signal %d", signal));
-		//VM_Forced_Unload_Done();
-	}
-
-	if (signal == SIGTERM || signal == SIGINT)
-		Sys_Exit(1);
-	else
-		Sys_Exit(2);
+	sys_signal = signal;
 }
 
-#if defined(_MSC_VER) && !defined(DEDICATED)
-#define argv __argv
-#define argc __argc
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-#else
-int main(int argc, char* argv[]) {
+#if defined(_MSC_VER) && !defined(_DEBUG)
+LONG WINAPI Sys_NoteException(EXCEPTION_POINTERS* pExp, DWORD dwExpCode);
+void Sys_WriteCrashlog();
 #endif
+
+int main(int argc, char* argv[]) {
 	int		i;
 	char	commandLine[MAX_STRING_CHARS] = { 0 };
 
-#if !defined(DEDICATED) && defined(WIN32)
-	SDL_SetMainReady();
+#if defined(_MSC_VER) && !defined(_DEBUG)
+	__try {
 #endif
 
-	Sys_PlatformInit();
+	Sys_PlatformInit(argc, argv);
 
 #if defined(_DEBUG) && !defined(DEDICATED)
 	CON_CreateConsoleWindow();
@@ -246,6 +228,10 @@ int main(int argc, char* argv[]) {
 	// This is passed if we are launched by double-clicking
 	if (argc >= 2 && Q_strncmp(argv[1], "-psn", 4) == 0)
 		argc = 1;
+#endif
+
+#if defined(DEBUG_SDL) && !defined(DEDICATED)
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
 #endif
 
 	// Concatenate the command line for passing to Com_Init
@@ -267,7 +253,7 @@ int main(int argc, char* argv[]) {
 	NET_Init();
 
 	// main game loop
-	while (1) {
+	while (!sys_signal) {
 		if (com_busyWait->integer) {
 			bool shouldSleep = false;
 
@@ -287,6 +273,15 @@ int main(int argc, char* argv[]) {
 		// run the game
 		Com_Frame();
 	}
+
+	Com_Quit(sys_signal);
+
+#if defined(_MSC_VER) && !defined(_DEBUG)
+	} __except(Sys_NoteException(GetExceptionInformation(), GetExceptionCode())) {
+		Sys_WriteCrashlog();
+		return 1;
+	}
+#endif
 
 	// never gets here
 	return 0;

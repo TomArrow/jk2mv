@@ -29,11 +29,11 @@ to the new value before sending out any replies.
 
 #define	FRAGMENT_BIT	(1<<31)
 
-cvar_t		*showpackets;
-cvar_t		*showdrop;
-cvar_t		*qport;
+static cvar_t	*showpackets;
+static cvar_t	*showdrop;
+static cvar_t	*qport;
 
-static char *netsrcString[2] = {
+static const char * const netsrcString[2] = {
 	"client",
 	"server"
 };
@@ -281,7 +281,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 		// if we missed a fragment, dump the message
 		if (fragmentStart != chan->fragmentLength) {
 			if (showdrop->integer || showpackets->integer) {
-				Com_Printf("%s:Dropped a message fragment\n"
+				Com_Printf("%s:Dropped a message fragment at %i\n"
 					, NET_AdrToString(chan->remoteAddress)
 					, sequence);
 			}
@@ -477,7 +477,7 @@ typedef struct loopback_s {
 	int			get, send;
 } loopback_t;
 
-loopback_t	loopbacks[2];
+static loopback_t	loopbacks[2];
 
 
 qboolean	NET_GetLoopPacket(netsrc_t sock, netadr_t *net_from, msg_t *net_message) {
@@ -523,7 +523,7 @@ void NET_SendLoopPacket(netsrc_t sock, int length, const void *data, netadr_t to
 void NET_SendPacket(netsrc_t sock, int length, const void *data, netadr_t to) {
 
 	// sequenced packets are shown in netchan, so just show oob
-	if (showpackets->integer && *(int *)data == -1) {
+	if (showpackets->integer && *(const int *)data == -1) {
 		Com_Printf("send packet %4i\n", length);
 	}
 
@@ -560,7 +560,7 @@ void QDECL NET_OutOfBandPrint(netsrc_t sock, netadr_t adr, const char *format, .
 	string[3] = -1;
 
 	va_start(argptr, format);
-	vsnprintf(string + 4, sizeof(string) - 4, format, argptr);
+	Q_vsnprintf(string + 4, sizeof(string) - 4, format, argptr);
 	va_end(argptr);
 
 	// send the datagram

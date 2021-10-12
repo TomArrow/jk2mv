@@ -1,7 +1,8 @@
 // cl_scrn.c -- master for refresh, status bar, console, chat, notify, etc
 
 #include "client.h"
-#include "mv_setup.h"
+#include "snd_public.h"
+#include <mv_setup.h>
 
 extern console_t con;
 qboolean	scr_initialized;		// ready to draw
@@ -25,7 +26,7 @@ void SCR_DrawNamedPic( float x, float y, float width, float height, const char *
 	assert( width != 0 );
 
 	hShader = re.RegisterShader( picname );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader, 1, 1 );
 }
 
 
@@ -39,7 +40,7 @@ Coordinates are 640*480 virtual values
 void SCR_FillRect( float x, float y, float width, float height, const float *color ) {
 	re.SetColor( color );
 
-	re.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
+	re.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader, 1, 1 );
 
 	re.SetColor( NULL );
 }
@@ -53,7 +54,7 @@ Coordinates are 640*480 virtual values
 =================
 */
 void SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader, 1, 1 );
 }
 
 
@@ -95,7 +96,7 @@ static void SCR_DrawChar( int x, int y, float size, int ch ) {
 	re.DrawStretchPic( ax, ay, aw, ah,
 					   fcol, frow,
 					   fcol + size, frow + size2,
-					   cls.charSetShader );
+					   cls.charSetShader, 1, 1 );
 }
 
 /*
@@ -132,11 +133,11 @@ void SCR_DrawSmallChar( int x, int y, int ch ) {
 #endif
 	size2 = 0.0625;
 
-	re.DrawStretchPic( x * cls.xadjust, y * cls.yadjust,
-					   con.charWidth * cls.xadjust, con.charHeight * cls.yadjust,
+	re.DrawStretchPic( x, y, con.charWidth, con.charHeight,
 					   fcol, frow,
 					   fcol + size, frow + size2,
-					   cls.charSetShader );
+					   cls.charSetShader,
+					   cls.xadjust, cls.yadjust );
 }
 
 
@@ -150,7 +151,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawStringExt( int x, int y, float size, const char *string, float *setColor, qboolean forceColor ) {
+static void SCR_DrawStringExt( int x, int y, float size, const char *string, const float *setColor, qboolean forceColor ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -204,7 +205,7 @@ void SCR_DrawBigString( int x, int y, const char *s, float alpha ) {
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qfalse );
 }
 
-void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color ) {
+void SCR_DrawBigStringColor( int x, int y, const char *s, const vec4_t color ) {
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qtrue );
 }
 
@@ -219,7 +220,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor ) {
+void SCR_DrawSmallStringExt( int x, int y, const char *string, const vec4_t setColor, qboolean forceColor ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -286,7 +287,6 @@ SCR_DrawDemoRecording
 =================
 */
 void SCR_DrawDemoRecording( void ) {
-	const float ratio = cls.ratioFix;
 	char	string[1024];
 	int		pos;
 
@@ -300,7 +300,8 @@ void SCR_DrawDemoRecording( void ) {
 	if (cl_drawRecording->integer >= 2 && cls.recordingShader) {
 		static const float width = 60.0f, height = 15.0f;
 		re.SetColor(NULL);
-		re.DrawStretchPic(0*ratio, SCREEN_HEIGHT-height, width*ratio, height, 0, 0, 1, 1, cls.recordingShader);
+		re.DrawStretchPic(0, cls.glconfig.vidHeight - height, width, height,
+			0, 0, 1, 1, cls.recordingShader, cls.xadjust, cls.yadjust);
 	} else if (cl_drawRecording->integer) {
 		pos = FS_FTell( clc.demofile );
 		sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
@@ -356,8 +357,8 @@ void SCR_DrawDebugGraph (void)
 	x = 0;
 	y = cls.glconfig.vidHeight;
 	re.SetColor( g_color_table[0] );
-	re.DrawStretchPic(x, y - cl_graphheight->integer,
-		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
+	re.DrawStretchPic(x, y - cl_graphheight->integer, w, cl_graphheight->integer,
+		0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust );
 	re.SetColor( NULL );
 
 	for (a=0 ; a<w ; a++)
@@ -370,7 +371,8 @@ void SCR_DrawDebugGraph (void)
 		if (v < 0)
 			v += cl_graphheight->integer * (1+(int)(-v / cl_graphheight->integer));
 		h = (int)v % cl_graphheight->integer;
-		re.DrawStretchPic( x+w-1-a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader );
+		re.DrawStretchPic( x+w-1-a, y - h, 1, h,
+			0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust );
 	}
 }
 
@@ -400,7 +402,7 @@ void MV_DrawConnectingInfo( void )
 	int		 line = 17;
 	char	 txtbuf[128];
 
-	Com_sprintf(txtbuf, sizeof(txtbuf), "^1[ ^7JK2MV " JK2MV_VERSION " " CPUSTRING " ^1]");
+	Com_sprintf(txtbuf, sizeof(txtbuf), "^1[ ^7JK2MV " JK2MV_VERSION " " PLATFORM_STRING " ^1]");
 	SCR_DrawStringExt(320 - SCR_Strlen(txtbuf) * 4, yPos + (line * 0), 8, txtbuf, g_color_table[7], qfalse);
 
 	Com_sprintf(txtbuf, sizeof(txtbuf), "Game-Version^1: ^71.%02d", (int)MV_GetCurrentGameversion());
@@ -415,17 +417,9 @@ This will be called twice if rendering in stereo mode
 ==================
 */
 void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
-	re.BeginFrame( stereoFrame );
+	qboolean skipBackend = (qboolean)(com_minimized->integer && !CL_VideoRecording());
 
-	// wide aspect ratio screens need to have the sides cleared
-	// unless they are displaying game renderings
-	if ( cls.state != CA_ACTIVE ) {
-		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
-			re.SetColor( g_color_table[0] );
-			re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
-			re.SetColor( NULL );
-		}
-	}
+	re.BeginFrame( stereoFrame, skipBackend );
 
 	if ( !uivm ) {
 		Com_DPrintf("draw screen without UI loaded\n");
@@ -450,6 +444,11 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 		case CA_CONNECTING:
 		case CA_CHALLENGING:
 		case CA_CONNECTED:
+			{
+				// workaround for ingame UI not loading connect.menu
+				qhandle_t hShader = re.RegisterShader("menu/art/unknownmap");
+				re.DrawStretchPic(0, 0, 640, 480, 0, 0, 1, 1, hShader, 1, 1);
+			}
 			// connecting clients will only show the connection dialog
 			// refresh to update the time
 			VM_Call(uivm, UI_REFRESH, cls.realtime);
@@ -487,6 +486,8 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	if ( cl_debuggraph->integer || cl_timegraph->integer || cl_debugMove->integer ) {
 		SCR_DrawDebugGraph ();
 	}
+
+	re.EndFrame();
 }
 
 /*
@@ -517,10 +518,12 @@ void SCR_UpdateScreen( void ) {
 		SCR_DrawScreenField( STEREO_CENTER );
 	}
 
+	CL_TakeVideoFrame();
+
 	if ( com_speeds->integer ) {
-		re.EndFrame( &time_frontend, &time_backend );
+		re.SwapBuffers( &time_frontend, &time_backend );
 	} else {
-		re.EndFrame( NULL, NULL );
+		re.SwapBuffers( NULL, NULL );
 	}
 
 	recursive = 0;
