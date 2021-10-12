@@ -116,7 +116,8 @@ void CMod_LoadSubmodels( lump_t *l ) {
 	cm.numSubModels = count;
 
 	if ( count > MAX_SUBMODELS ) {
-		Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded" );
+		//Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded" );
+		count = MAX_SUBMODELS - 1;
 	}
 
 	for ( i=0 ; i<count ; i++, in++, out++)
@@ -740,12 +741,12 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 		return &box_model;
 	}
 	if ( handle < MAX_SUBMODELS ) {
-		Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",
-			cm.numSubModels, handle, MAX_SUBMODELS );
+		//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",	cm.numSubModels, handle, MAX_SUBMODELS );
+		return &box_model;
 	}
-	Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
-
-	return NULL;
+	//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
+	return &box_model;
+	//return NULL;
 
 }
 
