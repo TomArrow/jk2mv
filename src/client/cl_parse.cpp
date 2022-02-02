@@ -184,6 +184,9 @@ cl.snap and saved in cl.snapshots[].  If the snapshot is invalid
 for any reason, no changes to the state will be made at all.
 ================
 */
+#ifdef RELDEBUG
+//#pragma optimize("", off)
+#endif
 void CL_ParseSnapshot( msg_t *msg ) {
 	int			len;
 	clSnapshot_t	*old;
@@ -191,6 +194,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	int			deltaNum;
 	int			oldMessageNum;
 	int			i, packetNum;
+	static int	serverTimeOlderThanPreviousCount = 0; // Count of snaps received with a lower servertime than the old snap we have.
 
 	// get the reliable sequence acknowledge number
 	// NOTE: now sent with all server to client messages
@@ -205,6 +209,16 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	newSnap.serverCommandNum = clc.serverCommandSequence;
 
 	newSnap.serverTime = MSG_ReadLong( msg );
+
+	// Sometimes packets arrive out of order. We want to tolerate this a bit to tolerate bad internet connections.
+	// However if it happens a large amount of times in a row, it might indicate a game restart/map chance I guess?
+	// So let the cvar cl_snapOrderTolerance decide how many times we allow it.
+	if (newSnap.serverTime < cl.oldFrameServerTime) {
+		Com_Printf("WARNING: newSnap.serverTime < cl.oldFrameServerTime.\n");
+		serverTimeOlderThanPreviousCount++;
+	} else {
+		serverTimeOlderThanPreviousCount = 0;
+	}
 
 	newSnap.messageNum = clc.serverMessageSequence;
 
@@ -235,9 +249,22 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			Com_Printf ("Delta frame too old.\n");
 		} else if ( cl.parseEntitiesNum - old->parseEntitiesNum > MAX_PARSE_ENTITIES-128 ) {
 			Com_DPrintf ("Delta parseEntitiesNum too old.\n");
-		} else {
+		}
+		else {
 			newSnap.valid = qtrue;	// valid delta parse
 		}
+	}
+
+	// Ironically, to be more tolerant of bad internet, we set the (possibly) out of order snap to invalid. 
+	// That way it will not be saved to cl.snap and cause a catastrophic failure/disconnect unless it happens
+	// at least cl_snapOrderTolerance times in a row.
+	if (serverTimeOlderThanPreviousCount > 0 && serverTimeOlderThanPreviousCount <= cl_snapOrderTolerance->integer) {
+		// TODO handle demowaiting better?
+		newSnap.valid = qfalse;
+		if (cl_snapOrderToleranceDemoSkipPackets->integer) {
+			clc.demoSkipPacket = qtrue;
+		}
+		Com_Printf("WARNING: Snapshot servertime lower than previous snap. Ignoring %d/%d.\n", serverTimeOlderThanPreviousCount, cl_snapOrderTolerance->integer);
 	}
 
 	// read areamask
@@ -296,6 +323,9 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	cl.newSnapshots = qtrue;
 }
+#ifdef RELDEBUG
+//#pragma optimize("", on)
+#endif
 
 
 //=====================================================================

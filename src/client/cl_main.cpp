@@ -38,6 +38,8 @@ cvar_t	*cl_freezeDemo;
 
 cvar_t	*cl_drawRecording;
 
+cvar_t	*cl_snapOrderTolerance;
+cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
@@ -630,6 +632,7 @@ void CL_Record_f( void ) {
 
 	// don't start saving messages until a non-delta compressed message is received
 	clc.demowaiting = qtrue;
+	clc.demoSkipPacket = qfalse; // We sometimes want to skip a packet, for example when a packet arrives out of order
 
 	// write out the gamestate message
 	MSG_Init (&buf, bufData, sizeof(bufData));
@@ -2585,9 +2588,13 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	// we don't know if it is ok to save a demo message until
 	// after we have parsed the frame
 	//
-	if ( clc.demorecording && !clc.demowaiting ) {
+	if ( clc.demorecording && !clc.demowaiting && !clc.demoSkipPacket ) {
 		CL_WriteDemoMessage( msg, headerBytes );
 	}
+	clc.demoSkipPacket = qfalse; // Reset again for next message
+	// TODO Maybe instead make a queue of packages to be written to the demo file.
+	// Then just read them in the correct order. That way we can integrate even packages out of order.
+	// However it's low priority bc this error is relatively rare.
 }
 
 /*
@@ -3086,6 +3093,8 @@ void CL_Init( void ) {
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
+	cl_snapOrderTolerance = Cvar_Get ("cl_snapOrderTolerance", "100", CVAR_ARCHIVE);
+	cl_snapOrderToleranceDemoSkipPackets = Cvar_Get("cl_snapOrderToleranceDemoSkipPackets", "1", CVAR_ARCHIVE);
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
 	cl_showTimeDelta = Cvar_Get ("cl_showTimeDelta", "0", CVAR_TEMP );

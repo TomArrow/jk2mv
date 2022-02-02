@@ -80,6 +80,7 @@ typedef struct {
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
 #define	MAX_PARSE_ENTITIES	2048
+//#define	MAX_PARSE_ENTITIES	32768
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
@@ -220,6 +221,7 @@ typedef struct {
 	qboolean	demorecording;
 	qboolean	demoplaying;
 	qboolean	demowaiting;	// don't record until a non-delta message is received
+	qboolean	demoSkipPacket;
 	qboolean	firstDemoFrameSkipped;
 	fileHandle_t	demofile;
 
@@ -420,6 +422,8 @@ extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
+extern	cvar_t	*cl_snapOrderTolerance;
+extern	cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;

@@ -525,6 +525,8 @@ delta functions
 =============================================================================
 */
 
+extern cvar_t *cl_snapOrderTolerance;
+extern cvar_t *cl_snapOrderToleranceDemoSkipPackets;
 extern cvar_t *cl_shownet;
 
 #define	LOG(x) if( cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
