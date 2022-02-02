@@ -158,6 +158,7 @@ NET
 
 #ifndef DEDICATED
 #define PACKET_BACKUP	256
+//#define PACKET_BACKUP	4096
 #else
 #define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
 							// server for delta comrpession and ping estimation
