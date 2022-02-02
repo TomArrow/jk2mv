@@ -386,7 +386,7 @@ void WIN_Present( window_t *window )
 GLimp_CompareModes
 ===============
 */
-static int GLimp_CompareModes( const void *a, const void *b )
+static int QDECL GLimp_CompareModes( const void *a, const void *b )
 {
 	const float ASPECT_EPSILON = 0.001f;
 	const SDL_Rect *modeA = (const SDL_Rect *)a;
@@ -497,6 +497,37 @@ static bool GLimp_DetectAvailableModes(void)
 
 	SDL_free( modes );
 	return true;
+}
+
+static float GLimp_GetDisplayScale(int display)
+{
+	float scale = 1.0f;
+
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+	const char *driver = SDL_GetCurrentVideoDriver();
+
+	if (!strcmp(driver, "windows")) {
+		float ddpi;
+
+		// on windows driver dpi is always 96 * desktop scaling
+		if (!SDL_GetDisplayDPI(display, &ddpi, NULL, NULL)) {
+			scale = ddpi / 96.0f;
+		}
+	} else if (!strcmp(driver, "x11")) {
+		float ddpi;
+
+		// this is a hack: some environments return real display DPI,
+		// others synthetic, based on desktop scaling. Not sure if 96
+		// is universal synthetic 1:1 neither. x11 has no fractional
+		// scaling so round to integer.
+		if (!SDL_GetDisplayDPI(display, &ddpi, NULL, NULL)) {
+			scale = roundf(ddpi / 96.0f);
+		}
+
+	}
+#endif
+
+	return scale;
 }
 
 /*
@@ -848,14 +879,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		}
 	}
 
-	glConfig->displayDPI = 96.0f;
-#if SDL_VERSION_ATLEAST(2, 0, 4)
-	float ddpi;
-	if (!SDL_GetDisplayDPI(display, &ddpi, NULL, NULL)) {
-		glConfig->displayDPI = ddpi;
-	}
-	Com_DPrintf("SDL_CreateWindow: Screen DPI: %f\n", glConfig->displayDPI);
-#endif
+	glConfig->displayScale = GLimp_GetDisplayScale(display);
 
 	SDL_FreeSurface(icon);
 

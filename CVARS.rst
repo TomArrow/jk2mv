@@ -27,6 +27,24 @@ New and Modified Cvars
 :Description:
    Print timestamps in qconsole.log and system console.
 
+..
+
+:Name: fs_forcegame
+:Values: Foldername
+:Default: "" (Not set)
+:Description:
+   Overrides the active folder, allowing a server/client to store configs and
+   other data in a specific folder independent of the active mod (``fs_game``).
+   All new configs, screenshots, demos, etc. stored by the game end up in the
+   specified folder. This folder may also be "base".
+
+   Load order:
+
+   | ``base``
+   | ``fs_basegame cvar``
+   | ``fs_game cvar``
+   | ``fs_forcegame cvar``
+
 -----------
 Client-Side
 -----------
@@ -266,6 +284,22 @@ Client-Side
    quality video drivers. Small negative values (eg "-0.2") can help
    with distant textures appearing blurry.
 
+..
+
+:Name: s_muteWhenMinimized
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Mute all sounds when client window is minimized.
+
+..
+
+:Name: s_muteWhenUnfocused
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Mute all sounds when client window is unfocused.
+
 -----------
 Server-Side
 -----------
@@ -398,6 +432,20 @@ Server-Side
 
 ..
 
+:Name: mv_resetServerTime
+:Valid: "0", "1", "2"
+:Default: "1"
+:Description:
+   Reset internal server time on map restart. Helps to avoid high
+   server time bugs. Breaks queue in duel gametype on basejk. May
+   cause issues with other mods.
+
+   | 0: Never (compatible)
+   | 1: Always except in Duel gametype
+   | 2: Always
+
+..
+
 :Name: sv_autoWhitelist
 :Values: "0", "1"
 :Default: "1"
@@ -407,6 +455,15 @@ Server-Side
    they are stored in ipwhitelist.dat file. Collecting IP addresses
    without consent may be against European Union's General Data
    Protection Regulation.
+
+..
+
+:Name: sv_enforceSnaps
+:Values: "0", "1"
+:Default: "0"
+:Description:
+   Ignore the client preference for "snaps" and try to send a snapshot per
+   server frame (sv_fps) if sv_maxSnaps and the client rate permit it.
 
 ..
 
@@ -450,11 +507,59 @@ Server-Side
 
 ..
 
+:Name: sv_maxRate
+:Valid: "0", Integer >= 1000
+:Default: "90000"
+:Description:
+   Maximum rate for each client. The client rate limits the maximum amount of
+   snapshots sent to a client.
+
+..
+
+:Name: sv_maxSnaps
+:Valid: Integer > 0
+:Default: "30"
+:Description:
+   Maximum amount of snapshots each client should receive. This can also be
+   limited by the client rate.
+
+..
+
+:Name: sv_minRate
+:Valid: Integer >= 1000
+:Default: "1000"
+:Description:
+   Minimum rate for each client. The client rate limits the maximum amount of
+   snapshots sent to a client.
+
+..
+
+:Name: sv_minSnaps
+:Valid: Integer > 0
+:Default: "1"
+:Description:
+   Minimum amount of snapshots each client should receive. This can also be
+   limited by the client rate.
+
+..
+
 :Name: sv_pingFix
 :Values: "0", "1"
 :Default: "1"
 :Description:
    Enable more accurate and bug-free ping calculation.
+
+..
+
+:Name: sv_dynamicSnapshots
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Try to send partial snapshots if a snapshot message would otherwise overflow.
+   This should help to avoid clients from dropping due to
+   ``CL_ParseServerMessage: read past end of server message`` when maps or mods
+   cause a lot of commands to be sent to a client in a short interval on a busy
+   server.
 
 ==================
 Undocumented Cvars

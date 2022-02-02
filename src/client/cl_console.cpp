@@ -537,7 +537,7 @@ void Con_CheckResize (void)
 
 	assert(SMALLCHAR_HEIGHT >= SMALLCHAR_WIDTH);
 
-	scale = cls.glconfig.displayDPI / 96.0f *
+	scale = cls.glconfig.displayScale *
 		((con_scale->value > 0.0f) ? con_scale->value : 1.0f);
 	charWidth = scale * SMALLCHAR_WIDTH;
 
@@ -558,11 +558,11 @@ void Con_CheckResize (void)
 		Com_Error(ERR_FATAL, "Con_CheckResize: Window too small to draw a console");
 	}
 
-	rowwidth = width + 1 + CON_TIMESTAMP_LEN;
+	rowwidth = width + 1 + (con_timestamps->integer ? 0 : CON_TIMESTAMP_LEN);
 
 	con.charWidth = charWidth;
 	con.charHeight = scale * SMALLCHAR_HEIGHT;
-	con.linewidth = width - (con_timestamps->integer ? 0 : CON_TIMESTAMP_LEN);
+	con.linewidth = width;
 	kg.g_consoleField.widthInChars = width - 1; // Command prompt
 
 	if (con.rowwidth != rowwidth)
@@ -1070,6 +1070,8 @@ void Con_DrawSolidConsole( float frac ) {
 		SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x) * con.charWidth, lines - (con.charHeight + con.charHeight / 2) + padding, ts[x]);
 	}
 
+	// draw the input prompt, user text, and cursor if desired
+	Con_DrawInput ();
 
 	// draw the text
 	con.vislines = lines;
@@ -1159,9 +1161,6 @@ void Con_DrawSolidConsole( float frac ) {
 			}
 		}
 	}
-
-	// draw the input prompt, user text, and cursor if desired
-	Con_DrawInput ();
 
 	re.SetColor( NULL );
 }

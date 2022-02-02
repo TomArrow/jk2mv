@@ -351,7 +351,11 @@ void CL_SystemInfoChanged( void ) {
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
 
-	// don't set any vars when playing a demo
+	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
+	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
+	FS_PureServerSetReferencedPaks( s, t );
+
+	// don't set any other vars when playing a demo
 	if ( clc.demoplaying ) {
 		return;
 	}
@@ -366,10 +370,6 @@ void CL_SystemInfoChanged( void ) {
 	s = Info_ValueForKey( systemInfo, "sv_paks" );
 	t = Info_ValueForKey( systemInfo, "sv_pakNames" );
 	FS_PureServerSetLoadedPaks( s, t );
-
-	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
-	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
-	FS_PureServerSetReferencedPaks( s, t );
 
 	gameSet = qfalse;
 	// scan through all the variables in the systeminfo and locally set cvars to match
@@ -476,16 +476,19 @@ void CL_ParseGamestate( msg_t *msg ) {
 				Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 			}
 
-			if ( demoCheckFor103 && i == CS_SERVERINFO ) {
-				//This is the big serverinfo string containing the value of the "version" cvar of the server.
-				//If we are about to play a demo, we can use this information to ascertain whether this demo was recorded on
-				//a 1.03 server.
-				if ( CL_ServerVersionIs103( Info_ValueForKey(s, "version") ) ) {
-					//A 1.03 demo - set the proper game version internally so parsing snapshots etc won't fail
-					MV_SetCurrentGameversion( VERSION_1_03 );
-				}
+			if ( i == CS_SERVERINFO ) {
+				if ( demoCheckFor103 ) {
+					//This is the big serverinfo string containing the value of the "version" cvar of the server.
+					//If we are about to play a demo, we can use this information to ascertain whether this demo was recorded on
+					//a 1.03 server.
+					if ( CL_ServerVersionIs103( Info_ValueForKey(s, "version") ) ) {
+						//A 1.03 demo - set the proper game version internally so parsing snapshots etc won't fail
+						MV_SetCurrentGameversion( VERSION_1_03 );
+					}
 
-				demoCheckFor103 = false; //No need to check this again while playing the demo.
+					demoCheckFor103 = false; //No need to check this again while playing the demo.
+				}
+				clc.udpdl = atoi( Info_ValueForKey(s, "sv_allowDownload") );
 			}
 
 			// append it to the gameState string buffer

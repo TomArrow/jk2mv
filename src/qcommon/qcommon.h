@@ -775,6 +775,7 @@ MISC
 
 
 const char	*CopyString( const char *in );
+const char	*CopyString( const char *in, memtag_t eTag );
 void		Info_Print( const char *s );
 
 void		Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)(char *), qboolean silent);
@@ -987,9 +988,6 @@ void S_ClearSoundBuffer( void );
 // call before filesystem access
 
 void SCR_DebugGraph (float value, int color);	// FIXME: move logging to common?
-
-// AVI files have the start of pixel lines 4 byte-aligned
-#define AVI_LINE_PADDING 4
 
 //
 // server interface

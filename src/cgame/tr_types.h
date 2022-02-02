@@ -357,7 +357,7 @@ typedef struct {
 	// normal screens should be 4/3, but wide aspect monitors may be 16/9
 	float					windowAspect;
 
-	float					displayDPI;
+	float					displayScale;
 	int						displayFrequency;
 
 	// synonymous with "does rendering consume the entire screen?", therefore

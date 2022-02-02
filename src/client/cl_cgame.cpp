@@ -365,6 +365,8 @@ void CL_ConfigstringModified( void ) {
 		return;		// unchanged
 	}
 
+	if ( index == CS_SERVERINFO ) clc.udpdl = atoi( Info_ValueForKey(s, "sv_allowDownload") );
+
 	// build the new gameState_t
 	oldGs = cl.gameState;
 
