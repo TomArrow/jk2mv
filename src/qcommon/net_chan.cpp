@@ -282,8 +282,12 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 					++it;
 					if (itTmp->second.time + FRAGMENT_BUFFERS_TIMEOUT < Com_RealTime(NULL)) {
 						if (showdrop->integer || showpackets->integer) {
+							netadr_t tmpAdr;
+							tmpAdr.ipi = itIP->first;
+							tmpAdr.port = itPort->first;
+							tmpAdr.type = NA_IP;
 							Com_Printf("%s:Dropped timed out message fragment buffer at %i\n"
-								, NET_AdrToString(chan->remoteAddress)
+								, NET_AdrToString(tmpAdr)
 								, itTmp->first);
 						}
 						itPort->second.erase(itTmp);
