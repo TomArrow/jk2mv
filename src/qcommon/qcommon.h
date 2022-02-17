@@ -210,6 +210,22 @@ void		NET_Sleep(int msec);
 #define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
 #define MAX_DOWNLOAD_BLKSIZE		2048	// 2048 byte block chunks
 
+#define	MAX_PACKETLEN			1400		// max size of a network packet
+#define	FRAGMENT_SIZE			(MAX_PACKETLEN - 100)
+#define	PACKET_HEADER			10			// two ints and a short
+
+#define	FRAGMENT_BIT	(1<<31)
+
+#define FRAGMENT_BUFFERS_TIMEOUT 10			// Any fragments buffers that have seen no action for this many seconds are discarded
+
+// Buffer used to assemble a fragmented packet
+typedef struct {
+	byte data[MAX_MSGLEN]; // actual data
+	qboolean fragmentsReceived[MAX_MSGLEN / FRAGMENT_SIZE + 1]; // array indicating if a particular fragment has been received
+	int lastFragment; // index of the last fragment. 0 means we don't know yet.
+	int totalLength; // length of the entire message
+	int time; // when was this fragment buffer last accessed? we want to clean up old unfinished fragment buffers.
+} fragmentAssemblyBuffer_t;
 
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression

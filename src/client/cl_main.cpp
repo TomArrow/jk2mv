@@ -1045,6 +1045,7 @@ void CL_ClearState (void) {
 	Com_Memset( &cl, 0, sizeof( cl ) );
 }
 
+extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
 
 /*
 =====================
@@ -1101,6 +1102,7 @@ void CL_Disconnect( qboolean showMainMenu ) {
 
 	// wipe the client connection
 	Com_Memset( &clc, 0, sizeof( clc ) );
+	fragmentBuffers.clear();
 
 	cls.state = CA_DISCONNECTED;
 

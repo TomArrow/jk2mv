@@ -235,6 +235,7 @@ typedef struct {
 
 extern	clientConnection_t clc;
 
+
 /*
 ==================================================================
 
