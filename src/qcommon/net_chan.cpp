@@ -402,7 +402,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 		msg->bit = 32;	// past the sequence number
 
 		thisFragmentBuffer = NULL;
-		fragmentBuffers.erase(sequence); // Now that the message is fully assembled, we can discard the fragment buffer
+		buffersMap->erase(sequence); // Now that the message is fully assembled, we can discard the fragment buffer
 
 						// but I am a wuss -mw
 		chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
