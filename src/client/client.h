@@ -223,6 +223,7 @@ typedef struct {
 	qboolean	demowaiting;	// don't record until a non-delta message is received
 	qboolean	demoSkipPacket;
 	qboolean	firstDemoFrameSkipped;
+	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
 
 	int			timeDemoFrames;		// counter of rendered frames
@@ -235,6 +236,10 @@ typedef struct {
 
 extern	clientConnection_t clc;
 
+typedef struct {
+	bufferedMsg_t msg;
+	int time; // We don't want to wait infinitely for old messages to arrive.
+} bufferedMessageContainer_t;
 
 /*
 ==================================================================
@@ -660,7 +665,7 @@ void LAN_SaveServersToCache();
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 void CL_Netchan_TransmitNextFragment( netchan_t *chan );
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
+qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
 
 // cg_demos_auto.c
 

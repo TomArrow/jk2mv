@@ -192,9 +192,17 @@ out of order or a fragment.
 Msg must be large enough to hold MAX_MSGLEN, because if this is the
 final fragment of a multi-part message, the entire thing will be
 copied out.
+
+Addition 2022-02-18 by Tom:
+If you plan to use valid but out of order packets, pass pointers to an integer and a qboolean. 
+If provided, sequenceNumber will be assigned the sequence number of this message and 
+validButOutOfOrder will be assigned qtrue if the message was valid but arrived too late. Likewise,
+it will be assigned qtrue if the message was the last missing fragment of a fragmented message and the 
+message was successfully reconstructed.
+Basically, it's for recording more smooth demos that include even packets that arrived too late.
 =================
 */
-qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
+qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qboolean* validButOutOfOrder) {
 	int			sequence;
 	//int			qport;
 	int			fragmentStart, fragmentLength;
@@ -203,6 +211,10 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 	// get sequence numbers
 	MSG_BeginReadingOOB(msg);
 	sequence = MSG_ReadLong(msg);
+		
+	if (validButOutOfOrder) { // This will be set to true if a packet is valid/fragmented message assembled, but out of order and thus not usable for the game itself
+		*validButOutOfOrder = qfalse;
+	}
 
 	// check for fragment information
 	if (sequence & FRAGMENT_BIT) {
@@ -210,6 +222,10 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 		fragmented = qtrue;
 	} else {
 		fragmented = qfalse;
+	}
+
+	if (sequenceNumber) { // Pass the sequence number to the outside if requested
+		*sequenceNumber = sequence;
 	}
 
 	// read the qport if we are a server
@@ -244,6 +260,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 	//
 	// discard out of order or duplicated packets
 	//
+	qboolean isOutOfOrder = qfalse;
 	if (sequence <= chan->incomingSequence) {
 		if (showdrop->integer || showpackets->integer) {
 			Com_Printf("%s:Out of order packet %i at %i\n"
@@ -251,7 +268,8 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 				, sequence
 				, chan->incomingSequence);
 		}
-		return qfalse;
+		//return qfalse;
+		isOutOfOrder = qtrue; // We still want to assemble fragmented messages, even if out of order
 	}
 
 	//
@@ -409,16 +427,34 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 		buffersMap->erase(sequence); // Now that the message is fully assembled, we can discard the fragment buffer
 
 						// but I am a wuss -mw
-		chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
-		return qtrue;
+		
+		
+		if (!isOutOfOrder) {
+			chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
+			return qtrue;
+		}
+		else {
+			if (validButOutOfOrder) {
+				*validButOutOfOrder = qtrue;
+			}
+			return qfalse;
+		}
 	}
 
 	//
 	// the message can now be read from the current message pointer
 	//
-	chan->incomingSequence = sequence;
+	if (!isOutOfOrder) {
+		chan->incomingSequence = sequence;
 
-	return qtrue;
+		return qtrue;
+	}
+	else {
+		if (validButOutOfOrder) {
+			*validButOutOfOrder = qtrue;
+		}
+		return qfalse;
+	}
 }
 
 

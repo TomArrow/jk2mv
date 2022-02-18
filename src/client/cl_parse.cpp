@@ -237,6 +237,11 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if ( newSnap.deltaNum <= 0 ) {
 		newSnap.valid = qtrue;		// uncompressed frame
 		old = NULL;
+		if (clc.demowaiting) { 
+			// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
+			// Here we just save a fake number of the message before this so that *this* message does get saved.
+			clc.demoLastWrittenSequenceNumber = clc.serverMessageSequence - 1;
+		}
 		clc.demowaiting = qfalse;	// we can start recording now
 	} else {
 		old = &cl.snapshots[newSnap.deltaNum & PACKET_MASK];

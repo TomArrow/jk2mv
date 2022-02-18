@@ -3,6 +3,7 @@
 #include "client.h"
 #include "snd_public.h"
 #include <mv_setup.h>
+#include <map>
 
 extern console_t con;
 qboolean	scr_initialized;		// ready to draw
@@ -12,6 +13,9 @@ cvar_t		*cl_debuggraph;
 cvar_t		*cl_graphheight;
 cvar_t		*cl_graphscale;
 cvar_t		*cl_graphshift;
+
+extern cvar_t* cl_demoRecordBufferedReorder;
+extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
 
 /*
 ================
@@ -312,7 +316,12 @@ void SCR_DrawDemoRecording( void ) {
 			0, 0, 1, 1, cls.recordingShader, cls.xadjust, cls.yadjust);
 	} else if (cl_drawRecording->integer) {
 		pos = FS_FTell( clc.demofile );
-		sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
+		if (bufferedDemoMessages.size() > 0 || cl_demoRecordBufferedReorder->integer) {
+			sprintf(string, "RECORDING %s: %ik (%i queued)", clc.demoName, pos / 1024, (int)bufferedDemoMessages.size());
+		}
+		else {
+			sprintf(string, "RECORDING %s: %ik", clc.demoName, pos / 1024);
+		}
 		SCR_DrawStringExt( ((SCREEN_WIDTH / 2) * (1 / cls.cgxadj)) - (int)strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue );
 	}
 }

@@ -88,6 +88,8 @@ typedef struct {
 	int		bit;				// for bitwise reads and writes
 } msg_t;
 
+
+
 void MSG_Init (msg_t *buf, byte *data, int length);
 void MSG_InitOOB( msg_t *buf, byte *data, int length );
 void MSG_Clear (msg_t *buf);
@@ -227,6 +229,21 @@ typedef struct {
 	int time; // when was this fragment buffer last accessed? we want to clean up old unfinished fragment buffers.
 } fragmentAssemblyBuffer_t;
 
+
+typedef struct {
+	qboolean	allowoverflow;	// if false, do a Com_Error
+	qboolean	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
+	qboolean	oob;			// set to true if the buffer size failed (with allowoverflow set)
+	byte	data[MAX_MSGLEN];
+	int		maxsize;
+	int		cursize;
+	int		readcount;
+	int		bit;				// for bitwise reads and writes
+} bufferedMsg_t;
+
+void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
+void MSG_FromBuffered(msg_t* dst, bufferedMsg_t* src);
+
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression
 */
@@ -262,7 +279,7 @@ void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
 void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
 void Netchan_TransmitNextFragment( netchan_t *chan );
 
-qboolean Netchan_Process( netchan_t *chan, msg_t *msg );
+qboolean Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
 
 
 /*
