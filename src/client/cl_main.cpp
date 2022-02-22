@@ -692,7 +692,7 @@ void CL_Record_f( void ) {
 	Q_strncpyz( clc.demoName, demoName, sizeof( clc.demoName ) );
 
 	// don't start saving messages until a non-delta compressed message is received
-	clc.demowaiting = qtrue;
+	clc.demowaiting = 2; // request non-delta message with value 2.
 	clc.demoSkipPacket = qfalse; // We sometimes want to skip a packet, for example when a packet arrives out of order
 	clc.demoLastWrittenSequenceNumber = 0;
 
@@ -2640,6 +2640,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 		bufferedMessageContainer_t* messageContainer = &bufferedDemoMessages[sequenceNumber]; // Will automatically create if not existant.
 		messageContainer->time = Com_RealTime(NULL); // Remember when we wrote this
 		MSG_ToBuffered(msg, &messageContainer->msg); // Copy message into the buffer
+		messageContainer->containsFullSnapshot = qfalse; // to be determined.
 	}
 	if (!process) {
 		return;		// out of order, duplicated, etc

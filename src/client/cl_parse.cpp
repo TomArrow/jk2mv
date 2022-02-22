@@ -174,6 +174,8 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 	}
 }
 
+extern cvar_t* cl_demoRecordBufferedReorder;
+extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
 
 /*
 ================
@@ -237,26 +239,65 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if ( newSnap.deltaNum <= 0 ) {
 		newSnap.valid = qtrue;		// uncompressed frame
 		old = NULL;
-		if (clc.demowaiting) { 
+		if (cl_demoRecordBufferedReorder->integer) {
+			if (bufferedDemoMessages.find(clc.serverMessageSequence) != bufferedDemoMessages.end()) {
+				bufferedDemoMessages[clc.serverMessageSequence].containsFullSnapshot = qtrue;
+			}
+			if (clc.demowaiting == 2) {
+				clc.demowaiting = 1;	// now we wait for a delta snapshot that references this or another buffered full snapshot.
+			}
+		}
+		else {
 			// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
 			// Here we just save a fake number of the message before this so that *this* message does get saved.
+			//
 			clc.demoLastWrittenSequenceNumber = clc.serverMessageSequence - 1;
+			clc.demowaiting = 0;// we can start recording now (old fashioned behavior that can occasionally lead to damaged demos)
 		}
-		clc.demowaiting = qfalse;	// we can start recording now
+		
 	} else {
 		old = &cl.snapshots[newSnap.deltaNum & PACKET_MASK];
 		if ( !old->valid ) {
 			// should never happen
-			Com_Printf ("Delta from invalid frame (not supposed to happen!).\n");
+			Com_Printf ("Message %d: Delta from invalid frame %d (not supposed to happen!).\n",newSnap.messageNum,newSnap.deltaNum);
 		} else if ( old->messageNum != newSnap.deltaNum ) {
 			// The frame that the server did the delta from
 			// is too old, so we can't reconstruct it properly.
-			Com_Printf ("Delta frame too old.\n");
+			Com_Printf ("Message %d: Delta frame %d too old.\n", newSnap.messageNum, newSnap.deltaNum);
 		} else if ( cl.parseEntitiesNum - old->parseEntitiesNum > MAX_PARSE_ENTITIES-128 ) {
-			Com_DPrintf ("Delta parseEntitiesNum too old.\n");
+			Com_DPrintf ("Message %d: Delta parseEntitiesNum too old.\n", newSnap.messageNum);
 		}
 		else {
 			newSnap.valid = qtrue;	// valid delta parse
+		}
+		
+		// Demo recording stuff.
+		if (clc.demowaiting == 1 && cl_demoRecordBufferedReorder->integer && newSnap.valid) {
+			if (bufferedDemoMessages.find(newSnap.deltaNum) != bufferedDemoMessages.end()) {
+				if (bufferedDemoMessages[newSnap.deltaNum].containsFullSnapshot) {
+					// Okay NOW we can start recording the demo.
+					clc.demowaiting = 0;
+					// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
+					// Here we just save a fake number of the message before the referenced full snapshot so that saving begins at that full snapshot that is being correctly referenced by the server.
+					//
+					clc.demoLastWrittenSequenceNumber = newSnap.deltaNum - 1;
+					// Short explanation: 
+					// The old system merely waited for a full snapshot to start writing the demo.
+					// However, at that point the server has not yet received an ack for that full snapshot we received.
+					// Sometimes the server does not receive this ack (in time?) and as a result it keeps referencing
+					// older snapshots including delta snapshots that are not part of our demo file.
+					// So instead, we do a two tier system. First we request a full snapshot. Then we wait for a delta
+					// snapshot that correctly references the full snapshot. THEN we start recording the demo, starting
+					// exactly at the snapshot that we finally know the server knows we received.
+				}
+				else {
+					clc.demowaiting = 2; // Nah. It's referencing a delta snapshot. We need it to reference a full one. Request another full one.
+				}
+			}
+			else {
+				// We do not have this referenced snapshot buffered. Request a new full snapshot.
+				clc.demowaiting = 2;
+			}
 		}
 	}
 

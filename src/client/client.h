@@ -220,7 +220,7 @@ typedef struct {
 	qboolean	spDemoRecording;
 	qboolean	demorecording;
 	qboolean	demoplaying;
-	qboolean	demowaiting;	// don't record until a non-delta message is received
+	int			demowaiting;	// don't record until a non-delta message is received. Changed to int. 0=not waiting. 1=waiting for delta message with correct deltanum. 2= waiting for full snapshot
 	qboolean	demoSkipPacket;
 	qboolean	firstDemoFrameSkipped;
 	int			demoLastWrittenSequenceNumber;
@@ -239,6 +239,7 @@ extern	clientConnection_t clc;
 typedef struct {
 	bufferedMsg_t msg;
 	int time; // We don't want to wait infinitely for old messages to arrive.
+	qboolean containsFullSnapshot;
 } bufferedMessageContainer_t;
 
 /*
