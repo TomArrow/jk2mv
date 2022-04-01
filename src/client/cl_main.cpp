@@ -20,6 +20,8 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
+#define NOCONNECT
+
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
 
