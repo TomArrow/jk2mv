@@ -1345,7 +1345,7 @@ void R_Register( void )
 	// cel outline option
 	r_celoutline = ri.Cvar_Get("r_celoutline", "0", CVAR_ARCHIVE);
 	r_celoutlineWidth = ri.Cvar_Get("r_celoutlineWidth", "4.0", CVAR_ARCHIVE);
-	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 0.0", CVAR_ARCHIVE);
+	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
 	r_celoutlineColor->modified = qtrue;
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
