@@ -495,6 +495,8 @@ Ghoul2 Insert End
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
 
 	struct	shader_s	*next;
+
+	qboolean isWorldShader; // UGLY hack.
 } shader_t;
 
 /*
@@ -1120,6 +1122,9 @@ typedef struct {
 
 	int						dynamicGlowWidth;
 	int						dynamicGlowHeight;
+
+	vec4_t					celLineColor;
+	qboolean				celLineColorIsSet;
 } trGlobals_t;
 
 
@@ -1248,6 +1253,8 @@ extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
 // Cel shading ported from http://q3cellshading.sourceforge.net/
 extern	cvar_t* r_celshadalgo;					// Cell shading, chooses method: 0 = disabled, 1 = kuwahara, 2 = whiteTexture
 extern	cvar_t* r_celoutline;						//. cel outline. 1 on, 0 off. (maybe other options later)
+extern	cvar_t* r_celoutlineColor;
+extern	cvar_t* r_celoutlineWidth;
 
 extern	cvar_t	*r_showtris;					// enables wireframe rendering of the world
 extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
