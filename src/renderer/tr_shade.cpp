@@ -217,14 +217,23 @@ static void R_DrawCel(int numIndexes, const glIndex_t* indexes) {
 		}
 	}
 
+	if (r_celoutline->integer == 2 && tess.shader->isWorldShader) {
+		qglDisable(GL_CULL_FACE);
+	}
+
 	//. correction for mirrors. SEE NOTE #2.
 	if (backEnd.viewParms.isMirror == qtrue) { qglCullFace(GL_FRONT); }
 	else { qglCullFace(GL_BACK); }
 
 	qglEnable(GL_BLEND);
 	qglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	qglColor3f(0.0f, 0.0f, 0.0f);
-	qglLineWidth(4.0f);
+	if (tr.celLineColorIsSet) {
+		qglColor4fv(tr.celLineColor);
+	}
+	else {
+		qglColor3f(0.0f, 0.0f, 0.0f);
+	}
+	qglLineWidth(r_celoutlineWidth->value);
 
 	if (primitives == 2) {
 		qglDrawElements(GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, indexes);
@@ -241,6 +250,10 @@ static void R_DrawCel(int numIndexes, const glIndex_t* indexes) {
 	else { qglCullFace(GL_FRONT); }
 
 	qglDisable(GL_BLEND);
+
+	if (r_celoutline->integer == 2 && tess.shader->isWorldShader) {
+		qglEnable(GL_CULL_FACE);
+	}
 
 	return;
 
@@ -1351,7 +1364,7 @@ void RB_StageIteratorGeneric( void )
 
 	//. show me cel outlines.
 	//. there has to be a better place to put this.
-	if (r_celoutline->integer == 1) {
+	if (r_celoutline->integer) {
 		DrawCel(&tess);
 	}
 
