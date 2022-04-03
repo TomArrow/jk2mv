@@ -1255,6 +1255,7 @@ extern	cvar_t* r_celshadalgo;					// Cell shading, chooses method: 0 = disabled,
 extern	cvar_t* r_celoutline;						//. cel outline. 1 on, 0 off. (maybe other options later)
 extern	cvar_t* r_celoutlineColor;
 extern	cvar_t* r_celoutlineWidth;
+extern	cvar_t* r_celTextureOutline;
 
 extern	cvar_t	*r_showtris;					// enables wireframe rendering of the world
 extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
