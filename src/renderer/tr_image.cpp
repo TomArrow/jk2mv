@@ -1462,6 +1462,57 @@ void blur(int columns, int rows, byte* targa_rgba)
 
 }
 
+// New function for fun that adds outlines to textures -TA
+// Adapted from whiteTexture()
+void textureOutline(int columns, int rows, byte* targa_rgba) {
+	int		row, column;
+
+	int lineWidth = r_celTextureOutline->integer;
+	if (!lineWidth) return;
+
+	// Check if texture has alpha. We don't do this to textures with alpha.
+	for (row = 0; row < rows; row++) {
+		for (column = 0; column < columns; column++) {
+			if (getImageA(targa_rgba, column, row, columns, rows) < 255) {
+				return;
+			}
+		}
+	}
+
+	int r=0, g=0, b=0;
+	float a=1.0f;
+	if (tr.celLineColorIsSet) {
+
+		r = (unsigned char)(fmaxf(0.0f, fminf(255.0f, tr.celLineColor[0] * 255.0f)) + 0.5f);
+		g = (unsigned char)(fmaxf(0.0f, fminf(255.0f, tr.celLineColor[1] * 255.0f)) + 0.5f);
+		b = (unsigned char)(fmaxf(0.0f, fminf(255.0f, tr.celLineColor[2] * 255.0f)) + 0.5f);
+		a = fmaxf(0.0f,fminf(1.0f,tr.celLineColor[3]));
+	}
+	float aInverse = 1.0f - a;
+
+	for (row = 0; row < rows; row++) {
+		for (column = 0; column < columns; column++) {
+			if (row < lineWidth || row >= (rows - lineWidth)
+				|| column < lineWidth || column >= (columns - lineWidth)
+				) {
+
+				if (a == 1.0f) {
+
+					setImageR(targa_rgba, column, row, columns, rows, r);
+					setImageG(targa_rgba, column, row, columns, rows, g);
+					setImageB(targa_rgba, column, row, columns, rows, b);
+				}
+				else {
+					setImageR(targa_rgba, column, row, columns, rows, (float)r*a + aInverse*(float)getImageR(targa_rgba, column, row, columns, rows));
+					setImageG(targa_rgba, column, row, columns, rows, (float)g * a + aInverse * (float)getImageG(targa_rgba, column, row, columns, rows));
+					setImageB(targa_rgba, column, row, columns, rows, (float)b * a + aInverse * (float)getImageB(targa_rgba, column, row, columns, rows));
+				}
+
+			}
+		}
+	}
+}
+
 
 /**
  * Converts the texture to a white image.
@@ -2725,6 +2776,10 @@ void R_LoadImage( const char *shortname, byte **pic, int *width, int *height )
 		kuwahara(*width, *height, *pic);
 	else if (r_celshadalgo->integer == 2)
 		whiteTexture(*width, *height, *pic);
+
+	if (r_celTextureOutline->integer) {
+		textureOutline(*width, *height, *pic);
+	}
 }
 
 

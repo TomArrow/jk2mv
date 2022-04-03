@@ -134,8 +134,11 @@ cvar_t	*r_picmip;
 cvar_t* r_celshadalgo;
 //. next one for enable/disable cel bordering all together.
 cvar_t* r_celoutline;
+// My own additions:
 cvar_t* r_celoutlineColor;
 cvar_t* r_celoutlineWidth;
+cvar_t* r_celTextureOutline;
+
 
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
@@ -1346,6 +1349,7 @@ void R_Register( void )
 	r_celoutline = ri.Cvar_Get("r_celoutline", "0", CVAR_ARCHIVE);
 	r_celoutlineWidth = ri.Cvar_Get("r_celoutlineWidth", "4.0", CVAR_ARCHIVE);
 	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
+	r_celTextureOutline = ri.Cvar_Get("r_celTextureOutline", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_celoutlineColor->modified = qtrue;
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);

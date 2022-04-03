@@ -1914,6 +1914,14 @@ static void ParseSkyParms( const char **text ) {
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
+
+	// Remember previous value
+	int			old_r_celTextureOutline;
+	// Prevent skybox images from getting black borders
+	old_r_celTextureOutline = r_celTextureOutline->integer;
+	r_celTextureOutline->integer = 0;
+
+
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s", token, suf[i] );
@@ -1932,6 +1940,9 @@ static void ParseSkyParms( const char **text ) {
 		}
 	}
 
+	// Restore value
+	r_celTextureOutline->integer = old_r_celTextureOutline;
+
 	// cloudheight
 	token = COM_ParseExt( text, qfalse );
 	if ( token[0] == 0 ) {
@@ -1945,6 +1956,8 @@ static void ParseSkyParms( const char **text ) {
 #ifndef DEDICATED
 	R_InitSkyTexCoords( shader.sky.cloudHeight );
 #endif
+
+	r_celTextureOutline->integer = 0;
 
 	// innerbox
 	token = COM_ParseExt( text, qfalse );
@@ -1965,6 +1978,8 @@ static void ParseSkyParms( const char **text ) {
 #endif // !DEDICATED
 		}
 	}
+
+	r_celTextureOutline->integer = old_r_celTextureOutline;
 
 	shader.isSky = qtrue;
 }
