@@ -2874,6 +2874,7 @@ void CL_Frame ( int msec ) {
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
 	}
 
+
 	CL_CheckCvarUpdate();
 
 	// see if we need to update any userinfo
@@ -2899,6 +2900,7 @@ void CL_Frame ( int msec ) {
 		// update audio
 		S_Update();
 	}
+
 
 	// advance local effects for next frame
 	SCR_RunCinematic();

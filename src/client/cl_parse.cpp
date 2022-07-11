@@ -351,6 +351,56 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// copy to the current good spot
 	cl.snap = newSnap;
 	cl.snap.ping = 999;
+
+	if (cl_fpsGuess->integer) {
+		// FPS guessing
+		qboolean isMovementDown = (qboolean)(cl.snap.ps.origin[2] < cls.fpsGuess.lastPosition[2]);
+		if (isMovementDown && cls.fpsGuess.lastMovementDown && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE) {
+			// We will only guess if last and current movement is down. Only that way we can be somewhat sure that force jump isn't interfering.
+			// Also useless if we're on the ground.
+			int commandTimeDelta = cl.snap.ps.commandTime - cls.fpsGuess.lastPsCommandTime;
+			if (commandTimeDelta > 0) { // No use guessing if commandTime didn't change.
+				float toPosition = cl.snap.ps.origin[2];
+				float toSpeed = cl.snap.ps.velocity[2];
+				int foundFps = 0;
+				int tmpGuessedFps = -1;
+				for (int msec = 1; msec < 50; msec++) {
+					float frametime = (float)msec / 1000.0f;
+					// We're gonna try out all these msec options. Find the best fit.
+					float speed = cls.fpsGuess.lastVelocity[2];
+					float position = cls.fpsGuess.lastPosition[2];
+					int totalTime = 0;
+					while (position > toPosition) {
+						totalTime += msec;
+						float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+						position += 0.5f * (speed + newSpeed) * frametime;
+						speed = roundf(newSpeed); 
+					}
+					if (position == toPosition && speed == toSpeed &&( totalTime == commandTimeDelta|| cl_fpsGuess->integer ==1)) {
+						// Bingo
+						tmpGuessedFps = 1000 / msec;
+						foundFps++;
+					}
+				}
+				if (foundFps == 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
+
+					cls.fpsGuess.lastGuessedFps = cls.fpsGuess.currentGuessedFps = tmpGuessedFps;
+					cls.fpsGuess.lastGuessedFpsServerTime = cl.snap.serverTime;
+				}
+				else {
+					cls.fpsGuess.currentGuessedFps = -1;
+				}
+			}
+		}
+		else {
+			cls.fpsGuess.currentGuessedFps = -1;
+		}
+		VectorCopy(cl.snap.ps.velocity, cls.fpsGuess.lastVelocity);
+		VectorCopy(cl.snap.ps.origin, cls.fpsGuess.lastPosition);
+		cls.fpsGuess.lastMovementDown = isMovementDown;
+		cls.fpsGuess.lastPsCommandTime = cl.snap.ps.commandTime;
+	}
+
 	// calculate ping time
 	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;

@@ -295,6 +295,7 @@ typedef struct {
 	netadr_t server;
 } blacklistentry_t;
 
+
 typedef struct {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
@@ -365,6 +366,19 @@ typedef struct {
 	struct {
 		fileHandle_t	chat;
 	} log;
+
+
+	struct {
+		int lastPsCommandTime;
+		vec3_t lastVelocity;
+		vec3_t lastPosition;
+		qboolean lastMovementDown;
+		int lastGuessedFps;
+		int currentGuessedFps;
+		int lastGuessedFpsServerTime;
+	} fpsGuess;
+
+
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -427,6 +441,7 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
+extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;
