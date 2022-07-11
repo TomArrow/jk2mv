@@ -364,28 +364,62 @@ void CL_ParseSnapshot( msg_t *msg ) {
 				float toSpeed = cl.snap.ps.velocity[2];
 				int foundFps = 0;
 				int tmpGuessedFps = -1;
-				for (int msec = 1; msec < 50; msec++) {
-					float frametime = (float)msec / 1000.0f;
-					// We're gonna try out all these msec options. Find the best fit.
-					float speed = cls.fpsGuess.lastVelocity[2];
-					float position = cls.fpsGuess.lastPosition[2];
-					int totalTime = 0;
-					while (position > toPosition) {
-						totalTime += msec;
-						float newSpeed = speed - DEFAULT_GRAVITY * frametime;
-						position += 0.5f * (speed + newSpeed) * frametime;
-						speed = roundf(newSpeed); 
-					}
-					if (position == toPosition && speed == toSpeed &&( totalTime == commandTimeDelta|| cl_fpsGuess->integer ==1)) {
-						// Bingo
-						tmpGuessedFps = 1000 / msec;
-						foundFps++;
+				if (cl_fpsGuessMode->integer == 0) { // All fps from 1 to 50ms
+					for (int msec = 50; msec >= 1; msec--) {
+						float frametime = (float)msec / 1000.0f;
+						// We're gonna try out all these msec options. Find the best fit.
+						float speed = cls.fpsGuess.lastVelocity[2];
+						float position = cls.fpsGuess.lastPosition[2];
+						int totalTime = 0;
+						while (position > toPosition) {
+							totalTime += msec;
+							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+							position += 0.5f * (speed + newSpeed) * frametime;
+							speed = roundf(newSpeed);
+						}
+						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+							// Bingo
+							tmpGuessedFps = 1000 / msec;
+							foundFps++;
+						}
 					}
 				}
-				if (foundFps == 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
+				else if (cl_fpsGuessMode->integer == 1) {
+					// Only most relevant FPS to avoid improbable fps making a reading sound improbable.
+					const static int commonFPSes[] = {3,4,7,8,12,13,33}; // 333,250,142,125,83,76,30
+					for (int i = 0; i <(sizeof(commonFPSes)/sizeof(int)); i++) {
+						int msec = commonFPSes[i];
+						float frametime = (float)msec / 1000.0f;
+						// We're gonna try out all these msec options. Find the best fit.
+						float speed = cls.fpsGuess.lastVelocity[2];
+						float position = cls.fpsGuess.lastPosition[2];
+						int totalTime = 0;
+						while (position > toPosition) {
+							totalTime += msec;
+							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+							position += 0.5f * (speed + newSpeed) * frametime;
+							speed = roundf(newSpeed);
+						}
+						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+							// Bingo
+							tmpGuessedFps = 1000 / msec;
+							foundFps++;
+						}
+					}
+				}
+				
+				if (foundFps >= 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
 
 					cls.fpsGuess.lastGuessedFps = cls.fpsGuess.currentGuessedFps = tmpGuessedFps;
 					cls.fpsGuess.lastGuessedFpsServerTime = cl.snap.serverTime;
+					if (foundFps == 1) { 
+						cls.fpsGuess.lastCertainGuessedFps = cls.fpsGuess.lastGuessedFps;
+						cls.fpsGuess.lastCertainGuessedFpsServerTime = cls.fpsGuess.lastGuessedFpsServerTime;
+						cls.fpsGuess.lastGuessedFpsPercentage = 100;
+					}
+					else {
+						cls.fpsGuess.lastGuessedFpsPercentage = 100/ foundFps;
+					}
 				}
 				else {
 					cls.fpsGuess.currentGuessedFps = -1;

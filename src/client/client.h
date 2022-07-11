@@ -373,7 +373,10 @@ typedef struct {
 		vec3_t lastVelocity;
 		vec3_t lastPosition;
 		qboolean lastMovementDown;
+		int lastCertainGuessedFps;
+		int lastCertainGuessedFpsServerTime;
 		int lastGuessedFps;
+		int lastGuessedFpsPercentage;
 		int currentGuessedFps;
 		int lastGuessedFpsServerTime;
 	} fpsGuess;
@@ -442,6 +445,7 @@ extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
 extern	cvar_t	* cl_fpsGuess;
+extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;

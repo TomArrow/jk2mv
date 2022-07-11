@@ -15,6 +15,7 @@ cvar_t		*cl_graphscale;
 cvar_t		*cl_graphshift;
 
 cvar_t* cl_fpsGuess;
+cvar_t* cl_fpsGuessMode;
 
 extern cvar_t* cl_demoRecordBufferedReorder;
 extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
@@ -405,6 +406,7 @@ SCR_Init
 void SCR_Init( void ) {
 
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
+	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
 	cl_debuggraph = Cvar_Get ("debuggraph", "0", CVAR_CHEAT);
 	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
@@ -541,8 +543,9 @@ void SCR_UpdateScreen( void ) {
 	}
 
 	if (cl_fpsGuess->integer) {
-		SCR_DrawBigString(320, 240, va("%d/%d/%d", cls.fpsGuess.lastGuessedFps,(cl.snap.serverTime-cls.fpsGuess.lastGuessedFpsServerTime < 500) ? cls.fpsGuess.lastGuessedFps:-1, cls.fpsGuess.currentGuessedFps), 1.0f);
-	}
+		bool notTooOld = (cl.snap.serverTime - cls.fpsGuess.lastGuessedFpsServerTime < 1000);
+		SCR_DrawBigString(320, 240, va("%d:%d/%d(%d%%)",cl_fpsGuessMode->integer, cls.fpsGuess.lastCertainGuessedFps, notTooOld ? cls.fpsGuess.lastGuessedFps:0, notTooOld ? cls.fpsGuess.lastGuessedFpsPercentage: 0), 1.0f);
+	} 
 
 	if ( com_speeds->integer ) {
 		re.EndFrame( &time_frontend, &time_backend );
