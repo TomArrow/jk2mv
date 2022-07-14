@@ -298,6 +298,29 @@ void R_ImageList_f( void ) {
 	ri.Printf (PRINT_ALL, " %i total images\n\n", iNumImages );
 }
 
+
+/*
+===============
+R_SQLPosCube_f
+===============
+*/
+void R_SQLPosCube_f(void) {
+	char query[1024];
+	int maxX = max(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
+	int minX = min(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
+	int maxY = max(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
+	int minY = min(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
+	int maxZ = max(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
+	int minZ = min(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
+
+	Com_sprintf(query, sizeof(query), "positionX > %d AND positionX < %d AND positionY > %d AND positionY < %d AND positionZ > %d AND positionZ < %d", minX, maxX, minY, maxY, minZ, maxZ);
+	
+	Com_Printf("%s\n",query);
+	Sys_SetClipboardData(query);
+
+	VectorCopy(tr.refdef.vieworg, tr.sqlPosHelper.lastPos);
+}
+
 //=======================================================================
 
 

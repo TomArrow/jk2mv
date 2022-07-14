@@ -1125,6 +1125,13 @@ typedef struct {
 
 	vec4_t					celLineColor;
 	qboolean				celLineColorIsSet;
+
+
+	//SQL position cube query helper
+	struct {
+		vec3_t lastPos;
+	}sqlPosHelper;
+
 } trGlobals_t;
 
 
@@ -1432,6 +1439,7 @@ qboolean	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode )
 void		R_SetColorMappings( void );
 void		R_GammaCorrect( byte *buffer, int bufSize );
 
+void	R_SQLPosCube_f(void);
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
 void	R_ScreenShot_f( void );

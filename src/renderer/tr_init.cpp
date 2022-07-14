@@ -1382,6 +1382,7 @@ Ghoul2 Insert End
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
 #ifndef DEDICATED
+	ri.Cmd_AddCommand( "sqlposcube", R_SQLPosCube_f);// A little hacky thing to generate SQL queries based on current position x 2 to span a cube
 	ri.Cmd_AddCommand( "imagelist", R_ImageList_f );
 	ri.Cmd_AddCommand( "shaderlist", R_ShaderList_f );
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );
