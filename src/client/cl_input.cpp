@@ -5,6 +5,9 @@
 unsigned	frame_msec;
 int			old_com_frameTime;
 
+//valar how often to cycle to get to the saberstyle we want
+extern int saberCycleThisManyTimes = 0;
+extern int cycledThisframe = 0;
 /*
 ===============================================================================
 
@@ -168,6 +171,55 @@ void IN_GenCMD20( void )
 	cl.gcmdValue = GENCMD_FORCE_THROW;
 }
 
+/*valar new commands*/
+void IN_blue(void)			//POC command for saberstyle switching
+{
+	cl.gcmdValue = GENCMD_SABERATTACKCYCLE;
+	cl.gcmdSendValue = qtrue;
+}
+
+void IN_GenCMD21( void )	//valar  goal: blue stance
+{
+	if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_1) {
+	 saberCycleThisManyTimes = 0;	//do nothing
+	}else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_3) {
+	 saberCycleThisManyTimes = 1;	//cycle once
+	}else{
+	 saberCycleThisManyTimes = 2;}	//cycle twice
+	if (cycledThisframe == 1) {
+	--saberCycleThisManyTimes;
+	}
+}
+void IN_GenCMD22( void )	//valar goal: ylw stance
+{	
+	if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_2) {
+	 saberCycleThisManyTimes = 0;
+	}
+	else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_1) {
+	 saberCycleThisManyTimes = 1;
+	}else{
+	 saberCycleThisManyTimes = 2; }
+	if (cycledThisframe == 1) {
+	--saberCycleThisManyTimes;
+	}
+}
+void IN_GenCMD23( void )	//valar goal: red stance
+{
+	if ( cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_3 ) {
+	 saberCycleThisManyTimes = 0;
+	}
+	else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_2) {
+	 saberCycleThisManyTimes = 1;
+	}else{
+	 saberCycleThisManyTimes = 2; }
+	if (cycledThisframe == 1) {
+	--saberCycleThisManyTimes;
+	}
+}
+/*valar end of new commands*/
+
+
+
 void IN_KeyDown( kbutton_t *b ) {
 	int		k;
 	char	*c;
@@ -269,6 +321,8 @@ float CL_KeyState( kbutton_t *key ) {
 		}
 		if (!cl_idrive->integer)
 			key->downtime = com_frameTime;//Loda - Not sure what the fuck this is doing here, downtime is supposed to store time of when the key was initially pressed, not the most recent time its been held down..
+
+		//valar removed: key->downtime = com_frameTime;
 	}
 
 #if 0
@@ -432,6 +486,8 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	int		forward, side, up;
 	float	s1, s2;
 
+	//int		forward,f,b,	side,r,l,	up,u,d; // valar's version
+	
 	//
 	// adjust for speed key / running
 	// the walking flag is to keep animations consistant
@@ -502,6 +558,39 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	}
 	forward += movespeed * s1;
 	forward -= movespeed * s2;	
+/* valar's version
+	if ( in_strafe.active ) {
+		side += movespeed * CL_KeyState (&in_right);
+		side -= movespeed * CL_KeyState (&in_left);
+	}
+
+	//valar new right/left input handling
+	//---
+	r = movespeed * CL_KeyState (&in_moveright);
+	l = movespeed * CL_KeyState (&in_moveleft);
+	side = r - l;
+	//if both are down send only the most recent input.
+	if (r && l) {
+		side = (in_moveright.downtime > in_moveleft.downtime ? r : -l);
+	}
+
+	//valar new up+down input handling
+	//---
+	u = movespeed * CL_KeyState (&in_up);
+	d = movespeed * CL_KeyState (&in_down);
+	//if both are down send only up input.
+	up = (u >= d ? u : -d);
+
+	//valar new forward/back input handling
+	//--
+	f = movespeed * CL_KeyState (&in_forward);
+	b = movespeed * CL_KeyState (&in_back);
+	forward = f - b;
+	//if both are down send only the most recent input.
+	if (f && b) {
+		forward = (in_forward.downtime > in_back.downtime ? f : -b);
+	}
+	*/
 
 	cmd->forwardmove = ClampChar( forward );
 	cmd->rightmove = ClampChar( side );
@@ -911,19 +1000,26 @@ qboolean CL_ReadyToSendPacket( void ) {
 	if ( Sys_IsLANAddress( clc.netchan.remoteAddress ) ) {
 		return qtrue;
 	}
-
+/*
 	// check for exceeding cl_maxpackets
 	if ( cl_maxpackets->integer < 1 ) {
 		Cvar_Set( "cl_maxpackets", "1" );
 	} else if ( cl_maxpackets->integer > 2000 ) {
 		Cvar_Set( "cl_maxpackets", "2000" );
+	//	valar: let's not.
+	//if ( cl_maxpackets->integer < 15 ) {
+	//	Cvar_Set( "cl_maxpackets", "15" );
+	//} else if ( cl_maxpackets->integer > 100 ) {
+	//	Cvar_Set( "cl_maxpackets", "100" );
 	}
+*/
 	oldPacketNum = (clc.netchan.outgoingSequence - 1) & PACKET_MASK;
 	delta = cls.realtime -  cl.outPackets[ oldPacketNum ].p_realtime;
 	if ( delta < 1000 / cl_maxpackets->integer ) {
 		// the accumulated commands will go out in the next packet
 		return qfalse;
 	}
+	
 
 	return qtrue;
 }
@@ -1071,7 +1167,16 @@ void CL_SendCmd( void ) {
 	if ( cls.state < CA_CONNECTED ) {
 		return;
 	}
+	cycledThisframe = 0;
 
+	if (saberCycleThisManyTimes == 0) {
+	//do nothing
+	}else{
+	cl.gcmdValue = GENCMD_SABERATTACKCYCLE;
+	cl.gcmdSendValue = qtrue;
+	saberCycleThisManyTimes--;
+	cycledThisframe = 1;
+	}
 	// don't send commands if paused
 	if ( com_sv_running->integer && sv_paused->integer && cl_paused->integer ) {
 		return;
@@ -1195,6 +1300,10 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("use_sentry", IN_GenCMD18);
 	Cmd_AddCommand ("saberAttackCycle", IN_GenCMD19);
 	Cmd_AddCommand ("force_throw", IN_GenCMD20);
+	/*valar new client commands*/
+	Cmd_AddCommand ("select_fast", IN_GenCMD21);
+	Cmd_AddCommand ("select_medium", IN_GenCMD22);
+	Cmd_AddCommand ("select_heavy", IN_GenCMD23);
 
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
