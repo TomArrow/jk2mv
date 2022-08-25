@@ -50,6 +50,7 @@ void Field_BigDraw( field_t *edit, int x, int y, qboolean showCursor );
 
 extern	field_t	chatField;
 extern	qboolean	chat_team;
+extern	qboolean	chat_demoMoment;
 extern	int			chat_playerNum;
 
 void Key_WriteBindings( fileHandle_t f );

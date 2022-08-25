@@ -11,6 +11,7 @@ int Key_GetProtocolKey(mvversion_t protocol, int key16);
 
 field_t		chatField;
 qboolean	chat_team;
+qboolean	chat_demoMoment;
 
 int			chat_playerNum;
 
@@ -1400,7 +1401,9 @@ void Message_Key( int key ) {
 			}
 
 			CL_RandomizeColors(chatField.buffer, coloredString);
-			if (chat_playerNum != -1 )
+			if (chat_demoMoment)
+				Com_sprintf(buffer, sizeof(buffer), "tell %i \"[DEMOMOMENT] %s\"\n", chat_playerNum, chatField.buffer);
+			else if (chat_playerNum != -1 )
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
 			else if (chat_team)
 				Com_sprintf( buffer, sizeof( buffer ), "say_team \"%s\"\n", chatField.buffer );

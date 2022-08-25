@@ -219,9 +219,10 @@ typedef struct {
 	qboolean	spDemoRecording;
 	qboolean	demorecording;
 	qboolean	demoplaying;
-	qboolean	demowaiting;	// don't record until a non-delta message is received
+	int			demowaiting;	// don't record until a non-delta message is received. Changed to int. 0=not waiting. 1=waiting for delta message with correct deltanum. 2= waiting for full snapshot
 	qboolean	demoSkipPacket;
 	qboolean	firstDemoFrameSkipped;
+	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
 
 	int			timeDemoFrames;		// counter of rendered frames
@@ -236,6 +237,12 @@ typedef struct {
 } clientConnection_t;
 
 extern	clientConnection_t clc;
+
+typedef struct {
+	bufferedMsg_t msg;
+	int time; // We don't want to wait infinitely for old messages to arrive.
+	qboolean containsFullSnapshot;
+} bufferedMessageContainer_t;
 
 /*
 ==================================================================
@@ -289,6 +296,7 @@ typedef struct {
 	time_t time;
 	netadr_t server;
 } blacklistentry_t;
+
 
 typedef struct {
 	connstate_t	state;				// connection status
@@ -360,6 +368,22 @@ typedef struct {
 	struct {
 		fileHandle_t	chat;
 	} log;
+
+
+	struct {
+		int lastPsCommandTime;
+		vec3_t lastVelocity;
+		vec3_t lastPosition;
+		qboolean lastMovementDown;
+		int lastCertainGuessedFps;
+		int lastCertainGuessedFpsServerTime;
+		int lastGuessedFps;
+		int lastGuessedFpsPercentage;
+		int currentGuessedFps;
+		int lastGuessedFpsServerTime;
+	} fpsGuess;
+
+
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -422,6 +446,8 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
+extern	cvar_t	* cl_fpsGuess;
+extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;
@@ -661,7 +687,7 @@ void LAN_SaveServersToCache();
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 void CL_Netchan_TransmitNextFragment( netchan_t *chan );
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
+qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
 
 // cg_demos_auto.c
 

@@ -174,6 +174,8 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 	}
 }
 
+extern cvar_t* cl_demoRecordBufferedReorder;
+extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
 
 /*
 ================
@@ -237,21 +239,65 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if ( newSnap.deltaNum <= 0 ) {
 		newSnap.valid = qtrue;		// uncompressed frame
 		old = NULL;
-		clc.demowaiting = qfalse;	// we can start recording now
+		if (cl_demoRecordBufferedReorder->integer) {
+			if (bufferedDemoMessages.find(clc.serverMessageSequence) != bufferedDemoMessages.end()) {
+				bufferedDemoMessages[clc.serverMessageSequence].containsFullSnapshot = qtrue;
+			}
+			if (clc.demowaiting == 2) {
+				clc.demowaiting = 1;	// now we wait for a delta snapshot that references this or another buffered full snapshot.
+			}
+		}
+		else {
+			// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
+			// Here we just save a fake number of the message before this so that *this* message does get saved.
+			//
+			clc.demoLastWrittenSequenceNumber = clc.serverMessageSequence - 1;
+			clc.demowaiting = 0;// we can start recording now (old fashioned behavior that can occasionally lead to damaged demos)
+		}
+		
 	} else {
 		old = &cl.snapshots[newSnap.deltaNum & PACKET_MASK];
 		if ( !old->valid ) {
 			// should never happen
-			Com_Printf ("Delta from invalid frame (not supposed to happen!).\n");
+			Com_Printf ("Message %d: Delta from invalid frame %d (not supposed to happen!).\n",newSnap.messageNum,newSnap.deltaNum);
 		} else if ( old->messageNum != newSnap.deltaNum ) {
 			// The frame that the server did the delta from
 			// is too old, so we can't reconstruct it properly.
-			Com_Printf ("Delta frame too old.\n");
+			Com_Printf ("Message %d: Delta frame %d too old.\n", newSnap.messageNum, newSnap.deltaNum);
 		} else if ( cl.parseEntitiesNum - old->parseEntitiesNum > MAX_PARSE_ENTITIES-128 ) {
-			Com_DPrintf ("Delta parseEntitiesNum too old.\n");
+			Com_DPrintf ("Message %d: Delta parseEntitiesNum too old.\n", newSnap.messageNum);
 		}
 		else {
 			newSnap.valid = qtrue;	// valid delta parse
+		}
+		
+		// Demo recording stuff.
+		if (clc.demowaiting == 1 && cl_demoRecordBufferedReorder->integer && newSnap.valid) {
+			if (bufferedDemoMessages.find(newSnap.deltaNum) != bufferedDemoMessages.end()) {
+				if (bufferedDemoMessages[newSnap.deltaNum].containsFullSnapshot) {
+					// Okay NOW we can start recording the demo.
+					clc.demowaiting = 0;
+					// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
+					// Here we just save a fake number of the message before the referenced full snapshot so that saving begins at that full snapshot that is being correctly referenced by the server.
+					//
+					clc.demoLastWrittenSequenceNumber = newSnap.deltaNum - 1;
+					// Short explanation: 
+					// The old system merely waited for a full snapshot to start writing the demo.
+					// However, at that point the server has not yet received an ack for that full snapshot we received.
+					// Sometimes the server does not receive this ack (in time?) and as a result it keeps referencing
+					// older snapshots including delta snapshots that are not part of our demo file.
+					// So instead, we do a two tier system. First we request a full snapshot. Then we wait for a delta
+					// snapshot that correctly references the full snapshot. THEN we start recording the demo, starting
+					// exactly at the snapshot that we finally know the server knows we received.
+				}
+				else {
+					clc.demowaiting = 2; // Nah. It's referencing a delta snapshot. We need it to reference a full one. Request another full one.
+				}
+			}
+			else {
+				// We do not have this referenced snapshot buffered. Request a new full snapshot.
+				clc.demowaiting = 2;
+			}
 		}
 	}
 
@@ -305,6 +351,90 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// copy to the current good spot
 	cl.snap = newSnap;
 	cl.snap.ping = 999;
+
+	if (cl_fpsGuess->integer) {
+		// FPS guessing
+		qboolean isMovementDown = (qboolean)(cl.snap.ps.origin[2] < cls.fpsGuess.lastPosition[2]);
+		if (isMovementDown && cls.fpsGuess.lastMovementDown && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE) {
+			// We will only guess if last and current movement is down. Only that way we can be somewhat sure that force jump isn't interfering.
+			// Also useless if we're on the ground.
+			int commandTimeDelta = cl.snap.ps.commandTime - cls.fpsGuess.lastPsCommandTime;
+			if (commandTimeDelta > 0) { // No use guessing if commandTime didn't change.
+				float toPosition = cl.snap.ps.origin[2];
+				float toSpeed = cl.snap.ps.velocity[2];
+				int foundFps = 0;
+				int tmpGuessedFps = -1;
+				if (cl_fpsGuessMode->integer == 0) { // All fps from 1 to 50ms
+					for (int msec = 50; msec >= 1; msec--) {
+						float frametime = (float)msec / 1000.0f;
+						// We're gonna try out all these msec options. Find the best fit.
+						float speed = cls.fpsGuess.lastVelocity[2];
+						float position = cls.fpsGuess.lastPosition[2];
+						int totalTime = 0;
+						while (position > toPosition) {
+							totalTime += msec;
+							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+							position += 0.5f * (speed + newSpeed) * frametime;
+							speed = roundf(newSpeed);
+						}
+						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+							// Bingo
+							tmpGuessedFps = 1000 / msec;
+							foundFps++;
+						}
+					}
+				}
+				else if (cl_fpsGuessMode->integer == 1) {
+					// Only most relevant FPS to avoid improbable fps making a reading sound improbable.
+					const static int commonFPSes[] = {3,4,7,8,12,13,33}; // 333,250,142,125,83,76,30
+					for (int i = 0; i <(sizeof(commonFPSes)/sizeof(int)); i++) {
+						int msec = commonFPSes[i];
+						float frametime = (float)msec / 1000.0f;
+						// We're gonna try out all these msec options. Find the best fit.
+						float speed = cls.fpsGuess.lastVelocity[2];
+						float position = cls.fpsGuess.lastPosition[2];
+						int totalTime = 0;
+						while (position > toPosition) {
+							totalTime += msec;
+							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+							position += 0.5f * (speed + newSpeed) * frametime;
+							speed = roundf(newSpeed);
+						}
+						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+							// Bingo
+							tmpGuessedFps = 1000 / msec;
+							foundFps++;
+						}
+					}
+				}
+				
+				if (foundFps >= 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
+
+					cls.fpsGuess.lastGuessedFps = cls.fpsGuess.currentGuessedFps = tmpGuessedFps;
+					cls.fpsGuess.lastGuessedFpsServerTime = cl.snap.serverTime;
+					if (foundFps == 1) { 
+						cls.fpsGuess.lastCertainGuessedFps = cls.fpsGuess.lastGuessedFps;
+						cls.fpsGuess.lastCertainGuessedFpsServerTime = cls.fpsGuess.lastGuessedFpsServerTime;
+						cls.fpsGuess.lastGuessedFpsPercentage = 100;
+					}
+					else {
+						cls.fpsGuess.lastGuessedFpsPercentage = 100/ foundFps;
+					}
+				}
+				else {
+					cls.fpsGuess.currentGuessedFps = -1;
+				}
+			}
+		}
+		else {
+			cls.fpsGuess.currentGuessedFps = -1;
+		}
+		VectorCopy(cl.snap.ps.velocity, cls.fpsGuess.lastVelocity);
+		VectorCopy(cl.snap.ps.origin, cls.fpsGuess.lastPosition);
+		cls.fpsGuess.lastMovementDown = isMovementDown;
+		cls.fpsGuess.lastPsCommandTime = cl.snap.ps.commandTime;
+	}
+
 	// calculate ping time
 	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;

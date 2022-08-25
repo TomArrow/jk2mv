@@ -306,6 +306,29 @@ void RE_RotatePic2 ( float x, float y, float w, float h, float s1, float t1,
 	cmd->t2 = t2;
 }
 
+static int parseVec4(const char* text, vec4_t out) {
+	int matches = sscanf(text, "%f %f %f %f", &out[0], &out[1], &out[2], &out[3]);
+	if (matches <= 0) {
+		out[0] = out[1] = out[2] = out[3] = 1.0f;
+	}
+	else if (matches == 1) {
+		// Only 1 number. Use as scale in general for colors.
+		out[1] = out[2] = out[0];
+		out[3] = 1.0f;
+	}
+	else if (matches == 3) { // Alpha not specified
+		out[3] = 1.0f;
+	}
+	else if (matches == 2) { // First number is color scale, second is alpha
+		out[3] = out[1];
+		out[1] = out[2] = out[0];
+	}
+	else {
+		// I guess we got all 4? All good.
+	}
+	return matches;
+}
+
 /*
 ====================
 RE_BeginFrame
@@ -431,6 +454,17 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 		if ( ( err = qglGetError() ) != GL_NO_ERROR ) {
 			ri.Error( ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!", err );
 		}
+	}
+
+	if (r_celoutlineColor->modified) {
+		tr.celLineColorIsSet = qfalse;
+		if (Q_stricmp(r_celoutlineColor->string, "0")) {
+			const char* skyColorTextPointer = r_celoutlineColor->string;
+			if (parseVec4(skyColorTextPointer,tr.celLineColor)) {
+				tr.celLineColorIsSet = qtrue;
+			}
+		}
+		r_celoutlineColor->modified = qfalse;
 	}
 
 	//

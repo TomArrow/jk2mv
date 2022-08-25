@@ -128,6 +128,18 @@ cvar_t	*r_nobind;
 cvar_t	*r_singleShader;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
+
+// Cel shading ported from http://q3cellshading.sourceforge.net/
+// Next one added for cell shading algorithm selection
+cvar_t* r_celshadalgo;
+//. next one for enable/disable cel bordering all together.
+cvar_t* r_celoutline;
+// My own additions:
+cvar_t* r_celoutlineColor;
+cvar_t* r_celoutlineWidth;
+cvar_t* r_celTextureOutline;
+
+
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
 cvar_t	*r_shownormals;
@@ -1189,6 +1201,14 @@ void R_Register( void )
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
 	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
 	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
+	// for cell shading algorithm selection
+	r_celshadalgo = ri.Cvar_Get("r_celshadalgo", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	// cel outline option
+	r_celoutline = ri.Cvar_Get("r_celoutline", "0", CVAR_ARCHIVE);
+	r_celoutlineWidth = ri.Cvar_Get("r_celoutlineWidth", "4.0", CVAR_ARCHIVE);
+	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
+	r_celTextureOutline = ri.Cvar_Get("r_celTextureOutline", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	r_celoutlineColor->modified = qtrue;
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
 	r_clear = ri.Cvar_Get ("r_clear", "0", CVAR_CHEAT);
@@ -1220,6 +1240,7 @@ Ghoul2 Insert End
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
 #ifndef DEDICATED
+	ri.Cmd_AddCommand( "sqlposcube", R_SQLPosCube_f);// A little hacky thing to generate SQL queries based on current position x 2 to span a cube
 	ri.Cmd_AddCommand( "imagelist", R_ImageList_f );
 	ri.Cmd_AddCommand( "shaderlist", R_ShaderList_f );
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );

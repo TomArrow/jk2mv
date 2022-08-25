@@ -495,6 +495,8 @@ Ghoul2 Insert End
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
 
 	struct	shader_s	*next;
+
+	qboolean isWorldShader; // UGLY hack.
 } shader_t;
 
 /*
@@ -914,7 +916,7 @@ void		R_Modellist_f (void);
 extern	refimport_t		ri;
 
 #define	MAX_DRAWIMAGES			2048
-#define	MAX_LIGHTMAPS			256
+#define	MAX_LIGHTMAPS			2048
 #define	MAX_SKINS				1024
 
 
@@ -1133,6 +1135,16 @@ typedef struct {
 
 	int						dynamicGlowWidth;
 	int						dynamicGlowHeight;
+
+	vec4_t					celLineColor;
+	qboolean				celLineColorIsSet;
+
+
+	//SQL position cube query helper
+	struct {
+		vec3_t lastPos;
+	}sqlPosHelper;
+
 } trGlobals_t;
 
 
@@ -1257,6 +1269,14 @@ extern	cvar_t	*r_vertexLight;					// vertex lighting mode for better performance
 extern	cvar_t	*r_uiFullScreen;				// ui is running fullscreen
 
 extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
+
+// Cel shading ported from http://q3cellshading.sourceforge.net/
+extern	cvar_t* r_celshadalgo;					// Cell shading, chooses method: 0 = disabled, 1 = kuwahara, 2 = whiteTexture
+extern	cvar_t* r_celoutline;						//. cel outline. 1 on, 0 off. (maybe other options later)
+extern	cvar_t* r_celoutlineColor;
+extern	cvar_t* r_celoutlineWidth;
+extern	cvar_t* r_celTextureOutline;
+
 extern	cvar_t	*r_showtris;					// enables wireframe rendering of the world
 extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
 extern	cvar_t	*r_shownormals;					// draws wireframe normals
@@ -1432,6 +1452,7 @@ qboolean	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode )
 void		R_SetColorMappings( void );
 void		R_GammaCorrect( byte *buffer, int bufSize );
 
+void	R_SQLPosCube_f(void);
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
 void	R_ScreenShot_f( void );

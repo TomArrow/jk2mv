@@ -349,6 +349,8 @@ gotnewcl:
 }
 
 
+extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
+
 /*
 =====================
 SV_DropClient
@@ -409,6 +411,9 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	if ( drop->netchan.remoteAddress.type == NA_BOT ) {
 		SV_BotFreeClient( drop - svs.clients );
 	}
+
+	// Clear associated fragment buffers
+	fragmentBuffers[drop->netchan.remoteAddress.ipi][drop->netchan.remoteAddress.port].clear();
 
 	// nuke user info
 	SV_SetUserinfo( drop - svs.clients, "" );
