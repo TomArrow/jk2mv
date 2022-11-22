@@ -14,6 +14,8 @@ cvar_t		*cl_graphheight;
 cvar_t		*cl_graphscale;
 cvar_t		*cl_graphshift;
 
+cvar_t* cl_showVelocity;
+cvar_t* cl_showVelocityAllowNegative;
 cvar_t* cl_fpsGuess;
 cvar_t* cl_fpsGuessMode;
 
@@ -405,6 +407,8 @@ SCR_Init
 */
 void SCR_Init( void ) {
 
+	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
+	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
 	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
@@ -545,6 +549,10 @@ void SCR_UpdateScreen( void ) {
 	if (cl_fpsGuess->integer) {
 		bool notTooOld = (cl.snap.serverTime - cls.fpsGuess.lastGuessedFpsServerTime < 1000);
 		SCR_DrawBigString(320, 240, va("%d:%d/%d(%d%%)",cl_fpsGuessMode->integer, cls.fpsGuess.lastCertainGuessedFps, notTooOld ? cls.fpsGuess.lastGuessedFps:0, notTooOld ? cls.fpsGuess.lastGuessedFpsPercentage: 0), 1.0f);
+	} 
+	if (cl_showVelocity->integer) {
+		SCR_DrawStringExt(100, 260,10, va("mV:%.2f, mVh:%.2f, mVv: %.2f",cls.showVelocity.maxVelocity, cls.showVelocity.maxVelocityH, cls.showVelocity.maxVelocityV),colorWhite,qfalse);
+		SCR_DrawStringExt(100, 270,10, va("mDV:%.2f, mDVh:%.2f, mDVv: %.2f",cls.showVelocity.maxVelocityDelta, cls.showVelocity.maxVelocityDeltaH, cls.showVelocity.maxVelocityDeltaV), colorWhite, qfalse);
 	} 
 
 	if ( com_speeds->integer ) {

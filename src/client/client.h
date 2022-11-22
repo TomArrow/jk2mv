@@ -381,6 +381,15 @@ typedef struct {
 		int lastGuessedFpsServerTime;
 	} fpsGuess;
 
+	struct { // Data for a reasonable number of past frames.
+		float maxVelocity;
+		float maxVelocityV;
+		float maxVelocityH;
+		float maxVelocityDelta;
+		float maxVelocityDeltaV;
+		float maxVelocityDeltaH;
+	} showVelocity;
+
 
 } clientStatic_t;
 
@@ -444,6 +453,8 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
+extern	cvar_t	* cl_showVelocity;
+extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	*cl_maxpackets;

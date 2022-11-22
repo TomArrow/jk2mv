@@ -352,6 +352,55 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	cl.snap = newSnap;
 	cl.snap.ping = 999;
 
+#define SHOWVELOCITY_MAX_PAST_FRAMES 250
+	if (cl_showVelocity->integer) {
+		static int showVelocityLogIndex = 0;
+		static vec3_t lastVelocity{ 0,0,0 };
+		static float velocities[SHOWVELOCITY_MAX_PAST_FRAMES];
+		static float velocitiesH[SHOWVELOCITY_MAX_PAST_FRAMES];
+		static float velocitiesV[SHOWVELOCITY_MAX_PAST_FRAMES];
+		static float velocityDeltas[SHOWVELOCITY_MAX_PAST_FRAMES];
+		static float velocityDeltasH[SHOWVELOCITY_MAX_PAST_FRAMES];
+		static float velocityDeltasV[SHOWVELOCITY_MAX_PAST_FRAMES];
+
+		int pastFrameCount = cl_showVelocity->integer > 1 ? min(SHOWVELOCITY_MAX_PAST_FRAMES, cl_showVelocity->integer) : SHOWVELOCITY_MAX_PAST_FRAMES;
+
+		//vec3_t velocityDelta;
+		//VectorSubtract(cl.snap.ps.velocity, lastVelocity, velocityDelta);
+		velocities[showVelocityLogIndex] = VectorLength(cl.snap.ps.velocity);
+		velocitiesH[showVelocityLogIndex] = VectorLength2(cl.snap.ps.velocity);
+		velocitiesV[showVelocityLogIndex] = cl.snap.ps.velocity[2];
+		velocityDeltas[showVelocityLogIndex] = VectorLength(cl.snap.ps.velocity)- VectorLength(lastVelocity);
+		velocityDeltasH[showVelocityLogIndex] = VectorLength2(cl.snap.ps.velocity)- VectorLength2(lastVelocity);
+		velocityDeltasV[showVelocityLogIndex] = cl.snap.ps.velocity[2] - lastVelocity[2];
+
+		Com_Memset(&cls.showVelocity, 0, sizeof(cls.showVelocity));
+
+		for (int i = 0; i < pastFrameCount; i++) {
+			if (cl_showVelocityAllowNegative->integer) {
+
+				if (abs(velocities[i]) > abs(cls.showVelocity.maxVelocity)) cls.showVelocity.maxVelocity = velocities[i];
+				if (abs(velocitiesH[i]) > abs(cls.showVelocity.maxVelocityH)) cls.showVelocity.maxVelocityH = velocitiesH[i];
+				if (abs(velocitiesV[i]) > abs(cls.showVelocity.maxVelocityV)) cls.showVelocity.maxVelocityV = velocitiesV[i];
+				if (abs(velocityDeltas[i]) > abs(cls.showVelocity.maxVelocityDelta)) cls.showVelocity.maxVelocityDelta = velocityDeltas[i];
+				if (abs(velocityDeltasH[i]) > abs(cls.showVelocity.maxVelocityDeltaH)) cls.showVelocity.maxVelocityDeltaH = velocityDeltasH[i];
+				if (abs(velocityDeltasV[i]) > abs(cls.showVelocity.maxVelocityDeltaV)) cls.showVelocity.maxVelocityDeltaV = velocityDeltasV[i];
+			}
+			else {
+
+				if ((velocities[i]) > (cls.showVelocity.maxVelocity)) cls.showVelocity.maxVelocity = velocities[i];
+				if ((velocitiesH[i]) > (cls.showVelocity.maxVelocityH)) cls.showVelocity.maxVelocityH = velocitiesH[i];
+				if ((velocitiesV[i]) > (cls.showVelocity.maxVelocityV)) cls.showVelocity.maxVelocityV = velocitiesV[i];
+				if ((velocityDeltas[i]) > (cls.showVelocity.maxVelocityDelta)) cls.showVelocity.maxVelocityDelta = velocityDeltas[i];
+				if ((velocityDeltasH[i]) > (cls.showVelocity.maxVelocityDeltaH)) cls.showVelocity.maxVelocityDeltaH = velocityDeltasH[i];
+				if ((velocityDeltasV[i]) > (cls.showVelocity.maxVelocityDeltaV)) cls.showVelocity.maxVelocityDeltaV = velocityDeltasV[i];
+			}
+		}
+
+		showVelocityLogIndex = ++showVelocityLogIndex % pastFrameCount;
+		VectorCopy(cl.snap.ps.velocity, lastVelocity);
+	}
+
 	if (cl_fpsGuess->integer) {
 		// FPS guessing
 		qboolean isMovementDown = (qboolean)(cl.snap.ps.origin[2] < cls.fpsGuess.lastPosition[2]);
