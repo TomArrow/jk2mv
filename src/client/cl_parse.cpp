@@ -1,5 +1,6 @@
 // cl_parse.c  -- parse a message received from the server
 
+#include <algorithm>
 #include "client.h"
 #include "../qcommon/strip.h"
 #include "../ghoul2/G2_local.h"
@@ -363,7 +364,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		static float velocityDeltasH[SHOWVELOCITY_MAX_PAST_FRAMES];
 		static float velocityDeltasV[SHOWVELOCITY_MAX_PAST_FRAMES];
 
-		int pastFrameCount = cl_showVelocity->integer > 1 ? min(SHOWVELOCITY_MAX_PAST_FRAMES, cl_showVelocity->integer) : SHOWVELOCITY_MAX_PAST_FRAMES;
+		int pastFrameCount = cl_showVelocity->integer > 1 ? std::min(SHOWVELOCITY_MAX_PAST_FRAMES, cl_showVelocity->integer) : SHOWVELOCITY_MAX_PAST_FRAMES;
 
 		//vec3_t velocityDelta;
 		//VectorSubtract(cl.snap.ps.velocity, lastVelocity, velocityDelta);
