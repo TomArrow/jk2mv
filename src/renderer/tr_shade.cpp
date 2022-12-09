@@ -308,7 +308,7 @@ void R_BindAnimatedImage( textureBundle_t *bundle ) {
 		return;
 	}
 
-	if ((r_fullbright->value /*|| tr.refdef.doFullbright */) && bundle->isLightmap)
+	if ((r_fullbright->value /*|| tr.refdef.doFullbright */ && r_fullbright->integer != 200000) && bundle->isLightmap)
 	{
 		GL_Bind( tr.whiteImage );
 		return;

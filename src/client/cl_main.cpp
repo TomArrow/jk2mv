@@ -20,7 +20,7 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
-#define NOCONNECT
+//#define NOCONNECT
 
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
@@ -360,6 +360,8 @@ void CL_RandomizeColors(const char* in, char *out) {
 	*s = '\0';
 }
 
+extern cvar_t* r_fullbright;
+
 static void CL_ColorName_f(void) {
 	char name[MAX_TOKEN_CHARS];
 	char coloredName[MAX_TOKEN_CHARS];
@@ -367,7 +369,7 @@ static void CL_ColorName_f(void) {
 	int storebitcount = cl_colorStringCount->integer;
 
 	Cvar_VariableStringBuffer("name", name, sizeof(name));
-	Q_StripColor(name);
+	Q_StripColor(name, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 	if (Cmd_Argc() == 1) {
 		CL_RandomizeColors(name, coloredName);
 		Cvar_Set("name", va("%s", coloredName));

@@ -236,6 +236,8 @@ void Con_Copy(void) {
 	Hunk_FreeTempMemory(savebuffer);
 }
 
+extern cvar_t* r_fullbright;
+
 void Con_CopyLink(void) {
 	int l, x, i, pointDiff;
 	//short *line;
@@ -261,7 +263,7 @@ void Con_CopyLink(void) {
 			else
 				break;
 		}
-		Q_StripColor(buffer);
+		Q_StripColor(buffer, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 		if ((link = Q_stristr(buffer, "://")) || (link = Q_stristr(buffer, "www."))) {
 			// Move link ptr back until it hits a space or first char of string
 			while (link != &buffer[0] && *(link - 1) != ' ') link--;

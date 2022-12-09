@@ -1053,7 +1053,7 @@ This function modifies INPUT (is mutable)
 (Also strips ^8 and ^9)
 ==================
 */
-void Q_StripColor(char *text)
+void Q_StripColor(char *text,qboolean doHex)
 {
 	qboolean doPass = qtrue;
 	char *read;
@@ -1065,7 +1065,7 @@ void Q_StripColor(char *text)
 		read = write = text;
 		while ( *read )
 		{
-			if (Q_IsColorStringHex(read + 1)) {
+			if (doHex && Q_IsColorStringHex(read + 1)) {
 				int skipCount = 0;
 				Q_parseColorHex(read + 1, 0, &skipCount);
 				read += 1 + skipCount;

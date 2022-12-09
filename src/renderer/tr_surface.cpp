@@ -257,7 +257,7 @@ inline uint32_t ComputeFinalVertexColor(const byte *colors)
 	for (k = 0; k < 4; k++)
 		result.b[k] = colors[k];
 
-	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || r_fullbright->integer)
+	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || (r_fullbright->integer && r_fullbright->integer != 200000))
 	{
 		result.b[0] = 255;
 		result.b[1] = 255;
