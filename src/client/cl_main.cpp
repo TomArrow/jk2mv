@@ -20,6 +20,8 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
+#define NOCONNECT
+
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
 
@@ -1332,12 +1334,14 @@ CL_Reconnect_f
 ================
 */
 void CL_Reconnect_f( void ) {
+#ifndef NOCONNECT
 	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
 	Cvar_Set("ui_singlePlayerActive", "0");
 	Cbuf_AddText( va("connect %s\n", cls.servername ) );
+#endif
 }
 
 /*
@@ -1347,6 +1351,7 @@ CL_Connect_f
 ================
 */
 void CL_Connect_f( void ) {
+#ifndef NOCONNECT
 	char	server[MAX_OSPATH];
 
 	if ( Cmd_Argc() != 2 ) {
@@ -1409,6 +1414,7 @@ void CL_Connect_f( void ) {
 
 	// server connection string
 	Cvar_Set( "cl_currentServerAddress", server );
+#endif
 }
 
 #define MAX_RCON_MESSAGE 1024
