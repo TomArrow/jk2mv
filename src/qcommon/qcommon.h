@@ -7,6 +7,8 @@
 #include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
 
+#include <vector>
+
 //============================================================================
 
 // for auto-complete (copied from OpenJK)
@@ -86,11 +88,15 @@ typedef struct {
 	int		cursize;
 	int		readcount;
 	int		bit;				// for bitwise reads and writes
+
+	qboolean	raw;			// raw, everything saved as integers
+	std::vector<byte>* dataRaw;
 } msg_t;
 
 
 
 void MSG_Init (msg_t *buf, byte *data, int length);
+void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw);
 void MSG_InitOOB( msg_t *buf, byte *data, int length );
 void MSG_Clear (msg_t *buf);
 void MSG_WriteData (msg_t *buf, const void *data, int length);
@@ -207,6 +213,7 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_messag
 void		NET_Sleep(int msec);
 
 #define	MAX_MSGLEN				16384		// max length of a message, which may
+#define	MAX_MSGLEN_RAW			MAX_MSGLEN*10	// max length of a message, which may
 											// be fragmented into multiple packets
 
 #define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
@@ -639,6 +646,12 @@ typedef enum {
 	MODULE_MAX
 } module_t;
 
+enum fileCompressionScheme_t {
+	FILECOMPRESSION_NONE, // Normal default file handling
+	FILECOMPRESSION_RAW, // The special compressed file format but without actually using any compression
+	FILECOMPRESSION_LZMA // The special compressed file format with LZMA compression
+};
+
 qboolean FS_CopyFile( char *fromOSPath, char *toOSPath, char *newOSPath = NULL, const int newSize = 0 );
 
 qboolean FS_Initialized();
@@ -678,8 +691,8 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODUL
 fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN );
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN );
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse);
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -692,7 +705,7 @@ int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 int		FS_Write( const void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 
 int		FS_Read2( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
-int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
+int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN, qboolean ignoreCompression = qfalse);
 // properly handles partial reads and reads from other dlls
 
 void	FS_FCloseFile( fileHandle_t f, module_t module = MODULE_MAIN );

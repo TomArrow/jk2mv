@@ -793,6 +793,7 @@ void CL_ReadDemoMessage( void ) {
 	int			r;
 	msg_t		buf;
 	byte		bufData[ MAX_MSGLEN ];
+	std::vector<byte> bufDataRaw;
 	int			s;
 
 	if ( !clc.demofile ) {
@@ -809,7 +810,13 @@ void CL_ReadDemoMessage( void ) {
 	clc.serverMessageSequence = LittleLong( s );
 
 	// init the message
-	MSG_Init( &buf, bufData, sizeof( bufData ) );
+	if (clc.demoIsCompressed) {
+		bufDataRaw.clear();
+		MSG_InitRaw(&buf, &bufDataRaw); // Input message
+	}
+	else {
+		MSG_Init(&buf, bufData, sizeof(bufData));
+	}
 
 	// get the length
 	r = FS_Read (&buf.cursize, 4, clc.demofile);
@@ -825,7 +832,15 @@ void CL_ReadDemoMessage( void ) {
 	if ( buf.cursize > buf.maxsize ) {
 		Com_Error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
-	r = FS_Read( buf.data, buf.cursize, clc.demofile );
+
+	if (buf.raw) {
+		buf.dataRaw->resize(buf.cursize);
+		r = FS_Read(buf.dataRaw->data(), buf.cursize, clc.demofile);
+	}
+	else {
+		r = FS_Read(buf.data, buf.cursize, clc.demofile);
+	}
+
 	if ( r != buf.cursize ) {
 		Com_Printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
@@ -874,11 +889,20 @@ void CL_PlayDemo_f( void ) {
 	*/
 
 	// open the demo file
-	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) )
+	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) 
+		|| !Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16") // Compressed types
+		)
 	{ // Load "dm_15" and "dm_16" demos.
 		Com_sprintf (name, sizeof(name), "demos/%s", arg);
 
-		FS_FOpenFileRead( name, &clc.demofile, qtrue );
+		if (!Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16")) {
+			clc.demoIsCompressed = qtrue;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue); // Compressed type
+		}
+		else {
+			clc.demoIsCompressed = qfalse;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue);
+		}
 		if (!clc.demofile)
 		{
 			if (!Q_stricmp(arg, "(null)"))
@@ -894,24 +918,39 @@ void CL_PlayDemo_f( void ) {
 	}
 	else
 	{
+
 		// Check for both, "dm_15" and "dm_16".
-		Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
-		FS_FOpenFileRead( name, &clc.demofile, qtrue );
-		if ( !clc.demofile )
+		Com_sprintf(name, sizeof(name), "demos/%s.dmc15", arg);// Compressed dm_15 type
+		clc.demoIsCompressed = qtrue;
+		FS_FOpenFileRead(name, &clc.demofile, qtrue,MODULE_MAIN,qtrue);
+		if (!clc.demofile)
 		{
-			Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
-			FS_FOpenFileRead( name, &clc.demofile, qtrue );
-			if ( !clc.demofile )
+			Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
+			clc.demoIsCompressed = qfalse;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue);
+			if (!clc.demofile)
 			{
-				if (!Q_stricmp(arg, "(null)"))
+				Com_sprintf(name, sizeof(name), "demos/%s.dmc16", arg);// Compressed dm_16 type
+				clc.demoIsCompressed = qtrue;
+				FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue);
+				if (!clc.demofile)
 				{
-					Com_Error( ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED") );
+					Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
+					clc.demoIsCompressed = qfalse;
+					FS_FOpenFileRead(name, &clc.demofile, qtrue);
+					if (!clc.demofile)
+					{
+						if (!Q_stricmp(arg, "(null)"))
+						{
+							Com_Error(ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED"));
+						}
+						else
+						{
+							Com_Error(ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
+						}
+						return;
+					}
 				}
-				else
-				{
-					Com_Error( ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
-				}
-				return;
 			}
 		}
 	}
@@ -926,11 +965,11 @@ void CL_PlayDemo_f( void ) {
 	Q_strncpyz( cls.servername, arg, sizeof( cls.servername ) );
 
 	// Set the protocol according to the the demo-file.
-	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) ) {
+	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc15"), ".dmc15")) {
 		MV_SetCurrentGameversion(VERSION_1_02);
 		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
 	}
-	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) ) {
+	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc16"), ".dmc16")) {
 		MV_SetCurrentGameversion(VERSION_1_04);
 	}
 

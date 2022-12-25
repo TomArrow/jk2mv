@@ -225,6 +225,7 @@ typedef struct {
 	qboolean	firstDemoFrameSkipped;
 	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
+	qboolean	demoIsCompressed;
 
 	int			timeDemoFrames;		// counter of rendered frames
 	int			timeDemoStart;		// cls.realtime before first frame
