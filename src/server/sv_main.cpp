@@ -27,6 +27,7 @@ cvar_t	*sv_serverid;
 cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
 cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
 cvar_t	*sv_enforceSnaps;
+cvar_t	*sv_enforceSnapsDebug;  // Generate all snapshots but only actually send the messages according to max snaps etc
 cvar_t	*sv_minRate;
 cvar_t	*sv_maxRate;
 cvar_t	*sv_maxOOBRate;
@@ -1256,6 +1257,8 @@ void SV_Frame( int msec ) {
 
 	// send messages back to the clients
 	SV_SendClientMessages();
+
+	SV_CheckCvars();
 
 	// send a heartbeat to the master if needed
 	SV_MasterHeartbeat();
