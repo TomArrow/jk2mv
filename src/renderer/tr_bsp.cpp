@@ -2133,6 +2133,7 @@ static void RE_LoadWorldMap_Actual( const char *name ) {
 
 	Com_Memset( &s_worldData, 0, sizeof( s_worldData ) );
 	Q_strncpyz( s_worldData.name, name, sizeof( s_worldData.name ) );
+	Q_strncpyz( tr.worldDir, name, sizeof( tr.worldDir ) );
 
 	COM_StripExtension(COM_SkipPath(s_worldData.name), s_worldData.baseName, sizeof(s_worldData.baseName));
 	COM_StripExtension(name, tr.worldDir, sizeof(tr.worldDir));
