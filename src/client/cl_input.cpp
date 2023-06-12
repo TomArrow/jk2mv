@@ -679,11 +679,53 @@ CL_FinishMove
 void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 	qboolean didForce = qfalse;
+	unsigned int flags;
 
 	// copy the state that the cgame is currently sending
-	cmd->weapon = cl.cgameUserCmdValue;
-	cmd->forcesel = cl.cgameForceSelection;
-	cmd->invensel = cl.cgameInvenSelection;
+	flags = cl.cgameUserCmdFlags;
+
+	if (flags & USERCMD_SET_SERVERTIME)
+	{
+		cmd->serverTime = cl.cgameUserCmd.serverTime;
+	}
+	if (flags & USERCMD_SET_ANGLES)
+	{
+		cmd->angles[0] = cl.cgameUserCmd.angles[0];
+		cmd->angles[1] = cl.cgameUserCmd.angles[1];
+		cmd->angles[2] = cl.cgameUserCmd.angles[2];
+	}
+	if (flags & USERCMD_SET_BUTTONS)
+	{
+		cmd->buttons = cl.cgameUserCmd.buttons;
+	}
+	if (flags & USERCMD_SET_WEAPON)
+	{
+		cmd->weapon = cl.cgameUserCmd.weapon;
+	}
+	if (flags & USERCMD_SET_FORCESEL)
+	{
+		cmd->forcesel = cl.cgameUserCmd.forcesel;
+	}
+	if (flags & USERCMD_SET_INVENSEL)
+	{
+		cmd->invensel = cl.cgameUserCmd.invensel;
+	}
+	if (flags & USERCMD_SET_GENERIC_CMD)
+	{
+		cmd->generic_cmd = cl.cgameUserCmd.generic_cmd;
+	}
+	if (flags & USERCMD_SET_FORWARDMOVE)
+	{
+		cmd->forwardmove = cl.cgameUserCmd.forwardmove;
+	}
+	if (flags & USERCMD_SET_RIGHTMOVE)
+	{
+		cmd->rightmove = cl.cgameUserCmd.rightmove;
+	}
+	if (flags & USERCMD_SET_UPMOVE)
+	{
+		cmd->upmove = cl.cgameUserCmd.upmove;
+	}
 
 	if (cl.gcmdSendValue)
 	{

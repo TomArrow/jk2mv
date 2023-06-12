@@ -279,11 +279,70 @@ qboolean	CL_GetSnapshot(int snapshotNumber, snapshot_t *snapshot) {
 CL_SetUserCmdValue
 =====================
 */
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int fpSel, int invenSel ) {
-	cl.cgameUserCmdValue = userCmdValue;
-	cl.cgameSensitivity = sensitivityScale;
-	cl.cgameForceSelection = fpSel;
-	cl.cgameInvenSelection = invenSel;
+void
+CL_SetUserCmdValue(
+	int serverTime,
+	const int *angles,
+	int buttons,
+	byte weapon,
+	byte forcesel,
+	byte invensel,
+	byte generic_cmd,
+	signed char forwardmove,
+	signed char rightmove,
+	signed char upmove,
+	float sensitivityScale,
+	unsigned int flags
+)
+{
+	if (flags & USERCMD_SET_SERVERTIME)
+	{
+		cl.cgameUserCmd.serverTime = serverTime;
+	}
+	if (flags & USERCMD_SET_ANGLES)
+	{
+		cl.cgameUserCmd.angles[0] = angles[0];
+		cl.cgameUserCmd.angles[1] = angles[1];
+		cl.cgameUserCmd.angles[2] = angles[2];
+	}
+	if (flags & USERCMD_SET_BUTTONS)
+	{
+		cl.cgameUserCmd.buttons = buttons;
+	}
+	if (flags & USERCMD_SET_WEAPON)
+	{
+		cl.cgameUserCmd.weapon = weapon;
+	}
+	if (flags & USERCMD_SET_FORCESEL)
+	{
+		cl.cgameUserCmd.forcesel = forcesel;
+	}
+	if (flags & USERCMD_SET_INVENSEL)
+	{
+		cl.cgameUserCmd.invensel = invensel;
+	}
+	if (flags & USERCMD_SET_GENERIC_CMD)
+	{
+		cl.cgameUserCmd.generic_cmd = generic_cmd;
+	}
+	if (flags & USERCMD_SET_FORWARDMOVE)
+	{
+		cl.cgameUserCmd.forwardmove = forwardmove;
+	}
+	if (flags & USERCMD_SET_RIGHTMOVE)
+	{
+		cl.cgameUserCmd.rightmove = rightmove;
+	}
+	if (flags & USERCMD_SET_UPMOVE)
+	{
+		cl.cgameUserCmd.upmove = upmove;
+	}
+	if (flags & USERCMD_SET_SENSITIVITYSCALE)
+	{
+		cl.cgameSensitivity = sensitivityScale;
+	}
+
+	cl.cgameUserCmdFlags = flags;
 }
 
 /*
@@ -978,7 +1037,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	case CG_GETUSERCMD:
 		return CL_GetUserCmd( args[1], VMAV(2, usercmd_t) );
 	case CG_SETUSERCMDVALUE:
-		CL_SetUserCmdValue( args[1], VMF(2), args[3], args[4] );
+		CL_SetUserCmdValue(args[1], VMAP(2, const int, 3), args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], VMF(11), args[12]);
 		return 0;
 	case CG_SETCLIENTFORCEANGLE:
 		CL_SetClientForceAngle(args[1], VMAP(2, const vec_t, 3));

@@ -106,16 +106,14 @@ typedef struct {
 	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
 
 	// cgame communicates a few values to the client system
-	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+	usercmd_t	cgameUserCmd;
+	unsigned int cgameUserCmdFlags;
 	vec3_t		cgameViewAngleForce;
 	int			cgameViewAngleForceTime;
 	float		cgameTurnExtentAdd;
 	float		cgameTurnExtentSub;
 	int			cgameTurnExtentTime;
 	float		cgameSensitivity;
-
-	int			cgameForceSelection;
-	int			cgameInvenSelection;
 
 	qboolean	gcmdSendValue;
 	byte		gcmdValue;
