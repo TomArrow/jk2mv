@@ -17,110 +17,47 @@
  * license, as set out in <https://www.cesanta.com/license>.
  */
 
-#include "mongoose.h"
 #ifdef MG_MODULE_LINES
 #line 1 "mongoose/src/mg_internal.h"
 #endif
+/*
+ * Copyright (c) 2014 Cesanta Software Limited
+ * All rights reserved
+ */
 
-#ifdef MG_ENABLE_LINES
-#line 1 "src/base64.c"
+#ifndef CS_MONGOOSE_SRC_INTERNAL_H_
+#define CS_MONGOOSE_SRC_INTERNAL_H_
+
+/* Amalgamated: #include "common/mg_mem.h" */
+
+#ifndef MBUF_REALLOC
+#define MBUF_REALLOC MG_REALLOC
 #endif
 
+#ifndef MBUF_FREE
+#define MBUF_FREE MG_FREE
+#endif
 
-static int mg_base64_encode_single(int c) {
-  if (c < 26) {
-    return c + 'A';
-  } else if (c < 52) {
-    return c - 26 + 'a';
-  } else if (c < 62) {
-    return c - 52 + '0';
-  } else {
-    return c == 62 ? '+' : '/';
-  }
-}
+#define MG_SET_PTRPTR(_ptr, _v) \
+  do {                          \
+    if (_ptr) *(_ptr) = _v;     \
+  } while (0)
 
-static int mg_base64_decode_single(int c) {
-  if (c >= 'A' && c <= 'Z') {
-    return c - 'A';
-  } else if (c >= 'a' && c <= 'z') {
-    return c + 26 - 'a';
-  } else if (c >= '0' && c <= '9') {
-    return c + 52 - '0';
-  } else if (c == '+') {
-    return 62;
-  } else if (c == '/') {
-    return 63;
-  } else if (c == '=') {
-    return 64;
-  } else {
-    return -1;
-  }
-}
+#ifndef MG_INTERNAL
+#define MG_INTERNAL static
+#endif
 
-size_t mg_base64_update(unsigned char ch, char *to, size_t n) {
-  unsigned long rem = (n & 3) % 3;
-  if (rem == 0) {
-    to[n] = (char) mg_base64_encode_single(ch >> 2);
-    to[++n] = (char) ((ch & 3) << 4);
-  } else if (rem == 1) {
-    to[n] = (char) mg_base64_encode_single(to[n] | (ch >> 4));
-    to[++n] = (char) ((ch & 15) << 2);
-  } else {
-    to[n] = (char) mg_base64_encode_single(to[n] | (ch >> 6));
-    to[++n] = (char) mg_base64_encode_single(ch & 63);
-    n++;
-  }
-  return n;
-}
+#ifdef PICOTCP
+#define NO_LIBC
+#define MG_DISABLE_PFS
+#endif
 
-size_t mg_base64_final(char *to, size_t n) {
-  size_t saved = n;
-  // printf("---[%.*s]\n", n, to);
-  if (n & 3) n = mg_base64_update(0, to, n);
-  if ((saved & 3) == 2) n--;
-  // printf("    %d[%.*s]\n", n, n, to);
-  while (n & 3) to[n++] = '=';
-  to[n] = '\0';
-  return n;
-}
+/* Amalgamated: #include "common/cs_dbg.h" */
+/* Amalgamated: #include "mg_http.h" */
+/* Amalgamated: #include "mg_net.h" */
 
-size_t mg_base64_encode(const unsigned char *p, size_t n, char *to, size_t dl) {
-  size_t i, len = 0;
-  if (dl > 0) to[0] = '\0';
-  if (dl < ((n / 3) + (n % 3 ? 1 : 0)) * 4 + 1) return 0;
-  for (i = 0; i < n; i++) len = mg_base64_update(p[i], to, len);
-  len = mg_base64_final(to, len);
-  return len;
-}
-
-size_t mg_base64_decode(const char *src, size_t n, char *dst, size_t dl) {
-  const char *end = src == NULL ? NULL : src + n;  // Cannot add to NULL
-  size_t len = 0;
-  if (dl < n / 4 * 3 + 1) goto fail;
-  while (src != NULL && src + 3 < end) {
-    int a = mg_base64_decode_single(src[0]),
-        b = mg_base64_decode_single(src[1]),
-        c = mg_base64_decode_single(src[2]),
-        d = mg_base64_decode_single(src[3]);
-    if (a == 64 || a < 0 || b == 64 || b < 0 || c < 0 || d < 0) {
-      goto fail;
-    }
-    dst[len++] = (char) ((a << 2) | (b >> 4));
-    if (src[2] != '=') {
-      dst[len++] = (char) ((b << 4) | (c >> 2));
-      if (src[3] != '=') dst[len++] = (char) ((c << 6) | d);
-    }
-    src += 4;
-  }
-  dst[len] = '\0';
-  return len;
-fail:
-  if (dl > 0) dst[0] = '\0';
-  return 0;
-}
-
-#ifdef MG_ENABLE_LINES
-#line 1 "src/dns.c"
+#ifndef MG_CTL_MSG_MESSAGE_SIZE
+#define MG_CTL_MSG_MESSAGE_SIZE 8192
 #endif
 
 
@@ -1259,100 +1196,44 @@ size_t mg_vxprintf(void (*out)(char, void *), void *param, const char *fmt,
 #ifdef MG_ENABLE_LINES
 #line 1 "src/fs.c"
 #endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#ifndef CS_COMMON_CS_DIRENT_H_
+#define CS_COMMON_CS_DIRENT_H_
 
+#include <limits.h>
 
+/* Amalgamated: #include "common/platform.h" */
 
-struct mg_fd *mg_fs_open(struct mg_fs *fs, const char *path, int flags) {
-  struct mg_fd *fd = (struct mg_fd *) calloc(1, sizeof(*fd));
-  if (fd != NULL) {
-    fd->fd = fs->op(path, flags);
-    fd->fs = fs;
-    if (fd->fd == NULL) {
-      free(fd);
-      fd = NULL;
-    }
-  }
-  return fd;
-}
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-void mg_fs_close(struct mg_fd *fd) {
-  if (fd != NULL) {
-    fd->fs->cl(fd->fd);
-    free(fd);
-  }
-}
+#ifdef CS_DEFINE_DIRENT
+typedef struct { int dummy; } DIR;
 
-struct mg_str mg_file_read(struct mg_fs *fs, const char *path) {
-  struct mg_str result = {NULL, 0};
-  void *fp;
-  fs->st(path, &result.len, NULL);
-  if ((fp = fs->op(path, MG_FS_READ)) != NULL) {
-    result.buf = (char *) calloc(1, result.len + 1);
-    if (result.buf != NULL &&
-        fs->rd(fp, (void *) result.buf, result.len) != result.len) {
-      free((void *) result.buf);
-      result.buf = NULL;
-    }
-    fs->cl(fp);
-  }
-  if (result.buf == NULL) result.len = 0;
-  return result;
-}
-
-bool mg_file_write(struct mg_fs *fs, const char *path, const void *buf,
-                   size_t len) {
-  bool result = false;
-  struct mg_fd *fd;
-  char tmp[MG_PATH_MAX];
-  mg_snprintf(tmp, sizeof(tmp), "%s..%d", path, rand());
-  if ((fd = mg_fs_open(fs, tmp, MG_FS_WRITE)) != NULL) {
-    result = fs->wr(fd->fd, buf, len) == len;
-    mg_fs_close(fd);
-    if (result) {
-      fs->rm(path);
-      fs->mv(tmp, path);
-    } else {
-      fs->rm(tmp);
-    }
-  }
-  return result;
-}
-
-bool mg_file_printf(struct mg_fs *fs, const char *path, const char *fmt, ...) {
-  va_list ap;
-  char *data;
-  bool result = false;
-  va_start(ap, fmt);
-  data = mg_vmprintf(fmt, &ap);
-  va_end(ap);
-  result = mg_file_write(fs, path, data, strlen(data));
-  free(data);
-  return result;
-}
-
-// This helper function allows to scan a filesystem in a sequential way,
-// without using callback function:
-//      char buf[100] = "";
-//      while (mg_fs_ls(&mg_fs_posix, "./", buf, sizeof(buf))) {
-//        ...
-static void mg_fs_ls_fn(const char *filename, void *param) {
-  struct mg_str *s = (struct mg_str *) param;
-  if (s->buf[0] == '\0') {
-    mg_snprintf((char *) s->buf, s->len, "%s", filename);
-  } else if (strcmp(s->buf, filename) == 0) {
-    ((char *) s->buf)[0] = '\0';  // Fetch next file
-  }
-}
-
-bool mg_fs_ls(struct mg_fs *fs, const char *path, char *buf, size_t len) {
-  struct mg_str s = {buf, len};
-  fs->ls(path, mg_fs_ls_fn, &s);
-  return buf[0] != '\0';
-}
-
-#ifdef MG_ENABLE_LINES
-#line 1 "src/fs_fat.c"
+struct dirent {
+  int d_ino;
+#ifdef _WIN32
+  char d_name[MAX_PATH];
+#else
+  /* TODO(rojer): Use PATH_MAX but make sure it's sane on every platform */
+  char d_name[256];
 #endif
 
 
@@ -1612,54 +1493,36 @@ struct mg_fs mg_fs_packed = {
 #ifdef MG_ENABLE_LINES
 #line 1 "src/fs_posix.c"
 #endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#ifndef EXCLUDE_COMMON
 
-#if MG_ENABLE_POSIX_FS
+/* Amalgamated: #include "common/mg_mem.h" */
+/* Amalgamated: #include "common/cs_dirent.h" */
 
-#ifndef MG_STAT_STRUCT
-#define MG_STAT_STRUCT stat
-#endif
+/*
+ * This file contains POSIX opendir/closedir/readdir API implementation
+ * for systems which do not natively support it (e.g. Windows).
+ */
 
-#ifndef MG_STAT_FUNC
-#define MG_STAT_FUNC stat
-#endif
-
-static int p_stat(const char *path, size_t *size, time_t *mtime) {
-#if !defined(S_ISDIR)
-  MG_ERROR(("stat() API is not supported. %p %p %p", path, size, mtime));
-  return 0;
-#else
-#if MG_ARCH == MG_ARCH_WIN32
-  struct _stati64 st;
-  wchar_t tmp[MG_PATH_MAX];
-  MultiByteToWideChar(CP_UTF8, 0, path, -1, tmp, sizeof(tmp) / sizeof(tmp[0]));
-  if (_wstati64(tmp, &st) != 0) return 0;
-  // If path is a symlink, windows reports 0 in st.st_size.
-  // Get a real file size by opening it and jumping to the end
-  if (st.st_size == 0 && (st.st_mode & _S_IFREG)) {
-    FILE *fp = _wfopen(tmp, L"rb");
-    if (fp != NULL) {
-      fseek(fp, 0, SEEK_END);
-      if (ftell(fp) > 0) st.st_size = ftell(fp);  // Use _ftelli64 on win10+
-      fclose(fp);
-    }
-  }
-#else
-  struct MG_STAT_STRUCT st;
-  if (MG_STAT_FUNC(path, &st) != 0) return 0;
-#endif
-  if (size) *size = (size_t) st.st_size;
-  if (mtime) *mtime = st.st_mtime;
-  return MG_FS_READ | MG_FS_WRITE | (S_ISDIR(st.st_mode) ? MG_FS_DIR : 0);
-#endif
-}
-
-#if MG_ARCH == MG_ARCH_WIN32
-struct dirent {
-  char d_name[MAX_PATH];
-};
-
-typedef struct win32_dir {
+#ifdef _WIN32
+struct win32_dir {
+  DIR d;
   HANDLE handle;
   WIN32_FIND_DATAW info;
   struct dirent result;
@@ -2222,366 +2085,28 @@ int mg_http_parse(const char *s, size_t len, struct mg_http_message *hm) {
 #ifdef MG_MODULE_LINES
 #line 1 "common/cs_endian.h"
 #endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-static void mg_http_vprintf_chunk(struct mg_connection *c, const char *fmt,
-                                  va_list *ap) {
-  size_t len = c->send.len;
-  mg_send(c, "        \r\n", 10);
-  mg_vxprintf(mg_pfn_iobuf, &c->send, fmt, ap);
-  if (c->send.len >= len + 10) {
-    mg_snprintf((char *) c->send.buf + len, 9, "%08lx", c->send.len - len - 10);
-    c->send.buf[len + 8] = '\r';
-    if (c->send.len == len + 10) c->is_resp = 0;  // Last chunk, reset marker
-  }
-  mg_send(c, "\r\n", 2);
-}
+#ifndef CS_COMMON_CS_ENDIAN_H_
+#define CS_COMMON_CS_ENDIAN_H_
 
-void mg_http_printf_chunk(struct mg_connection *c, const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  mg_http_vprintf_chunk(c, fmt, &ap);
-  va_end(ap);
-}
-
-void mg_http_write_chunk(struct mg_connection *c, const char *buf, size_t len) {
-  mg_printf(c, "%lx\r\n", (unsigned long) len);
-  mg_send(c, buf, len);
-  mg_send(c, "\r\n", 2);
-  if (len == 0) c->is_resp = 0;
-}
-
-// clang-format off
-static const char *mg_http_status_code_str(int status_code) {
-  switch (status_code) {
-    case 100: return "Continue";
-    case 101: return "Switching Protocols";
-    case 102: return "Processing";
-    case 200: return "OK";
-    case 201: return "Created";
-    case 202: return "Accepted";
-    case 203: return "Non-authoritative Information";
-    case 204: return "No Content";
-    case 205: return "Reset Content";
-    case 206: return "Partial Content";
-    case 207: return "Multi-Status";
-    case 208: return "Already Reported";
-    case 226: return "IM Used";
-    case 300: return "Multiple Choices";
-    case 301: return "Moved Permanently";
-    case 302: return "Found";
-    case 303: return "See Other";
-    case 304: return "Not Modified";
-    case 305: return "Use Proxy";
-    case 307: return "Temporary Redirect";
-    case 308: return "Permanent Redirect";
-    case 400: return "Bad Request";
-    case 401: return "Unauthorized";
-    case 402: return "Payment Required";
-    case 403: return "Forbidden";
-    case 404: return "Not Found";
-    case 405: return "Method Not Allowed";
-    case 406: return "Not Acceptable";
-    case 407: return "Proxy Authentication Required";
-    case 408: return "Request Timeout";
-    case 409: return "Conflict";
-    case 410: return "Gone";
-    case 411: return "Length Required";
-    case 412: return "Precondition Failed";
-    case 413: return "Payload Too Large";
-    case 414: return "Request-URI Too Long";
-    case 415: return "Unsupported Media Type";
-    case 416: return "Requested Range Not Satisfiable";
-    case 417: return "Expectation Failed";
-    case 418: return "I'm a teapot";
-    case 421: return "Misdirected Request";
-    case 422: return "Unprocessable Entity";
-    case 423: return "Locked";
-    case 424: return "Failed Dependency";
-    case 426: return "Upgrade Required";
-    case 428: return "Precondition Required";
-    case 429: return "Too Many Requests";
-    case 431: return "Request Header Fields Too Large";
-    case 444: return "Connection Closed Without Response";
-    case 451: return "Unavailable For Legal Reasons";
-    case 499: return "Client Closed Request";
-    case 500: return "Internal Server Error";
-    case 501: return "Not Implemented";
-    case 502: return "Bad Gateway";
-    case 503: return "Service Unavailable";
-    case 504: return "Gateway Timeout";
-    case 505: return "HTTP Version Not Supported";
-    case 506: return "Variant Also Negotiates";
-    case 507: return "Insufficient Storage";
-    case 508: return "Loop Detected";
-    case 510: return "Not Extended";
-    case 511: return "Network Authentication Required";
-    case 599: return "Network Connect Timeout Error";
-    default: return "";
-  }
-}
-// clang-format on
-
-void mg_http_reply(struct mg_connection *c, int code, const char *headers,
-                   const char *fmt, ...) {
-  va_list ap;
-  size_t len;
-  mg_printf(c, "HTTP/1.1 %d %s\r\n%sContent-Length:            \r\n\r\n", code,
-            mg_http_status_code_str(code), headers == NULL ? "" : headers);
-  len = c->send.len;
-  va_start(ap, fmt);
-  mg_vxprintf(mg_pfn_iobuf, &c->send, fmt, &ap);
-  va_end(ap);
-  if (c->send.len > 16) {
-    size_t n = mg_snprintf((char *) &c->send.buf[len - 15], 11, "%-10lu",
-                           (unsigned long) (c->send.len - len));
-    c->send.buf[len - 15 + n] = ' ';  // Change ending 0 to space
-  }
-  c->is_resp = 0;
-}
-
-static void http_cb(struct mg_connection *, int, void *);
-static void restore_http_cb(struct mg_connection *c) {
-  mg_fs_close((struct mg_fd *) c->pfn_data);
-  c->pfn_data = NULL;
-  c->pfn = http_cb;
-  c->is_resp = 0;
-}
-
-char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime);
-char *mg_http_etag(char *buf, size_t len, size_t size, time_t mtime) {
-  mg_snprintf(buf, len, "\"%lld.%lld\"", (int64_t) mtime, (int64_t) size);
-  return buf;
-}
-
-static void static_cb(struct mg_connection *c, int ev, void *ev_data) {
-  if (ev == MG_EV_WRITE || ev == MG_EV_POLL) {
-    struct mg_fd *fd = (struct mg_fd *) c->pfn_data;
-    // Read to send IO buffer directly, avoid extra on-stack buffer
-    size_t n, max = MG_IO_SIZE, space;
-    size_t *cl = (size_t *) &c->data[(sizeof(c->data) - sizeof(size_t)) /
-                                     sizeof(size_t) * sizeof(size_t)];
-    if (c->send.size < max) mg_iobuf_resize(&c->send, max);
-    if (c->send.len >= c->send.size) return;  // Rate limit
-    if ((space = c->send.size - c->send.len) > *cl) space = *cl;
-    n = fd->fs->rd(fd->fd, c->send.buf + c->send.len, space);
-    c->send.len += n;
-    *cl -= n;
-    if (n == 0) restore_http_cb(c);
-  } else if (ev == MG_EV_CLOSE) {
-    restore_http_cb(c);
-  }
-  (void) ev_data;
-}
-
-// Known mime types. Keep it outside guess_content_type() function, since
-// some environments don't like it defined there.
-// clang-format off
-#define MG_C_STR(a) { (char *) (a), sizeof(a) - 1 }
-static struct mg_str s_known_types[] = {
-    MG_C_STR("html"), MG_C_STR("text/html; charset=utf-8"),
-    MG_C_STR("htm"), MG_C_STR("text/html; charset=utf-8"),
-    MG_C_STR("css"), MG_C_STR("text/css; charset=utf-8"),
-    MG_C_STR("js"), MG_C_STR("text/javascript; charset=utf-8"),
-    MG_C_STR("gif"), MG_C_STR("image/gif"),
-    MG_C_STR("png"), MG_C_STR("image/png"),
-    MG_C_STR("jpg"), MG_C_STR("image/jpeg"),
-    MG_C_STR("jpeg"), MG_C_STR("image/jpeg"),
-    MG_C_STR("woff"), MG_C_STR("font/woff"),
-    MG_C_STR("ttf"), MG_C_STR("font/ttf"),
-    MG_C_STR("svg"), MG_C_STR("image/svg+xml"),
-    MG_C_STR("txt"), MG_C_STR("text/plain; charset=utf-8"),
-    MG_C_STR("avi"), MG_C_STR("video/x-msvideo"),
-    MG_C_STR("csv"), MG_C_STR("text/csv"),
-    MG_C_STR("doc"), MG_C_STR("application/msword"),
-    MG_C_STR("exe"), MG_C_STR("application/octet-stream"),
-    MG_C_STR("gz"), MG_C_STR("application/gzip"),
-    MG_C_STR("ico"), MG_C_STR("image/x-icon"),
-    MG_C_STR("json"), MG_C_STR("application/json"),
-    MG_C_STR("mov"), MG_C_STR("video/quicktime"),
-    MG_C_STR("mp3"), MG_C_STR("audio/mpeg"),
-    MG_C_STR("mp4"), MG_C_STR("video/mp4"),
-    MG_C_STR("mpeg"), MG_C_STR("video/mpeg"),
-    MG_C_STR("pdf"), MG_C_STR("application/pdf"),
-    MG_C_STR("shtml"), MG_C_STR("text/html; charset=utf-8"),
-    MG_C_STR("tgz"), MG_C_STR("application/tar-gz"),
-    MG_C_STR("wav"), MG_C_STR("audio/wav"),
-    MG_C_STR("webp"), MG_C_STR("image/webp"),
-    MG_C_STR("zip"), MG_C_STR("application/zip"),
-    MG_C_STR("3gp"), MG_C_STR("video/3gpp"),
-    {0, 0},
-};
-// clang-format on
-
-static struct mg_str guess_content_type(struct mg_str path, const char *extra) {
-  struct mg_str entry, k, v, s = mg_str(extra), asterisk = mg_str_n("*", 1);
-  size_t i = 0;
-
-  // Shrink path to its extension only
-  while (i < path.len && path.buf[path.len - i - 1] != '.') i++;
-  path.buf += path.len - i;
-  path.len = i;
-
-  // Process user-provided mime type overrides, if any
-  while (mg_span(s, &entry, &s, ',')) {
-    if (mg_span(entry, &k, &v, '=') &&
-        (mg_strcmp(asterisk, k) == 0 || mg_strcmp(path, k) == 0))
-      return v;
-  }
-
-  // Process built-in mime types
-  for (i = 0; s_known_types[i].buf != NULL; i += 2) {
-    if (mg_strcmp(path, s_known_types[i]) == 0) return s_known_types[i + 1];
-  }
-
-  return mg_str("text/plain; charset=utf-8");
-}
-
-static int getrange(struct mg_str *s, size_t *a, size_t *b) {
-  size_t i, numparsed = 0;
-  for (i = 0; i + 6 < s->len; i++) {
-    struct mg_str k, v = mg_str_n(s->buf + i + 6, s->len - i - 6);
-    if (memcmp(&s->buf[i], "bytes=", 6) != 0) continue;
-    if (mg_span(v, &k, &v, '-')) {
-      if (mg_to_size_t(k, a)) numparsed++;
-      if (v.len > 0 && mg_to_size_t(v, b)) numparsed++;
-    } else {
-      if (mg_to_size_t(v, a)) numparsed++;
-    }
-    break;
-  }
-  return (int) numparsed;
-}
-
-void mg_http_serve_file(struct mg_connection *c, struct mg_http_message *hm,
-                        const char *path,
-                        const struct mg_http_serve_opts *opts) {
-  char etag[64], tmp[MG_PATH_MAX];
-  struct mg_fs *fs = opts->fs == NULL ? &mg_fs_posix : opts->fs;
-  struct mg_fd *fd = NULL;
-  size_t size = 0;
-  time_t mtime = 0;
-  struct mg_str *inm = NULL;
-  struct mg_str mime = guess_content_type(mg_str(path), opts->mime_types);
-  bool gzip = false;
-
-  if (path != NULL) {
-    // If a browser sends us "Accept-Encoding: gzip", try to open .gz first
-    struct mg_str *ae = mg_http_get_header(hm, "Accept-Encoding");
-    if (ae != NULL) {
-      char *ae_ = mg_mprintf("%.*s", ae->len, ae->buf);
-      if (ae_ != NULL && strstr(ae_, "gzip") != NULL) {
-        mg_snprintf(tmp, sizeof(tmp), "%s.gz", path);
-        fd = mg_fs_open(fs, tmp, MG_FS_READ);
-        if (fd != NULL) gzip = true, path = tmp;
-      }
-      free(ae_);
-    }
-    // No luck opening .gz? Open what we've told to open
-    if (fd == NULL) fd = mg_fs_open(fs, path, MG_FS_READ);
-  }
-
-  // Failed to open, and page404 is configured? Open it, then
-  if (fd == NULL && opts->page404 != NULL) {
-    fd = mg_fs_open(fs, opts->page404, MG_FS_READ);
-    path = opts->page404;
-    mime = guess_content_type(mg_str(path), opts->mime_types);
-  }
-
-  if (fd == NULL || fs->st(path, &size, &mtime) == 0) {
-    mg_http_reply(c, 404, opts->extra_headers, "Not found\n");
-    mg_fs_close(fd);
-    // NOTE: mg_http_etag() call should go first!
-  } else if (mg_http_etag(etag, sizeof(etag), size, mtime) != NULL &&
-             (inm = mg_http_get_header(hm, "If-None-Match")) != NULL &&
-             mg_strcasecmp(*inm, mg_str(etag)) == 0) {
-    mg_fs_close(fd);
-    mg_http_reply(c, 304, opts->extra_headers, "");
-  } else {
-    int n, status = 200;
-    char range[100];
-    size_t r1 = 0, r2 = 0, cl = size;
-
-    // Handle Range header
-    struct mg_str *rh = mg_http_get_header(hm, "Range");
-    range[0] = '\0';
-    if (rh != NULL && (n = getrange(rh, &r1, &r2)) > 0) {
-      // If range is specified like "400-", set second limit to content len
-      if (n == 1) r2 = cl - 1;
-      if (r1 > r2 || r2 >= cl) {
-        status = 416;
-        cl = 0;
-        mg_snprintf(range, sizeof(range), "Content-Range: bytes */%lld\r\n",
-                    (int64_t) size);
-      } else {
-        status = 206;
-        cl = r2 - r1 + 1;
-        mg_snprintf(range, sizeof(range),
-                    "Content-Range: bytes %llu-%llu/%llu\r\n", (uint64_t) r1,
-                    (uint64_t) (r1 + cl - 1), (uint64_t) size);
-        fs->sk(fd->fd, r1);
-      }
-    }
-    mg_printf(c,
-              "HTTP/1.1 %d %s\r\n"
-              "Content-Type: %.*s\r\n"
-              "Etag: %s\r\n"
-              "Content-Length: %llu\r\n"
-              "%s%s%s\r\n",
-              status, mg_http_status_code_str(status), (int) mime.len, mime.buf,
-              etag, (uint64_t) cl, gzip ? "Content-Encoding: gzip\r\n" : "",
-              range, opts->extra_headers ? opts->extra_headers : "");
-    if (mg_strcasecmp(hm->method, mg_str("HEAD")) == 0) {
-      c->is_resp = 0;
-      mg_fs_close(fd);
-    } else {
-      // Track to-be-sent content length at the end of c->data, aligned
-      size_t *clp = (size_t *) &c->data[(sizeof(c->data) - sizeof(size_t)) /
-                                        sizeof(size_t) * sizeof(size_t)];
-      c->pfn = static_cb;
-      c->pfn_data = fd;
-      *clp = cl;
-    }
-  }
-}
-
-struct printdirentrydata {
-  struct mg_connection *c;
-  struct mg_http_message *hm;
-  const struct mg_http_serve_opts *opts;
-  const char *dir;
-};
-
-#if MG_ENABLE_DIRLIST
-static void printdirentry(const char *name, void *userdata) {
-  struct printdirentrydata *d = (struct printdirentrydata *) userdata;
-  struct mg_fs *fs = d->opts->fs == NULL ? &mg_fs_posix : d->opts->fs;
-  size_t size = 0;
-  time_t t = 0;
-  char path[MG_PATH_MAX], sz[40], mod[40];
-  int flags, n = 0;
-
-  // MG_DEBUG(("[%s] [%s]", d->dir, name));
-  if (mg_snprintf(path, sizeof(path), "%s%c%s", d->dir, '/', name) >
-      sizeof(path)) {
-    MG_ERROR(("%s truncated", name));
-  } else if ((flags = fs->st(path, &size, &t)) == 0) {
-    MG_ERROR(("%lu stat(%s): %d", d->c->id, path, errno));
-  } else {
-    const char *slash = flags & MG_FS_DIR ? "/" : "";
-    if (flags & MG_FS_DIR) {
-      mg_snprintf(sz, sizeof(sz), "%s", "[DIR]");
-    } else {
-      mg_snprintf(sz, sizeof(sz), "%lld", (uint64_t) size);
-    }
-#if defined(MG_HTTP_DIRLIST_TIME_FMT)
-    {
-      char time_str[40];
-      struct tm *time_info = localtime(&t);
-      strftime(time_str, sizeof time_str, "%Y/%m/%d %H:%M:%S", time_info);
-      mg_snprintf(mod, sizeof(mod), "%s", time_str);
-    }
-#else
-    mg_snprintf(mod, sizeof(mod), "%lu", (unsigned long) t);
+#ifdef __cplusplus
+extern "C" {
 #endif
     n = (int) mg_url_encode(name, strlen(name), path, sizeof(path));
     mg_printf(d->c,
@@ -8006,118 +7531,88 @@ void mg_sha1_final(unsigned char digest[20], mg_sha1_ctx *context) {
   memset(&finalcount, '\0', sizeof(finalcount));
 }
 
-#ifdef MG_ENABLE_LINES
-#line 1 "src/sha256.c"
+void cs_hmac_sha1(const unsigned char *key, size_t keylen,
+                  const unsigned char *data, size_t datalen,
+                  unsigned char out[20]) {
+  cs_sha1_ctx ctx;
+  unsigned char buf1[64], buf2[64], tmp_key[20], i;
+
+  if (keylen > sizeof(buf1)) {
+    cs_sha1_init(&ctx);
+    cs_sha1_update(&ctx, key, keylen);
+    cs_sha1_final(tmp_key, &ctx);
+    key = tmp_key;
+    keylen = sizeof(tmp_key);
+  }
+
+  memset(buf1, 0, sizeof(buf1));
+  memset(buf2, 0, sizeof(buf2));
+  memcpy(buf1, key, keylen);
+  memcpy(buf2, key, keylen);
+
+  for (i = 0; i < sizeof(buf1); i++) {
+    buf1[i] ^= 0x36;
+    buf2[i] ^= 0x5c;
+  }
+
+  cs_sha1_init(&ctx);
+  cs_sha1_update(&ctx, buf1, sizeof(buf1));
+  cs_sha1_update(&ctx, data, datalen);
+  cs_sha1_final(out, &ctx);
+
+  cs_sha1_init(&ctx);
+  cs_sha1_update(&ctx, buf2, sizeof(buf2));
+  cs_sha1_update(&ctx, out, 20);
+  cs_sha1_final(out, &ctx);
+}
+
+#endif /* EXCLUDE_COMMON */
+#ifdef MG_MODULE_LINES
+#line 1 "common/mbuf.c"
+#endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef EXCLUDE_COMMON
+
+#include <assert.h>
+#include <string.h>
+/* Amalgamated: #include "common/mbuf.h" */
+
+#ifndef MBUF_REALLOC
+#define MBUF_REALLOC realloc
 #endif
 
+#ifndef MBUF_FREE
+#define MBUF_FREE free
+#endif
 
-
-#define ror(x, n) (((x) >> (n)) | ((x) << (32 - (n))))
-#define ch(x, y, z) (((x) & (y)) ^ (~(x) & (z)))
-#define maj(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
-#define ep0(x) (ror(x, 2) ^ ror(x, 13) ^ ror(x, 22))
-#define ep1(x) (ror(x, 6) ^ ror(x, 11) ^ ror(x, 25))
-#define sig0(x) (ror(x, 7) ^ ror(x, 18) ^ ((x) >> 3))
-#define sig1(x) (ror(x, 17) ^ ror(x, 19) ^ ((x) >> 10))
-
-static const uint32_t mg_sha256_k[64] = {
-    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
-    0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
-    0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
-    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
-    0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
-    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
-    0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
-    0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
-
-void mg_sha256_init(mg_sha256_ctx *ctx) {
-  ctx->len = 0;
-  ctx->bits = 0;
-  ctx->state[0] = 0x6a09e667;
-  ctx->state[1] = 0xbb67ae85;
-  ctx->state[2] = 0x3c6ef372;
-  ctx->state[3] = 0xa54ff53a;
-  ctx->state[4] = 0x510e527f;
-  ctx->state[5] = 0x9b05688c;
-  ctx->state[6] = 0x1f83d9ab;
-  ctx->state[7] = 0x5be0cd19;
+void mbuf_init(struct mbuf *mbuf, size_t initial_size) WEAK;
+void mbuf_init(struct mbuf *mbuf, size_t initial_size) {
+  mbuf->len = mbuf->size = 0;
+  mbuf->buf = NULL;
+  mbuf_resize(mbuf, initial_size);
 }
 
-static void mg_sha256_chunk(mg_sha256_ctx *ctx) {
-  int i, j;
-  uint32_t a, b, c, d, e, f, g, h;
-  uint32_t m[64];
-  for (i = 0, j = 0; i < 16; ++i, j += 4)
-    m[i] = (uint32_t) (((uint32_t) ctx->buffer[j] << 24) |
-                       ((uint32_t) ctx->buffer[j + 1] << 16) |
-                       ((uint32_t) ctx->buffer[j + 2] << 8) |
-                       ((uint32_t) ctx->buffer[j + 3]));
-  for (; i < 64; ++i)
-    m[i] = sig1(m[i - 2]) + m[i - 7] + sig0(m[i - 15]) + m[i - 16];
-
-  a = ctx->state[0];
-  b = ctx->state[1];
-  c = ctx->state[2];
-  d = ctx->state[3];
-  e = ctx->state[4];
-  f = ctx->state[5];
-  g = ctx->state[6];
-  h = ctx->state[7];
-
-  for (i = 0; i < 64; ++i) {
-    uint32_t t1 = h + ep1(e) + ch(e, f, g) + mg_sha256_k[i] + m[i];
-    uint32_t t2 = ep0(a) + maj(a, b, c);
-    h = g;
-    g = f;
-    f = e;
-    e = d + t1;
-    d = c;
-    c = b;
-    b = a;
-    a = t1 + t2;
-  }
-
-  ctx->state[0] += a;
-  ctx->state[1] += b;
-  ctx->state[2] += c;
-  ctx->state[3] += d;
-  ctx->state[4] += e;
-  ctx->state[5] += f;
-  ctx->state[6] += g;
-  ctx->state[7] += h;
-}
-
-void mg_sha256_update(mg_sha256_ctx *ctx, const unsigned char *data,
-                      size_t len) {
-  size_t i;
-  for (i = 0; i < len; i++) {
-    ctx->buffer[ctx->len] = data[i];
-    if ((++ctx->len) == 64) {
-      mg_sha256_chunk(ctx);
-      ctx->bits += 512;
-      ctx->len = 0;
-    }
-  }
-}
-
-// TODO: make final reusable (remove side effects)
-void mg_sha256_final(unsigned char digest[32], mg_sha256_ctx *ctx) {
-  uint32_t i = ctx->len;
-  if (i < 56) {
-    ctx->buffer[i++] = 0x80;
-    while (i < 56) {
-      ctx->buffer[i++] = 0x00;
-    }
-  } else {
-    ctx->buffer[i++] = 0x80;
-    while (i < 64) {
-      ctx->buffer[i++] = 0x00;
-    }
-    mg_sha256_chunk(ctx);
-    memset(ctx->buffer, 0, 56);
+void mbuf_free(struct mbuf *mbuf) WEAK;
+void mbuf_free(struct mbuf *mbuf) {
+  if (mbuf->buf != NULL) {
+    MBUF_FREE(mbuf->buf);
+    mbuf_init(mbuf, 0);
   }
 
   ctx->bits += ctx->len * 8;
@@ -9205,6 +8700,21 @@ int mg_strcasecmp(const struct mg_str str1, const struct mg_str str2) {
   return 0;
 }
 
+int mg_strcasecmp(const struct mg_str str1, const struct mg_str str2) WEAK;
+int mg_strcasecmp(const struct mg_str str1, const struct mg_str str2) {
+  size_t i = 0;
+  while (i < str1.len && i < str2.len) {
+    int c1 = tolower((int) str1.p[i]);
+    int c2 = tolower((int) str2.p[i]);
+    if (c1 < c2) return -1;
+    if (c1 > c2) return 1;
+    i++;
+  }
+  if (i < str1.len) return 1;
+  if (i < str2.len) return -1;
+  return 0;
+}
+
 void mg_strfree(struct mg_str *s) WEAK;
 void mg_strfree(struct mg_str *s) {
   char *sp = (char *) s->p;
@@ -9360,701 +8870,21 @@ void mg_timer_poll(struct mg_timer **head, uint64_t now_ms) {
 #ifdef MG_ENABLE_LINES
 #line 1 "src/tls_aes128.c"
 #endif
-/******************************************************************************
- *
- * THIS SOURCE CODE IS HEREBY PLACED INTO THE PUBLIC DOMAIN FOR THE GOOD OF ALL
- *
- * This is a simple and straightforward implementation of the AES Rijndael
- * 128-bit block cipher designed by Vincent Rijmen and Joan Daemen. The focus
- * of this work was correctness & accuracy.  It is written in 'C' without any
- * particular focus upon optimization or speed. It should be endian (memory
- * byte order) neutral since the few places that care are handled explicitly.
- *
- * This implementation of Rijndael was created by Steven M. Gibson of GRC.com.
- *
- * It is intended for general purpose use, but was written in support of GRC's
- * reference implementation of the SQRL (Secure Quick Reliable Login) client.
- *
- * See:    http://csrc.nist.gov/archive/aes/rijndael/wsdindex.html
- *
- * NO COPYRIGHT IS CLAIMED IN THIS WORK, HOWEVER, NEITHER IS ANY WARRANTY MADE
- * REGARDING ITS FITNESS FOR ANY PARTICULAR PURPOSE. USE IT AT YOUR OWN RISK.
- *
- *******************************************************************************/
-
-/******************************************************************************/
-#define AES_DECRYPTION 1  // whether AES decryption is supported
-/******************************************************************************/
-
-#define MG_ENCRYPT 1  // specify whether we're encrypting
-#define MG_DECRYPT 0  // or decrypting
-
-
-
-
-
-#if MG_TLS == MG_TLS_BUILTIN
-/******************************************************************************
- *  AES_INIT_KEYGEN_TABLES : MUST be called once before any AES use
- ******************************************************************************/
-static void aes_init_keygen_tables(void);
-
-/******************************************************************************
- *  AES_SETKEY : called to expand the key for encryption or decryption
- ******************************************************************************/
-static int aes_setkey(aes_context *ctx,  // pointer to context
-                      int mode,          // 1 or 0 for Encrypt/Decrypt
-                      const unsigned char *key,  // AES input key
-                      unsigned int keysize);  // size in bytes (must be 16, 24, 32 for
-                                      // 128, 192 or 256-bit keys respectively)
-                                      // returns 0 for success
-
-/******************************************************************************
- *  AES_CIPHER : called to encrypt or decrypt ONE 128-bit block of data
- ******************************************************************************/
-static int aes_cipher(aes_context *ctx,       // pointer to context
-                      const unsigned char input[16],  // 128-bit block to en/decipher
-                      unsigned char output[16]);      // 128-bit output result block
-                                              // returns 0 for success
-
-/******************************************************************************
- *  GCM_CONTEXT : GCM context / holds keytables, instance data, and AES ctx
- ******************************************************************************/
-typedef struct {
-  int mode;             // cipher direction: encrypt/decrypt
-  uint64_t len;         // cipher data length processed so far
-  uint64_t add_len;     // total add data length
-  uint64_t HL[16];      // precalculated lo-half HTable
-  uint64_t HH[16];      // precalculated hi-half HTable
-  unsigned char base_ectr[16];  // first counter-mode cipher output for tag
-  unsigned char y[16];          // the current cipher-input IV|Counter value
-  unsigned char buf[16];        // buf working value
-  aes_context aes_ctx;  // cipher context used
-} gcm_context;
-
-/******************************************************************************
- *  GCM_SETKEY : sets the GCM (and AES) keying material for use
- ******************************************************************************/
-static int gcm_setkey(
-    gcm_context *ctx,   // caller-provided context ptr
-    const unsigned char *key,   // pointer to cipher key
-    const unsigned int keysize  // size in bytes (must be 16, 24, 32 for
-                        // 128, 192 or 256-bit keys respectively)
-);                      // returns 0 for success
-
-/******************************************************************************
- *
- *  GCM_CRYPT_AND_TAG
- *
- *  This either encrypts or decrypts the user-provided data and, either
- *  way, generates an authentication tag of the requested length. It must be
- *  called with a GCM context whose key has already been set with GCM_SETKEY.
- *
- *  The user would typically call this explicitly to ENCRYPT a buffer of data
- *  and optional associated data, and produce its an authentication tag.
- *
- *  To reverse the process the user would typically call the companion
- *  GCM_AUTH_DECRYPT function to decrypt data and verify a user-provided
- *  authentication tag.  The GCM_AUTH_DECRYPT function calls this function
- *  to perform its decryption and tag generation, which it then compares.
- *
- ******************************************************************************/
-static int gcm_crypt_and_tag(
-    gcm_context *ctx,    // gcm context with key already setup
-    int mode,            // cipher direction: MG_ENCRYPT (1) or MG_DECRYPT (0)
-    const unsigned char *iv,     // pointer to the 12-byte initialization vector
-    size_t iv_len,       // byte length if the IV. should always be 12
-    const unsigned char *add,    // pointer to the non-ciphered additional data
-    size_t add_len,      // byte length of the additional AEAD data
-    const unsigned char *input,  // pointer to the cipher data source
-    unsigned char *output,       // pointer to the cipher data destination
-    size_t length,       // byte length of the cipher data
-    unsigned char *tag,          // pointer to the tag to be generated
-    size_t tag_len);     // byte length of the tag to be generated
-
-/******************************************************************************
- *
- *  GCM_START
- *
- *  Given a user-provided GCM context, this initializes it, sets the encryption
- *  mode, and preprocesses the initialization vector and additional AEAD data.
- *
- ******************************************************************************/
-static int gcm_start(
-    gcm_context *ctx,  // pointer to user-provided GCM context
-    int mode,          // MG_ENCRYPT (1) or MG_DECRYPT (0)
-    const unsigned char *iv,   // pointer to initialization vector
-    size_t iv_len,     // IV length in bytes (should == 12)
-    const unsigned char *add,  // pointer to additional AEAD data (NULL if none)
-    size_t add_len);   // length of additional AEAD data (bytes)
-
-/******************************************************************************
- *
- *  GCM_UPDATE
- *
- *  This is called once or more to process bulk plaintext or ciphertext data.
- *  We give this some number of bytes of input and it returns the same number
- *  of output bytes. If called multiple times (which is fine) all but the final
- *  invocation MUST be called with length mod 16 == 0. (Only the final call can
- *  have a partial block length of < 128 bits.)
- *
- ******************************************************************************/
-static int gcm_update(gcm_context *ctx,  // pointer to user-provided GCM context
-                      size_t length,     // length, in bytes, of data to process
-                      const unsigned char *input,  // pointer to source data
-                      unsigned char *output);      // pointer to destination data
-
-/******************************************************************************
- *
- *  GCM_FINISH
- *
- *  This is called once after all calls to GCM_UPDATE to finalize the GCM.
- *  It performs the final GHASH to produce the resulting authentication TAG.
- *
- ******************************************************************************/
-static int gcm_finish(
-    gcm_context *ctx,  // pointer to user-provided GCM context
-    unsigned char *tag,        // ptr to tag buffer - NULL if tag_len = 0
-    size_t tag_len);   // length, in bytes, of the tag-receiving buf
-
-/******************************************************************************
- *
- *  GCM_ZERO_CTX
- *
- *  The GCM context contains both the GCM context and the AES context.
- *  This includes keying and key-related material which is security-
- *  sensitive, so it MUST be zeroed after use. This function does that.
- *
- ******************************************************************************/
-static void gcm_zero_ctx(gcm_context *ctx);
-
-/******************************************************************************
- *
- * THIS SOURCE CODE IS HEREBY PLACED INTO THE PUBLIC DOMAIN FOR THE GOOD OF ALL
- *
- * This is a simple and straightforward implementation of the AES Rijndael
- * 128-bit block cipher designed by Vincent Rijmen and Joan Daemen. The focus
- * of this work was correctness & accuracy.  It is written in 'C' without any
- * particular focus upon optimization or speed. It should be endian (memory
- * byte order) neutral since the few places that care are handled explicitly.
- *
- * This implementation of Rijndael was created by Steven M. Gibson of GRC.com.
- *
- * It is intended for general purpose use, but was written in support of GRC's
- * reference implementation of the SQRL (Secure Quick Reliable Login) client.
- *
- * See:    http://csrc.nist.gov/archive/aes/rijndael/wsdindex.html
- *
- * NO COPYRIGHT IS CLAIMED IN THIS WORK, HOWEVER, NEITHER IS ANY WARRANTY MADE
- * REGARDING ITS FITNESS FOR ANY PARTICULAR PURPOSE. USE IT AT YOUR OWN RISK.
- *
- *******************************************************************************/
-
-
-
-
-static int aes_tables_inited = 0;  // run-once flag for performing key
-                                   // expasion table generation (see below)
 /*
- *  The following static local tables must be filled-in before the first use of
- *  the GCM or AES ciphers. They are used for the AES key expansion/scheduling
- *  and once built are read-only and thread safe. The "gcm_initialize" function
- *  must be called once during system initialization to populate these arrays
- *  for subsequent use by the AES key scheduler. If they have not been built
- *  before attempted use, an error will be returned to the caller.
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
  *
- *  NOTE: GCM Encryption/Decryption does NOT REQUIRE AES decryption. Since
- *  GCM uses AES in counter-mode, where the AES cipher output is XORed with
- *  the GCM input, we ONLY NEED AES encryption.  Thus, to save space AES
- *  decryption is typically disabled by setting AES_DECRYPTION to 0 in aes.h.
- */
-// We always need our forward tables
-static unsigned char FSb[256];     // Forward substitution box (FSb)
-static uint32_t FT0[256];  // Forward key schedule assembly tables
-static uint32_t FT1[256];
-static uint32_t FT2[256];
-static uint32_t FT3[256];
-
-#if AES_DECRYPTION         // We ONLY need reverse for decryption
-static unsigned char RSb[256];     // Reverse substitution box (RSb)
-static uint32_t RT0[256];  // Reverse key schedule assembly tables
-static uint32_t RT1[256];
-static uint32_t RT2[256];
-static uint32_t RT3[256];
-#endif /* AES_DECRYPTION */
-
-static uint32_t RCON[10];  // AES round constants
-
-/*
- * Platform Endianness Neutralizing Load and Store Macro definitions
- * AES wants platform-neutral Little Endian (LE) byte ordering
- */
-#define GET_UINT32_LE(n, b, i)                                               \
-  {                                                                          \
-    (n) = ((uint32_t) (b)[(i)]) | ((uint32_t) (b)[(i) + 1] << 8) |           \
-          ((uint32_t) (b)[(i) + 2] << 16) | ((uint32_t) (b)[(i) + 3] << 24); \
-  }
-
-#define PUT_UINT32_LE(n, b, i)          \
-  {                                     \
-    (b)[(i)] = (unsigned char) ((n));           \
-    (b)[(i) + 1] = (unsigned char) ((n) >> 8);  \
-    (b)[(i) + 2] = (unsigned char) ((n) >> 16); \
-    (b)[(i) + 3] = (unsigned char) ((n) >> 24); \
-  }
-
-/*
- *  AES forward and reverse encryption round processing macros
- */
-#define AES_FROUND(X0, X1, X2, X3, Y0, Y1, Y2, Y3)          \
-  {                                                         \
-    X0 = *RK++ ^ FT0[(Y0) & 0xFF] ^ FT1[(Y1 >> 8) & 0xFF] ^ \
-         FT2[(Y2 >> 16) & 0xFF] ^ FT3[(Y3 >> 24) & 0xFF];   \
-                                                            \
-    X1 = *RK++ ^ FT0[(Y1) & 0xFF] ^ FT1[(Y2 >> 8) & 0xFF] ^ \
-         FT2[(Y3 >> 16) & 0xFF] ^ FT3[(Y0 >> 24) & 0xFF];   \
-                                                            \
-    X2 = *RK++ ^ FT0[(Y2) & 0xFF] ^ FT1[(Y3 >> 8) & 0xFF] ^ \
-         FT2[(Y0 >> 16) & 0xFF] ^ FT3[(Y1 >> 24) & 0xFF];   \
-                                                            \
-    X3 = *RK++ ^ FT0[(Y3) & 0xFF] ^ FT1[(Y0 >> 8) & 0xFF] ^ \
-         FT2[(Y1 >> 16) & 0xFF] ^ FT3[(Y2 >> 24) & 0xFF];   \
-  }
-
-#define AES_RROUND(X0, X1, X2, X3, Y0, Y1, Y2, Y3)          \
-  {                                                         \
-    X0 = *RK++ ^ RT0[(Y0) & 0xFF] ^ RT1[(Y3 >> 8) & 0xFF] ^ \
-         RT2[(Y2 >> 16) & 0xFF] ^ RT3[(Y1 >> 24) & 0xFF];   \
-                                                            \
-    X1 = *RK++ ^ RT0[(Y1) & 0xFF] ^ RT1[(Y0 >> 8) & 0xFF] ^ \
-         RT2[(Y3 >> 16) & 0xFF] ^ RT3[(Y2 >> 24) & 0xFF];   \
-                                                            \
-    X2 = *RK++ ^ RT0[(Y2) & 0xFF] ^ RT1[(Y1 >> 8) & 0xFF] ^ \
-         RT2[(Y0 >> 16) & 0xFF] ^ RT3[(Y3 >> 24) & 0xFF];   \
-                                                            \
-    X3 = *RK++ ^ RT0[(Y3) & 0xFF] ^ RT1[(Y2 >> 8) & 0xFF] ^ \
-         RT2[(Y1 >> 16) & 0xFF] ^ RT3[(Y0 >> 24) & 0xFF];   \
-  }
-
-/*
- *  These macros improve the readability of the key
- *  generation initialization code by collapsing
- *  repetitive common operations into logical pieces.
- */
-#define ROTL8(x) ((x << 8) & 0xFFFFFFFF) | (x >> 24)
-#define XTIME(x) ((x << 1) ^ ((x & 0x80) ? 0x1B : 0x00))
-#define MUL(x, y) ((x && y) ? pow[(log[x] + log[y]) % 255] : 0)
-#define MIX(x, y)                     \
-  {                                   \
-    y = ((y << 1) | (y >> 7)) & 0xFF; \
-    x ^= y;                           \
-  }
-#define CPY128     \
-  {                \
-    *RK++ = *SK++; \
-    *RK++ = *SK++; \
-    *RK++ = *SK++; \
-    *RK++ = *SK++; \
-  }
-
-/******************************************************************************
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  AES_INIT_KEYGEN_TABLES
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Fills the AES key expansion tables allocated above with their static
- *  data. This is not "per key" data, but static system-wide read-only
- *  table data. THIS FUNCTION IS NOT THREAD SAFE. It must be called once
- *  at system initialization to setup the tables for all subsequent use.
- *
- ******************************************************************************/
-void aes_init_keygen_tables(void) {
-  int i, x, y, z;  // general purpose iteration and computation locals
-  int pow[256];
-  int log[256];
-
-  if (aes_tables_inited) return;
-
-  // fill the 'pow' and 'log' tables over GF(2^8)
-  for (i = 0, x = 1; i < 256; i++) {
-    pow[i] = x;
-    log[x] = i;
-    x = (x ^ XTIME(x)) & 0xFF;
-  }
-  // compute the round constants
-  for (i = 0, x = 1; i < 10; i++) {
-    RCON[i] = (uint32_t) x;
-    x = XTIME(x) & 0xFF;
-  }
-  // fill the forward and reverse substitution boxes
-  FSb[0x00] = 0x63;
-#if AES_DECRYPTION  // whether AES decryption is supported
-  RSb[0x63] = 0x00;
-#endif /* AES_DECRYPTION */
-
-  for (i = 1; i < 256; i++) {
-    x = y = pow[255 - log[i]];
-    MIX(x, y);
-    MIX(x, y);
-    MIX(x, y);
-    MIX(x, y);
-    FSb[i] = (unsigned char) (x ^= 0x63);
-#if AES_DECRYPTION  // whether AES decryption is supported
-    RSb[x] = (unsigned char) i;
-#endif /* AES_DECRYPTION */
-  }
-  // generate the forward and reverse key expansion tables
-  for (i = 0; i < 256; i++) {
-    x = FSb[i];
-    y = XTIME(x) & 0xFF;
-    z = (y ^ x) & 0xFF;
-
-    FT0[i] = ((uint32_t) y) ^ ((uint32_t) x << 8) ^ ((uint32_t) x << 16) ^
-             ((uint32_t) z << 24);
-
-    FT1[i] = ROTL8(FT0[i]);
-    FT2[i] = ROTL8(FT1[i]);
-    FT3[i] = ROTL8(FT2[i]);
-
-#if AES_DECRYPTION  // whether AES decryption is supported
-    x = RSb[i];
-
-    RT0[i] = ((uint32_t) MUL(0x0E, x)) ^ ((uint32_t) MUL(0x09, x) << 8) ^
-             ((uint32_t) MUL(0x0D, x) << 16) ^ ((uint32_t) MUL(0x0B, x) << 24);
-
-    RT1[i] = ROTL8(RT0[i]);
-    RT2[i] = ROTL8(RT1[i]);
-    RT3[i] = ROTL8(RT2[i]);
-#endif /* AES_DECRYPTION */
-  }
-  aes_tables_inited = 1;  // flag that the tables have been generated
-}  // to permit subsequent use of the AES cipher
-
-/******************************************************************************
- *
- *  AES_SET_ENCRYPTION_KEY
- *
- *  This is called by 'aes_setkey' when we're establishing a key for
- *  subsequent encryption.  We give it a pointer to the encryption
- *  context, a pointer to the key, and the key's length in bytes.
- *  Valid lengths are: 16, 24 or 32 bytes (128, 192, 256 bits).
- *
- ******************************************************************************/
-static int aes_set_encryption_key(aes_context *ctx, const unsigned char *key,
-                                  unsigned int keysize) {
-  unsigned int i;                  // general purpose iteration local
-  uint32_t *RK = ctx->rk;  // initialize our RoundKey buffer pointer
-
-  for (i = 0; i < (keysize >> 2); i++) {
-    GET_UINT32_LE(RK[i], key, i << 2);
-  }
-
-  switch (ctx->rounds) {
-    case 10:
-      for (i = 0; i < 10; i++, RK += 4) {
-        RK[4] = RK[0] ^ RCON[i] ^ ((uint32_t) FSb[(RK[3] >> 8) & 0xFF]) ^
-                ((uint32_t) FSb[(RK[3] >> 16) & 0xFF] << 8) ^
-                ((uint32_t) FSb[(RK[3] >> 24) & 0xFF] << 16) ^
-                ((uint32_t) FSb[(RK[3]) & 0xFF] << 24);
-
-        RK[5] = RK[1] ^ RK[4];
-        RK[6] = RK[2] ^ RK[5];
-        RK[7] = RK[3] ^ RK[6];
-      }
-      break;
-
-    case 12:
-      for (i = 0; i < 8; i++, RK += 6) {
-        RK[6] = RK[0] ^ RCON[i] ^ ((uint32_t) FSb[(RK[5] >> 8) & 0xFF]) ^
-                ((uint32_t) FSb[(RK[5] >> 16) & 0xFF] << 8) ^
-                ((uint32_t) FSb[(RK[5] >> 24) & 0xFF] << 16) ^
-                ((uint32_t) FSb[(RK[5]) & 0xFF] << 24);
-
-        RK[7] = RK[1] ^ RK[6];
-        RK[8] = RK[2] ^ RK[7];
-        RK[9] = RK[3] ^ RK[8];
-        RK[10] = RK[4] ^ RK[9];
-        RK[11] = RK[5] ^ RK[10];
-      }
-      break;
-
-    case 14:
-      for (i = 0; i < 7; i++, RK += 8) {
-        RK[8] = RK[0] ^ RCON[i] ^ ((uint32_t) FSb[(RK[7] >> 8) & 0xFF]) ^
-                ((uint32_t) FSb[(RK[7] >> 16) & 0xFF] << 8) ^
-                ((uint32_t) FSb[(RK[7] >> 24) & 0xFF] << 16) ^
-                ((uint32_t) FSb[(RK[7]) & 0xFF] << 24);
-
-        RK[9] = RK[1] ^ RK[8];
-        RK[10] = RK[2] ^ RK[9];
-        RK[11] = RK[3] ^ RK[10];
-
-        RK[12] = RK[4] ^ ((uint32_t) FSb[(RK[11]) & 0xFF]) ^
-                 ((uint32_t) FSb[(RK[11] >> 8) & 0xFF] << 8) ^
-                 ((uint32_t) FSb[(RK[11] >> 16) & 0xFF] << 16) ^
-                 ((uint32_t) FSb[(RK[11] >> 24) & 0xFF] << 24);
-
-        RK[13] = RK[5] ^ RK[12];
-        RK[14] = RK[6] ^ RK[13];
-        RK[15] = RK[7] ^ RK[14];
-      }
-      break;
-
-    default:
-      return -1;
-  }
-  return (0);
-}
-
-#if AES_DECRYPTION  // whether AES decryption is supported
-
-/******************************************************************************
- *
- *  AES_SET_DECRYPTION_KEY
- *
- *  This is called by 'aes_setkey' when we're establishing a
- *  key for subsequent decryption.  We give it a pointer to
- *  the encryption context, a pointer to the key, and the key's
- *  length in bits. Valid lengths are: 128, 192, or 256 bits.
- *
- ******************************************************************************/
-static int aes_set_decryption_key(aes_context *ctx, const unsigned char *key,
-                                  unsigned int keysize) {
-  int i, j;
-  aes_context cty;         // a calling aes context for set_encryption_key
-  uint32_t *RK = ctx->rk;  // initialize our RoundKey buffer pointer
-  uint32_t *SK;
-  int ret;
-
-  cty.rounds = ctx->rounds;  // initialize our local aes context
-  cty.rk = cty.buf;          // round count and key buf pointer
-
-  if ((ret = aes_set_encryption_key(&cty, key, keysize)) != 0) return (ret);
-
-  SK = cty.rk + cty.rounds * 4;
-
-  CPY128  // copy a 128-bit block from *SK to *RK
-
-      for (i = ctx->rounds - 1, SK -= 8; i > 0; i--, SK -= 8) {
-    for (j = 0; j < 4; j++, SK++) {
-      *RK++ = RT0[FSb[(*SK) & 0xFF]] ^ RT1[FSb[(*SK >> 8) & 0xFF]] ^
-              RT2[FSb[(*SK >> 16) & 0xFF]] ^ RT3[FSb[(*SK >> 24) & 0xFF]];
-    }
-  }
-  CPY128  // copy a 128-bit block from *SK to *RK
-      memset(&cty, 0, sizeof(aes_context));  // clear local aes context
-  return (0);
-}
-
-#endif /* AES_DECRYPTION */
-
-/******************************************************************************
- *
- *  AES_SETKEY
- *
- *  Invoked to establish the key schedule for subsequent encryption/decryption
- *
- ******************************************************************************/
-static int aes_setkey(aes_context *ctx,  // AES context provided by our caller
-                      int mode,          // ENCRYPT or DECRYPT flag
-                      const unsigned char *key,  // pointer to the key
-                      unsigned int keysize)      // key length in bytes
-{
-  // since table initialization is not thread safe, we could either add
-  // system-specific mutexes and init the AES key generation tables on
-  // demand, or ask the developer to simply call "gcm_initialize" once during
-  // application startup before threading begins. That's what we choose.
-  if (!aes_tables_inited) return (-1);  // fail the call when not inited.
-
-  ctx->mode = mode;    // capture the key type we're creating
-  ctx->rk = ctx->buf;  // initialize our round key pointer
-
-  switch (keysize)  // set the rounds count based upon the keysize
-  {
-    case 16:
-      ctx->rounds = 10;
-      break;  // 16-byte, 128-bit key
-    case 24:
-      ctx->rounds = 12;
-      break;  // 24-byte, 192-bit key
-    case 32:
-      ctx->rounds = 14;
-      break;  // 32-byte, 256-bit key
-    default:
-      return (-1);
-  }
-
-#if AES_DECRYPTION
-  if (mode == MG_DECRYPT)  // expand our key for encryption or decryption
-    return (aes_set_decryption_key(ctx, key, keysize));
-  else /* MG_ENCRYPT */
-#endif /* AES_DECRYPTION */
-    return (aes_set_encryption_key(ctx, key, keysize));
-}
-
-/******************************************************************************
- *
- *  AES_CIPHER
- *
- *  Perform AES encryption and decryption.
- *  The AES context will have been setup with the encryption mode
- *  and all keying information appropriate for the task.
- *
- ******************************************************************************/
-static int aes_cipher(aes_context *ctx, const unsigned char input[16],
-                      unsigned char output[16]) {
-  int i;
-  uint32_t *RK, X0, X1, X2, X3, Y0, Y1, Y2, Y3;  // general purpose locals
-
-  RK = ctx->rk;
-
-  GET_UINT32_LE(X0, input, 0);
-  X0 ^= *RK++;  // load our 128-bit
-  GET_UINT32_LE(X1, input, 4);
-  X1 ^= *RK++;  // input buffer in a storage
-  GET_UINT32_LE(X2, input, 8);
-  X2 ^= *RK++;  // memory endian-neutral way
-  GET_UINT32_LE(X3, input, 12);
-  X3 ^= *RK++;
-
-#if AES_DECRYPTION  // whether AES decryption is supported
-
-  if (ctx->mode == MG_DECRYPT) {
-    for (i = (ctx->rounds >> 1) - 1; i > 0; i--) {
-      AES_RROUND(Y0, Y1, Y2, Y3, X0, X1, X2, X3);
-      AES_RROUND(X0, X1, X2, X3, Y0, Y1, Y2, Y3);
-    }
-
-    AES_RROUND(Y0, Y1, Y2, Y3, X0, X1, X2, X3);
-
-    X0 = *RK++ ^ ((uint32_t) RSb[(Y0) & 0xFF]) ^
-         ((uint32_t) RSb[(Y3 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) RSb[(Y2 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) RSb[(Y1 >> 24) & 0xFF] << 24);
-
-    X1 = *RK++ ^ ((uint32_t) RSb[(Y1) & 0xFF]) ^
-         ((uint32_t) RSb[(Y0 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) RSb[(Y3 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) RSb[(Y2 >> 24) & 0xFF] << 24);
-
-    X2 = *RK++ ^ ((uint32_t) RSb[(Y2) & 0xFF]) ^
-         ((uint32_t) RSb[(Y1 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) RSb[(Y0 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) RSb[(Y3 >> 24) & 0xFF] << 24);
-
-    X3 = *RK++ ^ ((uint32_t) RSb[(Y3) & 0xFF]) ^
-         ((uint32_t) RSb[(Y2 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) RSb[(Y1 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) RSb[(Y0 >> 24) & 0xFF] << 24);
-  } else /* MG_ENCRYPT */
-  {
-#endif /* AES_DECRYPTION */
-
-    for (i = (ctx->rounds >> 1) - 1; i > 0; i--) {
-      AES_FROUND(Y0, Y1, Y2, Y3, X0, X1, X2, X3);
-      AES_FROUND(X0, X1, X2, X3, Y0, Y1, Y2, Y3);
-    }
-
-    AES_FROUND(Y0, Y1, Y2, Y3, X0, X1, X2, X3);
-
-    X0 = *RK++ ^ ((uint32_t) FSb[(Y0) & 0xFF]) ^
-         ((uint32_t) FSb[(Y1 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) FSb[(Y2 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) FSb[(Y3 >> 24) & 0xFF] << 24);
-
-    X1 = *RK++ ^ ((uint32_t) FSb[(Y1) & 0xFF]) ^
-         ((uint32_t) FSb[(Y2 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) FSb[(Y3 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) FSb[(Y0 >> 24) & 0xFF] << 24);
-
-    X2 = *RK++ ^ ((uint32_t) FSb[(Y2) & 0xFF]) ^
-         ((uint32_t) FSb[(Y3 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) FSb[(Y0 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) FSb[(Y1 >> 24) & 0xFF] << 24);
-
-    X3 = *RK++ ^ ((uint32_t) FSb[(Y3) & 0xFF]) ^
-         ((uint32_t) FSb[(Y0 >> 8) & 0xFF] << 8) ^
-         ((uint32_t) FSb[(Y1 >> 16) & 0xFF] << 16) ^
-         ((uint32_t) FSb[(Y2 >> 24) & 0xFF] << 24);
-
-#if AES_DECRYPTION  // whether AES decryption is supported
-  }
-#endif /* AES_DECRYPTION */
-
-  PUT_UINT32_LE(X0, output, 0);
-  PUT_UINT32_LE(X1, output, 4);
-  PUT_UINT32_LE(X2, output, 8);
-  PUT_UINT32_LE(X3, output, 12);
-
-  return (0);
-}
-/* end of aes.c */
-/******************************************************************************
- *
- * THIS SOURCE CODE IS HEREBY PLACED INTO THE PUBLIC DOMAIN FOR THE GOOD OF ALL
- *
- * This is a simple and straightforward implementation of AES-GCM authenticated
- * encryption. The focus of this work was correctness & accuracy. It is written
- * in straight 'C' without any particular focus upon optimization or speed. It
- * should be endian (memory byte order) neutral since the few places that care
- * are handled explicitly.
- *
- * This implementation of AES-GCM was created by Steven M. Gibson of GRC.com.
- *
- * It is intended for general purpose use, but was written in support of GRC's
- * reference implementation of the SQRL (Secure Quick Reliable Login) client.
- *
- * See:    http://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf
- *         http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/
- *         gcm/gcm-revised-spec.pdf
- *
- * NO COPYRIGHT IS CLAIMED IN THIS WORK, HOWEVER, NEITHER IS ANY WARRANTY MADE
- * REGARDING ITS FITNESS FOR ANY PARTICULAR PURPOSE. USE IT AT YOUR OWN RISK.
- *
- *******************************************************************************/
-
-/******************************************************************************
- *                      ==== IMPLEMENTATION WARNING ====
- *
- *  This code was developed for use within SQRL's fixed environmnent. Thus, it
- *  is somewhat less "general purpose" than it would be if it were designed as
- *  a general purpose AES-GCM library. Specifically, it bothers with almost NO
- *  error checking on parameter limits, buffer bounds, etc. It assumes that it
- *  is being invoked by its author or by someone who understands the values it
- *  expects to receive. Its behavior will be undefined otherwise.
- *
- *  All functions that might fail are defined to return 'ints' to indicate a
- *  problem. Most do not do so now. But this allows for error propagation out
- *  of internal functions if robust error checking should ever be desired.
- *
- ******************************************************************************/
-
-/* Calculating the "GHASH"
- *
- * There are many ways of calculating the so-called GHASH in software, each with
- * a traditional size vs performance tradeoff.  The GHASH (Galois field hash) is
- * an intriguing construction which takes two 128-bit strings (also the cipher's
- * block size and the fundamental operation size for the system) and hashes them
- * into a third 128-bit result.
- *
- * Many implementation solutions have been worked out that use large precomputed
- * table lookups in place of more time consuming bit fiddling, and this approach
- * can be scaled easily upward or downward as needed to change the time/space
- * tradeoff. It's been studied extensively and there's a solid body of theory
- * and practice.  For example, without using any lookup tables an implementation
- * might obtain 119 cycles per byte throughput, whereas using a simple, though
- * large, key-specific 64 kbyte 8-bit lookup table the performance jumps to 13
- * cycles per byte.
- *
- * And Intel's processors have, since 2010, included an instruction which does
- * the entire 128x128->128 bit job in just several 64x64->128 bit pieces.
- *
- * Since SQRL is interactive, and only processing a few 128-bit blocks, I've
- * settled upon a relatively slower but appealing small-table compromise which
- * folds a bunch of not only time consuming but also bit twiddling into a simple
- * 16-entry table which is attributed to Victor Shoup's 1996 work while at
- * Bellcore: "On Fast and Provably Secure MessageAuthentication Based on
- * Universal Hashing."  See: http://www.shoup.net/papers/macs.pdf
- * See, also section 4.1 of the "gcm-revised-spec" cited above.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /*

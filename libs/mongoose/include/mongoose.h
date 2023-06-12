@@ -972,12 +972,38 @@ int _stat(const char *pathname, struct stat *st);
 #endif
 
 #endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+#ifndef CS_COMMON_PLATFORMS_PLATFORM_TM4C129_H_
+#define CS_COMMON_PLATFORMS_PLATFORM_TM4C129_H_
+#if CS_PLATFORM == CS_P_TM4C129
 
-#if MG_ARCH == MG_ARCH_WIN32
+#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <stdint.h>
+#include <string.h>
+#include <time.h>
 
-#ifndef _CRT_RAND_S
-#define _CRT_RAND_S
+#ifndef __TI_COMPILER_VERSION__
+#include <fcntl.h>
+#include <sys/time.h>
 #endif
 
 #define SIZE_T_FMT "u"
@@ -1491,6 +1517,95 @@ typedef int socklen_t;
 #define MG_IO_SIZE 16384
 #endif
 
+#ifndef ENOMEM
+#define ENOMEM ERROR_NOT_ENOUGH_MEMORY
+#endif
+
+#ifndef _UINTPTR_T_DEFINED
+typedef unsigned int *uintptr_t;
+#endif
+
+#define _S_IFREG 2
+#define _S_IFDIR 4
+
+#ifndef S_ISDIR
+#define S_ISDIR(x) (((x) &_S_IFDIR) != 0)
+#endif
+
+#ifndef S_ISREG
+#define S_ISREG(x) (((x) &_S_IFREG) != 0)
+#endif
+
+int open(const char *filename, int oflag, int pmode);
+int _wstati64(const wchar_t *path, cs_stat_t *st);
+const char *strerror();
+
+#endif /* CS_PLATFORM == CS_P_WINCE */
+#endif /* CS_COMMON_PLATFORMS_PLATFORM_WINCE_H_ */
+#ifdef MG_MODULE_LINES
+#line 1 "common/platforms/platform_nxp_lpc.h"
+#endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef CS_COMMON_PLATFORMS_PLATFORM_NXP_LPC_H_
+#define CS_COMMON_PLATFORMS_PLATFORM_NXP_LPC_H_
+
+#if CS_PLATFORM == CS_P_NXP_LPC
+
+#include <ctype.h>
+#include <stdint.h>
+#include <string.h>
+
+#define SIZE_T_FMT "u"
+typedef struct stat cs_stat_t;
+#define INT64_FMT "lld"
+#define INT64_X_FMT "llx"
+#define __cdecl
+
+#define MG_LWIP 1
+
+#define MG_NET_IF MG_NET_IF_LWIP_LOW_LEVEL
+
+/*
+ * LPCXpress comes with 3 C library implementations: Newlib, NewlibNano and
+ *Redlib.
+ * See https://community.nxp.com/message/630860 for more details.
+ *
+ * Redlib is the default and lacks certain things, so we provide them.
+ */
+#ifdef __REDLIB_INTERFACE_VERSION__
+
+/* Let LWIP define timeval for us. */
+#define LWIP_TIMEVAL_PRIVATE 1
+
+#define va_copy(d, s) __builtin_va_copy(d, s)
+
+#define CS_ENABLE_TO64 1
+#define to64(x) cs_to64(x)
+
+#define CS_ENABLE_STRDUP 1
+
+#else
+
+#include <sys/time.h>
+#define LWIP_TIMEVAL_PRIVATE 0
+#define to64(x) strtoll(x, NULL, 10)
+
 #endif
 
 #endif /* CS_PLATFORM == CS_P_NXP_LPC */
@@ -1498,8 +1613,25 @@ typedef int socklen_t;
 #ifdef MG_MODULE_LINES
 #line 1 "common/platforms/platform_nxp_kinetis.h"
 #endif
+/*
+ * Copyright (c) 2014-2018 Cesanta Software Limited
+ * All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the ""License"");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an ""AS IS"" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#if MG_ARCH == MG_ARCH_ZEPHYR
+#ifndef CS_COMMON_PLATFORMS_PLATFORM_NXP_KINETIS_H_
+#define CS_COMMON_PLATFORMS_PLATFORM_NXP_KINETIS_H_
 
 #if CS_PLATFORM == CS_P_NXP_KINETIS
 
@@ -3754,6 +3886,9 @@ bool mg_path_is_sane(const struct mg_str path);
 #define MG_ARM_ENABLE_IRQ()
 #endif
 
+#define MG_F_WEBSOCKET_NO_DEFRAG MG_F_PROTO_1
+#define MG_F_DELETE_CHUNK MG_F_PROTO_2
+
 #if defined(__CC_ARM)
 #define MG_DSB() __dsb(0xf)
 #elif defined(__ARMCC_VERSION)
@@ -5646,647 +5781,39 @@ size_t mg_dns_parse_rr(const uint8_t *buf, size_t len, size_t ofs,
  * Encodes a DNS name.
  */
 int mg_dns_encode_name(struct mbuf *io, const char *name, size_t len);
-int mg_dns_encode_name_s(struct mbuf *io, struct mg_str name);
 
-// Error return values - negative. Successful returns are >= 0
-enum { MG_JSON_TOO_DEEP = -1, MG_JSON_INVALID = -2, MG_JSON_NOT_FOUND = -3 };
-int mg_json_get(struct mg_str json, const char *path, int *toklen);
-
-struct mg_str mg_json_get_tok(struct mg_str json, const char *path);
-bool mg_json_get_num(struct mg_str json, const char *path, double *v);
-bool mg_json_get_bool(struct mg_str json, const char *path, bool *v);
-long mg_json_get_long(struct mg_str json, const char *path, long dflt);
-char *mg_json_get_str(struct mg_str json, const char *path);
-char *mg_json_get_hex(struct mg_str json, const char *path, int *len);
-char *mg_json_get_b64(struct mg_str json, const char *path, int *len);
-
-bool mg_json_unescape(struct mg_str str, char *buf, size_t len);
-size_t mg_json_next(struct mg_str obj, size_t ofs, struct mg_str *key,
-                    struct mg_str *val);
-
-
-
-
-// JSON-RPC request descriptor
-struct mg_rpc_req {
-  struct mg_rpc **head;  // RPC handlers list head
-  struct mg_rpc *rpc;    // RPC handler being called
-  mg_pfn_t pfn;          // Response printing function
-  void *pfn_data;        // Response printing function data
-  void *req_data;        // Arbitrary request data
-  struct mg_str frame;   // Request, e.g. {"id":1,"method":"add","params":[1,2]}
-};
-
-// JSON-RPC method handler
-struct mg_rpc {
-  struct mg_rpc *next;              // Next in list
-  struct mg_str method;             // Method pattern
-  void (*fn)(struct mg_rpc_req *);  // Handler function
-  void *fn_data;                    // Handler function argument
-};
-
-void mg_rpc_add(struct mg_rpc **head, struct mg_str method_pattern,
-                void (*handler)(struct mg_rpc_req *), void *handler_data);
-void mg_rpc_del(struct mg_rpc **head, void (*handler)(struct mg_rpc_req *));
-void mg_rpc_process(struct mg_rpc_req *);
-
-// Helper functions to print result or error frame
-void mg_rpc_ok(struct mg_rpc_req *, const char *fmt, ...);
-void mg_rpc_vok(struct mg_rpc_req *, const char *fmt, va_list *ap);
-void mg_rpc_err(struct mg_rpc_req *, int code, const char *fmt, ...);
-void mg_rpc_verr(struct mg_rpc_req *, int code, const char *fmt, va_list *);
-void mg_rpc_list(struct mg_rpc_req *r);
-// Copyright (c) 2023 Cesanta Software Limited
-// All rights reserved
-
-
-
-
-
-#define MG_OTA_NONE 0       // No OTA support
-#define MG_OTA_STM32H5 1    // STM32 H5
-#define MG_OTA_STM32H7 2    // STM32 H7
-#define MG_OTA_STM32H7_DUAL_CORE 3 // STM32 H7 dual core
-#define MG_OTA_STM32F  4    // STM32 F7/F4/F2
-#define MG_OTA_CH32V307 100 // WCH CH32V307
-#define MG_OTA_U2A 200      // Renesas U2A16, U2A8, U2A6
-#define MG_OTA_RT1020 300   // IMXRT1020
-#define MG_OTA_RT1060 301   // IMXRT1060
-#define MG_OTA_RT1064 302   // IMXRT1064
-#define MG_OTA_RT1170 303   // IMXRT1170
-#define MG_OTA_MCXN 310 	  // MCXN947
-#define MG_OTA_FLASH 900    // OTA via an internal flash
-#define MG_OTA_ESP32 910    // ESP32 OTA implementation
-#define MG_OTA_PICOSDK 920  // RP2040/2350 using Pico-SDK hardware_flash
-#define MG_OTA_CUSTOM 1000  // Custom implementation
-
-#ifndef MG_OTA
-#define MG_OTA MG_OTA_NONE
-#else
-#ifndef MG_IRAM
-#if defined(__GNUC__)
-#define MG_IRAM __attribute__((noinline, section(".iram")))
-#else
-#define MG_IRAM
-#endif // compiler
-#endif // IRAM
-#endif // OTA
-
-// Firmware update API
-bool mg_ota_begin(size_t new_firmware_size);     // Start writing
-bool mg_ota_write(const void *buf, size_t len);  // Write chunk, aligned to 1k
-bool mg_ota_end(void);                           // Stop writing
-
-
-
-#if MG_OTA != MG_OTA_NONE && MG_OTA != MG_OTA_CUSTOM
-
-struct mg_flash {
-  void *start;    // Address at which flash starts
-  size_t size;    // Flash size
-  size_t secsz;   // Sector size
-  size_t align;   // Write alignment
-  bool (*write_fn)(void *, const void *, size_t);  // Write function
-  bool (*swap_fn)(void);                           // Swap partitions
-};
-
-bool mg_ota_flash_begin(size_t new_firmware_size, struct mg_flash *flash);
-bool mg_ota_flash_write(const void *buf, size_t len, struct mg_flash *flash);
-bool mg_ota_flash_end(struct mg_flash *flash);
-
-#endif
-
-
-
-
-
-
-#if defined(MG_ENABLE_TCPIP) && MG_ENABLE_TCPIP
-struct mg_tcpip_if;  // Mongoose TCP/IP network interface
-#define MG_TCPIP_IFACE(mgr_) ((struct mg_tcpip_if *) (mgr_)->priv)
-
-struct mg_tcpip_driver {
-  bool (*init)(struct mg_tcpip_if *);                         // Init driver
-  size_t (*tx)(const void *, size_t, struct mg_tcpip_if *);   // Transmit frame
-  size_t (*rx)(void *buf, size_t len, struct mg_tcpip_if *);  // Receive frame
-  bool (*up)(struct mg_tcpip_if *);                           // Up/down status
-};
-
-typedef void (*mg_tcpip_event_handler_t)(struct mg_tcpip_if *ifp, int ev,
-                                         void *ev_data);
-
-enum {
-  MG_TCPIP_EV_ST_CHG,     // state change             uint8_t * (&ifp->state)
-  MG_TCPIP_EV_DHCP_DNS,   // DHCP DNS assignment      uint32_t *ipaddr
-  MG_TCPIP_EV_DHCP_SNTP,  // DHCP SNTP assignment     uint32_t *ipaddr
-  MG_TCPIP_EV_ARP,        // Got ARP packet           struct mg_str *
-  MG_TCPIP_EV_TIMER_1S,   // 1 second timer           NULL
-  MG_TCPIP_EV_USER        // Starting ID for user events
-};
-
-// Network interface
-struct mg_tcpip_if {
-  uint8_t mac[6];                  // MAC address. Must be set to a valid MAC
-  uint32_t ip, mask, gw;           // IP address, mask, default gateway
-  struct mg_str tx;                // Output (TX) buffer
-  bool enable_dhcp_client;         // Enable DCHP client
-  bool enable_dhcp_server;         // Enable DCHP server
-  bool enable_get_gateway;         // DCHP server sets client as gateway
-  bool enable_req_dns;             // DCHP client requests DNS server
-  bool enable_req_sntp;            // DCHP client requests SNTP server
-  bool enable_crc32_check;         // Do a CRC check on RX frames and strip it
-  bool enable_mac_check;           // Do a MAC check on RX frames
-  struct mg_tcpip_driver *driver;  // Low level driver
-  void *driver_data;               // Driver-specific data
-  mg_tcpip_event_handler_t fn;     // User-specified event handler function
-  struct mg_mgr *mgr;              // Mongoose event manager
-  struct mg_queue recv_queue;      // Receive queue
-  uint16_t mtu;                    // Interface MTU
-#define MG_TCPIP_MTU_DEFAULT 1500
-
-  // Internal state, user can use it but should not change it
-  uint8_t gwmac[6];             // Router's MAC
-  uint64_t now;                 // Current time
-  uint64_t timer_1000ms;        // 1000 ms timer: for DHCP and link state
-  uint64_t lease_expire;        // Lease expiration time, in ms
-  uint16_t eport;               // Next ephemeral port
-  volatile uint32_t ndrop;      // Number of received, but dropped frames
-  volatile uint32_t nrecv;      // Number of received frames
-  volatile uint32_t nsent;      // Number of transmitted frames
-  volatile uint32_t nerr;       // Number of driver errors
-  uint8_t state;                // Current state
-#define MG_TCPIP_STATE_DOWN 0   // Interface is down
-#define MG_TCPIP_STATE_UP 1     // Interface is up
-#define MG_TCPIP_STATE_REQ 2    // Interface is up, DHCP REQUESTING state
-#define MG_TCPIP_STATE_IP 3     // Interface is up and has an IP assigned
-#define MG_TCPIP_STATE_READY 4  // Interface has fully come up, ready to work
-};
-
-void mg_tcpip_init(struct mg_mgr *, struct mg_tcpip_if *);
-void mg_tcpip_free(struct mg_tcpip_if *);
-void mg_tcpip_qwrite(void *buf, size_t len, struct mg_tcpip_if *ifp);
-void mg_tcpip_arp_request(struct mg_tcpip_if *ifp, uint32_t ip, uint8_t *mac);
-
-extern struct mg_tcpip_driver mg_tcpip_driver_stm32f;
-extern struct mg_tcpip_driver mg_tcpip_driver_w5500;
-extern struct mg_tcpip_driver mg_tcpip_driver_tm4c;
-extern struct mg_tcpip_driver mg_tcpip_driver_tms570;
-extern struct mg_tcpip_driver mg_tcpip_driver_stm32h;
-extern struct mg_tcpip_driver mg_tcpip_driver_imxrt;
-extern struct mg_tcpip_driver mg_tcpip_driver_same54;
-extern struct mg_tcpip_driver mg_tcpip_driver_cmsis;
-extern struct mg_tcpip_driver mg_tcpip_driver_ra;
-extern struct mg_tcpip_driver mg_tcpip_driver_xmc;
-extern struct mg_tcpip_driver mg_tcpip_driver_xmc7;
-
-// Drivers that require SPI, can use this SPI abstraction
-struct mg_tcpip_spi {
-  void *spi;                        // Opaque SPI bus descriptor
-  void (*begin)(void *);            // SPI begin: slave select low
-  void (*end)(void *);              // SPI end: slave select high
-  uint8_t (*txn)(void *, uint8_t);  // SPI transaction: write 1 byte, read reply
-};
-#endif
-
-
-
-// Macros to record timestamped events that happens with a connection.
-// They are saved into a c->prof IO buffer, each event is a name and a 32-bit
-// timestamp in milliseconds since connection init time.
-//
-// Test (run in two separate terminals):
-//   make -C examples/http-server/ CFLAGS_EXTRA=-DMG_ENABLE_PROFILE=1
-//   curl localhost:8000
-// Output:
-//   1ea1f1e7 2 net.c:150:mg_close_conn      3 profile:                                                            
-//   1ea1f1e8 2 net.c:150:mg_close_conn      1ea1f1e6 init                                                         
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_OPEN
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_ACCEPT 
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_READ
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_HTTP_MSG
-//   1ea1f1e8 2 net.c:150:mg_close_conn          0 EV_WRITE
-//   1ea1f1e8 2 net.c:150:mg_close_conn          1 EV_CLOSE
-//
-// Usage:
-//   Enable profiling by setting MG_ENABLE_PROFILE=1
-//   Invoke MG_PROF_ADD(c, "MY_EVENT_1") in the places you'd like to measure
-
-#if MG_ENABLE_PROFILE
-struct mg_profitem {
-  const char *name;    // Event name
-  uint32_t timestamp;  // Milliseconds since connection creation (MG_EV_OPEN)
-};
-
-#define MG_PROFILE_ALLOC_GRANULARITY 256  // Can save 32 items wih to realloc
-
-// Adding a profile item to the c->prof. Must be as fast as possible.
-// Reallocation of the c->prof iobuf is not desirable here, that's why we
-// pre-allocate c->prof with MG_PROFILE_ALLOC_GRANULARITY.
-// This macro just inits and copies 8 bytes, and calls mg_millis(),
-// which should be fast enough.
-#define MG_PROF_ADD(c, name_)                                             \
-  do {                                                                    \
-    struct mg_iobuf *io = &c->prof;                                       \
-    uint32_t inittime = ((struct mg_profitem *) io->buf)->timestamp;      \
-    struct mg_profitem item = {name_, (uint32_t) mg_millis() - inittime}; \
-    mg_iobuf_add(io, io->len, &item, sizeof(item));                       \
-  } while (0)
-
-// Initialising profile for a new connection. Not time sensitive
-#define MG_PROF_INIT(c)                                          \
-  do {                                                           \
-    struct mg_profitem first = {"init", (uint32_t) mg_millis()}; \
-    mg_iobuf_init(&(c)->prof, 0, MG_PROFILE_ALLOC_GRANULARITY);  \
-    mg_iobuf_add(&c->prof, c->prof.len, &first, sizeof(first));  \
-  } while (0)
-
-#define MG_PROF_FREE(c) mg_iobuf_free(&(c)->prof)
-
-// Dumping the profile. Not time sensitive
-#define MG_PROF_DUMP(c)                                            \
-  do {                                                             \
-    struct mg_iobuf *io = &c->prof;                                \
-    struct mg_profitem *p = (struct mg_profitem *) io->buf;        \
-    struct mg_profitem *e = &p[io->len / sizeof(*p)];              \
-    MG_INFO(("%lu profile:", c->id));                              \
-    while (p < e) {                                                \
-      MG_INFO(("%5lx %s", (unsigned long) p->timestamp, p->name)); \
-      p++;                                                         \
-    }                                                              \
-  } while (0)
-
-#else
-#define MG_PROF_INIT(c)
-#define MG_PROF_FREE(c)
-#define MG_PROF_ADD(c, name)
-#define MG_PROF_DUMP(c)
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_CMSIS) && MG_ENABLE_DRIVER_CMSIS
-
-#include "Driver_ETH_MAC.h"  // keep this include
-#include "Driver_ETH_PHY.h"  // keep this include
-
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_IMXRT) && MG_ENABLE_DRIVER_IMXRT
-
-struct mg_tcpip_driver_imxrt_data {
-  // MDC clock divider. MDC clock is derived from IPS Bus clock (ipg_clk),
-  // must not exceed 2.5MHz. Configuration for clock range 2.36~2.50 MHz
-  // 37.5.1.8.2, Table 37-46 : f = ipg_clk / (2(mdc_cr + 1))
-  //    ipg_clk       mdc_cr VALUE
-  //    --------------------------
-  //                  -1  <-- TODO() tell driver to guess the value
-  //    25 MHz         4
-  //    33 MHz         6
-  //    40 MHz         7
-  //    50 MHz         9
-  //    66 MHz        13
-  int mdc_cr;  // Valid values: -1 to 63
-
-  uint8_t phy_addr;  // PHY address
-};
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 2
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 24
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                                \
-  do {                                                           \
-    static struct mg_tcpip_driver_imxrt_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                              \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                      \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                   \
-    mif_.ip = MG_TCPIP_IP;                                       \
-    mif_.mask = MG_TCPIP_MASK;                                   \
-    mif_.gw = MG_TCPIP_GW;                                       \
-    mif_.driver = &mg_tcpip_driver_imxrt;                        \
-    mif_.driver_data = &driver_data_;                            \
-    MG_SET_MAC_ADDRESS(mif_.mac);                                \
-    mg_tcpip_init(mgr, &mif_);                                   \
-    MG_INFO(("Driver: imxrt, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
-
-
-
-
-struct mg_phy {
-  uint16_t (*read_reg)(uint8_t addr, uint8_t reg);
-  void (*write_reg)(uint8_t addr, uint8_t reg, uint16_t value);
-};
-
-// PHY configuration settings, bitmask
-enum {
-  // Set if PHY LEDs are connected to ground
-  MG_PHY_LEDS_ACTIVE_HIGH = (1 << 0),
-  // Set when PHY clocks MAC. Otherwise, MAC clocks PHY
-  MG_PHY_CLOCKS_MAC = (1 << 1),
-};
-
-enum { MG_PHY_SPEED_10M, MG_PHY_SPEED_100M, MG_PHY_SPEED_1000M };
-
-void mg_phy_init(struct mg_phy *, uint8_t addr, uint8_t config);
-bool mg_phy_up(struct mg_phy *, uint8_t addr, bool *full_duplex,
-               uint8_t *speed);
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_RA) && MG_ENABLE_DRIVER_RA
-
-struct mg_tcpip_driver_ra_data {
-  // MDC clock "divider". MDC clock is software generated,
-  uint32_t clock;    // core clock frequency in Hz
-  uint16_t irqno;    // IRQn, R_ICU->IELSR[irqno]
-  uint8_t phy_addr;  // PHY address
-};
-
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_SAME54) && MG_ENABLE_DRIVER_SAME54
-
-struct mg_tcpip_driver_same54_data {
-    int mdc_cr;
-};
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 5
-#endif
-
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_STM32F) && \
-    MG_ENABLE_DRIVER_STM32F
-
-struct mg_tcpip_driver_stm32f_data {
-  // MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
-  //    HCLK range    DIVIDER    mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    HCLK/42        0
-  //    100-150 MHz   HCLK/62        1
-  //    20-35 MHz     HCLK/16        2
-  //    35-60 MHz     HCLK/26        3
-  //    150-216 MHz   HCLK/102       4  <-- value for Nucleo-F* on max speed
-  //    216-310 MHz   HCLK/124       5
-  //    110, 111 Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-
-  uint8_t phy_addr;  // PHY address
-};
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 0
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 4
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                                 \
-  do {                                                            \
-    static struct mg_tcpip_driver_stm32f_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                               \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                       \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                    \
-    mif_.ip = MG_TCPIP_IP;                                        \
-    mif_.mask = MG_TCPIP_MASK;                                    \
-    mif_.gw = MG_TCPIP_GW;                                        \
-    mif_.driver = &mg_tcpip_driver_stm32f;                        \
-    mif_.driver_data = &driver_data_;                             \
-    MG_SET_MAC_ADDRESS(mif_.mac);                                 \
-    mg_tcpip_init(mgr, &mif_);                                    \
-    MG_INFO(("Driver: stm32f, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
-
-
-#if MG_ENABLE_TCPIP
-#if !defined(MG_ENABLE_DRIVER_STM32H)
-#define MG_ENABLE_DRIVER_STM32H 0
-#endif
-#if !defined(MG_ENABLE_DRIVER_MCXN)
-#define MG_ENABLE_DRIVER_MCXN 0
-#endif
-#if MG_ENABLE_DRIVER_STM32H || MG_ENABLE_DRIVER_MCXN
-
-struct mg_tcpip_driver_stm32h_data {
-  // MDC clock divider. MDC clock is derived from HCLK, must not exceed 2.5MHz
-  //    HCLK range    DIVIDER    mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    HCLK/42        0
-  //    100-150 MHz   HCLK/62        1
-  //    20-35 MHz     HCLK/16        2
-  //    35-60 MHz     HCLK/26        3
-  //    150-250 MHz   HCLK/102       4  <-- value for max speed HSI
-  //    250-300 MHz   HCLK/124       5  <-- value for Nucleo-H* on CSI
-  //    300-500 MHz   HCLK/204       6
-  //    500-800 MHz   HCLK/324       7
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-
-  uint8_t phy_addr;  // PHY address
-  uint8_t phy_conf;  // PHY config
-};
-
-#ifndef MG_TCPIP_PHY_CONF
-#define MG_TCPIP_PHY_CONF MG_PHY_CLOCKS_MAC
-#endif
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 0
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 4
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                                 \
-  do {                                                            \
-    static struct mg_tcpip_driver_stm32h_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                               \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                       \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                    \
-    driver_data_.phy_conf = MG_TCPIP_PHY_CONF;                    \
-    mif_.ip = MG_TCPIP_IP;                                        \
-    mif_.mask = MG_TCPIP_MASK;                                    \
-    mif_.gw = MG_TCPIP_GW;                                        \
-    mif_.driver = &mg_tcpip_driver_stm32h;                        \
-    mif_.driver_data = &driver_data_;                             \
-    MG_SET_MAC_ADDRESS(mif_.mac);                                 \
-    mg_tcpip_init(mgr, &mif_);                                    \
-    MG_INFO(("Driver: stm32h, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_TM4C) && MG_ENABLE_DRIVER_TM4C
-
-struct mg_tcpip_driver_tm4c_data {
-  // MDC clock divider. MDC clock is derived from SYSCLK, must not exceed 2.5MHz
-  //    SYSCLK range   DIVIDER   mdc_cr VALUE
-  //    -------------------------------------
-  //                                -1  <-- tell driver to guess the value
-  //    60-100 MHz    SYSCLK/42      0
-  //    100-150 MHz   SYSCLK/62      1  <-- value for EK-TM4C129* on max speed
-  //    20-35 MHz     SYSCLK/16      2
-  //    35-60 MHz     SYSCLK/26      3
-  //    0x4-0xF Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3
-};
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 1
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                               \
-  do {                                                          \
-    static struct mg_tcpip_driver_tm4c_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                             \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                     \
-    mif_.ip = MG_TCPIP_IP;                                      \
-    mif_.mask = MG_TCPIP_MASK;                                  \
-    mif_.gw = MG_TCPIP_GW;                                      \
-    mif_.driver = &mg_tcpip_driver_tm4c;                        \
-    mif_.driver_data = &driver_data_;                           \
-    MG_SET_MAC_ADDRESS(mif_.mac);                               \
-    mg_tcpip_init(mgr, &mif_);                                  \
-    MG_INFO(("Driver: tm4c, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_TMS570) && MG_ENABLE_DRIVER_TMS570
-struct mg_tcpip_driver_tms570_data {
-  int mdc_cr;
-  int phy_addr;
-};
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 0
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 1
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                               \
-  do {                                                          \
-    static struct mg_tcpip_driver_tms570_data driver_data_;     \
-    static struct mg_tcpip_if mif_;                             \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                     \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                  \
-    mif_.ip = MG_TCPIP_IP;                                      \
-    mif_.mask = MG_TCPIP_MASK;                                  \
-    mif_.gw = MG_TCPIP_GW;                                      \
-    mif_.driver = &mg_tcpip_driver_tms570;                      \
-    mif_.driver_data = &driver_data_;                           \
-    MG_SET_MAC_ADDRESS(mif_.mac);                               \
-    mg_tcpip_init(mgr, &mif_);                                  \
-    MG_INFO(("Driver: tms570, MAC: %M", mg_print_mac, mif_.mac));\
-  } while (0)
-#endif
-
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_W5500) && MG_ENABLE_DRIVER_W5500
-
-#endif
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_XMC7) && MG_ENABLE_DRIVER_XMC7
-
-struct mg_tcpip_driver_xmc7_data {
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-  uint8_t phy_addr;
-};
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 0
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 3
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                                 \
-  do {                                                            \
-    static struct mg_tcpip_driver_xmc7_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                               \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                       \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                    \
-    mif_.ip = MG_TCPIP_IP;                                        \
-    mif_.mask = MG_TCPIP_MASK;                                    \
-    mif_.gw = MG_TCPIP_GW;                                        \
-    mif_.driver = &mg_tcpip_driver_xmc7;                        \
-    mif_.driver_data = &driver_data_;                             \
-    MG_SET_MAC_ADDRESS(mif_.mac);                                 \
-    mg_tcpip_init(mgr, &mif_);                                    \
-    MG_INFO(("Driver: xmc7, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
-
-
-
-#if MG_ENABLE_TCPIP && defined(MG_ENABLE_DRIVER_XMC) && MG_ENABLE_DRIVER_XMC
-
-struct mg_tcpip_driver_xmc_data {
-  // 13.2.8.1 Station Management Functions
-  // MDC clock divider (). MDC clock is derived from ETH MAC clock
-  // It must not exceed 2.5MHz
-  // ETH Clock range  DIVIDER       mdc_cr VALUE
-  // --------------------------------------------
-  //                                     -1  <-- tell driver to guess the value
-  // 60-100 MHz       ETH Clock/42        0
-  // 100-150 MHz      ETH Clock/62        1
-  // 20-35 MHz        ETH Clock/16        2
-  // 35-60 MHz        ETH Clock/26        3
-  // 150-250 MHz      ETH Clock/102       4
-  // 250-300 MHz      ETH Clock/124       5
-  // 110, 111 Reserved
-  int mdc_cr;  // Valid values: -1, 0, 1, 2, 3, 4, 5
-  uint8_t phy_addr;
-};
-
-#ifndef MG_TCPIP_PHY_ADDR
-#define MG_TCPIP_PHY_ADDR 0
-#endif
-
-#ifndef MG_DRIVER_MDC_CR
-#define MG_DRIVER_MDC_CR 4
-#endif
-
-#define MG_TCPIP_DRIVER_INIT(mgr)                                 \
-  do {                                                            \
-    static struct mg_tcpip_driver_xmc_data driver_data_;       \
-    static struct mg_tcpip_if mif_;                               \
-    driver_data_.mdc_cr = MG_DRIVER_MDC_CR;                       \
-    driver_data_.phy_addr = MG_TCPIP_PHY_ADDR;                    \
-    mif_.ip = MG_TCPIP_IP;                                        \
-    mif_.mask = MG_TCPIP_MASK;                                    \
-    mif_.gw = MG_TCPIP_GW;                                        \
-    mif_.driver = &mg_tcpip_driver_xmc;                        \
-    mif_.driver_data = &driver_data_;                             \
-    MG_SET_MAC_ADDRESS(mif_.mac);                                 \
-    mg_tcpip_init(mgr, &mif_);                                    \
-    MG_INFO(("Driver: xmc, MAC: %M", mg_print_mac, mif_.mac)); \
-  } while (0)
-
-#endif
+/* Low-level: parses a DNS response. */
+int mg_parse_dns(const char *buf, int len, struct mg_dns_message *msg);
+
+/*
+ * Uncompresses a DNS compressed name.
+ *
+ * The containing DNS message is required because of the compressed encoding
+ * and reference suffixes present elsewhere in the packet.
+ *
+ * If the name is less than `dst_len` characters long, the remainder
+ * of `dst` is terminated with `\0` characters. Otherwise, `dst` is not
+ * terminated.
+ *
+ * If `dst_len` is 0 `dst` can be NULL.
+ * Returns the uncompressed name length.
+ */
+size_t mg_dns_uncompress_name(struct mg_dns_message *msg, struct mg_str *name,
+                              char *dst, int dst_len);
+
+/*
+ * Attaches a built-in DNS event handler to the given listening connection.
+ *
+ * The DNS event handler parses the incoming UDP packets, treating them as DNS
+ * requests. If an incoming packet gets successfully parsed by the DNS event
+ * handler, a user event handler will receive an `MG_DNS_REQUEST` event, with
+ * `ev_data` pointing to the parsed `struct mg_dns_message`.
+ *
+ * See
+ * [captive_dns_server](https://github.com/cesanta/mongoose/tree/master/examples/captive_dns_server)
+ * example on how to handle DNS request and send DNS reply.
+ */
+void mg_set_protocol_dns(struct mg_connection *nc);
 
 #ifdef __cplusplus
 }
