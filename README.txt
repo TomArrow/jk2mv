@@ -32,11 +32,45 @@ V24 features:
       "cg_autoKick_sideKickFirst 0" + "can kick side" + "can kick front" = "kick front"
       "cg_autoKick_sideKickFirst 1" + "can kick side" + "can kick front" = "kick side"
   Enable debug:
-      \cg_autoKick "1"
-      \cg_autoKick_debug "1"
+      \set cg_autoKick "1"
+      \set cg_autoKick_debug "1"
   Enable prediction:
-      \cg_autoKick_usePrediction "1"
+      \set cg_autoKick_usePrediction "1"
   Check prediction:
-      \cg_showmiss "1"
+      \set cg_showmiss "1"
   Prediction note:
       cg_showmiss will print misses and errors to the console when they occur
+  Enable indicator:
+      \set cg_movementKeys "1"
+      \set cg_autoKick_indicator "1"
+  Disable checks:
+      \set cg_autoKick_checkRoll "0"
+      \set cg_autoKick_checkAir "0"
+      \set cg_autoKick_checkKnockdown "0"
+
+* Kill messages
+  Disable:
+      \set cg_drawKillMessage "0"
+  Enable default:
+      \set cg_drawKillMessage "1"
+  Enable multikill:
+      \set cg_drawKillMessage "2"
+
+* Friends list
+  Description:
+      Clients in this list will be ignored by autokick
+  Add friend:
+      \friendAdd <client_id or name or all>
+  Remove friend:
+      \friendRemove <client_id or name or all>
+  List friends:
+      \friendsList
+  List all clients:
+      \clientlist
+  Examples:
+      \friendAdd Padawan
+      \friendAdd 6
+      \friendAdd all
+      \friendRemove Luke
+      \friendRemove 19
+      \friendRemove all
