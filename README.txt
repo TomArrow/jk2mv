@@ -74,3 +74,34 @@ V24 features:
       \friendRemove Luke
       \friendRemove 19
       \friendRemove all
+
+* Auto backstab
+  Enable normal backstab (toggle):
+      \bind V "toggle cg_autoBackStab"
+  Enable crouched backstab with jump (toggle):
+      \bind V "toggle cg_autoBackStab 0 2"
+  Enable normal backstab (press):
+      \set cg_autoBackStab "3"
+      \bind V "+autoBackStab"
+  Enable crouched backstab with jump (press):
+      \set cg_autoBackStab "4"
+      \bind V "+autoBackStab"
+  Change distance:
+      \set cg_autoBackStab_distance "128.0"
+  Enable debug:
+      \set cg_autoBackStab "1"
+      \set cg_autoBackStab_debug "1"
+  Enable prediction:
+      \set cg_autoBackStab_usePrediction "1"
+
+* Saber box visualization
+  Enable:
+      \set cg_debugSaberBox "1"
+  Enable prediction:
+      \set cg_debugSaberBox_usePrediction "1"
+
+* Score counter
+  Enable:
+      \set cg_scoreCounter "1"
+  Example message:
+      Luke (15) was sabered by Lando (34)
