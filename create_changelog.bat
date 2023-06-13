@@ -1,4 +1,4 @@
-git log 2bba9f5976b912586c79426c00d9c1257c3325c9.. > jk2mv_log.txt
+git log 3ea62c674464d55091bee199ec84f162342ed16b.. > jk2mv_log.txt
 cd src\mvsdk
-git log 2a3fb066513cdb7f6e760d70f9c674daf17b269e.. > ..\..\mvsdk_log.txt
+git log 42aad66cf87333fd79217e18db61ceaaf600c0a3.. > ..\..\mvsdk_log.txt
 cd ..\..
