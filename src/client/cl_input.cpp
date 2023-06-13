@@ -690,9 +690,9 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	}
 	if (flags & USERCMD_SET_ANGLES)
 	{
-		cmd->angles[0] = cl.cgameUserCmd.angles[0];
-		cmd->angles[1] = cl.cgameUserCmd.angles[1];
-		cmd->angles[2] = cl.cgameUserCmd.angles[2];
+		cl.viewangles[0] = SHORT2ANGLE(cl.cgameUserCmd.angles[0]);
+		cl.viewangles[1] = SHORT2ANGLE(cl.cgameUserCmd.angles[1]);
+		cl.viewangles[2] = SHORT2ANGLE(cl.cgameUserCmd.angles[2]);
 	}
 	if (flags & USERCMD_SET_BUTTONS)
 	{
@@ -726,6 +726,8 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	{
 		cmd->upmove = cl.cgameUserCmd.upmove;
 	}
+
+	cl.cgameUserCmdFlags = 0;
 
 	if (cl.gcmdSendValue)
 	{

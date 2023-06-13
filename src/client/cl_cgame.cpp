@@ -342,7 +342,7 @@ CL_SetUserCmdValue(
 		cl.cgameSensitivity = sensitivityScale;
 	}
 
-	cl.cgameUserCmdFlags = flags;
+	cl.cgameUserCmdFlags |= flags;
 }
 
 /*
