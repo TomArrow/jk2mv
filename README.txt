@@ -58,7 +58,7 @@ V24 features:
 
 * Friends list
   Description:
-      Clients in this list will be ignored by autokick
+      Clients in this list will be ignored by autokick and auto backstab
   Add friend:
       \friendAdd <client_id or name or all>
   Remove friend:
@@ -105,3 +105,7 @@ V24 features:
       \set cg_scoreCounter "1"
   Example message:
       Luke (15) was sabered by Lando (34)
+
+* Chat only from friends
+  Enable:
+      \set cg_friendsChatsOnly "1"
