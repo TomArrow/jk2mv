@@ -20,6 +20,8 @@ set(AssetsFiles
 	"gfx/hud/keys/forward_on.tga"
 	"gfx/hud/keys/jump_off.tga"
 	"gfx/hud/keys/jump_on.tga"
+	"gfx/hud/keys/jump_off_autokick.tga"
+	"gfx/hud/keys/jump_on_autokick.tga"
 	"gfx/hud/keys/left_off.tga"
 	"gfx/hud/keys/left_on.tga"
 	"gfx/hud/keys/right_off.tga"
