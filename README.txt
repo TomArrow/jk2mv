@@ -3,11 +3,9 @@ V24 features:
 * Fixes from JK2MV.
   See files mvsdk_log.txt and jk2mv_log.txt
 
-* Allow to change cheat cvars:
+* Allow to change cheat cvars.
+  Enable:
       \set com_overrideCheats "1"
-
-* Allow to change cvars:
-      JK2MV, cg_MVSDK, g_MVSDK, ui_MVSDK
 
 * Wallhack.
   Enable:
@@ -48,7 +46,7 @@ V24 features:
       \set cg_autoKick_checkAir "0"
       \set cg_autoKick_checkKnockdown "0"
 
-* Kill messages
+* Kill messages.
   Disable:
       \set cg_drawKillMessage "0"
   Enable default:
@@ -56,9 +54,9 @@ V24 features:
   Enable multikill:
       \set cg_drawKillMessage "2"
 
-* Friends list
+* Friends list.
   Description:
-      Clients in this list will be ignored by autokick and auto backstab
+      Clients in this list will be ignored by aim, autokick and auto backstab
   Add friend:
       \friendAdd <client_id or name or all>
   Remove friend:
@@ -75,7 +73,7 @@ V24 features:
       \friendRemove 19
       \friendRemove all
 
-* Auto backstab
+* Auto backstab.
   Enable:
       \set cg_autoBackStab "<mode>"
   Toggle:
@@ -95,23 +93,29 @@ V24 features:
   Enable prediction:
       \set cg_autoBackStab_usePrediction "1"
 
-* Saber box visualization
+* Saber box visualization.
   Enable:
       \set cg_debugSaberBox "1"
   Enable prediction:
       \set cg_debugSaberBox_usePrediction "1"
 
-* Score counter
+* Kill tracker.
   Enable:
-      \set cg_scoreCounter "1"
+      \set cg_showKills "1"
   Example message:
       Luke (15) was sabered by Lando (34)
+  Show statistics for all players:
+      \killTracker
+  Show statistics for one player:
+      \killTracker <client_id or name>
+  Example:
+      \killTracker Padawan
 
-* Chat only from friends
+* Chat only from friends.
   Enable:
       \set cg_friendsChatsOnly "1"
 
-* Auto aim
+* Auto aim.
   Enable:
       \set cg_autoAim "<mode>"
   Toggle:
