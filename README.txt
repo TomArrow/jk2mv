@@ -76,20 +76,21 @@ V24 features:
       \friendRemove all
 
 * Auto backstab
-  Enable normal backstab (toggle):
-      \bind V "toggle cg_autoBackStab"
-  Enable crouched backstab with jump (toggle):
-      \bind V "toggle cg_autoBackStab 0 2"
-  Enable normal backstab (press):
-      \set cg_autoBackStab "3"
+  Enable:
+      \set cg_autoBackStab "<mode>"
+  Toggle:
+      \bind V "toggle cg_autoBackStab 0 <mode>"
+  Press:
       \bind V "+autoBackStab"
-  Enable crouched backstab with jump (press):
-      \set cg_autoBackStab "4"
-      \bind V "+autoBackStab"
+  Modes:
+      1 - normal backstab
+      2 - crouched backstab with jump
+      3 - same as 1, need to press +autoBackStab
+      4 - same as 2, need to press +autoBackStab
   Change distance:
       \set cg_autoBackStab_distance "128.0"
   Enable debug:
-      \set cg_autoBackStab "1"
+      \set cg_autoBackStab "<mode>"
       \set cg_autoBackStab_debug "1"
   Enable prediction:
       \set cg_autoBackStab_usePrediction "1"
@@ -109,3 +110,25 @@ V24 features:
 * Chat only from friends
   Enable:
       \set cg_friendsChatsOnly "1"
+
+* Auto aim
+  Enable:
+      \set cg_autoAim "<mode>"
+  Toggle:
+      \bind V "toggle cg_autoAim 0 <mode>"
+  Press:
+      \bind V "+autoAim"
+  Modes:
+      1 - auto aim at the nearest enemy
+      2 - auto aim at the crosshair enemy, then at the nearest enemy
+      3 - auto aim at the crosshair enemy
+      4 - same as 1, need to press +autoAim
+      5 - same as 2, need to press +autoAim
+      6 - same as 3, need to press +autoAim
+  Enable debug:
+      \set cg_autoAim "<mode>"
+      \set cg_autoAim_debug "1"
+  Enable prediction:
+      \set cg_autoAim_usePrediction "1"
+  Ignore walls:
+      \set cg_autoAim_ignoreWalls "1"
