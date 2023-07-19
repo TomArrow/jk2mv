@@ -3802,6 +3802,14 @@ qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 	return sh->index;
 }
 
+//added for ui -rww
+const char *RE_ShaderNameFromIndex(int index)
+{
+	if (index >= 0 && index < tr.numShaders && tr.shaders[index])
+		return tr.shaders[index]->name;
+	else
+		return NULL;
+}
 
 /*
 ====================

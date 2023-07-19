@@ -20,6 +20,11 @@ Ghoul2 Insert End
 #include "mv_setup.h"
 
 extern	botlib_export_t	*botlib_export;
+
+#ifdef G2_COLLISION_ENABLED
+extern CMiniHeap *G2VertSpaceClient;
+#endif
+
 void SP_Register(const char *Package);
 
 int UI_ConcatDLList(dlfile_t *files, const int maxfiles);
@@ -1142,6 +1147,191 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 
+	case UI_R_SHADERNAMEFROMINDEX:
+	{
+		char *gameMem = VMAP(1, char, MAX_QPATH);
+		const char *retMem = re.ShaderNameFromIndex(args[2]);
+		if (retMem)
+		{
+			Q_strncpyz(gameMem, retMem, MAX_QPATH);
+		}
+		else
+		{
+			gameMem[0] = '\0';
+		}
+		return 0;
+	}
+
+	case UI_SP_GETNUMLANGUAGES:
+		return SP_LANGUAGE_MAX;
+
+	case UI_SP_GETLANGUAGENAME:
+	{
+		char *holdName;
+		const char *languageName[] = {
+			"English",
+			"French",
+			"German",
+			"British",
+			"Korean",
+			"Taiwanese",
+			"Italian",
+			"Spanish",
+			"Japanese"
+		};
+
+		holdName = VMAP(2, char, 128);
+
+		if (args[1] >= 0 && args[1] < ARRAY_LEN(languageName))
+		{
+			Q_strncpyz(holdName, languageName[args[1]], 128);
+		}
+		else
+		{
+			Q_strncpyz(holdName, "Unknown", 128);
+		}
+
+		return 0;
+	}
+
+/*
+Ghoul2 Insert Start
+*/
+	case UI_G2_LISTSURFACES:
+		G2API_ListSurfaces((g2handle_t)args[1], args[2]);
+		return 0;
+
+	case UI_G2_LISTBONES:
+		G2API_ListBones((g2handle_t)args[1], args[2], args[3]);
+		return 0;
+
+	case UI_G2_HAVEWEGHOULMODELS:
+		return G2API_HaveWeGhoul2Models((g2handle_t)args[1]);
+
+	case UI_G2_GETBOLT:
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+
+	case UI_G2_GETBOLT_NOREC:
+		gG2_GBMNoReconstruct = qtrue;
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+
+	case UI_G2_GETBOLT_NOREC_NOROT:
+		gG2_GBMNoReconstruct = qtrue;
+		gG2_GBMUseSPMethod = qtrue;
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+
+	case UI_G2_INITGHOUL2MODEL:
+		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
+			(qhandle_t) args[5], args[6], args[7]);
+
+	case UI_G2_COLLISIONDETECT:
+#ifdef G2_COLLISION_ENABLED
+		G2API_CollisionDetect(VMAA(1, CollisionRecord_t, MAX_G2_COLLISIONS),
+								   (g2handle_t)args[2],
+								   VMAP(3, const vec_t, 3),
+								   VMAP(4, const vec_t, 3),
+								   args[5],
+								   args[6],
+								   VMAP(7, const vec_t, 3),
+								   VMAP(8, const vec_t, 3),
+								   VMAP(9, const vec_t, 3),
+								   G2VertSpaceClient,
+								   args[10],
+								   args[11],
+								   VMF(12) );
+#endif
+		return 0;
+
+	case UI_G2_CLEANMODELS:
+		G2API_CleanGhoul2Models(VMAV(1, g2handle_t));
+		return 0;
+
+	case UI_G2_PLAYANIM:
+		return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5],
+								args[6], VMF(7), args[8], VMF(9), args[10]);
+	case UI_G2_GETGLANAME:
+		{
+			char *local;
+			local = G2API_GetGLAName((g2handle_t)args[1], args[2]);
+			if (local)
+			{
+				char *point = VMAP(3, char, strlen(local) + 1);
+				strcpy(point, local);
+			}
+		}
+		return 0;
+
+	case UI_G2_COPYGHOUL2INSTANCE:
+		return G2API_CopyGhoul2Instance((g2handle_t)args[1], (g2handle_t)args[2], args[3]);
+
+	case UI_G2_COPYSPECIFICGHOUL2MODEL:
+		G2API_CopySpecificG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4]);
+		return 0;
+
+	case UI_G2_DUPLICATEGHOUL2INSTANCE:
+		G2API_DuplicateGhoul2Instance((g2handle_t)args[1], VMAV(2, g2handle_t));
+		return 0;
+
+	case UI_G2_HASGHOUL2MODELONINDEX:
+		return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
+
+	case UI_G2_REMOVEGHOUL2MODEL:
+		return G2API_RemoveGhoul2Model(VMAV(1, g2handle_t), args[2]);
+
+	case UI_G2_ADDBOLT:
+		return G2API_AddBolt((g2handle_t)args[1], args[2], VMAS(3));
+
+	case UI_G2_SETBOLTON:
+		G2API_SetBoltInfo((g2handle_t)args[1], args[2], args[3]);
+		return 0;
+
+	case UI_G2_SETROOTSURFACE:
+		return G2API_SetRootSurface((g2handle_t)args[1], args[2], VMAS(3));
+
+	case UI_G2_SETSURFACEONOFF:
+		return G2API_SetSurfaceOnOff((g2handle_t)args[1], VMAS(2), args[3]);
+
+	case UI_G2_SETNEWORIGIN:
+		return G2API_SetNewOrigin((g2handle_t)args[1], args[2]);
+
+	case UI_G2_SETSKIN:
+	{
+		CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(args[1]);
+		int modelIndex = args[2];
+
+		if (!ghoul2Ptr)
+		{
+			assert(0);
+			return qfalse;
+		}
+
+		CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+		if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
+		{
+			return qfalse;
+		}
+
+		return G2API_SetSkin( ghoul2, modelIndex, args[3], args[4] );
+	}
+
+	case UI_G2_SETMODELS:
+	case UI_G2_COLLISIONDETECTCACHE:
+	case UI_G2_GETBONEANIM:
+	case UI_G2_GETBONEFRAME:
+	case UI_G2_GETTIME:
+	case UI_G2_SETTIME:
+	case UI_G2_SETRAGDOLL:
+	case UI_G2_ANIMATEG2MODELS:
+	case UI_G2_SETBONEIKSTATE:
+	case UI_G2_IKMOVE:
+	case UI_G2_GETSURFACENAME:
+	case UI_G2_ATTACHG2MODEL:
+		return 0;
+/*
+Ghoul2 Insert End
+*/
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
 	}
@@ -1249,9 +1439,9 @@ void CL_InitUI(qboolean mainMenu) {
 
 	// sanity check
 	v = VM_Call( uivm, UI_GETAPIVERSION, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0, (mainMenu ? MV_MENULEVEL_MAX : 0) );
-	if (v != UI_API_16_VERSION && v != UI_API_15_VERSION) {
+	if (v != UI_API_VERSION && v != UI_API_VERSION_1_02) {
 		CL_ShutdownUI();
-		Com_Error(ERR_DROP, "User Interface is version %d, expected %d or %d", v, UI_API_16_VERSION, UI_API_15_VERSION);
+		Com_Error(ERR_DROP, "User Interface is version %d, expected %d or %d", v, UI_API_VERSION, UI_API_VERSION_1_02);
 	} else {
 		int apireq;
 

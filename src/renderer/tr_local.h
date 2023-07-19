@@ -1459,6 +1459,7 @@ extern	const byte	stylesDefault[MAXLIGHTMAPS];
 qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex, const byte *styles ) ;
 qhandle_t		 RE_RegisterShader( const char *name );
 qhandle_t		 RE_RegisterShaderNoMip( const char *name );
+const char		*RE_ShaderNameFromIndex(int index);
 qhandle_t RE_RegisterShaderFromImage(const char *name, int *lightmapIndex, byte *styles, image_t *image, qboolean mipRawImage);
 
 shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage );
