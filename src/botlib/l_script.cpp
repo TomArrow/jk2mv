@@ -156,6 +156,8 @@ char basefolder[MAX_PATH];
 char basefolder[MAX_QPATH];
 #endif
 
+extern cvar_t *com_writeMenuPatchFiles;
+
 //===========================================================================
 //
 // Parameter:				-
@@ -1481,16 +1483,16 @@ script_t *LoadScriptFile(const char *filename) {
 
 		FreeMemory(pbuffer);
 
-		// uncomment to dump patched file with _patched suffix; menu_patch
-
-		/*
-		char patchedName[MAX_QPATH];
-		fileHandle_t patchedFile;
-		Com_sprintf(patchedName, sizeof(patchedName), "%s_patched", pathname);
-		botimport.FS_FOpenFile(patchedName, &patchedFile, FS_WRITE);
-		botimport.FS_Write(outbuffer, outlength, patchedFile);
-		botimport.FS_FCloseFile(patchedFile);
-		*/
+		if (com_writeMenuPatchFiles->integer)
+		{
+			// dump patched file with _patched suffix; menu_patch
+			char patchedName[MAX_QPATH];
+			fileHandle_t patchedFile;
+			Com_sprintf(patchedName, sizeof(patchedName), "%s_patched", pathname);
+			botimport.FS_FOpenFile(patchedName, &patchedFile, FS_WRITE);
+			botimport.FS_Write(outbuffer, outlength, patchedFile);
+			botimport.FS_FCloseFile(patchedFile);
+		}
 	} else {
 		outbuffer = inbuffer;
 		outlength = inlength;

@@ -66,6 +66,7 @@ cvar_t	*cl_paused;
 cvar_t	*sv_paused;
 cvar_t	*com_cameraMode;
 cvar_t	*com_busyWait;
+cvar_t	*com_writeMenuPatchFiles;
 
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
@@ -2555,6 +2556,7 @@ void Com_Init( char *commandLine ) {
 	com_cl_running = Cvar_Get ("cl_running", "0", CVAR_ROM);
 	com_buildScript = Cvar_Get( "com_buildScript", "0", 0 );
 	com_busyWait = Cvar_Get("com_busyWait", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
+	com_writeMenuPatchFiles = Cvar_Get("com_writeMenuPatchFiles", "0", CVAR_INIT);
 
 	com_introPlayed = Cvar_Get("com_introplayed", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 
