@@ -579,10 +579,13 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_atoms.c"
 		"mvsdk/code/ui/ui_force.c"
 		"mvsdk/code/ui/ui_gameinfo.c"
+		"mvsdk/code/ui/ui_saber.c"
 		"mvsdk/code/ui/ui_shared.c"
 		"mvsdk/code/ui/ui_multiversion.c"
 
 		"mvsdk/code/game/bg_misc.c"
+		"mvsdk/code/game/bg_saberLoad.c"
+		"mvsdk/code/game/bg_saga.c"
 		"mvsdk/code/game/bg_weapons.c"
 		"mvsdk/code/game/q_math.c"
 		"mvsdk/code/game/q_shared.c"
