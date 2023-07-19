@@ -2413,6 +2413,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 			nTotal += nLen;
 		}
 		else {
+			Com_Printf(S_COLOR_YELLOW "WARNING: FS_GetFileList: buffer size %d is too small for path:\"%s\" ext:\"%s\" (%d files dropped)\n", bufsize, path, extension, nFiles - i + 1);
 			nFiles = i;
 			break;
 		}
