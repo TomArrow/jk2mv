@@ -1311,6 +1311,7 @@ std::istream& MV_MenuLineizeGetline(std::istream& is, std::string& t);
 
 #define ERROR_SYNTAX -1
 #define ERROR_HASH -2
+#define ERROR_FILE_NOT_IN_PAK -3
 
 int MV_MenuPatchFile(const char *in, unsigned long inhash, const char *patch, char **out) {
 	std::vector<line_t> menufile = MV_MenuLineize(std::string(in));
@@ -1332,6 +1333,10 @@ int MV_MenuPatchFile(const char *in, unsigned long inhash, const char *patch, ch
 			if (cmd.at(0) == "ORI_HASH") {
 				size_t expected;
 				expected = strtoul(cmd.at(1).c_str(), NULL, 0);
+
+				if (inhash == 0ul) {
+					return ERROR_FILE_NOT_IN_PAK;
+				}
 
 				if (expected != inhash) {
 					return ERROR_HASH;
@@ -1474,7 +1479,9 @@ script_t *LoadScriptFile(const char *filename) {
 			if (outlength == ERROR_SYNTAX) {
 				Com_Printf("patching failed: syntax error in patchfile\n");
 			} else if (outlength == ERROR_HASH) {
-				Com_Printf("patching skipped: hash mismatch\n");
+				Com_Printf("patching skipped: mismatched hash %lu\n", inhash);
+			} else if (outlength == ERROR_FILE_NOT_IN_PAK) {
+				Com_Printf("patching skipped: file not in pk3\n");
 			}
 
 			outbuffer = inbuffer;
