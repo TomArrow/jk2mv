@@ -1,5 +1,13 @@
 ORI_HASH 3084045269
 
+LINES_REPLACE 149 [
+			model_rotation		20
+]
+
+LINES_REPLACE 165 [
+			model_rotation		20
+]
+
 LINES_DELETE 3255 3258
 
 LINES_DELETE 3262 3265

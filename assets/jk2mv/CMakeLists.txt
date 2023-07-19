@@ -64,6 +64,16 @@ set(AssetsFiles
 	"ui/jk2mp/ingame_setup_modoptions.menu"
 	"ui/jk2mp/joinserver.menu_patch"
 	"ui/jk2mp/setup.menu_patch"
+	"ui/jk2mp/credits.menu_patch"
+	"ui/jk2mp/demo.menu_patch"
+	"ui/jk2mp/main.menu_patch"
+	"ui/jk2mp/multiplayer.menu_patch"
+	"ui/jk2mp/quit.menu_patch"
+	"ui/jk2mp/rules.menu_patch"
+	"ui/jk2mp/rules_force.menu_patch"
+	"ui/jk2mp/rules_games.menu_patch"
+	"ui/jk2mp/rules_items.menu_patch"
+	"ui/jk2mp/rules_weapons.menu_patch"
 
 	"ui/jk2mp/menudef.h"
 

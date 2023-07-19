@@ -8,6 +8,14 @@ LINES_INSERT 38 [
 			hide			downloads ;
 ]
 
+LINES_REPLACE 139 [
+			model_rotation		20
+]
+
+LINES_REPLACE 154 [
+			model_rotation		20
+]
+
 LINES_REPLACE 527 [
 			rect				120 173 170 24
 ]
@@ -1245,6 +1253,10 @@ LINES_INSERT 2677 [
 			decoration
 ]
 
+LINES_REPLACE 2706 [
+			feeder				FEEDER_MODS
+]
+
 LINES_REPLACE 2926 [
 			maxPaintChars	23
 ]
@@ -1379,7 +1391,7 @@ LINES_INSERT 3053 [
 			backcolor			0 0 .5 .25
 			outlinecolor		.5 .5 .5 .5
 			elementtype			LISTBOX_TEXT
-			feeder				17
+			feeder				FEEDER_DOWNLOADS
 			notselectable
 			visible				0
 			columns				1	2 40 40

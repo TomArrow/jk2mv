@@ -30,7 +30,7 @@
 			rect				10 4 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -48,7 +48,7 @@
 			text				""
 			cvar				"char_color_red"
 			rect				176 4 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -62,7 +62,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				286 4 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -82,7 +82,7 @@
 			rect				10 24 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -100,7 +100,7 @@
 			text				""
 			cvar				"char_color_green"
 			rect				176 24 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -114,7 +114,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				286 24 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -134,7 +134,7 @@
 			rect				10 44 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -152,7 +152,7 @@
 			text				""
 			cvar				"char_color_blue"
 			rect				176 44 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -166,7 +166,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				286 44 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1

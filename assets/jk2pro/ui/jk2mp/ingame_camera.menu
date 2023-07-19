@@ -40,7 +40,7 @@
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -66,7 +66,7 @@
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -92,7 +92,7 @@
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -118,7 +118,7 @@
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			0
 			textaligny			0
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -136,7 +136,7 @@
 			text				"Camera FPS:"
 			cvar				"cg_smoothCameraFPS"
 			rect				150 24 116 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			cvartest			"cg_smoothCamera"
@@ -155,7 +155,7 @@
 			rect				10 44 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -173,7 +173,7 @@
 			text				""
 			cvar				"cg_fov"
 			rect				176 44 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -187,7 +187,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 44 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -208,7 +208,7 @@
 			rect				10 64 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -226,7 +226,7 @@
 			text				""
 			cvar				"cg_fovViewmodel"
 			rect				176 64 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -240,7 +240,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 64 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -261,7 +261,7 @@
 			rect				10 104 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -279,7 +279,7 @@
 			text				""
 			cvar				"cg_thirdPersonRange"
 			rect				176 104 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -293,7 +293,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 104 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -314,7 +314,7 @@
 			rect				10 124 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -329,7 +329,7 @@
 			text				""
 			cvar				"cg_thirdPersonAngle"
 			rect				176 124 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -343,7 +343,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 124 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -364,7 +364,7 @@
 			rect				10 144 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -379,7 +379,7 @@
 			text				""
 			cvar				"cg_thirdPersonPitchOffset"
 			rect				176 144 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -393,7 +393,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 144 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -414,7 +414,7 @@
 			rect				10 164 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -429,7 +429,7 @@
 			text				""
 			cvar				"cg_thirdPersonVertOffset"
 			rect				176 164 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -443,7 +443,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 164 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -464,7 +464,7 @@
 			rect				10 184 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -479,7 +479,7 @@
 			text				""
 			cvar				"cg_thirdPersonHorzOffset"
 			rect				176 184 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -493,7 +493,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 184 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -514,7 +514,7 @@
 			rect				10 204 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -529,7 +529,7 @@
 			text				""
 			cvar				"cg_thirdPersonCameraDamp"
 			rect				176 204 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -543,7 +543,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 204 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
@@ -563,7 +563,7 @@
 			rect				10 224 156 20
 			textalign			ITEM_ALIGN_RIGHT
 			textalignx			52
-			font				4
+			font				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -578,7 +578,7 @@
 			text				""
 			cvar				"cg_thirdPersonTargetDamp"
 			rect				176 224 40 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			.615 .615 .956 1
 			visible				1
@@ -592,7 +592,7 @@
 	 		type				ITEM_TYPE_BUTTON
 			text				"Reset"
 			rect				226 224 30 20
-			font 				4
+			font 				0
 			textscale			0.75
 			forecolor			1 .682 0 1
 			visible				1
