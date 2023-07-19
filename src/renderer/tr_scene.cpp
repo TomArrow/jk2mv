@@ -194,15 +194,11 @@ void RE_AddRefEntityToScene( const refEntity_t *ent, qboolean intShaderTime ) {
 	backEndData->entities[r_numentities].lightingCalculated = qfalse;
 	backEndData->entities[r_numentities].intShaderTime = intShaderTime;
 
-#ifdef WIN32
+#ifdef DEBUG
 	if (ent->ghoul2)
 	{
-		CGhoul2Info_v	*ghoul2 = G2API_GetGhoul2Model(ent->ghoul2);
-
-		if (!ghoul2 || ghoul2->empty() || !(*ghoul2)[0].mModel)
-		{
-			DebugBreak();
-		}
+		CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(ent->ghoul2);
+		assert(ghoul2 && !ghoul2->empty() && (*ghoul2)[0].mModel);
 	}
 #endif
 
