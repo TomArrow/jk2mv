@@ -10,6 +10,8 @@
 	loadMenu { "ui/jk2mp/ingame_setup_modoptions.menu" }
 	loadMenu { "ui/jk2mp/ingame_leave.menu" }
 	loadMenu { "ui/jk2mp/ingame_player.menu" }
+	loadMenu { "ui/jk2mp/ingame_player2.menu" }
+	loadMenu { "ui/jk2mp/ingame_saber.menu" }
 	loadMenu { "ui/jk2mp/ingame_playerforce.menu" }
 	loadMenu { "ui/jk2mp/ingame_addbot.menu" }
 	loadMenu { "ui/jk2mp/ingame_callvote.menu" }

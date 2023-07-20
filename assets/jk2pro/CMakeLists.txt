@@ -59,8 +59,14 @@ set(AssetsFiles
 	"sound/chars/tavion/misc/jump1.mp3"
 	"sound/common/warning.wav"
 
+	"strip/menus_jka.sp"
+
 	"ui/jk2mp/ingame.menu"
+	"ui/jk2mp/ingame_callvote.menu"
 	"ui/jk2mp/ingame_camera.menu"
+	"ui/jk2mp/ingame_player.menu"
+	"ui/jk2mp/ingame_player2.menu"
+	"ui/jk2mp/ingame_saber.menu"
 	"ui/jk2mp/ingame_server.menu"
 	"ui/jk2mpingame.txt"
 )
