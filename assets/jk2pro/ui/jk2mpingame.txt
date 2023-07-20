@@ -20,5 +20,4 @@
 	loadMenu { "ui/jk2mp/password.menu" }
 	loadMenu { "ui/jk2mp/ingame_server.menu" }
 	loadMenu { "ui/jk2mp/ingame_camera.menu" }
-	loadMenu { "ui/jk2mp/ingame_character_colors.menu" }
 }
