@@ -3,7 +3,7 @@ CONFIG W:\bin\striped.cfg
 ID 130
 REFERENCE MENUS_JKA
 DESCRIPTION "menus_jka"
-COUNT 34
+COUNT 40
 INDEX 0
 {
    REFERENCE APPEARANCE
@@ -479,4 +479,88 @@ INDEX 33
    TEXT_LANGUAGE8 "TORSO"
    TEXT_LANGUAGE9 "TORSO"
    TEXT_LANGUAGE10 "TORSO"
+}
+INDEX 34
+{
+   REFERENCE JEDI_HF
+   TEXT_LANGUAGE1 "Human Female"
+   TEXT_LANGUAGE2 "Human Female"
+   TEXT_LANGUAGE3 "Human Female"
+   TEXT_LANGUAGE4 "Human Female"
+   TEXT_LANGUAGE5 "Human Female"
+   TEXT_LANGUAGE6 "Human Female"
+   TEXT_LANGUAGE7 "Human Female"
+   TEXT_LANGUAGE8 "Human Female"
+   TEXT_LANGUAGE9 "Human Female"
+   TEXT_LANGUAGE10 "Human Female"
+}
+INDEX 35
+{
+   REFERENCE JEDI_HM
+   TEXT_LANGUAGE1 "Human Male"
+   TEXT_LANGUAGE2 "Human Male"
+   TEXT_LANGUAGE3 "Human Male"
+   TEXT_LANGUAGE4 "Human Male"
+   TEXT_LANGUAGE5 "Human Male"
+   TEXT_LANGUAGE6 "Human Male"
+   TEXT_LANGUAGE7 "Human Male"
+   TEXT_LANGUAGE8 "Human Male"
+   TEXT_LANGUAGE9 "Human Male"
+   TEXT_LANGUAGE10 "Human Male"
+}
+INDEX 36
+{
+   REFERENCE JEDI_KDM
+   TEXT_LANGUAGE1 "Kel Dor Male"
+   TEXT_LANGUAGE2 "Kel Dor Male"
+   TEXT_LANGUAGE3 "Kel Dor Male"
+   TEXT_LANGUAGE4 "Kel Dor Male"
+   TEXT_LANGUAGE5 "Kel Dor Male"
+   TEXT_LANGUAGE6 "Kel Dor Male"
+   TEXT_LANGUAGE7 "Kel Dor Male"
+   TEXT_LANGUAGE8 "Kel Dor Male"
+   TEXT_LANGUAGE9 "Kel Dor Male"
+   TEXT_LANGUAGE10 "Kel Dor Male"
+}
+INDEX 37
+{
+   REFERENCE JEDI_RM
+   TEXT_LANGUAGE1 "Rodian Male"
+   TEXT_LANGUAGE2 "Rodian Male"
+   TEXT_LANGUAGE3 "Rodian Male"
+   TEXT_LANGUAGE4 "Rodian Male"
+   TEXT_LANGUAGE5 "Rodian Male"
+   TEXT_LANGUAGE6 "Rodian Male"
+   TEXT_LANGUAGE7 "Rodian Male"
+   TEXT_LANGUAGE8 "Rodian Male"
+   TEXT_LANGUAGE9 "Rodian Male"
+   TEXT_LANGUAGE10 "Rodian Male"
+}
+INDEX 38
+{
+   REFERENCE JEDI_TF
+   TEXT_LANGUAGE1 "Twi'lek Female"
+   TEXT_LANGUAGE2 "Twi'lek Female"
+   TEXT_LANGUAGE3 "Twi'lek Female"
+   TEXT_LANGUAGE4 "Twi'lek Female"
+   TEXT_LANGUAGE5 "Twi'lek Female"
+   TEXT_LANGUAGE6 "Twi'lek Female"
+   TEXT_LANGUAGE7 "Twi'lek Female"
+   TEXT_LANGUAGE8 "Twi'lek Female"
+   TEXT_LANGUAGE9 "Twi'lek Female"
+   TEXT_LANGUAGE10 "Twi'lek Female"
+}
+INDEX 39
+{
+   REFERENCE JEDI_ZF
+   TEXT_LANGUAGE1 "Zabrak Female"
+   TEXT_LANGUAGE2 "Zabrak Female"
+   TEXT_LANGUAGE3 "Zabrak Female"
+   TEXT_LANGUAGE4 "Zabrak Female"
+   TEXT_LANGUAGE5 "Zabrak Female"
+   TEXT_LANGUAGE6 "Zabrak Female"
+   TEXT_LANGUAGE7 "Zabrak Female"
+   TEXT_LANGUAGE8 "Zabrak Female"
+   TEXT_LANGUAGE9 "Zabrak Female"
+   TEXT_LANGUAGE10 "Zabrak Female"
 }
