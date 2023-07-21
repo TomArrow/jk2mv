@@ -873,11 +873,6 @@
 				fadeout message_arena ; 
 				setitemcolor map bordercolor .5 .5 .5 .5 
 			} 
-			action
-			{
-				play			"sound/interface/button1.wav" ; 
-				
-			}
 		}
 
 
@@ -980,11 +975,6 @@
 				fadeout message_arena ; 
 				setitemcolor kick bordercolor .5 .5 .5 1 
 			}
-			action
-			{
-				play			"sound/interface/button1.wav" ; 
-			}
-
 		}
 
 		itemDef 
@@ -1073,11 +1063,6 @@
 				fadeout message_arena ; 
 				setitemcolor forcespec bordercolor .5 .5 .5 1 
 			}
-			action
-			{
-				play			"sound/interface/button1.wav" ; 
-			}
-
 		}
 
 		itemDef 

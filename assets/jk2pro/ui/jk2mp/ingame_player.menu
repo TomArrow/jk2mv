@@ -310,10 +310,6 @@
 			descText			@MENUS2_CHOOSE_THE_MODEL_FOR
 			visible 			1
 			textscale 			0.7
-			action 
-			{
-				play			"sound/interface/button1"
-			}
 			mouseenter 
 			{ 
 				setitemcolor 	headlist bordercolor 1 0 0 1 

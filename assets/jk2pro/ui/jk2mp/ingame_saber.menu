@@ -394,7 +394,6 @@
 			visible				1			 
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt"			
 				uiScript  		"saber_hilt"
 			}
@@ -430,7 +429,6 @@
 			visible				1
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberstaff"			
 				uiScript  		"saber_hilt"
 			}
@@ -469,7 +467,6 @@
 			visible				1			 
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt1"			
 				uiScript  		"saber_hilt"
 			}
@@ -508,7 +505,6 @@
 			visible				1
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt2"			
 				uiScript  		"saber2_hilt"
 			}
