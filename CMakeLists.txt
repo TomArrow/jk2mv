@@ -175,6 +175,7 @@ set(MVMENU "${MVMENU_STRING}_${Architecture}")
 set(MVGAME "jk2mpgame_${Architecture}")
 set(MVCGAME "cgame_${Architecture}")
 set(MVUI "ui_${Architecture}")
+set(ETERNAL_UI "eternal_ui_${Architecture}")
 
 set(MVDED "eternaljk2mvded")
 

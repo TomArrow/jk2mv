@@ -553,6 +553,7 @@ if (BuildMVMP)
 		add_dependencies(${MVMP} ${MVGAME})
 		add_dependencies(${MVMP} ${MVCGAME})
 		add_dependencies(${MVMP} ${MVUI})
+		add_dependencies(${MVMP} ${ETERNAL_UI})
 	endif()
 
 	# mvmenu is now built from source conainted in the mvsdk submodule
@@ -671,6 +672,7 @@ if (BuildMVDED)
 		add_dependencies(${MVMP} ${MVGAME})
 		add_dependencies(${MVMP} ${MVCGAME})
 		add_dependencies(${MVMP} ${MVUI})
+		add_dependencies(${MVMP} ${ETERNAL_UI})
 	endif()
 
 	# installation
