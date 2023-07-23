@@ -94,6 +94,8 @@ cvar_t	*cl_downloadTime;
 cvar_t	*cl_downloadProtocol;
 
 cvar_t	*cl_uiName;
+cvar_t	*cl_uiConvertSystemCalls;
+cvar_t	*cl_uiConvertKeys;
 
 vec3_t cl_windVec;
 
@@ -3228,6 +3230,8 @@ void CL_Init( void ) {
 	cl_logChat = Cvar_Get("cl_logChat", "1", CVAR_ARCHIVE|CVAR_GLOBAL);
 
 	cl_uiName = Cvar_Get("cl_uiName", "ui", CVAR_INIT | CVAR_VM_NOREAD | CVAR_VM_NOWRITE);
+	cl_uiConvertSystemCalls = Cvar_Get("cl_uiConvertSystemCalls", "1", CVAR_INIT | CVAR_VM_NOREAD | CVAR_VM_NOWRITE);
+	cl_uiConvertKeys = Cvar_Get("cl_uiConvertKeys", "1", CVAR_INIT | CVAR_VM_NOREAD | CVAR_VM_NOWRITE);
 
 	//
 	// register our commands

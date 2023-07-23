@@ -767,7 +767,7 @@ The ui module is making a system call
 intptr_t CL_UISystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
-	if (VM_GetGameversion(uivm) == VERSION_1_02) {
+	if (cl_uiConvertSystemCalls->integer && VM_GetGameversion(uivm) == VERSION_1_02) {
 		if (args[0] == 61) {
 			args[0] = UI_ANYLANGUAGE_READCHARFROMSTRING;
 		} else if (args[0] == 62) {

@@ -2298,7 +2298,7 @@ int Key_GetProtocolKey_New(mvversion_t version, int key, qboolean to15, qboolean
 	int i;
 
 	// We don't need to convert anything if we're not dealing with 1.02, cause internally we use the 1.03/1.04 values
-	if ( version != VERSION_1_02 )
+	if ( !cl_uiConvertKeys->integer || version != VERSION_1_02 )
 		return key;
 
 	// Char events don't need conversion
