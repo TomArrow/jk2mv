@@ -3913,16 +3913,19 @@ a single large text block that can be scanned for shader names
 static void ScanAndLoadShaderFiles( const char *path )
 {
 	const char **shaderFiles[3];
-	char *buffers[MAX_SHADER_FILES];
+	char *buffers[MAX_SHADER_FILES] = {0};
 	const char *p;
-	char *pw;
 	int numShaderFiles;
 	int numShaderFilesType[3];
 	int i, j, type;
 	const char *oldp, *token;
 	char *hashMem;
 	int shaderTextHashTableSizes[MAX_SHADERTEXT_HASH], hash, size;
-	int sum;
+	long sum;
+	char *textEnd;
+	char shaderName[MAX_QPATH];
+	int shaderLine;
+	long summand;
 
 	// scan for shader files
 	shaderFiles[0] = ri.FS_ListFiles( path, ".shader_mv", &numShaderFilesType[0] );
@@ -3965,24 +3968,70 @@ static void ScanAndLoadShaderFiles( const char *path )
 
 			Com_sprintf( filename, sizeof( filename ), "%s/%s", path, shaderFiles[type][i] );
 			ri.Printf( PRINT_ALL, "...loading '%s'\n", filename );
-			ri.FS_ReadFile( filename, (void **)&buffers[j] );
+			summand = ri.FS_ReadFile( filename, (void **)&buffers[j] );
 			if ( !buffers[j] ) {
 				ri.Error( ERR_DROP, "Couldn't load %s", filename );
 			}
-			sum += COM_Compress(buffers[j]);
+			// Do a simple check on the shader structure in that file to make sure one bad shader file cannot break all other shaders.
+			p = buffers[j];
+			COM_BeginParseSession(filename);
+			while(1)
+			{
+				token = COM_ParseExt(&p, qtrue);
+
+				if(!*token)
+					break;
+
+				Q_strncpyz(shaderName, token, sizeof(shaderName));
+				shaderLine = COM_GetCurrentParseLine();
+
+				token = COM_ParseExt(&p, qtrue);
+				if(token[0] != '{' || token[1] != '\0')
+				{
+					ri.Printf(PRINT_WARNING, "WARNING: Ignoring shader file %s. Shader \"%s\" on line %d missing opening brace",
+								filename, shaderName, shaderLine);
+					if (token[0])
+					{
+						ri.Printf(PRINT_WARNING, " (found \"%s\" on line %d)", token, COM_GetCurrentParseLine());
+					}
+					ri.Printf(PRINT_WARNING, ".\n");
+					ri.FS_FreeFile(buffers[j]);
+					buffers[j] = NULL;
+					break;
+				}
+
+				if(!SkipBracedSection(&p, 1))
+				{
+					ri.Printf(PRINT_WARNING, "WARNING: Ignoring shader file %s. Shader \"%s\" on line %d missing closing brace.\n",
+								filename, shaderName, shaderLine);
+					ri.FS_FreeFile(buffers[j]);
+					buffers[j] = NULL;
+					break;
+				}
+			}
+
+			if (buffers[j])
+				sum += summand;		
 		}
 	}
-
 	// build single large buffer
-	s_shaderText = (char *)ri.Hunk_Alloc( sum + numShaderFiles + 1, h_low );
-	pw = s_shaderText;
-	for ( i = 0; i < numShaderFiles ; i++ ) {
-		strcat( pw, buffers[i] );
-		strcat( pw, "\n" );
-		pw += strlen( pw );
-		ri.FS_FreeFile( (void*) buffers[i] );
+	s_shaderText = (char *)ri.Hunk_Alloc( sum + numShaderFiles*2, h_low );
+	s_shaderText[ 0 ] = '\0';
+	textEnd = s_shaderText;
+
+	// free in reverse order, so the temp files are all dumped
+	for ( i = numShaderFiles - 1; i >= 0 ; i-- )
+	{
+		if ( !buffers[i] )
+			continue;
+
+		strcat( textEnd, buffers[i] );
+		strcat( textEnd, "\n" );
+		textEnd += strlen( textEnd );
+		ri.FS_FreeFile( buffers[i] );
 	}
-	assert((int)strlen(s_shaderText) == sum + numShaderFiles);
+
+	COM_Compress( s_shaderText );
 
 	// free up memory
 	ri.FS_FreeFileList( shaderFiles[0] );
@@ -4003,7 +4052,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 		hash = generateHashValue(token, MAX_SHADERTEXT_HASH);
 		shaderTextHashTableSizes[hash]++;
 		size++;
-		SkipBracedSection(&p);
+		SkipBracedSection(&p, 0);
 	}
 
 	size += MAX_SHADERTEXT_HASH;
@@ -4029,7 +4078,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 		hash = generateHashValue(token, MAX_SHADERTEXT_HASH);
 		shaderTextHashTable[hash][shaderTextHashTableSizes[hash]++] = oldp;
 
-		SkipBracedSection(&p);
+		SkipBracedSection(&p, 0);
 	}
 }
 

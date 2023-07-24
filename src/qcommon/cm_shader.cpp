@@ -56,7 +56,7 @@ void CM_CreateShaderTextHash(void)
 		shader = new CCMShaderText(token, p);
 		shaderTextTable.insert(shader);
 
-		SkipBracedSection(&p);
+		SkipBracedSection(&p, 0);
 	}
 }
 
@@ -387,7 +387,7 @@ static void CM_ParseShader( CCMShader *shader, const char **text )
 		// stage definition
 		else if ( token[0] == '{' )
 		{
-			SkipBracedSection( text );
+			SkipBracedSection( text, 0 );
 			continue;
 		}
 		// material deprecated as of 11 Jan 01
