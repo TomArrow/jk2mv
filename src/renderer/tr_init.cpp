@@ -148,6 +148,7 @@ cvar_t	*r_lodCurveError;
 cvar_t	*r_customaspect;
 
 cvar_t	*r_overBrightBits;
+cvar_t	*r_mapOverBrightBits;
 
 cvar_t	*r_debugSurface;
 cvar_t	*r_simpleMipMaps;
@@ -1102,6 +1103,7 @@ void R_Register( void )
 	r_texturebits = ri.Cvar_Get("r_texturebits", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_texturebitslm = ri.Cvar_Get("r_texturebitslm", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_overBrightBits = ri.Cvar_Get("r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_mapOverBrightBits = ri.Cvar_Get("r_mapOverBrightBits", "0", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
 	r_intensity = ri.Cvar_Get("r_intensity", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_aspectratio = ri.Cvar_Get("r_aspectratio", "-1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH); // screen resolutions
 	r_customaspect = ri.Cvar_Get("r_customaspect", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
