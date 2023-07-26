@@ -11,7 +11,7 @@ if not defined FOUND (
 ) else (
 	echo Found CMake!
 )
-mkdir msvc12_x64
-cd msvc12_x64
+mkdir defrag_msvc12_x64
+cd defrag_msvc12_x64
 cmake -G "Visual Studio 12 Win64" ../..
 pause

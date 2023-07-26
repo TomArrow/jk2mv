@@ -11,7 +11,7 @@ if not defined FOUND (
 ) else (
 	echo Found CMake!
 )
-mkdir msvc17_x64
-cd msvc17_x64
+mkdir defrag_msvc17_x64
+cd defrag_msvc17_x64
 cmake -G "Visual Studio 17" -A "x64" ../..
 pause

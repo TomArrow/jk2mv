@@ -11,7 +11,7 @@ if not defined FOUND (
 ) else (
 	echo Found CMake!
 )
-mkdir msvc16_x86
-cd msvc16_x86
+mkdir defrag_msvc16_x86
+cd defrag_msvc16_x86
 cmake -G "Visual Studio 16" -A "Win32" ../..
 pause
