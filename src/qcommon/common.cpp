@@ -2475,7 +2475,7 @@ void Com_Init( char *commandLine ) {
 	// skip the jk2mpconfig.cfg if "safe" is on the command line
 	if ( !Com_SafeMode() ) {
 #ifdef DEDICATED
-		Cbuf_AddText ("exec jk2mvserver.cfg\n");
+		Cbuf_AddText ("exec eternaljk2mvserver.cfg\n");
 #else
 		Cbuf_AddText ("exec eternaljk2mv.cfg\n");
 		Cbuf_AddText("exec eternaljk2mvglobal.cfg\n");

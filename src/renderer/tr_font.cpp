@@ -875,7 +875,7 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
 			//^blah stuff confuses shadows, so parse it out first
-			while (psText[i] && r < 1024) {
+			while (psText[i] && r < 1023) {
 				if (psText[i] == '^') {
 					if ((i < 1 || psText[i - 1] != '^') &&
 						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode

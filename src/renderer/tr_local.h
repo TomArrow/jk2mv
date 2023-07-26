@@ -1216,6 +1216,7 @@ extern cvar_t	*r_mode;				// video mode
 extern cvar_t	*r_fullscreen;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
+extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans
 extern cvar_t	*r_displayRefresh;		// optional display refresh option
 
 extern cvar_t	*r_allowExtensions;				// global enable/disable of OpenGL extensions

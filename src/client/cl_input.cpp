@@ -775,12 +775,13 @@ void CL_FinishMove( usercmd_t *cmd ) {
 }
 
 
+
 /*
 =================
-CL_CreateCmd
+CL_CreateCmdReal
 =================
 */
-usercmd_t CL_CreateCmd( void ) {
+usercmd_t CL_CreateCmdReal( void ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
@@ -823,6 +824,18 @@ usercmd_t CL_CreateCmd( void ) {
 	}
 
 	return cmd;
+}
+
+
+/*
+=================
+CL_CreateCmd
+=================
+*/
+usercmd_t CL_CreateCmd(void) {
+
+	return CL_CreateCmdReal();
+
 }
 
 

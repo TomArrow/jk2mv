@@ -751,7 +751,7 @@ byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, qboolea
 	qglReadPixels(x, y, width, height, swapRB ? GL_BGR : GL_RGB, GL_UNSIGNED_BYTE, bufstart);
 
 	// gamma correct
-	if (r_gammamethod->integer == GAMMA_HARDWARE)
+	if (r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer)
 		R_GammaCorrect(bufstart, padwidth * height);
 
 	*offset = bufstart - buffer;
@@ -893,7 +893,7 @@ static void R_LevelShot( void ) {
 	}
 
 	// gamma correct
-	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE) {
+	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer) {
 		R_GammaCorrect( buffer + 18, LEVELSHOTSIZE * LEVELSHOTSIZE * 3 );
 	}
 

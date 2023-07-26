@@ -3358,7 +3358,7 @@ R_InitImages
 */
 void	R_InitImages( void ) {
 	// gamma render target
-	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
+	if (r_gammamethod->integer == GAMMA_POSTPROCESSING && !r_gammabypass->integer) {
 		qglEnable(GL_TEXTURE_3D);
 		tr.gammaLUTImage = 1024 + giTextureBindNum++;
 		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
