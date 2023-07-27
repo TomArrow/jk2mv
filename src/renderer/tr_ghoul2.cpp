@@ -2426,7 +2426,7 @@ qboolean R_LoadMDXM( model_t *mod, void *buffer, const char *mod_name, qboolean 
 	}
 
 	bool isANewModelFile = false;
-	if (r_convertModelBones->integer && mdxm->numBones == 53 && strstr(mdxm->animName, "_humanoid"))
+	if (r_convertModelBones->integer && mdxm->numBones == 53 && Q_stricmp(mdxm->animName, "models/players/_humanoid/_humanoid") == 0)
 	{
 		isANewModelFile = true;
 	}
