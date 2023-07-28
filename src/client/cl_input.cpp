@@ -775,12 +775,13 @@ void CL_FinishMove( usercmd_t *cmd ) {
 }
 
 
+
 /*
 =================
-CL_CreateCmd
+CL_CreateCmdReal
 =================
 */
-usercmd_t CL_CreateCmd( void ) {
+usercmd_t CL_CreateCmdReal( void ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
@@ -823,6 +824,18 @@ usercmd_t CL_CreateCmd( void ) {
 	}
 
 	return cmd;
+}
+
+
+/*
+=================
+CL_CreateCmd
+=================
+*/
+usercmd_t CL_CreateCmd(void) {
+
+	return CL_CreateCmdReal();
+
 }
 
 
@@ -994,9 +1007,9 @@ void CL_WritePacket( void ) {
 	// all the cmds will make it to the server
 	if ( cl_packetdup->integer < 0 ) {
 		Cvar_Set( "cl_packetdup", "0" );
-	} else if ( cl_packetdup->integer > 5 ) {
-		Cvar_Set( "cl_packetdup", "5" );
-	}
+	}/* else if ( cl_packetdup->integer > 5 ) {
+		Cvar_Set( "cl_packetdup", "5" ); // I need MOAR
+	}*/
 	oldPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
@@ -1010,7 +1023,7 @@ void CL_WritePacket( void ) {
 		}
 
 		// begin a client move command
-		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
+		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting == 2
 			|| clc.serverMessageSequence != cl.snap.messageNum ) {
 			MSG_WriteByte (&buf, clc_moveNoDelta);
 		} else {

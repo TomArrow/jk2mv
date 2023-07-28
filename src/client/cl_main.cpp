@@ -20,6 +20,8 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
+//#define NOCONNECT
+
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
 
@@ -39,6 +41,8 @@ cvar_t	*cl_freezeDemo;
 
 cvar_t	*cl_drawRecording;
 
+cvar_t	*cl_snapOrderTolerance;
+cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
@@ -80,6 +84,14 @@ cvar_t *cl_colorStringCount;
 cvar_t *cl_colorStringRandom;
 
 cvar_t	*cl_autolodscale;
+
+// Buffered reordering for demo recording.
+cvar_t	*cl_demoRecordBufferedReorder;
+cvar_t	*cl_demoRecordBufferedReorderTimeout;
+
+std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
+typedef std::map<int, bufferedMessageContainer_t>::iterator bufferedDemoMessageIterator;
+
 
 cvar_t	*mv_slowrefresh;
 cvar_t	*mv_coloredTextShadows;
@@ -353,6 +365,8 @@ void CL_RandomizeColors(const char* in, char *out) {
 	*s = '\0';
 }
 
+extern cvar_t* r_fullbright;
+
 static void CL_ColorName_f(void) {
 	char name[MAX_TOKEN_CHARS];
 	char coloredName[MAX_TOKEN_CHARS];
@@ -360,7 +374,7 @@ static void CL_ColorName_f(void) {
 	int storebitcount = cl_colorStringCount->integer;
 
 	Cvar_VariableStringBuffer("name", name, sizeof(name));
-	Q_StripColor(name);
+	Q_StripColor(name, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 	if (Cmd_Argc() == 1) {
 		CL_RandomizeColors(name, coloredName);
 		Cvar_Set("name", va("%s", coloredName));
@@ -497,11 +511,12 @@ CL_WriteDemoMessage
 Dumps the current net message, prefixed by the length
 ====================
 */
-void CL_WriteDemoMessage ( msg_t *msg, int headerBytes ) {
+void CL_WriteDemoMessage ( msg_t *msg, int headerBytes, int sequenceNumber ) {
 	int		len, swlen;
 
 	// write the packet sequence
-	len = clc.serverMessageSequence;
+	//len = clc.serverMessageSequence;
+	len = sequenceNumber;
 	swlen = LittleLong( len );
 	FS_Write (&swlen, 4, clc.demofile);
 
@@ -512,6 +527,54 @@ void CL_WriteDemoMessage ( msg_t *msg, int headerBytes ) {
 	FS_Write ( msg->data + headerBytes, len, clc.demofile );
 }
 
+/*
+====================
+CL_WriteBufferedDemoMessages
+
+Writes messages from the buffered demo packets map into the demo if they are either 
+follow ups to a previously written messages without a gap or if they are at least the timeout age.
+
+If called with qtrue parameter, timeout will be ignored and all messages will be flushed and written
+into the demo file.
+====================
+*/
+void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
+	static msg_t tmpMsg;
+	static byte tmpMsgData[MAX_MSGLEN];
+	tmpMsg.data = tmpMsgData;
+
+	// First write messages that exist without a gap.
+	while (bufferedDemoMessages.find(clc.demoLastWrittenSequenceNumber + 1) != bufferedDemoMessages.end()) {
+		// While we have all the messages without any gaps, we can just dump them all into the demo file.
+		MSG_FromBuffered(&tmpMsg, &bufferedDemoMessages[clc.demoLastWrittenSequenceNumber + 1].msg);
+		CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount, clc.demoLastWrittenSequenceNumber + 1);
+		clc.demoLastWrittenSequenceNumber = clc.demoLastWrittenSequenceNumber + 1;
+		bufferedDemoMessages.erase(clc.demoLastWrittenSequenceNumber);
+	}
+
+	// Now write messages that are older than the timeout. Also do a bit of cleanup while we're at it.
+	// bufferedDemoMessages is a map and maps are ordered, so the key (sequence number) should be incrementing.
+	for (bufferedDemoMessageIterator it = bufferedDemoMessages.begin(); it != bufferedDemoMessages.end();) {
+		bufferedDemoMessageIterator tmpIt = it;
+		it++;
+		if (tmpIt->first <= clc.demoLastWrittenSequenceNumber) { // Older or identical number to stuff we already wrote. Discard.
+			bufferedDemoMessages.erase(tmpIt);
+			continue;
+		}
+		// First potential candidate.
+		if (forceWriteAll || tmpIt->second.time + cl_demoRecordBufferedReorderTimeout->integer < Com_RealTime(NULL)) {
+			MSG_FromBuffered(&tmpMsg, &tmpIt->second.msg);
+			CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount,tmpIt->first);
+			clc.demoLastWrittenSequenceNumber = tmpIt->first;
+			bufferedDemoMessages.erase(tmpIt);
+		}
+		else {
+			// Not old enough. When there are gaps we want to wait X amount of seconds before writing a new
+			// message so that older ones can still arrive.
+			break; // Since the messages in the map are ordered, if we're not writing this one, no need to continue.
+		}
+	}
+}
 
 /*
 ====================
@@ -526,6 +589,10 @@ void CL_StopRecord_f( void ) {
 	if ( !clc.demorecording ) {
 		Com_Printf ("Not recording a demo.\n");
 		return;
+	}
+
+	if (cl_demoRecordBufferedReorder->integer) {
+		CL_WriteBufferedDemoMessages(qtrue); // Flush all messages into the demo file.
 	}
 
 	// finish up
@@ -634,7 +701,9 @@ void CL_Record_f( void ) {
 	Q_strncpyz( clc.demoName, demoName, sizeof( clc.demoName ) );
 
 	// don't start saving messages until a non-delta compressed message is received
-	clc.demowaiting = qtrue;
+	clc.demowaiting = 2; // request non-delta message with value 2.
+	clc.demoSkipPacket = qfalse; // We sometimes want to skip a packet, for example when a packet arrives out of order
+	clc.demoLastWrittenSequenceNumber = 0;
 
 	// write out the gamestate message
 	MSG_Init (&buf, bufData, sizeof(bufData));
@@ -729,6 +798,7 @@ void CL_ReadDemoMessage( void ) {
 	int			r;
 	msg_t		buf;
 	byte		bufData[ MAX_MSGLEN ];
+	std::vector<byte> bufDataRaw;
 	int			s;
 
 	if ( !clc.demofile ) {
@@ -745,7 +815,13 @@ void CL_ReadDemoMessage( void ) {
 	clc.serverMessageSequence = LittleLong( s );
 
 	// init the message
-	MSG_Init( &buf, bufData, sizeof( bufData ) );
+	if (clc.demoIsCompressed) {
+		bufDataRaw.clear();
+		MSG_InitRaw(&buf, &bufDataRaw); // Input message
+	}
+	else {
+		MSG_Init(&buf, bufData, sizeof(bufData));
+	}
 
 	// get the length
 	r = FS_Read (&buf.cursize, 4, clc.demofile);
@@ -761,7 +837,15 @@ void CL_ReadDemoMessage( void ) {
 	if ( buf.cursize > buf.maxsize ) {
 		Com_Error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
-	r = FS_Read( buf.data, buf.cursize, clc.demofile );
+
+	if (buf.raw) {
+		buf.dataRaw->resize(buf.cursize);
+		r = FS_Read(buf.dataRaw->data(), buf.cursize, clc.demofile);
+	}
+	else {
+		r = FS_Read(buf.data, buf.cursize, clc.demofile);
+	}
+
 	if ( r != buf.cursize ) {
 		Com_Printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
@@ -810,11 +894,20 @@ void CL_PlayDemo_f( void ) {
 	*/
 
 	// open the demo file
-	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) )
+	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) 
+		|| !Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16") // Compressed types
+		)
 	{ // Load "dm_15" and "dm_16" demos.
 		Com_sprintf (name, sizeof(name), "demos/%s", arg);
 
-		FS_FOpenFileRead( name, &clc.demofile, qtrue );
+		if (!Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16")) {
+			clc.demoIsCompressed = qtrue;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue); // Compressed type
+		}
+		else {
+			clc.demoIsCompressed = qfalse;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue);
+		}
 		if (!clc.demofile)
 		{
 			if (!Q_stricmp(arg, "(null)"))
@@ -830,24 +923,39 @@ void CL_PlayDemo_f( void ) {
 	}
 	else
 	{
+
 		// Check for both, "dm_15" and "dm_16".
-		Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
-		FS_FOpenFileRead( name, &clc.demofile, qtrue );
-		if ( !clc.demofile )
+		Com_sprintf(name, sizeof(name), "demos/%s.dmc15", arg);// Compressed dm_15 type
+		clc.demoIsCompressed = qtrue;
+		FS_FOpenFileRead(name, &clc.demofile, qtrue,MODULE_MAIN,qtrue);
+		if (!clc.demofile)
 		{
-			Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
-			FS_FOpenFileRead( name, &clc.demofile, qtrue );
-			if ( !clc.demofile )
+			Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
+			clc.demoIsCompressed = qfalse;
+			FS_FOpenFileRead(name, &clc.demofile, qtrue);
+			if (!clc.demofile)
 			{
-				if (!Q_stricmp(arg, "(null)"))
+				Com_sprintf(name, sizeof(name), "demos/%s.dmc16", arg);// Compressed dm_16 type
+				clc.demoIsCompressed = qtrue;
+				FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue);
+				if (!clc.demofile)
 				{
-					Com_Error( ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED") );
+					Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
+					clc.demoIsCompressed = qfalse;
+					FS_FOpenFileRead(name, &clc.demofile, qtrue);
+					if (!clc.demofile)
+					{
+						if (!Q_stricmp(arg, "(null)"))
+						{
+							Com_Error(ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED"));
+						}
+						else
+						{
+							Com_Error(ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
+						}
+						return;
+					}
 				}
-				else
-				{
-					Com_Error( ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
-				}
-				return;
 			}
 		}
 	}
@@ -862,11 +970,11 @@ void CL_PlayDemo_f( void ) {
 	Q_strncpyz( cls.servername, arg, sizeof( cls.servername ) );
 
 	// Set the protocol according to the the demo-file.
-	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) ) {
+	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc15"), ".dmc15")) {
 		MV_SetCurrentGameversion(VERSION_1_02);
 		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
 	}
-	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) ) {
+	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc16"), ".dmc16")) {
 		MV_SetCurrentGameversion(VERSION_1_04);
 	}
 
@@ -1051,6 +1159,7 @@ void CL_ClearState (void) {
 	Com_Memset( &cl, 0, sizeof( cl ) );
 }
 
+extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
 
 /*
 =====================
@@ -1107,6 +1216,7 @@ void CL_Disconnect( qboolean showMainMenu ) {
 
 	// wipe the client connection
 	Com_Memset( &clc, 0, sizeof( clc ) );
+	fragmentBuffers.clear();
 
 	cls.state = CA_DISCONNECTED;
 
@@ -1274,12 +1384,14 @@ CL_Reconnect_f
 ================
 */
 void CL_Reconnect_f( void ) {
+#ifndef NOCONNECT
 	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
 	Cvar_Set("ui_singlePlayerActive", "0");
 	Cbuf_AddText( va("connect %s\n", cls.servername ) );
+#endif
 }
 
 /*
@@ -1289,6 +1401,7 @@ CL_Connect_f
 ================
 */
 void CL_Connect_f( void ) {
+#ifndef NOCONNECT
 	char	server[MAX_OSPATH];
 
 	if ( Cmd_Argc() != 2 ) {
@@ -1355,6 +1468,7 @@ void CL_Connect_f( void ) {
 
 	// server connection string
 	Cvar_Set( "cl_currentServerAddress", server );
+#endif
 }
 
 #define MAX_RCON_MESSAGE 1024
@@ -2586,7 +2700,16 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 		return;
 	}
 
-	if (!CL_Netchan_Process( &clc.netchan, msg) ) {
+	int sequenceNumber;
+	qboolean validButOutOfOrder;
+	qboolean process = CL_Netchan_Process(&clc.netchan, msg, &sequenceNumber, &validButOutOfOrder);
+	if (cl_demoRecordBufferedReorder->integer && clc.demorecording && (process || validButOutOfOrder) ) {
+		bufferedMessageContainer_t* messageContainer = &bufferedDemoMessages[sequenceNumber]; // Will automatically create if not existant.
+		messageContainer->time = Com_RealTime(NULL); // Remember when we wrote this
+		MSG_ToBuffered(msg, &messageContainer->msg); // Copy message into the buffer
+		messageContainer->containsFullSnapshot = qfalse; // to be determined.
+	}
+	if (!process) {
 		return;		// out of order, duplicated, etc
 	}
 
@@ -2605,10 +2728,22 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	// we don't know if it is ok to save a demo message until
 	// after we have parsed the frame
 	//
-	if ( clc.demorecording && !clc.demowaiting ) {
-		CL_WriteDemoMessage( msg, headerBytes );
+	if ( clc.demorecording && !clc.demowaiting && !clc.demoSkipPacket ) {
+		if (cl_demoRecordBufferedReorder->integer) {
+			CL_WriteBufferedDemoMessages();
+		}
+		else {
+			CL_WriteBufferedDemoMessages(qtrue); // Flush all messages (if any) in case cl_demoRecordBufferedReorder was deactivated and there's still something in the queue. Otherwise we might lose vital messages.
+			CL_WriteDemoMessage(msg, headerBytes, sequenceNumber);
+			clc.demoLastWrittenSequenceNumber = sequenceNumber;
+		}
 	}
+	clc.demoSkipPacket = qfalse; // Reset again for next message
+	// TODO Maybe instead make a queue of packages to be written to the demo file.
+	// Then just read them in the correct order. That way we can integrate even packages out of order.
+	// However it's low priority bc this error is relatively rare.
 }
+
 
 /*
 ==================
@@ -2803,6 +2938,7 @@ void CL_Frame ( int msec ) {
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
 	}
 
+
 	CL_CheckCvarUpdate();
 
 	// see if we need to update any userinfo
@@ -2828,6 +2964,7 @@ void CL_Frame ( int msec ) {
 		// update audio
 		S_Update();
 	}
+
 
 	// advance local effects for next frame
 	SCR_RunCinematic();
@@ -3115,6 +3252,8 @@ void CL_Init( void ) {
 
 	cl_autoNudge = Cvar_Get( "cl_autoNudge", "0", CVAR_TEMP );
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
+	cl_snapOrderTolerance = Cvar_Get ("cl_snapOrderTolerance", "100", CVAR_ARCHIVE);
+	cl_snapOrderToleranceDemoSkipPackets = Cvar_Get("cl_snapOrderToleranceDemoSkipPackets", "1", CVAR_ARCHIVE);
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
 	cl_showTimeDelta = Cvar_Get ("cl_showTimeDelta", "0", CVAR_TEMP );
@@ -3149,6 +3288,9 @@ void CL_Init( void ) {
 	mv_allowDownload = Cvar_Get("mv_allowDownload", "1", CVAR_ARCHIVE | CVAR_GLOBAL); // renamed so old configs do not override
 
 	cl_autolodscale = Cvar_Get("cl_autolodscale", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+
+	cl_demoRecordBufferedReorder = Cvar_Get("cl_demoRecordBufferedReorder", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	cl_demoRecordBufferedReorderTimeout = Cvar_Get("cl_demoRecordBufferedReorderTimeout", "10", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 

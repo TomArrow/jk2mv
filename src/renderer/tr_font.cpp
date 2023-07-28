@@ -873,10 +873,43 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 
 		offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
-		gbInShadow = qtrue;
-		RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
-			iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
-		gbInShadow = qfalse;
+
+			//^blah stuff confuses shadows, so parse it out first
+			while (psText[i] && r < 1023) {
+				if (psText[i] == '^') {
+					if ((i < 1 || psText[i - 1] != '^') &&
+						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode
+						if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001  && Q_IsColorStringHex(&psText[i + 1])) {
+							int skipCount = 0;
+							Q_parseColorHex(&psText[i + 1], 0, &skipCount);
+							i += 1 + skipCount;
+						}
+						else {
+							i += 2;
+						}
+					}
+				}
+
+				dropShadowText[r] = psText[i];
+				r++;
+				i++;
+			}
+			dropShadowText[r] = 0;
+
+			RE_Font_DrawString(ox + offset, oy + offset, dropShadowText, v4DKGREY2,
+				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
+		}
+		else
+		{
+			static const vec4_t v4DKGREY2 = {0.15f, 0.15f, 0.15f, 1};
+
+			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
+
+			gbInShadow = qtrue;
+			RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
+				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
+			gbInShadow = qfalse;
+		}
 	}
 
 	RE_SetColor( rgba );
@@ -920,6 +953,31 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			fx += (float)pLetter->horizAdvance * fScale;
 			break;
 
+#if 1
+		case '^':
+			if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 &&  Q_IsColorStringHex(psText))
+			{
+				vec4_t color;
+				int skipCount;
+				if (Q_parseColorHex(psText, color, &skipCount)) {
+					psText += skipCount;
+					if (!gbInShadow)
+					{
+						RE_SetColor(color);
+					}
+				}
+			}
+			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
+			{
+				colour = ColorIndex(*psText);
+				if (!gbInShadow)
+				{
+					RE_SetColor(g_color_table[colour]);
+				}
+				++psText;
+			}
+			break;
+#endif
 		default:
 			qbThisCharCountsAsLetter = qtrue;
 			pLetter = curfont->GetLetter( uiLetter, &hShader );			// Description of pLetter

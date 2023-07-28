@@ -564,6 +564,7 @@ static int SV_RateMsec( client_t *client, int messageSize ) {
 	if ( messageSize > 1500 ) {
 		messageSize = 1500;
 	}
+
 	rateMsec = ( messageSize + HEADER_RATE_BYTES ) * 1000 / rate;
 
 	return rateMsec;
@@ -639,7 +640,7 @@ Also called by SV_FinalMessage
 
 =======================
 */
-void SV_SendClientSnapshot( client_t *client ) {
+void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	byte		msg_buf[MAX_MSGLEN];
 	msg_t		msg;
 	msg_t		msgBak;
@@ -705,7 +706,9 @@ void SV_SendClientSnapshot( client_t *client ) {
 		MSG_Clear (&msg);
 	}
 
-	SV_SendMessageToClient( &msg, client );
+	if (!dontSend) {
+		SV_SendMessageToClient(&msg, client);
+	}
 }
 
 
@@ -724,8 +727,14 @@ void SV_SendClientMessages( void ) {
 			continue;		// not connected
 		}
 
+		qboolean softLimit = qfalse;
 		if ( svs.time < c->nextSnapshotTime ) {
-			continue;		// not time yet
+			if (sv_enforceSnapsDebug->integer) {
+				softLimit = qtrue;
+			}
+			else {
+				continue;		// not time yet
+			}
 		}
 
 		// send additional message fragments if the last message
@@ -742,7 +751,7 @@ void SV_SendClientMessages( void ) {
 		}
 
 		// generate and send a new message
-		SV_SendClientSnapshot( c );
+		SV_SendClientSnapshot( c, softLimit);
 	}
 
 	if ( sv.vmPlayerSnapshots ) {

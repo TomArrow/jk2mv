@@ -17,6 +17,8 @@
 #include <unzip.h>	// minizip
 #include <mv_setup.h>
 
+#include "../qcommon/files_lzma.hpp"
+
 #if !defined(DEDICATED) && !defined(FINAL_BUILD)
 #include "../client/client.h"
 #endif
@@ -263,6 +265,15 @@ typedef struct qfile_us {
 	qboolean	unique;
 } qfile_ut;
 
+typedef struct compressedFileInfo_t {
+	fileCompressionScheme_t compression;
+
+	// For LZMA
+	qboolean readMode;
+	LZMAIncrementalCompressor* lzmaCompressor;
+	LZMADecompressor* lzmaDecompressor;
+};
+
 typedef struct {
 	qfile_ut	handleFiles;
 	qboolean	handleSync;
@@ -273,6 +284,9 @@ typedef struct {
 	qboolean	zipFile;
 	module_t	module;
 	char		name[MAX_ZPATH];
+
+	// For LZMA compressed demos but could be used for other stuff too
+	compressedFileInfo_t compressedFileInfo;
 } fileHandleData_t;
 
 static fileHandleData_t	fsh[MAX_FILE_HANDLES];
@@ -452,13 +466,28 @@ int FS_filelength( fileHandle_t f, module_t module ) {
 	int		end;
 	FILE*	h;
 
-	h = FS_FileForHandle(f, module);
-	pos = ftell (h);
-	fseek (h, 0, SEEK_END);
-	end = ftell (h);
-	fseek (h, pos, SEEK_SET);
+	if (!fsh[f].compressedFileInfo.compression || fsh[f].compressedFileInfo.compression == FILECOMPRESSION_RAW) {
+		h = FS_FileForHandle(f, module);
+		pos = ftell(h);
+		fseek(h, 0, SEEK_END);
+		end = ftell(h);
+		fseek(h, pos, SEEK_SET);
 
-	return end;
+		return fsh[f].compressedFileInfo.compression == FILECOMPRESSION_RAW ? end - 4 : end;
+	}
+	else if (fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
+
+		if (fsh[f].compressedFileInfo.readMode) {
+
+			return fsh[f].compressedFileInfo.lzmaDecompressor->getDataSize();
+		}
+		else {
+			throw std::logic_error("Can't use FS_Filelength on LZMA files opened in write mode.");
+		}
+	}
+	else {
+		throw std::logic_error("can't use FS_filelength here");
+	}
 }
 
 /*
@@ -768,6 +797,7 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
+	fsh[f].compressedFileInfo = {};
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_FOpenFileWrite: %s\n", ospath );
@@ -806,6 +836,7 @@ fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
+	fsh[f].compressedFileInfo = {};
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
@@ -847,6 +878,7 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
+	fsh[f].compressedFileInfo = {};
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
@@ -986,6 +1018,14 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 		return;
 	}
 
+	if (fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
+		if (fsh[f].compressedFileInfo.readMode) {
+
+			delete fsh[f].compressedFileInfo.lzmaDecompressor; // Just a quick and dirty cleanup.
+			fsh[f].compressedFileInfo.lzmaDecompressor = NULL;
+		}
+	}
+
 	// we didn't find it as a pak, so close it as a unique file
 	if (fsh[f].handleFiles.file.o) {
 		fclose (fsh[f].handleFiles.file.o);
@@ -1010,6 +1050,7 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
+	fsh[f].compressedFileInfo = {};
 
 	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
 
@@ -1046,6 +1087,7 @@ fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
+	fsh[f].compressedFileInfo = {};
 
 	ospath = FS_BuildOSPath(fs_homepath->string, "base", filename);
 
@@ -1241,11 +1283,11 @@ separate file or a ZIP file.
 */
 extern qboolean		com_fullyInitialized;
 
-int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean skipJKA) {
-	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module, skipJKA);
+int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean skipJKA, qboolean compressedType) {
+	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module, skipJKA, compressedType);
 }
 
-int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean skipJKA) {
+int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean skipJKA, qboolean compressedType) {
 	bool			isLocalConfig;
 	searchpath_t	*search;
 	char			*netpath;
@@ -1255,6 +1297,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	int			hash;
 	int				l;
 	char demoExt[16];
+	char demoExtCompressed[16];
 
 	hash = 0;
 
@@ -1271,6 +1314,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	}
 
 	Com_sprintf (demoExt, sizeof(demoExt), ".dm_%d", MV_GetCurrentProtocol());
+	Com_sprintf (demoExtCompressed, sizeof(demoExtCompressed), ".dmc%d", MV_GetCurrentProtocol());
 	// qpaths are not supposed to have a leading slash
 	if ( filename[0] == '/' || filename[0] == '\\' ) {
 		filename++;
@@ -1296,6 +1340,8 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	*file = FS_HandleForFile();
 	fsh[*file].module = module;
 	fsh[*file].handleFiles.unique = uniqueFILE;
+	fsh[*file].compressedFileInfo = {};
+	fsh[*file].compressedFileInfo.readMode = qtrue;
 
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		//
@@ -1453,6 +1499,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
 					&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
+					&& Q_stricmp( filename + l - strlen(demoExtCompressed), demoExtCompressed)	// menu files
 					&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 					continue;
 				}
@@ -1471,12 +1518,29 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 				&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 				&& Q_stricmp( filename + l - 5, ".game" )	// menu files
 				&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
+				&& Q_stricmp( filename + l - strlen(demoExtCompressed), demoExtCompressed)	// menu files
 				&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 				fs_fakeChkSum = qrandom();
 			}
 
 			Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
 			fsh[*file].zipFile = qfalse;
+
+			if (compressedType) {
+				FS_Read(&fsh[*file].compressedFileInfo.compression, 4, *file,module);
+				fsh[*file].compressedFileInfo.compression = LittleLong(fsh[*file].compressedFileInfo.compression);
+			}
+			if (fsh[*file].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
+				int tmp = *file;
+				module_t moduleCaptured = module;
+				fsh[*file].compressedFileInfo.lzmaDecompressor = new LZMADecompressor(
+					[tmp,module](void* buf, size_t size) -> size_t {
+						return (size_t)FS_Read(buf, size, tmp, module,qtrue); // Last parameter qtrue (ignoreCompression) so the stuff is just written to the file regardless.
+					}
+				);
+			}
+			return FS_filelength(*file);
+
 			if ( fs_debug->integer ) {
 				Com_Printf( "FS_FOpenFileRead: %s (found in '%s/%s')\n", filename,
 					dir->path, dir->gamedir );
@@ -1519,7 +1583,7 @@ int FS_Read2( void *buffer, int len, fileHandle_t f, module_t module ) {
 	return FS_Read( buffer, len, f, module );
 }
 
-int FS_Read( void *buffer, int len, fileHandle_t f, module_t module ) {
+int FS_Read( void *buffer, int len, fileHandle_t f, module_t module, qboolean ignoreCompression) {
 	size_t		block, remaining;
 	size_t		read;
 	byte	*buf;
@@ -1530,6 +1594,16 @@ int FS_Read( void *buffer, int len, fileHandle_t f, module_t module ) {
 	}
 
 	FS_CHECKHANDLE(f, module, 0)
+
+	if (!ignoreCompression && fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) { // Idk, I guess this should have better error handling or sth but there isn't much we can do tbh
+		if (fsh[f].compressedFileInfo.readMode) {
+
+			return fsh[f].compressedFileInfo.lzmaDecompressor->get((byte*)buffer, len);
+		}
+		else {
+			throw std::logic_error("Can't use FS_Read on LZMA stream that was opened for write.");
+		}
+	}
 
 	buf = (byte *)buffer;
 	fs_readCount += len;
@@ -1634,6 +1708,10 @@ int FS_Seek( fileHandle_t f, int offset, int origin, module_t module ) {
 
 	FS_CHECKHANDLE(f, module, -1)
 
+	if (fsh[f].compressedFileInfo.compression/* == FILECOMPRESSION_LZMA*/) {
+		Com_Error(ERR_FATAL, "Can't use FS_Seek on compressed files.");
+	}
+
 	if (fsh[f].zipFile == qtrue) {
 		if (offset == 0 && origin == FS_SEEK_SET) {
 			// set the file position in the zip file (also sets the current file info)
@@ -1666,6 +1744,7 @@ int FS_Seek( fileHandle_t f, int offset, int origin, module_t module ) {
 			Com_Error( ERR_FATAL, "Bad origin in FS_Seek" );
 			break;
 		}
+
 
 		return fseek( file, offset, _origin );
 	}

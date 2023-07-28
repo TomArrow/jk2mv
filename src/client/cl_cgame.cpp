@@ -472,6 +472,8 @@ extern cvar_t	*con_notifyvote;
 extern char	notifyWords[MAX_NOTIFYWORDS][32];
 extern int stampColor;
 
+extern cvar_t* r_fullbright;
+
 qboolean CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
@@ -577,7 +579,7 @@ rescan:
 
 			s = Cmd_Argv(1);
 			Com_sprintf(chat, sizeof(chat), "%s\n", s);
-			Q_StripColor(chat);
+			Q_StripColor(chat,(qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 
 			//Remove escape char from name
 			l = 0;

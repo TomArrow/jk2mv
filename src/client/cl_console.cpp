@@ -59,6 +59,7 @@ Con_MessageMode_f
 void Con_MessageMode_f (void) {		//yell
 	chat_playerNum = -1;
 	chat_team = qfalse;
+	chat_demoMoment = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (16 * cls.cgxadj);
 
@@ -73,6 +74,7 @@ Con_MessageMode2_f
 void Con_MessageMode2_f (void) {	//team chat
 	chat_playerNum = -1;
 	chat_team = qtrue;
+	chat_demoMoment = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (25 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -95,6 +97,7 @@ void Con_MessageMode3_f (void) {	//target chat
 		return;
 	}
 	chat_team = qfalse;
+	chat_demoMoment = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (24 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -112,8 +115,27 @@ void Con_MessageMode4_f (void) {	//attacker
 		return;
 	}
 	chat_team = qfalse;
+	chat_demoMoment = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = 30 / cls.cgxadj;
+	cls.keyCatchers ^= KEYCATCH_MESSAGE;
+}
+
+/*
+================
+Con_MessageMode5_f (Demo moment)
+================
+*/
+void Con_MessageMode5_f (void) {	// We send a message to ourselves starting with [DEMOMOMENT] 
+	chat_playerNum = clc.clientNum; // Send to ourselves
+	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
+		chat_playerNum = -1;
+		return;
+	}
+	chat_team = qfalse;
+	chat_demoMoment = qtrue;
+	Field_Clear( &chatField );
+	chatField.widthInChars = 24 / cls.cgxadj; // Idk, just guessing
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
 }
 
@@ -215,6 +237,8 @@ void Con_Copy(void) {
 	Hunk_FreeTempMemory(savebuffer);
 }
 
+extern cvar_t* r_fullbright;
+
 void Con_CopyLink(void) {
 	int l, x, i, pointDiff;
 	//short *line;
@@ -240,7 +264,7 @@ void Con_CopyLink(void) {
 			else
 				break;
 		}
-		Q_StripColor(buffer);
+		Q_StripColor(buffer, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 		if ((link = Q_stristr(buffer, "://")) || (link = Q_stristr(buffer, "www."))) {
 			// Move link ptr back until it hits a space or first char of string
 			while (link != &buffer[0] && *(link - 1) != ' ') link--;
@@ -600,6 +624,7 @@ void Con_Init (void) {
 	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
 	Cmd_AddCommand ("messagemode3", Con_MessageMode3_f);
 	Cmd_AddCommand ("messagemode4", Con_MessageMode4_f);
+	Cmd_AddCommand ("messagemode5", Con_MessageMode5_f);
 	Cmd_AddCommand ("clear", Con_Clear_f);
 	Cmd_AddCommand ("condump", Con_Dump_f);
 	Cmd_SetCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
@@ -966,7 +991,11 @@ void Con_DrawNotify (void)
 	// draw the chat line
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
 	{
-		if (chat_playerNum != -1) {
+		if (chat_demoMoment) {
+			chattext = "Demo moment:";
+			skip = 13;
+		} 
+		else if (chat_playerNum != -1) {
 			chattext = "Whisper:";
 			skip = 9;
 		}

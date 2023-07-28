@@ -80,6 +80,7 @@ typedef struct {
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
 #define	MAX_PARSE_ENTITIES	2048
+//#define	MAX_PARSE_ENTITIES	32768
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
@@ -218,9 +219,12 @@ typedef struct {
 	qboolean	spDemoRecording;
 	qboolean	demorecording;
 	qboolean	demoplaying;
-	qboolean	demowaiting;	// don't record until a non-delta message is received
+	int			demowaiting;	// don't record until a non-delta message is received. Changed to int. 0=not waiting. 1=waiting for delta message with correct deltanum. 2= waiting for full snapshot
+	qboolean	demoSkipPacket;
 	qboolean	firstDemoFrameSkipped;
+	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
+	qboolean	demoIsCompressed;
 
 	int			timeDemoFrames;		// counter of rendered frames
 	int			timeDemoStart;		// cls.realtime before first frame
@@ -234,6 +238,12 @@ typedef struct {
 } clientConnection_t;
 
 extern	clientConnection_t clc;
+
+typedef struct {
+	bufferedMsg_t msg;
+	int time; // We don't want to wait infinitely for old messages to arrive.
+	qboolean containsFullSnapshot;
+} bufferedMessageContainer_t;
 
 /*
 ==================================================================
@@ -287,6 +297,7 @@ typedef struct {
 	time_t time;
 	netadr_t server;
 } blacklistentry_t;
+
 
 typedef struct {
 	connstate_t	state;				// connection status
@@ -359,6 +370,31 @@ typedef struct {
 	struct {
 		fileHandle_t	chat;
 	} log;
+
+
+	struct {
+		int lastPsCommandTime;
+		vec3_t lastVelocity;
+		vec3_t lastPosition;
+		qboolean lastMovementDown;
+		int lastCertainGuessedFps;
+		int lastCertainGuessedFpsServerTime;
+		int lastGuessedFps;
+		int lastGuessedFpsPercentage;
+		int currentGuessedFps;
+		int lastGuessedFpsServerTime;
+	} fpsGuess;
+
+	struct { // Data for a reasonable number of past frames.
+		float maxVelocity;
+		float maxVelocityV;
+		float maxVelocityH;
+		float maxVelocityDelta;
+		float maxVelocityDeltaV;
+		float maxVelocityDeltaH;
+	} showVelocity;
+
+
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -421,8 +457,14 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
+extern	cvar_t	* cl_showVelocity;
+extern	cvar_t	* cl_showVelocityAllowNegative;
+extern	cvar_t	* cl_fpsGuess;
+extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
+extern	cvar_t	*cl_snapOrderTolerance;
+extern	cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_autoNudge;
@@ -664,7 +706,7 @@ void LAN_SaveServersToCache();
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 void CL_Netchan_TransmitNextFragment( netchan_t *chan );
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
+qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
 
 // cg_demos_auto.c
 

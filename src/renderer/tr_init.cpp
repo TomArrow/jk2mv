@@ -128,6 +128,18 @@ cvar_t	*r_nobind;
 cvar_t	*r_singleShader;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
+
+// Cel shading ported from http://q3cellshading.sourceforge.net/
+// Next one added for cell shading algorithm selection
+cvar_t* r_celshadalgo;
+//. next one for enable/disable cel bordering all together.
+cvar_t* r_celoutline;
+// My own additions:
+cvar_t* r_celoutlineColor;
+cvar_t* r_celoutlineWidth;
+cvar_t* r_celTextureOutline;
+
+
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
 cvar_t	*r_shownormals;
@@ -720,6 +732,89 @@ void GL_CheckErrors( void ) {
 #ifndef DEDICATED
 
 /*
+===============
+RB_ReadPixels
+===============
+*/
+byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, qboolean swapRB, int packAlign)
+{
+	byte	*buffer, *bufstart;
+	int		padwidth, linelen;
+
+	qglPixelStorei(GL_PACK_ALIGNMENT, packAlign);
+
+	linelen = width * 3;
+	padwidth = PAD(linelen, packAlign);
+
+	// Allocate a few more bytes so that we can choose an alignment we like
+	buffer = (byte *)ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1);
+	bufstart = (byte *)PADP((intptr_t)buffer + *offset, packAlign);
+
+	qglReadPixels(x, y, width, height, swapRB ? GL_BGR : GL_RGB, GL_UNSIGNED_BYTE, bufstart);
+
+	// gamma correct
+	if (r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer)
+		R_GammaCorrect(bufstart, padwidth * height);
+
+	*offset = bufstart - buffer;
+
+	return buffer;
+}
+
+/*
+==================
+R_TakeScreenshot
+==================
+*/
+static void R_TakeScreenshot(int x, int y, int width, int height, const char *fileName, qboolean jpeg) {
+	screenshotCommand_t	*cmd;
+
+	cmd = (screenshotCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	if ( !cmd ) {
+		return;
+	}
+	cmd->commandId = RC_SCREENSHOT;
+
+	cmd->x = x;
+	cmd->y = y;
+	cmd->width = width;
+	cmd->height = height;
+	Q_strncpyz( cmd->fileName, fileName, sizeof( cmd->fileName ) );
+	cmd->jpeg = jpeg;
+}
+
+void RB_TakeScreenshot(int x, int y, int width, int height, const char *fileName) {
+	byte	*allbuf, *buffer;
+	size_t	offset = 18;
+
+	// tga does not use line padding
+	allbuf = RB_ReadPixels(x, y, width, height, &offset, qtrue, 1);
+	buffer = allbuf + offset - 18;
+
+	Com_Memset(buffer, 0, 18);
+	buffer[2] = 2;		// uncompressed type
+	buffer[12] = width & 255;
+	buffer[13] = width >> 8;
+	buffer[14] = height & 255;
+	buffer[15] = height >> 8;
+	buffer[16] = 24;	// pixel size
+
+	ri.FS_WriteFile(fileName, buffer, 18 + width * 3 * height);
+
+	ri.Hunk_FreeTempMemory(allbuf);
+}
+
+void RB_TakeScreenshotJPEG(int x, int y, int width, int height, const char *fileName) {
+	byte	*buffer;
+	size_t	offset = 0;
+
+	buffer = RB_ReadPixels(x, y, width, height, &offset, qfalse, 1);
+
+	SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, 0);
+	ri.Hunk_FreeTempMemory(buffer);
+}
+
+/*
 ==================
 R_ScreenshotFilename
 ==================
@@ -754,8 +849,55 @@ the menu system, sampled down from full screen distorted images
 */
 static void R_LevelShot( void ) {
 
-	Com_sprintf(tr.levelshotName, sizeof(tr.levelshotName), "levelshots/%s.tga", tr.world->baseName);
-	tr.levelshot = qtrue;
+	//Com_sprintf(tr.levelshotName, sizeof(tr.levelshotName), "levelshots/%s.tga", tr.world->baseName);
+	//tr.levelshot = qtrue;
+	sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+
+	source = (unsigned char *)ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight * 3 );
+
+	buffer = (unsigned char *)ri.Hunk_AllocateTempMemory( LEVELSHOTSIZE * LEVELSHOTSIZE*3 + 18);
+	Com_Memset (buffer, 0, 18);
+	buffer[2] = 2;		// uncompressed type
+	buffer[12] = LEVELSHOTSIZE & 255;
+	buffer[13] = LEVELSHOTSIZE >> 8;
+	buffer[14] = LEVELSHOTSIZE & 255;
+	buffer[15] = LEVELSHOTSIZE >> 8;
+	buffer[16] = 24;	// pixel size
+
+	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB, GL_UNSIGNED_BYTE, source );
+
+	// resample from source
+	xScale = glConfig.vidWidth / (4.0*LEVELSHOTSIZE);
+	yScale = glConfig.vidHeight / (3.0*LEVELSHOTSIZE);
+	for ( y = 0 ; y < LEVELSHOTSIZE ; y++ ) {
+		for ( x = 0 ; x < LEVELSHOTSIZE ; x++ ) {
+			r = g = b = 0;
+			for ( yy = 0 ; yy < 3 ; yy++ ) {
+				for ( xx = 0 ; xx < 4 ; xx++ ) {
+					src = source + 3 * ( glConfig.vidWidth * (int)( (y*3+yy)*yScale ) + (int)( (x*4+xx)*xScale ) );
+					r += src[0];
+					g += src[1];
+					b += src[2];
+				}
+			}
+			dst = buffer + 18 + 3 * ( y * LEVELSHOTSIZE + x );
+			dst[0] = b / 12;
+			dst[1] = g / 12;
+			dst[2] = r / 12;
+		}
+	}
+
+	// gamma correct
+	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer) {
+		R_GammaCorrect( buffer + 18, LEVELSHOTSIZE * LEVELSHOTSIZE * 3 );
+	}
+
+	ri.FS_WriteFile( checkname, buffer, LEVELSHOTSIZE * LEVELSHOTSIZE*3 + 18 );
+
+	ri.Hunk_FreeTempMemory( buffer );
+	ri.Hunk_FreeTempMemory( source );
+
+	ri.Printf( PRINT_ALL, "Wrote %s\n", checkname );
 }
 
 /*
@@ -1194,6 +1336,14 @@ void R_Register( void )
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
 	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
 	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
+	// for cell shading algorithm selection
+	r_celshadalgo = ri.Cvar_Get("r_celshadalgo", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	// cel outline option
+	r_celoutline = ri.Cvar_Get("r_celoutline", "0", CVAR_ARCHIVE);
+	r_celoutlineWidth = ri.Cvar_Get("r_celoutlineWidth", "4.0", CVAR_ARCHIVE);
+	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
+	r_celTextureOutline = ri.Cvar_Get("r_celTextureOutline", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	r_celoutlineColor->modified = qtrue;
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
 	r_clear = ri.Cvar_Get ("r_clear", "8", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -1225,6 +1375,7 @@ Ghoul2 Insert End
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
 #ifndef DEDICATED
+	ri.Cmd_AddCommand( "sqlposcube", R_SQLPosCube_f);// A little hacky thing to generate SQL queries based on current position x 2 to span a cube
 	ri.Cmd_AddCommand( "imagelist", R_ImageList_f );
 	ri.Cmd_AddCommand( "shaderlist", R_ShaderList_f );
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );

@@ -248,6 +248,7 @@ extern	cvar_t	*sv_serverid;
 extern	cvar_t	*sv_minSnaps;
 extern	cvar_t	*sv_maxSnaps;
 extern	cvar_t	*sv_enforceSnaps;
+extern	cvar_t	*sv_enforceSnapsDebug; // Generate all snapshots but only actually send the messages according to max snaps etc
 extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
 extern	cvar_t	*sv_maxOOBRate;
@@ -357,7 +358,7 @@ qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, client_t *client );
 void SV_SendClientMessages( void );
-void SV_SendClientSnapshot( client_t *client );
+void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
 
 //
 // sv_game.c

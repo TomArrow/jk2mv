@@ -3,6 +3,7 @@
 #include "client.h"
 #include "snd_public.h"
 #include <mv_setup.h>
+#include <map>
 
 extern console_t con;
 qboolean	scr_initialized;		// ready to draw
@@ -12,6 +13,14 @@ cvar_t		*cl_debuggraph;
 cvar_t		*cl_graphheight;
 cvar_t		*cl_graphscale;
 cvar_t		*cl_graphshift;
+
+cvar_t* cl_showVelocity;
+cvar_t* cl_showVelocityAllowNegative;
+cvar_t* cl_fpsGuess;
+cvar_t* cl_fpsGuessMode;
+
+extern cvar_t* cl_demoRecordBufferedReorder;
+extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
 
 /*
 ================
@@ -312,7 +321,12 @@ void SCR_DrawDemoRecording( void ) {
 			0, 0, 1, 1, cls.recordingShader, cls.xadjust, cls.yadjust);
 	} else if (cl_drawRecording->integer) {
 		pos = FS_FTell( clc.demofile );
-		sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
+		if (bufferedDemoMessages.size() > 0 || cl_demoRecordBufferedReorder->integer) {
+			sprintf(string, "RECORDING %s: %ik (%i queued)", clc.demoName, pos / 1024, (int)bufferedDemoMessages.size());
+		}
+		else {
+			sprintf(string, "RECORDING %s: %ik", clc.demoName, pos / 1024);
+		}
 		SCR_DrawStringExt( ((SCREEN_WIDTH / 2) * (1 / cls.cgxadj)) - (int)strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue );
 	}
 }
@@ -392,6 +406,11 @@ SCR_Init
 ==================
 */
 void SCR_Init( void ) {
+
+	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
+	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
+	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
+	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
 	cl_debuggraph = Cvar_Get ("debuggraph", "0", CVAR_CHEAT);
 	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
@@ -534,6 +553,14 @@ void SCR_UpdateScreen( void ) {
 	}
 
 	CL_TakeVideoFrame();
+	if (cl_fpsGuess->integer) {
+		bool notTooOld = (cl.snap.serverTime - cls.fpsGuess.lastGuessedFpsServerTime < 1000);
+		SCR_DrawBigString(320, 240, va("%d:%d/%d(%d%%)",cl_fpsGuessMode->integer, cls.fpsGuess.lastCertainGuessedFps, notTooOld ? cls.fpsGuess.lastGuessedFps:0, notTooOld ? cls.fpsGuess.lastGuessedFpsPercentage: 0), 1.0f);
+	} 
+	if (cl_showVelocity->integer) {
+		SCR_DrawStringExt(100, 260,10, va("mV:%.2f, mVh:%.2f, mVv: %.2f",cls.showVelocity.maxVelocity, cls.showVelocity.maxVelocityH, cls.showVelocity.maxVelocityV),colorWhite,qfalse);
+		SCR_DrawStringExt(100, 270,10, va("mDV:%.2f, mDVh:%.2f, mDVv: %.2f",cls.showVelocity.maxVelocityDelta, cls.showVelocity.maxVelocityDeltaH, cls.showVelocity.maxVelocityDeltaV), colorWhite, qfalse);
+	} 
 
 	if ( com_speeds->integer ) {
 		re.SwapBuffers( &time_frontend, &time_backend );

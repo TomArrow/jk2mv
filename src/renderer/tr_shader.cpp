@@ -1924,6 +1924,14 @@ static void ParseSkyParms( const char **text ) {
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
+
+	// Remember previous value
+	int			old_r_celTextureOutline;
+	// Prevent skybox images from getting black borders
+	old_r_celTextureOutline = r_celTextureOutline->integer;
+	r_celTextureOutline->integer = 0;
+
+
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s", token, suf[i] );
@@ -1942,6 +1950,9 @@ static void ParseSkyParms( const char **text ) {
 		}
 	}
 
+	// Restore value
+	r_celTextureOutline->integer = old_r_celTextureOutline;
+
 	// cloudheight
 	token = COM_ParseExt( text, qfalse );
 	if ( token[0] == 0 ) {
@@ -1955,6 +1966,8 @@ static void ParseSkyParms( const char **text ) {
 #ifndef DEDICATED
 	R_InitSkyTexCoords( shader.sky.cloudHeight );
 #endif
+
+	r_celTextureOutline->integer = 0;
 
 	// innerbox
 	token = COM_ParseExt( text, qfalse );
@@ -1975,6 +1988,8 @@ static void ParseSkyParms( const char **text ) {
 #endif // !DEDICATED
 		}
 	}
+
+	r_celTextureOutline->integer = old_r_celTextureOutline;
 
 	shader.isSky = qtrue;
 }
@@ -3782,13 +3797,26 @@ For menu graphics that should never be picmiped
 */
 qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 	shader_t	*sh;
+	// Remember previous value
+	int			old_r_celshadalgo;
 
 	if ( strlen( name ) >= MAX_QPATH ) {
 		Com_Printf( "Shader name exceeds MAX_QPATH\n" );
 		return 0;
 	}
 
+	/*
+	 * This will prevent sprites, like buttons, go through
+	 * cel shading filters, like kuwahara.
+	 * @author gmiranda
+	 */
+	old_r_celshadalgo = r_celshadalgo->integer;
+	r_celshadalgo->integer = 0;
+
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qfalse );
+
+	// Restore value
+	r_celshadalgo->integer = old_r_celshadalgo;
 
 	// we want to return 0 if the shader failed to
 	// load for some reason, but R_FindShader should

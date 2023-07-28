@@ -115,8 +115,16 @@ void CMod_LoadSubmodels( lump_t *l ) {
 	cm.cmodels = (struct cmodel_s *)Hunk_Alloc( count * sizeof( *cm.cmodels ), h_high );
 	cm.numSubModels = count;
 
+	// Mixing two different methods here lol.
+	// Lom client:
 	cm.capsuleModelHandle = MAX(254, count); // At least 254 (CAPSULE_MODEL_HANDLE) in case some legacy cgame module violates the api
 	cm.boxModelHandle = MAX(255, count + 1); // At least 255 (BOX_MODEL_HANDLE) in case some legacy cgame module violates the api
+
+	// My own:
+	if ( count > MAX_SUBMODELS ) {
+		//Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded" );
+		count = MAX_SUBMODELS - 1;
+	}
 
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
@@ -760,12 +768,12 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 		return &box_model;
 	}
 	if ( handle < MAX_SUBMODELS ) {
-		Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",
-			cm.numSubModels, handle, MAX_SUBMODELS );
+		//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",	cm.numSubModels, handle, MAX_SUBMODELS );
+		return &box_model;
 	}
-	Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
-
-	return NULL;
+	//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
+	return &box_model;
+	//return NULL;
 
 }
 

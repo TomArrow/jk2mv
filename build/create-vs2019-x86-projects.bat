@@ -13,5 +13,5 @@ if not defined FOUND (
 )
 mkdir msvc16_x86
 cd msvc16_x86
-cmake -G "Visual Studio 16" -A "Win32" ../..
+cmake -G "Visual Studio 16 2019" -A Win32 ../..
 pause
