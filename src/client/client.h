@@ -298,6 +298,11 @@ typedef struct {
 
 
 typedef struct {
+	int globalTime;
+	float measuredEffectiveGravity;
+} fpsGuessMethod3HistorySample_t;
+
+typedef struct {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
 
@@ -372,6 +377,11 @@ typedef struct {
 	#define FPS_GUESS_METHOD2_MSEC_LIMIT 100
 	#define FPS_GUESS_METHOD2_FRAMEAVG_COUNT 30
 	#define FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT 20
+	#define FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT 10
+	#define FPS_GUESS_METHOD3_MSEC_LIMIT 100
+	#define FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY 5
+	#define FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES 1000
+	
 	struct {
 		int lastPsCommandTime;
 		vec3_t lastVelocity;
@@ -384,6 +394,13 @@ typedef struct {
 		int currentGuessedFps;
 		int lastGuessedFpsServerTime;
 		int method2PossibleMsecValues[FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT];
+		int method3PossibleMsecValues[FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY];
+		int method3EffectiveFPSGravities[FPS_GUESS_METHOD3_MSEC_LIMIT];
+		fpsGuessMethod3HistorySample_t method3MeasuredGravitySamples[FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES];
+		int method3MeasuredGravitySamplesIndex = 0;
+		int method3MeasuredGravityGlobalTime = 0;
+		float method3MeasuredEffectiveGravity;
+		qboolean lastFrameWasMeasured;
 	} fpsGuess;
 
 	struct { // Data for a reasonable number of past frames.
@@ -465,6 +482,9 @@ extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
 extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
 extern	cvar_t	* cl_fpsGuessMethod2DebugDumpPrimeResiduals;
+extern	cvar_t	* cl_fpsGuessMethod3FrameAvgCount;
+extern	cvar_t	* cl_fpsGuessMethod3GravityMatchPrecision;
+extern	cvar_t	* cl_fpsGuessMethod3ReferenceLines;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;

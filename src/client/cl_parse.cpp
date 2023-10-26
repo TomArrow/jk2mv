@@ -518,6 +518,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 					//gravityReverseMsecLookup[velocityDeltaForThisFps] = msec;
 					gravityVelocityDeltas[msec] = velocityDeltaForThisFps;
 				}
+				lastGravity = currentGravity;
 			}
 			if (!fpsGuessInitialized) {
 				// Create reverse prime number lookup table
@@ -688,6 +689,81 @@ void CL_ParseSnapshot( msg_t *msg ) {
 						}
 					}
 					
+				}
+			}
+
+			oldCommandTime = cl.snap.ps.commandTime;
+		}else if (cl_fpsGuess->integer == 3) {
+			
+
+			static int oldCommandTime = 0;
+			static int downFallVelocityDeltasAndMsecDeltas[FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT][2]{};
+			static int downFallVelocityDeltasAndMsecDeltasIndex = 0;
+			static int lastGravity = -999;
+			//static float effectiveGravities[FPS_GUESS_METHOD3_MSEC_LIMIT]{}; // The velocity deltas resulting from various fps settings based on curent gravity. Lucky for us, this is the same regardless of current downspeed as gravity is constant and we are working in 1 dimension (Z axis)
+			
+			int actualFrameCount = MAX(MIN(FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT,cl_fpsGuessMethod3FrameAvgCount->integer),1);
+
+			int currentGravity = cl.snap.ps.gravity ? cl.snap.ps.gravity : 800;
+			if (currentGravity != lastGravity) {
+
+				//gravityReverseMsecLookup.clear();
+				// Create velocity delta->msec frametime lookup table
+				for (int msec = 0; msec < FPS_GUESS_METHOD2_MSEC_LIMIT; msec++) {
+					float speed = 0;
+					float frametime = 0.001f * (float)msec;
+					speed = speed - currentGravity * frametime;
+					float unroundedSpeed = speed;
+					speed = roundf(speed);
+					int velocityDeltaForThisFps = fabsf(speed) + 0.5f;
+					//gravityReverseMsecLookup[velocityDeltaForThisFps] = msec;
+					cls.fpsGuess.method3EffectiveFPSGravities[msec] = currentGravity * speed/ unroundedSpeed;
+				}
+				lastGravity = currentGravity;
+			}
+
+			cls.fpsGuess.lastFrameWasMeasured = qfalse;
+			int commandTimeDelta = cl.snap.ps.commandTime - oldCommandTime;
+			static bool lastFrameHadLevitation = false;
+			bool frameHasLevitation = cl.snap.ps.fd.forcePowersActive & (1 << FP_LEVITATION);
+			if (oldCommandTime != cl.snap.ps.commandTime && oldCommandTime != 0 && cl.snap.ps.commandTime > oldCommandTime) {
+				if ((/*(!frameHasLevitation && !lastFrameHadLevitation) || */ (isMovementDown && cls.fpsGuess.lastMovementDown)) && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE && cl.snap.ps.velocity[2] < cls.fpsGuess.lastVelocity[2] && commandTimeDelta <= 999) {
+
+					int downFallDelta = fabsf(cl.snap.ps.velocity[2] - cls.fpsGuess.lastVelocity[2]) + 0.5f;
+					if (downFallDelta <= 999) {
+						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex % actualFrameCount][0] = downFallDelta;
+						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex++ % actualFrameCount][1] = commandTimeDelta;
+						cls.fpsGuess.lastFrameWasMeasured = qtrue;
+					}
+				}
+			}
+			lastFrameHadLevitation = frameHasLevitation;
+
+			Com_Memset(cls.fpsGuess.method3PossibleMsecValues, 0, sizeof(cls.fpsGuess.method3PossibleMsecValues));
+
+			// Actual analysis.
+			if (downFallVelocityDeltasAndMsecDeltasIndex >= actualFrameCount) {
+				int totalTimeDelta = 0;
+				int totalVelocityDelta = 0;
+				for (int frame = 0; frame < actualFrameCount; frame++) {
+					totalVelocityDelta += downFallVelocityDeltasAndMsecDeltas[frame][0];
+					totalTimeDelta += downFallVelocityDeltasAndMsecDeltas[frame][1];
+				}
+				float effectiveMeasuredGravity = 1000.0f*(float)totalVelocityDelta/(float)totalTimeDelta;
+
+				cls.fpsGuess.method3MeasuredEffectiveGravity = effectiveMeasuredGravity;
+				cls.fpsGuess.method3MeasuredGravityGlobalTime += commandTimeDelta;
+				cls.fpsGuess.method3MeasuredGravitySamples[cls.fpsGuess.method3MeasuredGravitySamplesIndex % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES].measuredEffectiveGravity = effectiveMeasuredGravity;
+				cls.fpsGuess.method3MeasuredGravitySamples[cls.fpsGuess.method3MeasuredGravitySamplesIndex++ % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES].globalTime = cls.fpsGuess.method3MeasuredGravityGlobalTime;
+
+				int possibleFpsesIndex = 0;
+				for (int msec = 0; msec < FPS_GUESS_METHOD3_MSEC_LIMIT; msec++) {
+					if (fabsf(cls.fpsGuess.method3EffectiveFPSGravities[msec]-effectiveMeasuredGravity) < cl_fpsGuessMethod3GravityMatchPrecision->value) {
+						cls.fpsGuess.method3PossibleMsecValues[possibleFpsesIndex++] = msec;
+						if (possibleFpsesIndex >= FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY) {
+							break;
+						}
+					}
 				}
 			}
 
