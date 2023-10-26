@@ -1,6 +1,7 @@
 // cl_parse.c  -- parse a message received from the server
 
 #include <algorithm>
+#include <sstream>
 #include "client.h"
 #include "../qcommon/strip.h"
 #include "../ghoul2/G2_local.h"
@@ -177,6 +178,8 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 
 extern cvar_t* cl_demoRecordBufferedReorder;
 extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
+
+
 
 /*
 ================
@@ -405,79 +408,290 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if (cl_fpsGuess->integer) {
 		// FPS guessing
 		qboolean isMovementDown = (qboolean)(cl.snap.ps.origin[2] < cls.fpsGuess.lastPosition[2]);
-		if (isMovementDown && cls.fpsGuess.lastMovementDown && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE) {
-			// We will only guess if last and current movement is down. Only that way we can be somewhat sure that force jump isn't interfering.
-			// Also useless if we're on the ground.
-			int commandTimeDelta = cl.snap.ps.commandTime - cls.fpsGuess.lastPsCommandTime;
-			if (commandTimeDelta > 0) { // No use guessing if commandTime didn't change.
-				float toPosition = cl.snap.ps.origin[2];
-				float toSpeed = cl.snap.ps.velocity[2];
-				int foundFps = 0;
-				int tmpGuessedFps = -1;
-				if (cl_fpsGuessMode->integer == 0) { // All fps from 1 to 50ms
-					for (int msec = 50; msec >= 1; msec--) {
-						float frametime = (float)msec / 1000.0f;
-						// We're gonna try out all these msec options. Find the best fit.
-						float speed = cls.fpsGuess.lastVelocity[2];
-						float position = cls.fpsGuess.lastPosition[2];
-						int totalTime = 0;
-						while (position > toPosition) {
-							totalTime += msec;
-							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
-							position += 0.5f * (speed + newSpeed) * frametime;
-							speed = roundf(newSpeed);
-						}
-						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
-							// Bingo
-							tmpGuessedFps = 1000 / msec;
-							foundFps++;
-						}
-					}
-				}
-				else if (cl_fpsGuessMode->integer == 1) {
-					// Only most relevant FPS to avoid improbable fps making a reading sound improbable.
-					const static int commonFPSes[] = {3,4,7,8,12,13,33}; // 333,250,142,125,83,76,30
-					for (int i = 0; i <(sizeof(commonFPSes)/sizeof(int)); i++) {
-						int msec = commonFPSes[i];
-						float frametime = (float)msec / 1000.0f;
-						// We're gonna try out all these msec options. Find the best fit.
-						float speed = cls.fpsGuess.lastVelocity[2];
-						float position = cls.fpsGuess.lastPosition[2];
-						int totalTime = 0;
-						while (position > toPosition) {
-							totalTime += msec;
-							float newSpeed = speed - DEFAULT_GRAVITY * frametime;
-							position += 0.5f * (speed + newSpeed) * frametime;
-							speed = roundf(newSpeed);
-						}
-						if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
-							// Bingo
-							tmpGuessedFps = 1000 / msec;
-							foundFps++;
+		if (cl_fpsGuess->integer == 1) { // Old method.
+			if (isMovementDown && cls.fpsGuess.lastMovementDown && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE) {
+				// We will only guess if last and current movement is down. Only that way we can be somewhat sure that force jump isn't interfering.
+				// Also useless if we're on the ground.
+				int commandTimeDelta = cl.snap.ps.commandTime - cls.fpsGuess.lastPsCommandTime;
+				if (commandTimeDelta > 0) { // No use guessing if commandTime didn't change.
+					float toPosition = cl.snap.ps.origin[2];
+					float toSpeed = cl.snap.ps.velocity[2];
+					int foundFps = 0;
+					int tmpGuessedFps = -1;
+					if (cl_fpsGuessMode->integer == 0) { // All fps from 1 to 50ms
+						for (int msec = 50; msec >= 1; msec--) {
+							float frametime = (float)msec / 1000.0f;
+							// We're gonna try out all these msec options. Find the best fit.
+							float speed = cls.fpsGuess.lastVelocity[2];
+							float position = cls.fpsGuess.lastPosition[2];
+							int totalTime = 0;
+							while (position > toPosition) {
+								totalTime += msec;
+								float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+								position += 0.5f * (speed + newSpeed) * frametime;
+								speed = roundf(newSpeed);
+							}
+							if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+								// Bingo
+								tmpGuessedFps = 1000 / msec;
+								foundFps++;
+							}
 						}
 					}
-				}
-				
-				if (foundFps >= 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
+					else if (cl_fpsGuessMode->integer == 1) {
+						// Only most relevant FPS to avoid improbable fps making a reading sound improbable.
+						const static int commonFPSes[] = { 3,4,7,8,12,13,33 }; // 333,250,142,125,83,76,30
+						for (int i = 0; i < (sizeof(commonFPSes) / sizeof(int)); i++) {
+							int msec = commonFPSes[i];
+							float frametime = (float)msec / 1000.0f;
+							// We're gonna try out all these msec options. Find the best fit.
+							float speed = cls.fpsGuess.lastVelocity[2];
+							float position = cls.fpsGuess.lastPosition[2];
+							int totalTime = 0;
+							while (position > toPosition) {
+								totalTime += msec;
+								float newSpeed = speed - DEFAULT_GRAVITY * frametime;
+								position += 0.5f * (speed + newSpeed) * frametime;
+								speed = roundf(newSpeed);
+							}
+							if (position == toPosition && speed == toSpeed && (totalTime == commandTimeDelta || cl_fpsGuess->integer == 1)) {
+								// Bingo
+								tmpGuessedFps = 1000 / msec;
+								foundFps++;
+							}
+						}
+					}
 
-					cls.fpsGuess.lastGuessedFps = cls.fpsGuess.currentGuessedFps = tmpGuessedFps;
-					cls.fpsGuess.lastGuessedFpsServerTime = cl.snap.serverTime;
-					if (foundFps == 1) { 
-						cls.fpsGuess.lastCertainGuessedFps = cls.fpsGuess.lastGuessedFps;
-						cls.fpsGuess.lastCertainGuessedFpsServerTime = cls.fpsGuess.lastGuessedFpsServerTime;
-						cls.fpsGuess.lastGuessedFpsPercentage = 100;
+					if (foundFps >= 1) { // Guess is only valid if only one option is possible. If two different framerates could result in same result, ignore result.
+
+						cls.fpsGuess.lastGuessedFps = cls.fpsGuess.currentGuessedFps = tmpGuessedFps;
+						cls.fpsGuess.lastGuessedFpsServerTime = cl.snap.serverTime;
+						if (foundFps == 1) {
+							cls.fpsGuess.lastCertainGuessedFps = cls.fpsGuess.lastGuessedFps;
+							cls.fpsGuess.lastCertainGuessedFpsServerTime = cls.fpsGuess.lastGuessedFpsServerTime;
+							cls.fpsGuess.lastGuessedFpsPercentage = 100;
+						}
+						else {
+							cls.fpsGuess.lastGuessedFpsPercentage = 100 / foundFps;
+						}
 					}
 					else {
-						cls.fpsGuess.lastGuessedFpsPercentage = 100/ foundFps;
+						cls.fpsGuess.currentGuessedFps = -1;
 					}
 				}
-				else {
-					cls.fpsGuess.currentGuessedFps = -1;
-				}
+			}
+			else {
+				cls.fpsGuess.currentGuessedFps = -1;
 			}
 		}
-		else {
-			cls.fpsGuess.currentGuessedFps = -1;
+		else if (cl_fpsGuess->integer == 2) {
+			// New method. Spoiler: It's trash and doesn't work at all. Was fun to make though. :D
+			static qboolean fpsGuessInitialized = qfalse;
+			static signed short commandTimeDeltas[FPS_GUESS_METHOD2_FRAMEAVG_COUNT]{};
+			static signed short downfallDeltas[FPS_GUESS_METHOD2_FRAMEAVG_COUNT]{};
+			static int commandTimeDeltaIndex = 0;
+			static int downFallDeltaIndex = 0;
+			static int oldCommandTime = 0;
+			//static int primeNumberFactorizations[1000][6] = {{}, {}, { 2 }, { 3 }, { 2,2 }, { 5 }, { 2,3 }, { 7 }, { 2,2,2 }, { 3,3 }, { 2,5 }, { 11 }, { 2,2,3 }, { 13 }, { 2,7 }, { 3,5 }, { 2,2,2,2 }, { 17 }, { 2,3,3 }, { 19 }, { 2,2,5 }, { 3,7 }, { 2,11 }, { 23 }, { 2,2,2,3 }, { 5,5 }, { 2,13 }, { 3,3,3 }, { 2,2,7 }, { 29 }, { 2,3,5 }, { 31 }, { 2,2,2,2,2 }, { 3,11 }, { 2,17 }, { 5,7 }, { 2,2,3,3 }, { 37 }, { 2,19 }, { 3,13 }, { 2,2,2,5 }, { 41 }, { 2,3,7 }, { 43 }, { 2,2,11 }, { 3,3,5 }, { 2,23 }, { 47 }, { 2,2,2,2,3 }, { 7,7 }, { 2,5,5 }, { 3,17 }, { 2,2,13 }, { 53 }, { 2,3,3,3 }, { 5,11 }, { 2,2,2,7 }, { 3,19 }, { 2,29 }, { 59 }, { 2,2,3,5 }, { 61 }, { 2,31 }, { 3,3,7 }, { 2,2,2,2,2,2 }, { 5,13 }, { 2,3,11 }, { 67 }, { 2,2,17 }, { 3,23 }, { 2,5,7 }, { 71 }, { 2,2,2,3,3 }, { 73 }, { 2,37 }, { 3,5,5 }, { 2,2,19 }, { 7,11 }, { 2,3,13 }, { 79 }, { 2,2,2,2,5 }, { 3,3,3,3 }, { 2,41 }, { 83 }, { 2,2,3,7 }, { 5,17 }, { 2,43 }, { 3,29 }, { 2,2,2,11 }, { 89 }, { 2,3,3,5 }, { 7,13 }, { 2,2,23 }, { 3,31 }, { 2,47 }, { 5,19 }, { 2,2,2,2,2,3 }, { 97 }, { 2,7,7 }, { 3,3,11 }, { 2,2,5,5 }, { 101 }, { 2,3,17 }, { 103 }, { 2,2,2,13 }, { 3,5,7 }, { 2,53 }, { 107 }, { 2,2,3,3,3 }, { 109 }, { 2,5,11 }, { 3,37 }, { 2,2,2,2,7 }, { 113 }, { 2,3,19 }, { 5,23 }, { 2,2,29 }, { 3,3,13 }, { 2,59 }, { 7,17 }, { 2,2,2,3,5 }, { 11,11 }, { 2,61 }, { 3,41 }, { 2,2,31 }, { 5,5,5 }, { 2,3,3,7 }, { 127 }, { 2,2,2,2,2,2,2 }, { 3,43 }, { 2,5,13 }, { 131 }, { 2,2,3,11 }, { 7,19 }, { 2,67 }, { 3,3,3,5 }, { 2,2,2,17 }, { 137 }, { 2,3,23 }, { 139 }, { 2,2,5,7 }, { 3,47 }, { 2,71 }, { 11,13 }, { 2,2,2,2,3,3 }, { 5,29 }, { 2,73 }, { 3,7,7 }, { 2,2,37 }, { 149 }, { 2,3,5,5 }, { 151 }, { 2,2,2,19 }, { 3,3,17 }, { 2,7,11 }, { 5,31 }, { 2,2,3,13 }, { 157 }, { 2,79 }, { 3,53 }, { 2,2,2,2,2,5 }, { 7,23 }, { 2,3,3,3,3 }, { 163 }, { 2,2,41 }, { 3,5,11 }, { 2,83 }, { 167 }, { 2,2,2,3,7 }, { 13,13 }, { 2,5,17 }, { 3,3,19 }, { 2,2,43 }, { 173 }, { 2,3,29 }, { 5,5,7 }, { 2,2,2,2,11 }, { 3,59 }, { 2,89 }, { 179 }, { 2,2,3,3,5 }, { 181 }, { 2,7,13 }, { 3,61 }, { 2,2,2,23 }, { 5,37 }, { 2,3,31 }, { 11,17 }, { 2,2,47 }, { 3,3,3,7 }, { 2,5,19 }, { 191 }, { 2,2,2,2,2,2,3 }, { 193 }, { 2,97 }, { 3,5,13 }, { 2,2,7,7 }, { 197 }, { 2,3,3,11 }, { 199 }, { 2,2,2,5,5 }, { 3,67 }, { 2,101 }, { 7,29 }, { 2,2,3,17 }, { 5,41 }, { 2,103 }, { 3,3,23 }, { 2,2,2,2,13 }, { 11,19 }, { 2,3,5,7 }, { 211 }, { 2,2,53 }, { 3,71 }, { 2,107 }, { 5,43 }, { 2,2,2,3,3,3 }, { 7,31 }, { 2,109 }, { 3,73 }, { 2,2,5,11 }, { 13,17 }, { 2,3,37 }, { 223 }, { 2,2,2,2,2,7 }, { 3,3,5,5 }, { 2,113 }, { 227 }, { 2,2,3,19 }, { 229 }, { 2,5,23 }, { 3,7,11 }, { 2,2,2,29 }, { 233 }, { 2,3,3,13 }, { 5,47 }, { 2,2,59 }, { 3,79 }, { 2,7,17 }, { 239 }, { 2,2,2,2,3,5 }, { 241 }, { 2,11,11 }, { 3,3,3,3,3 }, { 2,2,61 }, { 5,7,7 }, { 2,3,41 }, { 13,19 }, { 2,2,2,31 }, { 3,83 }, { 2,5,5,5 }, { 251 }, { 2,2,3,3,7 }, { 11,23 }, { 2,127 }, { 3,5,17 }, { 2,2,2,2,2,2,2,2 }, { 257 }, { 2,3,43 }, { 7,37 }, { 2,2,5,13 }, { 3,3,29 }, { 2,131 }, { 263 }, { 2,2,2,3,11 }, { 5,53 }, { 2,7,19 }, { 3,89 }, { 2,2,67 }, { 269 }, { 2,3,3,3,5 }, { 271 }, { 2,2,2,2,17 }, { 3,7,13 }, { 2,137 }, { 5,5,11 }, { 2,2,3,23 }, { 277 }, { 2,139 }, { 3,3,31 }, { 2,2,2,5,7 }, { 281 }, { 2,3,47 }, { 283 }, { 2,2,71 }, { 3,5,19 }, { 2,11,13 }, { 7,41 }, { 2,2,2,2,2,3,3 }, { 17,17 }, { 2,5,29 }, { 3,97 }, { 2,2,73 }, { 293 }, { 2,3,7,7 }, { 5,59 }, { 2,2,2,37 }, { 3,3,3,11 }, { 2,149 }, { 13,23 }, { 2,2,3,5,5 }, { 7,43 }, { 2,151 }, { 3,101 }, { 2,2,2,2,19 }, { 5,61 }, { 2,3,3,17 }, { 307 }, { 2,2,7,11 }, { 3,103 }, { 2,5,31 }, { 311 }, { 2,2,2,3,13 }, { 313 }, { 2,157 }, { 3,3,5,7 }, { 2,2,79 }, { 317 }, { 2,3,53 }, { 11,29 }, { 2,2,2,2,2,2,5 }, { 3,107 }, { 2,7,23 }, { 17,19 }, { 2,2,3,3,3,3 }, { 5,5,13 }, { 2,163 }, { 3,109 }, { 2,2,2,41 }, { 7,47 }, { 2,3,5,11 }, { 331 }, { 2,2,83 }, { 3,3,37 }, { 2,167 }, { 5,67 }, { 2,2,2,2,3,7 }, { 337 }, { 2,13,13 }, { 3,113 }, { 2,2,5,17 }, { 11,31 }, { 2,3,3,19 }, { 7,7,7 }, { 2,2,2,43 }, { 3,5,23 }, { 2,173 }, { 347 }, { 2,2,3,29 }, { 349 }, { 2,5,5,7 }, { 3,3,3,13 }, { 2,2,2,2,2,11 }, { 353 }, { 2,3,59 }, { 5,71 }, { 2,2,89 }, { 3,7,17 }, { 2,179 }, { 359 }, { 2,2,2,3,3,5 }, { 19,19 }, { 2,181 }, { 3,11,11 }, { 2,2,7,13 }, { 5,73 }, { 2,3,61 }, { 367 }, { 2,2,2,2,23 }, { 3,3,41 }, { 2,5,37 }, { 7,53 }, { 2,2,3,31 }, { 373 }, { 2,11,17 }, { 3,5,5,5 }, { 2,2,2,47 }, { 13,29 }, { 2,3,3,3,7 }, { 379 }, { 2,2,5,19 }, { 3,127 }, { 2,191 }, { 383 }, { 2,2,2,2,2,2,2,3 }, { 5,7,11 }, { 2,193 }, { 3,3,43 }, { 2,2,97 }, { 389 }, { 2,3,5,13 }, { 17,23 }, { 2,2,2,7,7 }, { 3,131 }, { 2,197 }, { 5,79 }, { 2,2,3,3,11 }, { 397 }, { 2,199 }, { 3,7,19 }, { 2,2,2,2,5,5 }, { 401 }, { 2,3,67 }, { 13,31 }, { 2,2,101 }, { 3,3,3,3,5 }, { 2,7,29 }, { 11,37 }, { 2,2,2,3,17 }, { 409 }, { 2,5,41 }, { 3,137 }, { 2,2,103 }, { 7,59 }, { 2,3,3,23 }, { 5,83 }, { 2,2,2,2,2,13 }, { 3,139 }, { 2,11,19 }, { 419 }, { 2,2,3,5,7 }, { 421 }, { 2,211 }, { 3,3,47 }, { 2,2,2,53 }, { 5,5,17 }, { 2,3,71 }, { 7,61 }, { 2,2,107 }, { 3,11,13 }, { 2,5,43 }, { 431 }, { 2,2,2,2,3,3,3 }, { 433 }, { 2,7,31 }, { 3,5,29 }, { 2,2,109 }, { 19,23 }, { 2,3,73 }, { 439 }, { 2,2,2,5,11 }, { 3,3,7,7 }, { 2,13,17 }, { 443 }, { 2,2,3,37 }, { 5,89 }, { 2,223 }, { 3,149 }, { 2,2,2,2,2,2,7 }, { 449 }, { 2,3,3,5,5 }, { 11,41 }, { 2,2,113 }, { 3,151 }, { 2,227 }, { 5,7,13 }, { 2,2,2,3,19 }, { 457 }, { 2,229 }, { 3,3,3,17 }, { 2,2,5,23 }, { 461 }, { 2,3,7,11 }, { 463 }, { 2,2,2,2,29 }, { 3,5,31 }, { 2,233 }, { 467 }, { 2,2,3,3,13 }, { 7,67 }, { 2,5,47 }, { 3,157 }, { 2,2,2,59 }, { 11,43 }, { 2,3,79 }, { 5,5,19 }, { 2,2,7,17 }, { 3,3,53 }, { 2,239 }, { 479 }, { 2,2,2,2,2,3,5 }, { 13,37 }, { 2,241 }, { 3,7,23 }, { 2,2,11,11 }, { 5,97 }, { 2,3,3,3,3,3 }, { 487 }, { 2,2,2,61 }, { 3,163 }, { 2,5,7,7 }, { 491 }, { 2,2,3,41 }, { 17,29 }, { 2,13,19 }, { 3,3,5,11 }, { 2,2,2,2,31 }, { 7,71 }, { 2,3,83 }, { 499 }, { 2,2,5,5,5 }, { 3,167 }, { 2,251 }, { 503 }, { 2,2,2,3,3,7 }, { 5,101 }, { 2,11,23 }, { 3,13,13 }, { 2,2,127 }, { 509 }, { 2,3,5,17 }, { 7,73 }, { 2,2,2,2,2,2,2,2,2 }, { 3,3,3,19 }, { 2,257 }, { 5,103 }, { 2,2,3,43 }, { 11,47 }, { 2,7,37 }, { 3,173 }, { 2,2,2,5,13 }, { 521 }, { 2,3,3,29 }, { 523 }, { 2,2,131 }, { 3,5,5,7 }, { 2,263 }, { 17,31 }, { 2,2,2,2,3,11 }, { 23,23 }, { 2,5,53 }, { 3,3,59 }, { 2,2,7,19 }, { 13,41 }, { 2,3,89 }, { 5,107 }, { 2,2,2,67 }, { 3,179 }, { 2,269 }, { 7,7,11 }, { 2,2,3,3,3,5 }, { 541 }, { 2,271 }, { 3,181 }, { 2,2,2,2,2,17 }, { 5,109 }, { 2,3,7,13 }, { 547 }, { 2,2,137 }, { 3,3,61 }, { 2,5,5,11 }, { 19,29 }, { 2,2,2,3,23 }, { 7,79 }, { 2,277 }, { 3,5,37 }, { 2,2,139 }, { 557 }, { 2,3,3,31 }, { 13,43 }, { 2,2,2,2,5,7 }, { 3,11,17 }, { 2,281 }, { 563 }, { 2,2,3,47 }, { 5,113 }, { 2,283 }, { 3,3,3,3,7 }, { 2,2,2,71 }, { 569 }, { 2,3,5,19 }, { 571 }, { 2,2,11,13 }, { 3,191 }, { 2,7,41 }, { 5,5,23 }, { 2,2,2,2,2,2,3,3 }, { 577 }, { 2,17,17 }, { 3,193 }, { 2,2,5,29 }, { 7,83 }, { 2,3,97 }, { 11,53 }, { 2,2,2,73 }, { 3,3,5,13 }, { 2,293 }, { 587 }, { 2,2,3,7,7 }, { 19,31 }, { 2,5,59 }, { 3,197 }, { 2,2,2,2,37 }, { 593 }, { 2,3,3,3,11 }, { 5,7,17 }, { 2,2,149 }, { 3,199 }, { 2,13,23 }, { 599 }, { 2,2,2,3,5,5 }, { 601 }, { 2,7,43 }, { 3,3,67 }, { 2,2,151 }, { 5,11,11 }, { 2,3,101 }, { 607 }, { 2,2,2,2,2,19 }, { 3,7,29 }, { 2,5,61 }, { 13,47 }, { 2,2,3,3,17 }, { 613 }, { 2,307 }, { 3,5,41 }, { 2,2,2,7,11 }, { 617 }, { 2,3,103 }, { 619 }, { 2,2,5,31 }, { 3,3,3,23 }, { 2,311 }, { 7,89 }, { 2,2,2,2,3,13 }, { 5,5,5,5 }, { 2,313 }, { 3,11,19 }, { 2,2,157 }, { 17,37 }, { 2,3,3,5,7 }, { 631 }, { 2,2,2,79 }, { 3,211 }, { 2,317 }, { 5,127 }, { 2,2,3,53 }, { 7,7,13 }, { 2,11,29 }, { 3,3,71 }, { 2,2,2,2,2,2,2,5 }, { 641 }, { 2,3,107 }, { 643 }, { 2,2,7,23 }, { 3,5,43 }, { 2,17,19 }, { 647 }, { 2,2,2,3,3,3,3 }, { 11,59 }, { 2,5,5,13 }, { 3,7,31 }, { 2,2,163 }, { 653 }, { 2,3,109 }, { 5,131 }, { 2,2,2,2,41 }, { 3,3,73 }, { 2,7,47 }, { 659 }, { 2,2,3,5,11 }, { 661 }, { 2,331 }, { 3,13,17 }, { 2,2,2,83 }, { 5,7,19 }, { 2,3,3,37 }, { 23,29 }, { 2,2,167 }, { 3,223 }, { 2,5,67 }, { 11,61 }, { 2,2,2,2,2,3,7 }, { 673 }, { 2,337 }, { 3,3,3,5,5 }, { 2,2,13,13 }, { 677 }, { 2,3,113 }, { 7,97 }, { 2,2,2,5,17 }, { 3,227 }, { 2,11,31 }, { 683 }, { 2,2,3,3,19 }, { 5,137 }, { 2,7,7,7 }, { 3,229 }, { 2,2,2,2,43 }, { 13,53 }, { 2,3,5,23 }, { 691 }, { 2,2,173 }, { 3,3,7,11 }, { 2,347 }, { 5,139 }, { 2,2,2,3,29 }, { 17,41 }, { 2,349 }, { 3,233 }, { 2,2,5,5,7 }, { 701 }, { 2,3,3,3,13 }, { 19,37 }, { 2,2,2,2,2,2,11 }, { 3,5,47 }, { 2,353 }, { 7,101 }, { 2,2,3,59 }, { 709 }, { 2,5,71 }, { 3,3,79 }, { 2,2,2,89 }, { 23,31 }, { 2,3,7,17 }, { 5,11,13 }, { 2,2,179 }, { 3,239 }, { 2,359 }, { 719 }, { 2,2,2,2,3,3,5 }, { 7,103 }, { 2,19,19 }, { 3,241 }, { 2,2,181 }, { 5,5,29 }, { 2,3,11,11 }, { 727 }, { 2,2,2,7,13 }, { 3,3,3,3,3,3 }, { 2,5,73 }, { 17,43 }, { 2,2,3,61 }, { 733 }, { 2,367 }, { 3,5,7,7 }, { 2,2,2,2,2,23 }, { 11,67 }, { 2,3,3,41 }, { 739 }, { 2,2,5,37 }, { 3,13,19 }, { 2,7,53 }, { 743 }, { 2,2,2,3,31 }, { 5,149 }, { 2,373 }, { 3,3,83 }, { 2,2,11,17 }, { 7,107 }, { 2,3,5,5,5 }, { 751 }, { 2,2,2,2,47 }, { 3,251 }, { 2,13,29 }, { 5,151 }, { 2,2,3,3,3,7 }, { 757 }, { 2,379 }, { 3,11,23 }, { 2,2,2,5,19 }, { 761 }, { 2,3,127 }, { 7,109 }, { 2,2,191 }, { 3,3,5,17 }, { 2,383 }, { 13,59 }, { 2,2,2,2,2,2,2,2,3 }, { 769 }, { 2,5,7,11 }, { 3,257 }, { 2,2,193 }, { 773 }, { 2,3,3,43 }, { 5,5,31 }, { 2,2,2,97 }, { 3,7,37 }, { 2,389 }, { 19,41 }, { 2,2,3,5,13 }, { 11,71 }, { 2,17,23 }, { 3,3,3,29 }, { 2,2,2,2,7,7 }, { 5,157 }, { 2,3,131 }, { 787 }, { 2,2,197 }, { 3,263 }, { 2,5,79 }, { 7,113 }, { 2,2,2,3,3,11 }, { 13,61 }, { 2,397 }, { 3,5,53 }, { 2,2,199 }, { 797 }, { 2,3,7,19 }, { 17,47 }, { 2,2,2,2,2,5,5 }, { 3,3,89 }, { 2,401 }, { 11,73 }, { 2,2,3,67 }, { 5,7,23 }, { 2,13,31 }, { 3,269 }, { 2,2,2,101 }, { 809 }, { 2,3,3,3,3,5 }, { 811 }, { 2,2,7,29 }, { 3,271 }, { 2,11,37 }, { 5,163 }, { 2,2,2,2,3,17 }, { 19,43 }, { 2,409 }, { 3,3,7,13 }, { 2,2,5,41 }, { 821 }, { 2,3,137 }, { 823 }, { 2,2,2,103 }, { 3,5,5,11 }, { 2,7,59 }, { 827 }, { 2,2,3,3,23 }, { 829 }, { 2,5,83 }, { 3,277 }, { 2,2,2,2,2,2,13 }, { 7,7,17 }, { 2,3,139 }, { 5,167 }, { 2,2,11,19 }, { 3,3,3,31 }, { 2,419 }, { 839 }, { 2,2,2,3,5,7 }, { 29,29 }, { 2,421 }, { 3,281 }, { 2,2,211 }, { 5,13,13 }, { 2,3,3,47 }, { 7,11,11 }, { 2,2,2,2,53 }, { 3,283 }, { 2,5,5,17 }, { 23,37 }, { 2,2,3,71 }, { 853 }, { 2,7,61 }, { 3,3,5,19 }, { 2,2,2,107 }, { 857 }, { 2,3,11,13 }, { 859 }, { 2,2,5,43 }, { 3,7,41 }, { 2,431 }, { 863 }, { 2,2,2,2,2,3,3,3 }, { 5,173 }, { 2,433 }, { 3,17,17 }, { 2,2,7,31 }, { 11,79 }, { 2,3,5,29 }, { 13,67 }, { 2,2,2,109 }, { 3,3,97 }, { 2,19,23 }, { 5,5,5,7 }, { 2,2,3,73 }, { 877 }, { 2,439 }, { 3,293 }, { 2,2,2,2,5,11 }, { 881 }, { 2,3,3,7,7 }, { 883 }, { 2,2,13,17 }, { 3,5,59 }, { 2,443 }, { 887 }, { 2,2,2,3,37 }, { 7,127 }, { 2,5,89 }, { 3,3,3,3,11 }, { 2,2,223 }, { 19,47 }, { 2,3,149 }, { 5,179 }, { 2,2,2,2,2,2,2,7 }, { 3,13,23 }, { 2,449 }, { 29,31 }, { 2,2,3,3,5,5 }, { 17,53 }, { 2,11,41 }, { 3,7,43 }, { 2,2,2,113 }, { 5,181 }, { 2,3,151 }, { 907 }, { 2,2,227 }, { 3,3,101 }, { 2,5,7,13 }, { 911 }, { 2,2,2,2,3,19 }, { 11,83 }, { 2,457 }, { 3,5,61 }, { 2,2,229 }, { 7,131 }, { 2,3,3,3,17 }, { 919 }, { 2,2,2,5,23 }, { 3,307 }, { 2,461 }, { 13,71 }, { 2,2,3,7,11 }, { 5,5,37 }, { 2,463 }, { 3,3,103 }, { 2,2,2,2,2,29 }, { 929 }, { 2,3,5,31 }, { 7,7,19 }, { 2,2,233 }, { 3,311 }, { 2,467 }, { 5,11,17 }, { 2,2,2,3,3,13 }, { 937 }, { 2,7,67 }, { 3,313 }, { 2,2,5,47 }, { 941 }, { 2,3,157 }, { 23,41 }, { 2,2,2,2,59 }, { 3,3,3,5,7 }, { 2,11,43 }, { 947 }, { 2,2,3,79 }, { 13,73 }, { 2,5,5,19 }, { 3,317 }, { 2,2,2,7,17 }, { 953 }, { 2,3,3,53 }, { 5,191 }, { 2,2,239 }, { 3,11,29 }, { 2,479 }, { 7,137 }, { 2,2,2,2,2,2,3,5 }, { 31,31 }, { 2,13,37 }, { 3,3,107 }, { 2,2,241 }, { 5,193 }, { 2,3,7,23 }, { 967 }, { 2,2,2,11,11 }, { 3,17,19 }, { 2,5,97 }, { 971 }, { 2,2,3,3,3,3,3 }, { 7,139 }, { 2,487 }, { 3,5,5,13 }, { 2,2,2,2,61 }, { 977 }, { 2,3,163 }, { 11,89 }, { 2,2,5,7,7 }, { 3,3,109 }, { 2,491 }, { 983 }, { 2,2,2,3,41 }, { 5,197 }, { 2,17,29 }, { 3,7,47 }, { 2,2,13,19 }, { 23,43 }, { 2,3,3,5,11 }, { 991 }, { 2,2,2,2,2,31 }, { 3,331 }, { 2,7,71 }, { 5,199 }, { 2,2,3,83 }, { 997 }, { 2,499 }, { 3,3,3,37 },};
+			// Contains the various prime numbers that occur in a given number from 0 to 999, no duplicates. Each number from 0 to 999 has no more than 4 unique prime numbers it consists of.
+			static const unsigned short primeNumberFactorizationsUnique[1000][4] = { {},{},{2},{3},{2},{5},{2,3},{7},{2},{3},{2,5},{11},{2,3},{13},{2,7},{3,5},{2},{17},{2,3},{19},{2,5},{3,7},{2,11},{23},{2,3},{5},{2,13},{3},{2,7},{29},{2,3,5},{31},{2},{3,11},{2,17},{5,7},{2,3},{37},{2,19},{3,13},{2,5},{41},{2,3,7},{43},{2,11},{3,5},{23},{47},{2,3},{7},{2,5},{3,17},{2,13},{53},{2,3},{5,11},{2,7},{3,19},{29},{59},{2,3,5},{61},{2,31},{3,7},{2},{5,13},{2,3,11},{67},{2,17},{3,23},{2,5,7},{71},{2,3},{73},{2,37},{3,5},{2,19},{7,11},{2,3,13},{79},{2,5},{3},{2,41},{83},{2,3,7},{5,17},{2,43},{3,29},{2,11},{89},{2,3,5},{7,13},{23},{31},{2,47},{5,19},{2,3},{97},{2,7},{3,11},{2,5},{101},{2,3,17},{103},{2,13},{3,5,7},{2,53},{107},{2,3},{109},{2,5,11},{37},{2,7},{113},{2,3,19},{5,23},{29},{3,13},{2,59},{7,17},{2,3,5},{11},{2,61},{3,41},{2,31},{5},{2,3,7},{127},{2},{3,43},{2,5,13},{131},{2,3,11},{7,19},{2,67},{3,5},{2,17},{137},{2,3,23},{139},{2,5,7},{3,47},{2,71},{11,13},{2,3},{5,29},{2,73},{3,7},{2,37},{149},{2,3,5},{151},{2,19},{3,17},{2,7,11},{5,31},{2,3,13},{157},{2,79},{3,53},{2,5},{7,23},{2,3},{163},{2,41},{3,5,11},{2,83},{167},{2,3,7},{13},{2,5,17},{3,19},{2,43},{173},{2,3,29},{5,7},{2,11},{3,59},{2,89},{179},{2,3,5},{181},{2,7,13},{3,61},{23},{5,37},{2,31},{11,17},{2,47},{3,7},{2,5,19},{191},{2,3},{193},{2,97},{3,5,13},{2,7},{197},{2,3,11},{199},{2,5},{3,67},{2,101},{7,29},{2,3,17},{5,41},{2,103},{3,23},{2,13},{11,19},{2,3,5,7},{211},{2,53},{3,71},{2,107},{5,43},{2,3},{7,31},{2,109},{3,73},{2,5,11},{13,17},{2,37},{223},{2,7},{3,5},{2,113},{227},{2,3,19},{229},{2,5,23},{3,7,11},{29},{233},{2,3,13},{5,47},{2,59},{3,79},{2,7,17},{239},{2,3,5},{241},{2,11},{3},{2,61},{5,7},{2,3,41},{13,19},{2,31},{3,83},{2,5},{251},{2,3,7},{11,23},{2,127},{3,5,17},{2},{257},{2,3,43},{7,37},{2,5,13},{3,29},{2,131},{263},{2,3,11},{53},{2,7,19},{3,89},{2,67},{269},{2,3,5},{271},{2,17},{3,7,13},{2,137},{5,11},{2,3,23},{277},{2,139},{31},{2,5,7},{281},{2,3,47},{283},{2,71},{3,5,19},{2,11,13},{7,41},{2,3},{17},{2,5,29},{3,97},{2,73},{293},{2,3,7},{59},{2,37},{3,11},{2,149},{13,23},{2,3,5},{7,43},{2,151},{3,101},{2,19},{5,61},{2,3,17},{307},{2,7,11},{3,103},{2,5,31},{311},{2,3,13},{313},{2,157},{3,5,7},{2,79},{317},{2,3,53},{11,29},{2,5},{3,107},{2,7,23},{17,19},{2,3},{5,13},{2,163},{3,109},{2,41},{7,47},{2,3,5,11},{331},{2,83},{37},{2,167},{5,67},{2,3,7},{337},{2,13},{3,113},{2,5,17},{11,31},{2,3,19},{7},{2,43},{3,5,23},{2,173},{347},{2,3,29},{349},{2,5,7},{3,13},{2,11},{353},{2,3,59},{5,71},{2,89},{3,7,17},{2,179},{359},{2,3,5},{19},{2,181},{3,11},{2,7,13},{5,73},{2,3,61},{367},{23},{3,41},{2,5,37},{7,53},{2,31},{373},{2,11,17},{3,5},{2,47},{13,29},{2,3,7},{379},{2,5,19},{3,127},{2,191},{383},{2,3},{5,7,11},{2,193},{3,43},{2,97},{389},{2,3,5,13},{17,23},{2,7},{3,131},{2,197},{5,79},{2,3,11},{397},{2,199},{3,7,19},{2,5},{401},{2,3,67},{131},{2,101},{3,5},{2,7,29},{11,37},{2,3,17},{409},{2,5,41},{3,137},{2,103},{7,59},{2,3,23},{5,83},{2,13},{3,139},{2,11,19},{419},{2,3,5,7},{421},{211},{3,47},{2,53},{5,17},{2,3,71},{7,61},{2,107},{3,11,13},{2,5,43},{431},{2,3},{433},{2,7,31},{3,5,29},{2,109},{19,23},{2,3,73},{439},{2,5,11},{3,7},{2,13,17},{443},{2,37},{5,89},{223},{3,149},{2,7},{449},{2,3,5},{11,41},{2,113},{3,151},{227},{5,7,13},{2,3,19},{457},{229},{3,17},{2,5,23},{461},{2,3,7,11},{463},{29},{3,5,31},{233},{467},{2,3,13},{7,67},{2,5,47},{3,157},{2,59},{11,43},{2,3,79},{5,19},{2,7,17},{3,53},{239},{479},{2,3,5},{137},{241},{3,7,23},{2,11},{5,97},{2,3},{487},{2,61},{3,163},{2,5,7},{491},{2,3,41},{17,29},{2,13,19},{3,5,11},{2,31},{71},{2,3,83},{499},{2,5},{3,167},{251},{503},{2,3,7},{5,101},{2,11,23},{3,13},{2,127},{509},{2,3,5,17},{73},{2},{3,19},{257},{5,103},{2,3,43},{11,47},{2,7,37},{3,173},{2,5,13},{521},{2,3,29},{523},{2,131},{3,5,7},{263},{17,31},{2,3,11},{23},{2,53},{3,59},{2,7,19},{13,41},{2,3,89},{5,107},{2,67},{3,179},{269},{7,11},{2,3,5},{541},{271},{3,181},{2,17},{5,109},{2,3,7,13},{547},{2,137},{3,61},{2,5,11},{19,29},{2,3,23},{79},{277},{3,5,37},{2,139},{557},{2,31},{13,43},{2,5,7},{3,11,17},{281},{563},{2,3,47},{5,113},{283},{3,7},{2,71},{569},{2,3,5,19},{571},{2,11,13},{3,191},{2,7,41},{5,23},{2,3},{577},{2,17},{3,193},{2,5,29},{7,83},{2,3,97},{11,53},{2,73},{3,5,13},{293},{587},{2,3,7},{19,31},{2,59},{3,197},{2,37},{593},{2,3,11},{5,7,17},{2,149},{3,199},{2,13,23},{599},{2,3,5},{601},{2,7,43},{3,67},{2,151},{5,11},{2,3,101},{607},{2,19},{3,7,29},{2,5,61},{13,47},{2,3,17},{613},{2,307},{3,5,41},{2,7,11},{617},{2,3,103},{619},{2,5,31},{3,23},{2,311},{7,89},{2,3,13},{5},{2,313},{3,11,19},{2,157},{17,37},{2,3,5,7},{631},{2,79},{3,211},{2,317},{5,127},{2,3,53},{7,13},{2,11,29},{3,71},{2,5},{641},{2,3,107},{643},{2,7,23},{3,5,43},{2,17,19},{647},{2,3},{11,59},{2,5,13},{3,7,31},{2,163},{653},{2,3,109},{5,131},{2,41},{3,73},{2,7,47},{659},{2,3,5,11},{661},{2,331},{3,13,17},{2,83},{5,7,19},{2,37},{23,29},{2,167},{3,223},{2,5,67},{11,61},{2,3,7},{673},{2,337},{3,5},{2,13},{677},{2,3,113},{7,97},{2,5,17},{3,227},{2,11,31},{683},{2,3,19},{5,137},{2,7},{3,229},{2,43},{13,53},{2,3,5,23},{691},{2,173},{3,7,11},{2,347},{5,139},{2,3,29},{17,41},{2,349},{3,233},{2,5,7},{701},{2,3,13},{19,37},{2,11},{3,5,47},{2,353},{7,101},{2,3,59},{709},{2,5,71},{3,79},{2,89},{231},{2,3,7,17},{5,11,13},{2,179},{3,239},{2,359},{719},{2,3,5},{7,103},{2,19},{3,241},{2,181},{5,29},{2,3,11},{727},{2,7,13},{3},{2,5,73},{17,43},{2,3,61},{733},{2,367},{3,5,7},{23},{11,67},{2,3,41},{739},{2,5,37},{3,13,19},{2,7,53},{743},{2,31},{5,149},{2,373},{3,83},{2,11,17},{7,107},{2,3,5},{751},{2,47},{3,251},{2,13,29},{5,151},{2,3,7},{757},{2,379},{3,11,23},{2,5,19},{761},{2,3,127},{7,109},{2,191},{3,5,17},{2,383},{13,59},{2,3},{769},{2,5,7,11},{3,257},{2,193},{773},{2,3,43},{5,31},{2,97},{3,7,37},{2,389},{19,41},{2,3,5,13},{11,71},{2,17,23},{3,29},{2,7},{5,157},{2,3,131},{787},{2,197},{3,263},{2,5,79},{7,113},{2,3,11},{13,61},{2,397},{3,53},{2,199},{797},{2,3,7,19},{17,47},{2,5},{3,89},{2,401},{11,73},{2,3,67},{5,7,23},{2,131},{3,269},{2,101},{809},{2,3,5},{811},{2,7,29},{3,271},{2,11,37},{5,163},{2,3,17},{19,43},{2,409},{3,7,13},{2,5,41},{821},{2,3,137},{823},{2,103},{3,5,11},{2,7,59},{827},{2,3,23},{829},{2,5,83},{3,277},{2,13},{7,17},{2,3,139},{5,167},{2,11,19},{31},{2,419},{839},{2,3,5,7},{29},{2,421},{3,281},{211},{5,13},{2,3,47},{7,11},{2,53},{3,283},{2,5,17},{237},{2,3,71},{853},{2,7,61},{3,5,19},{2,107},{857},{2,3,11,13},{859},{2,5,43},{3,7,41},{2,431},{863},{2,3},{5,173},{2,433},{3,17},{2,7,31},{11,79},{2,3,5,29},{13,67},{2,109},{3,97},{2,19,23},{5,7},{2,3,73},{877},{2,439},{3,293},{2,5,11},{881},{2,3,7},{883},{2,13,17},{3,59},{2,443},{887},{2,37},{7,127},{2,5,89},{3,11},{223},{19,47},{2,3,149},{5,179},{2,7},{3,13,23},{2,449},{29,31},{2,3,5},{17,53},{2,11,41},{3,7,43},{2,113},{5,181},{2,3,151},{907},{227},{3,101},{2,5,7,13},{911},{2,3,19},{11,83},{2,457},{3,5,61},{229},{7,131},{2,3,17},{919},{2,5,23},{307},{2,461},{13,71},{2,3,7,11},{5,37},{2,463},{3,103},{29},{929},{2,3,5,31},{7,19},{233},{311},{2,467},{5,11,17},{2,3,13},{937},{2,7,67},{313},{2,5,47},{941},{2,3,157},{23,41},{2,59},{3,5,7},{2,11,43},{947},{2,3,79},{13,73},{2,5,19},{317},{2,7,17},{953},{2,3,53},{5,191},{239},{3,11,29},{2,479},{7,137},{2,3,5},{31},{2,137},{3,107},{241},{5,193},{2,3,7,23},{967},{2,11},{3,17,19},{2,5,97},{971},{2,3},{7,139},{2,487},{3,5,13},{2,61},{977},{2,3,163},{11,89},{2,5,7},{3,109},{2,491},{983},{2,3,41},{5,197},{2,17,29},{3,7,47},{2,13,19},{23,43},{2,3,5,11},{991},{2,31},{331},{2,71},{5,199},{2,3,83},{997},{2,499},{37}, };
+			static const unsigned short primeNumbers[] = { 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997 };
+			static const unsigned char primeNumbersCount = sizeof(primeNumbers) / sizeof(primeNumbers[0]);
+			static unsigned short primeNumbersPrevalence[primeNumbersCount]{};
+			static unsigned char primeNumbersCountToLimit = primeNumbersCount;
+			static unsigned short primeNumberReverseLookup[FPS_GUESS_METHOD2_MSEC_LIMIT][FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT]{}; // Let's say we detect that prime number 7 is very prevalent in commandTime deltas or velocity deltas. Then we use this lookup table to check which actual values this could indicate. We then cross-reference this list of possibilities with the list of possibilities based on the prime numbers seen in velocity deltas when falling and narrow it down. We limit this to 20 values because for a number like 2, there is hundreds of possible reverse results. With 20 we can detect down to about 25 fps if prime number 2 wins.
+			static int lastGravity = -999;
+			static unsigned short gravityVelocityDeltas[FPS_GUESS_METHOD2_MSEC_LIMIT]{}; // The velocity deltas resulting from various fps settings based on curent gravity. Lucky for us, this is the same regardless of current downspeed as gravity is constant and we are working in 1 dimension (Z axis)
+			//static std::unordered_map<int,int> gravityReverseMsecLookup;
+
+			int currentGravity = cl.snap.ps.gravity ? cl.snap.ps.gravity : 800;
+			if (!fpsGuessInitialized || currentGravity != lastGravity) {
+
+				//gravityReverseMsecLookup.clear();
+				// Create velocity delta->msec frametime lookup table
+				for (int msec = 0; msec < FPS_GUESS_METHOD2_MSEC_LIMIT; msec++) {
+					float speed = 0;
+					float frametime = 0.001f * (float)msec;
+					speed = speed - currentGravity * frametime;
+					speed = roundf(speed);
+					int velocityDeltaForThisFps = fabsf(speed) + 0.5f;
+					//gravityReverseMsecLookup[velocityDeltaForThisFps] = msec;
+					gravityVelocityDeltas[msec] = velocityDeltaForThisFps;
+				}
+			}
+			if (!fpsGuessInitialized) {
+				// Create reverse prime number lookup table
+				for (int primeIndex = 0; primeIndex < primeNumbersCount; primeIndex++) {
+					int prime = primeNumbers[primeIndex];
+					if (prime > FPS_GUESS_METHOD2_MSEC_LIMIT) {
+						primeNumbersCountToLimit = primeIndex;
+						break;
+					}
+					int countHere = 0;
+					for (int msecOption = 0; msecOption < FPS_GUESS_METHOD2_MSEC_LIMIT; msecOption++) {
+						for (int n = 0; n < 4; n++) {
+							if (primeNumberFactorizationsUnique[msecOption][n] == prime) {
+								if (countHere < (FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT - 1)) {
+									primeNumberReverseLookup[prime][countHere] = msecOption;
+								}
+								countHere++;
+								break;
+							}
+						}
+					}
+					primeNumbersPrevalence[primeIndex] = countHere;
+				}
+				/*for (int prime = 2; prime < FPS_GUESS_METHOD2_MSEC_LIMIT; prime++) {
+					int countHere = 0;
+					for (int msecOption = 0; msecOption < FPS_GUESS_METHOD2_MSEC_LIMIT; msecOption++) {
+						for (int n = 0; n < 4; n++) {
+							if (primeNumberFactorizationsUnique[msecOption][n] == i && countHere < (FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT-1)) {
+								primeNumberReverseLookup[prime][countHere++] = msecOption;
+								continue;
+							}
+						}
+					}
+				}*/
+				fpsGuessInitialized = qtrue;
+			}
+
+			if (oldCommandTime != cl.snap.ps.commandTime) {
+				if (isMovementDown && cls.fpsGuess.lastMovementDown && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE && cl.snap.ps.velocity[2] < cls.fpsGuess.lastVelocity[2]) {
+					int downFallDelta = fabsf(cl.snap.ps.velocity[2] - cls.fpsGuess.lastVelocity[2]) + 0.5f;
+					if (downFallDelta <= 999) {
+						downfallDeltas[downFallDeltaIndex++ % FPS_GUESS_METHOD2_FRAMEAVG_COUNT] = downFallDelta;
+					}
+				}
+				if (cl.snap.ps.commandTime > oldCommandTime) {
+					int commandTimeDelta = cl.snap.ps.commandTime - oldCommandTime;
+					if (commandTimeDelta <= 999) {
+						if (cl_fpsGuessMethod2DebugRandMod->integer) {
+							commandTimeDeltas[commandTimeDeltaIndex++ % FPS_GUESS_METHOD2_FRAMEAVG_COUNT] = rand() % cl_fpsGuessMethod2DebugRandMod->integer;
+						}
+						else {
+							commandTimeDeltas[commandTimeDeltaIndex++ % FPS_GUESS_METHOD2_FRAMEAVG_COUNT] = commandTimeDelta;
+						}
+					}
+				}
+			}
+
+			// Actual analysis.
+			if (downFallDeltaIndex >= FPS_GUESS_METHOD2_FRAMEAVG_COUNT && commandTimeDeltaIndex >= FPS_GUESS_METHOD2_FRAMEAVG_COUNT) {
+				static unsigned int commandTimeDeltaPrimeNumberResiduals[primeNumbersCount];
+				static unsigned int downFallDeltaPrimeNumberResiduals[primeNumbersCount];
+				static float commandTimeDeltaPrimeNumberResidualsCorrected[primeNumbersCount];
+				static float downFallDeltaPrimeNumberResidualsCorrected[primeNumbersCount];
+				Com_Memset(commandTimeDeltaPrimeNumberResiduals,0,sizeof(commandTimeDeltaPrimeNumberResiduals[0])*primeNumbersCountToLimit);
+				Com_Memset(downFallDeltaPrimeNumberResiduals,0,sizeof(downFallDeltaPrimeNumberResiduals[0])*primeNumbersCountToLimit);
+
+				//int smallestCommandTimeDelta = 999999;
+				//int smallestDownfallVelocityDelta = 999999;
+
+				for (int frame = 0; frame < FPS_GUESS_METHOD2_FRAMEAVG_COUNT; frame++) {
+					for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
+						int prime = primeNumbers[primeIndex];
+						downFallDeltaPrimeNumberResiduals[primeIndex] += downfallDeltas[frame] % prime;
+						commandTimeDeltaPrimeNumberResiduals[primeIndex] += commandTimeDeltas[frame] % prime;
+					}
+					//smallestCommandTimeDelta = MIN(smallestCommandTimeDelta, commandTimeDeltas[frame]);
+					//smallestDownfallVelocityDelta = MIN(smallestDownfallVelocityDelta, downfallDeltas[frame]);
+				}
+				
+				for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
+					int prime = primeNumbers[primeIndex];
+					// "punish" prime numbers that are part of almost any number, to favor more rare prime numbers as they give us a more specific idea?
+					// The actual relationship appears to be roughly linear, with 0.45x as the rough factor. With random test data, the prime residual
+					// of, say, prime number 20 (I know its not a real prime number lol, just to explain the line) with 1000 frames will be about 9000.
+					// Only thing is, the linear line does not go through zero. It goes through 1. So, we subtract 1 from the prime number and divide by it.
+					// The 0.45 factor doesn't really matter, we only need to flatten the curve, we don't care about the actual result value. 
+					downFallDeltaPrimeNumberResidualsCorrected[primeIndex] = (float)downFallDeltaPrimeNumberResiduals[primeIndex] / (float)(prime - 1); //*= primeNumbersPrevalence[primeIndex];
+					commandTimeDeltaPrimeNumberResidualsCorrected[primeIndex] = (float)commandTimeDeltaPrimeNumberResiduals[primeIndex] / (float)(prime - 1); //*= primeNumbersPrevalence[primeIndex];
+				}
+
+				if (cl_fpsGuessMethod2DebugDumpPrimeResiduals->integer) {
+					std::stringstream ssResidualsCMDTime;
+					std::stringstream ssResidualsVelDelta;
+					if (cl_fpsGuessMethod2DebugDumpPrimeResiduals->integer == 2) {
+
+						ssResidualsCMDTime << "cmdTimePrimeResiduals \n";
+						ssResidualsVelDelta << "velDeltaPrimeResiduals \n";
+						for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
+							int prime = primeNumbers[primeIndex];
+							ssResidualsCMDTime << prime << "," << commandTimeDeltaPrimeNumberResiduals[primeIndex] << "\n";
+							ssResidualsVelDelta << prime << "," << downFallDeltaPrimeNumberResiduals[primeIndex] << "\n";
+							// "punish" prime numbers that are part of almost any number, to favor more rare prime numbers as they give us a more specific idea?
+							//downFallDeltaPrimeNumberResiduals[primeIndex] *= primeNumbersPrevalence[primeIndex];
+							//commandTimeDeltaPrimeNumberResiduals[primeIndex] *= primeNumbersPrevalence[primeIndex];
+						}
+					}
+					else {
+						ssResidualsCMDTime << "cmdTimePrimeResiduals [";
+						ssResidualsVelDelta << "velDeltaPrimeResiduals [";
+						for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
+							//int prime = primeNumbers[primeIndex];
+							ssResidualsCMDTime << (primeIndex > 0 ? "," : "") << commandTimeDeltaPrimeNumberResiduals[primeIndex];
+							ssResidualsVelDelta << (primeIndex > 0 ? "," : "") << downFallDeltaPrimeNumberResiduals[primeIndex];
+							// "punish" prime numbers that are part of almost any number, to favor more rare prime numbers as they give us a more specific idea?
+							//downFallDeltaPrimeNumberResiduals[primeIndex] *= primeNumbersPrevalence[primeIndex];
+							//commandTimeDeltaPrimeNumberResiduals[primeIndex] *= primeNumbersPrevalence[primeIndex];
+						}
+						ssResidualsCMDTime << "]\n";
+						ssResidualsVelDelta << "]\n";
+					}
+					Com_Printf("%s\n", ssResidualsCMDTime.str().c_str());
+					Com_Printf("%s\n", ssResidualsVelDelta.str().c_str());
+					Cvar_Set("cl_fpsGuessMethod2DebugDumpPrimeResiduals", "0");
+				}
+
+				// Now let's decide on the prime number with the best results for both commandTime delta and falldown delta.
+				float minCommandTimeResidual = INT_MAX;
+				int minCommandTimeResidualPrimeIndex = -1;
+				float minDownFallResidual = INT_MAX;
+				int minDownfallResidualPrimeIndex = -1;
+				for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
+					if (downFallDeltaPrimeNumberResidualsCorrected[primeIndex] < minDownFallResidual) {
+						minDownFallResidual = downFallDeltaPrimeNumberResidualsCorrected[primeIndex];
+						minDownfallResidualPrimeIndex = primeIndex;
+					}
+					if (commandTimeDeltaPrimeNumberResidualsCorrected[primeIndex] < minCommandTimeResidual) {
+						minCommandTimeResidual = commandTimeDeltaPrimeNumberResidualsCorrected[primeIndex];
+						minCommandTimeResidualPrimeIndex = primeIndex;
+					}
+				}
+
+				// Ok now we know the most fitting prime numbers for both downfall velocity change and commandtime delta
+				if (minCommandTimeResidualPrimeIndex != -1 && minDownfallResidualPrimeIndex != -1) {
+					int commandTimeFavoritePrime = primeNumbers[minCommandTimeResidualPrimeIndex];
+					int downFallFavoritePrime = primeNumbers[minDownfallResidualPrimeIndex];
+					
+					// possibleCommandTimeFpses is now an array of maximum 20 entries that contains the possible msec values (as far as we are guessing anyway).
+					unsigned short* possibleCommandTimeFpses = primeNumberReverseLookup[commandTimeFavoritePrime];
+					// possibleFallDownVelocityDeltas is now an array of maximum 20 entries that contains the possible velocity delta values (as far as we are guessing anyway).
+					unsigned short* possibleFallDownVelocityDeltas = primeNumberReverseLookup[commandTimeFavoritePrime];
+
+					Com_Memset(cls.fpsGuess.method2PossibleMsecValues, 0, sizeof(cls.fpsGuess.method2PossibleMsecValues));
+					int possibleFpsesIndex = 0;
+					for (int p = 0; p < FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT; p++) {
+						int possibleMsecValue = possibleCommandTimeFpses[p];
+						if (possibleMsecValue /* && possibleMsecValue <= smallestCommandTimeDelta*/) {
+							for (int o = 0; o < FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT; o++) {
+								int possibleDownfallVelocityDelta = possibleFallDownVelocityDeltas[o];
+
+								if (possibleDownfallVelocityDelta /* && possibleDownfallVelocityDelta <= smallestDownfallVelocityDelta*/) {
+									if (gravityVelocityDeltas[possibleMsecValue] == possibleDownfallVelocityDelta) {
+										// Found an overlap: Both the command time and downwfall velocity delta values allow for this fps.
+										cls.fpsGuess.method2PossibleMsecValues[possibleFpsesIndex++] = possibleMsecValue;
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+				}
+			}
+
+			oldCommandTime = cl.snap.ps.commandTime;
 		}
 		VectorCopy(cl.snap.ps.velocity, cls.fpsGuess.lastVelocity);
 		VectorCopy(cl.snap.ps.origin, cls.fpsGuess.lastPosition);

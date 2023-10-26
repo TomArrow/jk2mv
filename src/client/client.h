@@ -369,6 +369,9 @@ typedef struct {
 	} log;
 
 
+	#define FPS_GUESS_METHOD2_MSEC_LIMIT 100
+	#define FPS_GUESS_METHOD2_FRAMEAVG_COUNT 30
+	#define FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT 20
 	struct {
 		int lastPsCommandTime;
 		vec3_t lastVelocity;
@@ -380,6 +383,7 @@ typedef struct {
 		int lastGuessedFpsPercentage;
 		int currentGuessedFps;
 		int lastGuessedFpsServerTime;
+		int method2PossibleMsecValues[FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT];
 	} fpsGuess;
 
 	struct { // Data for a reasonable number of past frames.
@@ -458,6 +462,9 @@ extern	cvar_t	* cl_showVelocity;
 extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_fpsGuessMode;
+extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
+extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
+extern	cvar_t	* cl_fpsGuessMethod2DebugDumpPrimeResiduals;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;
