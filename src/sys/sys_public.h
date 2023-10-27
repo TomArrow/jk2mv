@@ -66,6 +66,7 @@ extern cvar_t *com_unfocused;
 extern cvar_t *com_maxfps;
 extern cvar_t *com_maxfpsMinimized;
 extern cvar_t *com_maxfpsUnfocused;
+extern cvar_t *com_physicsFps;
 
 sysEvent_t	Sys_GetEvent( void );
 

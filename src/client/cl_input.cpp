@@ -857,27 +857,84 @@ void CL_CreateNewCommands( void ) {
 		return;
 	}
 
-	frame_msec = com_frameTime - old_com_frameTime;
+	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* (MAX_PACKET_USERCMDS-cl_packetdup->integer))) { // TODO: Double check that last condition, I just pulled that out real quick without thinking about it too much
 
-	// if running over 1000fps, act as if each frame is 1ms
-	// prevents division by zero
-	if ( frame_msec < 1 ) {
-		frame_msec = 1;
+		int oldCmdServerTime = cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime;
+		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
+		int frameCount = serverTimeDelta / desiredPhysicsMsec;
+
+
+		// Not sure if this whole frame_msec part should be outside the if(frameCount) condition or inside...
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if (frame_msec < 1) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if (frame_msec > 200) {
+			frame_msec = 200;
+		}
+		old_com_frameTime = com_frameTime;
+
+		if (frameCount) {
+			int genericCommandValue = 0;
+			if (cl.gcmdSendValue)
+			{
+				// Gotta intercept them earlier as they are only to be sent once but we might be duplicating our command to create multiple ones.
+				genericCommandValue = cl.gcmdValue;
+				cl.gcmdSendValue = qfalse;
+			}
+						usercmd_t newCommand = CL_CreateCmd();
+			
+			int newClServerTime = oldCmdServerTime + desiredPhysicsMsec;
+			for (int i = 0; i < frameCount; i++) {
+
+				// duplicate the command a few times until we are close to cl.serverTime.
+				cl.cmdNumber++;
+				cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+				newCommand.serverTime = newClServerTime;
+				newCommand.generic_cmd = genericCommandValue;
+				genericCommandValue = 0;
+				cl.cmds[cmdNum] = newCommand;
+				cmd = &cl.cmds[cmdNum];
+
+				newClServerTime += desiredPhysicsMsec;
+			}
+
+		}
+
+		
+	}
+	else {
+
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if (frame_msec < 1) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if (frame_msec > 200) {
+			frame_msec = 200;
+		}
+		old_com_frameTime = com_frameTime;
+
+
+		// generate a command for this frame
+		cl.cmdNumber++;
+		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+		cl.cmds[cmdNum] = CL_CreateCmd();
+		cmd = &cl.cmds[cmdNum];
 	}
 
-	// if running less than 5fps, truncate the extra time to prevent
-	// unexpected moves after a hitch
-	if ( frame_msec > 200 ) {
-		frame_msec = 200;
-	}
-	old_com_frameTime = com_frameTime;
-
-
-	// generate a command for this frame
-	cl.cmdNumber++;
-	cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
-	cl.cmds[cmdNum] = CL_CreateCmd ();
-	cmd = &cl.cmds[cmdNum];
 }
 
 /*

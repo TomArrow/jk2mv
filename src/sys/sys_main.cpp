@@ -26,6 +26,7 @@ cvar_t *com_unfocused;
 cvar_t *com_maxfps;
 cvar_t *com_maxfpsMinimized;
 cvar_t *com_maxfpsUnfocused;
+cvar_t* com_physicsFps;
 
 static volatile sig_atomic_t sys_signal = 0;
 
@@ -102,6 +103,7 @@ void Sys_Init(void) {
 	com_maxfps = Cvar_Get("com_maxfps", "125", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsUnfocused = Cvar_Get("com_maxfpsUnfocused", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsMinimized = Cvar_Get("com_maxfpsMinimized", "50", CVAR_ARCHIVE | CVAR_GLOBAL);
+	com_physicsFps = Cvar_Get("com_physicsFps", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 }
 
 static void Q_NORETURN Sys_Exit(int ex) {
