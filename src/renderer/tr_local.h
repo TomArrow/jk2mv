@@ -1283,6 +1283,9 @@ extern	cvar_t	*r_subdivisions;
 extern	cvar_t	*r_lodCurveError;
 extern	cvar_t	*r_skipBackEnd;
 
+extern	cvar_t	*r_markSurfaceAnglesAbove;
+extern	cvar_t	*r_markSurfaceAnglesBelow;
+
 extern	cvar_t	*r_ignoreGLErrors;
 
 extern	cvar_t	*r_overBrightBits;
@@ -1523,6 +1526,8 @@ struct shaderCommands_s
 	stageVars_t	svars;
 
 	color4ub_t	constantColor255[SHADER_MAX_VERTEXES];
+
+	byte		vertexIsMarked[SHADER_MAX_VERTEXES];
 
 	shader_t	*shader;
 	double		shaderTime;

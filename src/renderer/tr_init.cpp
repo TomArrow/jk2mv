@@ -154,6 +154,9 @@ cvar_t	*r_lockpvs;
 cvar_t	*r_noportals;
 cvar_t	*r_portalOnly;
 
+cvar_t* r_markSurfaceAnglesAbove;
+cvar_t* r_markSurfaceAnglesBelow;
+
 cvar_t	*r_subdivisions;
 cvar_t	*r_lodCurveError;
 
@@ -1267,6 +1270,9 @@ void R_Register( void )
 	//
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0 );
 	r_singleShader = ri.Cvar_Get ("r_singleShader", "0", CVAR_CHEAT | CVAR_LATCH );
+
+	r_markSurfaceAnglesAbove = ri.Cvar_Get ("r_markSurfaceAnglesAbove", "0", CVAR_TEMP );
+	r_markSurfaceAnglesBelow = ri.Cvar_Get ("r_markSurfaceAnglesBelow", "0", CVAR_TEMP);
 
 	//
 	// archived variables that can change at any time
