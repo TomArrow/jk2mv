@@ -1296,4 +1296,5 @@ void Con_Close( void ) {
 	cls.keyCatchers &= ~KEYCATCH_CONSOLE;
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;
+	cls.fpsGuess.method3MeasuredGravitySamplesIndex = 0;
 }

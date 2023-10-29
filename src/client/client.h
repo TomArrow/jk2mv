@@ -300,8 +300,15 @@ typedef struct {
 } blacklistentry_t;
 
 
+typedef enum fpsGuessMethod3SampleType_t {
+	FPSGUESSSAMPLE_MEASURED,
+	FPSGUESSSAMPLE_MEASURED_SLIDE,
+	FPSGUESSSAMPLE_REPEAT
+};
+
 typedef struct {
 	int globalTime;
+	fpsGuessMethod3SampleType_t sampleType;
 	float measuredEffectiveGravity;
 } fpsGuessMethod3HistorySample_t;
 
@@ -404,6 +411,7 @@ typedef struct {
 		int method3MeasuredGravityGlobalTime = 0;
 		float method3MeasuredEffectiveGravity;
 		qboolean lastFrameWasMeasured;
+		qboolean lastFrameWasSlide;
 	} fpsGuess;
 
 	struct { // Data for a reasonable number of past frames.

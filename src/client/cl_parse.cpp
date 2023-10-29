@@ -723,10 +723,12 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			}
 
 			cls.fpsGuess.lastFrameWasMeasured = qfalse;
+			cls.fpsGuess.lastFrameWasSlide = qfalse;
 			int commandTimeDelta = cl.snap.ps.commandTime - oldCommandTime;
 			static bool lastFrameHadLevitation = false;
 			bool frameHasLevitation = cl.snap.ps.fd.forcePowersActive & (1 << FP_LEVITATION);
 			if (oldCommandTime != cl.snap.ps.commandTime && oldCommandTime != 0 && cl.snap.ps.commandTime > oldCommandTime) {
+
 				if ((/*(!frameHasLevitation && !lastFrameHadLevitation) || */ (isMovementDown && cls.fpsGuess.lastMovementDown)) && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE && cl.snap.ps.velocity[2] < cls.fpsGuess.lastVelocity[2] && commandTimeDelta <= 999) {
 
 					int downFallDelta = fabsf(cl.snap.ps.velocity[2] - cls.fpsGuess.lastVelocity[2]) + 0.5f;
@@ -734,6 +736,17 @@ void CL_ParseSnapshot( msg_t *msg ) {
 						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex % actualFrameCount][0] = downFallDelta;
 						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex++ % actualFrameCount][1] = commandTimeDelta;
 						cls.fpsGuess.lastFrameWasMeasured = qtrue;
+
+						// Check if we are possibly sliding along some surface
+						vec3_t groundTracePoint;
+						trace_t trace;
+						static vec3_t	playerMins = { -15, -15, DEFAULT_MINS_2 };
+						static vec3_t	playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
+						groundTracePoint[0] = cl.snap.ps.origin[0];
+						groundTracePoint[1] = cl.snap.ps.origin[1];
+						groundTracePoint[2] = cl.snap.ps.origin[2] - 0.25;
+						CM_BoxTrace(&trace, cl.snap.ps.origin, groundTracePoint, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+						cls.fpsGuess.lastFrameWasSlide = (qboolean)( trace.fraction != 1.0);
 					}
 				}
 			}
@@ -754,6 +767,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 				cls.fpsGuess.method3MeasuredEffectiveGravity = effectiveMeasuredGravity;
 				cls.fpsGuess.method3MeasuredGravityGlobalTime += commandTimeDelta;
 				cls.fpsGuess.method3MeasuredGravitySamples[cls.fpsGuess.method3MeasuredGravitySamplesIndex % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES].measuredEffectiveGravity = effectiveMeasuredGravity;
+				cls.fpsGuess.method3MeasuredGravitySamples[cls.fpsGuess.method3MeasuredGravitySamplesIndex % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES].sampleType = cls.fpsGuess.lastFrameWasMeasured ? (cls.fpsGuess.lastFrameWasSlide ? FPSGUESSSAMPLE_MEASURED_SLIDE : FPSGUESSSAMPLE_MEASURED ) : FPSGUESSSAMPLE_REPEAT;
 				cls.fpsGuess.method3MeasuredGravitySamples[cls.fpsGuess.method3MeasuredGravitySamplesIndex++ % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES].globalTime = cls.fpsGuess.method3MeasuredGravityGlobalTime;
 
 				int possibleFpsesIndex = 0;

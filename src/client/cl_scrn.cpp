@@ -25,6 +25,7 @@ cvar_t* cl_fpsGuessMethod2DebugDumpPrimeResiduals;
 cvar_t* cl_fpsGuessMethod3FrameAvgCount;
 cvar_t* cl_fpsGuessMethod3GravityMatchPrecision;
 cvar_t* cl_fpsGuessMethod3ReferenceLines;
+//cvar_t* cl_fpsGuessMethod3DrawRepeat;
 
 extern cvar_t* cl_demoRecordBufferedReorder;
 extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
@@ -670,7 +671,6 @@ void SCR_UpdateScreen( void ) {
 			float highestSampleSeen = -999999;
 			if (totalTimeDelta > 0) { // Might have wrapped around otherwise idk... fuck it.
 
-				re.SetColor(colorRed);
 				int oldXPos = 50;
 				for (int i = oldestSampleIndex+1; i < cls.fpsGuess.method3MeasuredGravitySamplesIndex; i++) {
 					fpsGuessMethod3HistorySample_t* previousSample = &cls.fpsGuess.method3MeasuredGravitySamples[(i-1) % FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES];
@@ -693,6 +693,18 @@ void SCR_UpdateScreen( void ) {
 					float yPos = basePositionY + height - positionYOffset;
 					if (i == cls.fpsGuess.method3MeasuredGravitySamplesIndex - 1) {
 						yPosCurrent = yPos;
+					}
+					switch (currentSample->sampleType) {
+						case FPSGUESSSAMPLE_MEASURED:
+							re.SetColor(colorRed);
+							break;
+						case FPSGUESSSAMPLE_MEASURED_SLIDE:
+						default:
+							re.SetColor(colorBlue);
+							break;
+						case FPSGUESSSAMPLE_REPEAT:
+							re.SetColor(colorYellow);
+							break;
 					}
 					re.DrawStretchPic(oldXPos, yPos, currentXPos-oldXPos, 2,
 						0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
@@ -734,14 +746,14 @@ void SCR_UpdateScreen( void ) {
 			static char fpsGuessMethod3String[2048];
 			fpsGuessMethod3String[0] = 0;
 			//Q_strcat(fpsGuessMethod3String, sizeof(fpsGuessMethod3String), va("%sgrav: %d; %d-%d, %d", cls.fpsGuess.lastFrameWasMeasured ? " " : "_", (int)cls.fpsGuess.method3MeasuredEffectiveGravity, (int)lowerBound, (int)upperBound,(int)yPosCurrent));
-			Q_strcat(fpsGuessMethod3String, sizeof(fpsGuessMethod3String), va("%sgrav: %d", cls.fpsGuess.lastFrameWasMeasured ? " " : "_", (int)cls.fpsGuess.method3MeasuredEffectiveGravity));
+			Q_strcat(fpsGuessMethod3String, sizeof(fpsGuessMethod3String), va("%sgrav: %d", cls.fpsGuess.lastFrameWasMeasured ? (cls.fpsGuess.lastFrameWasSlide? "-": " ") : "_", (int)cls.fpsGuess.method3MeasuredEffectiveGravity));
 			/*for (int i = 0; i < FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY; i++) {
 				if (cls.fpsGuess.method3PossibleMsecValues[i]) {
 
 					Q_strcat(fpsGuessMethod3String, sizeof(fpsGuessMethod3String), i==0 ? va("%d", 1000/cls.fpsGuess.method3PossibleMsecValues[i]) : va("/%d", 1000/cls.fpsGuess.method3PossibleMsecValues[i]));
 				}
 			}*/
-			SCR_DrawBigString(120, 300, fpsGuessMethod3String, 1.0f);
+			SCR_DrawBigString(300, 400, fpsGuessMethod3String, 1.0f);
 
 			/*
 			// Draw debug graph like graph of history
