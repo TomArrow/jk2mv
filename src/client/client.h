@@ -148,6 +148,9 @@ typedef struct {
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
 
 	char			*mSharedMemory;
+
+	predictedMovement_t	predictedMovement;
+	qboolean		predictedMovementIsSet;
 } clientActive_t;
 
 extern	clientActive_t		cl;

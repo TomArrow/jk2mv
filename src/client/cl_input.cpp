@@ -838,6 +838,243 @@ usercmd_t CL_CreateCmd(void) {
 
 }
 
+typedef enum rampState_t {
+	RAMP_NORAMP,
+	RAMP_NOTAPPLICABLE,
+	RAMP_GOOD,
+	RAMP_DEAD
+};
+
+
+typedef struct
+{
+	vec3_t		forward, right, up;
+	float		frametime;
+} deadRampPML_t;
+
+static void CL_Accelerate(predictedMovement_t* ps,vec3_t wishdir, float wishspeed, float accel, float frametime) {
+
+	// q2 style
+	int			i;
+	float		addspeed, accelspeed, currentspeed;
+
+	currentspeed = DotProduct(ps->velocity, wishdir);
+	addspeed = wishspeed - currentspeed;
+	if (addspeed <= 0) {
+		return;
+	}
+	accelspeed = accel * frametime * wishspeed;
+	if (accelspeed > addspeed) {
+		accelspeed = addspeed;
+	}
+
+	for (i = 0; i < 3; i++) {
+		ps->velocity[i] += accelspeed * wishdir[i];
+	}
+}
+
+static float CL_CmdScale(usercmd_t* cmd, float speed) {
+	int		max;
+	float	total;
+	float	scale;
+	int		umove = 0; //cmd->upmove;
+			//don't factor upmove into scaling speed
+
+	max = abs(cmd->forwardmove);
+	if (abs(cmd->rightmove) > max) {
+		max = abs(cmd->rightmove);
+	}
+	if (abs(umove) > max) {
+		max = abs(umove);
+	}
+	if (!max) {
+		return 0;
+	}
+
+	total = sqrt(cmd->forwardmove * cmd->forwardmove
+		+ cmd->rightmove * cmd->rightmove + umove * umove);
+	scale = (float)speed * max / (127.0 * total);
+
+	return scale;
+}
+
+void CL_UpdateViewAngles(predictedMovement_t* ps, const usercmd_t* cmd) {
+	short		temp;
+	int		i;
+
+	if (ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION) {
+		return;		// no view changes at all
+	}
+
+	if (ps->pm_type != PM_SPECTATOR && ps->eFlags & EF_DEAD) {
+		return;		// no view changes at all
+	}
+
+	// circularly clamp the angles with deltas
+	for (i = 0; i < 3; i++) {
+		temp = cmd->angles[i] + ps->delta_angles[i];
+		if (i == PITCH) {
+			// don't let the player look up or down more than 90 degrees
+			if (temp > 16000) {
+				ps->delta_angles[i] = 16000 - cmd->angles[i];
+				temp = 16000;
+			}
+			else if (temp < -16000) {
+				ps->delta_angles[i] = -16000 - cmd->angles[i];
+				temp = -16000;
+			}
+		}
+		ps->viewangles[i] = SHORT2ANGLE(temp);
+	}
+
+}
+
+void CL_AirAccel(usercmd_t* cmd, predictedMovement_t* currentPs, float frametime) {
+	int			i;
+	vec3_t		wishvel;
+	float		fmove, smove;
+	vec3_t		wishdir;
+	float		wishspeed;
+	float		scale;
+	deadRampPML_t		pml;
+
+	CL_UpdateViewAngles(currentPs,cmd);
+	AngleVectors(currentPs->viewangles, pml.forward, pml.right, pml.up);
+
+	fmove = cmd->forwardmove;
+	smove = cmd->rightmove;
+
+	scale = CL_CmdScale(cmd, currentPs->speed);
+
+	// project moves down to flat plane
+	pml.forward[2] = 0;
+	pml.right[2] = 0;
+	VectorNormalize(pml.forward);
+	VectorNormalize(pml.right);
+
+	for (i = 0; i < 2; i++)
+	{
+		wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
+	}
+	wishvel[2] = 0;
+
+
+	VectorCopy(wishvel, wishdir);
+	wishspeed = VectorNormalize(wishdir);
+	wishspeed *= scale;
+
+	// not on ground, so little effect on velocity
+	CL_Accelerate(currentPs,wishdir, wishspeed, 1.0f,frametime);
+}
+
+rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, float frameTime) {
+	trace_t	trace;
+	vec3_t		end;
+	//vec3_t		testVelocity;
+	vec3_t		point;
+	//vec3_t		newPos;
+	int			i, j, k; 
+	static vec3_t	playerMins = { -15, -15, DEFAULT_MINS_2 };
+	static vec3_t	playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
+
+	if (currentPs->groundEntityNum != ENTITYNUM_NONE || currentPs->pm_type == PM_FLOAT) {
+		return RAMP_NOTAPPLICABLE;
+	}
+
+	Sys_SnapVector(currentPs->velocity);
+
+	CL_AirAccel(&cmd,currentPs,frameTime);
+
+	currentPs->velocity[2] = (currentPs->velocity[2] + (currentPs->velocity[2] - currentPs->gravity * frameTime)) * 0.5;
+	//if (gravity) {
+		//testVelocity[2] -= currentPs->gravity * frameTime;
+		//testVelocity[2] = (currentPs->velocity[2] + testVelocity[2]) * 0.5;
+	//}
+
+	// calculate position we are trying to move to
+	VectorMA(currentPs->origin, frameTime, currentPs->velocity, end);
+
+	// see if we can make it there
+	CM_BoxTrace(&trace, currentPs->origin, end, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+
+	if (trace.fraction == 1) {
+		VectorCopy(trace.endpos, currentPs->origin);
+
+		point[0] = currentPs->origin[0];
+		point[1] = currentPs->origin[1];
+		point[2] = currentPs->origin[2] - 0.25;
+
+		CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+
+		// do something corrective if the trace starts in a solid...
+		if (trace.allsolid) {
+			// jitter around
+			for (i = -1; i <= 1; i++) {
+				for (j = -1; j <= 1; j++) {
+					for (k = -1; k <= 1; k++) {
+						VectorCopy(currentPs->origin, point);
+						point[0] += (float)i;
+						point[1] += (float)j;
+						point[2] += (float)k;
+						CM_BoxTrace(&trace, point, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+						if (!trace.allsolid) {
+							point[0] = currentPs->origin[0];
+							point[1] = currentPs->origin[1];
+							point[2] = currentPs->origin[2] - 0.25;
+
+							CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+							i = j = k; // Stupid way to end the loop lol.
+						}
+					}
+				}
+			}
+		}
+
+		if (trace.fraction != 1.0 && (trace.plane.normal[0] != 0.0f || trace.plane.normal[1] != 0.0f || trace.plane.normal[2] != 1.0f)) {
+			return RAMP_DEAD;
+		}
+		else {
+			return RAMP_NORAMP;
+		}
+	}
+	return RAMP_GOOD;
+}
+
+
+qboolean CL_DeadRampCMDFix(usercmd_t* cmd, usercmd_t* lastCmd, predictedMovement_t* frameStartPredictMoveCopy) {
+	int originalServerTime = cmd->serverTime;
+	int msecDelta = cl.serverTime - lastCmd->serverTime;
+	bool deadRamp = true;
+	int offset = 0;
+	int realOffset = 0;
+	const int minDelta = 5;
+	int maxNeg = MAX(0, msecDelta - minDelta);
+	while (deadRamp) {
+
+		realOffset = offset > maxNeg ? offset - maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
+		int modifiedMsecDelta = msecDelta + realOffset;
+		float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
+		predictedMovement_t predictMoveCopy = *frameStartPredictMoveCopy;
+		deadRamp = (CL_PredictDeadRamp(*cmd, &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
+		if (deadRamp) {
+			offset++;
+		}
+		else {
+			*frameStartPredictMoveCopy = predictMoveCopy;
+		}
+	}
+	cmd->serverTime += realOffset;
+	if (realOffset) {
+		//if (com_deadRampFix->integer > 1) {
+		//}
+		if (com_deadRampFix->integer > 1) {
+			Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
+		}
+		Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
+		return qtrue;
+	}
+	return qfalse;
+}
 
 /*
 =================
@@ -892,6 +1129,7 @@ void CL_CreateNewCommands( void ) {
 						usercmd_t newCommand = CL_CreateCmd();
 			
 			int newClServerTime = oldCmdServerTime + desiredPhysicsMsec;
+			predictedMovement_t frameStartPredictMoveCopy = cl.predictedMovement;
 			for (int i = 0; i < frameCount; i++) {
 
 				// duplicate the command a few times until we are close to cl.serverTime.
@@ -901,6 +1139,39 @@ void CL_CreateNewCommands( void ) {
 				newCommand.generic_cmd = genericCommandValue;
 				genericCommandValue = 0;
 				cl.cmds[cmdNum] = newCommand;
+				if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
+					CL_DeadRampCMDFix(&cl.cmds[cmdNum],&cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &frameStartPredictMoveCopy);
+					newClServerTime = cl.cmds[cmdNum].serverTime;
+					/*int originalServerTime = cl.cmds[cmdNum].serverTime;
+					int msecDelta = cl.serverTime - cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK].serverTime;
+					bool deadRamp = true;
+					int offset = 0;
+					int realOffset = 0;
+					const int minDelta = 5;
+					int maxNeg = MAX(0, msecDelta - minDelta);
+					while (deadRamp) {
+
+						realOffset = offset > maxNeg ? offset - maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
+						int modifiedMsecDelta = msecDelta + realOffset;
+						float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
+						predictedMovement_t predictMoveCopy = frameStartPredictMoveCopy;
+						deadRamp = (CL_PredictDeadRamp(cl.cmds[cmdNum], &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
+						if (deadRamp) {
+							offset++;
+						}
+						else {
+							frameStartPredictMoveCopy = predictMoveCopy;
+						}
+					}
+					cl.cmds[cmdNum].serverTime += realOffset;
+					newClServerTime = cl.cmds[cmdNum].serverTime;
+					if (realOffset) {
+						//if (com_deadRampFix->integer > 1) {
+						//}
+						Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
+						Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
+					}*/
+				}
 				cmd = &cl.cmds[cmdNum];
 
 				newClServerTime += desiredPhysicsMsec;
@@ -925,13 +1196,43 @@ void CL_CreateNewCommands( void ) {
 		if (frame_msec > 200) {
 			frame_msec = 200;
 		}
-		old_com_frameTime = com_frameTime;
+		old_com_frameTime = com_frameTime; 
 
 
 		// generate a command for this frame
 		cl.cmdNumber++;
 		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
 		cl.cmds[cmdNum] = CL_CreateCmd();
+		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
+
+			predictedMovement_t predictedMovementCopy = cl.predictedMovement;
+			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &predictedMovementCopy);
+			/*int originalServerTime = cl.cmds[cmdNum].serverTime;
+			int msecDelta = cl.serverTime - cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK].serverTime;
+			bool deadRamp = true;
+			int offset = 0;
+			int realOffset = 0;
+			const int minDelta = 5;
+			int maxNeg = MAX(0,msecDelta - minDelta);
+			while (deadRamp) {
+
+				realOffset = offset > maxNeg ? offset-maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
+				int modifiedMsecDelta = msecDelta + realOffset;
+				float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
+				predictedMovement_t predictMoveCopy = cl.predictedMovement;
+				deadRamp = (CL_PredictDeadRamp(cl.cmds[cmdNum], &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
+				if (deadRamp) {
+					offset++;
+				}
+			}
+			cl.cmds[cmdNum].serverTime += realOffset;
+			if (realOffset){
+				//if (com_deadRampFix->integer > 1) {
+				//}
+				Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
+				Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
+			}*/
+		}
 		cmd = &cl.cmds[cmdNum];
 	}
 

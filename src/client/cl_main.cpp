@@ -3246,7 +3246,7 @@ void CL_Init( void ) {
 	cl_pitchspeed = Cvar_Get("cl_pitchspeed", "140", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_anglespeedkey = Cvar_Get("cl_anglespeedkey", "1.5", CVAR_ARCHIVE | CVAR_GLOBAL);
 
-	cl_maxpackets = Cvar_Get("cl_maxpackets", "125", CVAR_ARCHIVE | CVAR_GLOBAL);
+	cl_maxpackets = Cvar_Get("cl_maxpackets", "1000", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_packetdup = Cvar_Get("cl_packetdup", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -3290,8 +3290,8 @@ void CL_Init( void ) {
 
 	// userinfo
 	Cvar_Get("name", "Padawan", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("rate", "50000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("snaps", "30", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("rate", "90000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("snaps", "1000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("model", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 //	Cvar_Get ("headmodel", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get("team_model", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);

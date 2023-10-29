@@ -67,6 +67,8 @@ extern cvar_t *com_maxfps;
 extern cvar_t *com_maxfpsMinimized;
 extern cvar_t *com_maxfpsUnfocused;
 extern cvar_t *com_physicsFps;
+extern cvar_t *com_deadRampFix;
+extern cvar_t *com_deadRampFixedCount;
 
 sysEvent_t	Sys_GetEvent( void );
 

@@ -68,6 +68,8 @@ cvar_t	*sv_paused;
 cvar_t	*com_cameraMode;
 cvar_t	*com_busyWait;
 
+cvar_t	*cool_apiFeatures;
+
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
 cvar_t	*com_debugMessage;
@@ -2541,6 +2543,8 @@ void Com_Init( char *commandLine ) {
 
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
 	cl_commandsize = Cvar_Get("cl_commandsize", "64", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
+
+	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT), CVAR_INIT | CVAR_VM_NOWRITE);
 
 	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);

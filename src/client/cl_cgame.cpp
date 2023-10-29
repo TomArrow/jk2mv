@@ -1364,6 +1364,11 @@ Ghoul2 Insert End
 		cl.mSharedMemory = VMAP(1, char, MAX_CG_SHARED_BUFFER_SIZE);
 		return 0;
 
+	case CG_COOL_API_SETPREDICTEDMOVEMENT:
+		Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1),sizeof(predictedMovement_t));
+		cl.predictedMovementIsSet = qtrue;
+		return 0;
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}
