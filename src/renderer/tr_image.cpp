@@ -7,6 +7,7 @@
 #endif
 
 #include <map>
+#include <float.h> // Linux is special. It says it wants <cfloat> but what it REALLY wants is float.h?
 using namespace std;
 
 
@@ -22,7 +23,6 @@ using namespace std;
 #include <jpeglib.h>
 #include <png.h>
 
-#include <cfloat>
 
 static void LoadTGA( const char *name, byte **pic, int *width, int *height );
 static void LoadJPG( const char *name, byte **pic, int *width, int *height );
