@@ -84,7 +84,11 @@ class LZMAIncrementalCompressor {
 		while (*size < requestedSize) {
 
 			if (currentVectorData && currentVectorDataLeft > 0) {
+#ifdef min
 				size_t diff = min(currentVectorDataLeft, (requestedSize - *size));
+#else // ?!?! why does windows want the above and linux the below?!?
+				size_t diff = std::min(currentVectorDataLeft, (requestedSize - *size)); 
+#endif
 				memcpy(byteBuffer, currentVectorData, diff);
 				currentVectorData += diff;
 				currentVectorDataLeft -= diff;
@@ -325,7 +329,7 @@ class LZMADecompressor {
 		LzmaDec_Construct(&state);
 		res = LzmaDec_Allocate(&state, header.header, LZMA_PROPS_SIZE, &g_Alloc);
 		if (res != SZ_OK) {
-			throw std::exception("Couldn't do LZMA decoder allocation.");
+			throw std::runtime_error("Couldn't do LZMA decoder allocation.");
 		}
 
 		//res = Decode2(&state, outStream, inStream, unpackSize);
@@ -419,7 +423,7 @@ public:
 		size_t headerSize = sizeof(header.header);
 		SRes res = inStream.Read(&inStream, header.header, &headerSize);
 		if (res != SZ_OK) {
-			throw std::exception("Couldn't read LZMA header.");
+			throw std::runtime_error("Couldn't read LZMA header.");
 		}
 
 		unpackSize = 0;
