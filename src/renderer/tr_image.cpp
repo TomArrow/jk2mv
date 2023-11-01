@@ -22,6 +22,8 @@ using namespace std;
 #include <jpeglib.h>
 #include <png.h>
 
+#include <cfloat>
+
 static void LoadTGA( const char *name, byte **pic, int *width, int *height );
 static void LoadJPG( const char *name, byte **pic, int *width, int *height );
 
