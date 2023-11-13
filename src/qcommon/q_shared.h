@@ -2311,6 +2311,7 @@ typedef union byteAlias_u {
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
 
 #define COOL_APIFEATURE_SETPREDICTEDMOVEMENT (1<<0)
+#define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
 
 // This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
 typedef struct predictedMovement_s {
