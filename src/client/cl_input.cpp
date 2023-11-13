@@ -1113,6 +1113,8 @@ void CL_CreateNewCommands( void ) {
 	usercmd_t	*cmd;
 	int			cmdNum;
 
+	cl.newCmdsGenerated = qfalse;
+
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
 	// no need to create usercmds until we have a gamestate
@@ -1167,6 +1169,7 @@ void CL_CreateNewCommands( void ) {
 				newCommand.generic_cmd = genericCommandValue;
 				genericCommandValue = 0;
 				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
+				cl.newCmdsGenerated = qtrue;
 				if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 					CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &frameStartPredictMoveCopy);
 					newClServerTime = cl.cmds[cmdNum].serverTime;
@@ -1238,7 +1241,8 @@ void CL_CreateNewCommands( void ) {
 		// generate a command for this frame
 		cl.cmdNumber++;
 		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
-		cl.cmds[cmdNum] = CL_CreateCmd();
+		cl.temporaryCmd = cl.cmds[cmdNum] = CL_CreateCmd();
+		cl.newCmdsGenerated = qtrue;
 		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 
 			predictedMovement_t predictedMovementCopy = cl.predictedMovement;
@@ -1285,9 +1289,15 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-qboolean CL_ReadyToSendPacket( void ) {
+qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no new usercmds were generated this frame...
 	int		oldPacketNum;
 	int		delta;
+
+	if (!cl.newCmdsGenerated && cls.state >= CA_PRIMED) {
+		// When using com_physicsFps we may/will not generate new commands on every frame.
+		// If no new ones were generated, don't send a packet
+		return qfalse;
+	}
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
