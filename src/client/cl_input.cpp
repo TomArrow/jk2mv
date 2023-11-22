@@ -1166,6 +1166,19 @@ void CL_CreateNewCommands( void ) {
 				cl.cmdNumber++;
 				cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
 				newCommand.serverTime = newClServerTime;
+
+				// COOL API, set move values.
+				if (cl.cgameMoveSet & 1) {
+					newCommand.forwardmove = cl.cgameForwardmove;
+				} 
+				if (cl.cgameMoveSet & 2) {
+					newCommand.rightmove = cl.cgameRightmove;
+				}
+				if (cl.cgameMoveSet & 4) {
+					newCommand.upmove = cl.cgameUpmove;
+				}
+				cl.cgameMoveSet = 0;
+
 				newCommand.generic_cmd = genericCommandValue;
 				genericCommandValue = 0;
 				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
@@ -1243,6 +1256,19 @@ void CL_CreateNewCommands( void ) {
 		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
 		cl.temporaryCmd = cl.cmds[cmdNum] = CL_CreateCmd();
 		cl.newCmdsGenerated = qtrue;
+
+		// COOL API, set move values.
+		if (cl.cgameMoveSet & 1) {
+			cl.cmds[cmdNum].forwardmove = cl.cgameForwardmove;
+		}
+		if (cl.cgameMoveSet & 2) {
+			cl.cmds[cmdNum].rightmove = cl.cgameRightmove;
+		}
+		if (cl.cgameMoveSet & 4) {
+			cl.cmds[cmdNum].upmove = cl.cgameUpmove;
+		}
+		cl.cgameMoveSet = 0;
+
 		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 
 			predictedMovement_t predictedMovementCopy = cl.predictedMovement;

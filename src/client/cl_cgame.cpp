@@ -1380,6 +1380,13 @@ Ghoul2 Insert End
 		cl.predictedMovementIsSet = qtrue;
 		return 0;
 
+	case CG_COOL_API_SETUSERCMDMOVE:
+		cl.cgameForwardmove = args[1];
+		cl.cgameRightmove = args[2];
+		cl.cgameUpmove = args[3];
+		cl.cgameMoveSet = args[4];
+		return 0;
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}

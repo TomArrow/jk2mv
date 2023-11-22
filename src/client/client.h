@@ -118,6 +118,11 @@ typedef struct {
 	int			cgameForceSelection;
 	int			cgameInvenSelection;
 
+	int			cgameUpmove;
+	int			cgameRightmove;
+	int			cgameForwardmove;
+	int			cgameMoveSet;
+
 	qboolean	gcmdSendValue;
 	byte		gcmdValue;
 
