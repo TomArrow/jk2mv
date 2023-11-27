@@ -46,8 +46,19 @@ void Con_ToggleConsole_f (void) {
 
 	Field_Clear( &kg.g_consoleField );
 
+
 	Con_ClearNotify ();
 	cls.keyCatchers ^= KEYCATCH_CONSOLE;
+
+	if (Cmd_Argc() > 1 && !Q_stricmp(Cmd_Argv(1), "instant")) {
+		// If "instant" is used as argument for "toggleconsole", the transition is immediate.
+		if (cls.keyCatchers & KEYCATCH_CONSOLE) {
+			con.displayFrac = con_height->value;
+		}
+		else {
+			con.displayFrac = 0;
+		}
+	}
 }
 
 /*
