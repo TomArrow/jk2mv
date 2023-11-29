@@ -23,6 +23,13 @@
 #include "../client/client.h"
 #endif
 
+ // for rmdir
+#if defined (_MSC_VER)
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
 /*
 =============================================================================
 
@@ -274,9 +281,34 @@ typedef struct compressedFileInfo_t {
 	LZMADecompressor* lzmaDecompressor;
 };
 
-typedef struct {
+typedef struct fileHandleData_s  {
+#ifdef ASYNCIO
+	fileHandleData_s() :
+		handleFiles({}),
+		handleSync(qfalse),
+		handleAsync(qfalse),
+		writerThread(nullptr),
+		closed(qfalse),
+		fileSize(0),
+		zipFilePos(0),
+		zipFileLen(0),
+		zipFile(qfalse),
+		module((module_t)0) {
+		ospath[0] = '\0';
+		name[0] = '\0';
+	}
+#endif
 	qfile_ut	handleFiles;
 	qboolean	handleSync;
+#ifdef ASYNCIO
+	qboolean	handleAsync;
+	std::thread* writerThread;
+	std::mutex	writeLock;
+	std::condition_variable	cv;
+	std::deque<std::vector<byte> > writes;
+	qboolean	closed;
+	char		ospath[MAX_OSPATH];
+#endif
 	int			baseOffset;
 	int			fileSize;
 	int			zipFilePos;
@@ -305,6 +337,24 @@ static const char	*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
 // last valid game folder used
 char lastValidBase[MAX_OSPATH];
 char lastValidGame[MAX_OSPATH];
+
+#ifdef ASYNCIO
+static void FS_ResetFileHandleData(fileHandleData_t* f) {
+	f->handleFiles = {};
+	f->handleSync = qfalse;
+	f->handleAsync = qfalse;
+	assert(f->writerThread == nullptr);
+	f->writerThread = nullptr;
+	f->writes.clear();
+	f->closed = qfalse;
+	f->ospath[0] = '\0';
+	f->fileSize = 0;
+	f->zipFilePos = 0;
+	f->zipFileLen = 0;
+	f->zipFile = qfalse;
+	f->name[0] = '\0';
+}
+#endif
 
 qboolean FS_idPak(pack_t *pack);
 
@@ -415,8 +465,13 @@ static fileHandle_t	FS_HandleForFile(void) {
 	int		i;
 
 	for ( i = 1 ; i < MAX_FILE_HANDLES ; i++ ) {
-		if ( fsh[i].handleFiles.file.o == NULL ) {
+#ifdef ASYNCIO
+		if (fsh[i].handleAsync == qfalse && fsh[i].handleFiles.file.o == NULL) {
+			FS_ResetFileHandleData(&fsh[i]);
+#else
+		if (fsh[i].handleFiles.file.o == NULL) {
 			Com_Memset(&fsh[i], 0, sizeof(fsh[0]));
+#endif
 			return i;
 		}
 	}
@@ -571,6 +626,67 @@ qboolean FS_CreatePath (char *OSPath) {
 }
 
 /*
+============
+COM_GetExtension
+============
+*/
+static const char* COM_GetExtension(const char* name)
+{
+	const char* dot = strrchr(name, '.'), * slash;
+	if (dot && (!(slash = strrchr(name, '/')) || slash < dot))
+		return dot + 1;
+	else
+		return "";
+}
+
+/*
+============
+COM_CompareExtension
+
+string compare the end of the strings and return qtrue if strings match
+============
+*/
+static qboolean COM_CompareExtension(const char* in, const char* ext)
+{
+	int inlen, extlen;
+
+	inlen = strlen(in);
+	extlen = strlen(ext);
+
+	if (extlen <= inlen)
+	{
+		in += inlen - extlen;
+
+		if (!Q_stricmp(in, ext))
+			return qtrue;
+	}
+
+	return qfalse;
+}
+
+/*
+=================
+FS_CheckFilenameIsMutable
+
+ERR_FATAL if trying to maniuplate a file with the platform library, or pk3 extension
+=================
+*/
+static void FS_CheckFilenameIsMutable(const char* filename, const char* function)
+{
+	// Check if the filename ends with the library, or pk3 extension
+	if (COM_CompareExtension(filename, ".dll")
+		|| COM_CompareExtension(filename, ".dylib")
+		|| COM_CompareExtension(filename, ".so")
+		|| COM_CompareExtension(filename, ".qvm")
+		|| COM_CompareExtension(filename, ".pk3")
+		)
+	{
+		Com_Error(ERR_FATAL, "%s: Not allowed to manipulate '%s' due "
+			"to %s extension", function, filename, COM_GetExtension(filename));
+	}
+}
+
+/*
 =================
 FS_CopyFile
 
@@ -702,6 +818,56 @@ FS_HomeRemove
 void FS_HomeRemove( const char *homePath ) {
 	remove( FS_BuildOSPath( fs_homepath->string,
 				fs_gamedir, homePath ) );
+}
+
+/*
+===========
+FS_Rmdir
+
+Removes a directory, optionally deleting all files under it
+===========
+*/
+void FS_Rmdir(const char* osPath, qboolean recursive) {
+	FS_CheckFilenameIsMutable(osPath, __func__);
+
+	if (recursive) {
+		int numfiles;
+		int i;
+		const char** filesToRemove = Sys_ListFiles(osPath, "", NULL, &numfiles, qfalse);
+		for (i = 0; i < numfiles; i++) {
+			char fileOsPath[MAX_OSPATH];
+			Com_sprintf(fileOsPath, sizeof(fileOsPath), "%s/%s", osPath, filesToRemove[i]);
+			FS_Remove(fileOsPath);
+		}
+		FS_FreeFileList(filesToRemove);
+
+		const char** directoriesToRemove = Sys_ListFiles(osPath, "/", NULL, &numfiles, qfalse);
+		for (i = 0; i < numfiles; i++) {
+			if (!Q_stricmp(directoriesToRemove[i], ".") || !Q_stricmp(directoriesToRemove[i], "..")) {
+				continue;
+			}
+			char directoryOsPath[MAX_OSPATH];
+			Com_sprintf(directoryOsPath, sizeof(directoryOsPath), "%s/%s", osPath, directoriesToRemove[i]);
+			FS_Rmdir(directoryOsPath, qtrue);
+		}
+		FS_FreeFileList(directoriesToRemove);
+	}
+
+	rmdir(osPath);
+}
+
+/*
+===========
+FS_HomeRmdir
+
+Removes a directory, optionally deleting all files under it
+===========
+*/
+void FS_HomeRmdir(const char* homePath, qboolean recursive) {
+	FS_CheckFilenameIsMutable(homePath, __func__);
+
+	FS_Rmdir(FS_BuildOSPath(fs_homepath->string,
+		fs_gamedir, homePath), recursive);
 }
 
 /*
@@ -858,6 +1024,9 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module ) {
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -897,6 +1066,9 @@ fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module ) {
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "ab" );
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 
 	if (!fsh[f].handleFiles.file.o) {
 		return 0;
@@ -941,6 +1113,9 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "rb" );
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 	if (!fsh[f].handleFiles.file.o)
 	{
 		// NOTE TTimo on non *nix systems, fs_homepath == fs_basepath, might want to avoid
@@ -957,6 +1132,9 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 			fsh[f].handleFiles.file.o = fopen( ospath, "rb" );
 			fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+			fsh[f].handleAsync = qfalse;
+#endif
 		}
 
 		if (!fsh[f].handleFiles.file.o) {
@@ -1036,6 +1214,31 @@ void FS_Rename( const char *from, const char *to ) {
 	}
 }
 
+#ifdef ASYNCIO
+void FS_FCloseAio(int handle) {
+	fileHandle_t f = (fileHandle_t)handle;
+	if (f < 1 || f >= MAX_FILE_HANDLES) {
+		Com_Error(ERR_FATAL, "FCloseAio called with invalid handle %d\n", f);
+	}
+	if (com_developer->integer > 1) {
+		Com_Printf("waiting for async write thread to join ... ");
+	}
+	fsh[f].writerThread->join();
+	if (com_developer->integer > 1) {
+		Com_Printf("done, deleting writer thread ... ");
+	}
+	delete fsh[f].writerThread;
+	if (com_developer->integer > 1) {
+		Com_Printf("done, setting writer thread to nullptr ... ");
+	}
+	fsh[f].writerThread = nullptr;
+	if (com_developer->integer > 1) {
+		Com_Printf("done, resetting file handle data ... ");
+	}
+	FS_ResetFileHandleData(&fsh[f]);
+}
+#endif
+
 /*
 ==============
 FS_FCloseFile
@@ -1058,7 +1261,11 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 		if ( fsh[f].handleFiles.unique ) {
 			unzClose( fsh[f].handleFiles.file.z );
 		}
+#ifdef ASYNCIO
+		FS_ResetFileHandleData(&fsh[f]);
+#else
 		Com_Memset( &fsh[f], 0, sizeof( fsh[f] ) );
+#endif
 		return;
 	}
 
@@ -1072,10 +1279,140 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 
 	// we didn't find it as a pak, so close it as a unique file
 	if (fsh[f].handleFiles.file.o) {
-		fclose (fsh[f].handleFiles.file.o);
-	}
-	Com_Memset( &fsh[f], 0, sizeof( fsh[f] ) );
+#ifdef ASYNCIO
+		if (fsh[f].handleAsync) {
+			if (com_developer->integer > 1) {
+				Com_Printf("Acquiring lock for file to be closed and setting closed flag ... ");
+			}
+			// queue the file to be closed after all pending operations are completed.
+			{
+				std::lock_guard<std::mutex> l(fsh[f].writeLock);
+				fsh[f].closed = qtrue;
+			}
+			if (com_developer->integer > 1) {
+				Com_Printf("done. notifying condition variable of change ... ");
+			}
+			fsh[f].cv.notify_one();
+			return;
 }
+		else {
+			fclose(fsh[f].handleFiles.file.o);
+		}
+#else
+		fclose (fsh[f].handleFiles.file.o);
+#endif
+	}
+#ifdef ASYNCIO
+	FS_ResetFileHandleData(&fsh[f]);
+#else
+	Com_Memset( &fsh[f], 0, sizeof( fsh[f] ) );
+#endif
+}
+
+
+
+#ifdef ASYNCIO
+
+extern void Com_PushEvent(sysEvent_t* event);
+void FS_AsyncWriterThread(fileHandle_t h) {
+	if (com_developer->integer > 1) {
+		Com_Printf("Async writer thread started ...");
+	}
+	fileHandleData_t* f = &fsh[h];
+	if (com_developer->integer > 1) {
+		Com_Printf("(async) Creating path ...");
+	}
+	if (!FS_CreatePath(f->ospath)) {
+		if (com_developer->integer > 1) {
+			Com_Printf("(async) Opening file ...");
+		}
+		f->handleFiles.file.o = fopen(f->ospath, "wb");
+	}
+	if (com_developer->integer > 1) {
+		Com_Printf("File opened for async writing.\n");
+	}
+	if (f->handleFiles.file.o == nullptr) {
+		Com_Printf("Warning: failed to open file %s\n", f->name);
+		return;
+	}
+	while (qtrue) {
+		std::vector<byte> write;
+		{
+			std::unique_lock<std::mutex> l(f->writeLock);
+			while (f->writes.empty() && !f->closed) {
+				f->cv.wait(l);
+			}
+			//if (com_developer->integer > 1) {
+			//	Com_Printf("d ");
+			//}
+			if (f->closed && f->writes.empty()) {
+				if (com_developer->integer > 1) {
+					Com_Printf("Async writer thread: end of write detected, ending ...");
+				}
+				break;
+			}
+			//if (com_developer->integer > 1) {
+			//	Com_Printf("e ");
+			//}
+			write = std::move(f->writes.front());
+			//if (com_developer->integer > 1) {
+			//	Com_Printf("f ");
+			//}
+			f->writes.pop_front();
+			//if (com_developer->integer > 1) {
+			//	Com_Printf("g ");
+			//}
+		}
+		//if (com_developer->integer > 1) {
+		//	Com_Printf("h ");
+		//}
+		fwrite(&write[0], 1, write.size(), f->handleFiles.file.o);
+		//if (com_developer->integer > 1) {
+		//	Com_Printf("i ");
+		//}
+	}
+	if (com_developer->integer > 1) {
+		Com_Printf("Closing asnyc write handle ...");
+	}
+	fclose(f->handleFiles.file.o);
+	if (com_developer->integer > 1) {
+		Com_Printf("Done, queueing async file close cleanup event.\n");
+	}
+	sysEvent_t event;
+	Com_Memset(&event, 0, sizeof(event));
+	event.evType = SE_AIO_FCLOSE;
+	event.evValue = h;
+	Com_PushEvent(&event);
+}
+
+fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
+	if (com_developer->integer > 1) {
+		Com_Printf("Opening file for async writing ... ");
+	}
+	fileHandle_t f = FS_HandleForFile();
+	if (com_developer->integer > 1) {
+		Com_Printf("Handle acquired, building path ... ");
+	}
+	Q_strncpyz(fsh[f].ospath, FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename), MAX_OSPATH);
+
+	if (fs_debug->integer) {
+		Com_Printf("FS_FOpenFileWriteAsync: %s\n", fsh[f].ospath);
+	}
+
+	Q_strncpyz(fsh[f].name, filename, sizeof(fsh[f].name));
+	fsh[f].handleAsync = qtrue;
+	if (com_developer->integer > 1) {
+		Com_Printf("Spawning writer thread ... ");
+	}
+	// spawn writer thread
+	fsh[f].writerThread = new std::thread(FS_AsyncWriterThread, f);
+	if (com_developer->integer > 1) {
+		Com_Printf("Writer thread spawned.\n");
+	}
+	return f;
+}
+#endif
+
 
 /*
 ===========
@@ -1114,6 +1451,9 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1151,6 +1491,9 @@ fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module) {
 	Q_strncpyz(fsh[f].name, filename, sizeof(fsh[f].name));
 
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1192,6 +1535,9 @@ fileHandle_t FS_FOpenFileAppend( const char *filename, module_t module ) {
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "ab" );
 	fsh[f].handleSync = qfalse;
+#ifdef ASYNCIO
+	fsh[f].handleAsync = qfalse;
+#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1683,8 +2029,20 @@ int FS_Write( const void *buffer, int len, fileHandle_t h, module_t module ) {
 
 	FS_CHECKHANDLE(h, module, 0)
 
+	buf = (const byte*)buffer;
+
+#ifdef ASYNCIO
+	if (fsh[h].handleAsync) {
+		{
+			std::lock_guard<std::mutex> l(fsh[h].writeLock);
+			fsh[h].writes.emplace_back(buf, buf + len);
+		}
+		fsh[h].cv.notify_one();
+		return len;
+	}
+	else {
+#endif
 	f = FS_FileForHandle(h, module);
-	buf = (const byte *)buffer;
 
 	remaining = len;
 	tries = 0;
@@ -1703,6 +2061,9 @@ int FS_Write( const void *buffer, int len, fileHandle_t h, module_t module ) {
 		remaining -= written;
 		buf += written;
 	}
+#ifdef ASYNCIO
+	}
+#endif
 	if ( fsh[h].handleSync ) {
 		fflush( f );
 	}
@@ -4099,6 +4460,9 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 		fsh[*f].fileSize = r;
 	}
 	fsh[*f].handleSync = sync;
+#ifdef ASYNCIO
+	fsh[*f].handleAsync = qfalse;
+#endif
 
 	return r;
 }

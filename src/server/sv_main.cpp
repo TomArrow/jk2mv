@@ -44,6 +44,16 @@ cvar_t	*mv_apiConnectionless;
 cvar_t	*sv_pingFix;
 cvar_t	*sv_autoWhitelist;
 
+#ifdef SVDEMO
+cvar_t* sv_autoDemo;
+cvar_t* sv_autoDemoBots;
+cvar_t* sv_autoDemoMaxMaps;
+cvar_t* sv_demoPreRecord;
+cvar_t* sv_demoPreRecordTime;
+cvar_t* sv_demoPreRecordKeyframeDistance;
+cvar_t* sv_demoWriteMeta;
+#endif
+
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;
 cvar_t	*mv_fixforcecrash;

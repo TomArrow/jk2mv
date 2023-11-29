@@ -247,11 +247,7 @@ typedef struct {
 
 extern	clientConnection_t clc;
 
-typedef struct {
-	bufferedMsg_t msg;
-	int time; // We don't want to wait infinitely for old messages to arrive.
-	qboolean containsFullSnapshot;
-} bufferedMessageContainer_t;
+
 
 /*
 ==================================================================

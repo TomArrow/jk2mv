@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#define ASYNCIO
+
 //============================================================================
 
 // for auto-complete (copied from OpenJK)
@@ -247,6 +249,15 @@ typedef struct {
 	int		readcount;
 	int		bit;				// for bitwise reads and writes
 } bufferedMsg_t;
+
+typedef struct {
+	bufferedMsg_t msg;
+	int msgNum; // Message number
+	int lastClientCommand; // Need this if we are writing metadata with pre-recording as it is the first thing writen in any message.
+	int time; // So we can discard very old buffered messages. Or for clientside recording, so we don't have to wait infinitely for old messages to arrive (which they never may).
+	qboolean containsFullSnapshot; // Doesn't matter for serverside pre-Recording because we have the keyframes. Only relevant for clientside buffered recording.
+	qboolean isKeyframe; // Is a gamestate message as typical for writing at the start of demos.
+} bufferedMessageContainer_t;
 
 void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
 void MSG_FromBuffered(msg_t* dst, bufferedMsg_t* src);
@@ -683,6 +694,10 @@ int		FS_LoadStack();
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
 
+#ifdef ASYNCIO
+fileHandle_t	FS_FOpenFileWriteAsync(const char* qpath, qboolean safe = qtrue);
+#endif
+
 fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN );
 fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
 // will properly create any needed paths and deal with seperater character issues
@@ -786,6 +801,10 @@ qboolean FS_RMDLPrefix(const char *qpath);
 qboolean FS_DeleteDLFile(const char *qpath);
 
 void FS_HomeRemove( const char *homePath );
+
+void FS_Rmdir(const char* osPath, qboolean recursive);
+void FS_HomeRmdir(const char* homePath, qboolean recursive);
+
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 

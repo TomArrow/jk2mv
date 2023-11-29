@@ -418,6 +418,14 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// nuke user info
 	SV_SetUserinfo( drop - svs.clients, "" );
 
+#ifdef SVDEMO
+	if (drop->demo.demorecording) {
+		SV_StopRecordDemo(drop);
+	}
+	SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
+	SV_ClearClientDemoMeta(drop);
+#endif
+
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty
 	// send a heartbeat now so the master will get up to date info
@@ -438,6 +446,57 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		SV_Heartbeat_f();
 	}
 }
+
+#ifdef SVDEMO
+void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg) {
+	int			start;
+	entityState_t* base, nullstate;
+
+	// NOTE, MRE: all server->client messages now acknowledge
+	// let the client know which reliable clientCommands we have received
+	MSG_WriteLong(msg, client->lastClientCommand);
+
+	// send any server commands waiting to be sent first.
+	// we have to do this cause we send the client->reliableSequence
+	// with a gamestate and it sets the clc.serverCommandSequence at
+	// the client side
+	SV_UpdateServerCommandsToClient(client, msg);
+
+	// send the gamestate
+	MSG_WriteByte(msg, svc_gamestate);
+	MSG_WriteLong(msg, client->reliableSequence);
+
+	// write the configstrings
+	for (start = 0; start < MAX_CONFIGSTRINGS; start++) {
+		if (sv.configstrings[start][0]) {
+			MSG_WriteByte(msg, svc_configstring);
+			MSG_WriteShort(msg, start);
+			MSG_WriteBigString(msg, sv.configstrings[start]);
+		}
+	}
+
+	// write the baselines
+	Com_Memset(&nullstate, 0, sizeof(nullstate));
+	for (start = 0; start < MAX_GENTITIES; start++) {
+		base = &sv.svEntities[start].baseline;
+		if (!base->number) {
+			continue;
+		}
+		MSG_WriteByte(msg, svc_baseline);
+		MSG_WriteDeltaEntity(msg, &nullstate, base, qtrue);
+	}
+
+	MSG_WriteByte(msg, svc_EOF);
+
+	MSG_WriteLong(msg, client - svs.clients);
+
+	// write the checksum feed
+	MSG_WriteLong(msg, sv.checksumFeed);
+
+	// For old RMG system.
+	//MSG_WriteShort(msg, 0);
+}
+#endif
 
 /*
 ================
@@ -581,6 +640,12 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
+
+#ifdef SVDEMO
+	if (sv_autoDemo->integer == 1) { //Bots dont trigger this so whatever
+		SV_BeginAutoRecordDemos();
+	}
+#endif
 }
 
 /*
