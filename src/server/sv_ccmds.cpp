@@ -4,6 +4,7 @@
 #include "../qcommon/strip.h"
 
 #include <sstream>
+#include <ctime>
 
 #ifdef SVDEMO
 extern std::vector<bufferedMessageContainer_t> demoPreRecordBuffer[MAX_CLIENTS];
