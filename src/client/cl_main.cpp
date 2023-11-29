@@ -3317,7 +3317,7 @@ void CL_Init( void ) {
 	
 	// autorecord
 	cl_autoDemo = Cvar_Get ("cl_autoDemo", "0", CVAR_ARCHIVE | CVAR_GLOBAL );
-	cl_autoDemoFormat = Cvar_Get ("cl_autoDemoFormat", "%t_%m", CVAR_ARCHIVE | CVAR_GLOBAL );
+	cl_autoDemoFormat = Cvar_Get ("cl_autoDemoFormat", "%d_%t_%m", CVAR_ARCHIVE | CVAR_GLOBAL );
 
 	// mv cvars
 	mv_slowrefresh = Cvar_Get("mv_slowrefresh", "3", CVAR_ARCHIVE | CVAR_GLOBAL);
