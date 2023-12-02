@@ -768,6 +768,14 @@ CLIENT SIDE DEMO PLAYBACK
 CL_DemoCompleted
 =================
 */
+
+#ifdef CL_EZDEMO
+extern const char* PDCOUNT;
+extern int 			ezdemoPlayerstateClientNum;
+extern qboolean 	ezdemoActive;
+static qboolean 	ezdemoClearEventsAfterThisDemo = qfalse;
+#endif
+
 void CL_DemoCompleted( void ) {
 	if (cl_timedemo && cl_timedemo->integer) {
 		int	time;
@@ -778,6 +786,24 @@ void CL_DemoCompleted( void ) {
 			time/1000.0, clc.timeDemoFrames*1000.0 / time);
 		}
 	}
+
+#ifdef CL_EZDEMO
+	if (ezdemoActive) {
+		const int eventCount = Cvar_VariableIntegerValue(PDCOUNT);
+
+		if (eventCount > 0) {
+			//We found some events during ezdemo. Now start playing the demo normally and let cgame handle fastforwarding to these events.
+			ezdemoClearEventsAfterThisDemo = qtrue;
+			Cbuf_AddText(va("demo \"%s\"\n", clc.demoName));
+		}
+		else {
+			Cvar_SetValue(PDCOUNT, 0);
+		}
+	}
+
+	ezdemoActive = qfalse;
+	ezdemoPlayerstateClientNum = -1;
+#endif
 
 	CL_NextDemo();
 	CL_Disconnect_f();
@@ -871,7 +897,7 @@ void CL_PlayDemo_f( void ) {
 	char		name[MAX_OSPATH]/*, extension[32]*/;
 	char		arg[MAX_OSPATH];
 
-	if (Cmd_Argc() != 2) {
+	if (Cmd_Argc() < 2) {
 		Com_Printf ("demo <demoname>\n");
 		return;
 	}
@@ -956,6 +982,25 @@ void CL_PlayDemo_f( void ) {
 	}
 	Q_strncpyz( clc.demoName, arg, sizeof( clc.demoName ) );
 
+
+	// Set the protocol according to the the demo-file.
+	if (!Q_stricmp(name + strlen(name) - strlen(".dm_15"), ".dm_15") || !Q_stricmp(name + strlen(name) - strlen(".dmc15"), ".dmc15")) {
+		MV_SetCurrentGameversion(VERSION_1_02);
+		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
+	}
+	else if (!Q_stricmp(name + strlen(name) - strlen(".dm_16"), ".dm_16") || !Q_stricmp(name + strlen(name) - strlen(".dmc16"), ".dmc16")) {
+		MV_SetCurrentGameversion(VERSION_1_04);
+	}
+
+#ifdef CL_EZDEMO
+	void CL_Ezemo_JustDoIt(void);
+	if (ezdemoActive) {
+		CL_Ezemo_JustDoIt();
+		ezdemoActive = qfalse;
+		return;
+	}
+#endif
+
 	Con_Close();
 
 	cls.state = CA_CONNECTED;
@@ -963,15 +1008,6 @@ void CL_PlayDemo_f( void ) {
 	com_demoplaying = qtrue;
 
 	Q_strncpyz( cls.servername, arg, sizeof( cls.servername ) );
-
-	// Set the protocol according to the the demo-file.
-	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc15"), ".dmc15")) {
-		MV_SetCurrentGameversion(VERSION_1_02);
-		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
-	}
-	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) || !Q_stricmp(name + strlen(name) - strlen(".dmc16"), ".dmc16")) {
-		MV_SetCurrentGameversion(VERSION_1_04);
-	}
 
 	// read demo messages until connected
 	while ( cls.state >= CA_CONNECTED && cls.state < CA_PRIMED ) {
@@ -1162,10 +1198,33 @@ Sends a disconnect message to the server
 This is also called on Com_Error and Com_Quit, so it shouldn't cause any errors
 =====================
 */
+#ifdef CL_EZDEMO
+void CL_EzdemoClearEvents(void);
+#endif
 void CL_Disconnect( qboolean showMainMenu ) {
+#ifdef CL_EZDEMO
+	static int rec = 0;
+	static int demoClearAt = -1;
+#endif
+
 	if ( !com_cl_running || !com_cl_running->integer ) {
 		return;
 	}
+
+#ifdef CL_EZDEMO
+	++rec;
+
+	// WORST HACK.. EVER
+	if (rec == demoClearAt) {
+		CL_EzdemoClearEvents();
+		demoClearAt = -1;
+	}
+
+	if (ezdemoClearEventsAfterThisDemo) {
+		ezdemoClearEventsAfterThisDemo = qfalse;
+		demoClearAt = rec + 2;
+	}
+#endif
 
 	// shutting down the client so enter full screen ui mode
 	Cvar_Set("r_uiFullScreen", "1");
@@ -2428,7 +2487,7 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 #ifndef MAX_STRIPED_SV_STRING
 #define MAX_STRIPED_SV_STRING 1024
 #endif
-static void CL_CheckSVStripEdRef(char *buf, const char *str)
+void CL_CheckSVStripEdRef(char *buf, const char *str)
 { //I don't really like doing this. But it utilizes the system that was already in place.
 	int i = 0;
 	int b = 0;
@@ -2496,6 +2555,9 @@ static void CL_CheckSVStripEdRef(char *buf, const char *str)
 
 	buf[b] = 0;
 }
+
+
+
 
 
 /*
@@ -3196,6 +3258,10 @@ void CL_SetForcePowers_f( void ) {
 #define G2_VERT_SPACE_CLIENT_SIZE 256
 #endif
 
+#ifdef CL_EZDEMO
+void CL_Ezdemo_f(void);
+#endif
+
 /*
 ====================
 CL_Init
@@ -3364,6 +3430,11 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("setenv", CL_Setenv_f );
 	Cmd_AddCommand ("ping", CL_Ping_f );
 	Cmd_AddCommand ("serverstatus", CL_ServerStatus_f );
+
+#ifdef CL_EZDEMO
+	Cmd_AddCommand("ezdemo", CL_Ezdemo_f); // "find cool events in a demo like dbs returns..\\<demo> [options]"},
+#endif
+
 	Cmd_AddCommand ("showip", CL_ShowIP_f );
 	Cmd_AddCommand ("fs_openedList", CL_OpenedPK3List_f );
 	Cmd_AddCommand ("fs_referencedList", CL_ReferencedPK3List_f );

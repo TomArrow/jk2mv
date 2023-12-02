@@ -1349,6 +1349,23 @@ void Console_Key (int key) {
 //============================================================================
 
 
+qboolean CL_StringIsDigitsOnly(const char* buf) {
+	int i;
+	int len = strlen(buf);
+
+	for (i = 0; i < len; i++) {
+
+		if (buf[i] >= '0' && buf[i] <= '9') {}
+		else
+			return qfalse;
+	}
+
+	return qtrue;
+}
+
+
+
+
 /*
 ================
 Message_Key

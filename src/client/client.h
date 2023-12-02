@@ -559,6 +559,11 @@ void CL_Init (void);
 void CL_FlushMemory( qboolean disconnecting );
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
+void CL_ConfigstringModified(void);
+
+#define CL_EZDEMO
+
+qboolean CL_StringStartsWith(const char* str, const char* check);
 
 qboolean CL_ServerVersionIs103 (const char *versionstr);
 

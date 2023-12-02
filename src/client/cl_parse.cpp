@@ -44,6 +44,47 @@ Parses deltas from the given base and adds the resulting entity
 to the current frame
 ==================
 */
+
+#ifdef CL_EZDEMO
+
+void Ezdemo_AddEvent(int client);
+qboolean Ezdemo_ClientValid(int client);
+entityState_t* Ezdemo_EntForClientNum(int client);
+qboolean Ezdemo_CheckOptions(const int clientNum, const int event);
+static void Ezdemo_HandleEvent(entityState_t state);
+
+//ret options
+#define FRAGS_DBS 		1
+#define FRAGS_BS 		2
+#define FRAGS_DFA 		4
+#define FRAGS_DOOM 		8
+#define FRAGS_LUNGE		16
+#define FRAGS_BLUEBS	32
+#define BS_ATTEMPTS		64
+
+#define FRAGS_ABLUE		64
+#define FRAGS_AYELLOW	128
+#define FRAGS_ARED		256
+
+#define EZDEMO_RETS				2
+#define EZDEMO_CAPTURES			4
+#define EZDEMO_FLAGSTEALS		8
+#define EZDEMO_CHATS			16
+
+#define EZDEMO_PREDICTEDCLIENT			1337
+
+int 			ezdemoPlayerstateClientNum = -1;
+static int 		ezdemoFragOptions = 0;
+static int 		ezdemoBitOptions = 0;
+static int 		ezdemoEventCount = 0;
+static float 	ezdemoMinimumSpeed = 0;
+static int 		ezdemoShowOnlyKillsOn = -1;
+static int 		ezdemoShowOnlyKillsBy = -1;
+
+qboolean ezdemoActive = qfalse;
+
+#endif
+
 void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old,
 					 qboolean unchanged) {
 	entityState_t	*state;
@@ -66,6 +107,10 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 	}
 	cl.parseEntitiesNum++;
 	frame->numEntities++;
+
+	if (ezdemoActive && (state->eType == ET_EVENTS + EV_OBITUARY || state->eType == ET_EVENTS + EV_CTFMESSAGE)) {
+		Ezdemo_HandleEvent(*state);
+	}
 }
 
 /*
@@ -210,6 +255,19 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// we will only copy to cl.snap if it is valid
 	Com_Memset (&newSnap, 0, sizeof(newSnap));
 
+#ifdef XDEVELOPER
+	if (x3_debugcl->integer == 3) {
+		static int lastSnapReceiveTime = -1;
+		const int newtime = cls.realtime;
+
+		if (lastSnapReceiveTime != -1)
+			Com_Printf("Received new snapshot %i ms after last snapshot.\n", newtime - lastSnapReceiveTime);
+
+		lastSnapReceiveTime = cls.realtime;
+	}
+#endif
+
+
 	// we will have read any new server commands in this
 	// message before we got to svc_snapshot
 	newSnap.serverCommandNum = clc.serverCommandSequence;
@@ -321,6 +379,10 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	len = MSG_ReadByte( msg );
 	MSG_ReadData( msg, &newSnap.areamask, len);
 
+#ifdef XDEVELOPER
+	static int oldanim = -1;
+#endif
+
 	// read playerinfo
 	SHOWNET( msg, "playerstate" );
 	if ( old ) {
@@ -329,8 +391,25 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
 	}
 
+#ifdef XDEVELOPER
+	int newanim = newSnap.ps.torsoAnim;
+
+	if (newanim == 809 || newanim == 807 || newanim == 804) {
+		if (ezdemoActive && newanim != oldanim && ezdemoFragOptions & BS_ATTEMPTS) {
+			Ezdemo_AddEvent(ezdemoPlayerstateClientNum);
+		}
+	}
+
+	oldanim = newanim;
+#endif
+
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
+
+	if (ezdemoActive) {
+		ezdemoPlayerstateClientNum = newSnap.ps.clientNum;
+	}
+
 	CL_ParsePacketEntities( msg, old, &newSnap );
 
 	// if not valid, dump the entire thing now that it has
@@ -999,22 +1078,27 @@ void CL_ParseGamestate( msg_t *msg ) {
 #endif
 
 	// parse serverId and other cvars
-	CL_SystemInfoChanged();
+	if (!ezdemoActive) {
+		CL_SystemInfoChanged();
 
-	// reinitialize the filesystem if the game directory has changed
-	if( FS_ConditionalRestart( clc.checksumFeed ) ) {
-		// don't set to true because we yet have to start downloading
-		// enabling this can cause double loading of a map when connecting to
-		// a server which has a different game directory set
-		//clc.downloadRestart = qtrue;
+		// reinitialize the filesystem if the game directory has changed
+		if( FS_ConditionalRestart( clc.checksumFeed ) ) {
+			// don't set to true because we yet have to start downloading
+			// enabling this can cause double loading of a map when connecting to
+			// a server which has a different game directory set
+			//clc.downloadRestart = qtrue;
+		}
+
+		// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
+		// cgame
+		CL_InitDownloads();
+
+		// make sure the game starts
+		Cvar_Set( "cl_paused", "0" );
 	}
-
-	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
-	// cgame
-	CL_InitDownloads();
-
-	// make sure the game starts
-	Cvar_Set( "cl_paused", "0" );
+	else {
+		cls.state = CA_ACTIVE;	//for some reason it crashes when loading demo if we dont have this ..
+	}
 }
 
 //=====================================================================
@@ -1212,6 +1296,103 @@ void CL_ParseCommandString( msg_t *msg ) {
 
 	index = seq & (MAX_RELIABLE_COMMANDS-1);
 	Q_strncpyz( clc.serverCommands[ index ], s, sizeof( clc.serverCommands[ index ] ) );
+
+	if (ezdemoActive) {
+		const char* cmd;
+		Cmd_TokenizeString(s);
+
+		cmd = Cmd_Argv(0);
+
+		if (ezdemoBitOptions == EZDEMO_CHATS) {
+
+			if (!strcmp(cmd, "chat") || !strcmp(cmd, "tchat"))
+				Com_Printf("%s\n", Cmd_ArgsFrom(1));
+			else if (!strcmp(cmd, "print")) {
+				void CL_CheckSVStripEdRef(char* buf, const char* str);
+
+				char buf[1024] = { 0 };
+
+				CL_CheckSVStripEdRef(buf, Cmd_ArgsFrom(1));
+
+				Com_Printf("%s", buf);
+			}
+		}
+
+		if (!strcmp(cmd, "cs")) {
+			CL_ConfigstringModified();
+			// reparse the string, because CL_ConfigstringModified may have done another Cmd_TokenizeString()
+			// Cmd_TokenizeString( s );
+
+			//thx to nerevars cammod For preloading models!
+			// if (cam_preloadFiles.integer)
+#if 0
+			{
+				int num;
+				char* str;
+
+				index = atoi(Cmd_Argv(1));
+
+				Cmd_TokenizeString(s);
+				num = atoi(Cmd_Argv(1));
+
+				str = cl.gameState.stringData + cl.gameState.stringOffsets[index];
+
+				if (num >= CS_MODELS && num < CS_MODELS + MAX_MODELS) {
+					re.RegisterModel(str);
+				}
+				else if (num >= CS_SOUNDS && num < CS_SOUNDS + MAX_MODELS) {
+
+					if (str[0] != '*') {
+						S_RegisterSound(str);	// player specific sounds don't register here
+					}
+
+				}
+				else if (num >= CS_PLAYERS && num < CS_PLAYERS + MAX_CLIENTS) {
+					const char* v;
+					int     team;
+					char	modelName[MAX_QPATH];
+					char	skinName[MAX_QPATH];
+					char* slash;
+					qhandle_t torsoSkin;
+					void* ghoul2;
+
+					v = Info_ValueForKey(str, "t");
+					team = atoi(v);
+
+					v = Info_ValueForKey(str, "model");
+					Q_strncpyz(modelName, v, sizeof(modelName));
+
+					if (team != TEAM_SPECTATOR && modelName[0]) {
+
+						slash = strchr(modelName, '/');
+						if (!slash) {
+							Q_strncpyz(skinName, "default", sizeof(skinName));
+						}
+						else {
+							Q_strncpyz(skinName, slash + 1, sizeof(skinName));
+							*slash = 0;
+						}
+
+						if (team == TEAM_RED)
+							Q_strncpyz(skinName, "red", sizeof(skinName));
+						else if (team == TEAM_BLUE)
+							Q_strncpyz(skinName, "blue", sizeof(skinName));
+
+#ifdef XDEVELOPER
+						Com_Printf("^3registering player skinmodel in precache: '%s/%s'\n", modelName, skinName);
+#endif
+
+						torsoSkin = re.RegisterSkin(va("models/players/%s/model_%s.skin", modelName, skinName));
+						G2API_CleanGhoul2Models((CGhoul2Info_v**)&ghoul2);
+						G2API_InitGhoul2Model((CGhoul2Info_v**)&ghoul2, va("models/players/%s/model.glm", modelName), 0, torsoSkin, 0, 0, 0);
+					}
+				}
+			}
+#endif
+
+			// return qtrue;
+		}
+	}
 }
 
 
@@ -1284,7 +1465,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 		case svc_mapchange:
 			CL_KillDownload();
 
-			if (cgvm)
+			if (!ezdemoActive && cgvm)
 			{
 				VM_Call( cgvm, CG_MAP_CHANGE );
 			}
@@ -1403,3 +1584,515 @@ void CL_SP_Print(const word ID, intptr_t Data) //, char* color)
 		}
 	}
 }
+
+
+#ifdef CL_EZDEMO
+// main ezdemo loop, reading demo messages until end of file.
+// what happens next is controlled by CL_DemoCompleted
+void CL_Ezemo_JustDoIt(void) {
+	while (1) {
+		CL_ReadDemoMessage();
+	}
+}
+
+// #define PDCOUNT		"pdcount"
+const char* PDCOUNT = "pdcount";
+
+void CL_EzdemoClearEvents(void) {
+	//clear all points of interest before playing
+	Cvar_Set(PDCOUNT, "0");
+	ezdemoEventCount = 0;
+}
+
+qboolean CL_StringIsDigitsOnly(const char* buf);
+
+#define	KMHconv 0.050f	// for converting our QU speed into an arbitrary km/h unit, we multiply the QU speed with this number
+void CL_PlayDemo_f(void);
+
+typedef struct {
+	int attacker, target, mod, time;
+} lastObituary_t;
+
+typedef struct {
+	int client, team, msg, time;
+} lastCtfMessage_t;
+
+//This is.. CRAP
+lastObituary_t lastObi;
+lastCtfMessage_t lastCtf;
+
+void CL_Ezdemo_f(void) {
+	char buf[128] = { 0 };
+	int i;
+	const int argc = Cmd_Argc();
+
+	if (argc < 2) {
+		Com_Printf("Usage: ezdemo <demo name/number> [options] - find events in a demo and fast-forward to them\n");
+		Com_Printf("Options include:\n");
+		Com_Printf("   dbs    - show dbs frags           [\n");
+		Com_Printf("   bs     - show bs frags            [\n");
+		Com_Printf("   bluebs - show blue bs frags       [  can be combined\n");
+		Com_Printf("   lunge  - show blue uppercut frags [\n");
+		Com_Printf("   dfa    - show dfa frags           [\n");
+		Com_Printf("   by <clientnum or \"me\">    - show only frags/events by this client\n");
+		Com_Printf("   on <clientnum or \"me\">    - show only frags on this client\n");
+		Com_Printf("   ret                       - show only frags on flag carriers\n");
+		Com_Printf("   flaggrabs                 - show flag grabs\n");
+		Com_Printf("   caps                      - show flag captures\n");
+		Com_Printf("   {kmh, ups} <speed>\" - set a minimum speed in either km/h or Q3 units that a player must have at the time of the frag/event for it to be shown\n");
+		Com_Printf("Examples: ezdemo loltest dbs ret by me\n");
+		Com_Printf("          ezdemo loltest ret by 3 kmh 20\n");
+		Com_Printf("          ezdemo loltest bs on 5\n");
+		return;
+	}
+
+	ezdemoFragOptions = 0;
+	ezdemoBitOptions = 0;
+	ezdemoMinimumSpeed = 0;
+	ezdemoShowOnlyKillsOn = -1;
+	ezdemoShowOnlyKillsBy = -1;
+	ezdemoPlayerstateClientNum = -1;
+
+	CL_EzdemoClearEvents();
+
+	memset(&lastObi, -1, sizeof(lastObituary_t));
+	memset(&lastCtf, -1, sizeof(lastCtfMessage_t));
+
+	//read all additional args after demoname
+	for (i = 2; i < argc; ++i) {
+		Q_strncpyz(buf, Cmd_Argv(i), sizeof(buf));
+
+		if (!Q_stricmpn(buf, "chat", 4)) {
+			ezdemoBitOptions = EZDEMO_CHATS;
+			break;
+		}
+#ifdef XDEVELOPER
+		else if (!Q_stricmp(buf, "bss")) {
+			//show all bs attempts.
+			ezdemoFragOptions |= BS_ATTEMPTS;
+		}
+#endif
+		else if (!Q_stricmp(buf, "dbs")) {
+			ezdemoFragOptions |= FRAGS_DBS;
+
+		}
+		else if (!Q_stricmp(buf, "bs")) {
+			ezdemoFragOptions |= FRAGS_BS;
+		}
+		else if (!Q_stricmp(buf, "dfa")) {
+			ezdemoFragOptions |= FRAGS_DFA;
+		}
+		else if (!Q_stricmp(buf, "doom")) {
+			ezdemoFragOptions |= FRAGS_DOOM;
+		}
+		else if (!Q_stricmp(buf, "lunge") || !Q_stricmp(buf, "uppercut")) {
+			ezdemoFragOptions |= FRAGS_LUNGE;
+		}
+		else if (!Q_stricmp(buf, "bluebs")) {
+			ezdemoFragOptions |= FRAGS_BLUEBS;
+
+		}
+		else if (!Q_stricmp(buf, "blue")) {
+			ezdemoFragOptions |= FRAGS_ABLUE;
+		}
+		else if (!Q_stricmp(buf, "yellow")) {
+			ezdemoFragOptions |= FRAGS_AYELLOW;
+		}
+		else if (!Q_stricmp(buf, "red")) {
+			ezdemoFragOptions |= FRAGS_ARED;
+		}
+		else if (!Q_stricmp(buf, "ret") || !Q_stricmp(buf, "rets")) {
+			ezdemoBitOptions |= EZDEMO_RETS;
+		}
+		else if (!Q_stricmp(buf, "caps") || !Q_stricmp(buf, "cap")) {
+			ezdemoBitOptions |= EZDEMO_CAPTURES;
+		}
+		else if (CL_StringStartsWith(buf, "flagsteal") || CL_StringStartsWith(buf, "flaggrab")) {
+			ezdemoBitOptions |= EZDEMO_FLAGSTEALS;
+
+		}
+		else if (!Q_stricmp(buf, "by") || !Q_stricmp(buf, "on")) {
+			bool by = tolower(buf[0]) == 'b';
+
+			//What a nice hack!
+			int* toEdit = by ? &ezdemoShowOnlyKillsBy : &ezdemoShowOnlyKillsOn;
+			const char* argname = by ? "by" : "on";
+
+			Q_strncpyz(buf, Cmd_Argv(++i), sizeof(buf));		//try to read the next arg as clientnum
+
+			const char* fail =
+				va("ezdemo: option '%s' only supports client numbers [0 ; %d] or \"me\", e.g. \"/ezdemo testdemo %s 1\"\n",
+					argname, MAX_CLIENTS - 1, argname);
+
+			const int cl = atoi(buf);
+
+			if (!Q_stricmp(buf, "ps") || !Q_stricmp(buf, "me") || !Q_stricmp(buf, "self")) {
+				*toEdit = EZDEMO_PREDICTEDCLIENT;
+			}
+			else if (!CL_StringIsDigitsOnly(buf) || !(i < argc) || cl >= MAX_CLIENTS || cl < 0) {
+				Com_Printf(fail);
+				return;
+			}
+			else {
+				if (!CL_StringIsDigitsOnly(buf) || cl < 0 || cl >= MAX_CLIENTS) {
+					Com_Printf(fail);
+					return;
+				}
+
+				*toEdit = cl;
+			}
+
+		}
+		else if (!Q_stricmp(buf, "kmh") || !Q_stricmp(buf, "qu") || !Q_stricmp(buf, "ups")) {
+			//the user wants to specify the minimum speed for a the guy who did a frag, for it to be shown
+			bool kmh = tolower(buf[0]) == 'k';
+
+			Q_strncpyz(buf, Cmd_Argv(++i), sizeof(buf));		//try to read the next arg as speed
+
+			if (!(i < argc) || !CL_StringIsDigitsOnly(buf)) {
+				Com_Printf("ezdemo: option 'kmh/qu' needs an additional integer argument containing speed, e.g. \"/ezdemo lolowned kmh 40 dbs\"\n");
+				return;
+			}
+
+			float speed;
+
+
+			if (kmh) {
+				//use kmh as speed unit
+				speed = atof(buf) / KMHconv;	//convert to QU
+			}
+			else {
+				//use qu as speed unit
+				speed = atof(buf);
+			}
+
+			ezdemoMinimumSpeed = speed;
+			// Com_Printf("Minimum speed: %i qu -- %.2f km/h\n", (int)ezdemoMinimumSpeed, ezdemoMinimumSpeed * KMHconv);
+		}
+		else {
+			Com_Printf("Unknown option \"%s\".\n", buf);
+			return;
+		}
+	}
+
+	if (ezdemoShowOnlyKillsOn != -1 && ezdemoBitOptions & EZDEMO_RETS) {
+		Com_Printf("ezdemo: \"on <client>\" argument is not supported for rets. You can combine <on> and <by> on non-rets though.\n");
+		return;
+	}
+
+	if ((ezdemoFragOptions & FRAGS_DOOM) && (ezdemoBitOptions & EZDEMO_RETS)) {
+		Com_Printf("ezdemo: it's not possible to see ret-only dooms; try just dooms instead\n");
+		return;
+	}
+
+	ezdemoEventCount = 0;
+	ezdemoActive = qtrue;
+	CL_PlayDemo_f();
+	//everything after here wont be happening in the code. check DemoCompleted instead.
+}
+
+static void Ezdemo_HandleEvent(entityState_t state) {
+	const int eventType = state.eType - ET_EVENTS;
+
+	if (eventType == EV_OBITUARY && !ezdemoBitOptions) {
+		int attacker = state.otherEntityNum2;
+		int target = state.otherEntityNum;
+		int	mod = state.eventParm;
+
+		if ((ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT && attacker != ezdemoPlayerstateClientNum) ||
+			(ezdemoShowOnlyKillsBy != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsBy >= 0 && ezdemoShowOnlyKillsBy != attacker)) {
+			return;
+		}
+
+		if ((ezdemoShowOnlyKillsOn == EZDEMO_PREDICTEDCLIENT && target != ezdemoPlayerstateClientNum) ||
+			(ezdemoShowOnlyKillsOn != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsOn >= 0 && ezdemoShowOnlyKillsOn != target)) {
+			return;
+		}
+
+
+		if (attacker == lastObi.attacker && target == lastObi.target && mod == lastObi.mod && cl.snap.serverTime - lastObi.time < 600) {
+			//an identical kill happening 100 ms after one just happened? NO!
+#ifdef XDEVELOPER
+			Com_Printf("Not adding event at time %d...delta is %d\n", cl.snap.serverTime, cl.snap.serverTime - lastObi.time);
+#endif
+			return;
+		}
+
+		if (attacker != target) {
+			if (Ezdemo_ClientValid(attacker)) {
+
+				if ((ezdemoFragOptions & FRAGS_DOOM && mod == MOD_FALLING) || (mod != MOD_FALLING && Ezdemo_CheckOptions(attacker, EV_OBITUARY))) {
+					Ezdemo_AddEvent(attacker);
+
+					lastObi.attacker = attacker;
+					lastObi.target = target;
+					lastObi.mod = mod;
+					lastObi.time = cl.snap.serverTime;
+				}
+			}
+		}
+
+	}
+	else if (eventType == EV_CTFMESSAGE &&
+		ezdemoBitOptions /* & (EZDEMO_RETS | EZDEMO_CAPTURES | EZDEMO_FLAGSTEALS) */) {
+		const int clIndex = state.trickedentindex;
+		const int teamIndex = state.trickedentindex2;
+		const int ctfMsg = state.eventParm;
+
+		if (clIndex == lastCtf.client && teamIndex == lastCtf.team && ctfMsg == lastCtf.msg && ctfMsg != CTFMESSAGE_FRAGGED_FLAG_CARRIER && cl.snap.serverTime - lastCtf.time < 600) {
+			//BAD.
+			return;
+		}
+
+
+		switch (ctfMsg) {
+		case CTFMESSAGE_FRAGGED_FLAG_CARRIER:
+
+			if (!(ezdemoBitOptions & EZDEMO_RETS))
+				return;
+
+			if ((ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT && clIndex != ezdemoPlayerstateClientNum) ||
+				(ezdemoShowOnlyKillsBy != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsBy >= 0 && ezdemoShowOnlyKillsBy != clIndex)) {
+				return;
+			}
+
+			if (Ezdemo_ClientValid(clIndex)) {
+				if (Ezdemo_CheckOptions(clIndex, CTFMESSAGE_FRAGGED_FLAG_CARRIER)) {
+
+					lastCtf.client = clIndex;
+					lastCtf.team = teamIndex;
+					lastCtf.msg = ctfMsg;
+					lastCtf.time = cl.snap.serverTime;
+
+					Ezdemo_AddEvent(clIndex);
+				}
+			}
+
+			break;
+
+		case CTFMESSAGE_FLAG_RETURNED:
+			break;
+		case CTFMESSAGE_PLAYER_RETURNED_FLAG:
+			break;
+		case CTFMESSAGE_PLAYER_CAPTURED_FLAG:
+
+			if (!(ezdemoBitOptions & EZDEMO_CAPTURES))
+				return;
+
+			if ((ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT && clIndex != ezdemoPlayerstateClientNum) ||
+				(ezdemoShowOnlyKillsBy != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsBy >= 0 && ezdemoShowOnlyKillsBy != clIndex)) {
+				return;
+			}
+
+			if (Ezdemo_ClientValid(clIndex)) {
+				if (Ezdemo_CheckOptions(clIndex, CTFMESSAGE_PLAYER_CAPTURED_FLAG)) {
+					lastCtf.client = clIndex;
+					lastCtf.team = teamIndex;
+					lastCtf.msg = ctfMsg;
+					lastCtf.time = cl.snap.serverTime;
+
+					Ezdemo_AddEvent(clIndex);
+				}
+			}
+
+			break;
+		case CTFMESSAGE_PLAYER_GOT_FLAG:
+
+			if (!(ezdemoBitOptions & EZDEMO_FLAGSTEALS)) return;
+
+			if ((ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT && clIndex != ezdemoPlayerstateClientNum) ||
+				(ezdemoShowOnlyKillsBy != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsBy >= 0 && ezdemoShowOnlyKillsBy != clIndex)) {
+				return;
+			}
+
+			if (Ezdemo_ClientValid(clIndex) && Ezdemo_CheckOptions(clIndex, CTFMESSAGE_PLAYER_GOT_FLAG)) {
+				lastCtf.client = clIndex;
+				lastCtf.team = teamIndex;
+				lastCtf.msg = ctfMsg;
+				lastCtf.time = cl.snap.serverTime;
+
+				Ezdemo_AddEvent(clIndex);
+			}
+
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+//Add an event at this cl.serverTime with this client (we wanna be speccing this client at the time of this event).
+static void Ezdemo_AddEvent(const int clientNum) {
+	const char* varname = va("pd%d", ++ezdemoEventCount);
+	const char* varval = va("%d\\%d", clientNum, cl.snap.serverTime);
+
+
+	Cvar_Set(varname, varval);
+	Cvar_Get(varname, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
+	Cvar_SetValue(PDCOUNT, ezdemoEventCount);
+	Cvar_Get(PDCOUNT, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
+}
+
+// Return true if this client is present in the current snapshot.
+static qboolean Ezdemo_ClientValid(const int client) {
+	if (client == ezdemoPlayerstateClientNum)
+		//good, our playerstate client is always valid (visible)
+		return qtrue;
+
+	for (int i = 0; i < cl.snap.numEntities; ++i) {
+		const int entNum = (cl.snap.parseEntitiesNum + i) & (MAX_PARSE_ENTITIES - 1);
+
+		entityState_t* ent = &cl.parseEntities[entNum];
+
+		if (ent->number == client && ent->number >= 0 && ent->number < MAX_CLIENTS) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+
+// Ok, just commented out a lot of crap info that we dont really need in this context.
+static void BG_PlayerStateToEntityState(playerState_t* ps, entityState_t* s/* , qboolean snap */) {
+	// set the trDelta for flag direction
+	VectorCopy(ps->velocity, s->pos.trDelta);
+
+	s->legsAnim = ps->legsAnim;
+	s->torsoAnim = ps->torsoAnim;
+}
+
+static entityState_t* Ezdemo_EntForClientNum(const int client) {
+	if (client == ezdemoPlayerstateClientNum) {
+
+		static entityState_t	ent2 = { 0 };	//need to create an entityState_t here rather than pointing to one
+		BG_PlayerStateToEntityState(&cl.snap.ps, &ent2);
+		return &ent2;
+	}
+
+
+	for (int i = 0; i < cl.snap.numEntities; ++i) {
+
+		const int entNum = (cl.snap.parseEntitiesNum + i) & (MAX_PARSE_ENTITIES - 1);
+		entityState_t* ent = &cl.parseEntities[entNum];
+
+		if (ent->number == client) {
+			return ent;
+		}
+	}
+
+	return NULL;
+}
+
+static int Ezdemo_PlayerTorsoAnim(const int client) {
+
+	if (client == ezdemoPlayerstateClientNum)
+		return (cl.snap.ps.torsoAnim & ~ANIM_TOGGLEBIT);
+
+	entityState_t* test = Ezdemo_EntForClientNum(client);
+
+	if (test)
+		return (test->torsoAnim & ~ANIM_TOGGLEBIT);
+
+	return -1;
+}
+
+
+static float Ezdemo_PlayerSpeed(const int client) {
+	vec3_t vel = { 0,0,0 };
+
+	if (client == ezdemoPlayerstateClientNum) {
+		VectorCopy(cl.snap.ps.velocity, vel);
+	}
+	else if (client >= 0 && client < 32) {
+		entityState_t* test = Ezdemo_EntForClientNum(client);
+
+		if (!test) {
+			return -1;
+		}
+		else {
+			VectorCopy(test->pos.trDelta, vel);
+		}
+	}
+	else {
+		return -1;
+	}
+
+	const float speedQU = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);	// speed quake units
+
+	return speedQU;
+}
+
+//Should this event be displayed based on our preferences and what kind of event it is?
+static qboolean Ezdemo_CheckOptions(const int clientNum, const int event) {
+
+	//Only check for speed requirements on regular frags and return frags.
+	if (ezdemoMinimumSpeed &&
+		(event == EV_OBITUARY || event == CTFMESSAGE_FRAGGED_FLAG_CARRIER)
+		) {
+		const float speed = Ezdemo_PlayerSpeed(clientNum);
+
+		if (speed < ezdemoMinimumSpeed)
+			return qfalse;
+	}
+
+
+	// Dont check animation crap for caps and flaggrabs.
+	if (event == CTFMESSAGE_PLAYER_CAPTURED_FLAG || event == CTFMESSAGE_PLAYER_GOT_FLAG)
+		return qtrue;
+
+
+
+	if (ezdemoFragOptions) {
+		const int torsoAnim = Ezdemo_PlayerTorsoAnim(clientNum);
+
+
+		if (ezdemoFragOptions & FRAGS_DBS) {
+			if (torsoAnim == 809)
+				return qtrue;
+		}
+		if (ezdemoFragOptions & FRAGS_BS) {
+			if (torsoAnim == 804)
+				return qtrue;
+		}
+		if (ezdemoFragOptions & FRAGS_DFA) {
+			if (torsoAnim == 807)
+				return qtrue;
+		}
+		if (ezdemoFragOptions & FRAGS_LUNGE) {
+			if (torsoAnim == BOTH_LUNGE2_B__T_)
+				return qtrue;
+		}
+		if (ezdemoFragOptions & FRAGS_BLUEBS) {
+			if (torsoAnim == 803)
+				return qtrue;
+		}
+
+		if (ezdemoFragOptions & FRAGS_ARED) {
+			// if (torsoAnim == 803)
+			if (torsoAnim <= BOTH_D3_B____ && torsoAnim >= BOTH_A3_T__B_) {
+
+				return qtrue;
+			}
+		}
+		if (ezdemoFragOptions & FRAGS_AYELLOW) {
+			if (torsoAnim <= BOTH_D2_B____ && torsoAnim >= BOTH_A2_T__B_) {
+				return qtrue;
+			}
+		}
+		if (ezdemoFragOptions & FRAGS_ABLUE) {
+
+
+			if (torsoAnim <= BOTH_D1_B____ && torsoAnim >= BOTH_A1_T__B_) {
+				return qtrue;
+			}
+		}
+
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+#endif

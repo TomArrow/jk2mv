@@ -736,6 +736,30 @@ static void Con_Linefeed (qboolean skipnotify)
 	stampColor = COLOR_LT_TRANSPARENT;
 }
 
+// basically a faster version of !strcmpn(str, check, strlen(check))
+qboolean CL_StringStartsWith(const char* str, const char* check) {
+	if (!str || !check)
+		return qfalse;
+
+	while (*str) {
+		if (*check == 0)
+			return qtrue;
+
+		if (*str != *check)
+			return qfalse;
+
+		++str;
+		++check;
+	}
+
+	if (*check == 0)
+		return qtrue;
+
+	//str is shorter than check, so nope
+	return qfalse;
+}
+
+
 /*
 ================
 CL_ConsolePrint
