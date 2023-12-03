@@ -45,6 +45,8 @@ to the current frame
 ==================
 */
 
+ezDemoBuffer_t		ezDemoBuffer;
+
 #ifdef CL_EZDEMO
 
 void Ezdemo_AddEvent(int client);
@@ -82,6 +84,7 @@ static int 		ezdemoShowOnlyKillsOn = -1;
 static int 		ezdemoShowOnlyKillsBy = -1;
 
 qboolean ezdemoActive = qfalse;
+
 
 #endif
 
@@ -1602,6 +1605,7 @@ void CL_EzdemoClearEvents(void) {
 	//clear all points of interest before playing
 	Cvar_Set(PDCOUNT, "0");
 	ezdemoEventCount = 0;
+	Com_Memset(&ezDemoBuffer, 0, sizeof(ezDemoBuffer));
 }
 
 qboolean CL_StringIsDigitsOnly(const char* buf);
@@ -1786,6 +1790,7 @@ void CL_Ezdemo_f(void) {
 	}
 
 	ezdemoEventCount = 0;
+	Com_Memset(&ezDemoBuffer, 0, sizeof(ezDemoBuffer));
 	ezdemoActive = qtrue;
 	CL_PlayDemo_f();
 	//everything after here wont be happening in the code. check DemoCompleted instead.
@@ -1924,14 +1929,19 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 
 //Add an event at this cl.serverTime with this client (we wanna be speccing this client at the time of this event).
 static void Ezdemo_AddEvent(const int clientNum) {
-	const char* varname = va("pd%d", ++ezdemoEventCount);
-	const char* varval = va("%d\\%d", clientNum, cl.snap.serverTime);
 
+	ezDemoBuffer.events[ezDemoBuffer.eventCount].serverTime = cl.snap.serverTime;
+	ezDemoBuffer.events[ezDemoBuffer.eventCount++].clientNum = clientNum;
 
-	Cvar_Set(varname, varval);
-	Cvar_Get(varname, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
-	Cvar_SetValue(PDCOUNT, ezdemoEventCount);
-	Cvar_Get(PDCOUNT, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
+	if(ezdemoEventCount < 1000){ // With very long demos we get MAX_CVAR error here, so limit it. For more we need the buffer and write it directly to cgame.
+		const char* varname = va("pd%d", ++ezdemoEventCount);
+		const char* varval = va("%d\\%d", clientNum, cl.snap.serverTime);
+
+		Cvar_Set(varname, varval);
+		Cvar_Get(varname, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
+		Cvar_SetValue(PDCOUNT, ezdemoEventCount);
+		Cvar_Get(PDCOUNT, "", CVAR_INTERNAL | CVAR_ROM);	//ensure this cvar isnt visible to the user.
+	}
 }
 
 // Return true if this client is present in the current snapshot.

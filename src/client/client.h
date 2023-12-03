@@ -158,9 +158,12 @@ typedef struct {
 
 	predictedMovement_t	predictedMovement;
 	qboolean		predictedMovementIsSet;
+
+
 } clientActive_t;
 
 extern	clientActive_t		cl;
+extern	ezDemoBuffer_t		ezDemoBuffer;
 
 /*
 =============================================================================

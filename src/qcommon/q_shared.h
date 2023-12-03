@@ -2310,9 +2310,21 @@ typedef union byteAlias_u {
 #define XSTRING( a ) STRING( a )
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
 
+typedef struct ezDemoEvent_s {
+	int serverTime;
+	byte clientNum;
+	byte clientNum2;
+} ezDemoEvent_t;
+
+typedef struct ezDemoBuffer_s {
+	ezDemoEvent_t events[20000];
+	int eventCount;
+} ezDemoBuffer_t;
+
 #define COOL_APIFEATURE_SETPREDICTEDMOVEMENT (1<<0)
 #define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
 #define COOL_APIFEATURE_EXPANDEDSETUSERCMD (1<<2)
+#define COOL_APIFEATURE_EZDEMOCGAMEBUFFER (1<<3)
 
 // This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
 typedef struct predictedMovement_s {

@@ -1387,6 +1387,21 @@ Ghoul2 Insert End
 		cl.cgameMoveSet = args[4];
 		return 0;
 
+	case CG_COOL_API_SET_EZDEMO_BUFFER:
+	{
+		int i;
+		int ezDemoEventSize = args[2];
+		int ezDemoMaxEventCount = args[3];
+		int* ezDemoEventCount = VMAP(4, int, 1);
+		ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+		int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
+		for (i = 0; i < communicatedEventCount; i++) {
+			Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
+		}
+		*ezDemoEventCount = communicatedEventCount;
+		return 0;
+	}
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}
