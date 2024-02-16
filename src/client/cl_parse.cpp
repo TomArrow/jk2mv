@@ -882,6 +882,8 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// save the frame off in the backup array for later delta comparisons
 	cl.snapshots[cl.snap.messageNum & PACKET_MASK] = cl.snap;
 
+	cl.snapshotReceivedRealTimes[cl.snap.messageNum & PACKET_MASK] = cls.realtime;
+
 	if (cl_shownet->integer == 3) {
 		Com_Printf( "   snapshot:%i  delta:%i  ping:%i\n", cl.snap.messageNum,
 		cl.snap.deltaNum, cl.snap.ping );

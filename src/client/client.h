@@ -159,6 +159,7 @@ typedef struct {
 	predictedMovement_t	predictedMovement;
 	qboolean		predictedMovementIsSet;
 
+	int				snapshotReceivedRealTimes[PACKET_BACKUP]; // Cool API "get time since snapshot received"
 
 } clientActive_t;
 

@@ -1402,6 +1402,17 @@ Ghoul2 Insert End
 		return 0;
 	}
 
+	case CG_COOL_API_GETTIMESINCESNAPRECEIVED:
+	{
+		int snapNum = args[1];
+		if (cl.snapshots[snapNum & PACKET_MASK].messageNum != snapNum) {
+			return -1;
+		}
+		else {
+			return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
+		}
+	}
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}

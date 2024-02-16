@@ -2325,6 +2325,7 @@ typedef struct ezDemoBuffer_s {
 #define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
 #define COOL_APIFEATURE_EXPANDEDSETUSERCMD (1<<2)
 #define COOL_APIFEATURE_EZDEMOCGAMEBUFFER (1<<3)
+#define COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED (1<<4)
 
 // This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
 typedef struct predictedMovement_s {
