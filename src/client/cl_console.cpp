@@ -16,6 +16,7 @@ cvar_t		*con_timestamps;
 
 //EternalJK2MV
 cvar_t		*con_opacity;
+cvar_t		*con_blackColorOverride;
 cvar_t		*con_notifywords;
 cvar_t		*con_notifyconnect;
 cvar_t		*con_notifyvote;
@@ -620,6 +621,7 @@ void Con_Init (void) {
 	con_timestamps = Cvar_Get ("con_timestamps", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
 
 	//EternalJK2MV
+	con_blackColorOverride = Cvar_Get("con_blackColorOverride", "11", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_opacity = Cvar_Get("con_opacity", "1.0", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_notifywords = Cvar_Get("con_notifywords", "0", CVAR_ARCHIVE); // "Notifies you when defined words are mentioned"
 	con_notifyconnect = Cvar_Get("con_notifyconnect", "1", CVAR_ARCHIVE); // "Notifies you when someone connects to the server"
@@ -774,6 +776,8 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	char			c;
 	int				y;
 	qboolean		skipnotify = qfalse;
+	vec4_t			colorVec;
+	vec4_t			colorVecDiff;
 	int				prev;
 
 	// for some demos we don't want to ever show anything on the console
@@ -797,7 +801,26 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if ( Q_IsColorString( txt ) ||
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt + 1)) {
+			int skipCount = 0;
+			Q_parseColorHex(txt + 1, colorVec, &skipCount);
+			txt += 1 + skipCount;
+			// Find closest color
+			// Just use the extended table who cares
+			float closestColorDistance = 999999999999;
+			int chosenColor = 7;
+			for (int i = 0; i < (sizeof(g_color_table)/sizeof(g_color_table[0])); i++) {
+				VectorSubtract(g_color_table[i], colorVec, colorVecDiff);
+				float distanceHere = VectorLength(colorVecDiff);
+				if (distanceHere < closestColorDistance) {
+					closestColorDistance = distanceHere;
+					chosenColor = i;
+				}
+			}
+			color = chosenColor;
+			continue;
+		}
+		else if ( Q_IsColorString( txt ) ||
 			(extendedColors && Q_IsColorString_Extended( txt )) ||
 			( use102color && Q_IsColorString_1_02( txt ) ) )
 		{
@@ -805,6 +828,10 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 			else color = ColorIndex( *(txt+1) );
 			txt += 2;
 			continue;
+		}
+
+		if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
+			color = con_blackColorOverride->integer;
 		}
 
 		txt++;
