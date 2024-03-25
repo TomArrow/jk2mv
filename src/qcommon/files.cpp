@@ -1915,7 +1915,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 					}
 				);
 			}
-			return FS_filelength(*file);
+			return FS_filelength(*file, module);
 
 			if ( fs_debug->integer ) {
 				Com_Printf( "FS_FOpenFileRead: %s (found in '%s/%s')\n", filename,
