@@ -54,6 +54,8 @@ cvar_t* sv_demoPreRecordKeyframeDistance;
 cvar_t* sv_demoWriteMeta;
 #endif
 
+cvar_t* sv_specAllEnts;
+
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;
 cvar_t	*mv_fixforcecrash;

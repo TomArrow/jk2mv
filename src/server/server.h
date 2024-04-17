@@ -302,6 +302,8 @@ extern	cvar_t* sv_demoPreRecordKeyframeDistance;
 extern	cvar_t* sv_demoWriteMeta;
 #endif
 
+extern	cvar_t* sv_specAllEnts;
+
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
 extern	cvar_t	*mv_fixforcecrash;

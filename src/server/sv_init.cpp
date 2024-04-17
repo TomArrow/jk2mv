@@ -885,6 +885,8 @@ void SV_Init (void) {
 	sv_demoWriteMeta = Cvar_Get("sv_demoWriteMeta", "1", CVAR_ARCHIVE);// , "Enables writing metadata to demos, which can be set by the server/game. This is invisible to normal clients and can be used for storing information about when the demo was recorded, start of the recording, and so on.");
 #endif
 
+	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
+
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 
 	sv_hibernateFps = Cvar_Get("sv_hibernateFps", "4", CVAR_ARCHIVE | CVAR_GLOBAL);
