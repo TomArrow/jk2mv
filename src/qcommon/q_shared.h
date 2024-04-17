@@ -2295,4 +2295,7 @@ typedef union byteAlias_u {
 #define XSTRING( a ) STRING( a )
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
 
+#define COOL_APIFEATURE_SETPREDICTEDMOVEMENT (1<<0)
+#define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
+
 #endif	// __Q_SHARED_H

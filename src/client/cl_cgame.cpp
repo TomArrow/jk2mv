@@ -59,6 +59,12 @@ CL_GetUserCmd
 */
 qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
+	
+	// COOL_APIFEATURE_GETTEMPORARYUSERCMD:
+	if (cmdNumber == -1) {
+		*ucmd = cl.temporaryCmd;
+		return qtrue;
+	}
 
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
