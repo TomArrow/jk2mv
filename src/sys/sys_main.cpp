@@ -26,6 +26,7 @@ cvar_t *com_unfocused;
 cvar_t *com_maxfps;
 cvar_t *com_maxfpsMinimized;
 cvar_t *com_maxfpsUnfocused;
+cvar_t* com_slowDriftAdjustMaxFPS;
 cvar_t* com_physicsFps;
 cvar_t* com_deadRampFix;
 cvar_t* com_deadRampFixedCount;
@@ -105,6 +106,7 @@ void Sys_Init(void) {
 	com_maxfps = Cvar_Get("com_maxfps", "125", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsUnfocused = Cvar_Get("com_maxfpsUnfocused", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsMinimized = Cvar_Get("com_maxfpsMinimized", "50", CVAR_ARCHIVE | CVAR_GLOBAL);
+	com_slowDriftAdjustMaxFPS = Cvar_Get("com_slowDriftAdjustMaxFPS", "25", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_physicsFps = Cvar_Get("com_physicsFps", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_deadRampFix = Cvar_Get("com_deadRampFix", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_deadRampFixedCount = Cvar_Get("com_deadRampFixedCount", "0", CVAR_VM_NOWRITE | CVAR_INIT);

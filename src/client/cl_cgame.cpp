@@ -1591,6 +1591,8 @@ or bursted delayed packets.
 void CL_AdjustTimeDelta( void ) {
 	int		newDelta;
 	int		deltaDelta;
+	int		slowDriftAdjustMinMsec;
+	static int	oldSlowDriftAdjustServerTime;
 
 	cl.newSnapshots = qfalse;
 
@@ -1601,6 +1603,11 @@ void CL_AdjustTimeDelta( void ) {
 
 	newDelta = cl.snap.serverTime - cls.realtime;
 	deltaDelta = abs( newDelta - cl.serverTimeDelta );
+
+	slowDriftAdjustMinMsec = com_slowDriftAdjustMaxFPS->integer ? 1000/ com_slowDriftAdjustMaxFPS->integer : 0;
+	if (slowDriftAdjustMinMsec > 200) {
+		slowDriftAdjustMinMsec = 200; // Let's not let ppl set com_slowDriftAdjustMaxFPS to less than 5 fps. Idk if its really a problem but it's not really needed and we avoid potential weirdness
+	}
 
 	if ( deltaDelta > RESET_TIME ) {
 		cl.serverTimeDelta = newDelta;
@@ -1615,7 +1622,7 @@ void CL_AdjustTimeDelta( void ) {
 			Com_Printf( "<FAST> " );
 		}
 		cl.serverTimeDelta = ( cl.serverTimeDelta + newDelta ) >> 1;
-	} else {
+	} else if(!slowDriftAdjustMinMsec || cl.snap.serverTime < oldSlowDriftAdjustServerTime || (cl.snap.serverTime - oldSlowDriftAdjustServerTime) > slowDriftAdjustMinMsec) { // the slow drift adjust influences physics. use com_slowDriftAdjustMaxFPS to limit how often it happens.
 		// slow drift adjust, only move 1 or 2 msec
 
 		// if any of the frames between this and the previous snapshot
@@ -1630,11 +1637,14 @@ void CL_AdjustTimeDelta( void ) {
 				cl.serverTimeDelta++;
 			}
 		}
+
+		oldSlowDriftAdjustServerTime = cl.snap.serverTime;
 	}
 
 	if ( cl_showTimeDelta->integer ) {
 		Com_Printf( "%i ", cl.serverTimeDelta );
 	}
+
 }
 
 
