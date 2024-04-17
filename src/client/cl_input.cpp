@@ -925,6 +925,9 @@ Create a new usercmd_t structure for this frame
 void CL_CreateNewCommands( void ) {
 	usercmd_t	*cmd;
 	int			cmdNum;
+	int			sentPacketNum, availableCmdCount;
+
+	cl.newCmdsGenerated = qfalse;
 
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
@@ -933,27 +936,89 @@ void CL_CreateNewCommands( void ) {
 		return;
 	}
 
-	frame_msec = com_frameTime - old_com_frameTime;
+	sentPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
+	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
 
-	// if running over 1000fps, act as if each frame is 1ms
-	// prevents division by zero
-	if ( frame_msec < 1 ) {
-		frame_msec = 1;
+	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
+
+		int oldCmdServerTime = cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime;
+		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
+		int frameCount = serverTimeDelta / desiredPhysicsMsec;
+
+
+		// Not sure if this whole frame_msec part should be outside the if(frameCount) condition or inside...
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if (frame_msec < 1) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if (frame_msec > 200) {
+			frame_msec = 200;
+		}
+		old_com_frameTime = com_frameTime;
+
+		if (frameCount) {
+			int genericCommandValue = 0;
+			if (cl.gcmdSendValue)
+			{
+				// Gotta intercept them earlier as they are only to be sent once but we might be duplicating our command to create multiple ones.
+				genericCommandValue = cl.gcmdValue;
+				cl.gcmdSendValue = qfalse;
+			}
+			
+			usercmd_t newCommand = CL_CreateCmd();
+			
+			int newClServerTime = oldCmdServerTime + desiredPhysicsMsec;
+			for (int i = 0; i < frameCount; i++) {
+
+				// duplicate the command a few times until we are close to cl.serverTime.
+				cl.cmdNumber++;
+				cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+				newCommand.serverTime = newClServerTime;
+				newCommand.generic_cmd = genericCommandValue;
+				genericCommandValue = 0;
+				cl.cmds[cmdNum] = newCommand;
+				cl.newCmdsGenerated = qtrue;
+				cmd = &cl.cmds[cmdNum];
+
+				newClServerTime += desiredPhysicsMsec;
+			}
+
+		}
+		
+	}
+	else {
+
+		frame_msec = com_frameTime - old_com_frameTime;
+
+		// if running over 1000fps, act as if each frame is 1ms
+		// prevents division by zero
+		if (frame_msec < 1) {
+			frame_msec = 1;
+		}
+
+		// if running less than 5fps, truncate the extra time to prevent
+		// unexpected moves after a hitch
+		if (frame_msec > 200) {
+			frame_msec = 200;
+		}
+		old_com_frameTime = com_frameTime;
+
+		// generate a command for this frame
+		cl.cmdNumber++;
+		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+
+		cl.cmds[cmdNum] = CL_CreateCmd();
+		cl.newCmdsGenerated = qtrue;
+		cmd = &cl.cmds[cmdNum];
 	}
 
-	// if running less than 5fps, truncate the extra time to prevent
-	// unexpected moves after a hitch
-	if ( frame_msec > 200 ) {
-		frame_msec = 200;
-	}
-	old_com_frameTime = com_frameTime;
-
-
-	// generate a command for this frame
-	cl.cmdNumber++;
-	cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
-	cl.cmds[cmdNum] = CL_CreateCmd ();
-	cmd = &cl.cmds[cmdNum];
 }
 
 /*
@@ -967,9 +1032,15 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-qboolean CL_ReadyToSendPacket( void ) {
+qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no new usercmds were generated this frame...
 	int		oldPacketNum;
 	int		delta;
+
+	if (!cl.newCmdsGenerated && cls.state >= CA_PRIMED) {
+		// When using com_physicsFps we may/will not generate new commands on every frame.
+		// If no new ones were generated, don't send a packet
+		return qfalse;
+	}
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {

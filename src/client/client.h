@@ -128,6 +128,7 @@ typedef struct {
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
+	qboolean	newCmdsGenerated;	// For com_physicsfps. Let us know whether new cmds were generated on this frame. If not, don't send out new packets.
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
 
