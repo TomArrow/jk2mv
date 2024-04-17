@@ -1112,6 +1112,7 @@ Create a new usercmd_t structure for this frame
 void CL_CreateNewCommands( void ) {
 	usercmd_t	*cmd;
 	int			cmdNum;
+	int			sentPacketNum, availableCmdCount;
 
 	cl.newCmdsGenerated = qfalse;
 
@@ -1122,8 +1123,11 @@ void CL_CreateNewCommands( void ) {
 		return;
 	}
 
+	sentPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
+	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
+
 	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
-	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* (MAX_PACKET_USERCMDS-cl_packetdup->integer))) { // TODO: Double check that last condition, I just pulled that out real quick without thinking about it too much
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
 
 		int oldCmdServerTime = cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime;
 		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
