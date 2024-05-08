@@ -1079,6 +1079,13 @@ qboolean CL_DeadRampCMDFix(usercmd_t* cmd, usercmd_t* lastCmd, predictedMovement
 
 		realOffset = offset > maxNeg ? offset - maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
 		int modifiedMsecDelta = msecDelta + realOffset;
+		if (modifiedMsecDelta < 1) {
+			if (com_deadRampFix->integer > 1) {
+				Com_Printf("DEAD RAMP: can't fix @ (offset %d)\n", realOffset);
+				realOffset = 0;
+			}
+			break; // guess we can't fix it.
+		}
 		float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
 		predictedMovement_t predictMoveCopy = *frameStartPredictMoveCopy;
 		deadRamp = (CL_PredictDeadRamp(*cmd, &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
@@ -1110,7 +1117,6 @@ Create a new usercmd_t structure for this frame
 =================
 */
 void CL_CreateNewCommands( void ) {
-	usercmd_t	*cmd;
 	int			cmdNum;
 	int			sentPacketNum, availableCmdCount;
 
@@ -1190,37 +1196,8 @@ void CL_CreateNewCommands( void ) {
 				if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 					CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &frameStartPredictMoveCopy);
 					newClServerTime = cl.cmds[cmdNum].serverTime;
-					/*int originalServerTime = cl.cmds[cmdNum].serverTime;
-					int msecDelta = cl.serverTime - cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK].serverTime;
-					bool deadRamp = true;
-					int offset = 0;
-					int realOffset = 0;
-					const int minDelta = 5;
-					int maxNeg = MAX(0, msecDelta - minDelta);
-					while (deadRamp) {
-
-						realOffset = offset > maxNeg ? offset - maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
-						int modifiedMsecDelta = msecDelta + realOffset;
-						float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
-						predictedMovement_t predictMoveCopy = frameStartPredictMoveCopy;
-						deadRamp = (CL_PredictDeadRamp(cl.cmds[cmdNum], &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
-						if (deadRamp) {
-							offset++;
-						}
-						else {
-							frameStartPredictMoveCopy = predictMoveCopy;
-						}
-					}
-					cl.cmds[cmdNum].serverTime += realOffset;
-					newClServerTime = cl.cmds[cmdNum].serverTime;
-					if (realOffset) {
-						//if (com_deadRampFix->integer > 1) {
-						//}
-						Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
-						Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
-					}*/
+					
 				}
-				cmd = &cl.cmds[cmdNum];
 
 				newClServerTime += desiredPhysicsMsec;
 			}
@@ -1277,33 +1254,8 @@ void CL_CreateNewCommands( void ) {
 
 			predictedMovement_t predictedMovementCopy = cl.predictedMovement;
 			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &predictedMovementCopy);
-			/*int originalServerTime = cl.cmds[cmdNum].serverTime;
-			int msecDelta = cl.serverTime - cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK].serverTime;
-			bool deadRamp = true;
-			int offset = 0;
-			int realOffset = 0;
-			const int minDelta = 5;
-			int maxNeg = MAX(0,msecDelta - minDelta);
-			while (deadRamp) {
-
-				realOffset = offset > maxNeg ? offset-maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
-				int modifiedMsecDelta = msecDelta + realOffset;
-				float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
-				predictedMovement_t predictMoveCopy = cl.predictedMovement;
-				deadRamp = (CL_PredictDeadRamp(cl.cmds[cmdNum], &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
-				if (deadRamp) {
-					offset++;
-				}
-			}
-			cl.cmds[cmdNum].serverTime += realOffset;
-			if (realOffset){
-				//if (com_deadRampFix->integer > 1) {
-				//}
-				Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
-				Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
-			}*/
+			
 		}
-		cmd = &cl.cmds[cmdNum];
 	}
 
 }
