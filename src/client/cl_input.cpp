@@ -1049,7 +1049,7 @@ rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, flo
 							point[2] = currentPs->origin[2] - 0.25;
 
 							CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
-							i = j = k; // Stupid way to end the loop lol.
+							i = j = k = 2; // Stupid way to end the loop lol.
 						}
 					}
 				}
