@@ -722,6 +722,7 @@ int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, in
 int		FS_GetModList(  char *listbuf, int bufsize );
 
 #ifdef ASYNCIO
+void			FS_AsyncAssureFileClosed(const char* ospath);
 fileHandle_t	FS_FOpenFileWriteAsync(const char* qpath, qboolean safe = qtrue);
 #endif
 
