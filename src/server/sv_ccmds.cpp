@@ -7,7 +7,8 @@
 #include <ctime>
 
 #ifdef SVDEMO
-extern std::vector<bufferedMessageContainer_t> demoPreRecordBuffer[MAX_CLIENTS];
+//extern std::vector<bufferedMessageContainer_t> demoPreRecordBuffer[MAX_CLIENTS];
+extern std::vector<std::unique_ptr<bufferedMessageContainer_t>> demoPreRecordBuffer[MAX_CLIENTS];
 extern std::map<std::string, std::string> demoMetaData[MAX_CLIENTS];
 #endif
 
@@ -1203,10 +1204,10 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 		demoPreRecordBufferIt firstOldKeyframe;
 		qboolean firstOldKeyframeFound = qfalse;
 		if (com_developer->integer > 1) {
-			Com_Printf("Demo pre-record queue size is %d, number of first message in queue is %d ... ", demoPreRecordBuffer[cl - svs.clients].begin(), demoPreRecordBuffer[cl - svs.clients].begin()->msgNum);
+			Com_Printf("Demo pre-record queue size is %d, number of first message in queue is %d ... ", demoPreRecordBuffer[cl - svs.clients].begin(), demoPreRecordBuffer[cl - svs.clients].begin()->get()->msgNum);
 		}
 		for (demoPreRecordBufferIt it = demoPreRecordBuffer[cl - svs.clients].begin(); it != demoPreRecordBuffer[cl - svs.clients].end(); it++) {
-			if (it->isKeyframe && it->time < sv.time) {
+			if (it->get()->isKeyframe && it->get()->time < sv.time) {
 				firstOldKeyframe = it;
 				firstOldKeyframeFound = qtrue;
 				break;
@@ -1222,32 +1223,32 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 				static byte preRecordBufData[MAX_MSGLEN]; // I make these static so they don't sit on the stack.
 				static msg_t		preRecordMsg;
 
-				if ((!it->isKeyframe || index == 0) && it->msgNum <= cl->netchan.outgoingSequence && it->time <= sv.time) { // Check against outgoing sequence and server time too, *just in case* we ended up with some old messages
+				if ((!it->get()->isKeyframe || index == 0) && it->get()->msgNum <= cl->netchan.outgoingSequence && it->get()->time <= sv.time) { // Check against outgoing sequence and server time too, *just in case* we ended up with some old messages
 					// We only want a keyframe at the beginning of the demo, none after.
 					Com_Memset(&preRecordMsg, 0, sizeof(msg_t));
 					Com_Memset(&preRecordBufData, 0, sizeof(preRecordBufData));
 					preRecordMsg.data = preRecordBufData;
-					MSG_FromBuffered(&preRecordMsg, &it->msg);
+					MSG_FromBuffered(&preRecordMsg, &it->get()->msg);
 					MSG_WriteByte(&preRecordMsg, svc_EOF); // We didn't do that for the ones we put into the buffer, so we do it now.
 					if (index == 0 && sv_demoWriteMeta->integer) {
 						// This goes before the first messsage
 
-						ssMeta << ",\"ost\":" << ((int64_t)std::time(nullptr) - ((sv.time - it->time) / 1000)); // Original start time. When was demo recording started?
-						ssMeta << ",\"prso\":" << (sv.time - it->time); // Pre-recording start offset. Offset from start of demo to when the command to start recording was called
+						ssMeta << ",\"ost\":" << ((int64_t)std::time(nullptr) - ((sv.time - it->get()->time) / 1000)); // Original start time. When was demo recording started?
+						ssMeta << ",\"prso\":" << (sv.time - it->get()->time); // Pre-recording start offset. Offset from start of demo to when the command to start recording was called
 
 						ssMeta << "}"; // End JSON object
 						if (com_developer->integer > 1) {
 							Com_Printf("Writing demo metadata (pre-record) ... ");
 						}
-						SV_WriteEmptyMessageWithMetadata(it->lastClientCommand, cl->demo.demofile, ssMeta.str().c_str(), it->msgNum - 1);
+						SV_WriteEmptyMessageWithMetadata(it->get()->lastClientCommand, cl->demo.demofile, ssMeta.str().c_str(), it->get()->msgNum - 1);
 						if (com_developer->integer > 1) {
 							Com_Printf("done, writing pre-record messages ... ");
 						}
 					}
 					if (com_developer->integer > 1) {
-						Com_Printf("%d", it->msgNum);
+						Com_Printf("%d", it->get()->msgNum);
 					}
-					SV_WriteDemoMessage(cl, &preRecordMsg, 0, it->msgNum);
+					SV_WriteDemoMessage(cl, &preRecordMsg, 0, it->get()->msgNum);
 					if (com_developer->integer > 1) {
 						Com_Printf("w ");
 					}

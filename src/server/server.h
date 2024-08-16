@@ -14,6 +14,7 @@
 #include "../qcommon/cm_public.h"
 
 #include "../api/mvapi.h"
+#include <memory>
 
 //=============================================================================
 
@@ -133,7 +134,8 @@ typedef struct {
 	} preRecord;
 } demoInfo_t;
 
-typedef std::vector<bufferedMessageContainer_t>::iterator demoPreRecordBufferIt;
+//typedef std::vector<bufferedMessageContainer_t>::iterator demoPreRecordBufferIt;
+typedef std::vector<std::unique_ptr<bufferedMessageContainer_t>>::iterator demoPreRecordBufferIt;
 #endif
 
 typedef struct leakyBucket_s {
@@ -297,6 +299,7 @@ extern	cvar_t* sv_autoDemo;
 extern	cvar_t* sv_autoDemoBots;
 extern	cvar_t* sv_autoDemoMaxMaps;
 extern	cvar_t* sv_demoPreRecord;
+extern	cvar_t* sv_demoPreRecordBots;
 extern	cvar_t* sv_demoPreRecordTime;
 extern	cvar_t* sv_demoPreRecordKeyframeDistance;
 extern	cvar_t* sv_demoWriteMeta;

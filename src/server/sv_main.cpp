@@ -49,6 +49,7 @@ cvar_t* sv_autoDemo;
 cvar_t* sv_autoDemoBots;
 cvar_t* sv_autoDemoMaxMaps;
 cvar_t* sv_demoPreRecord;
+cvar_t* sv_demoPreRecordBots;
 cvar_t* sv_demoPreRecordTime;
 cvar_t* sv_demoPreRecordKeyframeDistance;
 cvar_t* sv_demoWriteMeta;

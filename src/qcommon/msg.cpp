@@ -66,6 +66,7 @@ void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw) {
 	buf->raw = qtrue;
 }
 
+/*
 void MSG_ToBuffered(msg_t *src, bufferedMsg_t *dst) {
 	if (src->raw) {
 		Com_Error(ERR_FATAL,"Can't buffer raw messages.");
@@ -78,7 +79,7 @@ void MSG_ToBuffered(msg_t *src, bufferedMsg_t *dst) {
 	dst->readcount = src->readcount;
 	dst->bit = src->bit;
 	Com_Memcpy(dst->data, src->data, sizeof(dst->data));
-}
+}*/
 
 void MSG_FromBuffered(msg_t *dst, bufferedMsg_t *src) {
 	dst->allowoverflow = src->allowoverflow;
@@ -88,7 +89,7 @@ void MSG_FromBuffered(msg_t *dst, bufferedMsg_t *src) {
 	dst->cursize = src->cursize;
 	dst->readcount = src->readcount;
 	dst->bit = src->bit;
-	Com_Memcpy(dst->data, src->data, sizeof(src->data));
+	Com_Memcpy(dst->data, src->data, src->cursize);
 }
 
 void MSG_InitOOB(msg_t *buf, byte *data, int length) {

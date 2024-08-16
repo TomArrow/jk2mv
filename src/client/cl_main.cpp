@@ -5,6 +5,7 @@
 #include <limits.h>
 #include "snd_local.h"
 #include <mv_setup.h>
+#include <memory>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2_local.h"
@@ -88,8 +89,8 @@ cvar_t	*cl_autolodscale;
 cvar_t	*cl_demoRecordBufferedReorder;
 cvar_t	*cl_demoRecordBufferedReorderTimeout;
 
-std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
-typedef std::map<int, bufferedMessageContainer_t>::iterator bufferedDemoMessageIterator;
+std::map<int, std::unique_ptr<bufferedMessageContainer_t>> bufferedDemoMessages;
+typedef std::map<int, std::unique_ptr<bufferedMessageContainer_t>>::iterator bufferedDemoMessageIterator;
 
 
 cvar_t	*mv_slowrefresh;
@@ -541,7 +542,7 @@ void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
 	// First write messages that exist without a gap.
 	while (bufferedDemoMessages.find(clc.demoLastWrittenSequenceNumber + 1) != bufferedDemoMessages.end()) {
 		// While we have all the messages without any gaps, we can just dump them all into the demo file.
-		MSG_FromBuffered(&tmpMsg, &bufferedDemoMessages[clc.demoLastWrittenSequenceNumber + 1].msg);
+		MSG_FromBuffered(&tmpMsg, &bufferedDemoMessages[clc.demoLastWrittenSequenceNumber + 1].get()->msg);
 		CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount, clc.demoLastWrittenSequenceNumber + 1);
 		clc.demoLastWrittenSequenceNumber = clc.demoLastWrittenSequenceNumber + 1;
 		bufferedDemoMessages.erase(clc.demoLastWrittenSequenceNumber);
@@ -557,8 +558,8 @@ void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
 			continue;
 		}
 		// First potential candidate.
-		if (forceWriteAll || tmpIt->second.time + cl_demoRecordBufferedReorderTimeout->integer < Com_RealTime(NULL)) {
-			MSG_FromBuffered(&tmpMsg, &tmpIt->second.msg);
+		if (forceWriteAll || tmpIt->second.get()->time + cl_demoRecordBufferedReorderTimeout->integer < Com_RealTime(NULL)) {
+			MSG_FromBuffered(&tmpMsg, &tmpIt->second.get()->msg);
 			CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount,tmpIt->first);
 			clc.demoLastWrittenSequenceNumber = tmpIt->first;
 			bufferedDemoMessages.erase(tmpIt);
@@ -2746,10 +2747,10 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	qboolean validButOutOfOrder;
 	qboolean process = CL_Netchan_Process(&clc.netchan, msg, &sequenceNumber, &validButOutOfOrder);
 	if (cl_demoRecordBufferedReorder->integer && clc.demorecording && (process || validButOutOfOrder) ) {
-		bufferedMessageContainer_t* messageContainer = &bufferedDemoMessages[sequenceNumber]; // Will automatically create if not existant.
+		std::unique_ptr<bufferedMessageContainer_t> messageContainer(new bufferedMessageContainer_t(msg));
 		messageContainer->time = Com_RealTime(NULL); // Remember when we wrote this
-		MSG_ToBuffered(msg, &messageContainer->msg); // Copy message into the buffer
 		messageContainer->containsFullSnapshot = qfalse; // to be determined.
+		bufferedDemoMessages[sequenceNumber] = std::move(messageContainer);
 	}
 	if (!process) {
 		return;		// out of order, duplicated, etc

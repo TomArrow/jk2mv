@@ -5,6 +5,7 @@
 #include <mv_setup.h>
 #include <map>
 #include <string>
+#include <memory>
 
 extern console_t con;
 qboolean	scr_initialized;		// ready to draw
@@ -28,7 +29,7 @@ cvar_t* cl_fpsGuessMethod3ReferenceLines;
 //cvar_t* cl_fpsGuessMethod3DrawRepeat;
 
 extern cvar_t* cl_demoRecordBufferedReorder;
-extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
+extern std::map<int, std::unique_ptr<bufferedMessageContainer_t>> bufferedDemoMessages;
 
 /*
 ================

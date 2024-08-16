@@ -225,7 +225,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 }
 
 extern cvar_t* cl_demoRecordBufferedReorder;
-extern std::map<int, bufferedMessageContainer_t> bufferedDemoMessages;
+extern std::map<int, std::unique_ptr<bufferedMessageContainer_t>> bufferedDemoMessages;
 
 
 
@@ -306,7 +306,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		old = NULL;
 		if (cl_demoRecordBufferedReorder->integer) {
 			if (bufferedDemoMessages.find(clc.serverMessageSequence) != bufferedDemoMessages.end()) {
-				bufferedDemoMessages[clc.serverMessageSequence].containsFullSnapshot = qtrue;
+				bufferedDemoMessages[clc.serverMessageSequence].get()->containsFullSnapshot = qtrue;
 			}
 			if (clc.demowaiting == 2) {
 				clc.demowaiting = 1;	// now we wait for a delta snapshot that references this or another buffered full snapshot.
@@ -339,7 +339,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		// Demo recording stuff.
 		if (clc.demowaiting == 1 && cl_demoRecordBufferedReorder->integer && newSnap.valid) {
 			if (bufferedDemoMessages.find(newSnap.deltaNum) != bufferedDemoMessages.end()) {
-				if (bufferedDemoMessages[newSnap.deltaNum].containsFullSnapshot) {
+				if (bufferedDemoMessages[newSnap.deltaNum].get()->containsFullSnapshot) {
 					// Okay NOW we can start recording the demo.
 					clc.demowaiting = 0;
 					// This is in case we use the buffered reordering of packets for demos. We want to remember the last sequenceNum we wrote to the demo.
