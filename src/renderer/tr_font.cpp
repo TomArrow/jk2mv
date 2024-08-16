@@ -875,11 +875,18 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
 			//^blah stuff confuses shadows, so parse it out first
-			while (psText[i] && r < 1024) {
+			while (psText[i] && r < 1023) {
 				if (psText[i] == '^') {
 					if ((i < 1 || psText[i - 1] != '^') &&
 						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode
-						i += 2;
+						if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001  && Q_IsColorStringHex(&psText[i + 1])) {
+							int skipCount = 0;
+							Q_parseColorHex(&psText[i + 1], 0, &skipCount);
+							i += 1 + skipCount;
+						}
+						else {
+							i += 2;
+						}
 					}
 				}
 
@@ -948,7 +955,19 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			break;
 #if 1
 		case '^':
-			if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
+			if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 &&  Q_IsColorStringHex(psText))
+			{
+				vec4_t color;
+				int skipCount;
+				if (Q_parseColorHex(psText, color, &skipCount)) {
+					psText += skipCount;
+					if (!gbInShadow)
+					{
+						RE_SetColor(color);
+					}
+				}
+			}
+			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
 			{
 				colour = ColorIndex(*psText);
 				if (!gbInShadow)
@@ -956,8 +975,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 					RE_SetColor(g_color_table[colour]);
 				}
 				++psText;
-				break;
 			}
+			break;
 #endif
 		default:
 			qbThisCharCountsAsLetter = qtrue;

@@ -331,6 +331,9 @@ void DeformText( const char *text ) {
 	// clear the shader indexes
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
+	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
+		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
+	}
 
 	color[0] = color[1] = color[2] = color[3] = 255;
 
@@ -394,6 +397,9 @@ static void AutospriteDeform( void ) {
 	oldVerts = tess.numVertexes;
 	tess.numVertexes = 0;
 	tess.numIndexes = 0;
+	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
+		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
+	}
 
 	if ( backEnd.currentEntity != &tr.worldEntity ) {
 		GlobalVectorToLocal( backEnd.viewParms.ori.axis[1], leftDir );

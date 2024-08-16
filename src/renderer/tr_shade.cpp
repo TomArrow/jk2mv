@@ -308,7 +308,7 @@ void R_BindAnimatedImage( textureBundle_t *bundle ) {
 		return;
 	}
 
-	if ((r_fullbright->value /*|| tr.refdef.doFullbright */) && bundle->isLightmap)
+	if ((r_fullbright->value /*|| tr.refdef.doFullbright */ && r_fullbright->integer != 200000) && bundle->isLightmap)
 	{
 		GL_Bind( tr.whiteImage );
 		return;
@@ -446,6 +446,9 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
+	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
+		Com_Memset(tess.vertexIsMarked,0,sizeof(tess.vertexIsMarked));
+	}
 	tess.shader = state;
 	tess.fogNum = fogNum;
 	tess.dlightBits = 0;		// will be OR'd in by surface functions
@@ -840,6 +843,9 @@ static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 {
 	int			i;
 	qboolean killGen = qfalse;
+	bool markSurfaceAngles;
+
+	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
 
 	if ( tess.shader != tr.projectionShadowShader && tess.shader != tr.shadowShader &&
 			( backEnd.currentEntity->e.renderfx & (RF_DISINTEGRATE1|RF_DISINTEGRATE2)))
@@ -988,6 +994,15 @@ static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 				tess.svars.colorsui[i] = tempColor;
 			}
 			break;
+	}
+
+	if (markSurfaceAngles) {
+		for (i = 0; i < tess.numVertexes; i++)
+		{
+			if (tess.vertexIsMarked[i]) {
+				tess.svars.colors[i][1] = tess.svars.colors[i][2] = 0;
+			}
+		}
 	}
 
 	//

@@ -154,6 +154,9 @@ cvar_t	*r_lockpvs;
 cvar_t	*r_noportals;
 cvar_t	*r_portalOnly;
 
+cvar_t* r_markSurfaceAnglesAbove;
+cvar_t* r_markSurfaceAnglesBelow;
+
 cvar_t	*r_subdivisions;
 cvar_t	*r_lodCurveError;
 
@@ -751,7 +754,7 @@ byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, qboolea
 	qglReadPixels(x, y, width, height, swapRB ? GL_BGR : GL_RGB, GL_UNSIGNED_BYTE, bufstart);
 
 	// gamma correct
-	if (r_gammamethod->integer == GAMMA_HARDWARE)
+	if (r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer)
 		R_GammaCorrect(bufstart, padwidth * height);
 
 	*offset = bufstart - buffer;
@@ -893,7 +896,7 @@ static void R_LevelShot( void ) {
 	}
 
 	// gamma correct
-	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE) {
+	if ( ( tr.overbrightBits > 0 ) && r_gammamethod->integer == GAMMA_HARDWARE && !r_gammabypass->integer) {
 		R_GammaCorrect( buffer + 18, LEVELSHOTSIZE * LEVELSHOTSIZE * 3 );
 	}
 
@@ -1267,6 +1270,9 @@ void R_Register( void )
 	//
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0 );
 	r_singleShader = ri.Cvar_Get ("r_singleShader", "0", CVAR_CHEAT | CVAR_LATCH );
+
+	r_markSurfaceAnglesAbove = ri.Cvar_Get ("r_markSurfaceAnglesAbove", "0", CVAR_TEMP );
+	r_markSurfaceAnglesBelow = ri.Cvar_Get ("r_markSurfaceAnglesBelow", "0", CVAR_TEMP);
 
 	//
 	// archived variables that can change at any time

@@ -418,6 +418,14 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// nuke user info
 	SV_SetUserinfo( drop - svs.clients, "" );
 
+#ifdef SVDEMO
+	if (drop->demo.demorecording) {
+		SV_StopRecordDemo(drop);
+	}
+	SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
+	SV_ClearClientDemoMeta(drop);
+#endif
+
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty
 	// send a heartbeat now so the master will get up to date info
@@ -438,6 +446,57 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		SV_Heartbeat_f();
 	}
 }
+
+#ifdef SVDEMO
+void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg) {
+	int			start;
+	entityState_t* base, nullstate;
+
+	// NOTE, MRE: all server->client messages now acknowledge
+	// let the client know which reliable clientCommands we have received
+	MSG_WriteLong(msg, client->lastClientCommand);
+
+	// send any server commands waiting to be sent first.
+	// we have to do this cause we send the client->reliableSequence
+	// with a gamestate and it sets the clc.serverCommandSequence at
+	// the client side
+	SV_UpdateServerCommandsToClient(client, msg);
+
+	// send the gamestate
+	MSG_WriteByte(msg, svc_gamestate);
+	MSG_WriteLong(msg, client->reliableSequence);
+
+	// write the configstrings
+	for (start = 0; start < MAX_CONFIGSTRINGS; start++) {
+		if (sv.configstrings[start][0]) {
+			MSG_WriteByte(msg, svc_configstring);
+			MSG_WriteShort(msg, start);
+			MSG_WriteBigString(msg, sv.configstrings[start]);
+		}
+	}
+
+	// write the baselines
+	Com_Memset(&nullstate, 0, sizeof(nullstate));
+	for (start = 0; start < MAX_GENTITIES; start++) {
+		base = &sv.svEntities[start].baseline;
+		if (!base->number) {
+			continue;
+		}
+		MSG_WriteByte(msg, svc_baseline);
+		MSG_WriteDeltaEntity(msg, &nullstate, base, qtrue);
+	}
+
+	MSG_WriteByte(msg, svc_EOF);
+
+	MSG_WriteLong(msg, client - svs.clients);
+
+	// write the checksum feed
+	MSG_WriteLong(msg, sv.checksumFeed);
+
+	// For old RMG system.
+	//MSG_WriteShort(msg, 0);
+}
+#endif
 
 /*
 ================
@@ -581,6 +640,12 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
+
+#ifdef SVDEMO
+	if (sv_autoDemo->integer == 1) { //Bots dont trigger this so whatever
+		SV_BeginAutoRecordDemos();
+	}
+#endif
 }
 
 /*
@@ -800,15 +865,7 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 
 	// based on the rate, how many bytes can we fit in the snapMsec time of the client
 	// normal rate / snapshotMsec calculation
-	rate = cl->rate;
-	if ( sv_maxRate->integer ) {
-		if ( sv_maxRate->integer < 1000 ) {
-			Cvar_Set( "sv_MaxRate", "1000" );
-		}
-		if ( sv_maxRate->integer < rate ) {
-			rate = sv_maxRate->integer;
-		}
-	}
+	rate = SV_ClientRate(cl);
 
 	if (!rate) {
 		blockspersnap = 1;
@@ -1052,21 +1109,9 @@ void SV_UserinfoChanged( client_t *cl ) {
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 ) {
+	cl->rate = atoi( Info_ValueForKey(cl->userinfo, "rate") );
+	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 && cl->rate < 99999 ) {
 		cl->rate = 99999;	// lans should not rate limit
-	} else {
-		val = Info_ValueForKey (cl->userinfo, "rate");
-		if (strlen(val)) {
-			i = atoi(val);
-			cl->rate = i;
-			if (cl->rate < 1000) {
-				cl->rate = 1000;
-			} else if (cl->rate > 90000) {
-				cl->rate = 90000;
-			}
-		} else {
-			cl->rate = 3000;
-		}
 	}
 	val = Info_ValueForKey (cl->userinfo, "handicap");
 	if (strlen(val)) {
@@ -1076,19 +1121,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 		}
 	}
 
-	// snaps command
-	val = Info_ValueForKey (cl->userinfo, "snaps");
-	if (strlen(val)) {
-		i = atoi(val);
-		if ( i < 1 ) {
-			i = 1;
-		} else if ( i > 30 ) {
-			i = 30;
-		}
-		cl->snapshotMsec = 1000/i;
-	} else {
-		cl->snapshotMsec = 50;
-	}
+	SV_ClientUpdateSnaps( cl );
 
 	if (mv_fixnamecrash->integer && !(sv.fixes & MVFIX_NAMECRASH)) {
 		char name[61], cleanedName[61]; // 60 because some mods increased this
@@ -1656,5 +1689,47 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //	if ( msg->readcount != msg->cursize ) {
 //		Com_Printf( "WARNING: Junk at end of packet for client %i\n", cl - svs.clients );
 //	}
+}
+
+int SV_ClientRate( client_t *client )
+{
+	int minRate = sv_minRate->integer;
+	int maxRate = sv_maxRate->integer;
+
+	// Special case for sv_maxRate 0: "unlimited" was hardcoded to 90000 in jk2ded
+	if ( !maxRate ) maxRate = 90000;
+
+	// Never allow rates below 1000 (was already hardcoded to 1000 in jk2ded)
+	if ( minRate < 1000 ) minRate = 1000;
+	if ( maxRate < 1000 ) maxRate = 1000;
+
+	// If the minimum is higher than the maximum settle for the lower value
+	if ( minRate > maxRate ) minRate = maxRate;
+
+	// Ensure the rate is within the allowed range
+	return Com_Clampi( minRate, maxRate, client->rate );
+}
+
+int SV_ClientSnaps( client_t *client )
+{
+	int maxSnaps = Com_Clampi( 1, sv_fps->integer, sv_maxSnaps->integer );
+	int minSnaps = Com_Clampi( 1, maxSnaps, sv_minSnaps->integer );
+
+	// Get the desired snaps value (either sv_fps or the value from the userinfo)
+	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
+
+	// Ensure the snaps value is within the allowed range
+	return Com_Clampi( minSnaps, maxSnaps, wishSnaps );
+}
+
+void SV_ClientUpdateSnaps( client_t *client )
+{
+	int snapsMsec = 1000 / SV_ClientSnaps( client );
+
+	if ( snapsMsec != client->snapshotMsec ) {
+		// Reset next snapshot so we avoid desync between server frame time and snapshot send time
+		client->nextSnapshotTime = -1;
+		client->snapshotMsec = snapsMsec;
+	}
 }
 

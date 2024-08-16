@@ -79,7 +79,7 @@ typedef struct {
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
-#define	MAX_PARSE_ENTITIES	2048
+#define	MAX_PARSE_ENTITIES	4096
 //#define	MAX_PARSE_ENTITIES	32768
 
 typedef struct {
@@ -118,6 +118,11 @@ typedef struct {
 	int			cgameForceSelection;
 	int			cgameInvenSelection;
 
+	int			cgameUpmove;
+	int			cgameRightmove;
+	int			cgameForwardmove;
+	int			cgameMoveSet;
+
 	qboolean	gcmdSendValue;
 	byte		gcmdValue;
 
@@ -126,8 +131,10 @@ typedef struct {
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
+	usercmd_t	temporaryCmd;		// temporary cmd when using com_physicsFps to have up to date view angles.
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
+	qboolean	newCmdsGenerated;	// For com_physicsfps. Let us know whether new cmds were generated on this frame. If not, don't send out new packets.
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
 
@@ -148,9 +155,16 @@ typedef struct {
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
 
 	char			*mSharedMemory;
+
+	predictedMovement_t	predictedMovement;
+	qboolean		predictedMovementIsSet;
+
+	int				snapshotReceivedRealTimes[PACKET_BACKUP]; // Cool API "get time since snapshot received"
+
 } clientActive_t;
 
 extern	clientActive_t		cl;
+extern	ezDemoBuffer_t		ezDemoBuffer;
 
 /*
 =============================================================================
@@ -225,6 +239,7 @@ typedef struct {
 	qboolean	firstDemoFrameSkipped;
 	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
+	qboolean	demoIsCompressed;
 
 	int			timeDemoFrames;		// counter of rendered frames
 	int			timeDemoStart;		// cls.realtime before first frame
@@ -236,11 +251,7 @@ typedef struct {
 
 extern	clientConnection_t clc;
 
-typedef struct {
-	bufferedMsg_t msg;
-	int time; // We don't want to wait infinitely for old messages to arrive.
-	qboolean containsFullSnapshot;
-} bufferedMessageContainer_t;
+
 
 /*
 ==================================================================
@@ -295,6 +306,18 @@ typedef struct {
 	netadr_t server;
 } blacklistentry_t;
 
+
+typedef enum fpsGuessMethod3SampleType_t {
+	FPSGUESSSAMPLE_MEASURED,
+	FPSGUESSSAMPLE_MEASURED_SLIDE,
+	FPSGUESSSAMPLE_REPEAT
+};
+
+typedef struct {
+	int globalTime;
+	fpsGuessMethod3SampleType_t sampleType;
+	float measuredEffectiveGravity;
+} fpsGuessMethod3HistorySample_t;
 
 typedef struct {
 	connstate_t	state;				// connection status
@@ -368,6 +391,14 @@ typedef struct {
 	} log;
 
 
+	#define FPS_GUESS_METHOD2_MSEC_LIMIT 100
+	#define FPS_GUESS_METHOD2_FRAMEAVG_COUNT 30
+	#define FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT 20
+	#define FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT 10
+	#define FPS_GUESS_METHOD3_MSEC_LIMIT 100
+	#define FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY 5
+	#define FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES 1000
+	
 	struct {
 		int lastPsCommandTime;
 		vec3_t lastVelocity;
@@ -379,7 +410,25 @@ typedef struct {
 		int lastGuessedFpsPercentage;
 		int currentGuessedFps;
 		int lastGuessedFpsServerTime;
+		int method2PossibleMsecValues[FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT];
+		int method3PossibleMsecValues[FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY];
+		int method3EffectiveFPSGravities[FPS_GUESS_METHOD3_MSEC_LIMIT];
+		fpsGuessMethod3HistorySample_t method3MeasuredGravitySamples[FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES];
+		int method3MeasuredGravitySamplesIndex = 0;
+		int method3MeasuredGravityGlobalTime = 0;
+		float method3MeasuredEffectiveGravity;
+		qboolean lastFrameWasMeasured;
+		qboolean lastFrameWasSlide;
 	} fpsGuess;
+
+	struct { // Data for a reasonable number of past frames.
+		float maxVelocity;
+		float maxVelocityV;
+		float maxVelocityH;
+		float maxVelocityDelta;
+		float maxVelocityDeltaV;
+		float maxVelocityDeltaH;
+	} showVelocity;
 
 
 } clientStatic_t;
@@ -444,8 +493,16 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
+extern	cvar_t	* cl_showVelocity;
+extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_fpsGuessMode;
+extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
+extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
+extern	cvar_t	* cl_fpsGuessMethod2DebugDumpPrimeResiduals;
+extern	cvar_t	* cl_fpsGuessMethod3FrameAvgCount;
+extern	cvar_t	* cl_fpsGuessMethod3GravityMatchPrecision;
+extern	cvar_t	* cl_fpsGuessMethod3ReferenceLines;
 extern	cvar_t	*cl_maxpackets;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;
@@ -506,6 +563,11 @@ void CL_Init (void);
 void CL_FlushMemory( qboolean disconnecting );
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
+void CL_ConfigstringModified(void);
+
+#define CL_EZDEMO
+
+qboolean CL_StringStartsWith(const char* str, const char* check);
 
 qboolean CL_ServerVersionIs103 (const char *versionstr);
 
@@ -566,7 +628,7 @@ void IN_CenterView (void);
 
 void CL_VerifyCode( void );
 
-float CL_KeyState (kbutton_t *key);
+float CL_KeyState (kbutton_t *key, qboolean temporaryViewAnglesOnly = qfalse);
 const char *Key_KeynumToString( int keynum/*, qboolean bTranslate */ ); //note: translate is only called for menu display not configs
 
 int Key_GetProtocolKey15(mvversion_t protocol, int key15);

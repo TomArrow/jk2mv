@@ -227,6 +227,7 @@ qboolean NET_GetPacket( netadr_t *net_from, msg_t *net_message, fd_set *fdr ) {
 	int ret, err;
 	socklen_t fromlen;
 	struct sockaddr_in from;
+	static byte socksMsgBuf[MAX_MSGLEN];
 
 	if ( ip_socket == INVALID_SOCKET || !FD_ISSET(ip_socket, fdr) ) {
 		return qfalse;
@@ -260,7 +261,10 @@ qboolean NET_GetPacket( netadr_t *net_from, msg_t *net_message, fd_set *fdr ) {
 		net_from->ip[2] = net_message->data[6];
 		net_from->ip[3] = net_message->data[7];
 		memcpy(&net_from->port, &net_message->data[8], 2);
-		net_message->readcount = 10;
+		//net_message->readcount = 10;
+		ret -= 10;
+		memcpy(socksMsgBuf,net_message->data+10, ret);
+		memcpy(net_message->data,socksMsgBuf, ret);
 	}
 	else {
 		SockadrToNetadr( &from, net_from );

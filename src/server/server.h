@@ -2,6 +2,8 @@
 #pragma once
 #endif
 
+#define SVDEMO
+
 #if !defined(SERVER_H_INC)
 #define SERVER_H_INC
 
@@ -12,6 +14,7 @@
 #include "../qcommon/cm_public.h"
 
 #include "../api/mvapi.h"
+#include <memory>
 
 //=============================================================================
 
@@ -72,6 +75,9 @@ typedef struct {
 	int				  gentitySizeMV;
 
 	int				fixes;
+
+	time_t			realMapTimeStarted;	// time the current map was started
+	qboolean		demosPruned; // whether or not existing demos were cleaned up already
 } server_t;
 
 typedef struct {
@@ -108,6 +114,29 @@ typedef enum {
 	CS_PRIMED,		// gamestate has been sent, but client hasn't sent a usercmd
 	CS_ACTIVE		// client is fully in game
 } clientState_t;
+
+#ifdef SVDEMO
+// struct to hold demo data for a single demo
+typedef struct {
+	char		demoName[MAX_OSPATH];
+	qboolean	demorecording;
+	qboolean	demowaiting;	// don't record until a non-delta message is sent
+	int			minDeltaFrame;	// the first non-delta frame stored in the demo.  cannot delta against frames older than this
+	fileHandle_t	demofile;
+	qboolean	isBot;
+	int			botReliableAcknowledge; // for bots, need to maintain a separate reliableAcknowledge to record server messages into the demo file
+	struct {
+		// this is basically the equivalent of the demowaiting and minDeltaFrame values above, except it's for the demo pre-record feature and will be done every sv_demoPreRecordKeyframeDistance seconds.
+		qboolean keyframeWaiting;
+		int minDeltaFrame;
+
+		int lastKeyframeTime; // When was the last keyframe (gamestate followed by non-delta frames) saved? If more than sv_demoPreRecordKeyframeDistance, we make a new keyframe.
+	} preRecord;
+} demoInfo_t;
+
+//typedef std::vector<bufferedMessageContainer_t>::iterator demoPreRecordBufferIt;
+typedef std::vector<std::unique_ptr<bufferedMessageContainer_t>>::iterator demoPreRecordBufferIt;
+#endif
 
 typedef struct leakyBucket_s {
 	int					lastTime;
@@ -166,6 +195,10 @@ typedef struct client_s {
 
 	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
+
+#ifdef SVDEMO
+	demoInfo_t		demo;
+#endif
 } client_t;
 
 //=============================================================================
@@ -241,6 +274,11 @@ extern	cvar_t	*sv_killserver;
 extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
+extern	cvar_t	*sv_minSnaps;
+extern	cvar_t	*sv_maxSnaps;
+extern	cvar_t	*sv_enforceSnaps;
+extern	cvar_t	*sv_enforceSnapsDebug; // Generate all snapshots but only actually send the messages according to max snaps etc
+extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
 extern	cvar_t	*sv_maxOOBRate;
 extern	cvar_t	*sv_minPing;
@@ -255,6 +293,19 @@ extern	cvar_t	*sv_hibernateFps;
 extern	cvar_t	*mv_apiConnectionless;
 extern	cvar_t	*sv_pingFix;
 extern	cvar_t	*sv_autoWhitelist;
+
+#ifdef SVDEMO
+extern	cvar_t* sv_autoDemo;
+extern	cvar_t* sv_autoDemoBots;
+extern	cvar_t* sv_autoDemoMaxMaps;
+extern	cvar_t* sv_demoPreRecord;
+extern	cvar_t* sv_demoPreRecordBots;
+extern	cvar_t* sv_demoPreRecordTime;
+extern	cvar_t* sv_demoPreRecordKeyframeDistance;
+extern	cvar_t* sv_demoWriteMeta;
+#endif
+
+extern	cvar_t* sv_specAllEnts;
 
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
@@ -327,10 +378,23 @@ void SV_ClientThink (int client, const usercmd_t *cmd);
 void SV_WriteDownloadToClient( client_t *cl , msg_t *msg );
 void SV_CloseDownload( client_t *cl );
 
+int SV_ClientRate( client_t *client );
+int SV_ClientSnaps( client_t *client );
+void SV_ClientUpdateSnaps( client_t *client );
+
 //
 // sv_ccmds.c
 //
 void SV_Heartbeat_f( void );
+
+void SV_RecordDemo(client_t* cl, char* demoName);
+void SV_StopRecordDemo(client_t* cl);
+void SV_ClearClientDemoMeta(client_t* cl);
+void SV_ClearClientDemoPreRecord(client_t* cl);
+void SV_ClearAllDemoPreRecord();
+void SV_AutoRecordDemo(client_t* cl);
+void SV_StopAutoRecordDemos();
+void SV_BeginAutoRecordDemos();
 
 //
 // sv_snapshot.c
@@ -340,7 +404,7 @@ void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, client_t *client );
 void SV_SendClientMessages( void );
-void SV_SendClientSnapshot( client_t *client );
+void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
 
 //
 // sv_game.c

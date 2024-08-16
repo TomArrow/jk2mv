@@ -257,7 +257,7 @@ inline uint32_t ComputeFinalVertexColor(const byte *colors)
 	for (k = 0; k < 4; k++)
 		result.b[k] = colors[k];
 
-	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || r_fullbright->integer)
+	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || (r_fullbright->integer && r_fullbright->integer != 200000))
 	{
 		result.b[0] = 255;
 		result.b[1] = 255;
@@ -1287,6 +1287,9 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int			Bob;
 	int			numPoints;
 	int			dlightBits;
+	bool		markSurfaceAngles;
+
+	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
 
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
@@ -1299,6 +1302,31 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	tessIndexes = tess.indexes + tess.numIndexes;
 	for ( i = surf->numIndices-1 ; i >= 0  ; i-- ) {
 		tessIndexes[i] = indices[i] + Bob;
+
+		if (markSurfaceAngles && ((i+1)%3)==0) {
+			// We want to mark all surfaces of certain angles with a color
+			// So let's first find out the angle of this surface
+			// Take cross product of two sides to get vector
+			vec3_t side1, side2, normal;
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
+			CrossProduct(side1, side2, normal);
+			VectorNormalize(normal);
+			// Cross product is a normal of the triangle
+			// We could do a dot product with other vector for angle
+			// But other vector is Z axis (0,0,1) so we the [0] and [1] would become 0 anyway
+			// So the dot product we want is simply normal[2]
+			float angle = 360.0f*acosf(normal[2])/ M_PI/2.0f;
+
+			if (
+				(r_markSurfaceAnglesAbove->value && r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value) // Both conditions must be met
+				|| (r_markSurfaceAnglesAbove->value && !r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value)
+				|| (r_markSurfaceAnglesBelow->value && !r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value)
+				) {
+				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
+			}
+			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
+		}
 	}
 
 	tess.numIndexes += surf->numIndices;
