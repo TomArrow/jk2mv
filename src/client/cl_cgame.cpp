@@ -460,6 +460,10 @@ void CL_ConfigstringModified( void ) {
 		CL_SystemInfoChanged();
 	}
 
+	// Shader Remaps
+	if ( index == cls.cs_remaps ) {
+		CL_ShaderStateChanged();
+	}
 }
 
 
@@ -672,6 +676,11 @@ void CL_CM_LoadMap( const char *mapname ) {
 	int		checksum;
 
 	CM_LoadMap( mapname, qtrue, &checksum );
+
+	// If the cgame module didn't announce it can handle it we want to abort now
+	if ( CM_NumInlineModels() > MAX_SUBMODELS && !cls.submodelBypass ) {
+		Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded\n\nYour CGame module doesn't support\nthe submodel bypass." );
+	}
 }
 
 /*
@@ -690,6 +699,7 @@ void CL_ShutdownCGame( void ) {
 	VM_Free( cgvm );
 	cgvm = NULL;
 	cls.fixes = MVFIX_NONE;
+	cls.submodelBypass = qfalse;
 #ifdef _DONETPROFILE_
 	ClReadProf().ShowTotals();
 #endif
@@ -738,6 +748,16 @@ void CL_CgameSetVirtualScreen(float w, float h) {
 
 
 float Q_asin(float c);
+
+/*
+====================
+CL_CgameEnableSubmodelBypass
+====================
+*/
+qboolean CL_CgameEnableSubmodelBypass( qboolean enable ) {
+	cls.submodelBypass = enable;
+	return cls.submodelBypass;
+}
 
 /*
 ====================
@@ -1438,6 +1458,16 @@ Ghoul2 Insert End
 			return (int)FS_FLock(args[1], (flockCmd_t)args[2], (qboolean)!!args[3], MODULE_CGAME);
 		case MVAPI_SET_VERSION:
 			VM_SetGameversion( cgvm, (mvversion_t)args[1] );
+			return 0;
+		}
+	}
+
+	if (VM_MVAPILevel(cgvm) >= 4) {
+		switch (args[0]) {
+		case CG_MVAPI_ENABLE_SUBMODELBYPASS:
+			return CL_CgameEnableSubmodelBypass( (qboolean)!!args[1] );
+		case MVAPI_PRINT:
+			Com_Printf_MV( args[1], "%s", VMAS(2) );
 			return 0;
 		}
 	}

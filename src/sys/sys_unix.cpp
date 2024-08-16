@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 #include <pwd.h>
 #include <pthread.h>
 #include <fenv.h>
@@ -452,12 +453,63 @@ char *Sys_DefaultAssetsPath() {
 #endif
 }
 
+// Try to find assets from /Applications (Appstore JKA) or Steam.
+// If neither worked try to find them in the same directory the jk2mv app is in.
+char *Sys_DefaultAssetsPathJKA() {
+#if defined(MACOS_X) && defined(INSTALLED)
+    static char path[MAX_OSPATH];
+    char *ptr;
+
+    // AppStore version (App name not verified, because the AppStore version
+	// doesn't support 32-bit and can't easily be obtained from the AppStore
+	// on modern Mac anymore; name guessed based on Steam version)
+    if (access("/Applications/SWJKJA.app/Contents/base/assets0.pk3", F_OK) != -1) {
+        return "/Applications/SWJKJA.app/Contents";
+    }
+
+    // Steam version
+    if (access(va("%s/Library/Application Support/Steam/steamapps/common/Jedi Academy/SWJKJA.app/Contents/base/assets0.pk3", getenv("HOME")), F_OK) != -1) {
+        Q_strncpyz(path, va("%s/Library/Application Support/Steam/steamapps/common/Jedi Academy/SWJKJA.app/Contents", getenv("HOME")), sizeof(path));
+        return path;
+    }
+
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size)) {
+        return NULL;
+    }
+
+    ptr = last_strstr(path, ".app/");
+    if (!ptr) {
+        return NULL;
+    }
+    *ptr = 0;
+
+    ptr = last_strstr(path, "/");
+    if (!ptr) {
+        return NULL;
+    }
+
+    strcpy(ptr, "/SWJKA.app/Contents");
+    if (access(va("%s/base/assets0.pk3", path), F_OK) == -1) {
+        return NULL;
+    }
+
+    return path;
+#else
+    return NULL;
+#endif
+}
+
 qboolean stdin_active = qtrue;
 qboolean stdinIsATTY = qfalse;
 int crashlogfd;
 extern void		Sys_SigHandler( int signal );
 static void		Sys_SigHandlerFatal(int sig, siginfo_t *info, void *context);
 static Q_NORETURN void Sys_CrashLogger(int fd, int argc, char *argv[]);
+
+// Max open file descriptors. Mostly used by pk3 files with
+// MAX_SEARCH_PATHS limit.
+#define MAX_OPEN_FILES	4096
 
 void Sys_PlatformInit( int argc, char *argv[] )
 {
@@ -511,10 +563,30 @@ skip_crash:
 
 	const char* term = getenv( "TERM" );
 
-    if (isatty( STDIN_FILENO ) && !( term && ( !strcmp( term, "raw" ) || !strcmp( term, "dumb" ) ) ))
+    if (isatty( STDIN_FILENO ) && !( term && ( !strcmp( term, "raw" ) || !strcmp( term, "dumb" ) ) )) {
 		stdinIsATTY = qtrue;
-    else
+    } else {
         stdinIsATTY = qfalse;
+	}
+
+	// raise open file limit to allow more pk3 files
+	int retval;
+	struct rlimit rlim;
+	rlim_t maxfds = MAX_OPEN_FILES;
+
+	for (int i = 1; i + 1 < argc; i++) {
+		if (!Q_stricmp(argv[i], "-maxfds")) {
+			maxfds = atoi(argv[i + 1]);
+		}
+	}
+
+	getrlimit(RLIMIT_NOFILE, &rlim);
+	rlim.rlim_cur = MIN(maxfds, rlim.rlim_max);
+	retval = setrlimit(RLIMIT_NOFILE, &rlim);
+
+	if (retval == -1) {
+		Com_Printf("Warning: Failed to raise open file limit. %s\n", strerror(errno));
+	}
 }
 
 void Sys_PlatformExit( void )
@@ -649,7 +721,7 @@ Sys_LoadModuleLibrary
 Used to load a module (jk2mpgame, cgame, ui) so/dylib
 =================
 */
-void *Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, intptr_t(QDECL **entryPoint)(int, ...), intptr_t(QDECL *systemcalls)(intptr_t, ...)) {
+void *Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, VM_EntryPoint_t *entryPoint, intptr_t(QDECL *systemcalls)(intptr_t, ...)) {
 	void (*dllEntry)(intptr_t(*syscallptr)(intptr_t, ...));
 	char filename[MAX_QPATH];
 	const char *path, *filePath;
@@ -703,7 +775,7 @@ void *Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, intptr_t(QDEC
 	}
 
 	dllEntry = (void (*)(intptr_t (*)(intptr_t,...))) dlsym(libHandle, "dllEntry");
-	*entryPoint = (intptr_t(*)(int,...))dlsym(libHandle, "vmMain");
+	*entryPoint = (VM_EntryPoint_t)dlsym(libHandle, "vmMain");
 	if ( !*entryPoint ) {
 		Com_DPrintf("Could not find vmMain in %s\n", filename);
 		dlclose(libHandle);
@@ -1296,7 +1368,7 @@ exit_failure:
 Sys_ResolvePath
 ===============
 */
-char *Sys_ResolvePath( char *path )
+const char *Sys_ResolvePath( const char *path )
 {	// There seems to be no function to resolve paths of files that don't exist
 	// on unix, so we just return the input path. This shouldn't be an issue,
 	// as we just need to resolve paths for those on windows anyway.
@@ -1309,10 +1381,24 @@ char *Sys_ResolvePath( char *path )
 Sys_RealPath
 ===============
 */
-char *Sys_RealPath( char *path )
+const char *Sys_RealPath( const char *path )
 {
 	static char realPath[PATH_MAX+1];
 	if ( realpath(path, realPath) )
 		return realPath;
 	return path;
+}
+
+/*
+===============
+Sys_FindFunctions
+===============
+*/
+int Sys_FindFunctions( void )
+{
+	// We only use this function on Windows to find functions that might not be
+	// available on all OS versions, but that may be required for some Sys_
+	// functions to be fully operational. On unix we can just return 0.
+
+	return 0;
 }

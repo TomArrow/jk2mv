@@ -166,6 +166,7 @@ cvar_t	*r_overBrightBits;
 
 cvar_t	*r_debugSurface;
 cvar_t	*r_simpleMipMaps;
+cvar_t	*r_openglMipMaps;
 
 cvar_t	*r_showImages;
 
@@ -208,6 +209,8 @@ cvar_t *r_fontSharpness;
 cvar_t *r_textureLODBias;
 cvar_t *r_saberGlow;
 cvar_t *r_environmentMapping;
+cvar_t *r_printMissingModels;
+cvar_t *r_newRemaps;
 
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
@@ -636,6 +639,16 @@ static void GLimp_InitExtensions(void) {
 	}
 }
 
+static void GLimp_InitOpenGLVersion(void) {
+	glConfig.glVersion = QGL_VERSION_1_0;
+
+	if (strncmp(glConfig.version_string, "1.4", 3) >= 0)
+	{
+		glConfig.glVersion = QGL_VERSION_1_4;
+		Com_Printf("...OpenGL 1.4 available\n");
+	}
+}
+
 /*
 ** InitOpenGL
 **
@@ -664,6 +677,8 @@ static void InitOpenGL(void) {
 
 		// stubbed or broken drivers may have reported 0...
 		glConfig.maxTextureSize = max(0, glConfig.maxTextureSize);
+
+		GLimp_InitOpenGLVersion();
 
 		// initialize extensions
 		GLimp_InitExtensions();
@@ -971,7 +986,8 @@ void GfxInfo_f( void )
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize );
 	ri.Printf( PRINT_ALL, "GL_MAX_ACTIVE_TEXTURES_ARB: %d\n", glConfig.maxActiveTextures );
 	ri.Printf( PRINT_ALL, "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n", glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits );
-	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer, glConfig.vidWidth, glConfig.vidHeight, fsstrings[r_fullscreen->integer == 1] );
+	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer, glConfig.winWidth, glConfig.winHeight, fsstrings[r_fullscreen->integer == 1] );
+
 	if ( glConfig.displayFrequency )
 	{
 		ri.Printf( PRINT_ALL, "%d\n", glConfig.displayFrequency );
@@ -981,7 +997,8 @@ void GfxInfo_f( void )
 		ri.Printf( PRINT_ALL, "N/A\n" );
 	}
 
-	ri.Printf(PRINT_ALL, "Display Scale: %d%%\n", (int)glConfig.displayScale * 100);
+	ri.Printf( PRINT_ALL, "renderer size: %d x %d\n", glConfig.vidWidth, glConfig.vidHeight );
+	ri.Printf( PRINT_ALL, "display scale: %d%%\n", (int)roundf(glConfig.displayScale * 100.0f));
 
 	// gamma correction
 	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
@@ -1118,10 +1135,14 @@ void R_Register( void )
 	r_aspectratio = ri.Cvar_Get("r_aspectratio", "-1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH); // screen resolutions
 	r_customaspect = ri.Cvar_Get("r_customaspect", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_simpleMipMaps = ri.Cvar_Get("r_simpleMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
+	r_openglMipMaps = ri.Cvar_Get("r_openglMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_vertexLight = ri.Cvar_Get("r_vertexLight", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_uiFullScreen = ri.Cvar_Get( "r_uifullscreen", "0", 0);
 	r_subdivisions = ri.Cvar_Get("r_subdivisions", "4", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_ignoreFastPath = ri.Cvar_Get("r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
+	r_newRemaps = ri.Cvar_Get("r_newRemaps", "0", CVAR_CHEAT ); // Only used for testing. Classic remaps are supposed to remain fullbright,
+	                                                            // because that is how they have been used by maps and serverside mods for
+	                                                            // more than 20 years. Servers can set a configstring for "mvremap" now.
 
 	//
 	// temporary latched variables that can only change over a restart
@@ -1217,7 +1238,7 @@ void R_Register( void )
 	r_celoutlineColor->modified = qtrue;
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
-	r_clear = ri.Cvar_Get ("r_clear", "0", CVAR_CHEAT);
+	r_clear = ri.Cvar_Get ("r_clear", "0", 0);
 	r_offsetFactor = ri.Cvar_Get( "r_offsetfactor", "-1", CVAR_CHEAT );
 	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
 	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
@@ -1270,6 +1291,7 @@ Ghoul2 Insert End
 	r_textureLODBias = ri.Cvar_Get("r_textureLODBias", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_saberGlow = ri.Cvar_Get("r_saberGlow", "1", CVAR_ARCHIVE | CVAR_LATCH);
 	r_environmentMapping = ri.Cvar_Get("r_environmentMapping", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_printMissingModels = ri.Cvar_Get("r_printMissingModels", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 }
 
 #ifdef G2_COLLISION_ENABLED
@@ -1507,6 +1529,22 @@ void RE_SetLightStyle(int style, int color)
 	memcpy(styleColors[style], &color, 4);
 }
 
+void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
+	int		oldWidth = glConfig.vidWidth;
+	int		oldHeight = glConfig.vidHeight;
+
+	WIN_UpdateGLConfig( &glConfig );
+
+	if (oldWidth != glConfig.vidWidth || oldHeight != glConfig.vidHeight) {
+		R_SyncRenderThread();
+		R_UpdateImages();
+	}
+
+	glconfigOut->vidWidth = glConfig.vidWidth;
+	glconfigOut->vidHeight = glConfig.vidHeight;
+	glconfigOut->displayScale = glConfig.displayScale;
+}
+
 #endif //!DEDICATED
 /*
 @@@@@@@@@@@@@@@@@@@@@
@@ -1540,6 +1578,7 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.SetWorldVisData = RE_SetWorldVisData;
 	re.EndRegistration = RE_EndRegistration;
 
+	re.UpdateGLConfig = RE_UpdateGLConfig;
 	re.BeginFrame = RE_BeginFrame;
 	re.EndFrame = RE_EndFrame;
 	re.SwapBuffers = RE_SwapBuffers;
@@ -1575,6 +1614,8 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.AnyLanguage_ReadCharFromString = AnyLanguage_ReadCharFromString;
 
 	re.RemapShader = R_RemapShader;
+	re.RemapShaderAdvanced = R_RemapShaderAdvanced;
+	re.RemoveAdvancedRemaps = R_RemoveAdvancedRemaps;
 	re.GetEntityToken = R_GetEntityToken;
 	re.inPVS = R_inPVS;
 

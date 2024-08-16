@@ -839,6 +839,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 	const glyphInfo_t	*pLetter;
 	qhandle_t			hShader;
 	qboolean			qbThisCharCountsAsLetter;	// logic for this bool must be kept same in this function and RE_Font_StrLenChars()
+	bool				colorShadow = (MV_GetCurrentGameversion() == VERSION_1_02 || mv_coloredTextShadows->integer == 1) && mv_coloredTextShadows->integer;
+	int					colourChain = 0;
 
 	if(iFontHandle & STYLE_BLINK)
 	{
@@ -867,13 +869,11 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 
 	// Draw a dropshadow if required
 	if (iFontHandle & STYLE_DROPSHADOW) {
-		if ((MV_GetCurrentGameversion() == VERSION_1_02 || mv_coloredTextShadows->integer == 1) && mv_coloredTextShadows->integer) {
-			int i = 0, r = 0;
-			char dropShadowText[1024];
-			static const vec4_t v4DKGREY2 = { 0.15f, 0.15f, 0.15f, 1 };
+		static const vec4_t v4DKGREY2 = {0.15f, 0.15f, 0.15f, 1};
 
-			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
+		offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
+/*
 			//^blah stuff confuses shadows, so parse it out first
 			while (psText[i] && r < 1023) {
 				if (psText[i] == '^') {
@@ -909,7 +909,11 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
 				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
 			gbInShadow = qfalse;
-		}
+		}*/
+		gbInShadow = qtrue;
+		RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
+			iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
+		gbInShadow = qfalse;
 	}
 
 	RE_SetColor( rgba );
@@ -935,8 +939,9 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 		case '^':
 			if ( !*psText ) break; // If we were given a string ending with '^'
 			colour = ColorIndex(*psText);
-			if (!gbInShadow)
-			{
+			colourChain++; // Keep track of the amount of chained colors
+			if (!gbInShadow || (colorShadow && !(colourChain % 2)))
+			{ // For colored shadows (when enabled) every second color in a chain is applied to the shadow
 				RE_SetColor( g_color_table[colour] );
 			}
 			++psText;
@@ -961,7 +966,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 				int skipCount;
 				if (Q_parseColorHex(psText, color, &skipCount)) {
 					psText += skipCount;
-					if (!gbInShadow)
+					colourChain++; // Keep track of the amount of chained colors
+					if (!gbInShadow || (colorShadow && !(colourChain % 2)))
 					{
 						RE_SetColor(color);
 					}
@@ -970,7 +976,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
 			{
 				colour = ColorIndex(*psText);
-				if (!gbInShadow)
+				colourChain++; // Keep track of the amount of chained colors
+				if (!gbInShadow || (colorShadow && !(colourChain % 2)))
 				{
 					RE_SetColor(g_color_table[colour]);
 				}
@@ -1007,6 +1014,9 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			fx += (float)pLetter->horizAdvance * fThisScale;
 			break;
 		}
+
+		// Reset colourChain if we hit a non colorcode
+		if ( uiLetter != '^' ) colourChain = 0;
 
 		if (qbThisCharCountsAsLetter && iCharLimit != -1)
 		{

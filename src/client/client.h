@@ -387,6 +387,7 @@ typedef struct {
 
 	int			fixes;
 
+
 	//EternalJK2MV
 	struct {
 		fileHandle_t	chat;
@@ -433,6 +434,9 @@ typedef struct {
 	} showVelocity;
 
 
+	qboolean	submodelBypass;
+
+	int			cs_remaps;
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -599,11 +603,13 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
+void CL_UpdateRefConfig( void );
 
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
 void CL_GetVMGLConfig(vmglconfig_t *vmglconfig);
 int CL_ScaledMilliseconds(void);
+void CL_ShaderStateChanged( void );
 
 //EternalJK2MV
 void CL_RandomizeColors(const char* in, char *out);

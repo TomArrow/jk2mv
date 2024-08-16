@@ -115,10 +115,9 @@ void CMod_LoadSubmodels( lump_t *l ) {
 	cm.cmodels = (struct cmodel_s *)Hunk_Alloc( count * sizeof( *cm.cmodels ), h_high );
 	cm.numSubModels = count;
 
-	if ( count > MAX_SUBMODELS ) {
-		//Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded" );
-		count = MAX_SUBMODELS - 1;
-	}
+	cm.capsuleModelHandle = MAX(254, count); // At least 254 (CAPSULE_MODEL_HANDLE) in case some legacy cgame module violates the api
+	cm.boxModelHandle = MAX(255, count + 1); // At least 255 (BOX_MODEL_HANDLE) in case some legacy cgame module violates the api
+
 
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
@@ -284,6 +283,10 @@ void CMod_LoadLeafs (lump_t *l)
 
 	cm.areas = (cArea_t *)Hunk_Alloc( cm.numAreas * sizeof( *cm.areas ), h_high );
 	cm.areaPortals = (int *)Hunk_Alloc( cm.numAreas * cm.numAreas * sizeof( *cm.areaPortals ), h_high );
+
+	if (cm.numAreas > MAX_MAP_AREA_BYTES * 8) {
+		Com_DPrintf(S_COLOR_YELLOW "WARNING: Map has %d areaportal areas but only up to %d are supported\n", cm.numAreas, MAX_MAP_AREA_BYTES * 8);
+	}
 }
 
 /*
@@ -754,7 +757,7 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 	if ( handle < cm.numSubModels ) {
 		return &cm.cmodels[handle];
 	}
-	if ( handle == BOX_MODEL_HANDLE ) {
+	if ( handle == cm.boxModelHandle ) {
 		return &box_model;
 	}
 	if ( handle < MAX_SUBMODELS ) {
@@ -876,7 +879,7 @@ clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean cap
 	VectorCopy( maxs, box_model.maxs );
 
 	if ( capsule ) {
-		return CAPSULE_MODEL_HANDLE;
+		return cm.capsuleModelHandle;
 	}
 
 	box_planes[0].dist = maxs[0];
@@ -895,7 +898,7 @@ clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean cap
 	VectorCopy( mins, box_brush->bounds[0] );
 	VectorCopy( maxs, box_brush->bounds[1] );
 
-	return BOX_MODEL_HANDLE;
+	return cm.boxModelHandle;
 }
 
 /*

@@ -178,7 +178,7 @@ if (BuildMVMP OR BuildMVDED)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_x86.cpp"
 		)
-	elseif(ARCH_ARM)
+	elseif(ARCH_ARM32)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_arm.cpp"
 		)
@@ -285,7 +285,7 @@ if (BuildMVMP)
 		message(FATAL_ERROR "OpenGL dev files not found!")
 	endif()
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} ${OPENGL_INCLUDE_DIR})
-	set(MVMPLibraries ${MVMPLibraries} ${OPENGL_gl_LIBRARY})
+	set(MVMPLibraries ${MVMPLibraries} ${OPENGL_LIBRARIES})
 
 	if(UseInternalOpenAL)
 		# OpenAL

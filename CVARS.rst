@@ -45,6 +45,33 @@ New and Modified Cvars
    | ``fs_game cvar``
    | ``fs_forcegame cvar``
 
+..
+
+:Name: fs_assetspathjka
+:Values: Foldername
+:Default: "" (Not set on portable); autodetected for non-portable
+:Description:
+   Sets the path to load JKA assets from.
+
+..
+
+:Name: fs_basejka
+:Values: Foldername
+:Default: "basejka" (if fs_assetspathjka is empty); "base" (if fs_assetspathjka is set)
+:Description:
+   Name of the folder containing the JKA assets within fs_assetspathjka. If
+   fs_assetspathjka is not set the game tries to load assets from the specified
+   folder in fs_basepath and fs_homepath.
+
+..
+
+:Name: fs_loadjka
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Enables loading of JKA assets when fs_assetspathjka point to a valid JKA
+   folder.
+
 -----------
 Client-Side
 -----------
@@ -132,6 +159,19 @@ Client-Side
 :Default: "1"
 :Description:
    Draw local timestamps in console and condump output.
+
+..
+
+:Name: in_mouse
+:Values: "0", "1", "2", "3"
+:Default: "1"
+:Description:
+   Mouse input mode
+
+   | 0: Mouse disabled.
+   | 1: Same as in retail client - high latency, follows desktop mouse speed and acceleration settings.
+   | 2: Raw, no acceleration, lowest latency.
+   | 3: Raw, lowest latency but with desktop mouse speed and acceleration settings.
 
 ..
 
@@ -267,6 +307,24 @@ Client-Side
 
 ..
 
+:Name: r_highdpi
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Enable / Disable high DPI rendering when desktop scaling is
+   enabled.
+
+..
+
+:Name: r_openglMipMaps
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Enable / Disable OpenGL mipmap generation. Disable to restore
+   original downsampling algorithms.
+
+..
+
 :Name: r_saberGlow
 :Values: "0", "1"
 :Default: "1"
@@ -299,6 +357,32 @@ Client-Side
 :Default: "1"
 :Description:
    Mute all sounds when client window is unfocused.
+
+..
+
+:Name: r_printMissingModels
+:Values: "0", "1"
+:Default: "1"
+:Description:
+   Print a warning when a model fails to load.
+
+..
+
+:Name: con_opacity
+:Values: 1 >= Decimal >= 0
+:Description:
+   Opacity of the in-game console.
+
+..
+
+:Name: con_skipNotifyKeyword
+:Values: String
+:Default: "" (Not set)
+:Description:
+   Keyword used by modules to print messags into the console that
+   should not appear as notifications. JKA uses the builtin keyword
+   ``[skipnotify]`` and some mods seem to have adopted this. To increase
+   compatibility with those mods this cvar can be used.
 
 -----------
 Server-Side

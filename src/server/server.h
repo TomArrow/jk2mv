@@ -81,6 +81,8 @@ typedef struct {
 
 	time_t			realMapTimeStarted;	// time the current map was started
 	qboolean		demosPruned; // whether or not existing demos were cleaned up already
+
+	qboolean		submodelBypass;
 } server_t;
 
 typedef struct {
@@ -430,6 +432,7 @@ qboolean	SV_inPVS (const vec3_t p1, const vec3_t p2);
 
 qboolean SV_MVAPI_ControlFixes(int fixes);
 qboolean SV_MVAPI_EnablePlayerSnapshots(qboolean enable);
+qboolean SV_MVAPI_EnableSubmodelBypass(qboolean enable);
 
 //
 // sv_bot.c

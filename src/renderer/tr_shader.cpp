@@ -103,6 +103,7 @@ static	qboolean		deferLoad;
 
 #define FILE_HASH_SIZE		1024
 static	shader_t*		hashTable[FILE_HASH_SIZE];
+static	shader_t*		advancedRemapShadersHashTable[FILE_HASH_SIZE];
 
 #define MAX_SHADERTEXT_HASH		2048
 static const char **shaderTextHashTable[MAX_SHADERTEXT_HASH];
@@ -205,6 +206,11 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	shader_t	*sh, *sh2;
 	qhandle_t	h;
 
+	if ( r_newRemaps->integer ) {
+		R_RemapShaderAdvanced( shaderName, newShaderName, (int)(atof(timeOffset)*1000), SHADERREMAP_LIGHTMAP_PRESERVE, SHADERREMAP_STYLE_PRESERVE );
+		return;
+	}
+
 	sh = R_FindShaderByName( shaderName );
 	if (sh == NULL || sh == tr.defaultShader) {
 		h = RE_RegisterShaderLightMap(shaderName, lightmapsNone, stylesDefault);
@@ -241,6 +247,77 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	}
 	if (timeOffset) {
 		sh2->timeOffset = atof(timeOffset);
+	}
+}
+
+void R_RemapShaderAdvanced(const char *shaderName, const char *newShaderName, int timeOffset, shaderRemapLightmapType_t lightmapMode, shaderRemapStyleType_t styleMode) {
+	char		strippedName[MAX_QPATH];
+	int			hash;
+	shader_t	*sh, *sh2 = NULL;
+	int			failed = 0;
+	const int	*lightmapIndex = NULL;
+	const byte	*styles = NULL;
+	qboolean	foundShader = qfalse;
+
+	// Lightmap
+	if ( lightmapMode == SHADERREMAP_LIGHTMAP_FULLBRIGHT ) {
+		lightmapIndex = lightmapsFullBright;
+	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_NONE ) {
+		lightmapIndex = lightmapsNone;
+	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_2D ) {
+		lightmapIndex = lightmaps2d;
+	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_VERTEX ) {
+		lightmapIndex = lightmapsVertex;
+	}
+
+	// Style
+	if ( styleMode == SHADERREMAP_STYLE_DEFAULT ) {
+		styles = stylesDefault;
+	}
+
+	if ( lightmapIndex && lightmapMode != SHADERREMAP_LIGHTMAP_VERTEX ) {
+		// For fullbright, none and 2d we only need one new shader
+		sh2 = R_FindAdvancedRemapShader( newShaderName, lightmapIndex, stylesDefault, qtrue );
+
+		if ( !sh2 || sh2 == tr.defaultShader || sh2->defaultShader ) {
+			ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: new shader %s not found\n", newShaderName );
+			return;
+		}
+	}
+
+	// Remap all the shaders with the given name and copy over the lightmap + styles
+	COM_StripExtension( shaderName, strippedName, sizeof(strippedName) );
+	hash = generateHashValue(strippedName, FILE_HASH_SIZE);
+	for (sh = hashTable[hash]; sh; sh = sh->next) {
+		if (Q_stricmp(sh->name, strippedName) == 0) {
+			foundShader = qtrue;
+
+			if ( lightmapMode == SHADERREMAP_LIGHTMAP_PRESERVE || lightmapMode == SHADERREMAP_LIGHTMAP_VERTEX ) {
+				// When preserving lightmaps we need to use the correct lightmap index (+styles)
+				sh2 = R_FindAdvancedRemapShader( newShaderName, lightmapIndex ? lightmapIndex : sh->lightmapIndex, styles ? styles : sh->styles, (qboolean)!sh->upload.noMipMaps );
+			}
+
+			if ( !sh2 || sh2 == tr.defaultShader || sh2->defaultShader ) {
+				failed++;
+				continue;
+			}
+			if ( timeOffset ) sh2->timeOffset = timeOffset * 0.001;
+
+			if (sh != sh2) {
+				sh->remappedShaderAdvanced = sh2;
+			} else {
+				sh->remappedShaderAdvanced = NULL;
+			}
+		}
+	}
+	if ( !foundShader ) ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: shader %s not found\n", shaderName );
+	if ( failed ) ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: new shader %s not found (x%i)\n", newShaderName, failed );
+}
+
+void R_RemoveAdvancedRemaps( void ) {
+	int i;
+	for ( i = 0; i < tr.numShaders; i++ ) {
+		tr.shaders[i]->remappedShaderAdvanced = NULL;
 	}
 }
 
@@ -2172,6 +2249,12 @@ static qboolean ParseShader( const char **text )
 		// stage definition
 		else if ( token[0] == '{' )
 		{
+			if ( s >= MAX_SHADER_STAGES )
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: too many stages in shader %s (max is %i)\n", shader.name, MAX_SHADER_STAGES );
+				break; // Don't return with qfalse, because we don't want existing shaders violating MAX_SHADER_STAGES to be displayed as missing shaders
+			}
+
 			if ( !ParseStage( &stages[s], text ) )
 			{
 				return qfalse;
@@ -2807,7 +2890,7 @@ static shader_t *GeneratePermanentShader( void ) {
 	int			i, b;
 	int			size, hash;
 
-	if ( tr.numShaders == MAX_SHADERS ) {
+	if ( (!shader.isAdvancedRemap && tr.numShaders == MAX_SHADERS) || (shader.isAdvancedRemap && tr.numAdvancedRemapShaders == MAX_SHADERS) ) {
 		ri.Printf( PRINT_WARNING, "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
 		return tr.defaultShader;
 	}
@@ -2844,13 +2927,19 @@ static shader_t *GeneratePermanentShader( void ) {
 		newShader->fogPass = FP_LE;
 	}
 
-	tr.shaders[ tr.numShaders ] = newShader;
-	newShader->index = tr.numShaders;
+	if ( newShader->isAdvancedRemap ) {
+		// If the shader has been created by the advanced remaps system we store it in a separate list
+		tr.advancedRemapShaders[ tr.numAdvancedRemapShaders ] = newShader;
+		tr.numAdvancedRemapShaders++;
+	} else {
+		tr.shaders[ tr.numShaders ] = newShader;
+		newShader->index = tr.numShaders;
 
-	tr.sortedShaders[ tr.numShaders ] = newShader;
-	newShader->sortedIndex = tr.numShaders;
+		tr.sortedShaders[ tr.numShaders ] = newShader;
+		newShader->sortedIndex = tr.numShaders;
 
-	tr.numShaders++;
+		tr.numShaders++;
+	}
 
 	for ( i = 0 ; i < newShader->numUnfoggedPasses ; i++ ) {
 		if ( !stages[i].active ) {
@@ -2868,11 +2957,18 @@ static shader_t *GeneratePermanentShader( void ) {
 		}
 	}
 
-	SortNewShader();
-
 	hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
-	newShader->next = hashTable[hash];
-	hashTable[hash] = newShader;
+
+	if ( newShader->isAdvancedRemap ) {
+		// We want to keep the advanced remaps separate
+		newShader->next = advancedRemapShadersHashTable[hash];
+		advancedRemapShadersHashTable[hash] = newShader;
+	} else {
+		SortNewShader();
+
+		newShader->next = hashTable[hash];
+		hashTable[hash] = newShader;
+	}
 
 	return newShader;
 }
@@ -3379,18 +3475,15 @@ inline qboolean IsShader(shader_t *sh, const char *name, const int *lightmapInde
 		return qfalse;
 	}
 
-	if (!sh->defaultShader)
+	for(i=0;i<MAXLIGHTMAPS;i++)
 	{
-		for(i=0;i<MAXLIGHTMAPS;i++)
+		if (sh->lightmapIndex[i] != lightmapIndex[i])
 		{
-			if (sh->lightmapIndex[i] != lightmapIndex[i])
-			{
-				return qfalse;
-			}
-			if (sh->styles[i] != styles[i])
-			{
-				return qfalse;
-			}
+			return qfalse;
+		}
+		if (sh->styles[i] != styles[i])
+		{
+			return qfalse;
 		}
 	}
 
@@ -3446,7 +3539,7 @@ most world construction surfaces.
 
 ===============
 */
-shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage )
+shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage, qboolean isAdvancedRemap )
 {
 	char		strippedName[MAX_QPATH];
 	char		fileName[MAX_QPATH];
@@ -3475,7 +3568,7 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	//
 	// see if the shader is already loaded
 	//
-	for (sh = hashTable[hash]; sh; sh = sh->next) {
+	for (sh = isAdvancedRemap ? advancedRemapShadersHashTable[hash] : hashTable[hash]; sh; sh = sh->next) {
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
@@ -3496,6 +3589,9 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	for ( i = 0 ; i < MAX_SHADER_STAGES ; i++ ) {
 		stages[i].bundle[0].texMods = texMods[i];
 	}
+
+	// Mark shader as advanced remap if it is
+	shader.isAdvancedRemap = isAdvancedRemap;
 
 	// FIXME: set these "need" values apropriately
 	shader.needsNormal = qtrue;
@@ -3551,7 +3647,8 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	if ( !image ) {
 		ri.Printf( PRINT_DEVELOPER, "Couldn't find image for shader %s\n", name );
 		shader.defaultShader = qtrue;
-		return FinishShader();
+		//return FinishShader();
+		image = tr.defaultImage;
 	}
 
 	//
@@ -3607,6 +3704,10 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 
 	return FinishShader();
 #endif //!DEDICATED
+}
+
+shader_t *R_FindAdvancedRemapShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage ) {
+	return R_FindShader( name, lightmapIndex, styles, mipRawImage, qtrue );
 }
 
 #if 0
@@ -3725,15 +3826,6 @@ qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex,
 
 	sh = R_FindShader( name, lightmapIndex, styles, qtrue );
 
-	// we want to return 0 if the shader failed to
-	// load for some reason, but R_FindShader should
-	// still keep a name allocated for it, so if
-	// something calls RE_RegisterShader again with
-	// the same name, we don't try looking for it again
-	if ( sh->defaultShader ) {
-		return 0;
-	}
-
 	return sh->index;
 }
 
@@ -3758,15 +3850,6 @@ qhandle_t RE_RegisterShader( const char *name ) {
 	}
 
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qtrue );
-
-	// we want to return 0 if the shader failed to
-	// load for some reason, but R_FindShader should
-	// still keep a name allocated for it, so if
-	// something calls RE_RegisterShader again with
-	// the same name, we don't try looking for it again
-	if ( sh->defaultShader ) {
-		return 0;
-	}
 
 	return sh->index;
 }
@@ -3916,12 +3999,12 @@ a single large text block that can be scanned for shader names
 #define	MAX_SHADER_FILES	4096
 static void ScanAndLoadShaderFiles( const char *path )
 {
-	const char **shaderFiles[2];
+	const char **shaderFiles[3];
 	char *buffers[MAX_SHADER_FILES];
 	const char *p;
 	char *pw;
 	int numShaderFiles;
-	int numShaderFilesType[2];
+	int numShaderFilesType[3];
 	int i, j, type;
 	const char *oldp, *token;
 	char *hashMem;
@@ -3931,6 +4014,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 	// scan for shader files
 	shaderFiles[0] = ri.FS_ListFiles( path, ".shader_mv", &numShaderFilesType[0] );
 	shaderFiles[1] = ri.FS_ListFiles( path, ".shader", &numShaderFilesType[1] );
+	shaderFiles[2] = ri.FS_ListFiles( path, ".shader_jka", &numShaderFilesType[2] );
 
 	if ( !shaderFiles[0] )
 	{
@@ -3940,23 +4024,28 @@ static void ScanAndLoadShaderFiles( const char *path )
 	{
 		numShaderFilesType[1] = 0;
 	}
-
-	if ( numShaderFilesType[0] + numShaderFilesType[1] > MAX_SHADER_FILES ) {
-		ri.Printf( PRINT_WARNING, "WARNING: too many shader files, truncating...\n" );
-		numShaderFilesType[0] = MIN(numShaderFilesType[0], MAX_SHADER_FILES);
-		numShaderFilesType[1] = MAX_SHADER_FILES - numShaderFilesType[0];
+	if ( !shaderFiles[2] )
+	{
+		numShaderFilesType[2] = 0;
 	}
 
-	numShaderFiles = numShaderFilesType[0] + numShaderFilesType[1];
+	if ( numShaderFilesType[0] + numShaderFilesType[1] + numShaderFilesType[2] > MAX_SHADER_FILES ) {
+		ri.Printf( PRINT_WARNING, "WARNING: too many shader files, truncating...\n" );
+		numShaderFilesType[0] = MIN(numShaderFilesType[0], MAX_SHADER_FILES);
+		numShaderFilesType[1] = MIN(numShaderFilesType[1], MAX_SHADER_FILES - numShaderFilesType[0]);
+		numShaderFilesType[2] = MIN(numShaderFilesType[2], MAX_SHADER_FILES - numShaderFilesType[0] - numShaderFilesType[1]);
+	}
+
+	numShaderFiles = numShaderFilesType[0] + numShaderFilesType[1] + numShaderFilesType[2];
 
 	if (numShaderFiles == 0) {
 			ri.Error( ERR_FATAL, "ERROR: no shader files found" );
 	}
 
-	assert(numShaderFilesType[0] > 0 || numShaderFilesType[1] > 0);
+	assert(numShaderFilesType[0] > 0 || numShaderFilesType[1] > 0 || numShaderFilesType[2] > 0);
 	sum = 0;
 	// load and parse shader files
-	for ( type = 0, j = 0; type < 2; type++ ) {
+	for ( type = 0, j = 0; type < 3; type++ ) {
 		for ( i = 0; i < numShaderFilesType[type]; i++, j++ )
 		{
 			char filename[MAX_QPATH];
@@ -3985,6 +4074,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 	// free up memory
 	ri.FS_FreeFileList( shaderFiles[0] );
 	ri.FS_FreeFileList( shaderFiles[1] );
+	ri.FS_FreeFileList( shaderFiles[2] );
 
 	Com_Memset(shaderTextHashTableSizes, 0, sizeof(shaderTextHashTableSizes));
 	size = 0;
@@ -4148,6 +4238,7 @@ CreateInternalShaders
 */
 static void CreateInternalShaders( void ) {
 	tr.numShaders = 0;
+	tr.numAdvancedRemapShaders = 0;
 
 	// init the default shader
 	Com_Memset( &shader, 0, sizeof( shader ) );
@@ -4275,6 +4366,7 @@ void R_InitShaders( void ) {
 	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
+	Com_Memset(advancedRemapShadersHashTable, 0, sizeof(advancedRemapShadersHashTable));
 
 	deferLoad = qfalse;
 

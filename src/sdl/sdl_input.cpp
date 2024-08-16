@@ -294,9 +294,9 @@ static void IN_ActivateMouse( void )
 	}
 
 	// in_nograb makes no sense in fullscreen mode
-	if( !(SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_FULLSCREEN) )
+	if( in_nograb->modified || !mouseActive )
 	{
-		if( in_nograb->modified || !mouseActive )
+		if( !(SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_FULLSCREEN) )
 		{
 			if( in_nograb->integer )
 			{
@@ -308,9 +308,9 @@ static void IN_ActivateMouse( void )
 				SDL_SetRelativeMouseMode( SDL_TRUE );
 				SDL_SetWindowGrab( SDL_window, SDL_TRUE );
 			}
-
-			in_nograb->modified = qfalse;
 		}
+
+		in_nograb->modified = qfalse;
 	}
 
 	mouseActive = qtrue;
@@ -343,7 +343,7 @@ static void IN_DeactivateMouse( void )
 
 		// Don't warp the mouse unless the cursor is within the window
 		if( SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_MOUSE_FOCUS )
-			SDL_WarpMouseInWindow( SDL_window, cls.glconfig.vidWidth / 2, cls.glconfig.vidHeight / 2 );
+			SDL_WarpMouseInWindow( SDL_window, cls.glconfig.winWidth / 2, cls.glconfig.winHeight / 2 );
 
 		mouseActive = qfalse;
 	}
@@ -481,14 +481,30 @@ void IN_Init( void *windowData )
 
 	mouseAvailable = (qboolean)( in_mouse->value != 0 );
 
+	if (in_mouse->integer == 0) {
+		Com_DPrintf("IN_Init: Mouse input disabled\n");
+	}
+
+	if (in_mouse->integer == 1) {
+		Com_DPrintf("IN_Init: Using raw mouse input\n");
+	}
+
 	if (in_mouse->integer == 2) {
 		Com_DPrintf("IN_Init: Not using raw input\n");
 		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
-	}
-	else {
-		Com_DPrintf("IN_Init: Using raw mouse input\n");
+	} else {
 		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "0");
 	}
+
+#if SDL_VERSION_ATLEAST(2, 26, 0)
+	if (in_mouse->integer == 3) {
+		Com_DPrintf("IN_Init: Using raw mouse input with system scaling\n");
+		// low latency of raw mouse input with system mouse scaling
+		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "1");
+	} else {
+		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "0");
+	}
+#endif
 
 	IN_DeactivateMouse( );
 

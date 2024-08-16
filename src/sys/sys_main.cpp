@@ -225,6 +225,7 @@ void Sys_WriteCrashlog();
 int main(int argc, char* argv[]) {
 	int		i;
 	char	commandLine[MAX_STRING_CHARS] = { 0 };
+	int		missingFuncs = Sys_FindFunctions();
 
 #if defined(_MSC_VER) && !defined(_DEBUG)
 	__try {
@@ -266,7 +267,21 @@ int main(int argc, char* argv[]) {
 
 	Com_Init(commandLine);
 
-	NET_Init();
+	if ( missingFuncs ) {
+		static const char *missingFuncsError =
+			"Your system is missing functions this application relies on.\n"
+			"\n"
+			"Some features may be unavailable or their behavior may be incorrect.";
+
+		// Set the error cvar (the main menu should pick this up and display an error box to the user)
+		Cvar_Get( "com_errorMessage", missingFuncsError, CVAR_ROM );
+		Cvar_Set( "com_errorMessage", missingFuncsError );
+
+		// Print the error into the console, because we can't always display the main menu (dedicated servers, ...)
+		Com_Printf( "********************\n" );
+		Com_Printf( "ERROR: %s\n", missingFuncsError );
+		Com_Printf( "********************\n" );
+	}
 
 	// main game loop
 	while (!sys_signal) {

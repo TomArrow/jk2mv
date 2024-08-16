@@ -135,6 +135,7 @@ char	*MSG_ReadBigString (msg_t *sb);
 char	*MSG_ReadStringLine (msg_t *sb);
 float	MSG_ReadAngle16 (msg_t *sb);
 void	MSG_ReadData (msg_t *sb, void *buffer, int size);
+void	MSG_SkipData (msg_t *sb, int size);
 
 
 void MSG_WriteDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
@@ -695,9 +696,10 @@ qboolean FS_CopyFile( char *fromOSPath, char *toOSPath, char *newOSPath = NULL, 
 qboolean FS_Initialized();
 
 void	FS_InitFilesystem (void);
-void	FS_Shutdown( qboolean closemfp );
+void	FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles );
 
 qboolean	FS_ConditionalRestart( int checksumFeed );
+void	FS_Restart2( int checksumFeed, qboolean inPlace );
 void	FS_Restart( int checksumFeed );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
@@ -734,8 +736,10 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODUL
 fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse);
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse );
+
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
+
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -761,6 +765,7 @@ int		FS_ReadFile( const char *qpath, void **buffer );
 // A 0 byte will always be appended at the end, so string ops are safe.
 // the buffer should be considered read-only, because it may be cached
 // for other uses.
+int		FS_ReadFileSkipJKA( const char *qpath, void **buffer );
 
 void	FS_ForceFlush( fileHandle_t f, module_t module = MODULE_MAIN );
 // forces flush on files we're writing to.
@@ -820,7 +825,7 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 
 qboolean FS_CheckDirTraversal(const char *checkdir);
 qboolean FS_ComparePaks(char *neededpaks, int len, int *chksums, size_t maxchksums, qboolean dlstring);
-void FS_Rename( const char *from, const char *to );
+qboolean FS_Rename( const char *from, const char *to );
 
 const char *FS_MV_VerifyDownloadPath(const char *pk3file);
 
@@ -835,6 +840,7 @@ void FS_HomeRmdir(const char* homePath, qboolean recursive);
 
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
+qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module = MODULE_MAIN );
 
 /*
 ==============================================================
@@ -875,6 +881,7 @@ void		Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)(char *),
 void		Com_EndRedirect( void );
 void 		QDECL Com_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 void		QDECL Com_Printf_Ext( qboolean extendedColors, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
+void		QDECL Com_Printf_MV( int flags, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
 void 		QDECL Com_DPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 void		QDECL Com_OPrintf( const char *fmt, ...) __attribute__ ((format (printf, 1, 2))); // Outputs to the VC / Windows Debug window (only in debug compile)
 Q_NORETURN void QDECL  Com_Error( errorParm_t code, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
@@ -886,7 +893,7 @@ unsigned	Com_BlockChecksum( const void *buffer, int length );
 unsigned	Com_BlockChecksumKey (void *buffer, int length, int key);
 int			Com_HashKey(const char *string, int maxlen);
 int			Com_Filter(const char *filter, const char *name, int casesensitive);
-int			Com_FilterPath(char *filter, char *name, int casesensitive);
+int			Com_FilterPath(char *filter, const char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
 qboolean	Com_SafeMode( void );
 void Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
@@ -1054,7 +1061,7 @@ void CL_JoystickEvent( int axis, int value, int time );
 
 void CL_PacketEvent( netadr_t from, msg_t *msg );
 
-void CL_ConsolePrint( const char *text, qboolean extendedColors );
+void CL_ConsolePrint( const char *text, qboolean extendedColors, qboolean skipNotify );
 
 void CL_MapLoading( void );
 // do a screen update before starting to load a map
@@ -1126,6 +1133,11 @@ typedef struct {
 	node_t*		lhead;
 	node_t*		ltail;
 	node_t*		loc[HMAX+1];
+	// freelist is a head of linked list of nodePtrs
+	// elements. nodePtrs element type is overloaded and may hold
+	// node_t* pointer pointing to nodeList element or node_t**
+	// pointer pointing to another nodePtrs element when part of
+	// freelist!
 	node_t**	freelist;
 
 	node_t		nodeList[768];
@@ -1158,5 +1170,7 @@ extern huffman_t clientHuffTables;
 void MV_SetCurrentGameversion(mvversion_t version);
 mvversion_t MV_GetCurrentGameversion();
 mvprotocol_t MV_GetCurrentProtocol();
+
+#define	MAX_SUBMODELS			256
 
 #endif // _QCOMMON_H_

@@ -242,7 +242,7 @@ for any reason, no changes to the state will be made at all.
 //#pragma optimize("", off)
 #endif
 void CL_ParseSnapshot( msg_t *msg ) {
-	int			len;
+	int			len, len2;
 	clSnapshot_t	*old;
 	clSnapshot_t	newSnap;
 	int			deltaNum;
@@ -380,7 +380,9 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read areamask
 	len = MSG_ReadByte( msg );
-	MSG_ReadData( msg, &newSnap.areamask, len);
+	len2 = MIN(len, (int)sizeof(newSnap.areamask));
+	MSG_ReadData( msg, &newSnap.areamask, len2);
+	MSG_SkipData( msg, len - len2);
 
 #ifdef XDEVELOPER
 	static int oldanim = -1;
@@ -915,6 +917,7 @@ void CL_SystemInfoChanged( void ) {
 	char			key[BIG_INFO_KEY];
 	char			value[BIG_INFO_VALUE];
 	qboolean		gameSet;
+	int				old_cs_remaps = cls.cs_remaps;
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
@@ -922,6 +925,12 @@ void CL_SystemInfoChanged( void ) {
 	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
 	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
 	FS_PureServerSetReferencedPaks( s, t );
+
+	cls.cs_remaps = atoi( Info_ValueForKey(systemInfo, "mv_cs_remaps") );
+	if ( cls.cs_remaps != old_cs_remaps ) {
+		// If the configstring changed remove any active advanced remaps
+		re.RemoveAdvancedRemaps();
+	}
 
 	// don't set any other vars when playing a demo
 	if ( clc.demoplaying ) {
@@ -1088,6 +1097,9 @@ void CL_ParseGamestate( msg_t *msg ) {
 	// parse serverId and other cvars
 	if (!ezdemoActive) {
 		CL_SystemInfoChanged();
+
+		// Shader Remaps
+		CL_ShaderStateChanged();
 
 		// reinitialize the filesystem if the game directory has changed
 		if( FS_ConditionalRestart( clc.checksumFeed ) ) {

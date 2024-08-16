@@ -684,8 +684,8 @@ given values
 ============
 */
 void Cvar_Toggle_f( void ) {
-	int		i, c = Cmd_Argc();
-	const char		*curval;
+	int         i, c = Cmd_Argc();
+	const char  *curval;
 
 	if(c < 2) {
 		Com_Printf("usage: toggle <variable> [value1, value2, ...]\n");
@@ -693,7 +693,9 @@ void Cvar_Toggle_f( void ) {
 	}
 
 	if(c == 2) {
-		Cvar_Set2(Cmd_Argv(1), va("%i", !Cvar_VariableValue(Cmd_Argv(1))), qfalse);
+		Cvar_Set2(Cmd_Argv(1), va("%d",
+			!Cvar_VariableValue(Cmd_Argv(1))),
+			qfalse);
 		return;
 	}
 

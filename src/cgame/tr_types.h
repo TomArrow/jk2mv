@@ -300,6 +300,11 @@ typedef enum {
 	TC_S3TC_DXT
 } textureCompression_t;
 
+typedef enum {
+	QGL_VERSION_1_0,
+	QGL_VERSION_1_4
+} qglVersion_t;
+
 typedef struct {
 	char					renderer_string[MAX_STRING_CHARS];
 	char					vendor_string[MAX_STRING_CHARS];
@@ -339,6 +344,8 @@ typedef struct {
 	const char				*version_string;
 	const char				*extensions_string;
 
+	qglVersion_t			glVersion;
+
 	int						maxTextureSize;			// queried from GL
 	int						maxActiveTextures;		// multitexture ability
 
@@ -351,13 +358,12 @@ typedef struct {
 	qboolean				textureLODBiasAvailable;
 	qboolean				clampToEdgeAvailable;
 
-	int						vidWidth, vidHeight;
+	int						winWidth, winHeight;	// window size
 	// aspect is the screen's physical width / height, which may be different
 	// than scrWidth / scrHeight if the pixels are non-square
 	// normal screens should be 4/3, but wide aspect monitors may be 16/9
 	float					windowAspect;
 
-	float					displayScale;
 	int						displayFrequency;
 
 	// synonymous with "does rendering consume the entire screen?", therefore
@@ -369,8 +375,14 @@ typedef struct {
 
 	// gamma correction
 	qboolean				deviceSupportsPostprocessingGamma;
-} glconfig_t;
 
+	//
+	// following variables can change every frame!
+	//
+
+	int						vidWidth, vidHeight;	// OpenGL drawable size
+	float					displayScale;
+} glconfig_t;
 
 #if !defined _WIN32
 

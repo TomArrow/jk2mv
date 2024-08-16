@@ -80,7 +80,12 @@ sysEvent_t	Sys_GetEvent( void );
 
 void	Sys_Init (void);
 
-void	*Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, intptr_t(QDECL **entryPoint)(int, ...), intptr_t(QDECL *systemcalls)(intptr_t, ...));
+// NOTE: arm64 mac has a different calling convention for fixed parameters vs. variadic parameters.
+//       As the module entryPoints (vmMain) in jk2 use fixed arg0 to arg11 we can't use "..." around here or we end up with undefined behavior.
+//       See: https://developer.apple.com/documentation/apple-silicon/addressing-architectural-differences-in-your-macos-code
+typedef intptr_t (QDECL *VM_EntryPoint_t)( int, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t );
+
+void	*Sys_LoadModuleLibrary(const char *name, qboolean mvOverride, VM_EntryPoint_t *entryPoint, intptr_t(QDECL *systemcalls)(intptr_t, ...));
 void	Sys_UnloadModuleLibrary(void *dllHandle);
 
 char	*Sys_GetCurrentUser( void );
@@ -122,6 +127,7 @@ int			Sys_PID( void );
 
 char *Sys_DefaultInstallPath(void);
 char *Sys_DefaultAssetsPath();
+char *Sys_DefaultAssetsPathJKA();
 char *Sys_DefaultHomePath(void);
 
 #ifdef MACOS_X
@@ -149,8 +155,9 @@ void Sys_SetProcessPriority(void);
 int Sys_FLock(int fd, flockCmd_t cmd, qboolean nb);
 void Sys_PrintBacktrace(void);
 
-char *Sys_ResolvePath( char *path );
-char *Sys_RealPath( char *path );
+const char *Sys_ResolvePath( const char *path );
+const char *Sys_RealPath( const char *path );
+int Sys_FindFunctions( void );
 
 typedef enum graphicsApi_e
 {
@@ -204,6 +211,7 @@ typedef enum {
 window_t	WIN_Init( const windowDesc_t *desc, glconfig_t *glConfig );
 void		WIN_InitGammaMethod(glconfig_t *glConfig);
 void		WIN_Present( window_t *window );
+void		WIN_UpdateGLConfig( glconfig_t *glConfig );
 void		WIN_SetGamma( glconfig_t *glConfig, byte red[256], byte green[256], byte blue[256] );
 void		WIN_SetTaskbarState(tbstate_t state, uint64_t current, uint64_t total);
 void		WIN_Shutdown( void );
