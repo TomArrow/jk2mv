@@ -18,6 +18,7 @@ cvar_t	*cl_autoDemoFormat;
 
 static struct {
 	char				demoName[MAX_OSPATH];
+	char				demoNameFallback[MAX_OSPATH];
 	char				customName[MAX_QPATH];
 	int					timeStamps[MAX_TIMESTAMPS];
 	char				mod[MAX_QPATH];
@@ -161,13 +162,22 @@ extern void CL_StopRecord_f( void );
 void demoAutoComplete(void) {
 	char newName[MAX_OSPATH];
 	CL_StopRecord_f();
+	if (!demoAuto.demoNameFallback[0]) {
+		Com_sprintf(demoAuto.demoNameFallback, sizeof(demoAuto.demoNameFallback), "%s", demoAutoFormat(demoAuto.customName));
+	}
 	//if we are not manually saving, then temporarily store a demo in LastDemo folder
-	if (!demoAuto.demoName[0]
+	if (!demoAuto.demoName[0] && cl_autoDemo->integer < 2
 		&& FS_CopyFile(
 			va("%s/demos/%s%s", demoAuto.mod, DEFAULT_NAME, demoAuto.ext),
 			va("%s/demos/%s%s", demoAuto.mod, DEFAULT_NAME_LAST, demoAuto.ext)
 		)) {
 		Com_Printf(S_COLOR_GREEN "Demo temporarily saved into %s%s\n", DEFAULT_NAME, demoAuto.ext);
+	} else if (!demoAuto.demoName[0] && cl_autoDemo->integer >= 2 // with cl_autodemo 2 we always save
+		&& FS_CopyFile(
+			va("%s/demos/%s%s", demoAuto.mod, DEFAULT_NAME, demoAuto.ext),
+			va("%s/demos/%s%s", demoAuto.mod, demoAuto.demoNameFallback, demoAuto.ext), newName, sizeof(newName)
+		)) {
+		Com_Printf(S_COLOR_GREEN "Demo successfully saved into %s\n", ((Q_stricmp(newName, "")) ? newName : demoAuto.demoNameFallback));
 	} else if (
 		FS_CopyFile(
 			va("%s/demos/%s%s", demoAuto.mod, DEFAULT_NAME, demoAuto.ext),
@@ -183,6 +193,7 @@ void demoAutoComplete(void) {
 void demoAutoRecord(void) {
 	//mod resetting allowed in init only
 	memset(&demoAuto, 0, sizeof(demoAuto)-sizeof(demoAuto.mod));
+	Com_sprintf(demoAuto.demoNameFallback, sizeof(demoAuto.demoNameFallback), "%s", demoAutoFormat(demoAuto.customName));
 	Cbuf_AddText(va("record %s\n", DEFAULT_NAME));
 }
 

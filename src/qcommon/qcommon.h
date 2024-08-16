@@ -7,6 +7,10 @@
 #include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
 
+#include <vector>
+
+#define ASYNCIO
+
 //============================================================================
 
 // for auto-complete (copied from OpenJK)
@@ -86,11 +90,15 @@ typedef struct {
 	int		cursize;
 	int		readcount;
 	int		bit;				// for bitwise reads and writes
+
+	qboolean	raw;			// raw, everything saved as integers
+	std::vector<byte>* dataRaw;
 } msg_t;
 
 
 
 void MSG_Init (msg_t *buf, byte *data, int length);
+void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw);
 void MSG_InitOOB( msg_t *buf, byte *data, int length );
 void MSG_Clear (msg_t *buf);
 void MSG_WriteData (msg_t *buf, const void *data, int length);
@@ -207,6 +215,7 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_messag
 void		NET_Sleep(int msec);
 
 #define	MAX_MSGLEN				16384		// max length of a message, which may
+#define	MAX_MSGLEN_RAW			MAX_MSGLEN*10	// max length of a message, which may
 											// be fragmented into multiple packets
 
 #define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
@@ -230,18 +239,54 @@ typedef struct {
 } fragmentAssemblyBuffer_t;
 
 
-typedef struct {
+typedef struct bufferedMsg_s {
 	qboolean	allowoverflow;	// if false, do a Com_Error
 	qboolean	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
 	qboolean	oob;			// set to true if the buffer size failed (with allowoverflow set)
-	byte	data[MAX_MSGLEN];
+	//byte	data[MAX_MSGLEN];
+	byte*	data;
 	int		maxsize;
 	int		cursize;
 	int		readcount;
 	int		bit;				// for bitwise reads and writes
+public:
+	bufferedMsg_s(msg_t* src) {
+		allowoverflow = src->allowoverflow;
+		overflowed = src->overflowed;
+		oob = src->oob;
+		maxsize = src->maxsize;
+		cursize = src->cursize;
+		readcount = src->readcount;
+		bit = src->bit;
+		data = new byte[src->cursize];
+		Com_Memcpy(data, src->data, src->cursize);
+	}
+	~bufferedMsg_s() {
+		if (data) {
+			delete[] data;
+			data = NULL;
+		}
+	}
 } bufferedMsg_t;
 
-void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
+typedef struct bufferedMessageContainer_s  {
+	bufferedMsg_t msg;
+	int msgNum; // Message number
+	int lastClientCommand; // Need this if we are writing metadata with pre-recording as it is the first thing writen in any message.
+	int time; // So we can discard very old buffered messages. Or for clientside recording, so we don't have to wait infinitely for old messages to arrive (which they never may).
+	qboolean containsFullSnapshot; // Doesn't matter for serverside pre-Recording because we have the keyframes. Only relevant for clientside buffered recording.
+	qboolean isKeyframe; // Is a gamestate message as typical for writing at the start of demos.
+public:
+	bufferedMessageContainer_s(msg_t* src) : msg(src) {
+		msgNum = 0;
+		lastClientCommand = 0;
+		time = 0;
+		containsFullSnapshot = qfalse;
+		isKeyframe = qfalse;
+	}
+} bufferedMessageContainer_t;
+
+//void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
 void MSG_FromBuffered(msg_t* dst, bufferedMsg_t* src);
 
 /*
@@ -639,6 +684,12 @@ typedef enum {
 	MODULE_MAX
 } module_t;
 
+enum fileCompressionScheme_t {
+	FILECOMPRESSION_NONE, // Normal default file handling
+	FILECOMPRESSION_RAW, // The special compressed file format but without actually using any compression
+	FILECOMPRESSION_LZMA // The special compressed file format with LZMA compression
+};
+
 qboolean FS_CopyFile( char *fromOSPath, char *toOSPath, char *newOSPath = NULL, const int newSize = 0 );
 
 qboolean FS_Initialized();
@@ -670,6 +721,11 @@ int		FS_LoadStack();
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
 
+#ifdef ASYNCIO
+void			FS_AsyncAssureFileClosed(const char* ospath);
+fileHandle_t	FS_FOpenFileWriteAsync(const char* qpath, qboolean safe = qtrue);
+#endif
+
 fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN );
 fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
 // will properly create any needed paths and deal with seperater character issues
@@ -678,8 +734,8 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODUL
 fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN );
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN );
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse);
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -692,7 +748,7 @@ int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 int		FS_Write( const void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 
 int		FS_Read2( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
-int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
+int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN, qboolean ignoreCompression = qfalse);
 // properly handles partial reads and reads from other dlls
 
 void	FS_FCloseFile( fileHandle_t f, module_t module = MODULE_MAIN );
@@ -773,6 +829,10 @@ qboolean FS_RMDLPrefix(const char *qpath);
 qboolean FS_DeleteDLFile(const char *qpath);
 
 void FS_HomeRemove( const char *homePath );
+
+void FS_Rmdir(const char* osPath, qboolean recursive);
+void FS_HomeRmdir(const char* homePath, qboolean recursive);
+
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 
@@ -850,6 +910,8 @@ extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
+
+extern	cvar_t	*cool_apiFeatures;
 
 extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;

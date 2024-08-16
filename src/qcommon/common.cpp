@@ -67,6 +67,8 @@ cvar_t	*sv_paused;
 cvar_t	*com_cameraMode;
 cvar_t	*com_busyWait;
 
+cvar_t	*cool_apiFeatures;
+
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
 cvar_t	*com_debugMessage;
@@ -2303,6 +2305,20 @@ int Com_EventLoop( void ) {
 			}
 			Cbuf_AddText( "\n" );
 			break;
+#ifdef ASYNCIO
+		case SE_AIO_FCLOSE:
+		{
+			extern void	FS_FCloseAio(int handle);
+			if (com_developer->integer > 1) {
+				Com_Printf("Async file close cleanup event is being handled ... ");
+			}
+			FS_FCloseAio(ev.evValue);
+			if (com_developer->integer > 1) {
+				Com_Printf("done\n");
+			}
+			break;
+		}
+#endif
 		}
 
 		// free any block data
@@ -2477,7 +2493,7 @@ void Com_Init( char *commandLine ) {
 	// skip the jk2mpconfig.cfg if "safe" is on the command line
 	if ( !Com_SafeMode() ) {
 #ifdef DEDICATED
-		Cbuf_AddText ("exec jk2mvserver.cfg\n");
+		Cbuf_AddText ("exec eternaljk2mvserver.cfg\n");
 #else
 		Cbuf_AddText ("exec eternaljk2mv.cfg\n");
 		Cbuf_AddText("exec eternaljk2mvglobal.cfg\n");
@@ -2542,6 +2558,8 @@ void Com_Init( char *commandLine ) {
 
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
 	cl_commandsize = Cvar_Get("cl_commandsize", "64", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
+
+	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT|COOL_APIFEATURE_GETTEMPORARYUSERCMD|COOL_APIFEATURE_EXPANDEDSETUSERCMD|COOL_APIFEATURE_EZDEMOCGAMEBUFFER| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED), CVAR_INIT | CVAR_VM_NOWRITE);
 
 	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);
@@ -3016,6 +3034,21 @@ float Q_acos(float c) {
 	float angle;
 
 	angle = acosf(c);
+
+	if (angle > (float) M_PI) {
+		return (float)M_PI;
+	}
+	if (angle < -(float) M_PI) {
+		return (float)M_PI;
+	}
+	return angle;
+}
+
+// Analogue to Q_acos, not sure if this limitation is necessary here as well
+float Q_asin(float c) {
+	float angle;
+
+	angle = asinf(c);
 
 	if (angle > (float) M_PI) {
 		return (float)M_PI;

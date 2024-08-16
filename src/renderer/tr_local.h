@@ -1229,6 +1229,7 @@ extern cvar_t	*r_mode;				// video mode
 extern cvar_t	*r_fullscreen;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
+extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans
 extern cvar_t	*r_displayRefresh;		// optional display refresh option
 
 extern cvar_t	*r_allowExtensions;				// global enable/disable of OpenGL extensions
@@ -1294,6 +1295,9 @@ extern	cvar_t	*r_portalOnly;
 extern	cvar_t	*r_subdivisions;
 extern	cvar_t	*r_lodCurveError;
 extern	cvar_t	*r_skipBackEnd;
+
+extern	cvar_t	*r_markSurfaceAnglesAbove;
+extern	cvar_t	*r_markSurfaceAnglesBelow;
 
 extern	cvar_t	*r_ignoreGLErrors;
 
@@ -1533,6 +1537,8 @@ struct shaderCommands_s
 	stageVars_t	svars;
 
 	color4ub_t	constantColor255[SHADER_MAX_VERTEXES];
+
+	byte		vertexIsMarked[SHADER_MAX_VERTEXES];
 
 	shader_t	*shader;
 	double		shaderTime;

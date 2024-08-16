@@ -5,6 +5,8 @@
 
 #define MAXPRINTMSG 4096
 
+#define ASYNCIO
+
 typedef enum netadrtype_s
 {
 	NA_BAD = 0,					// an address lookup failed
@@ -50,7 +52,10 @@ typedef enum {
 	SE_CHAR,	// evValue is an ascii char
 	SE_MOUSE,	// evValue and evValue2 are reletive signed x / y moves
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
-	SE_CONSOLE	// evPtr is a char*
+	SE_CONSOLE,	// evPtr is a char*
+#ifdef ASYNCIO
+	SE_AIO_FCLOSE,  // evPtr is a pointer to fsh[h]
+#endif
 } sysEventType_t;
 
 typedef struct sysEvent_s {
@@ -66,6 +71,10 @@ extern cvar_t *com_unfocused;
 extern cvar_t *com_maxfps;
 extern cvar_t *com_maxfpsMinimized;
 extern cvar_t *com_maxfpsUnfocused;
+extern cvar_t *com_slowDriftAdjustMaxFPS;
+extern cvar_t *com_physicsFps;
+extern cvar_t *com_deadRampFix;
+extern cvar_t *com_deadRampFixedCount;
 
 sysEvent_t	Sys_GetEvent( void );
 

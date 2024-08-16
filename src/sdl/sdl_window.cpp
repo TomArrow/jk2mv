@@ -42,6 +42,8 @@ static cvar_t	*r_colorbits;
 static cvar_t	*r_ext_multisample;
 static cvar_t	*r_allowsoftwaregl;
 cvar_t			*r_gammamethod;
+cvar_t			*r_gammabypass;
+cvar_t			*r_allowScreenSaver;
 
 /*
 ** R_GetModeInfo
@@ -904,6 +906,10 @@ static qboolean GLimp_StartDriverAndSetMode(glconfig_t *glConfig, const windowDe
 	{
 		const char *driverName;
 
+		if (r_allowScreenSaver->integer) {
+			SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "1");
+		}
+
 		if (SDL_Init(SDL_INIT_VIDEO) == -1)
 		{
 			Com_Printf( "SDL_Init( SDL_INIT_VIDEO ) FAILED (%s)\n", SDL_GetError());
@@ -981,6 +987,8 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 	r_ext_multisample	= Cvar_Get( "r_ext_multisample",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_allowsoftwaregl	= Cvar_Get( "r_allowsoftwaregl",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_gammamethod		= Cvar_Get( "r_gammamethod",		"2",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
+	r_gammabypass		= Cvar_Get( "r_gammabypass",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
+	r_allowScreenSaver	= Cvar_Get( "r_allowScreenSaver",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	Cvar_Get( "r_availableModes", "", CVAR_ROM );
 
 	// Create the window and set up the context
@@ -1071,7 +1079,7 @@ void WIN_SetGamma( glconfig_t *glConfig, byte red[256], byte green[256], byte bl
 	Uint16 table[3][256];
 	int i, j;
 
-	if( r_gammamethod->integer != GAMMA_HARDWARE )
+	if( r_gammamethod->integer != GAMMA_HARDWARE  || r_gammabypass->integer)
 		return;
 
 	for (i = 0; i < 256; i++)

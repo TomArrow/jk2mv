@@ -16,6 +16,7 @@ cvar_t		*con_timestamps;
 
 //EternalJK2MV
 cvar_t		*con_opacity;
+cvar_t		*con_blackColorOverride;
 cvar_t		*con_notifywords;
 cvar_t		*con_notifyconnect;
 cvar_t		*con_notifyvote;
@@ -46,8 +47,19 @@ void Con_ToggleConsole_f (void) {
 
 	Field_Clear( &kg.g_consoleField );
 
+
 	Con_ClearNotify ();
 	cls.keyCatchers ^= KEYCATCH_CONSOLE;
+
+	if (Cmd_Argc() > 1 && !Q_stricmp(Cmd_Argv(1), "instant")) {
+		// If "instant" is used as argument for "toggleconsole", the transition is immediate.
+		if (cls.keyCatchers & KEYCATCH_CONSOLE) {
+			con.displayFrac = con_height->value;
+		}
+		else {
+			con.displayFrac = 0;
+		}
+	}
 }
 
 /*
@@ -236,6 +248,8 @@ void Con_Copy(void) {
 	Hunk_FreeTempMemory(savebuffer);
 }
 
+extern cvar_t* r_fullbright;
+
 void Con_CopyLink(void) {
 	int l, x, i, pointDiff;
 	//short *line;
@@ -261,7 +275,7 @@ void Con_CopyLink(void) {
 			else
 				break;
 		}
-		Q_StripColor(buffer);
+		Q_StripColor(buffer, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 		if ((link = Q_stristr(buffer, "://")) || (link = Q_stristr(buffer, "www."))) {
 			// Move link ptr back until it hits a space or first char of string
 			while (link != &buffer[0] && *(link - 1) != ' ') link--;
@@ -607,6 +621,7 @@ void Con_Init (void) {
 	con_timestamps = Cvar_Get ("con_timestamps", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
 
 	//EternalJK2MV
+	con_blackColorOverride = Cvar_Get("con_blackColorOverride", "11", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_opacity = Cvar_Get("con_opacity", "1.0", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_notifywords = Cvar_Get("con_notifywords", "0", CVAR_ARCHIVE); // "Notifies you when defined words are mentioned"
 	con_notifyconnect = Cvar_Get("con_notifyconnect", "1", CVAR_ARCHIVE); // "Notifies you when someone connects to the server"
@@ -723,6 +738,30 @@ static void Con_Linefeed (qboolean skipnotify)
 	stampColor = COLOR_LT_TRANSPARENT;
 }
 
+// basically a faster version of !strcmpn(str, check, strlen(check))
+qboolean CL_StringStartsWith(const char* str, const char* check) {
+	if (!str || !check)
+		return qfalse;
+
+	while (*str) {
+		if (*check == 0)
+			return qtrue;
+
+		if (*str != *check)
+			return qfalse;
+
+		++str;
+		++check;
+	}
+
+	if (*check == 0)
+		return qtrue;
+
+	//str is shorter than check, so nope
+	return qfalse;
+}
+
+
 /*
 ================
 CL_ConsolePrint
@@ -737,6 +776,8 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	char			c;
 	int				y;
 	qboolean		skipnotify = qfalse;
+	vec4_t			colorVec;
+	vec4_t			colorVecDiff;
 	int				prev;
 
 	// for some demos we don't want to ever show anything on the console
@@ -760,7 +801,26 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if ( Q_IsColorString( txt ) ||
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt + 1)) {
+			int skipCount = 0;
+			Q_parseColorHex(txt + 1, colorVec, &skipCount);
+			txt += 1 + skipCount;
+			// Find closest color
+			// Just use the extended table who cares
+			float closestColorDistance = 999999999999;
+			int chosenColor = 7;
+			for (int i = 0; i < (sizeof(g_color_table)/sizeof(g_color_table[0])); i++) {
+				VectorSubtract(g_color_table[i], colorVec, colorVecDiff);
+				float distanceHere = VectorLength(colorVecDiff);
+				if (distanceHere < closestColorDistance) {
+					closestColorDistance = distanceHere;
+					chosenColor = i;
+				}
+			}
+			color = chosenColor;
+			continue;
+		}
+		else if ( Q_IsColorString( txt ) ||
 			(extendedColors && Q_IsColorString_Extended( txt )) ||
 			( use102color && Q_IsColorString_1_02( txt ) ) )
 		{
@@ -768,6 +828,10 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 			else color = ColorIndex( *(txt+1) );
 			txt += 2;
 			continue;
+		}
+
+		if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
+			color = con_blackColorOverride->integer;
 		}
 
 		txt++;
@@ -1293,4 +1357,5 @@ void Con_Close( void ) {
 	cls.keyCatchers &= ~KEYCATCH_CONSOLE;
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;
+	cls.fpsGuess.method3MeasuredGravitySamplesIndex = 0;
 }

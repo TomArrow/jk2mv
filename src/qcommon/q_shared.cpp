@@ -72,7 +72,7 @@ http://ioqsrc.vampireducks.com/d8/dbe/q__shared_8c-source.html#l00061
 */
 void COM_StripExtension(const char *in, char *out, int destsize) {
 	int length;
-	assert(out != in);
+	//assert(out != in); // NO! SHUT UP!
 	Q_strncpyz(out, in, destsize);
 	length = (int)strlen(out) - 1;
 	while (length > 0 && out[length] != '.') {
@@ -795,6 +795,82 @@ int Q_stricmp(const char *s1, const char *s2) {
 	return (s1 && s2) ? Q_stricmpn(s1, s2, 99999) : -1;
 }
 
+
+qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
+	char c = *p++;
+	int i;
+	int val;
+
+	qboolean doWrite = qtrue;
+	if (!color || !(color + 3)) {
+		doWrite = qfalse;
+	}
+
+	*skipCount = 0; // We update it only if successful. If not successful, we want the string to be parsed normally.
+
+	int countToParse = 8;
+	qboolean halfPrecision = qfalse;
+	if (c == 'Y') {
+		countToParse = 8;
+	}
+	else if (c == 'y') {
+		countToParse = 4;
+		halfPrecision = qtrue;
+	}
+	else if (c == 'X') {
+		countToParse = 6;
+		if (doWrite) color[3] = 1.0f; // Z and z don't contain alpha.
+	}
+	else if (c == 'x') {
+		countToParse = 3;
+		if (doWrite) color[3] = 1.0f;
+		halfPrecision = qtrue;
+	}
+
+	int presumableSkipCount = countToParse + 1; // skip count will be set to this if successful.
+
+	for (i = 0; i < countToParse; i++) {
+		int readHex;
+		c = p[i];
+		if (c >= '0' && c <= '9') {
+			readHex = c - '0';
+		}
+		else if (c >= 'a' && c <= 'f') {
+			readHex = 0xa + c - 'a';
+		}
+		else if (c >= 'A' && c <= 'F') {
+			readHex = 0xa + c - 'A';
+		}
+		else {
+			if (color) {
+				color[0] = color[1] = color[2] = color[3] = 1.0f;
+			}
+			return qfalse;
+		}
+		if (doWrite) {
+
+			if (halfPrecision) { // Single digit per value.
+				val = readHex;
+				color[i] = val * (1 / 15.0f);
+			}
+			else {
+				if (i & 1) {
+					val |= readHex;
+					color[i >> 1] = val * (1 / 255.0f);
+				}
+				else {
+					val = readHex << 4;
+				}
+			}
+		}
+
+	}
+
+	*skipCount = presumableSkipCount;
+	return qtrue;
+
+}
+
 char *Q_stristr(const char *str, char *charset) {
 	int i;
 
@@ -977,7 +1053,7 @@ This function modifies INPUT (is mutable)
 (Also strips ^8 and ^9)
 ==================
 */
-void Q_StripColor(char *text)
+void Q_StripColor(char *text,qboolean doHex)
 {
 	qboolean doPass = qtrue;
 	char *read;
@@ -989,7 +1065,12 @@ void Q_StripColor(char *text)
 		read = write = text;
 		while ( *read )
 		{
-			if ( Q_IsColorString(read) || Q_IsColorString_1_02(read) )
+			if (doHex && Q_IsColorStringHex(read + 1)) {
+				int skipCount = 0;
+				Q_parseColorHex(read + 1, 0, &skipCount);
+				read += 1 + skipCount;
+			}
+			else if ( Q_IsColorString(read) || Q_IsColorString_1_02(read) )
 			{
 				doPass = qtrue;
 				read += 2;

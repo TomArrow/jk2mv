@@ -397,7 +397,11 @@ void SV_SendMapChange(void)
 		{
 			if (svs.clients[i].state >= CS_CONNECTED)
 			{
-				if ( svs.clients[i].netchan.remoteAddress.type != NA_BOT )
+				if ( svs.clients[i].netchan.remoteAddress.type != NA_BOT 
+#ifdef SVDEMO
+					|| svs.clients[i].demo.demorecording
+#endif
+					)
 				{
 					SV_SendClientMapChange( &svs.clients[i] ) ;
 				}
@@ -407,6 +411,8 @@ void SV_SendMapChange(void)
 }
 
 void R_SVModelInit();
+
+extern void SV_SendClientGameState(client_t* client);
 
 /*
 ================
@@ -430,6 +436,11 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 	char		systemInfo[16384];
 	const char	*p;
 	qboolean	resetTime;
+
+#ifdef SVDEMO
+	SV_StopAutoRecordDemos();
+	SV_ClearAllDemoPreRecord();
+#endif
 
 	Com_Printf("------ Server Initialization ------\n");
 	Com_Printf("Server: %s\n", server);
@@ -611,6 +622,11 @@ Ghoul2 Insert End
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
+#ifdef SVDEMO
+	time(&sv.realMapTimeStarted);
+	sv.demosPruned = qfalse;
+#endif
+
 	// media configstring setting should be done during
 	// the loading stage, so connected clients don't have
 	// to load during actual gameplay
@@ -734,6 +750,18 @@ Ghoul2 Insert End
 
 	Hunk_SetMark();
 
+#ifdef SVDEMO
+	for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
+		// bots will not request gamestate, so it must be manually sent
+		// cannot do this above where it says it will because mapname is not set at that time
+		if (client->netchan.remoteAddress.type == NA_BOT && client->demo.demorecording) {
+			SV_SendClientGameState(client);
+		}
+	}
+
+	SV_BeginAutoRecordDemos();
+#endif
+
 	/* MrE: 2000-09-13: now called in CL_DownloadsComplete
 	// don't call when running dedicated
 	if ( !com_dedicated->integer ) {
@@ -816,6 +844,7 @@ void SV_Init (void) {
 	sv_minSnaps = Cvar_Get("sv_minSnaps", "1", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
 	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "30", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
 	sv_enforceSnaps = Cvar_Get("sv_enforceSnaps", "0", CVAR_ARCHIVE);                // 0: users choice (limited by min/max snaps); 1: sv_fps (limited by min/max snaps)	
+	sv_enforceSnapsDebug = Cvar_Get("sv_enforceSnapsDebug", "0", CVAR_ARCHIVE);      // 0: normal behavior; 1: generate snapshots and messages on EVERY server frame, but dont actually send them unless limit allows
 	sv_minRate = Cvar_Get("sv_minRate", "1000", CVAR_ARCHIVE | CVAR_SERVERINFO );    // jk2ded hardcoded min: 1000
 	sv_maxRate = Cvar_Get ("sv_maxRate", "90000", CVAR_ARCHIVE | CVAR_SERVERINFO );  // jk2ded hardcoded max: 90000
 	sv_maxOOBRate = Cvar_Get ("sv_maxOOBRate", "20", CVAR_ARCHIVE | CVAR_GLOBAL );
@@ -862,6 +891,19 @@ void SV_Init (void) {
 	sv_padPackets = Cvar_Get ("sv_padPackets", "0", 0);
 	sv_killserver = Cvar_Get ("sv_killserver", "0", 0);
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
+
+#ifdef SVDEMO
+	sv_autoDemo = Cvar_Get("sv_autoDemo", "0", CVAR_ARCHIVE | CVAR_SERVERINFO); // , "Automatically take server-side demos"
+	sv_autoDemoBots = Cvar_Get("sv_autoDemoBots", "0", CVAR_ARCHIVE); // , "Record server-side demos for bots"
+	sv_autoDemoMaxMaps = Cvar_Get("sv_autoDemoMaxMaps", "0", CVAR_ARCHIVE);
+	sv_demoPreRecord = Cvar_Get("sv_demoPreRecord", "0", CVAR_ARCHIVE);// , "Activate server demo pre-recording so demos can be retroactively recorded for duration sv_demoPreRecordTime (seconds)");
+	sv_demoPreRecordBots = Cvar_Get("sv_demoPreRecordBots", "0", CVAR_ARCHIVE);
+	sv_demoPreRecordTime = Cvar_Get("sv_demoPreRecordTime", "15", CVAR_ARCHIVE);// , "How many seconds of past packets should be stored for server demo pre-recording?");
+	sv_demoPreRecordKeyframeDistance = Cvar_Get("sv_demoPreRecordKeyframeDistance", "5", CVAR_ARCHIVE);// , "A demo can only start with a gamestate and full non-delta snapshot. How often should we save such a gamestate message? The shorter the distance, the more precisely the pre-record duration will be kept, but also the higher the RAM usage and regularity of non-delta frames being sent to the clients.");
+	sv_demoWriteMeta = Cvar_Get("sv_demoWriteMeta", "1", CVAR_ARCHIVE);// , "Enables writing metadata to demos, which can be set by the server/game. This is invisible to normal clients and can be used for storing information about when the demo was recorded, start of the recording, and so on.");
+#endif
+
+	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 

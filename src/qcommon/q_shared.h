@@ -697,10 +697,21 @@ extern const vec4_t		colorDkBlue;
 #define Q_COLOR_ESCAPE	'^'
 #define Q_COLOR_BITS 0x7
 
+
+qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
+
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString_1_02(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE ) // 1.02 ColorStrings
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
+
+#define Q_IsColorStringHex(p) ((Q_IsColorStringHexY((p))) || (Q_IsColorStringHexy((p))) || (Q_IsColorStringHexX((p))) || (Q_IsColorStringHexx((p)) ))
+#define Q_IsColorStringHexY(p) ((p)+8) && (p) && *(p)=='Y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6)) && Q_IsHex((p+7)) && Q_IsHex((p+8))
+#define Q_IsColorStringHexy(p) ((p)+4) && (p) && *(p)=='y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4))
+#define Q_IsColorStringHexX(p) ((p)+6) && (p) && *(p)=='X' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6))
+#define Q_IsColorStringHexx(p) ((p)+3) && (p) && *(p)=='x' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3))
+
+#define Q_IsHex(p) ((p) && ((*(p) >= '0' && *(p) <= '9') || (*(p) >= 'a' && *(p) <= 'f') || (*(p) >= 'A' && *(p) <= 'F')))
 
 // Default Colors
 #define COLOR_BLACK		'0'
@@ -882,6 +893,10 @@ ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 
 ID_INLINE vec_t VectorLength( const vec3_t v ) {
 	return (vec_t)sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+
+ID_INLINE vec_t VectorLength2( const vec2_t v ) {
+	return (vec_t)sqrtf(v[0]*v[0] + v[1]*v[1]);
 }
 
 ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
@@ -1071,7 +1086,7 @@ int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102colo
 void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color);
 // removes color sequences from string
 char *Q_CleanStr( char *string, qboolean use102color ) ;
-void Q_StripColor(char *text); //strips both colors
+void Q_StripColor(char *text, qboolean doHex=qfalse); //strips both colors
 const char *Q_strchrs( const char *string, const char *search );
 void Q_strstrip( char *string, const char *strip, const char *repl );
 
@@ -2298,5 +2313,60 @@ typedef union byteAlias_u {
 #define STRING( a ) #a
 #define XSTRING( a ) STRING( a )
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
+
+typedef struct ezDemoEvent_s {
+	int serverTime;
+	byte clientNum;
+	byte clientNum2;
+} ezDemoEvent_t;
+
+typedef struct ezDemoBuffer_s {
+	ezDemoEvent_t events[20000];
+	int eventCount;
+} ezDemoBuffer_t;
+
+#define COOL_APIFEATURE_SETPREDICTEDMOVEMENT (1<<0)
+#define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
+#define COOL_APIFEATURE_EXPANDEDSETUSERCMD (1<<2)
+#define COOL_APIFEATURE_EZDEMOCGAMEBUFFER (1<<3)
+#define COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED (1<<4)
+
+// This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
+typedef struct predictedMovement_s {
+	int			commandTime;	// cmd->serverTime of last executed command
+	int			pm_type;
+	int			pm_flags;		// ducked, jump_held, etc
+	int			pm_time;
+
+	vec3_t		origin;
+	vec3_t		velocity;
+
+	int			gravity;
+	int			speed;
+	int			basespeed; //used in prediction to know base server g_speed value when modifying speed between updates
+	int			delta_angles[3];	// add to command angles to get view direction
+									// changed by spawns, rotating objects, and teleporters
+
+
+	int			groundEntityNum;// ENTITYNUM_NONE = in air
+
+	int			movementDir;	// a number 0 to 7 that represents the reletive angle
+								// of movement to the view angle (axial and diagonals)
+								// when at rest, the value will remain unchanged
+								// used to twist the legs during strafing
+
+	int			eFlags;			// copied to entityState_t->eFlags
+
+
+	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
+
+	vec3_t		viewangles;		// for fixed views
+	int			viewheight;
+
+	int			jumppad_ent;	// jumppad entity hit this frame
+
+	forcedata_t	fd;
+} predictedMovement_t;
+
 
 #endif	// __Q_SHARED_H

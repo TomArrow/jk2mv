@@ -27,6 +27,7 @@ cvar_t	*sv_serverid;
 cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
 cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
 cvar_t	*sv_enforceSnaps;
+cvar_t	*sv_enforceSnapsDebug;  // Generate all snapshots but only actually send the messages according to max snaps etc
 cvar_t	*sv_minRate;
 cvar_t	*sv_maxRate;
 cvar_t	*sv_maxOOBRate;
@@ -43,6 +44,19 @@ cvar_t	*mv_apiConnectionless;
 cvar_t	*sv_pingFix;
 cvar_t	*sv_autoWhitelist;
 cvar_t	*sv_dynamicSnapshots;
+
+#ifdef SVDEMO
+cvar_t* sv_autoDemo;
+cvar_t* sv_autoDemoBots;
+cvar_t* sv_autoDemoMaxMaps;
+cvar_t* sv_demoPreRecord;
+cvar_t* sv_demoPreRecordBots;
+cvar_t* sv_demoPreRecordTime;
+cvar_t* sv_demoPreRecordKeyframeDistance;
+cvar_t* sv_demoWriteMeta;
+#endif
+
+cvar_t* sv_specAllEnts;
 
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;

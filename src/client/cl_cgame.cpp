@@ -59,6 +59,12 @@ CL_GetUserCmd
 */
 qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
+	
+	// COOL_APIFEATURE_GETTEMPORARYUSERCMD:
+	if (cmdNumber == -1) {
+		*ucmd = cl.temporaryCmd;
+		return qtrue;
+	}
 
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
@@ -472,6 +478,8 @@ extern cvar_t	*con_notifyvote;
 extern char	notifyWords[MAX_NOTIFYWORDS][32];
 extern int stampColor;
 
+extern cvar_t* r_fullbright;
+
 qboolean CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
@@ -577,7 +585,7 @@ rescan:
 
 			s = Cmd_Argv(1);
 			Com_sprintf(chat, sizeof(chat), "%s\n", s);
-			Q_StripColor(chat);
+			Q_StripColor(chat,(qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 
 			//Remove escape char from name
 			l = 0;
@@ -727,6 +735,9 @@ void CL_CgameSetVirtualScreen(float w, float h) {
 	cls.cgxadj = SCREEN_WIDTH / w;
 	cls.cgyadj = SCREEN_HEIGHT / h;
 }
+
+
+float Q_asin(float c);
 
 /*
 ====================
@@ -1011,6 +1022,8 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		return FloatAsInt( ceilf( VMF(1) ) );
 	case CGAME_ACOS:
 		return FloatAsInt( Q_acos( VMF(1) ) );
+	case CGAME_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
 
 	case CG_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMAS(1) );
@@ -1364,6 +1377,44 @@ Ghoul2 Insert End
 		cl.mSharedMemory = VMAP(1, char, MAX_CG_SHARED_BUFFER_SIZE);
 		return 0;
 
+	case CG_COOL_API_SETPREDICTEDMOVEMENT:
+		Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1),sizeof(predictedMovement_t));
+		cl.predictedMovementIsSet = qtrue;
+		return 0;
+
+	case CG_COOL_API_SETUSERCMDMOVE:
+		cl.cgameForwardmove = args[1];
+		cl.cgameRightmove = args[2];
+		cl.cgameUpmove = args[3];
+		cl.cgameMoveSet = args[4];
+		return 0;
+
+	case CG_COOL_API_SET_EZDEMO_BUFFER:
+	{
+		int i;
+		int ezDemoEventSize = args[2];
+		int ezDemoMaxEventCount = args[3];
+		int* ezDemoEventCount = VMAP(4, int, 1);
+		ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+		int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
+		for (i = 0; i < communicatedEventCount; i++) {
+			Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
+		}
+		*ezDemoEventCount = communicatedEventCount;
+		return 0;
+	}
+
+	case CG_COOL_API_GETTIMESINCESNAPRECEIVED:
+	{
+		int snapNum = args[1];
+		if (cl.snapshots[snapNum & PACKET_MASK].messageNum != snapNum) {
+			return -1;
+		}
+		else {
+			return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
+		}
+	}
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}
@@ -1542,6 +1593,8 @@ or bursted delayed packets.
 void CL_AdjustTimeDelta( void ) {
 	int		newDelta;
 	int		deltaDelta;
+	int		slowDriftAdjustMinMsec;
+	static int	oldSlowDriftAdjustServerTime;
 
 	cl.newSnapshots = qfalse;
 
@@ -1552,6 +1605,11 @@ void CL_AdjustTimeDelta( void ) {
 
 	newDelta = cl.snap.serverTime - cls.realtime;
 	deltaDelta = abs( newDelta - cl.serverTimeDelta );
+
+	slowDriftAdjustMinMsec = com_slowDriftAdjustMaxFPS->integer ? 1000/ com_slowDriftAdjustMaxFPS->integer : 0;
+	if (slowDriftAdjustMinMsec > 200) {
+		slowDriftAdjustMinMsec = 200; // Let's not let ppl set com_slowDriftAdjustMaxFPS to less than 5 fps. Idk if its really a problem but it's not really needed and we avoid potential weirdness
+	}
 
 	if ( deltaDelta > RESET_TIME ) {
 		cl.serverTimeDelta = newDelta;
@@ -1566,7 +1624,7 @@ void CL_AdjustTimeDelta( void ) {
 			Com_Printf( "<FAST> " );
 		}
 		cl.serverTimeDelta = ( cl.serverTimeDelta + newDelta ) >> 1;
-	} else {
+	} else if(!slowDriftAdjustMinMsec || cl.snap.serverTime < oldSlowDriftAdjustServerTime || (cl.snap.serverTime - oldSlowDriftAdjustServerTime) > slowDriftAdjustMinMsec) { // the slow drift adjust influences physics. use com_slowDriftAdjustMaxFPS to limit how often it happens.
 		// slow drift adjust, only move 1 or 2 msec
 
 		// if any of the frames between this and the previous snapshot
@@ -1581,11 +1639,14 @@ void CL_AdjustTimeDelta( void ) {
 				cl.serverTimeDelta++;
 			}
 		}
+
+		oldSlowDriftAdjustServerTime = cl.snap.serverTime;
 	}
 
 	if ( cl_showTimeDelta->integer ) {
 		Com_Printf( "%i ", cl.serverTimeDelta );
 	}
+
 }
 
 
