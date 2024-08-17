@@ -1163,16 +1163,18 @@ qboolean CL_DeadRampCMDFix(usercmd_t* cmd, usercmd_t* lastCmd, predictedMovement
 	int offset = 0;
 	int realOffset = 0;
 	const int minDelta = 5;
+	const int maxDelta = 10;
 	int maxNeg = MAX(0, msecDelta - minDelta);
+	int maxDeltaReal = MAX(msecDelta+2, maxDelta);
 	while (deadRamp) {
 
-		realOffset = offset > maxNeg ? offset - maxNeg : -offset; // We try to subtract first. If that doesn't work we add.
+		realOffset = offset > maxNeg ? offset : -offset; // We try to subtract first. If that doesn't work we add.
 		int modifiedMsecDelta = msecDelta + realOffset;
-		if (modifiedMsecDelta < 1) {
+		if (modifiedMsecDelta > maxDeltaReal) {
 			if (com_deadRampFix->integer > 1) {
 				Com_Printf("DEAD RAMP: can't fix @ (offset %d)\n", realOffset);
-				realOffset = 0;
 			}
+			realOffset = 0;
 			break; // guess we can't fix it.
 		}
 		float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
