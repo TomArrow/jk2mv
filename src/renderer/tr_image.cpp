@@ -3711,7 +3711,7 @@ void	R_InitImages( void ) {
 		tr.dynamicGlowWidth = (glConfig.vidWidth * r_DynamicGlowScale->value);
 		tr.dynamicGlowHeight = (glConfig.vidHeight * r_DynamicGlowScale->value);
 	}
-	Com_Printf("Dynamic Glow Texture Size = %ix%i\n", tr.dynamicGlowWidth, tr.dynamicGlowHeight);
+	Com_DPrintf("Dynamic Glow Texture Size = %ix%i\n", tr.dynamicGlowWidth, tr.dynamicGlowHeight);
 
 	// create default texture and white texture
 	R_CreateBuiltinImages();

@@ -3353,7 +3353,7 @@ static shader_t *FinishShader( void ) {
 		}
 		else
 		{
-			ri.Printf(PRINT_ALL, "WARNING: shader '%s' has lightmap but no lightmap stage!\n", shader.name );
+			ri.Printf(PRINT_DEVELOPER, "WARNING: shader '%s' has lightmap but no lightmap stage!\n", shader.name );
 			memcpy(shader.lightmapIndex, lightmapsNone, sizeof(shader.lightmapIndex));
 			memcpy(shader.styles, stylesDefault, sizeof(shader.styles));
 		}
@@ -4051,7 +4051,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 			char filename[MAX_QPATH];
 
 			Com_sprintf( filename, sizeof( filename ), "%s/%s", path, shaderFiles[type][i] );
-			ri.Printf( PRINT_ALL, "...loading '%s'\n", filename );
+			ri.Printf( PRINT_DEVELOPER, "...loading '%s'\n", filename );
 			ri.FS_ReadFile( filename, (void **)&buffers[j] );
 			if ( !buffers[j] ) {
 				ri.Error( ERR_DROP, "Couldn't load %s", filename );
@@ -4155,7 +4155,7 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 		char filename[MAX_QPATH];
 
 		Com_sprintf( filename, sizeof( filename ), "%s/%s", path, shaderFiles[i] );
-		ri.Printf( PRINT_ALL, "...loading '%s'\n", filename );
+		ri.Printf(PRINT_DEVELOPER, "...loading '%s'\n", filename );
 		ri.FS_ReadFile( filename, (void **)&dynGlowBuffers[i] );
 		if ( !dynGlowBuffers[i] ) {
 			ri.Error( ERR_DROP, "Couldn't load %s", filename );
@@ -4363,7 +4363,7 @@ R_InitShaders
 ==================
 */
 void R_InitShaders( void ) {
-	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
+	ri.Printf( PRINT_DEVELOPER, "Initializing Shaders\n" );
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 	Com_Memset(advancedRemapShadersHashTable, 0, sizeof(advancedRemapShadersHashTable));

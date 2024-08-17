@@ -135,6 +135,10 @@ void QDECL BotImport_Print(int type, char *fmt, ...)
 			Com_Printf("%s", str);
 			break;
 		}
+		case PRT_DEBUG: {
+			Com_DPrintf("%s", str);
+			break;
+		}
 		case PRT_WARNING: {
 			Com_Printf(S_COLOR_YELLOW "Warning: %s", str);
 			break;

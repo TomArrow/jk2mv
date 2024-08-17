@@ -1469,13 +1469,16 @@ script_t *LoadScriptFile(const char *filename) {
 		botimport.FS_Read(pbuffer, plength, h_patch);
 		botimport.FS_FCloseFile(h_patch);
 
-		Com_Printf("patching menu file %s...\n", pathname);
+		//Com_Printf("patching menu file %s...\n", pathname);
+		botimport.Print(PRT_DEBUG,"patching menu file %s...\n", pathname);
 		outlength = MV_MenuPatchFile(inbuffer, inhash, pbuffer, &outbuffer);
 		if (outlength < 0) {
 			if (outlength == ERROR_SYNTAX) {
-				Com_Printf("patching failed: syntax error in patchfile\n");
+				//Com_Printf("patching failed: syntax error in patchfile\n");
+				botimport.Print(PRT_DEBUG, "patching failed: syntax error in patchfile\n");
 			} else if (outlength == ERROR_HASH) {
-				Com_Printf("patching skipped: hash mismatch\n");
+				//Com_Printf("patching skipped: hash mismatch\n");
+				botimport.Print(PRT_DEBUG, "patching skipped: hash mismatch\n");
 			}
 
 			outbuffer = inbuffer;

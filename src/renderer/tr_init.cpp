@@ -1307,7 +1307,7 @@ void R_Init( void ) {
 	int i;
 	byte *ptr;
 
-	ri.Printf( PRINT_ALL, "----- R_Init -----\n" );
+	ri.Printf( PRINT_DEVELOPER, "----- R_Init -----\n" );
 
 	// clear all our internal state
 	Com_Memset( &tr, 0, sizeof( tr ) );
@@ -1393,7 +1393,7 @@ void R_Init( void ) {
 
 	GL_CheckErrors();
 #endif
-	ri.Printf( PRINT_ALL, "----- finished R_Init -----\n" );
+	ri.Printf( PRINT_DEVELOPER, "----- finished R_Init -----\n" );
 }
 
 /*
@@ -1403,7 +1403,7 @@ RE_Shutdown
 */
 void RE_Shutdown( qboolean destroyWindow ) {
 
-	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
+	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
 
 
 	ri.Cmd_RemoveCommand ("imagelist");

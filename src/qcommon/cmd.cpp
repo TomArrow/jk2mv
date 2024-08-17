@@ -421,7 +421,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			// allow completion-only commands to be silently doubled
 			if ( function != NULL ) {
-				Com_Printf ("Cmd_AddCommand: %s already defined\n", cmd_name);
+				Com_DPrintf ("Cmd_AddCommand: %s already defined\n", cmd_name);
 			}
 			return;
 		}

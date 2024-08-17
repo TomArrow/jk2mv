@@ -413,7 +413,7 @@ void VM_LoadSymbols( vm_t *vm ) {
 		}
 
 		vm->numSymbols += count;
-		Com_Printf( "%i symbols parsed from %s\n", count, symbols );
+		Com_DPrintf( "%i symbols parsed from %s\n", count, symbols );
 		FS_FreeFile( mapfile.v );
 	} else {
 		const char	*symName = "vmMain";
@@ -536,7 +536,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc)
 
 	// load the image
 	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", vm->name );
-	Com_Printf( "Loading vm file %s...\n", filename );
+	Com_DPrintf( "Loading vm file %s...\n", filename );
 
 	FS_ReadFile(filename, &header.v);
 
@@ -777,7 +777,7 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 	vm->programStack = vm->dataMask + 1;
 	vm->stackBottom = vm->programStack - PROGRAM_STACK_SIZE;
 
-	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
+	Com_DPrintf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
 
 	vm->gameversion = MV_GetCurrentGameversion();
 

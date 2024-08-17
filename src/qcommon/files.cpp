@@ -3969,7 +3969,8 @@ static void FS_Startup( const char *gameName ) {
 	Cmd_AddCommand ("fs_restart", FS_Restart_f );
 
 	// print the current search paths
-	FS_Path_f();
+	if (fs_debug->integer)
+		FS_Path_f();
 
 	fs_gamedirvar->modified = qfalse; // We just loaded, it's not modified
 
