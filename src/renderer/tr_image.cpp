@@ -1328,6 +1328,10 @@ image_t *R_CreateImageNew( const char *name, byte * const *mipmaps, qboolean cus
 }
 #endif // !DEDICATED
 
+
+// for pixelFormat_t
+static int pixelFormatChannelCounts[5]{1,3,3,4,4};
+
 /****************************
 Algorisme
 ****************************/
@@ -1335,7 +1339,7 @@ Algorisme
 //#pragma optimize("", off)
 
 //RED
-byte getImageR(byte* targa_rgba, int x, int y, int columns, int rows)
+byte getImageR(byte* targa_rgba, int x, int y, int columns, int rows, pixelFormat_t format)
 {
 	byte* pixbuf;
 
@@ -1345,7 +1349,7 @@ byte getImageR(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (rows <= y)
 		y = y % rows;
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
 
 	if (columns < x)
@@ -1354,27 +1358,27 @@ byte getImageR(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (x < 0)
 		x *= -1;
 
-	pixbuf += (x * 4);
+	pixbuf += (x * pixelFormatChannelCounts[format]);
 
 	return *pixbuf;
 }
 
-void setImageR(byte* targa_rgba, int x, int y, int columns, int rows, byte value)
+void setImageR(byte* targa_rgba, int x, int y, int columns, int rows, byte value, pixelFormat_t format)
 {
 	byte* pixbuf;
 
 	x *= ((x < 0) ? -1 : 1);
 	y *= ((y < 0) ? -1 : 1);
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
 
-	pixbuf += (x * 4);
+	pixbuf += (x * pixelFormatChannelCounts[format]);
 
 	*pixbuf = value;
 }
 //GREEN
-byte getImageG(byte* targa_rgba, int x, int y, int columns, int rows)
+byte getImageG(byte* targa_rgba, int x, int y, int columns, int rows, pixelFormat_t format)
 {
 	byte* pixbuf;
 
@@ -1384,7 +1388,7 @@ byte getImageG(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (rows <= y)
 		y = y % rows;
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
 	if (columns < x)
 		x = x % columns;
@@ -1392,27 +1396,27 @@ byte getImageG(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (x < 0)
 		x *= -1;
 
-	pixbuf += (x * 4);
+	pixbuf += (x * pixelFormatChannelCounts[format]);
 
-	pixbuf++;
+	if (pixelFormatChannelCounts[format] >= 3) pixbuf++;
 	return *pixbuf;
 }
 
-void setImageG(byte* targa_rgba, int x, int y, int columns, int rows, byte value)
+void setImageG(byte* targa_rgba, int x, int y, int columns, int rows, byte value, pixelFormat_t format)
 {
 	byte* pixbuf;
 
 	x *= ((x < 0) ? -1 : 1);
 	y *= ((y < 0) ? -1 : 1);
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
-	pixbuf += (x * 4);
-	pixbuf++;
+	pixbuf += (x * pixelFormatChannelCounts[format]);
+	if (pixelFormatChannelCounts[format] >= 3) pixbuf++;
 	*pixbuf = value;
 }
 //BLUE
-byte getImageB(byte* targa_rgba, int x, int y, int columns, int rows)
+byte getImageB(byte* targa_rgba, int x, int y, int columns, int rows, pixelFormat_t format)
 {
 	byte* pixbuf;
 
@@ -1422,7 +1426,7 @@ byte getImageB(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (rows <= y)
 		y = y % rows;
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
 	if (columns < x)
 		x = x % columns;
@@ -1430,42 +1434,46 @@ byte getImageB(byte* targa_rgba, int x, int y, int columns, int rows)
 	if (x < 0)
 		x *= -1;
 
-	pixbuf += (x * 4);
-	pixbuf += 2;
+	pixbuf += (x * pixelFormatChannelCounts[format]);
+	if (pixelFormatChannelCounts[format] >= 3) pixbuf += 2;
 	return *pixbuf;
 }
 
-void setImageB(byte* targa_rgba, int x, int y, int columns, int rows, byte value)
+void setImageB(byte* targa_rgba, int x, int y, int columns, int rows, byte value, pixelFormat_t format)
 {
 	byte* pixbuf;
 
 	x *= ((x < 0) ? -1 : 1);
 	y *= ((y < 0) ? -1 : 1);
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
-	pixbuf += (x * 4);
-	pixbuf += 2;
+	pixbuf += (x * pixelFormatChannelCounts[format]);
+	if (pixelFormatChannelCounts[format] >= 3) pixbuf += 2;
 	*pixbuf = value;
 }
 //ALPHA
-byte getImageA(byte* targa_rgba, int x, int y, int columns, int rows)
+byte getImageA(byte* targa_rgba, int x, int y, int columns, int rows, pixelFormat_t format)
 {
 	byte* pixbuf;
+
+	if (pixelFormatChannelCounts[format] < 4) return 255;
 
 	x *= ((x < 0) ? -1 : 1);
 	y *= ((y < 0) ? -1 : 1);
 
-	pixbuf = targa_rgba + y * columns * 4;
+	pixbuf = targa_rgba + y * columns * pixelFormatChannelCounts[format];
 
-	pixbuf += (x * 4);
+	pixbuf += (x * pixelFormatChannelCounts[format]);
 	pixbuf += 3;
 	return *pixbuf;
 }
 
-void setImageA(byte* targa_rgba, int x, int y, int columns, int rows, byte value)
+void setImageA(byte* targa_rgba, int x, int y, int columns, int rows, byte value, pixelFormat_t format)
 {
 	byte* pixbuf;
+
+	if (pixelFormatChannelCounts[format] < 4) return;
 
 	x *= ((x < 0) ? -1 : 1);
 	y *= ((y < 0) ? -1 : 1);
@@ -1476,8 +1484,8 @@ void setImageA(byte* targa_rgba, int x, int y, int columns, int rows, byte value
 	pixbuf += 3;
 	*pixbuf = value;
 }
-
-int pas3mean(int columns, int rows, byte* targa_rgba, int row, int column)
+/* TODO make this one work with pixelformat? but its not used anywhere anyway so idk
+int pas3mean(int columns, int rows, byte* targa_rgba, int row, int column, pixelFormat_t format)
 {
 	int arow = row;
 	int acolumn = column;
@@ -1499,7 +1507,7 @@ int pas3mean(int columns, int rows, byte* targa_rgba, int row, int column)
 		}
 	}
 	return total / 9;
-}
+}*/
 
 #define DIVNUM 15
 
@@ -1607,7 +1615,7 @@ int pas3mean(int columns, int rows, byte* targa_rgba, int row, int column)
 
 
  }*/
-void blur(int columns, int rows, byte* targa_rgba)
+void blur(int columns, int rows, byte* targa_rgba, pixelFormat_t format)
 {
 	int		row, column;
 	float red, green, blue;
@@ -1622,15 +1630,15 @@ void blur(int columns, int rows, byte* targa_rgba)
 		for (column = 0; column < columns; column++)
 		{
 			red = 0;
-			red += getImageR(targa_rgba, column - 1, row - 1, columns, rows);
-			red += getImageR(targa_rgba, column, row - 1, columns, rows);
-			red += getImageR(targa_rgba, column + 1, row - 1, columns, rows);
-			red += getImageR(targa_rgba, column - 1, row, columns, rows);
-			red += getImageR(targa_rgba, column, row, columns, rows);
-			red += getImageR(targa_rgba, column + 1, row, columns, rows);
-			red += getImageR(targa_rgba, column - 1, row + 1, columns, rows);
-			red += getImageR(targa_rgba, column, row + 1, columns, rows);
-			red += getImageR(targa_rgba, column + 1, row + 1, columns, rows);
+			red += getImageR(targa_rgba, column - 1, row - 1, columns, rows, format);
+			red += getImageR(targa_rgba, column, row - 1, columns, rows, format);
+			red += getImageR(targa_rgba, column + 1, row - 1, columns, rows, format);
+			red += getImageR(targa_rgba, column - 1, row, columns, rows, format);
+			red += getImageR(targa_rgba, column, row, columns, rows, format);
+			red += getImageR(targa_rgba, column + 1, row, columns, rows, format);
+			red += getImageR(targa_rgba, column - 1, row + 1, columns, rows, format);
+			red += getImageR(targa_rgba, column, row + 1, columns, rows, format);
+			red += getImageR(targa_rgba, column + 1, row + 1, columns, rows, format);
 
 			red /= 9;
 			red *= 2;
@@ -1642,18 +1650,18 @@ void blur(int columns, int rows, byte* targa_rgba)
 			red += (DIVNUM / 2);
 			ared = red;
 
-			setImageR(targa_rgba, column, row, columns, rows, (byte)red);
+			setImageR(targa_rgba, column, row, columns, rows, (byte)red, format);
 			////////////////////
 			green = 0;
-			green += getImageG(targa_rgba, column - 1, row - 1, columns, rows);
-			green += getImageG(targa_rgba, column, row - 1, columns, rows);
-			green += getImageG(targa_rgba, column + 1, row - 1, columns, rows);
-			green += getImageG(targa_rgba, column - 1, row, columns, rows);
-			green += getImageG(targa_rgba, column, row, columns, rows);
-			green += getImageG(targa_rgba, column + 1, row, columns, rows);
-			green += getImageG(targa_rgba, column - 1, row + 1, columns, rows);
-			green += getImageG(targa_rgba, column, row + 1, columns, rows);
-			green += getImageG(targa_rgba, column + 1, row + 1, columns, rows);
+			green += getImageG(targa_rgba, column - 1, row - 1, columns, rows, format);
+			green += getImageG(targa_rgba, column, row - 1, columns, rows, format);
+			green += getImageG(targa_rgba, column + 1, row - 1, columns, rows, format);
+			green += getImageG(targa_rgba, column - 1, row, columns, rows, format);
+			green += getImageG(targa_rgba, column, row, columns, rows, format);
+			green += getImageG(targa_rgba, column + 1, row, columns, rows, format);
+			green += getImageG(targa_rgba, column - 1, row + 1, columns, rows, format);
+			green += getImageG(targa_rgba, column, row + 1, columns, rows, format);
+			green += getImageG(targa_rgba, column + 1, row + 1, columns, rows, format);
 
 			green /= 9;
 			green *= 2;
@@ -1664,18 +1672,18 @@ void blur(int columns, int rows, byte* targa_rgba)
 			green *= DIVNUM;
 			green += (DIVNUM / 2);
 			agreen = green;
-			setImageG(targa_rgba, column, row, columns, rows, (byte)green);
+			setImageG(targa_rgba, column, row, columns, rows, (byte)green, format);
 			////////////////////////
 			blue = 0;
-			blue += getImageB(targa_rgba, column - 1, row - 1, columns, rows);
-			blue += getImageB(targa_rgba, column, row - 1, columns, rows);
-			blue += getImageB(targa_rgba, column + 1, row - 1, columns, rows);
-			blue += getImageB(targa_rgba, column - 1, row, columns, rows);
-			blue += getImageB(targa_rgba, column, row, columns, rows);
-			blue += getImageB(targa_rgba, column + 1, row, columns, rows);
-			blue += getImageB(targa_rgba, column - 1, row + 1, columns, rows);
-			blue += getImageB(targa_rgba, column, row + 1, columns, rows);
-			blue += getImageB(targa_rgba, column + 1, row + 1, columns, rows);
+			blue += getImageB(targa_rgba, column - 1, row - 1, columns, rows, format);
+			blue += getImageB(targa_rgba, column, row - 1, columns, rows, format);
+			blue += getImageB(targa_rgba, column + 1, row - 1, columns, rows, format);
+			blue += getImageB(targa_rgba, column - 1, row, columns, rows, format);
+			blue += getImageB(targa_rgba, column, row, columns, rows, format);
+			blue += getImageB(targa_rgba, column + 1, row, columns, rows, format);
+			blue += getImageB(targa_rgba, column - 1, row + 1, columns, rows, format);
+			blue += getImageB(targa_rgba, column, row + 1, columns, rows, format);
+			blue += getImageB(targa_rgba, column + 1, row + 1, columns, rows, format);
 
 			blue /= 9;
 
@@ -1688,7 +1696,7 @@ void blur(int columns, int rows, byte* targa_rgba)
 			blue += (DIVNUM / 2);
 
 			ablue = blue;
-			setImageB(targa_rgba, column, row, columns, rows, (byte)blue);
+			setImageB(targa_rgba, column, row, columns, rows, (byte)blue, format);
 
 			// "halftoning"
 			/*if((row%5==0)&&(column%5==1))
@@ -1717,19 +1725,20 @@ void blur(int columns, int rows, byte* targa_rgba)
 
 // New function for fun that adds outlines to textures -TA
 // Adapted from whiteTexture()
-void textureOutline(int columns, int rows, byte* targa_rgba, pixelFormat_t* format) {
+void textureOutline(int columns, int rows, byte* targa_rgba, pixelFormat_t format) {
 	int		row, column;
 
-	if (*format < PXF_RGBA) return; // TODO make this work for other formats?
 
 	int lineWidth = r_celTextureOutline->integer;
 	if (!lineWidth) return;
 
 	// Check if texture has alpha. We don't do this to textures with alpha.
-	for (row = 0; row < rows; row++) {
-		for (column = 0; column < columns; column++) {
-			if (getImageA(targa_rgba, column, row, columns, rows) < 255) {
-				return;
+	if (format >= PXF_RGBA) {
+		for (row = 0; row < rows; row++) {
+			for (column = 0; column < columns; column++) {
+				if (getImageA(targa_rgba, column, row, columns, rows, format) < 255) {
+					return;
+				}
 			}
 		}
 	}
@@ -1753,14 +1762,14 @@ void textureOutline(int columns, int rows, byte* targa_rgba, pixelFormat_t* form
 
 				if (a == 1.0f) {
 
-					setImageR(targa_rgba, column, row, columns, rows, r);
-					setImageG(targa_rgba, column, row, columns, rows, g);
-					setImageB(targa_rgba, column, row, columns, rows, b);
+					setImageR(targa_rgba, column, row, columns, rows, r, format);
+					setImageG(targa_rgba, column, row, columns, rows, g, format);
+					setImageB(targa_rgba, column, row, columns, rows, b, format);
 				}
 				else {
-					setImageR(targa_rgba, column, row, columns, rows, (float)r*a + aInverse*(float)getImageR(targa_rgba, column, row, columns, rows));
-					setImageG(targa_rgba, column, row, columns, rows, (float)g * a + aInverse * (float)getImageG(targa_rgba, column, row, columns, rows));
-					setImageB(targa_rgba, column, row, columns, rows, (float)b * a + aInverse * (float)getImageB(targa_rgba, column, row, columns, rows));
+					setImageR(targa_rgba, column, row, columns, rows, (float)r*a + aInverse*(float)getImageR(targa_rgba, column, row, columns, rows, format), format);
+					setImageG(targa_rgba, column, row, columns, rows, (float)g * a + aInverse * (float)getImageG(targa_rgba, column, row, columns, rows, format), format);
+					setImageB(targa_rgba, column, row, columns, rows, (float)b * a + aInverse * (float)getImageB(targa_rgba, column, row, columns, rows, format), format);
 				}
 
 			}
@@ -1772,18 +1781,17 @@ void textureOutline(int columns, int rows, byte* targa_rgba, pixelFormat_t* form
 /**
  * Converts the texture to a white image.
  */
-void whiteTexture(int columns, int rows, byte* targa_rgba, pixelFormat_t* format) {
+void whiteTexture(int columns, int rows, byte* targa_rgba, pixelFormat_t format) {
 	int		row, column;
 
-	if (*format < PXF_RGBA) return; // TODO make this work for other formats?
 	for (row = 0; row < rows; row++) {
 		for (column = 0; column < columns; column++) {
 			// Don't count fully transparent pixels
-			if (getImageA(targa_rgba, column, row, columns, rows) == 0)
+			if (getImageA(targa_rgba, column, row, columns, rows, format) == 0)
 				continue;
-			setImageR(targa_rgba, column, row, columns, rows, 255);
-			setImageG(targa_rgba, column, row, columns, rows, 255);
-			setImageB(targa_rgba, column, row, columns, rows, 255);
+			setImageR(targa_rgba, column, row, columns, rows, 255, format);
+			setImageG(targa_rgba, column, row, columns, rows, 255, format);
+			setImageB(targa_rgba, column, row, columns, rows, 255, format);
 		}
 	}
 }/*
@@ -1828,7 +1836,7 @@ void whiteTexture(int columns, int rows, byte *targa_rgba){
 /**
  * Performs the real kuwahara filter on the bitmap.
  */
-void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t* format)
+void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t format)
 {
 	byte channel;
 	int size = 10;
@@ -1848,9 +1856,7 @@ void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t* format)
 	float var, min;
 	float** mean, ** variance;
 
-	if (*format < PXF_RGBA) return; // TODO make this work for other formats?
-
-	blur(columns, rows, targa_rgba);
+	blur(columns, rows, targa_rgba, format);
 
 	// I hate malloc I hate malloc I hate malloc I hate malloc I hate malloc I hate malloc 
 	mean = (float**)malloc(sizeof(float*) * width2);
@@ -1872,13 +1878,13 @@ void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t* format)
 						//v = i(x2, y2);
 						switch (channel) {
 						case 0:
-							v = getImageR(targa_rgba, x2, y2, columns, rows);
+							v = getImageR(targa_rgba, x2, y2, columns, rows, format);
 							break;
 						case 1:
-							v = getImageG(targa_rgba, x2, y2, columns, rows);
+							v = getImageG(targa_rgba, x2, y2, columns, rows, format);
 							break;
 						case 2:
-							v = getImageB(targa_rgba, x2, y2, columns, rows);
+							v = getImageB(targa_rgba, x2, y2, columns, rows, format);
 							break;
 						}
 						//v = *targa_rgba + y2*columns*4+x2*4;
@@ -1931,13 +1937,13 @@ void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t* format)
 				//i(x1, y1)=(int)(mean[xbase2][ybase2]+0.5);
 				switch (channel) {
 				case 0:
-					setImageR(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5));
+					setImageR(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5), format);
 					break;
 				case 1:
-					setImageG(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5));
+					setImageG(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5), format);
 					break;
 				case 2:
-					setImageB(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5));
+					setImageB(targa_rgba, x1, y1, columns, rows, (byte)(mean[xbase2][ybase2] + 0.5), format);
 					break;
 				}
 			}
@@ -1952,7 +1958,7 @@ void kuwahara(int columns, int rows, byte* targa_rgba, pixelFormat_t* format)
 		free(variance[index2]);
 	free(variance);
 
-	blur(columns, rows, targa_rgba);
+	blur(columns, rows, targa_rgba, format);
 }
 // Cel shading functions END - ported from http://q3cellshading.sourceforge.net/
 
@@ -3106,12 +3112,12 @@ void R_LoadImage( const char *shortname, byte **pic, int *width, int *height, pi
 
 	// Cel shading ported from http://q3cellshading.sourceforge.net/
 	if (r_celshadalgo->integer == 1)
-		kuwahara(*width, *height, *pic, format);
+		kuwahara(*width, *height, *pic, *format);
 	else if (r_celshadalgo->integer == 2)
-		whiteTexture(*width, *height, *pic, format);
+		whiteTexture(*width, *height, *pic, *format);
 
 	if (r_celTextureOutline->integer) {
-		textureOutline(*width, *height, *pic, format);
+		textureOutline(*width, *height, *pic, *format);
 	}
 }
 
