@@ -2578,7 +2578,7 @@ void Com_Init( char *commandLine ) {
 	Cvar_Get("com_ignoreothertasks", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
-	cl_commandsize = Cvar_Get("cl_commandsize", "64", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
+	cl_commandsize = Cvar_Get("cl_commandsize", "512", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
 
 	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT|COOL_APIFEATURE_GETTEMPORARYUSERCMD|COOL_APIFEATURE_EXPANDEDSETUSERCMD|COOL_APIFEATURE_EZDEMOCGAMEBUFFER| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED), CVAR_INIT | CVAR_VM_NOWRITE);
 
