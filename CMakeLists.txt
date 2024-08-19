@@ -338,6 +338,11 @@ endif()
 
 add_subdirectory(libs/mongoose)
 
+set(WITH_MSI OFF)
+set(WITH_UNIT_TESTS OFF)
+set(USE_SYSTEM_INSTALLED_LIB OFF)
+add_subdirectory(libs/mariadb-connector-cpp)
+
 # Package
 set(CPACK_PACKAGE_NAME ${ProjectName})
 set(CPACK_PACKAGE_FILE_NAME "eternaljk2mv-v${MV_VERSION}")
