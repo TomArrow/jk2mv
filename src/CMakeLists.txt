@@ -13,6 +13,8 @@ if (BuildMVMP OR BuildMVDED)
 	# mongoose
 	set(MVMPDEDLibraries ${MVMPDEDLibraries} ${MONGOOSE_LIBRARIES})
 	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MONGOOSE_INCLUDE_DIRS})
+	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MARIADBCPP_INCLUDES})
+	message(STATUS "MariaDB includes: ${MARIADBCPP_INCLUDES}") 
 	
 	if(WIN32)
 		set(MVMPDEDLibraries ${MVMPDEDLibraries} "winmm" "ws2_32")
@@ -509,7 +511,7 @@ if (BuildMVMP)
 
 	set_target_properties(${MVMP} PROPERTIES CXX_STANDARD 14)
 	set_target_properties(${MVMP} PROPERTIES INCLUDE_DIRECTORIES "${MVMPIncludeDirs}")
-	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
+	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES} ${MARIADB_LIBRARIES})
 	set_target_properties(${MVMP} PROPERTIES PROJECT_LABEL "JK2MV MP Client")
 
 	# installation
@@ -654,7 +656,7 @@ if (BuildMVDED)
 
 	set_target_properties(${MVDED} PROPERTIES CXX_STANDARD 14)
 	set_target_properties(${MVDED} PROPERTIES INCLUDE_DIRECTORIES "${MVDEDIncludeDirs}")
-	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
+	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES} ${MARIADB_LIBRARIES})
 	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "JK2MV MP Dedicated Server")
 
 	add_dependencies(${MVDED} assetsmv)
