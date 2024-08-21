@@ -2493,6 +2493,8 @@ void Com_Init( char *commandLine ) {
 
 	Cmd_Init ();
 
+	DB_Init(); // MariaDB initialization
+
 	// override anything from the config files with command line args
 	Com_StartupVariable( NULL );
 

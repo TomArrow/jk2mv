@@ -149,6 +149,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/strip.h"
 		"qcommon/tags.h"
 		"qcommon/vm_local.h"
+		"qcommon/mariadb.h"
 
 		"qcommon/CNetProfile.cpp"
 		"qcommon/GenericParser2.cpp"
@@ -174,6 +175,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/strip.cpp"
 		"qcommon/vm.cpp"
 		"qcommon/vm_interpreted.cpp"
+		"qcommon/mariadb.cpp"
 	)
 
 	if(ARCH_X86)

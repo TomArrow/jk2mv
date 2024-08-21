@@ -6,6 +6,7 @@
 #include "../api/mvapi.h"
 #include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
+#include "mariadb.h"
 
 #include <vector>
 
