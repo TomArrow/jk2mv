@@ -18,6 +18,8 @@
 #include <windows.h>
 #endif
 
+#include <mutex>
+
 #define MAX_NUM_ARGVS	50
 
 #define MIN_DEDICATED_COMHUNKMEGS 16//1 //We need more than 1 for VMs when we are also using temporary hunk memory for bot nav functions
@@ -225,8 +227,10 @@ to the apropriate place.
 A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 =============
 */
+std::recursive_mutex printfLock;
 void QDECL Com_Printf( const char *fmt, ... )
 {
+	std::lock_guard<std::recursive_mutex> l(printfLock);
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
@@ -2195,7 +2199,9 @@ void Com_InitPushEvent( void ) {
 Com_PushEvent
 =================
 */
+std::mutex pushLock;
 void Com_PushEvent( sysEvent_t *event ) {
+	std::lock_guard<std::mutex> l(pushLock);
 	sysEvent_t		*ev;
 	static int printedWarning = 0; // bk001129 - init, bk001204 - explicit int
 
@@ -2227,9 +2233,12 @@ Com_GetEvent
 =================
 */
 sysEvent_t	Com_GetEvent( void ) {
-	if ( com_pushedEventsHead > com_pushedEventsTail ) {
-		com_pushedEventsTail++;
-		return com_pushedEvents[ (com_pushedEventsTail-1) & (MAX_PUSHED_EVENTS-1) ];
+	{
+		std::lock_guard<std::mutex> l(pushLock);
+		if (com_pushedEventsHead > com_pushedEventsTail) {
+			com_pushedEventsTail++;
+			return com_pushedEvents[(com_pushedEventsTail - 1) & (MAX_PUSHED_EVENTS - 1)];
+		}
 	}
 	return Com_GetRealEvent();
 }
