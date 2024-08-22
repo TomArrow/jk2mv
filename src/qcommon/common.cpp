@@ -404,6 +404,7 @@ void Com_Quit_f( void ) {
 		VM_Forced_Unload_Done();
 		Com_Shutdown ();
 		FS_Shutdown(qtrue, qfalse);
+		DB_Shutdown();
 	}
 	Sys_Quit ();
 }
@@ -423,6 +424,7 @@ Q_NORETURN void Com_Quit( int signal ) {
 	VM_Forced_Unload_Done();
 	Com_Shutdown ();
 	FS_Shutdown(qtrue, qfalse);
+	DB_Shutdown();
 	Sys_Quit ();
 }
 
@@ -2828,6 +2830,9 @@ void Com_Frame( void ) {
 
 	// write config file if anything changed
 	Com_WriteConfiguration();
+
+	// Update DB connection details if they changed
+	DB_CheckCvars();
 
 	//
 	// main event loop

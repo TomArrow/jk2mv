@@ -6,7 +6,6 @@
 #include "../api/mvapi.h"
 #include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
-#include "mariadb.h"
 
 #include <vector>
 
@@ -1173,5 +1172,7 @@ mvversion_t MV_GetCurrentGameversion();
 mvprotocol_t MV_GetCurrentProtocol();
 
 #define	MAX_SUBMODELS			256
+
+#include "mariadb.h"
 
 #endif // _QCOMMON_H_
