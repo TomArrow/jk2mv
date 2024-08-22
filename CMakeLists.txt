@@ -339,6 +339,7 @@ endif()
 add_subdirectory(libs/mongoose)
 
 # MariaDB
+set(ALL_PLUGINS_STATIC ON)
 set(WITH_MSI OFF)
 set(WITH_UNIT_TESTS OFF)
 set(USE_SYSTEM_INSTALLED_LIB OFF)
