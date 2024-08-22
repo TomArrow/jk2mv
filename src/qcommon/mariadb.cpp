@@ -30,17 +30,20 @@ struct {
 
 static void DB_BackgroundThread() {
 
+	Com_Printf("MariaDB background thread started.\n");
 	sql::Driver* driver = sql::mariadb::get_driver_instance();
 	sql::Connection* conn = NULL;
+
+	qboolean requestPending = qfalse; // if a request fails (connection not working or sth), keep that one in queue.
+	DBRequest requestToProcess;
+	qboolean connectionChanged = qfalse;
 	while (1) {
-		DBRequest requestToProcess;
-		qboolean connectionChanged = qfalse;
 		{
 			std::unique_lock<std::mutex> l(dbSyncedData.syncLock);
-			while ((!dbSyncedData.enabled || dbSyncedData.requestsIncoming.empty()) && !dbSyncedData.terminate ) {
+			while ((!dbSyncedData.enabled || dbSyncedData.requestsIncoming.empty() && !requestPending) && !dbSyncedData.terminate ) {
 				dbSyncedData.changeNotifier.wait(l);
 			}
-			if (dbSyncedData.terminate && (dbSyncedData.requestsIncoming.empty() || !dbSyncedData.enabled)) {
+			if (dbSyncedData.terminate && (dbSyncedData.requestsIncoming.empty() && !requestPending || !dbSyncedData.enabled)) {
 				if (conn != NULL) {
 					conn->close();
 					delete conn;
@@ -49,16 +52,25 @@ static void DB_BackgroundThread() {
 				break;
 			}
 			if (!dbSyncedData.enabled) continue;
-			requestToProcess = std::move(dbSyncedData.requestsIncoming.front());
-			dbSyncedData.requestsIncoming.pop_front();
-			connectionChanged = dbSyncedData.connectionDetailsChanged;
+			if (!requestPending) { // maybe last one failed.
+				requestToProcess = std::move(dbSyncedData.requestsIncoming.front());
+				dbSyncedData.requestsIncoming.pop_front();
+				requestPending = qtrue;
+			}
+			if (dbSyncedData.connectionDetailsChanged) {
+				connectionChanged = qtrue;
+			}
 			dbSyncedData.connectionDetailsChanged = qfalse;
 		}
 
 		// update connection if needed
 		int connectTries = 0;
+		qboolean connectionEnabled = qtrue;
 		while (!conn || connectionChanged || !conn->isValid()) {
 			if (connectTries) {
+				if (!connectionEnabled) {
+					break;
+				}
 				// dont do a hyper-fast endless loop when we obviously cannot connect
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1000ms);
@@ -66,8 +78,10 @@ static void DB_BackgroundThread() {
 			if (conn && !conn->isValid()) {
 				try {
 					conn->reconnect();
+					Com_Printf("MariaDB connection reconnected.\n");
 				}
 				catch (...) {
+					Com_Printf("MariaDB reconnect failed.\n");
 					conn->close();
 					delete conn;
 					conn = NULL;
@@ -87,6 +101,7 @@ static void DB_BackgroundThread() {
 					url = dbSyncedData.url;
 					username = dbSyncedData.username;
 					password = dbSyncedData.password;
+					connectionEnabled = dbSyncedData.enabled;
 				}
 				connectionChanged = qfalse;
 				try {
@@ -97,9 +112,11 @@ static void DB_BackgroundThread() {
 
 					// Establish Connection
 					conn = driver->connect(url, properties);
+					Com_Printf("MariaDB connection established.\n");
 				}
 				catch (...) {
 
+					Com_Printf("MariaDB connection failed.\n");
 					if (conn != NULL) {
 						conn->close();
 						delete conn;
@@ -112,11 +129,30 @@ static void DB_BackgroundThread() {
 		}
 
 		// process request
-
+		if (connectionEnabled) {
+			requestPending = qfalse;
+		}
 	}
 
 
 	/**/
+}
+
+qboolean DB_AddRequest(DBRequest& req) {
+	//if (!db_enabled->integer) return qfalse;
+	{
+		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		dbSyncedData.requestsIncoming.push_back(std::move(req));
+	}
+	dbSyncedData.changeNotifier.notify_one();
+	return qtrue;
+}
+
+static void DB_SetOptions() {
+	dbSyncedData.enabled = (qboolean)db_enabled->integer;
+	dbSyncedData.url = db_url->string;
+	dbSyncedData.username = db_username->string;
+	dbSyncedData.password = db_password->string;
 }
 
 void DB_Init() {
@@ -126,8 +162,15 @@ void DB_Init() {
 	db_username = Cvar_Get("db_username", "", CVAR_ARCHIVE);
 	db_password = Cvar_Get("db_password", "", CVAR_ARCHIVE);
 
-	dbThread = new std::thread(DB_BackgroundThread);
+	if (!dbThread) {
+		DB_SetOptions();
+		dbThread = new std::thread(DB_BackgroundThread);
+	}
+
+	DBRequest req;
+	DB_AddRequest(req);
 }
+
 
 void DB_CheckCvars() {
 
@@ -135,10 +178,7 @@ void DB_CheckCvars() {
 		{
 			std::lock_guard<std::mutex>(dbSyncedData.syncLock);
 			dbSyncedData.connectionDetailsChanged = (qboolean)(dbSyncedData.connectionDetailsChanged || db_url->modified || db_username->modified || db_password->modified);
-			dbSyncedData.enabled = (qboolean)db_enabled->integer;
-			dbSyncedData.url = db_url->string;
-			dbSyncedData.username = db_username->string;
-			dbSyncedData.password = db_password->string;
+			DB_SetOptions();
 		}
 		dbSyncedData.changeNotifier.notify_one();
 		db_enabled->modified = qfalse;
