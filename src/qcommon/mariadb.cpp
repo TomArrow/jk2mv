@@ -158,7 +158,7 @@ static void DB_SetOptions() {
 void DB_Init() {
 
 	db_enabled = Cvar_Get("db_enabled", "0", CVAR_ARCHIVE);
-	db_url = Cvar_Get("db_url", "", CVAR_ARCHIVE); // "jdbc:mariadb://localhost:3306/todo"
+	db_url = Cvar_Get("db_url", "jdbc:mariadb://example12345.com:5509/dbname", CVAR_ARCHIVE); // "jdbc:mariadb://localhost:3306/todo"
 	db_username = Cvar_Get("db_username", "", CVAR_ARCHIVE);
 	db_password = Cvar_Get("db_password", "", CVAR_ARCHIVE);
 
@@ -171,6 +171,49 @@ void DB_Init() {
 	DB_AddRequest(req);
 }
 
+// Escape stuff lifted from MariaDB because I'd need a connection to escape otherwise.
+static std::string& replace(std::string& str, const std::string& _substr, const std::string& subst)
+{
+	size_t pos = 0, prev = 0;
+	std::string& real = str;
+	const std::string& realSub = subst, & substr = _substr;
+
+	while ((pos = real.find(substr, prev)) != std::string::npos)
+	{
+		real.replace(pos, substr.length(), realSub);
+		prev += realSub.length();
+	}
+	return str;
+}
+std::string escapeString(std::string& value, bool noBackslashEscapes = false)
+{
+	if (!(value.find_first_of('\'') != std::string::npos)) {
+		if (noBackslashEscapes) {
+			return value;
+		}
+		if (!(value.find_first_of('\\') != std::string::npos)) {
+			return value;
+		}
+	}
+	std::string escaped = replace(value, "'", "''");
+	if (noBackslashEscapes) {
+		return escaped;
+	}
+	return replace(escaped, "\\", "\\\\");
+}
+
+qboolean DB_EscapeString(char* input, int size) {
+	std::string inputstring = input;
+	std::string escapedString = escapeString(inputstring);
+	const char* outString = escapedString.c_str();
+	if (strlen(outString) < size - 1) {
+		Q_strncpyz(input, outString, size);
+		return qtrue;
+	}
+	else {
+		return qfalse;
+	}
+}
 
 void DB_CheckCvars() {
 
