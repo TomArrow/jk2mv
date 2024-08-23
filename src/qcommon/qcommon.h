@@ -1173,6 +1173,4 @@ mvprotocol_t MV_GetCurrentProtocol();
 
 #define	MAX_SUBMODELS			256
 
-#include "mariadb.h"
-
 #endif // _QCOMMON_H_

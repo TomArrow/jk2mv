@@ -1,6 +1,7 @@
 
 
 #include "qcommon.h"
+#include "mariadb.h"
 #include <thread>
 #include <mutex>
 #include <deque>
@@ -130,7 +131,16 @@ static void DB_BackgroundThread() {
 
 		// process request
 		if (connectionEnabled) {
-			requestPending = qfalse;
+			try {
+				// Create a new Statement
+				std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
+				// Execute query
+				sql::ResultSet* res = stmnt->executeQuery(requestToProcess.requestString);
+				requestPending = qfalse;
+			}
+			catch (sql::SQLException& e) {
+				Com_Printf( "MariaDB error executing query: %s \n" ,e.what());
+			}
 		}
 	}
 
@@ -167,8 +177,16 @@ void DB_Init() {
 		dbThread = new std::thread(DB_BackgroundThread);
 	}
 
-	DBRequest req;
-	DB_AddRequest(req);
+	qtime_t	time;
+	char	timestamp[20];
+	Com_RealTime(&time);
+	Com_sprintf(timestamp, sizeof(timestamp), "[%02d:%02d:%02d] ",
+		time.tm_hour, time.tm_min, time.tm_sec);
+	if (DB_EscapeString(timestamp, sizeof(timestamp))) {
+		DBRequest req;
+		req.requestString = va("INSERT INTO test (testtext) VALUES ('%s')", timestamp);
+		DB_AddRequest(req);
+	}
 }
 
 // Escape stuff lifted from MariaDB because I'd need a connection to escape otherwise.

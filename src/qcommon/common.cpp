@@ -18,6 +18,8 @@
 #include <windows.h>
 #endif
 
+
+#include "mariadb.h"
 #include <mutex>
 
 #define MAX_NUM_ARGVS	50

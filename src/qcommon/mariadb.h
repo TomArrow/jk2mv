@@ -8,7 +8,8 @@ extern cvar_t* db_enabled;
 
 void DB_Init();
 void DB_CheckCvars();
-void DB_Shutdown();
+void DB_Shutdown(); 
+qboolean DB_EscapeString(char* input, int size);
 
 class DBRequest {
 public:
