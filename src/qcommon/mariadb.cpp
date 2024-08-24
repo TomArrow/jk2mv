@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <deque>
+#include <condition_variable>
 
 cvar_t* db_enabled;
 static cvar_t* db_url;
