@@ -14,6 +14,9 @@ static cvar_t* db_password;
 
 static std::thread* dbThread;
 
+static DBRequest currentFinishedRequest[MODULE_MAX];
+static qboolean currentFinishedRequestValid[MODULE_MAX]{ 0 };
+
 struct {
 	// connection
 	qboolean connectionDetailsChanged;
@@ -136,28 +139,40 @@ static void DB_BackgroundThread() {
 				// Create a new Statement
 				std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
 				// Execute query
-				std::unique_ptr<sql::ResultSet> res(stmnt->executeQuery(requestToProcess.requestString));
-				requestPending = qfalse;
-				while (res->next()) {
-					requestToProcess.responseData.push_back(SQLDelayedResponse(res.get()));
-				}
-			}
-			catch (sql::SQLException& e) {
-				const int max_tries = 10;
-				Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries+1, max_tries, e.what());
-				if (requestToProcess.tries < max_tries) {
-
-					// dont do a hyper-fast endless loop when failing
-					using namespace std::chrono_literals;
-					std::this_thread::sleep_for(1000ms);
-					requestToProcess.tries++;
+				if (stmnt->execute(requestToProcess.requestString)) {
+					std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
+					while (res->next()) {
+						requestToProcess.responseData.push_back(SQLDelayedResponse(res.get()));
+					}
 				}
 				else {
-					// alright, move on...
-					requestToProcess.successful = qfalse;
-					requestToProcess.errorCode = e.getErrorCode();
+					requestToProcess.affectedRowCount = stmnt->getUpdateCount();
+				}
+				requestPending = qfalse;
+			}
+			catch (sql::SQLException& e) {
+				if (!requestToProcess.errorCode) {
+					// error code 0: not an error.
 					requestToProcess.errorMessage = e.what();
 					requestPending = qfalse;
+				}
+				else {
+					const int max_tries = 10;
+					Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries + 1, max_tries, e.what());
+					if (requestToProcess.tries < max_tries) {
+
+						// dont do a hyper-fast endless loop when failing
+						using namespace std::chrono_literals;
+						std::this_thread::sleep_for(1000ms);
+						requestToProcess.tries++;
+					}
+					else {
+						// alright, move on...
+						requestToProcess.successful = qfalse;
+						requestToProcess.errorCode = e.getErrorCode();
+						requestToProcess.errorMessage = e.what();
+						requestPending = qfalse;
+					}
 				}
 			}
 		}
@@ -179,6 +194,49 @@ qboolean DB_AddRequest(DBRequest& req) {
 	}
 	dbSyncedData.changeNotifier.notify_one();
 	return qtrue;
+}
+qboolean DB_GetRequestReference(module_t module, byte* reference, int referenceLength) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (reference) {
+		// give back the reference
+		int copyCount = MIN(currentFinishedRequest[module].moduleReference.size(), referenceLength);
+		if (copyCount > 0) {
+			Com_Memcpy(reference, currentFinishedRequest[module].moduleReference.data(), copyCount);
+		}
+		if (currentFinishedRequest[module].moduleReference.size() > referenceLength) {
+			return qfalse;
+		}
+		return qtrue;
+	}
+	return qfalse;
+}
+qboolean DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize) {
+	{
+		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		if (!dbSyncedData.requestsFinished[module].empty()) {
+			currentFinishedRequest[module] = std::move(dbSyncedData.requestsFinished[module].front());
+			dbSyncedData.requestsFinished[module].pop_front();
+
+			if (requestType) *requestType = currentFinishedRequest[module].requestType;
+			if (affectedRows) *affectedRows = currentFinishedRequest[module].affectedRowCount;
+			if (status) *status = currentFinishedRequest[module].errorCode;
+			if (errorMessage) {
+				// error might be too long but we'll just silently cut it off then.
+				Q_strncpyz(errorMessage, currentFinishedRequest[module].errorMessage.c_str(), errorMessageSize);
+			}
+
+			currentFinishedRequestValid[module] = qtrue;
+			return qtrue;
+		}
+		else {
+			currentFinishedRequestValid[module] = qfalse;
+			return qfalse;
+		}
+	}
+	// No notification to background thread neccessary as there is no action it needs to take.
+	return qfalse;
 }
 
 static void DB_SetOptions() {

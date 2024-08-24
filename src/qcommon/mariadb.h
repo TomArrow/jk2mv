@@ -243,14 +243,15 @@ class DBRequest {
 public:
 	int tries = 0;
 	qboolean successful = qtrue;
-	int errorCode;
-	std::string errorMessage;
+	int errorCode =0;
+	std::string errorMessage = "";
+	int affectedRowCount = 0;
 
-	module_t module;					// the requesting module
+	module_t module = MODULE_MAIN;		// the requesting module
 	std::string requestString;			// sql instruction
 	int requestType = -1;				// so the module can have a different type of reference data struct for each request type
 	std::vector<byte> moduleReference;	// any sequence of bytes (probably a module struct) that the module gave us to remember what this request is
-	std::vector <SQLDelayedResponse> responseData;
+	std::vector<SQLDelayedResponse> responseData;
 };
 
 
