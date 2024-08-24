@@ -347,6 +347,105 @@ void CL_DoAutoLODScale(void)
 	Cvar_Set( "r_autolodscalevalue", va("%f", finalLODScaleFactor) );
 }
 
+// These are bit indexes that can be set on uni_clientFlags to disable cheats in the UnityMod client.
+// We reuse these for compatibility and to not reinvent the wheel
+typedef enum {
+	WALLHACK_DISABLE_ITEMS = 0,
+	WALLHACK_DISABLE_PLAYERS,
+} clientFlags_t;
+
+// check if its ok to do r_showtris and such
+void CL_CheckWallhackAllowed(const char* serverInfo) {
+	static char serverCheatDisableCvar[16]; // uni_clientFlags
+	static char nwhCompareSmall[4]; // nwh
+	static char nwhCompareBig[4]; // NWH
+	static char manhuntCompare[8]; // Manhunt
+	static qboolean stringsInited = qfalse;
+
+	const char* info = serverInfo;
+	char* v = NULL;
+
+	if (com_demoplaying) {
+		clRenderInfo.wallhackOk = qtrue;
+		return;
+	}
+
+	if (!stringsInited) {
+
+		serverCheatDisableCvar[0] = 'u';
+		serverCheatDisableCvar[1] = 'n';
+		serverCheatDisableCvar[2] = 'i';
+		serverCheatDisableCvar[3] = '_';
+		serverCheatDisableCvar[4] = 'c';
+		serverCheatDisableCvar[5] = 'l';
+		serverCheatDisableCvar[6] = 'i';
+		serverCheatDisableCvar[7] = 'e';
+		serverCheatDisableCvar[8] = 'n';
+		serverCheatDisableCvar[9] = 't';
+		serverCheatDisableCvar[10] = 'F';
+		serverCheatDisableCvar[11] = 'l';
+		serverCheatDisableCvar[12] = 'a';
+		serverCheatDisableCvar[13] = 'g';
+		serverCheatDisableCvar[14] = 's';
+		serverCheatDisableCvar[15] = '\0';
+
+		nwhCompareSmall[0] = 'n';
+		nwhCompareSmall[1] = 'w';
+		nwhCompareSmall[2] = 'h';
+		nwhCompareSmall[3] = '\0';
+
+		nwhCompareBig[0] = 'N';
+		nwhCompareBig[1] = 'W';
+		nwhCompareBig[2] = 'H';
+		nwhCompareBig[3] = '\0';
+
+		manhuntCompare[0] = 'M';
+		manhuntCompare[1] = 'a';
+		manhuntCompare[2] = 'n';
+		manhuntCompare[3] = 'h';
+		manhuntCompare[4] = 'u';
+		manhuntCompare[5] = 'n';
+		manhuntCompare[6] = 't';
+		manhuntCompare[7] = '\0';
+		stringsInited = qtrue;
+	}
+
+	qboolean wallhackOk = qtrue;
+	v = Info_ValueForKey(info, "g_gametype");
+	int gametype = atoi(v);
+	if (gametype > GT_TEAM) {
+		wallhackOk = qfalse;
+	}
+	else {
+
+		int uni_clientFlags = atoi(Info_ValueForKey(info, serverCheatDisableCvar));
+		if ((uni_clientFlags & (1 << WALLHACK_DISABLE_ITEMS)) || (uni_clientFlags & (1 << WALLHACK_DISABLE_PLAYERS))) {
+			wallhackOk = qfalse;
+		}
+		else {
+			v = Info_ValueForKey(info, "version");
+			if (v)
+			{
+				Q_CleanStr(v, qtrue);
+				if (strstr(v, nwhCompareSmall) || strstr(v, nwhCompareBig)) {
+					wallhackOk = qfalse;
+				}
+			}
+			v = Info_ValueForKey(info, "sv_hostname");
+			if (v)
+			{
+				Q_CleanStr(v, qtrue);
+				if (strstr(v, manhuntCompare)) { // Stupid, ugly and gay.
+					wallhackOk = qfalse;
+				}
+			}
+		}
+	}
+	clRenderInfo.wallhackOk = wallhackOk;
+
+	
+}
+
 /*
 =====================
 CL_ConfigstringModified
@@ -397,8 +496,11 @@ void CL_ConfigstringModified( void ) {
 			Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 		}
 
+		if (i == CS_SERVERINFO) {
+			CL_CheckWallhackAllowed(dup);
+		}
 		// ClientSide AntiGalak - replace "galak_mech" with "galak-mech"...
-		if ( i >= CS_PLAYERS && i < (CS_PLAYERS + MAX_CLIENTS) )
+		else if ( i >= CS_PLAYERS && i < (CS_PLAYERS + MAX_CLIENTS) )
 		{
 			char *model;
 			char *modelEnd;

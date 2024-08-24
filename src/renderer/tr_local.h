@@ -27,6 +27,9 @@ typedef unsigned int glIndex_t;
 #define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
 
+
+extern	clientRendererInfo_t	clRenderInfo;
+
 // can't be increased without changing bit packing for drawsurfs
 typedef enum
 {
@@ -95,6 +98,7 @@ typedef struct {
 	const char *name;
 	int	minimize, maximize;
 } textureMode_t;
+
 
 extern	int				gl_filter_min, gl_filter_max;
 

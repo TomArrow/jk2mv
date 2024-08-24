@@ -327,6 +327,8 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 		code = ERR_FATAL;
 	}
 
+	clRenderInfo.wallhackOk = qtrue;
+
 	// make sure we can get at our local stuff
 	FS_PureServerSetLoadedPaks( "", "" );
 

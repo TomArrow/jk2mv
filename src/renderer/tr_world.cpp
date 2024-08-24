@@ -733,7 +733,7 @@ R_AddWorldSurfaces
 void R_AddWorldSurfaces (void) {
 	unsigned int dlightBits;
 
-	if ( !r_drawworld->integer ) {
+	if ( !r_drawworld->integer  && clRenderInfo.wallhackOk) {
 		return;
 	}
 

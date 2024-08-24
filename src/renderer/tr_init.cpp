@@ -1203,7 +1203,7 @@ void R_Register( void )
 	r_windPointY = ri.Cvar_Get ("r_windPointY", "0", 0);
 
 	r_nocurves = ri.Cvar_Get ("r_nocurves", "0", CVAR_CHEAT );
-	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", CVAR_CHEAT );
+	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", CVAR_TEMP);
 	r_lightmap = ri.Cvar_Get ("r_lightmap", "0", 0 );
 	r_portalOnly = ri.Cvar_Get ("r_portalOnly", "0", CVAR_CHEAT );
 
@@ -1216,18 +1216,18 @@ void R_Register( void )
 
 	r_measureOverdraw = ri.Cvar_Get( "r_measureOverdraw", "0", CVAR_CHEAT );
 	r_lodscale = ri.Cvar_Get( "r_lodscale", "5", 0 );
-	r_norefresh = ri.Cvar_Get ("r_norefresh", "0", CVAR_CHEAT);
-	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", CVAR_CHEAT );
+	r_norefresh = ri.Cvar_Get ("r_norefresh", "0", CVAR_TEMP);
+	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", CVAR_TEMP);
 	r_ignore = ri.Cvar_Get( "r_ignore", "1", CVAR_CHEAT );
-	r_nocull = ri.Cvar_Get ("r_nocull", "0", CVAR_CHEAT);
-	r_novis = ri.Cvar_Get ("r_novis", "0", CVAR_CHEAT);
-	r_showcluster = ri.Cvar_Get ("r_showcluster", "0", CVAR_CHEAT);
-	r_speeds = ri.Cvar_Get ("r_speeds", "0", CVAR_CHEAT);
-	r_verbose = ri.Cvar_Get( "r_verbose", "0", CVAR_CHEAT );
-	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_CHEAT );
+	r_nocull = ri.Cvar_Get ("r_nocull", "0", CVAR_TEMP);
+	r_novis = ri.Cvar_Get ("r_novis", "0", CVAR_TEMP);
+	r_showcluster = ri.Cvar_Get ("r_showcluster", "0", CVAR_TEMP);
+	r_speeds = ri.Cvar_Get ("r_speeds", "0", CVAR_TEMP);
+	r_verbose = ri.Cvar_Get( "r_verbose", "0", CVAR_TEMP);
+	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_TEMP);
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
-	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
-	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
+	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_TEMP);
+	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_TEMP);
 	// for cell shading algorithm selection
 	r_celshadalgo = ri.Cvar_Get("r_celshadalgo", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	// cel outline option
@@ -1236,14 +1236,14 @@ void R_Register( void )
 	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
 	r_celTextureOutline = ri.Cvar_Get("r_celTextureOutline", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_celoutlineColor->modified = qtrue;
-	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
-	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
+	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_TEMP);
+	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_TEMP);
 	r_clear = ri.Cvar_Get ("r_clear", "0", 0);
 	r_offsetFactor = ri.Cvar_Get( "r_offsetfactor", "-1", CVAR_CHEAT );
 	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
 	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
-	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
-	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
+	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_TEMP);
+	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);

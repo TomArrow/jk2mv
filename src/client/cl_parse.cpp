@@ -1006,7 +1006,7 @@ CL_ParseGamestate
 */
 
 extern bool demoCheckFor103;
-
+void CL_CheckWallhackAllowed(const char* serverInfo);
 void CL_ParseGamestate( msg_t *msg ) {
 	int				i;
 	entityState_t	*es;
@@ -1066,6 +1066,9 @@ void CL_ParseGamestate( msg_t *msg ) {
 					demoCheckFor103 = false; //No need to check this again while playing the demo.
 				}
 				clc.udpdl = atoi( Info_ValueForKey(s, "sv_allowDownload") );
+				if (i == CS_SERVERINFO) {
+					CL_CheckWallhackAllowed(s);
+				}
 			}
 
 			// append it to the gameState string buffer

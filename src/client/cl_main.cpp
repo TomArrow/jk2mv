@@ -21,6 +21,8 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
+clientRendererInfo_t	clRenderInfo;
+
 //#define NOCONNECT
 
 cvar_t	*cl_nodelta;
@@ -1230,6 +1232,8 @@ void CL_Disconnect( qboolean showMainMenu ) {
 		demoClearAt = rec + 2;
 	}
 #endif
+
+	clRenderInfo.wallhackOk = qtrue;
 
 	// shutting down the client so enter full screen ui mode
 	Cvar_Set("r_uiFullScreen", "1");
@@ -3353,6 +3357,8 @@ CL_Init
 void CL_Init( void ) {
 	Com_Printf( "----- Client Initialization -----\n" );
 
+	clRenderInfo.wallhackOk = qtrue; // at the start its ok (menu etc)
+
 	Con_Init ();
 
 	CL_ClearState ();
@@ -3562,6 +3568,8 @@ CL_Shutdown
 */
 void CL_Shutdown( void ) {
 	static qboolean recursive = qfalse;
+
+	clRenderInfo.wallhackOk = qtrue;
 
 	Com_Printf( "----- CL_Shutdown -----\n" );
 

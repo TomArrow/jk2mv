@@ -873,6 +873,10 @@ MISC
 //==========================================================
 
 
+typedef struct clientRendererInfo_s {
+	qboolean	wallhackOk;
+} clientRendererInfo_t;
+
 const char	*CopyString( const char *in );
 const char	*CopyString( const char *in, memtag_t eTag );
 void		Info_Print( const char *s );

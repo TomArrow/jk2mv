@@ -12,6 +12,8 @@
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
+extern	clientRendererInfo_t	clRenderInfo;
+
 // Wind
 extern vec3_t cl_windVec;
 
@@ -160,7 +162,6 @@ typedef struct {
 	qboolean		predictedMovementIsSet;
 
 	int				snapshotReceivedRealTimes[PACKET_BACKUP]; // Cool API "get time since snapshot received"
-
 } clientActive_t;
 
 extern	clientActive_t		cl;
