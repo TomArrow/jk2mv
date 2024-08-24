@@ -21,6 +21,7 @@
 #include <windows.h>
 #endif
 
+#define _HAS_STD_BYTE 0
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>

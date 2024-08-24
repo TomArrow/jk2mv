@@ -53,6 +53,7 @@
 #include <errno.h>
 
 #ifdef __cplusplus
+#define _HAS_STD_BYTE 0
 #	include <cstddef>
 #endif
 

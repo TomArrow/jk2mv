@@ -138,7 +138,7 @@ static void DB_BackgroundThread() {
 				std::unique_ptr<sql::ResultSet> res(stmnt->executeQuery(requestToProcess.requestString));
 				requestPending = qfalse;
 				while (res->next()) {
-					res->getMetaData();
+					requestToProcess.responseData.push_back(SQLDelayedResponse(res.get()));
 				}
 			}
 			catch (sql::SQLException& e) {
@@ -159,6 +159,10 @@ static void DB_BackgroundThread() {
 					requestPending = qfalse;
 				}
 			}
+		}
+		if (!requestPending) {
+			std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
+			dbSyncedData.requestsFinished[requestToProcess.module].push_back(std::move(requestToProcess));
 		}
 	}
 

@@ -39,31 +39,9 @@ class SQLDelayedValue {
 	std::string* columnNameValue = NULL;
 public:
 
-	auto operator=(SQLDelayedValue&& movedFrom) {
-		type = std::move(movedFrom.type);
-		switch (movedFrom.type) {
-		case SQLVALUE_TYPE_INTEGER:
-			intValue = movedFrom.intValue;
-			break;
-		case SQLVALUE_TYPE_REAL:
-			doubleValue = movedFrom.doubleValue;
-			break;
-		case SQLVALUE_TYPE_TEXT:
-			stringValue = new std::string(std::move(*movedFrom.stringValue));
-			movedFrom.stringValue = NULL;
-			break;
-		}
-		columnNameValue = new std::string(std::move(*movedFrom.columnNameValue));
-		movedFrom.columnNameValue = NULL;
-	}
-	SQLDelayedValue(SQLDelayedValue&& movedFrom)
-	{
-		*this = std::move(movedFrom);
-	}
-
 
 	template<class T>
-	SQLDelayedValue(char* columnName, T valueA) {
+	SQLDelayedValue(const char* columnName, T valueA) {
 		if constexpr (std::is_floating_point<T>()) {
 			doubleValue = valueA;
 			type = SQLVALUE_TYPE_REAL;
@@ -94,6 +72,28 @@ public:
 			throw std::invalid_argument("Invalid SQLDelayedValue constructor type");
 		}
 		columnNameValue = new std::string(columnName);
+	}
+
+	auto operator=(SQLDelayedValue&& movedFrom) {
+		type = std::move(movedFrom.type);
+		switch (movedFrom.type) {
+		case SQLVALUE_TYPE_INTEGER:
+			intValue = movedFrom.intValue;
+			break;
+		case SQLVALUE_TYPE_REAL:
+			doubleValue = movedFrom.doubleValue;
+			break;
+		case SQLVALUE_TYPE_TEXT:
+			stringValue = new std::string(std::move(*movedFrom.stringValue));
+			movedFrom.stringValue = NULL;
+			break;
+		}
+		columnNameValue = new std::string(std::move(*movedFrom.columnNameValue));
+		movedFrom.columnNameValue = NULL;
+	}
+	SQLDelayedValue(SQLDelayedValue&& movedFrom)
+	{
+		*this = std::move(movedFrom);
 	}
 
 
@@ -140,14 +140,76 @@ class SQLDelayedResponse {
 	//}
 public:
 	template<class T>
-	void inline add(char* name, T value) {
+	void inline add(const char* name, T value) {
 		values.push_back(new SQLDelayedValue(name, value));
 	}
 	SQLDelayedResponse() {
 
 	}
 	SQLDelayedResponse(sql::ResultSet* sourceRow) {
+		std::unique_ptr<sql::ResultSetMetaData> meta(sourceRow->getMetaData());
+		int columnCount = meta->getColumnCount();
+		for (int i = 1; i <= columnCount; i++) {
+			sql::Types columnType = (sql::Types)meta->getColumnType(i);
 
+			switch (columnType) {
+			case sql::Types::BIGINT:
+			case sql::Types::BOOLEAN:
+			case sql::Types::SMALLINT:
+			case sql::Types::TINYINT:
+			case sql::Types::INTEGER:
+			case sql::Types::ROWID:
+				add(meta->getColumnName(i).c_str(), sourceRow->getInt64(i));
+				break;
+
+			case sql::Types::DECIMAL:
+			case sql::Types::NUMERIC:
+			case sql::Types::DOUBLE:
+			case sql::Types::FLOAT:
+			case sql::Types::REAL:
+				add(meta->getColumnName(i).c_str(), sourceRow->getDouble(i));
+				break;
+
+			case sql::Types::CHAR:
+			case sql::Types::LONGNVARCHAR:
+			case sql::Types::LONGVARCHAR:
+			case sql::Types::NCHAR:
+			case sql::Types::NVARCHAR:
+			case sql::Types::VARCHAR:
+			case sql::Types::CLOB:
+			case sql::Types::NCLOB:
+				add(meta->getColumnName(i).c_str(), sourceRow->getString(i).c_str());
+
+			case sql::Types::_NULL:
+				add(meta->getColumnName(i).c_str(), SQLDelayedValue_NULL);
+				break;
+
+			case sql::Types::DATE:
+			case sql::Types::TIME:
+			case sql::Types::TIME_WITH_TIMEZONE:
+			case sql::Types::TIMESTAMP:
+			case sql::Types::TIMESTAMP_WITH_TIMEZONE:
+				add(meta->getColumnName(i).c_str(), sourceRow->getString(i).c_str());// keep as string for now. maybe do something nicer later.
+				break;
+
+			case sql::Types::ARRAY:
+			case sql::Types::BINARY:
+			case sql::Types::VARBINARY:
+			case sql::Types::BIT:
+			case sql::Types::BLOB:
+			case sql::Types::DATALINK:
+			case sql::Types::DISTINCT:
+			case sql::Types::JAVA_OBJECT:
+			case sql::Types::LONGVARBINARY:
+			case sql::Types::OTHER:
+			case sql::Types::REF:
+			case sql::Types::REF_CURSOR:
+			case sql::Types::_SQLXML:
+			case sql::Types::STRUCT:
+				add(meta->getColumnName(i).c_str(), SQLDelayedValue_NULL); // not supported rn
+				break;
+			}
+		}
 	}
 	auto operator=(SQLDelayedResponse&& other) {
 		values = std::move(other.values);
@@ -188,7 +250,7 @@ public:
 	std::string requestString;			// sql instruction
 	int requestType = -1;				// so the module can have a different type of reference data struct for each request type
 	std::vector<byte> moduleReference;	// any sequence of bytes (probably a module struct) that the module gave us to remember what this request is
-	SQLDelayedResponse responseData;
+	std::vector <SQLDelayedResponse> responseData;
 };
 
 
