@@ -6,13 +6,17 @@
 
 extern cvar_t* db_enabled;
 
-void DB_Init();
-void DB_CheckCvars();
-void DB_Shutdown(); 
-qboolean DB_EscapeString(char* input, int size);
-
-
-
+void		DB_Init();
+void		DB_CheckCvars();
+void		DB_Shutdown(); 
+qboolean	DB_EscapeString(char* input, int size);
+qboolean	DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request);
+qboolean	DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength);
+qboolean	DB_GetRequestReference(module_t module, byte* reference, int referenceLength);
+qboolean	DB_NextRow(module_t module);
+int			DB_GetInt(module_t module, int place);
+int			DB_GetFloat(module_t module, int place);
+qboolean	DB_GetString(module_t module, int place, char* out, int outSize);
 
 enum SQLDelayedValueType {
 	SQLVALUE_TYPE_NULL,
@@ -39,6 +43,63 @@ class SQLDelayedValue {
 	std::string* columnNameValue = NULL;
 public:
 
+	int getInt() {
+		switch (type) {
+		case SQLVALUE_TYPE_NULL:
+			return 0;
+			break;
+		case SQLVALUE_TYPE_INTEGER:
+			return (int)intValue;
+			break;
+		case SQLVALUE_TYPE_REAL:
+			return (int)doubleValue;
+			break;
+		case SQLVALUE_TYPE_TEXT:
+			return stringValue ? atoi(stringValue->c_str()) : 0;
+			break;
+		default:
+			throw std::invalid_argument("cannot get as int");
+			break;
+		}
+	}
+	float getFloat() {
+		switch (type) {
+		case SQLVALUE_TYPE_NULL:
+			return 0.0f;
+			break;
+		case SQLVALUE_TYPE_INTEGER:
+			return (float)intValue;
+			break;
+		case SQLVALUE_TYPE_REAL:
+			return (float)doubleValue;
+			break;
+		case SQLVALUE_TYPE_TEXT:
+			return stringValue ? atof(stringValue->c_str()) : 0;
+			break;
+		default:
+			throw std::invalid_argument("cannot get as float");
+			break;
+		}
+	}
+	const std::string getString() {
+		switch (type) {
+		case SQLVALUE_TYPE_NULL:
+			return "NULL";
+			break;
+		case SQLVALUE_TYPE_INTEGER:
+			return va("%d",intValue);
+			break;
+		case SQLVALUE_TYPE_REAL:
+			return va("%f", (float)doubleValue);
+			break;
+		case SQLVALUE_TYPE_TEXT:
+			return stringValue ? *stringValue : "";
+			break;
+		default:
+			throw std::invalid_argument("cannot get as float");
+			break;
+		}
+	}
 
 	template<class T>
 	SQLDelayedValue(const char* columnName, T valueA) {
@@ -142,6 +203,13 @@ public:
 	template<class T>
 	void inline add(const char* name, T value) {
 		values.push_back(new SQLDelayedValue(name, value));
+	}
+	int size() {
+		return values.size();
+	}
+	SQLDelayedValue* getValue(int place) {
+		if (place > values.size()) return NULL;
+		return values[place];
 	}
 	SQLDelayedResponse() {
 
@@ -252,6 +320,7 @@ public:
 	int requestType = -1;				// so the module can have a different type of reference data struct for each request type
 	std::vector<byte> moduleReference;	// any sequence of bytes (probably a module struct) that the module gave us to remember what this request is
 	std::vector<SQLDelayedResponse> responseData;
+	int currentResponseRow = -1;
 };
 
 

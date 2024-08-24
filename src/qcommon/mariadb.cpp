@@ -15,7 +15,7 @@ static cvar_t* db_password;
 static std::thread* dbThread;
 
 static DBRequest currentFinishedRequest[MODULE_MAX];
-static qboolean currentFinishedRequestValid[MODULE_MAX]{ 0 };
+static qboolean currentFinishedRequestValid[MODULE_MAX]{ qfalse };// it doesnt initialize all to qfalse, but everyone after first to 0, but that's the same thing so its ok :)
 
 struct {
 	// connection
@@ -186,13 +186,77 @@ static void DB_BackgroundThread() {
 	/**/
 }
 
-qboolean DB_AddRequest(DBRequest& req) {
-	//if (!db_enabled->integer) return qfalse;
+qboolean DB_AddRequest(DBRequest&& req) {
+	if (!db_enabled->integer) return qfalse;
 	{
 		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
 		dbSyncedData.requestsIncoming.push_back(std::move(req));
 	}
 	dbSyncedData.changeNotifier.notify_one();
+	return qtrue;
+}
+qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request) {
+	if (!db_enabled->integer) return qfalse;
+	DBRequest req;
+	req.requestString = request;
+	req.requestType = requestType;
+	if (reference && referenceLength) {
+		req.moduleReference = std::move(std::vector<byte>(reference, reference+referenceLength));
+	}
+	DB_AddRequest(std::move(req));
+}
+
+qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].currentResponseRow < 0) {
+		return qfalse;
+	}
+	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValue* val = row->getValue(place);
+	if (val) {
+		std::string value = val->getString();
+		Q_strncpyz(out, value.c_str(), outSize);
+		return (qboolean)(outSize > value.size());
+	}
+}
+int DB_GetFloat(module_t module, int place) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].currentResponseRow < 0) {
+		return qfalse;
+	}
+	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValue* val = row->getValue(place);
+	if (val) {
+		return val->getFloat();
+	}
+	return 0;
+}
+int DB_GetInt(module_t module, int place) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].currentResponseRow < 0) {
+		return qfalse;
+	}
+	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValue* val = row->getValue(place);
+	if (val) {
+		return val->getInt();
+	}
+	return 0;
+}
+qboolean DB_NextRow(module_t module) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].responseData.size() <= currentFinishedRequest[module].currentResponseRow + 1) {
+		return qfalse;
+	}
+	currentFinishedRequest[module].currentResponseRow++;
 	return qtrue;
 }
 qboolean DB_GetRequestReference(module_t module, byte* reference, int referenceLength) {
@@ -212,7 +276,7 @@ qboolean DB_GetRequestReference(module_t module, byte* reference, int referenceL
 	}
 	return qfalse;
 }
-qboolean DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize) {
+qboolean DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength) {
 	{
 		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
 		if (!dbSyncedData.requestsFinished[module].empty()) {
@@ -225,6 +289,13 @@ qboolean DB_NextFinishedRequest(module_t module, int* requestType, int* affected
 			if (errorMessage) {
 				// error might be too long but we'll just silently cut it off then.
 				Q_strncpyz(errorMessage, currentFinishedRequest[module].errorMessage.c_str(), errorMessageSize);
+			}
+			if (reference) {
+				// give back the reference
+				int copyCount = MIN(currentFinishedRequest[module].moduleReference.size(), referenceLength);
+				if (copyCount > 0) {
+					Com_Memcpy(reference, currentFinishedRequest[module].moduleReference.data(), copyCount);
+				}
 			}
 
 			currentFinishedRequestValid[module] = qtrue;
@@ -266,7 +337,7 @@ void DB_Init() {
 	if (DB_EscapeString(timestamp, sizeof(timestamp))) {
 		DBRequest req;
 		req.requestString = va("INSERT INTO test (testtext) VALUES ('%s')", timestamp);
-		DB_AddRequest(req);
+		DB_AddRequest(std::move(req));
 	}
 }
 
@@ -310,6 +381,7 @@ qboolean DB_EscapeString(char* input, int size) {
 		return qtrue;
 	}
 	else {
+		input[0] = '\0'; // be safe. kill this string before someone uses it by accident.
 		return qfalse;
 	}
 }
