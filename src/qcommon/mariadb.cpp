@@ -135,11 +135,29 @@ static void DB_BackgroundThread() {
 				// Create a new Statement
 				std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
 				// Execute query
-				sql::ResultSet* res = stmnt->executeQuery(requestToProcess.requestString);
+				std::unique_ptr<sql::ResultSet> res(stmnt->executeQuery(requestToProcess.requestString));
 				requestPending = qfalse;
+				while (res->next()) {
+					res->getMetaData();
+				}
 			}
 			catch (sql::SQLException& e) {
-				Com_Printf( "MariaDB error executing query: %s \n" ,e.what());
+				const int max_tries = 10;
+				Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries+1, max_tries, e.what());
+				if (requestToProcess.tries < max_tries) {
+
+					// dont do a hyper-fast endless loop when failing
+					using namespace std::chrono_literals;
+					std::this_thread::sleep_for(1000ms);
+					requestToProcess.tries++;
+				}
+				else {
+					// alright, move on...
+					requestToProcess.successful = qfalse;
+					requestToProcess.errorCode = e.getErrorCode();
+					requestToProcess.errorMessage = e.what();
+					requestPending = qfalse;
+				}
 			}
 		}
 	}
