@@ -376,6 +376,7 @@ if (BuildMVMP)
 		"client/cl_net_chan.cpp"
 		"client/cl_parse.cpp"
 		"client/cl_scrn.cpp"
+		"client/cl_tc_vis.cpp"
 		"client/cl_ui.cpp"
 		"client/snd_dma.cpp"
 		"client/snd_mem.cpp"

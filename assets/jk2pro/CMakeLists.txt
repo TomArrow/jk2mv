@@ -7,6 +7,9 @@ set(AssetsFiles
 	"gfx/2d/crosshaira.tga"
 	"gfx/2d/crosshairj.tga"
 	"gfx/2d/mp_yteam_symbol.tga"
+	
+	"gfx/misc/tcRenderShader.jpg"
+	"gfx/misc/tcRenderShader2.jpg"
 
 	"gfx/effects/mp_y_forcefield.jpg"
 	"gfx/effects/mp_y_forcefield_d.jpg"
@@ -39,6 +42,7 @@ set(AssetsFiles
 	"models/map_objects/mp/flag3.jpg"
 
 	"shaders/ctf3_yellowteam.shader"
+	"shaders/japro_tcRender.shader"
 	"shaders/q3mod.shader"
 
 	"sound/chars/mothma/misc/40MOM017.mp3"
