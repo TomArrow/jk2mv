@@ -549,12 +549,14 @@ if (BuildMVMP)
 	endif()
 
 	# jk2mvmenu and assetsmv are required to run JK2MV
-	add_dependencies(${MVMP} ${MVMENU} assetsmv)
-	add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
+	# TA: Don't do this. It makes QVM recompile every time you try to compile client. Too annoying.
+	# These are required to run JK2MV but NOT to compile it. They will still get built when you build all.
+	#add_dependencies(${MVMP} ${MVMENU} assetsmv)
+	#add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
 
-	if(BuildMVSDK)
-		add_dependencies(${MVMP} bins-jk2pro)
-	endif()
+	#if(BuildMVSDK)
+	#	add_dependencies(${MVMP} bins-jk2pro)
+	#endif()
 
 	# mvmenu is now built from source conainted in the mvsdk submodule
 	set(MVMENUDefines "GAME_EXPORTS")
@@ -661,11 +663,13 @@ if (BuildMVDED)
 	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES} ${MARIADB_LIBRARIES})
 	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "JK2MV MP Dedicated Server")
 
-	add_dependencies(${MVDED} assetsmv)
+	# TA: Don't do this. It makes QVM recompile every time you try to compile client. Too annoying.
+	# These are required to run JK2MV but NOT to compile it. They will still get built when you build all.
+	# add_dependencies(${MVDED} assetsmv)
 
-	if(BuildMVSDK)
-		add_dependencies(${MVDED} bins-jk2pro)
-	endif()
+	#if(BuildMVSDK)
+	#	add_dependencies(${MVDED} bins-jk2pro)
+	#endif()
 
 	# installation
 	if(WIN32 OR APPLE OR BuildPortableVersion)
