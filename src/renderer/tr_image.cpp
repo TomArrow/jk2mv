@@ -8,7 +8,7 @@
 
 #include <map>
 #include <float.h> // Linux is special. It says it wants <cfloat> but what it REALLY wants is float.h?
-using namespace std;
+//using namespace std;
 
 
 /*
@@ -817,7 +817,7 @@ public:
 	bool operator()(const char *s1, const char *s2) const { return(strcmp(s1, s2) < 0); }
 };
 
-typedef map <const char *, image_t *, CStringComparator>	AllocatedImages_t;
+typedef std::map <const char *, image_t *, CStringComparator>	AllocatedImages_t;
 													AllocatedImages_t AllocatedImages;
 													AllocatedImages_t::iterator itAllocatedImages;
 int giTextureBindNum = 1024;	// will be set to this anyway at runtime, but wtf?

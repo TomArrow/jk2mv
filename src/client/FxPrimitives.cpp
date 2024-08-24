@@ -93,7 +93,7 @@ CCloud::CCloud() :
 	//mRefEnt.reType = RT_ENT_CHAIN;
 }
 
-extern set<CCloud *> OutstandClouds;
+extern std::set<CCloud *> OutstandClouds;
 
 CCloud::~CCloud()
 {

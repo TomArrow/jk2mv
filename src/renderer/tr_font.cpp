@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 
 inline int Round(float value)
@@ -20,8 +20,8 @@ inline int Round(float value)
 }
 
 int							fontIndex;	// entry 0 is reserved index for missing/invalid, else ++ with each new font registered
-vector<CFontInfo *>			fontArray;
-typedef map<string, int>	fontIndexMap_t;
+std::vector<CFontInfo *>			fontArray;
+typedef std::map<std::string, int>	fontIndexMap_t;
 							fontIndexMap_t fontIndexMap;
 //paletteRGBA_c				lastcolour;
 

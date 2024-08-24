@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 class hstring
 {
@@ -24,7 +24,7 @@ public:
 	{
 		Init(str);
 	}
-	hstring(const string &str)
+	hstring(const std::string &str)
 	{
 		Init(str.c_str());
 	}
@@ -33,20 +33,20 @@ public:
 		mId=str.mId;
 	}
 
-	operator string () const
+	operator std::string () const
 	{
 		return str();
 	}
 
 	const char *c_str(void) const;
-	string str(void) const;
+	std::string str(void) const;
 
 	hstring& operator= (const char *str)
 	{
 		Init(str);
 		return *this;
 	}
-	hstring& operator= (const string &str)
+	hstring& operator= (const std::string &str)
 	{
 		Init(str.c_str());
 		return *this;
@@ -87,8 +87,8 @@ void TouchStringPool(void);
 class CMapBlock;
 class CMapPoolLow
 {
-	vector <CMapBlock *>	mMapBlocks;
-	vector <void *>			mFreeList;
+	std::vector <CMapBlock *>	mMapBlocks;
+	std::vector <void *>			mFreeList;
 	int						mLastBlockNum;
 
 public:
@@ -198,16 +198,16 @@ bool operator!= (const CMapPool<T1>&,
    return true;
 }
 
-template <class K,class V,class Compare = less<K> >
+template <class K,class V,class Compare = std::less<K> >
 class hmap : public map<K,V,Compare,CMapPool<V> >{};
 
-template <class K,class V,class Compare = less<K> >
+template <class K,class V,class Compare = std::less<K> >
 class hmultimap : public multimap<K,V,Compare,CMapPool<V> >{};
 
-template <class K,class Compare = less<K> >
+template <class K,class Compare = std::less<K> >
 class hset : public set<K,Compare,CMapPool<K> >{};
 
-template <class K,class Compare = less<K> >
+template <class K,class Compare = std::less<K> >
 class hmultiset : public multiset<K,Compare,CMapPool<K> >{};
 
 template <class K>

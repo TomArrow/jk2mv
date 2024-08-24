@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "hstring.h"
 
-using namespace std;
+//using namespace std;
 
 // mapPoolBlockCount is defined differently in the executable (sv_main.cpp) and the game dll (g_main.cpp) cuz
 //we likely don't need as many blocks in the executable as we do in the game
@@ -38,7 +38,7 @@ class CMapBlock
 	int			mLastNode;
 
 public:
-	CMapBlock(int id,vector <void *> &freeList) :
+	CMapBlock(int id, std::vector <void *> &freeList) :
 		mLastNode(0)
 	{
 		// Alloc node storage for MAPBLOCK_SIZE_NODES worth of nodes.
@@ -304,7 +304,7 @@ public:
 
 class CPool
 {
-	vector<CHSBlock *>	mBlockVec;
+	std::vector<CHSBlock *>	mBlockVec;
 
 public:
 	int					mNextStringId;
@@ -486,14 +486,14 @@ const char *hstring::c_str(void) const
 	return(gCharPtrs[mId]);
 }
 
-string hstring::str(void) const
+std::string hstring::str(void) const
 {
 	if(!mId)
 	{
-		return(string());
+		return(std::string());
 	}
 	assert(mId>0&&mId<ThePool().mNextStringId);
-	return string(gCharPtrs[mId]);
+	return std::string(gCharPtrs[mId]);
 }
 
 #endif // _DONETPROFILE_

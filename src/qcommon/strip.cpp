@@ -23,7 +23,7 @@
 
 #include <list>
 
-using namespace std;
+//using namespace std;
 
 #ifdef _STRIPED_
 
@@ -1407,7 +1407,7 @@ cStringsSingle *cStringPackageSingle::FindString(char *ReferenceLookup)
 
 int cStringPackageSingle::FindStringID(const char *ReferenceLookup)
 {
-	map<string, int>::iterator	i;
+	std::map<std::string, int>::iterator	i;
 	size_t						size;
 
 	if (!Reference)
@@ -1426,7 +1426,7 @@ int cStringPackageSingle::FindStringID(const char *ReferenceLookup)
 		return -1;
 	}
 
-	i = ReferenceTable.find(string(ReferenceLookup + size + 1));
+	i = ReferenceTable.find(std::string(ReferenceLookup + size + 1));
 	if (i != ReferenceTable.end())
 	{
 		return (*i).second;
@@ -1469,7 +1469,7 @@ bool cStringPackageSingle::UnderstandToken(char *&Data, int &Size, int token, ch
 				ReferenceLookup = Strings[pos].GetReference();
 				if (ReferenceLookup)
 				{
-					ReferenceTable[string(ReferenceLookup)] = pos;
+					ReferenceTable[std::string(ReferenceLookup)] = pos;
 				}
 			}
 			return true;
@@ -1491,8 +1491,8 @@ bool cStringPackageSingle::UnderstandToken(char *&Data, int &Size, int token, ch
 #ifndef _STRIPED_
 
 // A map of loaded string packages
-map<string, cStringPackageSingle *>		SP_ListByName;
-map<byte, cStringPackageSingle *>		SP_ListByID;
+std::map<std::string, cStringPackageSingle *>		SP_ListByName;
+std::map<byte, cStringPackageSingle *>		SP_ListByID;
 
 
 // Registration
@@ -1502,7 +1502,7 @@ cStringPackageSingle *SP_Register(const char *inPackage, unsigned char Registrat
 	char											Package[MAX_QPATH];
 	int												size;
 	cStringPackageSingle							*new_sp;
-	map<string, cStringPackageSingle *>::iterator	i;
+	std::map<std::string, cStringPackageSingle *>::iterator	i;
 
 
 	assert(SP_ListByName.size() == SP_ListByID.size());
@@ -1570,8 +1570,8 @@ qboolean SP_RegisterServer(const char *Package)
 // Unload all packages with the relevant registration bits
 void SP_Unload(unsigned char Registration)
 {
-	map<string, cStringPackageSingle *>::iterator	i, next;
-	map<byte, cStringPackageSingle *>::iterator		id;
+	std::map<std::string, cStringPackageSingle *>::iterator	i, next;
+	std::map<byte, cStringPackageSingle *>::iterator		id;
 
 	assert(SP_ListByName.size() == SP_ListByID.size());
 
@@ -1597,7 +1597,7 @@ void SP_Unload(unsigned char Registration)
 
 int SP_GetStringID(const char *inReference)
 {
-	map<unsigned char,cStringPackageSingle *>::iterator	i;
+	std::map<unsigned char,cStringPackageSingle *>::iterator	i;
 	int													ID;
 	char Reference[MAX_QPATH];
 	Q_strncpyz(Reference, inReference, MAX_QPATH);
@@ -1629,7 +1629,7 @@ cStringsSingle *SP_GetString(unsigned short ID)
 {
 	cStringPackageSingle								*sp;
 	cStringsSingle										*string;
-	map<unsigned char,cStringPackageSingle *>::iterator	i;
+	std::map<unsigned char,cStringPackageSingle *>::iterator	i;
 
 	i = SP_ListByID.find(SP_GET_PACKAGE(ID));
 	if (i == SP_ListByID.end())
@@ -1720,9 +1720,9 @@ const qboolean SP_VMGetStringText(const char *Reference, char *dst, size_t dstsi
 
 static void SP_UpdateLanguage(void)
 {
-	map<unsigned char, cStringPackageSingle *>::iterator	it;
-	list<cStringPackageID>									sps;
-	list<cStringPackageID>::iterator						spit;
+	std::map<unsigned char, cStringPackageSingle *>::iterator	it;
+	std::list<cStringPackageID>									sps;
+	std::list<cStringPackageID>::iterator						spit;
 
 	// Grab all SP ids
 	for(it = SP_ListByID.begin(); it != SP_ListByID.end(); ++it)

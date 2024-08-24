@@ -30,7 +30,7 @@
 extern mdxaBone_t		worldMatrix;
 extern mdxaBone_t		worldMatrixInv;
 
-typedef map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
+typedef std::map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
 
 static CGhoul2Info_m	ghoultable[2];
 static g2handle_t		nextGhoul2Handle = (g2handle_t)1;

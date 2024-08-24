@@ -10,7 +10,7 @@
 
 #include <set>
 
-set<CCloud *> OutstandClouds;
+std::set<CCloud *> OutstandClouds;
 
 vec3_t	WHITE = {1.0f, 1.0f, 1.0f};
 

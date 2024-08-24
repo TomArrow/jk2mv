@@ -473,6 +473,9 @@ if (BuildMVMP)
 		set_source_files_properties(${LibFiles} PROPERTIES COMPILE_FLAGS "-w")
 	endif()
 
+	# Defines
+	set(MVMPDefines "_HAS_STD_BYTE=0")
+
 	# Project
 	if(WIN32)
 		add_executable(${MVMP} WIN32 ${MVMPFiles})
@@ -505,7 +508,7 @@ if (BuildMVMP)
 	endif()
 
 	target_compile_definitions(${MVMP}
-		PRIVATE ${GlobalDefines}
+		PRIVATE ${GlobalDefines} ${MVMPDefines}
 		PRIVATE $<$<CONFIG:Debug>:${DebugDefines}>
 		PRIVATE $<$<CONFIG:Release>:${ReleaseDefines}>
 		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
@@ -646,7 +649,7 @@ if (BuildMVDED)
 	set(MVDEDFiles ${MVDEDFiles} ${MVDEDNullFiles})
 
 	# Defines
-	set(MVDEDDefines "DEDICATED")
+	set(MVDEDDefines "DEDICATED" "_HAS_STD_BYTE=0")
 
 	# Project
 	add_executable(${MVDED} ${MVDEDFiles})
