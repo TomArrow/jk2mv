@@ -72,7 +72,7 @@ add_zip_command(${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3 ${OUTFILE}
 	DEPENDS "${AssetsFiles}"
 )
 
-add_custom_target(assets-jk2pro DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3" ${AssetsFiles})
+add_custom_target(assets-jk2pro ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/jk2pro-assets.pk3" ${AssetsFiles})
 
 if(WIN32 OR BuildPortableVersion)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eternaljk2-assets.pk3 DESTINATION "eternaljk2")
