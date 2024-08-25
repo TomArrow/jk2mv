@@ -208,7 +208,7 @@ public:
 		return values.size();
 	}
 	SQLDelayedValue* getValue(int place) {
-		if (place > values.size()) return NULL;
+		if (place >= values.size()) return NULL;
 		return values[place];
 	}
 	SQLDelayedResponse() {
@@ -247,6 +247,7 @@ public:
 			case sql::Types::CLOB:
 			case sql::Types::NCLOB:
 				add(meta->getColumnName(i).c_str(), sourceRow->getString(i).c_str());
+				break;
 
 			case sql::Types::_NULL:
 				add(meta->getColumnName(i).c_str(), SQLDelayedValue_NULL);

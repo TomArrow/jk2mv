@@ -117,6 +117,8 @@ static void DB_BackgroundThread() {
 
 					// Establish Connection
 					conn = driver->connect(url, properties);
+					std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
+					stmnt->execute("SET CHARACTER SET latin1"); // Make sure no character set shenanigans happen. Latin1 is what jka uses it seems. Good enough.
 					Com_Printf("MariaDB connection established.\n");
 				}
 				catch (...) {
