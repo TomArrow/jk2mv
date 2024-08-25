@@ -151,7 +151,7 @@ static void DB_BackgroundThread() {
 				requestPending = qfalse;
 			}
 			catch (sql::SQLException& e) {
-				if (!requestToProcess.errorCode) {
+				if (!e.getErrorCode()) {
 					// error code 0: not an error.
 					requestToProcess.errorMessage = e.what();
 					requestPending = qfalse;
@@ -200,6 +200,7 @@ qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, in
 	DBRequest req;
 	req.requestString = request;
 	req.requestType = requestType;
+	req.module = module;
 	if (reference && referenceLength) {
 		req.moduleReference = std::move(std::vector<byte>(reference, reference+referenceLength));
 	}
@@ -221,7 +222,7 @@ qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
 		return (qboolean)(outSize > value.size());
 	}
 }
-int DB_GetFloat(module_t module, int place) {
+float DB_GetFloat(module_t module, int place) {
 	if (!currentFinishedRequestValid[module]) {
 		return qfalse;
 	}
@@ -259,7 +260,7 @@ qboolean DB_NextRow(module_t module) {
 	currentFinishedRequest[module].currentResponseRow++;
 	return qtrue;
 }
-qboolean DB_GetRequestReference(module_t module, byte* reference, int referenceLength) {
+qboolean DB_GetReference(module_t module, byte* reference, int referenceLength) {
 	if (!currentFinishedRequestValid[module]) {
 		return qfalse;
 	}
@@ -276,7 +277,7 @@ qboolean DB_GetRequestReference(module_t module, byte* reference, int referenceL
 	}
 	return qfalse;
 }
-qboolean DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength) {
+qboolean DB_NextResponse(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength) {
 	{
 		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
 		if (!dbSyncedData.requestsFinished[module].empty()) {
@@ -351,7 +352,8 @@ static std::string& replace(std::string& str, const std::string& _substr, const 
 	while ((pos = real.find(substr, prev)) != std::string::npos)
 	{
 		real.replace(pos, substr.length(), realSub);
-		prev += realSub.length();
+		//prev += realSub.length();
+		prev = pos + realSub.length();
 	}
 	return str;
 }

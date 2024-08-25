@@ -11,11 +11,11 @@ void		DB_CheckCvars();
 void		DB_Shutdown(); 
 qboolean	DB_EscapeString(char* input, int size);
 qboolean	DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request);
-qboolean	DB_NextFinishedRequest(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength);
-qboolean	DB_GetRequestReference(module_t module, byte* reference, int referenceLength);
+qboolean	DB_NextResponse(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength);
+qboolean	DB_GetReference(module_t module, byte* reference, int referenceLength);
 qboolean	DB_NextRow(module_t module);
 int			DB_GetInt(module_t module, int place);
-int			DB_GetFloat(module_t module, int place);
+float		DB_GetFloat(module_t module, int place);
 qboolean	DB_GetString(module_t module, int place, char* out, int outSize);
 
 enum SQLDelayedValueType {
