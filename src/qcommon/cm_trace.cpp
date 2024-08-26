@@ -234,7 +234,7 @@ void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 		}
 		b->checkcount = cm.checkcount;
 
-		if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER)&& (tw->contents != CONTENTS_DEFRAGTIMER)) { // exception here: badly converted maps don't have proper contents set on triggers. but thats ok we wouldn't have gotten here if the entity didn't have the flag in the first place
+		if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER)&& (tw->contents != CONTENTS_TRIGGER_EXIT)) { // exception here: badly converted maps don't have proper contents set on triggers. but thats ok we wouldn't have gotten here if the entity didn't have the flag in the first place
 			continue;
 		}
 
@@ -659,7 +659,7 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 		}
 		b->checkcount = cm.checkcount;
 
-		if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER) && (tw->contents != CONTENTS_DEFRAGTIMER)) {
+		if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER) && (tw->contents != CONTENTS_TRIGGER_EXIT)) {
 			continue;
 		}
 

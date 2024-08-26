@@ -714,7 +714,7 @@ Ghoul2 Insert End
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
-	if (contentmask != CONTENTS_TRIGGER && contentmask != CONTENTS_DEFRAGTIMER) { // No point tracing world if we want triggers. Go straight to entities.
+	if (contentmask != CONTENTS_TRIGGER && contentmask != CONTENTS_TRIGGER_EXIT) { // No point tracing world if we want triggers. Go straight to entities.
 		CM_BoxTrace(&clip.trace, start, end, mins, maxs, 0, contentmask, capsule);
 		clip.trace.entityNum = clip.trace.fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 		if (clip.trace.fraction == 0) {
