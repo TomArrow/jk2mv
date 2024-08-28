@@ -1246,8 +1246,8 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
+	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), CVAR_ARCHIVE | CVAR_LATCH);
+	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), CVAR_ARCHIVE | CVAR_LATCH);
 
 	r_convertModelBones = ri.Cvar_Get( "r_convertModelBones", "1", CVAR_ARCHIVE | CVAR_GLOBAL );
 	r_loadSkinsJKA = ri.Cvar_Get( "r_loadSkinsJKA", "1", CVAR_ARCHIVE | CVAR_GLOBAL );

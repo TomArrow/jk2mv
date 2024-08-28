@@ -69,29 +69,39 @@ static void DB_BackgroundThread() {
 		}
 
 		// update connection if needed
+		reconnect:
 		int connectTries = 0;
 		qboolean connectionEnabled = qtrue;
-		while (!conn || connectionChanged || !conn->isValid()) {
+		qboolean terminating = qfalse;
+		while (!conn || connectionChanged) {
 			if (connectTries) {
-				if (!connectionEnabled) {
+				if (!connectionEnabled || terminating) {
 					break;
 				}
 				// dont do a hyper-fast endless loop when we obviously cannot connect
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1000ms);
 			}
-			if (conn && !conn->isValid()) {
-				try {
-					conn->reconnect();
-					Com_Printf("MariaDB connection reconnected.\n");
+			/* if (conn && !conn->isValid()) {
+				Com_Printf("MariaDB connection died.\n");
+				// could try ->reconnect() but its buggy. just start over.
+				conn->close();
+				delete conn;
+				conn = NULL;
+				
+				// can't actually do this because it breaks isValid. it just keeps returning false after reconnect.
+				// oh well, simplifies the whole thing anyway.
+				//try {
+				//	conn->reconnect();
+				//	Com_Printf("MariaDB connection reconnected.\n");
+				//}
+				//catch (...) {
+				//	Com_Printf("MariaDB reconnect failed.\n");
+				//	conn->close();
+				//	delete conn;
+				//	conn = NULL;
 				}
-				catch (...) {
-					Com_Printf("MariaDB reconnect failed.\n");
-					conn->close();
-					delete conn;
-					conn = NULL;
-				}
-			}
+			}*/
 			if (connectionChanged || !conn) {
 				if (conn != NULL) {
 					conn->close();
@@ -107,6 +117,7 @@ static void DB_BackgroundThread() {
 					username = dbSyncedData.username;
 					password = dbSyncedData.password;
 					connectionEnabled = dbSyncedData.enabled;
+					terminating = dbSyncedData.terminate;
 				}
 				connectionChanged = qfalse;
 				try {
@@ -123,7 +134,10 @@ static void DB_BackgroundThread() {
 				}
 				catch (...) {
 
-					Com_Printf("MariaDB connection failed.\n");
+					if (connectTries % 10 == 0) {
+						// don't spam too much
+						Com_Printf("MariaDB connection failed.\n");
+					}
 					if (conn != NULL) {
 						conn->close();
 						delete conn;
@@ -153,6 +167,23 @@ static void DB_BackgroundThread() {
 				requestPending = qfalse;
 			}
 			catch (sql::SQLException& e) {
+				bool connectionDied = false;
+				try {
+					if (!conn->isValid()) {
+						connectionDied = true;
+					}
+				}
+				catch (sql::SQLException& e2) {
+					connectionDied = true;
+				}
+				if (connectionDied) {
+					Com_Printf("MariaDB connection died.\n");
+					// could try ->reconnect() but its buggy. just start over.
+					conn->close();
+					delete conn;
+					conn = NULL;
+					goto reconnect; // just reconnect.
+				}
 				if (!e.getErrorCode()) {
 					// error code 0: not an error.
 					requestToProcess.errorMessage = e.what();

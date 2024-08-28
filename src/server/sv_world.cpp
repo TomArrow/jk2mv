@@ -575,6 +575,13 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 				!thisOwnerShared ) {
 				continue;	// don't clip against other missiles from our owner
 			}
+
+			if (touch->s.eType == ET_MISSILE &&
+				!(touch->r.svFlags & SVF_OWNERNOTSHARED) &&
+				touch->r.ownerNum == passOwnerNum)
+			{ //blah, hack (from JAPRO, do I need this?)
+				continue;
+			}
 		}
 
 		// if it doesn't have any brushes of a type we
@@ -724,6 +731,7 @@ Ghoul2 Insert End
 	}
 	else {
 		clip.trace.fraction = 1;
+		clip.trace.entityNum = ENTITYNUM_NONE;
 	}
 
 	clip.contentmask = contentmask;

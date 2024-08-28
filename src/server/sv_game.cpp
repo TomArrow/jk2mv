@@ -1104,14 +1104,19 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		switch(args[0]) {
 		case G_MVAPI_RESET_SERVER_TIME:
 			return (int)SV_MVAPI_ResetServerTime((qboolean)!!args[1]);
-		case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
-			return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
+		//case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
+		//	return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
 		case G_MVAPI_ENABLE_SUBMODELBYPASS:
 			return SV_MVAPI_EnableSubmodelBypass( (qboolean)!!args[1] );
 		case MVAPI_PRINT:
 			Com_Printf_MV( args[1], "%s", VMAS(2) );
 			return 0;
 		}
+	}
+	// cool api allows us to get this as sneak peek :)
+	switch (args[0]) {
+		case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
+			return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
 	}
 
 	Com_Error( ERR_DROP, "Bad game system trap: %lli", (long long int)args[0] );
