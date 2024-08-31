@@ -58,4 +58,6 @@ const char *CM_GetShaderText(const char *key);
 void CM_FreeShaderText(void);
 void CM_LoadShaderText(qboolean forceReload);
 
+void CM_SetBrushModelContentFlags(int modelIndex, int flags, coolApiSetBModelCFlagsMode_t setMode);
+
 #endif // _CM_PUBLIC_H_

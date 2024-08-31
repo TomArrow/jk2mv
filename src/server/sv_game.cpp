@@ -1064,6 +1064,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(gvm);
 
+	case G_COOL_API_SETBRUSHMODELCONTENTFLAGS:
+		CM_SetBrushModelContentFlags(VMAV(1, sharedEntity_t)->s.modelindex, args[2], (coolApiSetBModelCFlagsMode_t)args[3]);
+		return 0;
+
 	}
 
 	if (VM_MVAPILevel(gvm) >= 1) {

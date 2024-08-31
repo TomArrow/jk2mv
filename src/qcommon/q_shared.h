@@ -2343,6 +2343,13 @@ typedef struct ezDemoBuffer_s {
 #define COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED (1<<4)
 #define COOL_APIFEATURE_MARIADB (1<<5)
 #define COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK (1<<6)
+#define COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS (1<<7)
+
+typedef enum coolApiSetBModelCFlagsMode_s{
+	COOLAPI_BMODELCFLAGS_SET,
+	COOLAPI_BMODELCFLAGS_ADD,
+	COOLAPI_BMODELCFLAGS_REMOVE,
+} coolApiSetBModelCFlagsMode_t;
 
 // This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
 typedef struct predictedMovement_s {

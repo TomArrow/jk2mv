@@ -242,6 +242,35 @@ void CMod_LoadBrushes( lump_t *l ) {
 
 }
 
+void CM_SetBrushModelContentFlags(int modelIndex, int flags, coolApiSetBModelCFlagsMode_t setMode) {
+
+	clipHandle_t	h;
+	cmodel_t*		cmodel;
+	cLeaf_t*		leaf;
+	cbrush_t*		b;
+	int k, brushnum;
+
+	h = CM_InlineModel(modelIndex);
+	cmodel = &cm.cmodels[h];
+	leaf = &cmodel->leaf;
+
+	for (k = 0; k < leaf->numLeafBrushes; k++) {
+		brushnum = cm.leafbrushes[leaf->firstLeafBrush + k];
+		b = &cm.brushes[brushnum];
+		switch (setMode) {
+			case COOLAPI_BMODELCFLAGS_ADD:
+				b->contents |= flags;
+				break;
+			case COOLAPI_BMODELCFLAGS_REMOVE:
+				b->contents &= ~flags;
+				break;
+			case COOLAPI_BMODELCFLAGS_SET:
+				b->contents = flags;
+				break;
+		}
+	}
+}
+
 /*
 =================
 CMod_LoadLeafs
