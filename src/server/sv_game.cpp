@@ -15,6 +15,8 @@
 
 #include "../api/mvapi.h"
 
+std::vector<usercmd_t> userCmdStore[MAX_CLIENTS];
+
 botlib_export_t	*botlib_export;
 
 #ifdef G2_COLLISION_ENABLED
@@ -1066,6 +1068,50 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 
 	case G_COOL_API_SETBRUSHMODELCONTENTFLAGS:
 		CM_SetBrushModelContentFlags(VMAV(1, sharedEntity_t)->s.modelindex, args[2], (coolApiSetBModelCFlagsMode_t)args[3]);
+		return 0;
+
+	case G_COOL_API_PLAYERUSERCMD_ADD:
+		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+			userCmdStore[args[1]].push_back(*VMAV(2, usercmd_t));
+			return userCmdStore[args[1]].size() - 1;
+		}
+		return 0;
+	case G_COOL_API_PLAYERUSERCMD_REMOVE:
+		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+			if (!userCmdStore[args[1]].size()) {
+				return 0;
+			}
+			int from = MIN(MAX(0,args[2]), userCmdStore[args[1]].size()-1);
+			int to = MIN(MAX(0,args[3]), userCmdStore[args[1]].size()-1);
+			if (to < from) {
+				return 0;
+			}
+			if (from >= 0 && to >= 0) {
+				userCmdStore[args[1]].erase(userCmdStore[args[1]].begin()+from, userCmdStore[args[1]].begin()+to+1);
+			}
+			return from - to + 1;
+		}
+		return 0;
+	case G_COOL_API_PLAYERUSERCMD_CLEAR:
+		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+			int countCleared = userCmdStore[args[1]].size();
+			userCmdStore[args[1]].clear();
+			return countCleared;
+		}
+		return 0;
+	case G_COOL_API_PLAYERUSERCMD_GET:
+		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+			if (args[2] < 0 || args[2] >= userCmdStore[args[1]].size()) {
+				return qfalse;
+			}
+			*VMAV(3, usercmd_t) = userCmdStore[args[1]][args[2]];
+			return qtrue;
+		}
+		return qfalse;
+	case G_COOL_API_PLAYERUSERCMD_GETCOUNT:
+		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+			return userCmdStore[args[1]].size();
+		}
 		return 0;
 
 	}
