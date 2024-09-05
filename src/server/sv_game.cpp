@@ -15,7 +15,9 @@
 
 #include "../api/mvapi.h"
 
-std::vector<usercmd_t> userCmdStore[MAX_CLIENTS];
+#include <memory>
+
+std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
 
 botlib_export_t	*botlib_export;
 
@@ -1072,7 +1074,9 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 
 	case G_COOL_API_PLAYERUSERCMD_ADD:
 		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			userCmdStore[args[1]].push_back(*VMAV(2, usercmd_t));
+			std::unique_ptr<usercmd_t> ucmd(new usercmd_t);
+			*ucmd = *VMAV(2, usercmd_t);
+			userCmdStore[args[1]].push_back(std::move(ucmd));
 			return userCmdStore[args[1]].size() - 1;
 		}
 		return 0;
@@ -1104,7 +1108,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			if (args[2] < 0 || args[2] >= userCmdStore[args[1]].size()) {
 				return qfalse;
 			}
-			*VMAV(3, usercmd_t) = userCmdStore[args[1]][args[2]];
+			*VMAV(3, usercmd_t) = *userCmdStore[args[1]][args[2]];
 			return qtrue;
 		}
 		return qfalse;
