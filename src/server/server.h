@@ -58,7 +58,7 @@ typedef struct {
 
 	// the game virtual machine will update these on init and changes
 	sharedEntity_t	*gentities;
-	int				gentitySize;
+	size_t			gentitySize;
 	int				num_entities;		// current number, <= MAX_GENTITIES
 
 	void			*gameClients;

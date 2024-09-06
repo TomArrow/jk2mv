@@ -1085,8 +1085,8 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			if (!userCmdStore[args[1]].size()) {
 				return 0;
 			}
-			int from = MIN(MAX(0,args[2]), userCmdStore[args[1]].size()-1);
-			int to = MIN(MAX(0,args[3]), userCmdStore[args[1]].size()-1);
+			int from = MIN(MAX(0,(size_t)args[2]), userCmdStore[args[1]].size()-1);
+			int to = MIN(MAX(0,(size_t)args[3]), userCmdStore[args[1]].size()-1);
 			if (to < from) {
 				return 0;
 			}
@@ -1105,7 +1105,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 	case G_COOL_API_PLAYERUSERCMD_GET:
 		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			if (args[2] < 0 || args[2] >= userCmdStore[args[1]].size()) {
+			if (args[2] < 0 || (size_t)args[2] >= userCmdStore[args[1]].size()) {
 				return qfalse;
 			}
 			*VMAV(3, usercmd_t) = *userCmdStore[args[1]][args[2]];

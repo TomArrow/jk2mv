@@ -25,9 +25,9 @@ enum SQLDelayedValueType {
 	SQLVALUE_TYPE_TEXT,
 };
 
-typedef enum SQLDelayedValue_NULL_t {
+typedef enum SQLDelayedValue_NULL_s {
 	SQLDelayedValue_NULL
-};
+}SQLDelayedValue_NULL_t;
 
 // One could argue this is a little problematic because sometimes we may provide an integer to a double field and here 
 // that wont result in a C++ side implicit conversion but SQLite will automatically do such conversions anyway so I guess who cares

@@ -310,19 +310,19 @@ typedef struct {
 } blacklistentry_t;
 
 
-typedef enum fpsGuessMethod3SampleType_t {
+typedef enum fpsGuessMethod3SampleType_s {
 	FPSGUESSSAMPLE_MEASURED,
 	FPSGUESSSAMPLE_MEASURED_SLIDE,
 	FPSGUESSSAMPLE_REPEAT
-};
+}fpsGuessMethod3SampleType_t;
 
-typedef struct {
+typedef struct fpsGuessMethod3HistorySample_s {
 	int globalTime;
 	fpsGuessMethod3SampleType_t sampleType;
 	float measuredEffectiveGravity;
 } fpsGuessMethod3HistorySample_t;
 
-typedef struct {
+typedef struct clientStatic_s {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
 
@@ -460,13 +460,13 @@ typedef struct {
 	// or contains `CON_WRAP_CHAR' indicating a line wrap.
 	conChar_t	text[CON_TEXTSIZE];
 
-	int		current;		// line where next message will be printed
+	size_t	current;		// line where next message will be printed
 	int		x;				// offset in current line for next print
 	int		display;		// bottom of console displays this line
 
-	int 	linewidth;		// characters across screen
-	int		rowwidth;		// timestamp, text and line wrap character
-	int		totallines;		// total lines in console scrollback
+	size_t 	linewidth;		// characters across screen
+	size_t	rowwidth;		// timestamp, text and line wrap character
+	size_t	totallines;		// total lines in console scrollback
 
 	int		charWidth;		// Scaled console character width
 	int		charHeight;		// Scaled console character height

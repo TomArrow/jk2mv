@@ -61,7 +61,7 @@ struct  boneInfo_t
 	int			boneBlendTime;	// time for duration of bone angle blend with normal animation
 	int			boneBlendStart;	// time bone angle blend with normal animation began
 	int			lastTime;		// this does not go across the network
-	mdxaBone_t	newMatrix;		// This is the lerped matrix that Ghoul2 uses on the client side - does not go across the network
+	mdxaBone_t	newMatrix = { 0 };		// This is the lerped matrix that Ghoul2 uses on the client side - does not go across the network
 
 boneInfo_t():
 	boneNumber(-1),
@@ -91,7 +91,7 @@ struct boltInfo_t{
 	int			surfaceNumber;	// surface number bolt attaches to
 	int			surfaceType;	// if we attach to a surface, this tells us if it is an original surface or a generated one - doesn't go across the network
 	int			boltUsed;		// nor does this
-	mdxaBone_t	position;		// this does not go across the network
+	mdxaBone_t	position = { 0 };		// this does not go across the network
 	boltInfo_t():
 	boneNumber(-1),
 	surfaceNumber(-1),
@@ -173,16 +173,16 @@ class CCollisionRecord
 public:
 	float		mDistance;
 	int			mEntityNum;
-	int			mModelIndex;
-	int			mPolyIndex;
-	int			mSurfaceIndex;
-	vec3_t		mCollisionPosition;
-	vec3_t		mCollisionNormal;
-	int			mFlags;
-	int			mMaterial;
-	int			mLocation;
-	float		mBarycentricI; // two barycentic coodinates for the hit point
-	float		mBarycentricJ; // K = 1-I-J
+	int			mModelIndex = 0;
+	int			mPolyIndex = 0;
+	int			mSurfaceIndex = 0;
+	vec3_t		mCollisionPosition = { 0 };
+	vec3_t		mCollisionNormal = { 0 };
+	int			mFlags = 0;
+	int			mMaterial = 0;
+	int			mLocation = 0;
+	float		mBarycentricI = 0; // two barycentic coodinates for the hit point
+	float		mBarycentricJ=0; // K = 1-I-J
 
 	CCollisionRecord():
 	mDistance(100000),

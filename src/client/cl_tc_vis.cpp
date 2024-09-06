@@ -423,7 +423,7 @@ static void free_vis_brushes(visBrushNode_t *brushes) {
 
 static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type) {
 	//frustum = re.ext.GetFrustum();
-	vec3_t viewPos;
+	//vec3_t viewPos;
 	//VectorCopy(re.ext.GetViewPosition(), viewPos);
 
 	while (brush) {

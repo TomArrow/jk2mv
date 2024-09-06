@@ -953,12 +953,12 @@ usercmd_t CL_CreateCmd(qboolean temporaryViewAnglesOnly =qfalse) {
 
 }
 
-typedef enum rampState_t {
+typedef enum rampState_s {
 	RAMP_NORAMP,
 	RAMP_NOTAPPLICABLE,
 	RAMP_GOOD,
 	RAMP_DEAD
-};
+}rampState_t;
 
 
 typedef struct

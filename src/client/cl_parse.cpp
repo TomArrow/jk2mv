@@ -729,9 +729,9 @@ void CL_ParseSnapshot( msg_t *msg ) {
 				}
 
 				// Now let's decide on the prime number with the best results for both commandTime delta and falldown delta.
-				float minCommandTimeResidual = INT_MAX;
+				float minCommandTimeResidual = (float)INT_MAX;
 				int minCommandTimeResidualPrimeIndex = -1;
-				float minDownFallResidual = INT_MAX;
+				float minDownFallResidual = (float)INT_MAX;
 				int minDownfallResidualPrimeIndex = -1;
 				for (int primeIndex = 0; primeIndex < primeNumbersCountToLimit; primeIndex++) {
 					if (downFallDeltaPrimeNumberResidualsCorrected[primeIndex] < minDownFallResidual) {
@@ -914,8 +914,8 @@ gamestate, and possibly during gameplay.
 void CL_SystemInfoChanged( void ) {
 	char			*systemInfo;
 	const char		*s, *t;
-	char			key[BIG_INFO_KEY];
-	char			value[BIG_INFO_VALUE];
+	static char			key[BIG_INFO_KEY];
+	static char			value[BIG_INFO_VALUE];
 	qboolean		gameSet;
 	int				old_cs_remaps = cls.cs_remaps;
 
@@ -1135,7 +1135,7 @@ A UDP download message has been received from the server
 */
 void CL_ParseUDPDownload ( msg_t *msg ) {
 	int		size;
-	unsigned char data[MAX_MSGLEN];
+	static unsigned char data[MAX_MSGLEN];
 	uint16_t block;
 
 	if (!*clc.downloadTempName) {

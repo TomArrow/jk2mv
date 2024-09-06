@@ -13,9 +13,9 @@
 #include "../../libs/pocketlzma/lzma_c.hpp"
 
 #define LZMA_MY_HEADER_SIZE LZMA_PROPS_SIZE + 8 // This isnt only the strict LZMA header, this also includes a 64 bit size of the compressed content. That's how we do it here. It could be done differently. Whatever.
-typedef struct lzmaHeader_t {
+typedef struct lzmaHeader_s {
 	Byte header[LZMA_MY_HEADER_SIZE];
-};
+}lzmaHeader_t;
 
 
 #define IN_BUF_SIZE (1 << 16)
@@ -159,7 +159,7 @@ class LZMAIncrementalCompressor {
 
 		if (res == SZ_OK)
 		{
-			int i;
+			//int i;
 
 			res = LzmaEnc_WriteProperties(enc, header.header, &headerOffset);
 

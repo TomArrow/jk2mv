@@ -90,16 +90,16 @@ private:
 	public:
 	//------
 
-		int			mID;						// id for this roff file
-		char		mROFFFilePath[MAX_QPATH];	// roff file path
-		int			mROFFEntries;				// count of move/rotate commands
-		int			mFrameTime;					// frame rate
-		int			mLerp;						// Lerp rate (FPS)
-		TROFF2Entry	*mMoveRotateList;			// move rotate/command list
-		int			mNumNoteTracks;
-		char		**mNoteTrackIndexes;
+		int			mID=0;						// id for this roff file
+		char		mROFFFilePath[MAX_QPATH] = { 0 };	// roff file path
+		int			mROFFEntries = 0;				// count of move/rotate commands
+		int			mFrameTime = 0;					// frame rate
+		int			mLerp = 0;						// Lerp rate (FPS)
+		TROFF2Entry	*mMoveRotateList = NULL;			// move rotate/command list
+		int			mNumNoteTracks = 0;
+		char		**mNoteTrackIndexes = NULL;
 		qboolean	mUsedByClient;
-		qboolean	mUsedByServer;
+		qboolean	mUsedByServer = qfalse;
 
 		CROFF()
 		{

@@ -858,7 +858,7 @@ Also called by SV_FinalMessage
 =======================
 */
 void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
-	byte		msg_buf[MAX_MSGLEN];
+	static byte		msg_buf[MAX_MSGLEN];
 	msg_t		msg;
 	msg_t		msgBak;
 

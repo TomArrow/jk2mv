@@ -457,8 +457,8 @@ void CL_ConfigstringModified( void ) {
 	char		*old, *s;
 	int			i, index;
 	char		*dup;
-	gameState_t	oldGs;
-	int			len;
+	static gameState_t	oldGs;
+	size_t		len;
 
 	index = atoi( Cmd_Argv(1) );
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
@@ -1516,8 +1516,8 @@ Ghoul2 Insert End
 
 	case CG_COOL_API_SET_EZDEMO_BUFFER:
 	{
-		int i;
-		int ezDemoEventSize = args[2];
+		size_t i;
+		size_t ezDemoEventSize = args[2];
 		int ezDemoMaxEventCount = args[3];
 		int* ezDemoEventCount = VMAP(4, int, 1);
 		ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);

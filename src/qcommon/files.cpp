@@ -277,14 +277,14 @@ typedef struct qfile_us {
 	qboolean	unique;
 } qfile_ut;
 
-typedef struct compressedFileInfo_t {
+typedef struct compressedFileInfo_s {
 	fileCompressionScheme_t compression;
 
 	// For LZMA
 	qboolean readMode;
 	LZMAIncrementalCompressor* lzmaCompressor;
 	LZMADecompressor* lzmaDecompressor;
-};
+}compressedFileInfo_t;
 
 typedef struct fileHandleData_s  {
 #ifdef ASYNCIO

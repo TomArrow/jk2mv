@@ -252,7 +252,8 @@ void Con_Copy(void) {
 extern cvar_t* r_fullbright;
 
 void Con_CopyLink(void) {
-	int l, x, i, pointDiff;
+	size_t	l, i;
+	int x, pointDiff;
 	//short *line;
 	conChar_t *line;
 	char *buffer, n[] = "\0";
@@ -822,7 +823,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 			txt += 1 + skipCount;
 			// Find closest color
 			// Just use the extended table who cares
-			float closestColorDistance = 999999999999;
+			float closestColorDistance = 999999999999.0f;
 			int chosenColor = 7;
 			for (int i = 0; i < (sizeof(g_color_table)/sizeof(g_color_table[0])); i++) {
 				VectorSubtract(g_color_table[i], colorVec, colorVecDiff);
