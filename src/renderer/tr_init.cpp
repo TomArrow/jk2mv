@@ -1542,6 +1542,10 @@ void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 
 	glconfigOut->vidWidth = glConfig.vidWidth;
 	glconfigOut->vidHeight = glConfig.vidHeight;
+	if (r_allowResize->integer) {
+		glconfigOut->winWidth = glConfig.winWidth;
+		glconfigOut->winHeight = glConfig.winHeight;
+	}
 	glconfigOut->displayScale = glConfig.displayScale;
 }
 

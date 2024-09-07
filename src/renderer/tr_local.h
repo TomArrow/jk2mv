@@ -1245,6 +1245,7 @@ extern cvar_t	*r_windPointY;
 
 extern cvar_t	*r_mode;				// video mode
 extern cvar_t	*r_fullscreen;
+extern cvar_t	*r_allowResize;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
 extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans

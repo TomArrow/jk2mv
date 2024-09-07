@@ -27,6 +27,7 @@ static cvar_t *r_sdlDriver;
 
 // Window cvars
 cvar_t			*r_fullscreen;
+cvar_t			*r_allowResize;
 static cvar_t	*r_noborder;
 static cvar_t	*r_centerWindow;
 static cvar_t	*r_customwidth;
@@ -404,6 +405,19 @@ void WIN_UpdateGLConfig( glconfig_t *glConfig ) {
 	// moving window to another monitor with different scaling,
 	// changing scaling in display settings.
 	SDL_GL_GetDrawableSize(screen, &glConfig->vidWidth, &glConfig->vidHeight);
+	if (r_allowResize->integer) {
+		SDL_DisplayMode desktopMode;
+		Com_Memset(&desktopMode, 0, sizeof(SDL_DisplayMode));
+		if (desktopMode.w > 0 && desktopMode.h > 0) {
+			glConfig->winWidth = desktopMode.w;
+			glConfig->winHeight = desktopMode.h;
+		}
+		else if(glConfig->vidWidth > 0 && glConfig->vidHeight > 0){
+			// idk
+			glConfig->winWidth = glConfig->vidWidth;
+			glConfig->winHeight = glConfig->vidHeight;
+		}
+	}
 	glConfig->displayScale = displayBaseScale * glConfig->vidHeight / glConfig->winHeight;
 }
 
@@ -568,7 +582,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 	int samples;
 	int i = 0;
 	SDL_Surface *icon = NULL;
-	Uint32 flags = SDL_WINDOW_SHOWN;
+	Uint32 flags = SDL_WINDOW_SHOWN | (r_allowResize->integer ? SDL_WINDOW_RESIZABLE : 0);
 	SDL_DisplayMode desktopMode;
 	int display = 0;
 	int x = SDL_WINDOWPOS_CENTERED, y = SDL_WINDOWPOS_CENTERED;
@@ -1005,6 +1019,7 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	// Window cvars
 	r_fullscreen		= Cvar_Get( "r_fullscreen",			"1",		CVAR_ARCHIVE | CVAR_GLOBAL );
+	r_allowResize		= Cvar_Get( "r_allowResize",		"1",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_noborder			= Cvar_Get( "r_noborder",			"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_centerWindow		= Cvar_Get( "r_centerWindow",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_customwidth		= Cvar_Get( "r_customwidth",		"1600",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
