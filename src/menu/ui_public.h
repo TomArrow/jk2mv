@@ -145,6 +145,7 @@ Ghoul2 Insert Start
 /*
 Ghoul2 Insert End
 */
+	UI_COOL_API_GLRESOLUTIONCHANGED = 1104,
 } uiImport_t;
 
 typedef enum {

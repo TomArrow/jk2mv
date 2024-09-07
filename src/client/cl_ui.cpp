@@ -1142,6 +1142,10 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 
+	case UI_COOL_API_GLRESOLUTIONCHANGED:
+		return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+		break;
+
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
 	}

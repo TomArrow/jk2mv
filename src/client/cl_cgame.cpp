@@ -1539,8 +1539,9 @@ Ghoul2 Insert End
 			return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
 		}
 	}
-
-
+	case CG_COOL_API_GLRESOLUTIONCHANGED:
+		return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+		break;
 	case CG_COOL_API_DB_ESCAPESTRING:
 		return DB_EscapeString(VMAP(1,char, args[2]), args[2]);
 		break;
