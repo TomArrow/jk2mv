@@ -34,6 +34,8 @@ Ghoul2 Insert Start
 extern CMiniHeap *G2VertSpaceClient;
 #endif
 
+vec3_t psVelocity; // disgusting hack for ramphelper
+
 /*
 Ghoul2 Insert End
 */
@@ -1504,6 +1506,7 @@ Ghoul2 Insert End
 
 	case CG_COOL_API_SETPREDICTEDMOVEMENT:
 		Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1),sizeof(predictedMovement_t));
+		VectorCopy(cl.predictedMovement.velocity,psVelocity);
 		cl.predictedMovementIsSet = qtrue;
 		return 0;
 

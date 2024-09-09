@@ -1317,6 +1317,7 @@ extern	cvar_t	*r_skipBackEnd;
 
 extern	cvar_t	*r_markSurfaceAnglesAbove;
 extern	cvar_t	*r_markSurfaceAnglesBelow;
+extern	cvar_t	*r_rampHelper;
 
 extern	cvar_t	*r_ignoreGLErrors;
 
@@ -1564,7 +1565,8 @@ struct shaderCommands_s
 
 	color4ub_t	constantColor255[SHADER_MAX_VERTEXES];
 
-	byte		vertexIsMarked[SHADER_MAX_VERTEXES];
+	byte		vertexIsMarked[SHADER_MAX_VERTEXES]; 
+	color4ub_t	vertexColorOverrides[SHADER_MAX_VERTEXES]; // for ramp helper
 
 	shader_t	*shader;
 	double		shaderTime;

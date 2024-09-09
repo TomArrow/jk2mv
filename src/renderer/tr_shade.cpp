@@ -450,6 +450,9 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
 		Com_Memset(tess.vertexIsMarked,0,sizeof(tess.vertexIsMarked));
 	}
+	if (r_rampHelper->integer) {
+		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
+	}
 	tess.shader = state;
 	tess.fogNum = fogNum;
 	tess.dlightBits = 0;		// will be OR'd in by surface functions
@@ -842,11 +845,13 @@ ComputeColors
 */
 static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 {
-	int			i;
+	int			i,c;
 	qboolean killGen = qfalse;
 	bool markSurfaceAngles;
+	bool overrideVertexColors;
 
 	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
+	overrideVertexColors = r_rampHelper->integer;
 
 	if ( tess.shader != tr.projectionShadowShader && tess.shader != tr.shadowShader &&
 			( backEnd.currentEntity->e.renderfx & (RF_DISINTEGRATE1|RF_DISINTEGRATE2)))
@@ -1002,6 +1007,21 @@ static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 		{
 			if (tess.vertexIsMarked[i]) {
 				tess.svars.colors[i][1] = tess.svars.colors[i][2] = 0;
+			}
+		}
+	}
+
+	if (overrideVertexColors) {
+		int tmp, min;
+		for (i = 0; i < tess.numVertexes; i++)
+		{
+			if (tess.vertexColorOverrides[i][0] || tess.vertexColorOverrides[i][1] || tess.vertexColorOverrides[i][2]) {
+				for (c = 0; c < 3; c++) {
+					//min = tess.vertexColorOverrides[i][c] / 4; // random idk
+					tmp = tess.svars.colors[i][c] * tess.vertexColorOverrides[i][c] / 255;
+					//tess.svars.colors[i][c] = MIN(MAX(min,tmp),255);
+					tess.svars.colors[i][c] = MIN(MAX(0,tmp),255);
+				}
 			}
 		}
 	}

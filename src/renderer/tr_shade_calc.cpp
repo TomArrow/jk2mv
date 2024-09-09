@@ -334,6 +334,9 @@ void DeformText( const char *text ) {
 	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
 		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
 	}
+	if (r_rampHelper->integer) {
+		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
+	}
 
 	color[0] = color[1] = color[2] = color[3] = 255;
 
@@ -399,6 +402,9 @@ static void AutospriteDeform( void ) {
 	tess.numIndexes = 0;
 	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
 		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
+	}
+	if (r_rampHelper->integer) {
+		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
 
 	if ( backEnd.currentEntity != &tr.worldEntity ) {

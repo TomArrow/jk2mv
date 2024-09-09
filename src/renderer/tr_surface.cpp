@@ -1272,6 +1272,7 @@ void RB_SurfaceMesh(md3Surface_t *surface) {
 
 }
 
+extern vec3_t psVelocity; // disgusting hack for ramphelper. make this more reasonable if we grow too ashamed.
 
 /*
 ==============
@@ -1279,7 +1280,7 @@ RB_SurfaceFace
 ==============
 */
 void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
-	int			i, k;
+	int			i, j, k;
 	unsigned	*indices, *tessIndexes;
 	float		*v;
 	float		*normal;
@@ -1288,8 +1289,10 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int			numPoints;
 	int			dlightBits;
 	bool		markSurfaceAngles;
+	bool		rampHelper;
 
 	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
+	rampHelper = r_rampHelper->integer;
 
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
@@ -1325,6 +1328,64 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 				) {
 				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
 			}
+			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
+		}
+		if (rampHelper && ((i+1)%3)==0) {
+			// We want to mark all surfaces of certain angles with a color
+			// So let's first find out the angle of this surface
+			// Take cross product of two sides to get vector
+			vec3_t side1, side2, normal, newVelocity;
+			float change;
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
+			CrossProduct(side1, side2, normal);
+			VectorNormalize(normal);
+			// Cross product is a normal of the triangle
+			// We could do a dot product with other vector for angle
+			// But other vector is Z axis (0,0,1) so we the [0] and [1] would become 0 anyway
+			// So the dot product we want is simply normal[2]
+
+			float oldVel = rampHelper == 2 ? VectorLength(psVelocity) : VectorLength2(psVelocity); // we only care about horizontal speed usually
+
+			// this mirrors PM_ClipVelocity
+			float backoff = DotProduct(psVelocity,normal);
+			if (backoff < 0) {
+				backoff *= 1.01;
+			}
+			else {
+				continue; // normal looking same direction we are heading, it wont clip us.
+				//backoff /= 1.01; // but that might not be known yet? idk
+			}
+			for (j = 0;j < 3; j++) {
+				change = normal[j] * backoff;
+				newVelocity[j] = psVelocity[j] - change;
+			}
+
+			float newVel = rampHelper == 2 ? VectorLength(newVelocity) : VectorLength2(newVelocity); // we only care about horizontal speed usually
+
+			if (oldVel != newVel) {
+				tess.vertexColorOverrides[indices[i - 2] + Bob][2] = tess.vertexColorOverrides[indices[i - 1] + Bob][2] = tess.vertexColorOverrides[indices[i] + Bob][2] = 127;
+				tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = 127;
+				tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = 127;
+				if (oldVel < newVel) {
+					//tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MIN(MAX(127.0f*(newVel/oldVel),0),255);
+					tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MIN(MAX(127.0f+ powf((newVel- oldVel) / 500.0f, 0.3f) * 200.0f,0),255);
+				}
+				else if(newVel < oldVel) {
+					tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = MIN(MAX(127.0f + powf((oldVel - newVel)/500.0f,0.3f)*200.0f, 0), 255);
+				}
+			}
+
+			/*
+			float angle = 360.0f*acosf(normal[2])/ M_PI/2.0f;
+
+			if (
+				(r_markSurfaceAnglesAbove->value && r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value) // Both conditions must be met
+				|| (r_markSurfaceAnglesAbove->value && !r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value)
+				|| (r_markSurfaceAnglesBelow->value && !r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value)
+				) {
+				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
+			}*/
 			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
 		}
 	}
