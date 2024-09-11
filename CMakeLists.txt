@@ -215,8 +215,9 @@ if(MSVC)
 	# 4267 = 'var' : conversion from 'size_t' to 'type', possible loss of data
 	# 26812 = The enum type '' is unscoped. Prefer 'enum class' over 'enum' (Enum.3).
 	# 4013 = function undefined (should be error) 
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /wd4996 /wd4267 /we4013")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996 /wd4267 /wd26812 /we4013")
+	# 4133 = ':': incompatible types - from 'type1*' to 'type2*' (qvm enforces this too. it can be used as a cool type checking macro and may as well get a nicer error message)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /wd4996 /wd4267 /we4013 /we4133")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996 /wd4267 /wd26812 /we4013 /we4133")
 	
 	# Multithreaded
 	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
