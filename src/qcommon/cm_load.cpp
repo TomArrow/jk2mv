@@ -902,10 +902,14 @@ BSP trees instead of being compared directly.
 Capsules are handled differently though.
 ===================
 */
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule ) {
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule, int entityContents ) {
 
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );
+
+	if (entityContents != -1) { // if -1, it was a capsule later changed into a box, so we just keep the contents
+		box_brush->contents = entityContents ? entityContents : CONTENTS_BODY; // 0 = use default (CONTENTS_BODY)
+	}
 
 	if ( capsule ) {
 		return cm.capsuleModelHandle;

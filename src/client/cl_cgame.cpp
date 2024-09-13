@@ -957,9 +957,9 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	case CG_CM_INLINEMODEL:
 		return CM_InlineModel( args[1] );
 	case CG_CM_TEMPBOXMODEL:
-		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qfalse );
+		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qfalse,0 );
 	case CG_CM_TEMPCAPSULEMODEL:
-		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qtrue );
+		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qtrue,0 );
 	case CG_CM_POINTCONTENTS:
 		return CM_PointContents( VMAP(1, const vec_t, 3), args[2] );
 	case CG_CM_TRANSFORMEDPOINTCONTENTS:
