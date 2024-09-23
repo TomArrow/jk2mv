@@ -17,6 +17,8 @@
 
 #include <memory>
 
+#include "../qcommon/mariadb.h"
+
 std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
 
 botlib_export_t	*botlib_export;
@@ -1117,6 +1119,51 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			return userCmdStore[args[1]].size();
 		}
 		return 0;
+
+	case G_COOL_API_DB_ESCAPESTRING:
+		return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
+		break;
+	case G_COOL_API_DB_ADDREQUEST:
+		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
+		break;
+	case G_COOL_API_DB_NEXTRESPONSE:
+		// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
+		return DB_NextResponse(MODULE_GAME,
+			VMAP(1, int, 1),			// int* requestType
+			VMAP(2, int, 1),			// int* affectedRows
+			VMAP(3, int, 1),			// int* status
+			VMAP(4, char, args[5]),		// char* errorMessage
+			args[5],					// int errorMessageSize
+			args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
+			args[7]						// int referenceLength
+		);
+		break;
+	case G_COOL_API_DB_GETREFERENCE:
+		return DB_GetReference(MODULE_GAME,
+			VMAP(1, byte, args[2]),		// byte* reference
+			args[2]						// int referenceLength
+		);
+		break;
+	case G_COOL_API_DB_NEXTROW:
+		return DB_NextRow(MODULE_GAME);
+		break;
+	case G_COOL_API_DB_GETINT:
+		return DB_GetInt(MODULE_GAME, args[1]);
+		break;
+	case G_COOL_API_DB_GETFLOAT:
+	{
+		float* retVal = VMAP(2, float, 1);
+		*retVal = DB_GetFloat(MODULE_GAME, args[1]);
+		return 0;
+	}
+	break;
+	case G_COOL_API_DB_GETSTRING:
+		return DB_GetString(MODULE_GAME,
+			args[1],
+			VMAP(2, char, args[3]),		// byte* reference
+			args[3]						// int referenceLength
+		);
+		break;
 
 	}
 
