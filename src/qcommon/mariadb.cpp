@@ -46,7 +46,7 @@ static std::string bcryptString(std::string input, int* status) {
 
 	pw[0] = '\0';
 
-	Q_strncpyz(output, input.c_str(), sizeof(output));
+	Q_strncpyz(pw, input.c_str(), sizeof(output));
 
 	bcrypt_errno = 0;
 	_crypt_blowfish_rn(pw, settings, output, 64);
@@ -247,9 +247,21 @@ static void DB_BackgroundThread() {
 					requestPending = qfalse;
 				}
 				else {
+					int errorCode = e.getErrorCode();
 					const int max_tries = 10;
-					Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries + 1, max_tries, e.what());
-					if (requestToProcess.tries < max_tries) {
+					qboolean fastSkip = qfalse;
+					if (errorCode == 1062 // ER_DUP_ENTRY 
+						|| errorCode == 1146 // table doesnt exist
+						) {
+						fastSkip = qtrue;
+					}
+					if (fastSkip) {
+						Com_Printf("MariaDB error executing query: %s \n", e.what());
+					}
+					else {
+						Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries + 1, max_tries, e.what());
+					}
+					if (requestToProcess.tries < max_tries && !fastSkip) {
 
 						// dont do a hyper-fast endless loop when failing
 						using namespace std::chrono_literals;
