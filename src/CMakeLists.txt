@@ -177,7 +177,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/vm.cpp"
 		"qcommon/vm_interpreted.cpp"
 		"qcommon/mariadb.cpp"
-		"qcommon/crypt_blowfish.c"
+		"qcommon/crypt_blowfish.cpp"
 	)
 
 	if(ARCH_X86)

@@ -104,14 +104,19 @@ static void DB_BackgroundThread() {
 					requestToProcess.errorMessage = "Invalid request type";
 					break;
 				case DBREQUEST_BCRYPT:
+				case DBREQUEST_BCRYPT_DOUBLE: // we are doing one round on client and one on server. but some clients may not support it, so we do double on server.
 				{
 					std::string bcrypted = bcryptString(requestToProcess.requestString, &requestToProcess.errorCode);
 					requestToProcess.successful = (qboolean)( requestToProcess.errorCode == 0);
+					if (requestToProcess.dbRequestType == DBREQUEST_BCRYPT_DOUBLE && requestToProcess.successful) {
+						bcrypted = bcryptString(bcrypted, &requestToProcess.errorCode);
+						requestToProcess.successful = (qboolean)(requestToProcess.errorCode == 0);
+					}
 					if (requestToProcess.successful) {
 						SQLDelayedResponse response;
 						const char* result = bcrypted.c_str();
 						response.add("result", result);
-						requestToProcess.responseData.push_back(response);
+						requestToProcess.responseData.push_back(std::move(response));
 					}
 				}
 					break;
