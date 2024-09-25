@@ -150,6 +150,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/tags.h"
 		"qcommon/vm_local.h"
 		"qcommon/mariadb.h"
+		"qcommon/crypt_blowfish.h"
 
 		"qcommon/CNetProfile.cpp"
 		"qcommon/GenericParser2.cpp"
@@ -176,6 +177,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/vm.cpp"
 		"qcommon/vm_interpreted.cpp"
 		"qcommon/mariadb.cpp"
+		"qcommon/crypt_blowfish.c"
 	)
 
 	if(ARCH_X86)

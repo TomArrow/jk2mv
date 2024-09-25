@@ -1549,7 +1549,10 @@ Ghoul2 Insert End
 		return DB_EscapeString(VMAP(1,char, args[2]), args[2]);
 		break;
 	case CG_COOL_API_DB_ADDREQUEST:
-		return DB_AddRequest(MODULE_CGAME,args[1] ? VMAP(1, byte, args[2]) : NULL, args[2],args[3], VMAS(4));
+		return DB_AddRequest(MODULE_CGAME,args[1] ? VMAP(1, byte, args[2]) : NULL, args[2],args[3], VMAS(4),DBREQUEST_REQUEST);
+		break;
+	case CG_COOL_API_DB_ADDREQUEST_TYPED:
+		return DB_AddRequest(MODULE_CGAME,args[1] ? VMAP(1, byte, args[2]) : NULL, args[2],args[3], VMAS(4),(DBRequestType_t)args[5]);
 		break;
 	case CG_COOL_API_DB_NEXTRESPONSE:
 		// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength

@@ -10,7 +10,7 @@ void		DB_Init();
 void		DB_CheckCvars();
 void		DB_Shutdown(); 
 qboolean	DB_EscapeString(char* input, int size);
-qboolean	DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request);
+qboolean	DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request, DBRequestType_t dbRequestType);
 qboolean	DB_NextResponse(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength);
 qboolean	DB_GetReference(module_t module, byte* reference, int referenceLength);
 qboolean	DB_NextRow(module_t module);
@@ -306,8 +306,6 @@ public:
 
 
 
-
-
 class DBRequest {
 public:
 	int tries = 0;
@@ -315,6 +313,7 @@ public:
 	int errorCode =0;
 	std::string errorMessage = "";
 	int affectedRowCount = 0;
+	DBRequestType_t dbRequestType = DBREQUEST_REQUEST; // could be something else that we wanna do on a different thread
 
 	module_t module = MODULE_MAIN;		// the requesting module
 	std::string requestString;			// sql instruction

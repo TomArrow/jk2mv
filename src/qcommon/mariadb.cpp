@@ -6,6 +6,7 @@
 #include <mutex>
 #include <deque>
 #include <condition_variable>
+#include "crypt_blowfish.h"
 
 cvar_t* db_enabled;
 static cvar_t* db_url;
@@ -32,6 +33,32 @@ struct {
 	std::deque<DBRequest> requestsIncoming;					// incoming are all in the order they came in
 	std::deque<DBRequest> requestsFinished[MODULE_MAX];		// finished are served back to the modules they came from, so each needs its own queue
 } dbSyncedData;
+
+static std::mutex bcryptMutex;
+
+static std::string bcryptString(std::string input, int* status) {
+	int clientNum = -1;
+	char pw[64];
+	const static char settings[64] = BCRYPT_SETTINGS;
+	char output[64];
+
+	std::lock_guard<std::mutex> bcryptLock(bcryptMutex); // just in case aanyone tries to use this outside of the db stuff. errno is a global var :/
+
+	pw[0] = '\0';
+
+	Q_strncpyz(output, input.c_str(), sizeof(output));
+
+	bcrypt_errno = 0;
+	_crypt_blowfish_rn(pw, settings, output, 64);
+
+	if (status) {
+		*status = bcrypt_errno;
+	}
+
+	return std::string(output);
+
+	Com_Printf("db bcrypt; settings: %s\nRaw pw: %s, bcrypt: %s, bcrypt_errno: %d\n", settings, pw, output, bcrypt_errno);
+}
 
 static void DB_BackgroundThread() {
 
@@ -66,6 +93,31 @@ static void DB_BackgroundThread() {
 				connectionChanged = qtrue;
 			}
 			dbSyncedData.connectionDetailsChanged = qfalse;
+		}
+
+		if (requestToProcess.dbRequestType != DBREQUEST_REQUEST) {
+			// other types of async requests that arent actual db requests but that we want to run on a different thread for performance reasons.
+			switch (requestToProcess.dbRequestType) {
+				default:
+					requestToProcess.successful = qfalse;
+					requestToProcess.errorCode = -1;
+					requestToProcess.errorMessage = "Invalid request type";
+					break;
+				case DBREQUEST_BCRYPT:
+				{
+					std::string bcrypted = bcryptString(requestToProcess.requestString, &requestToProcess.errorCode);
+					requestToProcess.successful = (qboolean)( requestToProcess.errorCode == 0);
+					if (requestToProcess.successful) {
+						SQLDelayedResponse response;
+						const char* result = bcrypted.c_str();
+						response.add("result", result);
+						requestToProcess.responseData.push_back(response);
+					}
+				}
+					break;
+			}
+			requestPending = qfalse;
+			goto requestdone;
 		}
 
 		// update connection if needed
@@ -209,6 +261,8 @@ static void DB_BackgroundThread() {
 				}
 			}
 		}
+
+		requestdone:
 		if (!requestPending) {
 			std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 			dbSyncedData.requestsFinished[requestToProcess.module].push_back(std::move(requestToProcess));
@@ -228,10 +282,11 @@ qboolean DB_AddRequest(DBRequest&& req) {
 	dbSyncedData.changeNotifier.notify_one();
 	return qtrue;
 }
-qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request) {
+qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request, DBRequestType_t dbRequestType) {
 	if (!db_enabled->integer) return qfalse;
 	DBRequest req;
 	req.requestString = request;
+	req.dbRequestType = dbRequestType;
 	req.requestType = requestType;
 	req.module = module;
 	if (reference && referenceLength) {
