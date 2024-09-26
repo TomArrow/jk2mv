@@ -1,4 +1,6 @@
 
+#define NOMINMAX
+
 // tr_image.c
 #include "tr_local.h"
 
@@ -7,6 +9,7 @@
 #endif
 
 #include <map>
+#include <algorithm>
 #include <float.h> // Linux is special. It says it wants <cfloat> but what it REALLY wants is float.h?
 //using namespace std;
 
@@ -307,12 +310,12 @@ R_SQLPosCube_f
 */
 void R_SQLPosCube_f(void) {
 	char query[1024];
-	int maxX = max(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
-	int minX = min(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
-	int maxY = max(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
-	int minY = min(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
-	int maxZ = max(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
-	int minZ = min(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
+	int maxX = std::max(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
+	int minX = std::min(tr.refdef.vieworg[0], tr.sqlPosHelper.lastPos[0]);
+	int maxY = std::max(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
+	int minY = std::min(tr.refdef.vieworg[1], tr.sqlPosHelper.lastPos[1]);
+	int maxZ = std::max(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
+	int minZ = std::min(tr.refdef.vieworg[2], tr.sqlPosHelper.lastPos[2]);
 
 	Com_sprintf(query, sizeof(query), "positionX > %d AND positionX < %d AND positionY > %d AND positionY < %d AND positionZ > %d AND positionZ < %d", minX, maxX, minY, maxY, minZ, maxZ);
 	
@@ -890,8 +893,8 @@ static void Upload32( byte * const *mipmaps, qboolean customMip, image_t *image,
 				R_MipMap( data, width, height, format );
 			}
 
-			width = max(width >> 1, 1);
-			height = max(height >> 1, 1);
+			width = std::max(width >> 1, 1);
+			height = std::max(height >> 1, 1);
 			level++;
 		}
 	}
@@ -968,8 +971,8 @@ static void Upload32( byte * const *mipmaps, qboolean customMip, image_t *image,
 					processData = qfalse;
 				}
 
-				width = max(width >> 1, 1);
-				height = max(height >> 1, 1);
+				width = std::max(width >> 1, 1);
+				height = std::max(height >> 1, 1);
 
 				miplevel++;
 				level++;
