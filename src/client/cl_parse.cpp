@@ -49,10 +49,10 @@ ezDemoBuffer_t		ezDemoBuffer;
 
 #ifdef CL_EZDEMO
 
-void Ezdemo_AddEvent(int client);
-qboolean Ezdemo_ClientValid(int client);
-entityState_t* Ezdemo_EntForClientNum(int client);
-qboolean Ezdemo_CheckOptions(const int clientNum, const int event);
+static void Ezdemo_AddEvent(int client);
+static qboolean Ezdemo_ClientValid(int client);
+static entityState_t* Ezdemo_EntForClientNum(int client);
+static qboolean Ezdemo_CheckOptions(const int clientNum, const int event);
 static void Ezdemo_HandleEvent(entityState_t state);
 
 //ret options
