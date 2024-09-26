@@ -171,6 +171,8 @@ static void DB_BackgroundThread() {
 			dbSyncedData.connectionDetailsChanged = qfalse;
 		}
 
+		bool skipToDone = false;
+
 		if (requestToProcess.dbRequestType != DBREQUESTTYPE_REQUEST) {
 			// other types of async requests that arent actual db requests but that we want to run on a different thread for performance reasons.
 			switch (requestToProcess.dbRequestType) {
@@ -214,7 +216,7 @@ static void DB_BackgroundThread() {
 			}
 			requestfailed:
 			requestPending = qfalse;
-			goto requestdone;
+			skipToDone = true;
 		}
 
 		// update connection if needed
@@ -222,6 +224,11 @@ static void DB_BackgroundThread() {
 		int connectTries = 0;
 		qboolean connectionEnabled = qtrue;
 		qboolean terminating = qfalse;
+
+		if (skipToDone) {
+			goto requestdone;
+		}
+
 		while (!conn || connectionChanged) {
 			if (connectTries) {
 				if (!connectionEnabled || terminating) {
