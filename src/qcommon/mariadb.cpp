@@ -282,11 +282,11 @@ static void DB_BackgroundThread() {
 					std::cout << "Trying db connection with " << url << "," << username << "," << password << "\n";
 #endif
 					// Configure Connection
-					sql::SQLString url(url.c_str());
+					sql::SQLString urlsql(url);
 					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()} });
 
 					// Establish Connection
-					conn = driver->connect(url, properties);
+					conn = driver->connect(urlsql, properties);
 					std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
 					stmnt->execute("SET CHARACTER SET latin1"); // Make sure no character set shenanigans happen. Latin1 is what jka uses it seems. Good enough.
 					Com_Printf("MariaDB connection established.\n");
