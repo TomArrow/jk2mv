@@ -151,6 +151,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/vm_local.h"
 		"qcommon/mariadb.h"
 		"qcommon/crypt_blowfish.h"
+		"qcommon/randombytes.h"
 
 		"qcommon/CNetProfile.cpp"
 		"qcommon/GenericParser2.cpp"
@@ -178,6 +179,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/vm_interpreted.cpp"
 		"qcommon/mariadb.cpp"
 		"qcommon/crypt_blowfish.cpp"
+		"qcommon/randombytes.cpp"
 	)
 
 	if(ARCH_X86)

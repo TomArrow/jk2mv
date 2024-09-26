@@ -1124,7 +1124,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
 		break;
 	case G_COOL_API_DB_ADDREQUEST:
-		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUEST_REQUEST);
+		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
 		break;
 	case G_COOL_API_DB_ADDREQUEST_TYPED:
 		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);

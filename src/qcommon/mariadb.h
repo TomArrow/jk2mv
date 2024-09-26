@@ -313,7 +313,7 @@ public:
 	int errorCode =0;
 	std::string errorMessage = "";
 	int affectedRowCount = 0;
-	DBRequestType_t dbRequestType = DBREQUEST_REQUEST; // could be something else that we wanna do on a different thread
+	DBRequestType_t dbRequestType = DBREQUESTTYPE_REQUEST; // could be something else that we wanna do on a different thread
 
 	module_t module = MODULE_MAIN;		// the requesting module
 	std::string requestString;			// sql instruction

@@ -7,6 +7,7 @@
 #include <deque>
 #include <condition_variable>
 #include "crypt_blowfish.h"
+#include "randombytes.h"
 
 cvar_t* db_enabled;
 static cvar_t* db_url;
@@ -36,11 +37,86 @@ struct {
 
 static std::mutex bcryptMutex;
 
-static std::string bcryptString(std::string input, int* status) {
+class bcryptRequest {
+public:
+	std::vector<std::string> settings;
+	std::string input;
+	std::string errorMessage;
+	qboolean success;
+};
+
+static bcryptRequest parseBCryptRequest(std::string input) {
+	bcryptRequest retVal;
+	int segmentCount = 0;
+	char string[MAX_STRING_CHARS];
+	char* s = string;
+	const char* start = s;
+	Q_strncpyz(string, input.c_str(), sizeof(string));
+	while (*s != '\0') {
+		if (*s == '|' && (!segmentCount || retVal.settings.size() < segmentCount)) {
+			*s = '\0';
+			std::string settingSegment = std::string(start);
+			if (settingSegment.size()) {
+				if (!segmentCount) {
+					segmentCount = atoi(settingSegment.c_str());
+					if (!segmentCount) {
+						retVal.success = qfalse;
+						retVal.errorMessage = "parseBCryptRequest: request must start with non-0 count of settings and then |";
+						return retVal; // invalid
+					}
+				}
+				else {
+					retVal.settings.push_back(std::move(settingSegment));
+				}
+			}
+			else {
+				retVal.errorMessage = "parseBCryptRequest: settings segments must not be empty";
+				retVal.success = qfalse;
+				return retVal; // invalid
+			}
+			s++;
+			start = s;
+		}
+		else {
+			s++;
+		}
+	}
+	retVal.input = std::move(std::string(start));
+	if (!retVal.input.size()) {
+		retVal.success = qfalse;
+		retVal.errorMessage = "parseBCryptRequest: input must not be empty";
+		return retVal; // invalid
+	}
+	if (!retVal.settings.size()) {
+		retVal.success = qfalse;
+		retVal.errorMessage = "parseBCryptRequest: no settings segments found";
+		return retVal; // invalid
+	}
+	retVal.success = qtrue;
+	return retVal;
+}
+
+static std::string bcryptString(std::string input, int* status, std::string setting) {
 	int clientNum = -1;
 	char pw[64];
-	const static char settings[64] = BCRYPT_SETTINGS;
+	char settings[64];
 	char output[64];
+	char random[20];
+
+	if (!Q_stricmp("random", setting.c_str())) {
+		if (!randombytes(random, 20)) {
+			_crypt_gensalt_blowfish_rn(BCRYPT_SETTINGS, 6, random, 20, settings, sizeof(settings));
+		}
+		else {
+			if (status) {
+				*status = -1;
+				return "";
+			}
+		}
+	}
+	else {
+		Q_strncpyz(settings, setting.c_str(), sizeof(settings));
+	}
 
 	std::lock_guard<std::mutex> bcryptLock(bcryptMutex); // just in case aanyone tries to use this outside of the db stuff. errno is a global var :/
 
@@ -95,7 +171,7 @@ static void DB_BackgroundThread() {
 			dbSyncedData.connectionDetailsChanged = qfalse;
 		}
 
-		if (requestToProcess.dbRequestType != DBREQUEST_REQUEST) {
+		if (requestToProcess.dbRequestType != DBREQUESTTYPE_REQUEST) {
 			// other types of async requests that arent actual db requests but that we want to run on a different thread for performance reasons.
 			switch (requestToProcess.dbRequestType) {
 				default:
@@ -103,14 +179,29 @@ static void DB_BackgroundThread() {
 					requestToProcess.errorCode = -1;
 					requestToProcess.errorMessage = "Invalid request type";
 					break;
-				case DBREQUEST_BCRYPT:
-				case DBREQUEST_BCRYPT_DOUBLE: // we are doing one round on client and one on server. but some clients may not support it, so we do double on server.
+				case DBREQUESTTYPE_BCRYPT:
+				//case DBREQUEST_BCRYPT_DOUBLE: // we are doing one round on client and one on server. but some clients may not support it, so we do double on server.
 				{
-					std::string bcrypted = bcryptString(requestToProcess.requestString, &requestToProcess.errorCode);
-					requestToProcess.successful = (qboolean)( requestToProcess.errorCode == 0);
-					if (requestToProcess.dbRequestType == DBREQUEST_BCRYPT_DOUBLE && requestToProcess.successful) {
-						bcrypted = bcryptString(bcrypted, &requestToProcess.errorCode);
+				 	bcryptRequest breq=  parseBCryptRequest(requestToProcess.requestString);
+					if (!breq.success) {
+						requestToProcess.successful = qfalse;
+						requestToProcess.errorCode = -2;
+						requestToProcess.errorMessage = breq.errorMessage;
+						goto requestfailed;
+					}
+					std::string bcrypted = breq.input;
+					//if (com_developer->integer) {
+						Com_Printf("Bcrypt input: %s\n",bcrypted.c_str());
+					//}
+					for (int i = 0; i < breq.settings.size(); i++) {
+						bcrypted = bcryptString(bcrypted, &requestToProcess.errorCode, breq.settings[i]);
+						//if (com_developer->integer) {
+							Com_Printf("Bcrypt pass %d: status %d, settings %s, output %s\n", i, requestToProcess.errorCode, breq.settings[i].c_str(), bcrypted.c_str());
+						//}
 						requestToProcess.successful = (qboolean)(requestToProcess.errorCode == 0);
+						if (!requestToProcess.successful) {
+							break;
+						}
 					}
 					if (requestToProcess.successful) {
 						SQLDelayedResponse response;
@@ -121,6 +212,7 @@ static void DB_BackgroundThread() {
 				}
 					break;
 			}
+			requestfailed:
 			requestPending = qfalse;
 			goto requestdone;
 		}
