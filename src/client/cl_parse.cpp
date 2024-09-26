@@ -1,6 +1,7 @@
 // cl_parse.c  -- parse a message received from the server
 
 #include <algorithm>
+#include <memory>
 #include <sstream>
 #include "client.h"
 #include "../qcommon/strip.h"
