@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <deque>
+#include <iostream>
 #include <condition_variable>
 #include "crypt_blowfish.h"
 #include "randombytes.h"
@@ -277,7 +278,9 @@ static void DB_BackgroundThread() {
 				}
 				connectionChanged = qfalse;
 				try {
-
+#ifdef DEBUG
+					std::cout << "Trying db connection with " << url << "," << username << "," << password << "\n";
+#endif
 					// Configure Connection
 					sql::SQLString url(url.c_str());
 					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()} });
