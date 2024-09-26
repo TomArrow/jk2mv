@@ -279,8 +279,8 @@ static void DB_BackgroundThread() {
 				try {
 
 					// Configure Connection
-					sql::SQLString url(url);
-					sql::Properties properties({ {"user", username}, {"password", password} });
+					sql::SQLString url(url.c_str());
+					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()} });
 
 					// Establish Connection
 					conn = driver->connect(url, properties);
