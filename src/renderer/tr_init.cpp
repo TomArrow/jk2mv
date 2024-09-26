@@ -2,6 +2,8 @@
 
 #include "tr_local.h"
 
+#include <algorithm>
+
 #ifndef DEDICATED
 #if !defined __TR_WORLDEFFECTS_H
 	#include "tr_WorldEffects.h"
@@ -677,7 +679,7 @@ static void InitOpenGL(void) {
 		qglGetIntegerv(GL_MAX_TEXTURE_SIZE, &glConfig.maxTextureSize);
 
 		// stubbed or broken drivers may have reported 0...
-		glConfig.maxTextureSize = max(0, glConfig.maxTextureSize);
+		glConfig.maxTextureSize = std::max(0, glConfig.maxTextureSize);
 
 		GLimp_InitOpenGLVersion();
 

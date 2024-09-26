@@ -1,5 +1,4 @@
 
-#define NOMINMAX
 
 // tr_image.c
 #include "tr_local.h"

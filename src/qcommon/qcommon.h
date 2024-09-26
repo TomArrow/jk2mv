@@ -2,6 +2,7 @@
 #ifndef _QCOMMON_H_
 #define _QCOMMON_H_
 
+#define NOMINMAX
 #include "../qcommon/q_shared.h"
 #include "../api/mvapi.h"
 #include "../api/mvmenu.h"
