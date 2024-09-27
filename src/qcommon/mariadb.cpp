@@ -78,6 +78,9 @@ static bcryptRequest parseBCryptRequest(std::string input) {
 			s++;
 			start = s;
 		}
+		else if (segmentCount && retVal.settings.size() >= segmentCount) {
+			break; // quicker exit from loop when first condition can never be satisfied anymore.
+		}
 		else {
 			s++;
 		}
@@ -183,7 +186,6 @@ static void DB_BackgroundThread() {
 					requestToProcess.errorMessage = "Invalid request type";
 					break;
 				case DBREQUESTTYPE_BCRYPT:
-				//case DBREQUEST_BCRYPT_DOUBLE: // we are doing one round on client and one on server. but some clients may not support it, so we do double on server.
 				{
 				 	bcryptRequest breq=  parseBCryptRequest(requestToProcess.requestString);
 					if (!breq.success) {
@@ -193,14 +195,14 @@ static void DB_BackgroundThread() {
 						goto requestfailed;
 					}
 					std::string bcrypted = breq.input;
-					//if (com_developer->integer) {
+					if (com_developer->integer) {
 						Com_Printf("Bcrypt input: %s\n",bcrypted.c_str());
-					//}
+					}
 					for (int i = 0; i < breq.settings.size(); i++) {
 						bcrypted = bcryptString(bcrypted, &requestToProcess.errorCode, breq.settings[i]);
-						//if (com_developer->integer) {
+						if (com_developer->integer) {
 							Com_Printf("Bcrypt pass %d: status %d, settings %s, output %s\n", i, requestToProcess.errorCode, breq.settings[i].c_str(), bcrypted.c_str());
-						//}
+						}
 						requestToProcess.successful = (qboolean)(requestToProcess.errorCode == 0);
 						if (!requestToProcess.successful) {
 							break;
@@ -239,26 +241,6 @@ static void DB_BackgroundThread() {
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(1000ms);
 			}
-			/* if (conn && !conn->isValid()) {
-				Com_Printf("MariaDB connection died.\n");
-				// could try ->reconnect() but its buggy. just start over.
-				conn->close();
-				delete conn;
-				conn = NULL;
-				
-				// can't actually do this because it breaks isValid. it just keeps returning false after reconnect.
-				// oh well, simplifies the whole thing anyway.
-				//try {
-				//	conn->reconnect();
-				//	Com_Printf("MariaDB connection reconnected.\n");
-				//}
-				//catch (...) {
-				//	Com_Printf("MariaDB reconnect failed.\n");
-				//	conn->close();
-				//	delete conn;
-				//	conn = NULL;
-				}
-			}*/
 			if (connectionChanged || !conn) {
 				if (conn != NULL) {
 					conn->close();

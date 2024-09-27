@@ -2,6 +2,7 @@
 
 #include "server.h"
 #include "../qcommon/strip.h"
+#include "../qcommon/levenshtein.h"
 
 #include <mv_setup.h>
 
@@ -1393,6 +1394,7 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	int		seq;
 	const char	*s;
 	qboolean clientOk = qtrue;
+	const char* cmd;
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1402,7 +1404,15 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 		return qtrue;
 	}
 
-	Com_DPrintf( "clientCommand: %s : %i : %s\n", cl->name, seq, s );
+	// dont print full login/register commands to not leak pws
+	Cmd_TokenizeString(s);
+	cmd = Cmd_Argv(0);
+	if (levenshtein(cmd, "login") <= 2 || levenshtein(cmd, "register") <= 2) {
+		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, Cmd_Argv(1), Cmd_ArgsFrom(3));
+	}
+	else {
+		Com_DPrintf("clientCommand: %s : %i : %s\n", cl->name, seq, s);
+	}
 
 	// drop the connection if we have somehow lost commands
 	if ( seq > cl->lastClientCommand + 1 ) {
