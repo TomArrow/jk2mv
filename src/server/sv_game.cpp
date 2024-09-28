@@ -1167,7 +1167,26 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			args[3]						// int referenceLength
 		);
 		break;
-
+	case G_COOL_API_DB_ADDPREPAREDSTATEMENT:
+		return DB_AddPreparedStatement(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
+	case G_COOL_API_DB_PREPAREDBINDSTRING:
+		return DB_PreparedBindString(MODULE_GAME, VMAS(1));
+	case G_COOL_API_DB_PREPAREDBINDFLOAT:
+		return DB_PreparedBindFloat(MODULE_GAME, VMF(1));
+	case G_COOL_API_DB_PREPAREDBINDINT:
+		return DB_PreparedBindInt(MODULE_GAME, args[1]);
+	case G_COOL_API_DB_PREPAREDBINDNULL:
+		return DB_PreparedBindNull(MODULE_GAME);
+	case G_COOL_API_DB_PREPAREDBINDBINARY:
+		return DB_PreparedBindBinary(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL,args[2]);
+	case G_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
+		return DB_FinishAndSendPreparedStatement(MODULE_GAME);
+	case G_COOL_API_DB_GETBINARY:
+		return DB_GetBinary(MODULE_GAME,
+			args[1],
+			VMAP(2, byte, args[3]),		// byte* reference
+			args[3]						// int referenceLength
+		);
 	}
 
 	if (VM_MVAPILevel(gvm) >= 1) {

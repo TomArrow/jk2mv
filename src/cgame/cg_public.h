@@ -253,6 +253,9 @@ Ghoul2 Insert Start
 	CG_G2_SETROOTSURFACE,
 	CG_G2_SETSURFACEONOFF,
 	CG_G2_SETNEWORIGIN,
+		/*
+		Ghoul2 Insert End
+		*/
 
 	CG_SET_SHARED_BUFFER,
 
@@ -271,9 +274,6 @@ Ghoul2 Insert Start
 	CG_COOL_API_DB_GETFLOAT = 1206,
 	CG_COOL_API_DB_GETSTRING = 1207,
 	CG_COOL_API_DB_ADDREQUEST_TYPED = 1208,
-/*
-Ghoul2 Insert End
-*/
 } cgameImport_t;
 
 

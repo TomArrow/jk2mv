@@ -18,11 +18,21 @@ int			DB_GetInt(module_t module, int place);
 float		DB_GetFloat(module_t module, int place);
 qboolean	DB_GetString(module_t module, int place, char* out, int outSize);
 
+qboolean	DB_AddPreparedStatement(module_t module, byte* reference, int referenceLength, int requestType, const char* request);
+qboolean	DB_PreparedBindString(module_t module, const char* string);
+qboolean	DB_PreparedBindFloat(module_t module, float number);
+qboolean	DB_PreparedBindInt(module_t module, int number);
+qboolean	DB_PreparedBindBinary(module_t module, byte* data, int length);
+qboolean	DB_FinishAndSendPreparedStatement(module_t module); 
+int			DB_GetBinary(module_t module, int place, byte* out, int outSize);
+qboolean	DB_PreparedBindNull(module_t module);
+
 enum SQLDelayedValueType {
 	SQLVALUE_TYPE_NULL,
 	SQLVALUE_TYPE_INTEGER,
 	SQLVALUE_TYPE_REAL,
 	SQLVALUE_TYPE_TEXT,
+	SQLVALUE_TYPE_BINARY,
 };
 
 typedef enum SQLDelayedValue_NULL_s {
@@ -37,6 +47,7 @@ class SQLDelayedValue {
 	SQLDelayedValueType type = SQLVALUE_TYPE_NULL;
 	union {
 		std::string* stringValue = NULL;
+		std::vector<byte>* binaryData;
 		int64_t intValue;
 		double doubleValue;
 	};
@@ -96,7 +107,17 @@ public:
 			return stringValue ? *stringValue : "";
 			break;
 		default:
-			throw std::invalid_argument("cannot get as float");
+			throw std::invalid_argument("cannot get as string");
+			break;
+		}
+	}
+	const std::vector<byte> getBinary() {
+		switch (type) {
+		case SQLVALUE_TYPE_BINARY:
+			return binaryData ? *binaryData : std::vector<byte>();
+			break;
+		default:
+			throw std::invalid_argument("cannot get as binary");
 			break;
 		}
 	}
@@ -129,11 +150,34 @@ public:
 			stringValue = new std::string(*valueA);
 			type = SQLVALUE_TYPE_TEXT;
 		}
+		else if constexpr (std::is_same<T, sql::Blob*>()) {
+			type = SQLVALUE_TYPE_BINARY;
+			sql::Blob* blob = (sql::Blob*)valueA;
+			if (!blob) {
+				binaryData = NULL;
+			}
+			else {
+				blob->seekg(0, std::ios::end);
+				size_t size = blob->tellg();
+				blob->seekg(0, std::ios::beg);
+				binaryData = new std::vector<byte>();
+				binaryData->reserve(size);
+				blob->read((char*)binaryData->data(), size);
+				binaryData->resize(blob->tellg());
+			}
+		}
 		else {
 			throw std::invalid_argument("Invalid SQLDelayedValue constructor type");
 		}
 		columnNameValue = new std::string(columnName);
 	}
+
+	// special constructor for binary data since we can't guess the length
+	SQLDelayedValue(const char* columnName, void* data, int length) {
+		binaryData = data ? new std::vector<byte>((byte*)data, (byte*)data + length) : NULL; // is + length correct? TODO
+		type = SQLVALUE_TYPE_BINARY;
+	}
+
 
 	auto operator=(SQLDelayedValue&& movedFrom) {
 		type = std::move(movedFrom.type);
@@ -145,8 +189,12 @@ public:
 			doubleValue = movedFrom.doubleValue;
 			break;
 		case SQLVALUE_TYPE_TEXT:
-			stringValue = new std::string(std::move(*movedFrom.stringValue));
+			stringValue = movedFrom.stringValue ? new std::string(std::move(*movedFrom.stringValue)) : NULL; // uh why not just keep the same pointer tho?
 			movedFrom.stringValue = NULL;
+			break;
+		case SQLVALUE_TYPE_BINARY:
+			binaryData = movedFrom.binaryData ? new std::vector<byte>(std::move(*movedFrom.binaryData)) : NULL;// uh why not just keep the same pointer tho?
+			movedFrom.binaryData = NULL;
 			break;
 		}
 		columnNameValue = new std::string(std::move(*movedFrom.columnNameValue));
@@ -157,6 +205,44 @@ public:
 		*this = std::move(movedFrom);
 	}
 
+	inline void bind(sql::PreparedStatement* statement, int index) {
+		if (index == 0) {
+			return; // Sometimes we have same set of binds for multiple statements but with different values being used or not being used. So if index not found, just discard. It doesn't seem like sqlite throws an error even if we use 0 as an index but whatever, safe is safe. (this was a comment for sqlite version, not sure if it applies, too lazy to read and understand it again)
+		}
+		switch (type) {
+		case SQLVALUE_TYPE_NULL:
+			statement->setNull(index, sql::Types::SQLNULL);
+			break;
+		case SQLVALUE_TYPE_INTEGER:
+			statement->setInt64(index,intValue);
+			break;
+		case SQLVALUE_TYPE_REAL:
+			statement->setDouble(index,doubleValue);
+			break;
+		case SQLVALUE_TYPE_TEXT:
+			if (stringValue) {
+				statement->setString(index, *stringValue); // TODO correcT?
+			}
+			else {
+				statement->setString(index, NULL); // TODO correcT?
+			}
+			break;
+		case SQLVALUE_TYPE_BINARY:
+			if (binaryData) {
+				sql::bytes* theData = new sql::bytes(binaryData->size());
+				memcpy(theData->arr, binaryData->data(), binaryData->size());
+				statement->setBytes(index, theData); // TODO correcT?
+				delete theData; // TODO is this safe?! i think its copying the stuff internally but im not certain
+			}
+			else {
+				statement->setNull(index, sql::Types::SQLNULL);
+			}
+			break;
+		default:
+			throw std::invalid_argument("tried to bind SQLDelayedValue with invalid type");
+			break;
+		}
+	}
 
 	/*inline int bind(sqlite3_stmt* statement) {
 		int index = sqlite3_bind_parameter_index(statement, columnNameValue->c_str());
@@ -186,13 +272,16 @@ public:
 		if (type == SQLVALUE_TYPE_TEXT && stringValue) {
 			delete stringValue;
 		}
+		if (type == SQLVALUE_TYPE_BINARY && binaryData) {
+			delete binaryData;
+		}
 		if (columnNameValue) {
 			delete columnNameValue;
 		}
 	}
 };
 
-class SQLDelayedResponse {
+class SQLDelayedValues {
 	qboolean invalidated = qfalse;
 	std::vector<SQLDelayedValue*> values;
 	// The added SQLDelayedValue object will be automatically deleted when this object is destroyed.
@@ -204,6 +293,9 @@ public:
 	void inline add(const char* name, T value) {
 		values.push_back(new SQLDelayedValue(name, value));
 	}
+	void inline add(const char* name, byte* data, int length) {
+		values.push_back(new SQLDelayedValue(name, data, length));
+	}
 	int size() {
 		return values.size();
 	}
@@ -211,10 +303,10 @@ public:
 		if (place >= values.size()) return NULL;
 		return values[place];
 	}
-	SQLDelayedResponse() {
+	SQLDelayedValues() {
 
 	}
-	SQLDelayedResponse(sql::ResultSet* sourceRow) {
+	SQLDelayedValues(sql::ResultSet* sourceRow) {
 		std::unique_ptr<sql::ResultSetMetaData> meta(sourceRow->getMetaData());
 		int columnCount = meta->getColumnCount();
 		for (int i = 1; i <= columnCount; i++) {
@@ -261,15 +353,22 @@ public:
 				add(meta->getColumnName(i).c_str(), sourceRow->getString(i).c_str());// keep as string for now. maybe do something nicer later.
 				break;
 
-			case sql::Types::ARRAY:
 			case sql::Types::BINARY:
 			case sql::Types::VARBINARY:
-			case sql::Types::BIT:
 			case sql::Types::BLOB:
+			case sql::Types::LONGVARBINARY:
+			{
+				// TODO actually test this... no idea if it works.
+				sql::Blob* blob = sourceRow->getBlob(i);
+				add(meta->getColumnName(i).c_str(), blob); 
+				delete blob; // is this right?
+				break;
+			}
+			case sql::Types::ARRAY:
+			case sql::Types::BIT:
 			case sql::Types::DATALINK:
 			case sql::Types::DISTINCT:
 			case sql::Types::JAVA_OBJECT:
-			case sql::Types::LONGVARBINARY:
 			case sql::Types::OTHER:
 			case sql::Types::REF:
 			case sql::Types::REF_CURSOR:
@@ -280,11 +379,11 @@ public:
 			}
 		}
 	}
-	auto operator=(SQLDelayedResponse&& other) {
+	auto operator=(SQLDelayedValues&& other) {
 		values = std::move(other.values);
 		other.invalidated = qtrue;
 	}
-	SQLDelayedResponse(SQLDelayedResponse&& movedOne) {
+	SQLDelayedValues(SQLDelayedValues&& movedOne) {
 		*this = std::move(movedOne);
 	}
 	/*inline void bind(sqlite3_stmt* statement) {
@@ -293,7 +392,7 @@ public:
 			values[i]->bind(statement);
 		}
 	}*/
-	~SQLDelayedResponse() {
+	~SQLDelayedValues() {
 		if (!invalidated) {
 			int count = values.size();
 			for (int i = 0; i < count; i++) {
@@ -314,12 +413,14 @@ public:
 	std::string errorMessage = "";
 	int affectedRowCount = 0;
 	DBRequestType_t dbRequestType = DBREQUESTTYPE_REQUEST; // could be something else that we wanna do on a different thread
+	qboolean isPreparedStatement;
+	SQLDelayedValues preparedValues;
 
 	module_t module = MODULE_MAIN;		// the requesting module
 	std::string requestString;			// sql instruction
 	int requestType = -1;				// so the module can have a different type of reference data struct for each request type
 	std::vector<byte> moduleReference;	// any sequence of bytes (probably a module struct) that the module gave us to remember what this request is
-	std::vector<SQLDelayedResponse> responseData;
+	std::vector<SQLDelayedValues> responseData;
 	int currentResponseRow = -1;
 };
 

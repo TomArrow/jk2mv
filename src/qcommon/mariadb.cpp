@@ -17,6 +17,9 @@ static cvar_t* db_password;
 
 static std::thread* dbThread;
 
+static DBRequest currentPreparingRequest[MODULE_MAX];
+static qboolean currentPreparingRequestValid[MODULE_MAX]{ qfalse };// it doesnt initialize all to qfalse, but everyone after first to 0, but that's the same thing so its ok :)
+
 static DBRequest currentFinishedRequest[MODULE_MAX];
 static qboolean currentFinishedRequestValid[MODULE_MAX]{ qfalse };// it doesnt initialize all to qfalse, but everyone after first to 0, but that's the same thing so its ok :)
 
@@ -209,7 +212,7 @@ static void DB_BackgroundThread() {
 						}
 					}
 					if (requestToProcess.successful) {
-						SQLDelayedResponse response;
+						SQLDelayedValues response;
 						const char* result = bcrypted.c_str();
 						response.add("result", result);
 						requestToProcess.responseData.push_back(std::move(response));
@@ -265,7 +268,10 @@ static void DB_BackgroundThread() {
 #endif
 					// Configure Connection
 					sql::SQLString urlsql(url);
-					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()} });
+					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()}
+						//,{"CLIENT_MULTI_STATEMENTS", "true"} 
+						,{"useAffectedRows", "true"} 
+						});
 
 					// Establish Connection
 					conn = driver->connect(urlsql, properties);
@@ -293,19 +299,41 @@ static void DB_BackgroundThread() {
 		// process request
 		if (connectionEnabled) {
 			try {
-				// Create a new Statement
-				std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
-				// Execute query
-				if (stmnt->execute(requestToProcess.requestString)) {
-					std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
-					while (res->next()) {
-						requestToProcess.responseData.push_back(SQLDelayedResponse(res.get()));
+				if (requestToProcess.isPreparedStatement) {
+					// Create a new Statement
+					std::unique_ptr<sql::PreparedStatement> stmnt(conn->prepareStatement(requestToProcess.requestString));
+					int valueCount = requestToProcess.preparedValues.size();
+					for (int i = 0; i < valueCount; i++) {
+						requestToProcess.preparedValues.getValue(i)->bind(stmnt.get(),i+1);
 					}
+
+					// Execute query
+					if (stmnt->execute()) {
+						std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
+						while (res->next()) {
+							requestToProcess.responseData.push_back(SQLDelayedValues(res.get()));
+						}
+					}
+					else {
+						requestToProcess.affectedRowCount = stmnt->getUpdateCount();
+					}
+					requestPending = qfalse;
 				}
 				else {
-					requestToProcess.affectedRowCount = stmnt->getUpdateCount();
+					// Create a new Statement
+					std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
+					// Execute query
+					if (stmnt->execute(requestToProcess.requestString)) {
+						std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
+						while (res->next()) {
+							requestToProcess.responseData.push_back(SQLDelayedValues(res.get()));
+						}
+					}
+					else {
+						requestToProcess.affectedRowCount = stmnt->getUpdateCount();
+					}
+					requestPending = qfalse;
 				}
-				requestPending = qfalse;
 			}
 			catch (sql::SQLException& e) {
 				bool connectionDied = false;
@@ -383,6 +411,53 @@ qboolean DB_AddRequest(DBRequest&& req) {
 	dbSyncedData.changeNotifier.notify_one();
 	return qtrue;
 }
+qboolean DB_AddPreparedStatement(DBRequest&& req) {
+	if (!db_enabled->integer) return qfalse;
+	currentPreparingRequest[req.module] = std::move(req);
+	currentPreparingRequestValid[req.module] = qtrue;
+	return qtrue;
+}
+qboolean DB_PreparedBindString(module_t module, const char* string) {
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	currentPreparingRequest[module].preparedValues.add("whatever",string);
+	return qtrue;
+}
+qboolean DB_PreparedBindFloat(module_t module, float number) {
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	currentPreparingRequest[module].preparedValues.add("whatever", number);
+	return qtrue;
+}
+qboolean DB_PreparedBindInt(module_t module, int number) {
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	currentPreparingRequest[module].preparedValues.add("whatever", number);
+	return qtrue;
+}
+qboolean DB_PreparedBindNull(module_t module) {
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	currentPreparingRequest[module].preparedValues.add("whatever", SQLDelayedValue_NULL);
+	return qtrue;
+}
+qboolean DB_PreparedBindBinary(module_t module, byte* data, int length) { // TODO untested
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	currentPreparingRequest[module].preparedValues.add("whatever", data, length);
+	return qtrue;
+}
+qboolean DB_FinishAndSendPreparedStatement(module_t module) {
+	if (!db_enabled->integer) return qfalse;
+	if (!currentPreparingRequestValid[module]) return qfalse;
+	{
+		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		dbSyncedData.requestsIncoming.push_back(std::move(currentPreparingRequest[module]));
+		currentPreparingRequestValid[module] = qfalse;
+	}
+	dbSyncedData.changeNotifier.notify_one();
+	return qtrue;
+}
 qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request, DBRequestType_t dbRequestType) {
 	if (!db_enabled->integer) return qfalse;
 	DBRequest req;
@@ -395,6 +470,19 @@ qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, in
 	}
 	DB_AddRequest(std::move(req));
 }
+qboolean DB_AddPreparedStatement(module_t module, byte* reference, int referenceLength, int requestType, const char* request) {
+	if (!db_enabled->integer) return qfalse;
+	DBRequest req;
+	req.isPreparedStatement = qtrue;
+	req.requestString = request;
+	req.dbRequestType = DBREQUESTTYPE_REQUEST;
+	req.requestType = requestType;
+	req.module = module;
+	if (reference && referenceLength) {
+		req.moduleReference = std::move(std::vector<byte>(reference, reference+referenceLength));
+	}
+	DB_AddPreparedStatement(std::move(req));
+}
 
 qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
 	if (!currentFinishedRequestValid[module]) {
@@ -403,12 +491,27 @@ qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		std::string value = val->getString();
 		Q_strncpyz(out, value.c_str(), outSize);
 		return (qboolean)(outSize > value.size());
+	}
+}
+int DB_GetBinary(module_t module, int place, byte* out, int outSize) {
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].currentResponseRow < 0) {
+		return qfalse;
+	}
+	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValue* val = row->getValue(place);
+	if (val) {
+		std::vector<byte> value = val->getBinary();
+		Com_Memcpy(out, value.data(), MIN(value.size(),outSize));
+		return value.size();
 	}
 }
 float DB_GetFloat(module_t module, int place) {
@@ -418,7 +521,7 @@ float DB_GetFloat(module_t module, int place) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		return val->getFloat();
@@ -432,7 +535,7 @@ int DB_GetInt(module_t module, int place) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedResponse* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		return val->getInt();
