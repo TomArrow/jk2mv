@@ -368,10 +368,10 @@ static void DB_BackgroundThread() {
 						fastSkip = qtrue;
 					}
 					if (fastSkip) {
-						Com_Printf("MariaDB error executing query: %s \n", e.what());
+						Com_Printf("MariaDB error executing query: error %d, %s \n", e.getErrorCode(), e.what());
 					}
 					else {
-						Com_Printf("MariaDB error executing query (try %d/%d): %s \n", requestToProcess.tries + 1, max_tries, e.what());
+						Com_Printf("MariaDB error executing query (try %d/%d): error %d, %s \n", requestToProcess.tries + 1, max_tries, e.getErrorCode(), e.what());
 					}
 					if (requestToProcess.tries < max_tries && !fastSkip) {
 
