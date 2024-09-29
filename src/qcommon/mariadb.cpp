@@ -300,7 +300,7 @@ static void DB_BackgroundThread() {
 		}
 
 		// process request
-		if (connectionEnabled) {
+		if (connectionEnabled && conn) {
 			try {
 				if (requestToProcess.isPreparedStatement) {
 					// Create a new Statement
@@ -477,7 +477,7 @@ qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, in
 	if (reference && referenceLength) {
 		req.moduleReference = std::move(std::vector<byte>(reference, reference+referenceLength));
 	}
-	DB_AddRequest(std::move(req));
+	return DB_AddRequest(std::move(req));
 }
 qboolean DB_AddPreparedStatement(module_t module, byte* reference, int referenceLength, int requestType, const char* request) {
 	if (!db_enabled->integer) return qfalse;
