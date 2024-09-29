@@ -3,6 +3,7 @@
 #define MARIADBHEADER
 #include "conncpp.hpp"
 #include "qcommon.h"
+#include <queue>
 
 extern cvar_t* db_enabled;
 
@@ -26,6 +27,7 @@ qboolean	DB_PreparedBindBinary(module_t module, byte* data, int length);
 qboolean	DB_FinishAndSendPreparedStatement(module_t module); 
 int			DB_GetBinary(module_t module, int place, byte* out, int outSize);
 qboolean	DB_PreparedBindNull(module_t module);
+qboolean	DB_NextResultSet(module_t module, int* affectedRows);
 
 enum SQLDelayedValueType {
 	SQLVALUE_TYPE_NULL,
@@ -402,7 +404,11 @@ public:
 	}
 };
 
-
+class DBRequestResultSet {
+public:	
+	std::vector<SQLDelayedValues> responseData;
+	int affectedRowCount = 0;
+};
 
 
 class DBRequest {
@@ -411,7 +417,6 @@ public:
 	qboolean successful = qtrue;
 	int errorCode =0;
 	std::string errorMessage = "";
-	int affectedRowCount = 0;
 	DBRequestType_t dbRequestType = DBREQUESTTYPE_REQUEST; // could be something else that we wanna do on a different thread
 	qboolean isPreparedStatement;
 	SQLDelayedValues preparedValues;
@@ -420,8 +425,41 @@ public:
 	std::string requestString;			// sql instruction
 	int requestType = -1;				// so the module can have a different type of reference data struct for each request type
 	std::vector<byte> moduleReference;	// any sequence of bytes (probably a module struct) that the module gave us to remember what this request is
-	std::vector<SQLDelayedValues> responseData;
+	std::queue<DBRequestResultSet> results; // multi-statements can return multiple results. ALWAYS MUST HAVE AT LEAST ONE
 	int currentResponseRow = -1;
+
+	template<class STATEMENTTYPE>
+	inline void digestResults(STATEMENTTYPE* stmnt, bool wasResultSet) {
+		{
+			DBRequestResultSet result;
+			if (wasResultSet) {
+				std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
+				while (res->next()) {
+					result.responseData.push_back(SQLDelayedValues(res.get()));
+				}
+			}
+			else {
+				result.affectedRowCount = stmnt->getUpdateCount();
+			}
+			this->results.push(std::move(result)); 
+		}
+		bool moreResults = false;
+		int updateCount = 0;
+		while ((moreResults=stmnt->getMoreResults()) || (updateCount =stmnt->getUpdateCount()) != -1) // in mysql u have to compare to ~0ull i guess? why is mariadb so different
+		{
+			DBRequestResultSet result2;
+			if (moreResults) {
+				std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
+				while (res->next()) {
+					result2.responseData.push_back(SQLDelayedValues(res.get()));
+				}
+			}
+			else {
+				result2.affectedRowCount = updateCount;
+			}
+			this->results.push(std::move(result2));
+		}
+	}
 };
 
 

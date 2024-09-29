@@ -212,10 +212,12 @@ static void DB_BackgroundThread() {
 						}
 					}
 					if (requestToProcess.successful) {
+						DBRequestResultSet resultSet;
 						SQLDelayedValues response;
 						const char* result = bcrypted.c_str();
 						response.add("result", result);
-						requestToProcess.responseData.push_back(std::move(response));
+						resultSet.responseData.push_back(std::move(response));
+						requestToProcess.results.push(std::move(resultSet));
 					}
 				}
 					break;
@@ -270,7 +272,8 @@ static void DB_BackgroundThread() {
 					sql::SQLString urlsql(url);
 					sql::Properties properties({ {"user", username.c_str()}, {"password", password.c_str()}
 						//,{"CLIENT_MULTI_STATEMENTS", "true"} 
-						,{"useAffectedRows", "true"} 
+						,{"useAffectedRows", "true"}
+						,{"allowMultiQueries", "true"}
 						});
 
 					// Establish Connection
@@ -307,23 +310,29 @@ static void DB_BackgroundThread() {
 						requestToProcess.preparedValues.getValue(i)->bind(stmnt.get(),i+1);
 					}
 
+					bool wasResultSet = stmnt->execute();
+					requestToProcess.digestResults(stmnt.get(), wasResultSet);
+					/*
 					// Execute query
 					if (stmnt->execute()) {
 						std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
 						while (res->next()) {
-							requestToProcess.responseData.push_back(SQLDelayedValues(res.get()));
+							result.responseData.push_back(SQLDelayedValues(res.get()));
 						}
 					}
 					else {
-						requestToProcess.affectedRowCount = stmnt->getUpdateCount();
-					}
+						result.affectedRowCount = stmnt->getUpdateCount();
+					}*/
 					requestPending = qfalse;
 				}
 				else {
 					// Create a new Statement
 					std::unique_ptr<sql::Statement> stmnt(conn->createStatement());
+
+					bool wasResultSet = stmnt->execute(requestToProcess.requestString);
+					requestToProcess.digestResults(stmnt.get(), wasResultSet);
 					// Execute query
-					if (stmnt->execute(requestToProcess.requestString)) {
+					/*if (stmnt->execute(requestToProcess.requestString)) {
 						std::unique_ptr<sql::ResultSet> res(stmnt->getResultSet());
 						while (res->next()) {
 							requestToProcess.responseData.push_back(SQLDelayedValues(res.get()));
@@ -331,7 +340,7 @@ static void DB_BackgroundThread() {
 					}
 					else {
 						requestToProcess.affectedRowCount = stmnt->getUpdateCount();
-					}
+					}*/
 					requestPending = qfalse;
 				}
 			}
@@ -481,7 +490,7 @@ qboolean DB_AddPreparedStatement(module_t module, byte* reference, int reference
 	if (reference && referenceLength) {
 		req.moduleReference = std::move(std::vector<byte>(reference, reference+referenceLength));
 	}
-	DB_AddPreparedStatement(std::move(req));
+	return DB_AddPreparedStatement(std::move(req));
 }
 
 qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
@@ -491,13 +500,17 @@ qboolean DB_GetString(module_t module, int place, char* out, int outSize) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	if (!currentFinishedRequest[module].results.size()) {
+		return qfalse;
+	}
+	SQLDelayedValues* row = &currentFinishedRequest[module].results.front().responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		std::string value = val->getString();
 		Q_strncpyz(out, value.c_str(), outSize);
 		return (qboolean)(outSize > value.size());
 	}
+	return qtrue;
 }
 int DB_GetBinary(module_t module, int place, byte* out, int outSize) {
 	if (!currentFinishedRequestValid[module]) {
@@ -506,13 +519,17 @@ int DB_GetBinary(module_t module, int place, byte* out, int outSize) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	if (!currentFinishedRequest[module].results.size()) {
+		return qfalse;
+	}
+	SQLDelayedValues* row = &currentFinishedRequest[module].results.front().responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		std::vector<byte> value = val->getBinary();
 		Com_Memcpy(out, value.data(), MIN(value.size(),outSize));
 		return value.size();
 	}
+	return qtrue;
 }
 float DB_GetFloat(module_t module, int place) {
 	if (!currentFinishedRequestValid[module]) {
@@ -521,7 +538,10 @@ float DB_GetFloat(module_t module, int place) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	if (!currentFinishedRequest[module].results.size()) {
+		return qfalse;
+	}
+	SQLDelayedValues* row = &currentFinishedRequest[module].results.front().responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		return val->getFloat();
@@ -535,7 +555,10 @@ int DB_GetInt(module_t module, int place) {
 	if (currentFinishedRequest[module].currentResponseRow < 0) {
 		return qfalse;
 	}
-	SQLDelayedValues* row = &currentFinishedRequest[module].responseData[currentFinishedRequest[module].currentResponseRow];
+	if (!currentFinishedRequest[module].results.size()) {
+		return qfalse;
+	}
+	SQLDelayedValues* row = &currentFinishedRequest[module].results.front().responseData[currentFinishedRequest[module].currentResponseRow];
 	SQLDelayedValue* val = row->getValue(place);
 	if (val) {
 		return val->getInt();
@@ -546,10 +569,26 @@ qboolean DB_NextRow(module_t module) {
 	if (!currentFinishedRequestValid[module]) {
 		return qfalse;
 	}
-	if (currentFinishedRequest[module].responseData.size() <= currentFinishedRequest[module].currentResponseRow + 1) {
+	if (!currentFinishedRequest[module].results.size()) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].results.front().responseData.size() <= currentFinishedRequest[module].currentResponseRow + 1) {
 		return qfalse;
 	}
 	currentFinishedRequest[module].currentResponseRow++;
+	return qtrue;
+}
+qboolean DB_NextResultSet(module_t module, int* affectedRows) {
+	if (affectedRows) *affectedRows = 0;
+	if (!currentFinishedRequestValid[module]) {
+		return qfalse;
+	}
+	if (currentFinishedRequest[module].results.size() <= 1) {
+		return qfalse;
+	}
+	currentFinishedRequest[module].results.pop();
+	if (affectedRows) *affectedRows = currentFinishedRequest[module].results.front().affectedRowCount;
+	currentFinishedRequest[module].currentResponseRow = -1;
 	return qtrue;
 }
 qboolean DB_GetReference(module_t module, byte* reference, int referenceLength) {
@@ -577,7 +616,7 @@ qboolean DB_NextResponse(module_t module, int* requestType, int* affectedRows, i
 			dbSyncedData.requestsFinished[module].pop_front();
 
 			if (requestType) *requestType = currentFinishedRequest[module].requestType;
-			if (affectedRows) *affectedRows = currentFinishedRequest[module].affectedRowCount;
+			if (affectedRows) *affectedRows = currentFinishedRequest[module].results.size() ? currentFinishedRequest[module].results.front().affectedRowCount : -2;
 			if (status) *status = currentFinishedRequest[module].errorCode;
 			if (errorMessage) {
 				// error might be too long but we'll just silently cut it off then.

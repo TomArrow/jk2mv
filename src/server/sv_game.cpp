@@ -1177,6 +1177,8 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return DB_PreparedBindInt(MODULE_GAME, args[1]);
 	case G_COOL_API_DB_PREPAREDBINDNULL:
 		return DB_PreparedBindNull(MODULE_GAME);
+	case G_COOL_API_DB_GETMORERESULTS:
+		return DB_NextResultSet(MODULE_GAME, VMAP(1, int, 1));
 	case G_COOL_API_DB_PREPAREDBINDBINARY:
 		return DB_PreparedBindBinary(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL,args[2]);
 	case G_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
