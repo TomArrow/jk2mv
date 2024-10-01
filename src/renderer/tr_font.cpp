@@ -732,7 +732,7 @@ int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale
 	const char *pch = psText;
 	while (*pch && i < sizeof(parseText)-1) {
 #if 1
-		if (Q_IsColorString(pch) || (MV_USE102COLOR && Q_IsColorString_1_02(pch)) || Q_IsColorString_Extended(pch)) {
+		if (Q_IsColorString(pch) || (MV_USE102COLOR && Q_IsColorString_1_02(pch)) || Q_IsColorString_Extended(pch) || (serverIsTommyTernal && Q_IsColorStringNT(pch))) {
 			++pch;	//skip past ^
 			++pch;	//skip past the char after ^
 		}
@@ -972,6 +972,16 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 						RE_SetColor(color);
 					}
 				}
+			}
+			else if (serverIsTommyTernal && Q_IsColorStringNT(psText - 1))
+			{
+				colour = ColorIndexNT(*psText);
+				colourChain++; // Keep track of the amount of chained colors
+				if (!gbInShadow || (colorShadow && !(colourChain % 2)))
+				{
+					RE_SetColor(g_color_table_nt[colour]);
+				}
+				++psText;
 			}
 			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
 			{

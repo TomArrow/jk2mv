@@ -21,6 +21,8 @@
 #define FIELD_HISTORY_SIZE	32
 #define KILL_RING_SIZE		16
 
+extern qboolean serverIsTommyTernal;
+
 //For determining whether to allow 1.02 color codes:
 #define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
 

@@ -430,7 +430,7 @@ void CL_CheckWallhackAllowed(const char* serverInfo) {
 			v = Info_ValueForKey(info, "version");
 			if (v)
 			{
-				Q_CleanStr(v, qtrue);
+				Q_CleanStr(v, qtrue,serverIsTommyTernal);
 				if (strstr(v, nwhCompareSmall) || strstr(v, nwhCompareBig)) {
 					wallhackOk = qfalse;
 				}
@@ -438,7 +438,7 @@ void CL_CheckWallhackAllowed(const char* serverInfo) {
 			v = Info_ValueForKey(info, "sv_hostname");
 			if (v)
 			{
-				Q_CleanStr(v, qtrue);
+				Q_CleanStr(v, qtrue, serverIsTommyTernal);
 				if (strstr(v, manhuntCompare)) { // Stupid, ugly and gay.
 					wallhackOk = qfalse;
 				}

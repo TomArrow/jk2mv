@@ -717,6 +717,11 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define Q_IsColorString_1_02(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE ) // 1.02 ColorStrings
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
 
+// stealsies from jomme/nt mod :) thanks
+#define Q_IsColorStringNT(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= 0x7F && *((p)+1) >= 0x00 )
+#define Q_IsColorCharNT(p)		( (p) <= 0x7F && (p) >= 0x00 )
+#define ColorIndexNT(c)			( (c) & 127 )
+
 #define Q_IsColorStringHex(p) ((Q_IsColorStringHexY((p))) || (Q_IsColorStringHexy((p))) || (Q_IsColorStringHexX((p))) || (Q_IsColorStringHexx((p)) ))
 #define Q_IsColorStringHexY(p) ((p)+8) && (p) && *(p)=='Y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6)) && Q_IsHex((p+7)) && Q_IsHex((p+8))
 #define Q_IsColorStringHexy(p) ((p)+4) && (p) && *(p)=='y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4))
@@ -775,7 +780,8 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define S_COLOR_JK2MV   "^n" // Different in Debug/Release
 #define S_COLOR_LT_TRANSPARENT "^o"
 
-extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT];
+extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT]; 
+extern vec4_t	g_color_table_nt[128];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
@@ -1091,13 +1097,13 @@ void	Q_strcat( char *dest, int size, const char *src );
 int		Q_strlen(const char *s);
 
 // strlen that discounts Quake color sequences
-int Q_PrintStrlen( const char *string, qboolean use102color );
+int Q_PrintStrlen( const char *string, qboolean use102color, qboolean ntModColors);
 
-int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color);
-int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color);
-void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color);
+int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color, qboolean ntModColors);
+int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color, qboolean ntModColors);
+void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color, qboolean ntModColors);
 // removes color sequences from string
-char *Q_CleanStr( char *string, qboolean use102color ) ;
+char *Q_CleanStr( char *string, qboolean use102color, qboolean ntModColors) ;
 void Q_StripColor(char *text, qboolean doHex=qfalse); //strips both colors
 const char *Q_strchrs( const char *string, const char *search );
 void Q_strstrip( char *string, const char *strip, const char *repl );

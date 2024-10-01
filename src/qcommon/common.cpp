@@ -22,6 +22,8 @@
 #include "mariadb.h"
 #include <mutex>
 
+qboolean serverIsTommyTernal = qfalse;
+
 #define MAX_NUM_ARGVS	50
 
 #define MIN_DEDICATED_COMHUNKMEGS 16//1 //We need more than 1 for VMs when we are also using temporary hunk memory for bot nav functions
@@ -213,7 +215,7 @@ static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const ch
 #if defined(_WIN32) && defined(_DEBUG)
 	if ( *msg )
 	{
-		OutputDebugStringA ( Q_CleanStr((char *)msg, (qboolean)MV_USE102COLOR) );
+		OutputDebugStringA ( Q_CleanStr((char *)msg, (qboolean)MV_USE102COLOR, serverIsTommyTernal) );
 		OutputDebugStringA ("\n");
 	}
 #endif

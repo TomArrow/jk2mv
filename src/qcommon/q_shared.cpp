@@ -9,7 +9,6 @@ GetIDForString
 -------------------------
 */
 
-
 int GetIDForString(stringID_table_t *table, const char *string) {
 	int	index = 0;
 
@@ -937,7 +936,7 @@ void Q_strcat(char *dest, int size, const char *src) {
 }
 
 
-int Q_PrintStrlen(const char *string, qboolean use102color) {
+int Q_PrintStrlen(const char *string, qboolean use102color, qboolean ntModColors) {
 	int			len;
 	const char	*p;
 
@@ -948,7 +947,7 @@ int Q_PrintStrlen(const char *string, qboolean use102color) {
 	len = 0;
 	p = string;
 	while (*p) {
-		if (Q_IsColorString(p) || (use102color && Q_IsColorString_1_02(p))) {
+		if (Q_IsColorString(p) || (use102color && Q_IsColorString_1_02(p))|| (ntModColors && Q_IsColorStringNT(p))) {
 			p += 2;
 			continue;
 		}
@@ -959,13 +958,13 @@ int Q_PrintStrlen(const char *string, qboolean use102color) {
 	return len;
 }
 
-int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color) {
+int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color, qboolean ntModColors) {
 	int			advance = 0;
 	char		lastColor = 0;
 	int			i;
 
 	for (i = 0; advance < pos && str[i]; i++) {
-		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i]))) {
+		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i])) || (ntModColors && Q_IsColorStringNT(&str[i]))) {
 			i++;
 			lastColor = str[i];
 		} else {
@@ -981,13 +980,13 @@ int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102colo
 }
 
 
-int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color) {
+int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color, qboolean ntModColors) {
 	int		offset = 0;
 	char	lastColor = 0;
 	int		i;
 
 	for (i = 0; i < chars && str[i]; i++) {
-		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i]))) {
+		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i])) || (ntModColors && Q_IsColorStringNT(&str[i]))) {
 			i++;
 			lastColor = str[i];
 		} else {
@@ -1003,13 +1002,13 @@ int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102colo
 }
 
 // copy a substring of len printable characters from 'from' offset, saving initial color
-void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color) {
-	int		fromOffset = Q_PrintStrLenTo(src, from, NULL, use102color);
+void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color, qboolean ntModColors) {
+	int		fromOffset = Q_PrintStrLenTo(src, from, NULL, use102color, ntModColors);
 	int		to;
 	char	color;
 
-	from = Q_PrintStrCharsTo(src, fromOffset, &color, use102color);
-	to = Q_PrintStrCharsTo(src, fromOffset + len, NULL, use102color);
+	from = Q_PrintStrCharsTo(src, fromOffset, &color, use102color, ntModColors);
+	to = Q_PrintStrCharsTo(src, fromOffset + len, NULL, use102color, ntModColors);
 
 	assert(dstSize >= 3);
 
@@ -1022,7 +1021,7 @@ void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, 
 	Q_strncpyz(dst, src + from, MIN(dstSize, to - from + 1));
 }
 
-char *Q_CleanStr(char *string, qboolean use102color) {
+char *Q_CleanStr(char *string, qboolean use102color, qboolean ntModColors) {
 	char*	d;
 	char*	s;
 	int		c;
@@ -1030,7 +1029,7 @@ char *Q_CleanStr(char *string, qboolean use102color) {
 	s = string;
 	d = string;
 	while ((c = *s) != 0) {
-		if (Q_IsColorString(s) || (use102color && Q_IsColorString_1_02(s))) {
+		if (Q_IsColorString(s) || (use102color && Q_IsColorString_1_02(s)) || (ntModColors && Q_IsColorStringNT(s))) {
 			s++;
 		} else if (c >= 0x20 && c <= 0x7E) {
 			*d++ = c;

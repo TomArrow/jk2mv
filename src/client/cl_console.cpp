@@ -836,6 +836,12 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 			color = chosenColor;
 			continue;
 		}
+		else if ((serverIsTommyTernal && Q_IsColorStringNT(txt)))
+		{
+			color = ColorIndexNT( *(txt+1) );
+			txt += 2;
+			continue;
+		}
 		else if ( Q_IsColorString( txt ) ||
 			(extendedColors && Q_IsColorString_Extended( txt )) ||
 			( use102color && Q_IsColorString_1_02( txt ) ) )
@@ -846,8 +852,15 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 			continue;
 		}
 
-		if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
-			color = con_blackColorOverride->integer;
+		if (serverIsTommyTernal) {
+			if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table_nt) / sizeof(g_color_table_nt[0]))) {
+				color = con_blackColorOverride->integer;
+			}
+		}
+		else {
+			if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
+				color = con_blackColorOverride->integer;
+			}
 		}
 
 		txt++;
@@ -951,8 +964,8 @@ void Con_DrawInput (void) {
 	if ( kg.g_consoleField.scroll > 0 )
 		SCR_DrawSmallChar( 0, y, CON_SCROLL_L_CHAR );
 
-	int len = Q_PrintStrlen( kg.g_consoleField.buffer, MV_USE102COLOR );
-	int pos = Q_PrintStrLenTo( kg.g_consoleField.buffer, kg.g_consoleField.scroll, NULL, MV_USE102COLOR);
+	int len = Q_PrintStrlen( kg.g_consoleField.buffer, MV_USE102COLOR,serverIsTommyTernal );
+	int pos = Q_PrintStrLenTo( kg.g_consoleField.buffer, kg.g_consoleField.scroll, NULL, MV_USE102COLOR, serverIsTommyTernal);
 	if ( pos + kg.g_consoleField.widthInChars < len )
 		SCR_DrawSmallChar( cls.glconfig.vidWidth - con.charWidth, y, CON_SCROLL_R_CHAR );
 }
@@ -1033,15 +1046,26 @@ void Con_DrawNotify (void)
 			{
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					strcat(sTemp,va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor) ));
+					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+						strcat(sTemp, va("^%i", ColorIndexNT(currentColor)));
+					}
+					else {
+						strcat(sTemp, va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
+					}
 				}
 				strcat(sTemp,va("%c",text[x].f.character));
 			}
 			//
 			// and print...
 			//
-			re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
-				g_color_table[currentColor], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
+			if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+				re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
+					g_color_table_nt[ColorIndexNT(currentColor)], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
+			}
+			else {
+				re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
+					g_color_table[currentColor], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
+			}
 
 			v +=  iPixelHeightToAdvance;
 		}
@@ -1053,7 +1077,12 @@ void Con_DrawNotify (void)
 				}
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					re.SetColor( g_color_table[currentColor] );
+					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+						re.SetColor(g_color_table_nt[ColorIndexNT(currentColor)]);
+					}
+					else {
+						re.SetColor(g_color_table[currentColor]);
+					}
 				}
 
 				SCR_DrawSmallChar( (int)(xOffset + (x+1)*con.charWidth), v, text[x].f.character );
@@ -1243,15 +1272,26 @@ void Con_DrawSolidConsole( float frac ) {
 			{
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					strcat(sTemp,va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor) ));
+					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+						strcat(sTemp, va("^%i", currentColor));
+					}
+					else {
+						strcat(sTemp, va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
+					}
 				}
 				strcat(sTemp,va("%c",text[x].f.character));
 			}
 			//
 			// and print...
 			//
-			re.Font_DrawString(con.charWidth, y, sTemp, g_color_table[currentColor],
-				iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
+			if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+				re.Font_DrawString(con.charWidth, y, sTemp, g_color_table_nt[ColorIndexNT(currentColor)],
+					iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust); // am i doing this right? no idea.
+			}
+			else {
+				re.Font_DrawString(con.charWidth, y, sTemp, g_color_table[currentColor],
+					iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
+			}
 		}
 		else
 		{
@@ -1262,7 +1302,12 @@ void Con_DrawSolidConsole( float frac ) {
 
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					re.SetColor( g_color_table[currentColor] );
+					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
+						re.SetColor(g_color_table_nt[ColorIndexNT(currentColor)]);
+					}
+					else {
+						re.SetColor(g_color_table[currentColor]);
+					}
 				}
 				SCR_DrawSmallChar( (x+1)*con.charWidth, y, text[x].f.character );
 			}

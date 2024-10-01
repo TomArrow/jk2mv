@@ -404,10 +404,10 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, qboolean smallSize, qb
 	char	str[MAX_EDIT_LINE];
 
 	len = strlen(edit->buffer);
-	printLen = Q_PrintStrlen(edit->buffer, (qboolean)MV_USE102COLOR);
+	printLen = Q_PrintStrlen(edit->buffer, (qboolean)MV_USE102COLOR, serverIsTommyTernal);
 
-	cursorOffset = Q_PrintStrLenTo(edit->buffer, edit->cursor, NULL, MV_USE102COLOR);
-	scrollOffset = Q_PrintStrLenTo(edit->buffer, edit->scroll, NULL, MV_USE102COLOR);
+	cursorOffset = Q_PrintStrLenTo(edit->buffer, edit->cursor, NULL, MV_USE102COLOR, serverIsTommyTernal);
+	scrollOffset = Q_PrintStrLenTo(edit->buffer, edit->scroll, NULL, MV_USE102COLOR, serverIsTommyTernal);
 
 	if (scrollOffset > cursorOffset - 1)
 		scrollOffset = MAX(0, cursorOffset - 1);
@@ -418,9 +418,9 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, qboolean smallSize, qb
 	if (scrollOffset < cursorOffset - edit->widthInChars + 1)
 		scrollOffset = MAX(0, cursorOffset - edit->widthInChars + 1);
 
-	edit->scroll = Q_PrintStrCharsTo(edit->buffer, scrollOffset, NULL, MV_USE102COLOR);
+	edit->scroll = Q_PrintStrCharsTo(edit->buffer, scrollOffset, NULL, MV_USE102COLOR,serverIsTommyTernal);
 
-	Q_PrintStrCopy(str, edit->buffer, sizeof(str), edit->scroll, edit->widthInChars, MV_USE102COLOR);
+	Q_PrintStrCopy(str, edit->buffer, sizeof(str), edit->scroll, edit->widthInChars, MV_USE102COLOR, serverIsTommyTernal);
 
 	// draw it
 	if ( smallSize ) {

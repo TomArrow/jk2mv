@@ -76,7 +76,7 @@ static client_t *SV_GetPlayerByName( void ) {
 		}
 
 		Q_strncpyz( cleanName, cl->name, sizeof(cleanName) );
-		Q_CleanStr( cleanName, (qboolean)MV_USE102COLOR );
+		Q_CleanStr( cleanName, (qboolean)MV_USE102COLOR, serverIsTommyTernal);
 		if ( !Q_stricmp( cleanName, s ) ) {
 			return cl;
 		}
@@ -403,7 +403,7 @@ static client_t *SV_GetPlayerByFedName( const char *name )
 		}
 
 		Q_strncpyz( cleanName, cl->name, sizeof(cleanName) );
-		Q_CleanStr( cleanName, (qboolean)MV_USE102COLOR );
+		Q_CleanStr( cleanName, (qboolean)MV_USE102COLOR, serverIsTommyTernal);
 		if ( !Q_stricmp( cleanName, name ) )
 		{
 			return cl;
@@ -635,14 +635,14 @@ static void SV_Status_f( void )
 		s = NET_AdrToString( cl->netchan.remoteAddress );
 
 		// Count the length of the visible characters in the name and if it's less than 15 fill the rest with spaces
-		k = Q_PrintStrlen(cl->name, MV_USE102COLOR);
+		k = Q_PrintStrlen(cl->name, MV_USE102COLOR, serverIsTommyTernal);
 		if ( k < 0 ) k = 0; // Should never happen
 		for( j = 0; j < (15 - k); j++ ) spaces[j] = ' ';
 		spaces[j] = 0;
 
 		if (!avoidTruncation) {
 			// Limit the visible length of the name to 15 characters (not counting colors)
-			Q_PrintStrCopy( displayName, cl->name, sizeof(displayName), 0, 15, MV_USE102COLOR );
+			Q_PrintStrCopy( displayName, cl->name, sizeof(displayName), 0, 15, MV_USE102COLOR, serverIsTommyTernal);
 		} else {
 			Q_strncpyz( displayName, cl->name, sizeof(displayName) );
 		}
@@ -1326,7 +1326,7 @@ void SV_AutoRecordDemo(client_t* cl) {
 	strftime(folderDate, sizeof(folderDate), "%Y-%m-%d_%H-%M-%S", timeinfo);
 	strftime(folderTreeDate, sizeof(folderTreeDate), "%Y/%m/%d", timeinfo);
 	Q_strncpyz(demoPlayerName, cl->name, sizeof(demoPlayerName));
-	Q_CleanStr(demoPlayerName,qtrue);
+	Q_CleanStr(demoPlayerName,qtrue, serverIsTommyTernal);
 	if (sv_autoDemo->integer == 2)
 		Com_sprintf(demoFileName, sizeof(demoFileName), "%s %s", Cvar_VariableString("mapname"), date);
 	else

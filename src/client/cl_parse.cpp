@@ -1000,6 +1000,7 @@ void CL_SystemInfoChanged( void ) {
 	cl_connectedToPureServer = Cvar_VariableValue( "sv_pure" );
 }
 
+
 /*
 ==================
 CL_ParseGamestate
@@ -1069,6 +1070,12 @@ void CL_ParseGamestate( msg_t *msg ) {
 				clc.udpdl = atoi( Info_ValueForKey(s, "sv_allowDownload") );
 				if (i == CS_SERVERINFO) {
 					CL_CheckWallhackAllowed(s);
+				}
+				if (!Q_stricmpn(Info_ValueForKey(s, "gamename"), "tommyternal", 11)) { // is it dumb to make it dependent on mvsdk instead of server engine? idk
+					serverIsTommyTernal = qtrue;
+				}
+				else {
+					serverIsTommyTernal = qfalse;
 				}
 			}
 
