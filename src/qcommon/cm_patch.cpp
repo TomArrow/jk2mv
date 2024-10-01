@@ -1254,7 +1254,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 		d2 = DotProduct( tw->end, normal ) - planedist;
 
 		// if completely in front of face, no intersection with the entire patch
-		if (d1 > 0 && ( d2 >= SURFACE_CLIP_EPSILON || d2 >= d1 )  ) {
+		if (d1 > 0 && ( d2 >= tw->surfaceClipEpsilon || d2 >= d1 )  ) {
 			continue;
 		}
 
@@ -1265,7 +1265,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 
 		// crosses face
 		if (d1 > d2) {	// enter
-			fraction = (d1-SURFACE_CLIP_EPSILON) / (d1-d2);
+			fraction = (d1-tw->surfaceClipEpsilon) / (d1-d2);
 			if ( fraction < 0 ) {
 				fraction = 0;
 			}
@@ -1406,7 +1406,7 @@ void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollid
 			offset = DotProduct( tw->offsets[ planes->signbits ], planes->plane );
 			d1 = DotProduct( tw->start, planes->plane ) - planes->plane[3] + offset;
 			d2 = DotProduct( tw->end, planes->plane ) - planes->plane[3] + offset;
-			tw->trace.fraction = ( d1 - SURFACE_CLIP_EPSILON ) / ( d1 - d2 );
+			tw->trace.fraction = ( d1 - tw->surfaceClipEpsilon) / ( d1 - d2 );
 
 			if ( tw->trace.fraction < 0 ) {
 				tw->trace.fraction = 0;
@@ -1423,7 +1423,7 @@ void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollid
 CM_CheckFacetPlane
 ====================
 */
-int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit) {
+int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit, float surfaceClipEpsilon) {
 	float d1, d2, f;
 
 	*hit = qfalse;
@@ -1432,7 +1432,7 @@ int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac,
 	d2 = DotProduct( end, plane ) - plane[3];
 
 	// if completely in front of face, no intersection with the entire facet
-	if (d1 > 0 && ( d2 >= SURFACE_CLIP_EPSILON || d2 >= d1 )  ) {
+	if (d1 > 0 && ( d2 >= surfaceClipEpsilon || d2 >= d1 )  ) {
 //	if (d1 > 0 && d2 > 0) {
 		return qfalse;
 	}
@@ -1444,7 +1444,7 @@ int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac,
 
 	// crosses face
 	if (d1 > d2) {	// enter
-		f = (d1-SURFACE_CLIP_EPSILON) / (d1-d2);
+		f = (d1- surfaceClipEpsilon) / (d1-d2);
 		if ( f < 0 ) {
 			f = 0;
 		}
@@ -1454,7 +1454,7 @@ int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac,
 			*hit = qtrue;
 		}
 	} else {	// leave
-		f = (d1+SURFACE_CLIP_EPSILON) / (d1-d2);
+		f = (d1+ surfaceClipEpsilon) / (d1-d2);
 		if ( f > 1 ) {
 			f = 1;
 		}
@@ -1524,7 +1524,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 			VectorCopy( tw->end, endp );
 		}
 		//
-		if (!CM_CheckFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit))
+		if (!CM_CheckFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit, tw->surfaceClipEpsilon))
 			continue;
 		if (hit) {
 			Vector4Copy(plane, bestplane);
@@ -1565,7 +1565,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 				VectorCopy( tw->end, endp );
 			}
 			//
-			if (!CM_CheckFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit))
+			if (!CM_CheckFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit, tw->surfaceClipEpsilon))
 				break;
 			if (hit) {
 				hitnum = j;

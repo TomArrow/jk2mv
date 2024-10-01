@@ -830,7 +830,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 						groundTracePoint[0] = cl.snap.ps.origin[0];
 						groundTracePoint[1] = cl.snap.ps.origin[1];
 						groundTracePoint[2] = cl.snap.ps.origin[2] - 0.25;
-						CM_BoxTrace(&trace, cl.snap.ps.origin, groundTracePoint, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+						CM_BoxTrace(&trace, cl.snap.ps.origin, groundTracePoint, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, qfalse);
 						cls.fpsGuess.lastFrameWasSlide = (qboolean)( trace.fraction != 1.0);
 					}
 				}

@@ -474,7 +474,7 @@ SV_ClipToEntity
 
 ====================
 */
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule ) {
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule, qboolean nonEpsilon) {
 	sharedEntity_t	*touch;
 	clipHandle_t	clipHandle;
 	const float		*origin, *angles;
@@ -502,7 +502,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 
 	CM_TransformedBoxTrace ( trace, start, end,
 		mins, maxs, clipHandle,  contentmask,
-		origin, angles, capsule);
+		origin, angles, capsule, nonEpsilon);
 
 	if ( trace->fraction < 1 ) {
 		trace->entityNum = touch->s.number;
@@ -516,7 +516,7 @@ SV_ClipMoveToEntities
 
 ====================
 */
-void SV_ClipMoveToEntities( moveclip_t *clip ) {
+void SV_ClipMoveToEntities( moveclip_t *clip, qboolean nonEpsilon) {
 	int			i, num;
 	int			touchlist[MAX_GENTITIES];
 	sharedEntity_t *touch;
@@ -608,7 +608,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 
 		CM_TransformedBoxTrace ( &trace, clip->start, clip->end,
 			clip->mins, clip->maxs, clipHandle,  clip->contentmask,
-			origin, angles, clip->capsule);
+			origin, angles, clip->capsule, nonEpsilon);
 
 /*
 Ghoul2 Insert Start
@@ -704,7 +704,7 @@ passEntityNum and entities owned by passEntityNum are explicitly not checked.
 /*
 Ghoul2 Insert Start
 */
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod ) {
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod, qboolean nonEpsilon) {
 /*
 Ghoul2 Insert End
 */
@@ -722,7 +722,7 @@ Ghoul2 Insert End
 
 	// clip to world
 	if (contentmask != CONTENTS_TRIGGER && contentmask != CONTENTS_TRIGGER_EXIT) { // No point tracing world if we want triggers. Go straight to entities.
-		CM_BoxTrace(&clip.trace, start, end, mins, maxs, 0, contentmask, capsule);
+		CM_BoxTrace(&clip.trace, start, end, mins, maxs, 0, contentmask, capsule, nonEpsilon);
 		clip.trace.entityNum = clip.trace.fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 		if (clip.trace.fraction == 0) {
 			*results = clip.trace;
@@ -766,7 +766,7 @@ Ghoul2 Insert End
 	}
 
 	// clip to other solid entities
-	SV_ClipMoveToEntities ( &clip );
+	SV_ClipMoveToEntities ( &clip, nonEpsilon );
 
 	*results = clip.trace;
 }

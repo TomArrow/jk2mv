@@ -282,7 +282,7 @@ static void DB_BackgroundThread() {
 					stmnt->execute("SET CHARACTER SET latin1"); // Make sure no character set shenanigans happen. Latin1 is what jka uses it seems. Good enough.
 					Com_Printf("MariaDB connection established.\n");
 				}
-				catch (...) {
+				catch (sql::SQLException& e) {
 
 					if (connectTries % 10 == 0) {
 						// don't spam too much
@@ -292,6 +292,14 @@ static void DB_BackgroundThread() {
 						conn->close();
 						delete conn;
 						conn = NULL;
+					}
+					if (connectTries >= 10) {
+						// dont stay in this loop forever. give the caller a chance to realize his request is going nowhere.
+						requestToProcess.successful = qfalse;
+						requestToProcess.errorCode = e.getErrorCode();
+						requestToProcess.errorMessage = e.what();
+						requestPending = qfalse;
+						goto requestdone;
 					}
 				}
 			}
@@ -404,6 +412,16 @@ static void DB_BackgroundThread() {
 		if (!requestPending) {
 			std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 			dbSyncedData.requestsFinished[requestToProcess.module].push_back(std::move(requestToProcess));
+		}
+
+		// if we are closing down and there's no conceivable chance we will be able to succeed, just end it all.
+		if (terminating && (!connectionEnabled || !conn)) {
+			if (conn != NULL) {
+				conn->close();
+				delete conn;
+				conn = NULL;
+			}
+			break;
 		}
 	}
 

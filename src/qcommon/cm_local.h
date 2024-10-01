@@ -166,6 +166,7 @@ typedef struct {
 	qboolean	isPoint;	// optimized case
 	trace_t		trace;		// returned from trace call
 	sphere_t	sphere;		// sphere for oriendted capsule collision
+	float		surfaceClipEpsilon;	// this is normally a DEFINE but i wanna offer a precise trace without epsilon so we set it to 0 there.
 } traceWork_t;
 
 typedef struct leafList_s {

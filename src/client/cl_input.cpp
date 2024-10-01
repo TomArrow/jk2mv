@@ -1110,7 +1110,7 @@ rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, flo
 	VectorMA(currentPs->origin, frameTime, currentPs->velocity, end);
 
 	// see if we can make it there
-	CM_BoxTrace(&trace, currentPs->origin, end, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+	CM_BoxTrace(&trace, currentPs->origin, end, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, qfalse);
 
 	if (trace.fraction == 1) {
 		VectorCopy(trace.endpos, currentPs->origin);
@@ -1119,7 +1119,7 @@ rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, flo
 		point[1] = currentPs->origin[1];
 		point[2] = currentPs->origin[2] - 0.25;
 
-		CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+		CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, qfalse);
 
 		// do something corrective if the trace starts in a solid...
 		if (trace.allsolid) {
@@ -1131,13 +1131,13 @@ rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, flo
 						point[0] += (float)i;
 						point[1] += (float)j;
 						point[2] += (float)k;
-						CM_BoxTrace(&trace, point, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+						CM_BoxTrace(&trace, point, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, qfalse);
 						if (!trace.allsolid) {
 							point[0] = currentPs->origin[0];
 							point[1] = currentPs->origin[1];
 							point[2] = currentPs->origin[2] - 0.25;
 
-							CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse);
+							CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, qfalse);
 							i = j = k = 2; // Stupid way to end the loop lol.
 						}
 					}

@@ -172,7 +172,7 @@ void BotImport_Trace(bsp_trace_t *bsptrace, const vec3_t start, const vec3_t min
 {
 	trace_t trace;
 
-	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse, 0, 10);
+	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse, 0, 10, qfalse);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
@@ -197,7 +197,7 @@ BotImport_EntityTrace
 void BotImport_EntityTrace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int entnum, int contentmask) {
 	trace_t trace;
 
-	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse);
+	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse, qfalse);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
