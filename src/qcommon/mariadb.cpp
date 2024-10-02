@@ -487,6 +487,9 @@ qboolean DB_FinishAndSendPreparedStatement(module_t module) {
 }
 qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request, DBRequestType_t dbRequestType) {
 	if (!db_enabled->integer) return qfalse;
+	if (com_developer->integer) {
+		Com_Printf("SQL query: %s\n", request);
+	}
 	DBRequest req;
 	req.requestString = request;
 	req.dbRequestType = dbRequestType;
@@ -499,6 +502,9 @@ qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, in
 }
 qboolean DB_AddPreparedStatement(module_t module, byte* reference, int referenceLength, int requestType, const char* request) {
 	if (!db_enabled->integer) return qfalse;
+	if (com_developer->integer) {
+		Com_Printf("SQL prepared statement: %s\n", request);
+	}
 	DBRequest req;
 	req.isPreparedStatement = qtrue;
 	req.requestString = request;
