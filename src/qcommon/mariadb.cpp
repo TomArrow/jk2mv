@@ -319,6 +319,7 @@ static void DB_BackgroundThread() {
 					}
 
 					bool wasResultSet = stmnt->execute();
+
 					requestToProcess.digestResults(stmnt.get(), wasResultSet);
 					/*
 					// Execute query
