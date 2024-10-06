@@ -56,9 +56,9 @@ static visBrushNode_t *slick_head = NULL;
 static vec3_t w_center, w_normal, w_ref_vec;
 static float w_ref_vec_len;
 
-static cvar_t *triggers_draw;
-static cvar_t *clips_draw;
-static cvar_t *slicks_draw;
+cvar_t *triggers_draw;
+cvar_t *clips_draw;
+cvar_t *slicks_draw;
 
 static cvar_t *trigger_shader_setting;
 static cvar_t *clip_shader_setting;
