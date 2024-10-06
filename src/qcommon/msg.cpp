@@ -1243,7 +1243,7 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 	// just print the delta records`
 	if (cl_shownet->integer >= 2 || cl_shownet->integer == -1) {
 		print = 1;
-		Com_Printf("%3i: #%-3i ", msg->readcount, to->number);
+		Com_Printf("%3i: #%-3i ", msg->readcount, number);
 	} else {
 		print = 0;
 	}
