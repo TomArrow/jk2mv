@@ -19,6 +19,7 @@ cvar_t	*cl_autoDemoFormat;
 
 static struct demoAuto_s {
 	// reset on demoAutoRecord()
+	char				demoNameRecording[MAX_OSPATH]; // where demo is getting recorded to, for cl_autodemo 2, so we dont have to overwrite the same file from 2 instances
 	char				demoName[MAX_OSPATH];
 	char				demoNameFallback[MAX_OSPATH];
 	char				customName[MAX_QPATH];
@@ -146,11 +147,15 @@ void demoAutoSave_f(void) {
 	}
 }
 
-qboolean demoFindFreePath(char *path, int size, const char *name) {
+qboolean demoFindFreePath(char *path, int size, const char *name, const char* acceptableExisting) {
 	int		i;
 
 	Com_sprintf(path, size, "demos/%s", name);
 	COM_SanitizeExtension(path, size, demoAuto.ext);
+
+	if (!Q_stricmp(path, acceptableExisting)) {
+		return qtrue;
+	}
 
 	for (i = 1; i < 1000 && FS_FileExists(path); i++) {
 		Com_sprintf(path, size, "demos/%s (%d)", name, i);
@@ -180,7 +185,7 @@ void demoAutoSaveLast_f(void) {
 	Com_sprintf(autoDemoPath, sizeof(autoDemoPath), "demos/%s", autoDemoName);
 	COM_SanitizeExtension(autoDemoPath, sizeof(autoDemoPath), demoAuto.ext);
 
-	if (!demoFindFreePath(autoDemoPath, sizeof(autoDemoPath), autoDemoName)) {
+	if (!demoFindFreePath(autoDemoPath, sizeof(autoDemoPath), autoDemoName,lastDemoPath)) {
 		Com_Printf(S_COLOR_RED "Could not find free demo name: %s\n", autoDemoPath);
 		return;
 	}
@@ -231,15 +236,21 @@ void demoAutoComplete(void) {
 		Com_Printf(S_COLOR_GREEN "Demo successfully saved into %s\n", ((Q_stricmp(newName, "")) ? newName : demoAuto.demoName));
 */
 
-	Com_sprintf(currDemoPath, sizeof(currDemoPath), "demos/%s%s", DEFAULT_NAME, demoAuto.ext);
+	if (demoAuto.demoNameRecording[0]) {
+		Com_sprintf(currDemoPath, sizeof(currDemoPath), "demos/%s%s", demoAuto.demoNameRecording, demoAuto.ext);
+	}
+	else {
+		Com_sprintf(currDemoPath, sizeof(currDemoPath), "demos/%s%s", DEFAULT_NAME, demoAuto.ext);
+	}
+	//Com_sprintf(currDemoPath, sizeof(currDemoPath), "demos/%s%s", DEFAULT_NAME, demoAuto.ext);
 
 	if (demoAuto.demoName[0]) {
-		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), demoAuto.demoName)) {
+		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), demoAuto.demoName, currDemoPath)) {
 			Com_Printf(S_COLOR_RED "Could not find free demo name: %s\n", lastDemoPath);
 			freeFileNotFound = qtrue;
 		}
 	} else if (!demoAuto.demoName[0] && cl_autoDemo->integer >= 2) {// with cl_autodemo 2 we always save
-		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), demoAuto.demoNameFallback)) {
+		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), demoAuto.demoNameFallback, currDemoPath)) {
 			Com_Printf(S_COLOR_RED "Could not find free demo name: %s\n", lastDemoPath);
 			freeFileNotFound = qtrue;
 		}
@@ -249,7 +260,7 @@ void demoAutoComplete(void) {
 	}
 
 	if (freeFileNotFound) { // last ditch effort. demos are precious.
-		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), DEFAULT_NAME_RESCUE)) {
+		if (!demoFindFreePath(lastDemoPath, sizeof(lastDemoPath), DEFAULT_NAME_RESCUE, currDemoPath)) {
 			Com_Printf(S_COLOR_RED "Could not find free rescue demo name: %s, falling back to default last demo name.\n", lastDemoPath);
 			//return;
 
@@ -259,9 +270,13 @@ void demoAutoComplete(void) {
 		}
 	}
 
-	if (!FS_Rename(currDemoPath, lastDemoPath)) {
+	if (!Q_stricmp(currDemoPath, lastDemoPath)) { // target demoname is same as current demo name.  no need to move anything. e.g.,cl_autodemo 2 if we didnt mark any moments.
+		Com_Printf(S_COLOR_GREEN "Demo saved, name unchanged.\n");
+	} else if (!FS_Rename(currDemoPath, lastDemoPath)) {
 		Com_Printf(S_COLOR_RED "Demo has failed to save\n");
-	} else if (!demoAuto.demoName[0]) {
+	} else if (!demoAuto.demoName[0] && cl_autoDemo->integer >= 2) {
+		Com_Printf(S_COLOR_GREEN "Demo auto-saved into %s\n", lastDemoPath);
+	}  else if (!demoAuto.demoName[0]) {
 		Com_Printf(S_COLOR_GREEN "Demo temporarily saved into %s\n", lastDemoPath);
 	} else {
 		Com_Printf(S_COLOR_GREEN "Demo successfully saved into %s\n", lastDemoPath);
@@ -272,7 +287,13 @@ void demoAutoComplete(void) {
 void demoAutoRecord(void) {
 	Com_Memset(&demoAuto, 0, offsetof(struct demoAuto_s, ext));
 	Com_sprintf(demoAuto.demoNameFallback, sizeof(demoAuto.demoNameFallback), "%s", demoAutoFormat(demoAuto.customName));
-	Cbuf_AddText(va("record %s\n", DEFAULT_NAME));
+	if (cl_autoDemo->integer >= 2) {
+		Q_strncpyz(demoAuto.demoNameRecording, demoAuto.demoNameFallback, sizeof(demoAuto.demoNameRecording));
+	}
+	else {
+		Q_strncpyz(demoAuto.demoNameRecording, DEFAULT_NAME, sizeof(demoAuto.demoNameRecording));
+	}
+	Cbuf_AddText(va("record %s\n", demoAuto.demoNameRecording));
 }
 
 void demoAutoInit(void) {
