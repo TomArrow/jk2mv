@@ -1,5 +1,6 @@
 
 
+#include "q_shared.h"
 #include "qcommon.h"
 #include "mariadb.h"
 #include <thread>
@@ -433,7 +434,7 @@ static void DB_BackgroundThread() {
 qboolean DB_AddRequest(DBRequest&& req) {
 	if (!db_enabled->integer) return qfalse;
 	{
-		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 		dbSyncedData.requestsIncoming.push_back(std::move(req));
 	}
 	dbSyncedData.changeNotifier.notify_one();
@@ -479,7 +480,7 @@ qboolean DB_FinishAndSendPreparedStatement(module_t module) {
 	if (!db_enabled->integer) return qfalse;
 	if (!currentPreparingRequestValid[module]) return qfalse;
 	{
-		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 		dbSyncedData.requestsIncoming.push_back(std::move(currentPreparingRequest[module]));
 		currentPreparingRequestValid[module] = qfalse;
 	}
@@ -635,7 +636,7 @@ qboolean DB_GetReference(module_t module, byte* reference, int referenceLength) 
 }
 qboolean DB_NextResponse(module_t module, int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength) {
 	{
-		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 		if (!dbSyncedData.requestsFinished[module].empty()) {
 			currentFinishedRequest[module] = std::move(dbSyncedData.requestsFinished[module].front());
 			dbSyncedData.requestsFinished[module].pop_front();
@@ -748,7 +749,7 @@ void DB_CheckCvars() {
 
 	if (db_enabled->modified || db_url->modified || db_username->modified || db_password->modified) {
 		{
-			std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+			std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 			dbSyncedData.connectionDetailsChanged = (qboolean)(dbSyncedData.connectionDetailsChanged || db_url->modified || db_username->modified || db_password->modified);
 			DB_SetOptions();
 		}
@@ -763,7 +764,7 @@ void DB_CheckCvars() {
 
 void DB_Shutdown() {
 	{
-		std::lock_guard<std::mutex>(dbSyncedData.syncLock);
+		std::lock_guard<std::mutex> lock(dbSyncedData.syncLock);
 		dbSyncedData.terminate = qtrue;
 	}
 	dbSyncedData.changeNotifier.notify_one();
