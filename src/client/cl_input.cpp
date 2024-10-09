@@ -1647,6 +1647,12 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-force_lightning", IN_Button10Up);
 	Cmd_AddCommand ("+force_drain", IN_Button11Down);//active force power
 	Cmd_AddCommand ("-force_drain", IN_Button11Up);
+	Cmd_AddCommand ("+laserpointer", IN_Button12Down);
+	Cmd_AddCommand ("-laserpointer", IN_Button12Up);
+	Cmd_AddCommand ("+bouncepower", IN_Button13Down);
+	Cmd_AddCommand ("-bouncepower", IN_Button13Up);
+	Cmd_AddCommand ("+strafebot", IN_Button14Down);
+	Cmd_AddCommand ("-strafebot", IN_Button14Up);
 	//buttons
 	Cmd_AddCommand ("+button0", IN_Button0Down);//attack
 	Cmd_AddCommand ("-button0", IN_Button0Up);
