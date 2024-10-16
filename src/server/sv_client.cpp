@@ -1262,6 +1262,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 #define INFO_CHANGE_MIN_INTERVAL	5000
 #define INFO_CHANGE_MAX_COUNT		4
 
+extern cvar_t* com_coolApi_supported_game;
 /*
 ==================
 SV_UpdateUserinfo_f
@@ -1280,8 +1281,26 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 		cl->lastUserInfoCount++;
 
 		if (cl->lastUserInfoCount >= INFO_CHANGE_MAX_COUNT) {
+			qboolean doWarn = qtrue;
+			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_GAME_VMCALL_PHYSICSFPSUPDATE) {
+				int currentValue = atoi(Info_ValueForKey(cl->userinfo, "com_physicsFps"));
+				int newValue = atoi(Info_ValueForKey(arg, "com_physicsFps"));
+				if (currentValue != newValue) {
+					doWarn = qfalse; // allow fast fps toggles without raising a stink.
+					Info_SetValueForKey(cl->userinfo, "com_physicsFps", Info_ValueForKey(arg, "com_physicsFps")); // set new physicsfps value now.
+					if (!VM_Call(gvm, GAME_COOL_API_PHYSICSFPSUPDATE, cl - svs.clients)) {
+						doWarn = qtrue;
+					}
+				}
+			}
+
 			Q_strncpyz( cl->userinfoPostponed, arg, sizeof(cl->userinfoPostponed) );
-			SV_SendServerCommand(cl, "print \"Warning: Too many info changes, last info postponed\n\"\n");
+			if (doWarn) {
+				SV_SendServerCommand(cl, "print \"Warning: Too many info changes, last info postponed\n\"\n");
+			}
+			else {
+				SV_SendServerCommand(cl, "print \"Fast toggle detected, allowed. Other changes postponed. Nothing to worry about.\n\"\n");
+			}
 			return;
 		}
 	} else {
