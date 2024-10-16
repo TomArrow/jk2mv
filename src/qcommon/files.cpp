@@ -254,6 +254,7 @@ static	cvar_t		*fs_loadjka;
 static	cvar_t		*fs_basegame;
 static	cvar_t		*fs_copyfiles;
 static	cvar_t		*fs_gamedirvar;
+static	cvar_t		*fs_dlTommyTernalPk3;
 #ifndef DEDICATED
 static	cvar_t		*fs_globalcfg;
 #endif
@@ -3974,6 +3975,8 @@ static void FS_Startup( const char *gameName ) {
 	fs_basegame = Cvar_Get( "fs_basegame", "eternaljk2", CVAR_INIT );
 	fs_globalcfg = Cvar_Get( "fs_globalcfg", "1", CVAR_ARCHIVE/* | CVAR_LATCH*/ | CVAR_NORESTART );
 
+	fs_dlTommyTernalPk3 = Cvar_Get( "fs_dlTommyTernalPk3", "0", CVAR_LATCH | CVAR_ARCHIVE );
+
 	if (fs_globalcfg->integer)
 		fs_gamedirvar = fs_basegame;
 	else
@@ -4124,7 +4127,11 @@ static void FS_Startup( const char *gameName ) {
 			char packstr[MAX_QPATH];
 			Com_sprintf(packstr, sizeof(packstr), "\n%s/%s.pk3", search->pack->pakGamename, search->pack->pakBasename);
 
-			if (f_w && !Q_stristr(mv_whitelist, packstr)) {
+			if (!fs_dlTommyTernalPk3->integer && (!Q_stricmp(packstr,"\nbase/jk2pro-bins.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-bins.pk3"))) { // done in a shitty way i think, idk. this build system throws shit in random places depending on whether i build linux or windows, client or dedi etc. what a mess.
+				search->pack->noref = qtrue;
+				search->pack->referenced = 0;
+			} 
+			else if (f_w && !Q_stristr(mv_whitelist, packstr)) {
 				search->pack->noref = qtrue;
 				search->pack->referenced = 0;
 			} else if (f_b && Q_stristr(mv_blacklist, packstr)) {
