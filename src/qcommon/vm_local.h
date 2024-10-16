@@ -195,6 +195,8 @@ struct vm_s {
 	int			mvapilevel;
 	int			mvmenu;
 	mvversion_t	gameversion;
+
+	int			coolApiSupport;
 };
 
 

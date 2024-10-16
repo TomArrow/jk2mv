@@ -1326,6 +1326,13 @@ void VM_SetMVAPILevel(vm_t *vm, int level) {
 	vm->mvapilevel = level;
 }
 
+void VM_SetCoolApiSupport(vm_t *vm, int flags) {
+	vm->coolApiSupport = flags;
+}
+int VM_CoolApiSupport(vm_t *vm) {
+	return vm->coolApiSupport;
+}
+
 void VM_SetMVMenuLevel(vm_t *vm, int level) {
 	vm->mvmenu = level;
 }

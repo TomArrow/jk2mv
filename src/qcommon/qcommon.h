@@ -470,6 +470,9 @@ void	VM_Forced_Unload_Done(void);
 int	VM_MVAPILevel(const vm_t *vm);
 void VM_SetMVAPILevel(vm_t *vm, int level);
 
+void VM_SetCoolApiSupport(vm_t* vm, int flags);
+int VM_CoolApiSupport(vm_t* vm);
+
 void VM_SetMVMenuLevel(vm_t *vm, int level);
 int VM_MVMenuLevel(const vm_t *vm);
 

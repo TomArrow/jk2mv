@@ -19,6 +19,9 @@
 
 #include "../qcommon/mariadb.h"
 
+cvar_t* com_coolApi_supported_game;
+
+
 std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
 
 botlib_export_t	*botlib_export;
@@ -1070,131 +1073,148 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(gvm);
 
-	case G_COOL_API_SETBRUSHMODELCONTENTFLAGS:
-		CM_SetBrushModelContentFlags(VMAV(1, sharedEntity_t)->s.modelindex, args[2], (coolApiSetBModelCFlagsMode_t)args[3]);
-		return 0;
-
-	case G_COOL_API_PLAYERUSERCMD_ADD:
-		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			std::unique_ptr<usercmd_t> ucmd(new usercmd_t);
-			*ucmd = *VMAV(2, usercmd_t);
-			userCmdStore[args[1]].push_back(std::move(ucmd));
-			return userCmdStore[args[1]].size() - 1;
-		}
-		return 0;
-	case G_COOL_API_PLAYERUSERCMD_REMOVE:
-		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			if (!userCmdStore[args[1]].size()) {
-				return 0;
-			}
-			int from = MIN(MAX(0,(size_t)args[2]), userCmdStore[args[1]].size()-1);
-			int to = MIN(MAX(0,(size_t)args[3]), userCmdStore[args[1]].size()-1);
-			if (to < from) {
-				return 0;
-			}
-			if (from >= 0 && to >= 0) {
-				userCmdStore[args[1]].erase(userCmdStore[args[1]].begin()+from, userCmdStore[args[1]].begin()+to+1);
-			}
-			return from - to + 1;
-		}
-		return 0;
-	case G_COOL_API_PLAYERUSERCMD_CLEAR:
-		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			int countCleared = userCmdStore[args[1]].size();
-			userCmdStore[args[1]].clear();
-			return countCleared;
-		}
-		return 0;
-	case G_COOL_API_PLAYERUSERCMD_GET:
-		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			if (args[2] < 0 || (size_t)args[2] >= userCmdStore[args[1]].size()) {
-				return qfalse;
-			}
-			*VMAV(3, usercmd_t) = *userCmdStore[args[1]][args[2]];
-			return qtrue;
-		}
-		return qfalse;
-	case G_COOL_API_PLAYERUSERCMD_GETCOUNT:
-		if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-			return userCmdStore[args[1]].size();
-		}
-		return 0;
-	case G_COOL_API_NONEPSILONTRACE:
-		SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], qtrue);
-		return 0;
-	case G_COOL_API_NONEPSILONTRACE_CAPSULE:
-		SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], qtrue);
-		return 0;
-
-	case G_COOL_API_DB_ESCAPESTRING:
-		return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
-		break;
-	case G_COOL_API_DB_ADDREQUEST:
-		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
-		break;
-	case G_COOL_API_DB_ADDREQUEST_TYPED:
-		return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);
-		break;
-	case G_COOL_API_DB_NEXTRESPONSE:
-		// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
-		return DB_NextResponse(MODULE_GAME,
-			VMAP(1, int, 1),			// int* requestType
-			VMAP(2, int, 1),			// int* affectedRows
-			VMAP(3, int, 1),			// int* status
-			VMAP(4, char, args[5]),		// char* errorMessage
-			args[5],					// int errorMessageSize
-			args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
-			args[7]						// int referenceLength
-		);
-		break;
-	case G_COOL_API_DB_GETREFERENCE:
-		return DB_GetReference(MODULE_GAME,
-			VMAP(1, byte, args[2]),		// byte* reference
-			args[2]						// int referenceLength
-		);
-		break;
-	case G_COOL_API_DB_NEXTROW:
-		return DB_NextRow(MODULE_GAME);
-		break;
-	case G_COOL_API_DB_GETINT:
-		return DB_GetInt(MODULE_GAME, args[1]);
-		break;
-	case G_COOL_API_DB_GETFLOAT:
-	{
-		float* retVal = VMAP(2, float, 1);
-		*retVal = DB_GetFloat(MODULE_GAME, args[1]);
-		return 0;
 	}
-	break;
-	case G_COOL_API_DB_GETSTRING:
-		return DB_GetString(MODULE_GAME,
-			args[1],
-			VMAP(2, char, args[3]),		// byte* reference
-			args[3]						// int referenceLength
-		);
+
+
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS) {
+		switch (args[0]) {
+		case G_COOL_API_SETBRUSHMODELCONTENTFLAGS:
+			CM_SetBrushModelContentFlags(VMAV(1, sharedEntity_t)->s.modelindex, args[2], (coolApiSetBModelCFlagsMode_t)args[3]);
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_G_USERCMDSTORE) {
+		switch (args[0]) {
+		case G_COOL_API_PLAYERUSERCMD_ADD:
+			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+				std::unique_ptr<usercmd_t> ucmd(new usercmd_t);
+				*ucmd = *VMAV(2, usercmd_t);
+				userCmdStore[args[1]].push_back(std::move(ucmd));
+				return userCmdStore[args[1]].size() - 1;
+			}
+			return 0;
+		case G_COOL_API_PLAYERUSERCMD_REMOVE:
+			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+				if (!userCmdStore[args[1]].size()) {
+					return 0;
+				}
+				int from = MIN(MAX(0, (size_t)args[2]), userCmdStore[args[1]].size() - 1);
+				int to = MIN(MAX(0, (size_t)args[3]), userCmdStore[args[1]].size() - 1);
+				if (to < from) {
+					return 0;
+				}
+				if (from >= 0 && to >= 0) {
+					userCmdStore[args[1]].erase(userCmdStore[args[1]].begin() + from, userCmdStore[args[1]].begin() + to + 1);
+				}
+				return from - to + 1;
+			}
+			return 0;
+		case G_COOL_API_PLAYERUSERCMD_CLEAR:
+			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+				int countCleared = userCmdStore[args[1]].size();
+				userCmdStore[args[1]].clear();
+				return countCleared;
+			}
+			return 0;
+		case G_COOL_API_PLAYERUSERCMD_GET:
+			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+				if (args[2] < 0 || (size_t)args[2] >= userCmdStore[args[1]].size()) {
+					return qfalse;
+				}
+				*VMAV(3, usercmd_t) = *userCmdStore[args[1]][args[2]];
+				return qtrue;
+			}
+			return qfalse;
+		case G_COOL_API_PLAYERUSERCMD_GETCOUNT:
+			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
+				return userCmdStore[args[1]].size();
+			}
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_NONEPSILONTRACE) {
+		switch (args[0]) {
+
+		case G_COOL_API_NONEPSILONTRACE:
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], qtrue);
+			return 0;
+		case G_COOL_API_NONEPSILONTRACE_CAPSULE:
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], qtrue);
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MARIADB) {
+		switch (args[0]) {
+		case G_COOL_API_DB_ESCAPESTRING:
+			return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
+			break;
+		case G_COOL_API_DB_ADDREQUEST:
+			return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
+			break;
+		case G_COOL_API_DB_ADDREQUEST_TYPED:
+			return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);
+			break;
+		case G_COOL_API_DB_NEXTRESPONSE:
+			// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
+			return DB_NextResponse(MODULE_GAME,
+				VMAP(1, int, 1),			// int* requestType
+				VMAP(2, int, 1),			// int* affectedRows
+				VMAP(3, int, 1),			// int* status
+				VMAP(4, char, args[5]),		// char* errorMessage
+				args[5],					// int errorMessageSize
+				args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
+				args[7]						// int referenceLength
+			);
+			break;
+		case G_COOL_API_DB_GETREFERENCE:
+			return DB_GetReference(MODULE_GAME,
+				VMAP(1, byte, args[2]),		// byte* reference
+				args[2]						// int referenceLength
+			);
+			break;
+		case G_COOL_API_DB_NEXTROW:
+			return DB_NextRow(MODULE_GAME);
+			break;
+		case G_COOL_API_DB_GETINT:
+			return DB_GetInt(MODULE_GAME, args[1]);
+			break;
+		case G_COOL_API_DB_GETFLOAT:
+		{
+			float* retVal = VMAP(2, float, 1);
+			*retVal = DB_GetFloat(MODULE_GAME, args[1]);
+			return 0;
+		}
 		break;
-	case G_COOL_API_DB_ADDPREPAREDSTATEMENT:
-		return DB_AddPreparedStatement(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
-	case G_COOL_API_DB_PREPAREDBINDSTRING:
-		return DB_PreparedBindString(MODULE_GAME, VMAS(1));
-	case G_COOL_API_DB_PREPAREDBINDFLOAT:
-		return DB_PreparedBindFloat(MODULE_GAME, VMF(1));
-	case G_COOL_API_DB_PREPAREDBINDINT:
-		return DB_PreparedBindInt(MODULE_GAME, args[1]);
-	case G_COOL_API_DB_PREPAREDBINDNULL:
-		return DB_PreparedBindNull(MODULE_GAME);
-	case G_COOL_API_DB_GETMORERESULTS:
-		return DB_NextResultSet(MODULE_GAME, VMAP(1, int, 1));
-	case G_COOL_API_DB_PREPAREDBINDBINARY:
-		return DB_PreparedBindBinary(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL,args[2]);
-	case G_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
-		return DB_FinishAndSendPreparedStatement(MODULE_GAME);
-	case G_COOL_API_DB_GETBINARY:
-		return DB_GetBinary(MODULE_GAME,
-			args[1],
-			VMAP(2, byte, args[3]),		// byte* reference
-			args[3]						// int referenceLength
-		);
+		case G_COOL_API_DB_GETSTRING:
+			return DB_GetString(MODULE_GAME,
+				args[1],
+				VMAP(2, char, args[3]),		// byte* reference
+				args[3]						// int referenceLength
+			);
+			break;
+		case G_COOL_API_DB_ADDPREPAREDSTATEMENT:
+			return DB_AddPreparedStatement(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
+		case G_COOL_API_DB_PREPAREDBINDSTRING:
+			return DB_PreparedBindString(MODULE_GAME, VMAS(1));
+		case G_COOL_API_DB_PREPAREDBINDFLOAT:
+			return DB_PreparedBindFloat(MODULE_GAME, VMF(1));
+		case G_COOL_API_DB_PREPAREDBINDINT:
+			return DB_PreparedBindInt(MODULE_GAME, args[1]);
+		case G_COOL_API_DB_PREPAREDBINDNULL:
+			return DB_PreparedBindNull(MODULE_GAME);
+		case G_COOL_API_DB_GETMORERESULTS:
+			return DB_NextResultSet(MODULE_GAME, VMAP(1, int, 1));
+		case G_COOL_API_DB_PREPAREDBINDBINARY:
+			return DB_PreparedBindBinary(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2]);
+		case G_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
+			return DB_FinishAndSendPreparedStatement(MODULE_GAME);
+		case G_COOL_API_DB_GETBINARY:
+			return DB_GetBinary(MODULE_GAME,
+				args[1],
+				VMAP(2, byte, args[3]),		// byte* reference
+				args[3]						// int referenceLength
+			);
+		}
 	}
 
 	if (VM_MVAPILevel(gvm) >= 1) {
@@ -1298,6 +1318,8 @@ static void SV_InitGameVM( qboolean restart ) {
 
 	mvStructConversionDisabled = qfalse;
 
+	com_coolApi_supported_game = Cvar_Get("coolApi_supported_game", "0", CVAR_ROM);
+
 	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,
 		0, 0, 0, 0, 0, 0, 0, 0, MIN(mv_apienabled->integer, MV_APILEVEL));
 	if (apireq > mv_apienabled->integer) {
@@ -1305,6 +1327,8 @@ static void SV_InitGameVM( qboolean restart ) {
 	}
 	VM_SetMVAPILevel(gvm, apireq);
 	Com_DPrintf("GameVM uses MVAPI level %i.\n", apireq);
+
+	//VM_SetCoolApiSupport(gvm, com_coolApi_supported_game->integer); // dont care it will be in the cvar anyway
 
 	if (apireq >= 1) {
 		VM_Call(gvm, MVAPI_AFTER_INIT);

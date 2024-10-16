@@ -36,6 +36,8 @@ extern CMiniHeap *G2VertSpaceClient;
 
 vec3_t psVelocity; // disgusting hack for ramphelper
 
+cvar_t* com_coolApi_supported_cgame;
+
 /*
 Ghoul2 Insert End
 */
@@ -1504,101 +1506,126 @@ Ghoul2 Insert End
 		cl.mSharedMemory = VMAP(1, char, MAX_CG_SHARED_BUFFER_SIZE);
 		return 0;
 
-	case CG_COOL_API_SETPREDICTEDMOVEMENT:
-		Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1),sizeof(predictedMovement_t));
-		VectorCopy(cl.predictedMovement.velocity,psVelocity);
-		cl.predictedMovementIsSet = qtrue;
-		return 0;
-
-	case CG_COOL_API_SETUSERCMDMOVE:
-		cl.cgameForwardmove = args[1];
-		cl.cgameRightmove = args[2];
-		cl.cgameUpmove = args[3];
-		cl.cgameMoveSet = args[4];
-		return 0;
-
-	case CG_COOL_API_SET_EZDEMO_BUFFER:
-	{
-		size_t i;
-		size_t ezDemoEventSize = args[2];
-		int ezDemoMaxEventCount = args[3];
-		int* ezDemoEventCount = VMAP(4, int, 1);
-		ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
-		int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
-		for (i = 0; i < communicatedEventCount; i++) {
-			Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
-		}
-		*ezDemoEventCount = communicatedEventCount;
-		return 0;
-	}
-
-	case CG_COOL_API_GETTIMESINCESNAPRECEIVED:
-	{
-		int snapNum = args[1];
-		if (cl.snapshots[snapNum & PACKET_MASK].messageNum != snapNum) {
-			return -1;
-		}
-		else {
-			return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
-		}
-	}
-	case CG_COOL_API_GLRESOLUTIONCHANGED:
-		return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-		break;
-	case CG_COOL_API_DB_ESCAPESTRING:
-		return DB_EscapeString(VMAP(1,char, args[2]), args[2]);
-		break;
-	case CG_COOL_API_DB_ADDREQUEST:
-		return DB_AddRequest(MODULE_CGAME,args[1] ? VMAP(1, byte, args[2]) : NULL, args[2],args[3], VMAS(4),DBREQUESTTYPE_REQUEST);
-		break;
-	case CG_COOL_API_DB_ADDREQUEST_TYPED:
-		return DB_AddRequest(MODULE_CGAME,args[1] ? VMAP(1, byte, args[2]) : NULL, args[2],args[3], VMAS(4),(DBRequestType_t)args[5]);
-		break;
-	case CG_COOL_API_DB_NEXTRESPONSE:
-		// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
-		return DB_NextResponse(MODULE_CGAME, 
-			VMAP(1, int, 1),			// int* requestType
-			VMAP(2, int, 1),			// int* affectedRows
-			VMAP(3, int, 1),			// int* status
-			VMAP(4, char, args[5]),		// char* errorMessage
-			args[5],					// int errorMessageSize
-			args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
-			args[7]						// int referenceLength
-			);
-		break;
-	case CG_COOL_API_DB_GETREFERENCE:
-		return DB_GetReference(MODULE_CGAME,
-			VMAP(1, byte, args[2]),		// byte* reference
-			args[2]						// int referenceLength
-		);
-		break;
-	case CG_COOL_API_DB_NEXTROW:
-		return DB_NextRow(MODULE_CGAME);
-		break;
-	case CG_COOL_API_DB_GETINT:
-		return DB_GetInt(MODULE_CGAME,args[1]);
-		break;
-	case CG_COOL_API_DB_GETFLOAT:
-		{
-		float* retVal = VMAP(2, float, 1);
-		*retVal = DB_GetFloat(MODULE_CGAME, args[1]);
-		return 0;
-		}
-		break;
-	case CG_COOL_API_DB_GETSTRING:
-		return DB_GetString(MODULE_CGAME,
-			args[1],
-			VMAP(2, char, args[3]),		// byte* reference
-			args[3]						// int referenceLength
-		);
-		break;
-
 
 
 
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
 	}
+
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_EXPANDEDSETUSERCMD) {
+		switch (args[0]) {
+		case CG_COOL_API_SETUSERCMDMOVE:
+			cl.cgameForwardmove = args[1];
+			cl.cgameRightmove = args[2];
+			cl.cgameUpmove = args[3];
+			cl.cgameMoveSet = args[4];
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_SETPREDICTEDMOVEMENT) {
+		switch (args[0]) {
+		case CG_COOL_API_SETPREDICTEDMOVEMENT:
+			Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1), sizeof(predictedMovement_t));
+			VectorCopy(cl.predictedMovement.velocity, psVelocity);
+			cl.predictedMovementIsSet = qtrue;
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_EZDEMOCGAMEBUFFER) {
+		switch (args[0]) {
+		case CG_COOL_API_SET_EZDEMO_BUFFER:
+		{
+			size_t i;
+			size_t ezDemoEventSize = args[2];
+			int ezDemoMaxEventCount = args[3];
+			int* ezDemoEventCount = VMAP(4, int, 1);
+			ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+			int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
+			for (i = 0; i < communicatedEventCount; i++) {
+				Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
+			}
+			*ezDemoEventCount = communicatedEventCount;
+			return 0;
+		}
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED) {
+		switch (args[0]) {
+		case CG_COOL_API_GETTIMESINCESNAPRECEIVED:
+		{
+			int snapNum = args[1];
+			if (cl.snapshots[snapNum & PACKET_MASK].messageNum != snapNum) {
+				return -1;
+			}
+			else {
+				return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
+			}
+		}
+		}
+	}
+
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
+		switch (args[0]) {
+
+		case CG_COOL_API_GLRESOLUTIONCHANGED:
+			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+			break;
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_MARIADB) {
+		switch (args[0]) {
+
+		case CG_COOL_API_DB_ESCAPESTRING:
+			return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
+			break;
+		case CG_COOL_API_DB_ADDREQUEST:
+			return DB_AddRequest(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
+			break;
+		case CG_COOL_API_DB_ADDREQUEST_TYPED:
+			return DB_AddRequest(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);
+			break;
+		case CG_COOL_API_DB_NEXTRESPONSE:
+			// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
+			return DB_NextResponse(MODULE_CGAME,
+				VMAP(1, int, 1),			// int* requestType
+				VMAP(2, int, 1),			// int* affectedRows
+				VMAP(3, int, 1),			// int* status
+				VMAP(4, char, args[5]),		// char* errorMessage
+				args[5],					// int errorMessageSize
+				args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
+				args[7]						// int referenceLength
+			);
+			break;
+		case CG_COOL_API_DB_GETREFERENCE:
+			return DB_GetReference(MODULE_CGAME,
+				VMAP(1, byte, args[2]),		// byte* reference
+				args[2]						// int referenceLength
+			);
+			break;
+		case CG_COOL_API_DB_NEXTROW:
+			return DB_NextRow(MODULE_CGAME);
+			break;
+		case CG_COOL_API_DB_GETINT:
+			return DB_GetInt(MODULE_CGAME, args[1]);
+			break;
+		case CG_COOL_API_DB_GETFLOAT:
+		{
+			float* retVal = VMAP(2, float, 1);
+			*retVal = DB_GetFloat(MODULE_CGAME, args[1]);
+			return 0;
+		}
+		break;
+		case CG_COOL_API_DB_GETSTRING:
+			return DB_GetString(MODULE_CGAME,
+				args[1],
+				VMAP(2, char, args[3]),		// byte* reference
+				args[3]						// int referenceLength
+			);
+			break;
+		}
+	}
+
 
 	if (VM_MVAPILevel(cgvm) >= 1) {
 		switch (args[0]) {
@@ -1676,6 +1703,8 @@ void CL_InitCGame( void ) {
 	}
 	cls.state = CA_LOADING;
 
+	com_coolApi_supported_cgame = Cvar_Get("coolApi_supported_cgame", "0", CVAR_ROM);
+
 	// init for this gamestate
 	// use the lastExecutedServerCommand instead of the serverCommandSequence
 	// otherwise server commands sent just before a gamestate are dropped
@@ -1687,10 +1716,12 @@ void CL_InitCGame( void ) {
 	VM_SetMVAPILevel(cgvm, apireq);
 	Com_DPrintf("CGameVM uses MVAPI level %i.\n", apireq);
 
+	//VM_SetCoolApiSupport(cgvm, com_coolApi_supported_cgame->integer);// dont care it will be in the cvar anyway
+
 	if (apireq >= 1) {
 		VM_Call(cgvm, MVAPI_AFTER_INIT);
 	}
-	
+
 	demoAutoInit();
 
 	// we will send a usercmd this frame, which

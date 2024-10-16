@@ -19,6 +19,8 @@ Ghoul2 Insert End
 
 #include "mv_setup.h"
 
+cvar_t* com_coolApi_supported_ui;
+
 extern	botlib_export_t	*botlib_export;
 void SP_Register(const char *Package);
 
@@ -1142,12 +1144,16 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 
-	case UI_COOL_API_GLRESOLUTIONCHANGED:
-		return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-		break;
-
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
+	}
+
+	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
+		switch (args[0]) {
+		case UI_COOL_API_GLRESOLUTIONCHANGED:
+			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+			break;
+		}
 	}
 
 	if (VM_MVAPILevel(uivm) >= 3) {
@@ -1208,6 +1214,7 @@ void CL_ShutdownUI( void ) {
 	VM_Free( uivm );
 	uivm = NULL;
 }
+
 
 /*
 ====================
@@ -1277,11 +1284,16 @@ void CL_InitUI(qboolean mainMenu) {
 			VM_SetMVMenuLevel( uivm, 0 );
 		}
 
+		com_coolApi_supported_ui = Cvar_Get("coolApi_supported_ui", "0", CVAR_ROM);
+
 		apireq = VM_Call( uivm, UI_INIT, mainMenu ? qfalse : (cls.state >= CA_AUTHORIZING && cls.state <= CA_ACTIVE), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, apilevel );
 		if (apireq > apilevel) {
 			apireq = apilevel;
 		}
 		VM_SetMVAPILevel(uivm, apireq);
+
+		//VM_SetCoolApiSupport(uivm,com_coolApi_supported_ui->integer); // dont care it will be in the cvar anyway
+
 		Com_DPrintf("UIVM uses MVAPI level %i.\n", apireq);
 
 		if (apireq >= 1) {

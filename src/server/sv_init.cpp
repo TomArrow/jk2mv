@@ -1019,6 +1019,11 @@ Ghoul2 Insert Start
 	// free current level
 	SV_ClearServer();
 
+#ifdef SVDEMO
+	SV_StopAutoRecordDemos();
+	SV_ClearAllDemoPreRecord();
+#endif
+
 	// free server static data
 	if ( svs.clients ) {
 		Z_Free( svs.clients );
