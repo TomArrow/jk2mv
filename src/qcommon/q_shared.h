@@ -718,8 +718,8 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
 
 // stealsies from jomme/nt mod :) thanks
-#define Q_IsColorStringNT(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= 0x7F && *((p)+1) >= 0x00 )
-#define Q_IsColorCharNT(p)		( (p) <= 0x7F && (p) >= 0x00 )
+#define Q_IsColorStringNT(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= 0x7F && *((p)+1) >= '0' ) // changed from >= 0x00 to '0' compared to NT
+#define Q_IsColorCharNT(p)		( (p) <= 0x7F && (p) >= '0' ) // changed from >= 0x00 to '0' compared to NT
 #define ColorIndexNT(c)			( (c) & 127 )
 
 #define Q_IsColorStringHex(p) ((Q_IsColorStringHexY((p))) || (Q_IsColorStringHexy((p))) || (Q_IsColorStringHexX((p))) || (Q_IsColorStringHexx((p)) ))
