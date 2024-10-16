@@ -1330,6 +1330,8 @@ extern	cvar_t	*r_openglMipMaps;
 extern	cvar_t	*r_showImages;
 extern	cvar_t	*r_debugSort;
 
+extern	cvar_t	*r_drawAllAreas;
+
 extern	cvar_t	*r_printShaders;
 
 extern	cvar_t	*r_convertModelBones;
