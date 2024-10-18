@@ -368,7 +368,7 @@ SV_AddEntitiesVisibleFromPoint
 ===============
 */
 static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *frame,
-									snapshotEntityNumbers_t *eNums, qboolean portal ) {
+									snapshotEntityNumbers_t *eNums, qboolean portal, int realClientNum ) {
 	int		e, i;
 	sharedEntity_t *ent;
 	svEntity_t	*svEnt;
@@ -439,6 +439,15 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			{
 				SV_AddEntToSnapshot( svEnt, ent, eNums );
 				continue;
+			}
+
+			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS) {
+				if (mvEnt->snapshotIgnoreRealClient[realClientNum]) continue;
+				else if (mvEnt->snapshotEnforceRealClient[realClientNum])
+				{
+					SV_AddEntToSnapshot(svEnt, ent, eNums);
+					continue;
+				}
 			}
 		}
 
@@ -545,7 +554,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 					continue;
 				}
 			}
-			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, qtrue );
+			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, qtrue, realClientNum );
 		}
 
 	}
@@ -622,7 +631,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 
 	// add all the entities directly visible to the eye, which
 	// may include portal entities that merge other viewpoints
-	SV_AddEntitiesVisibleFromPoint( org, frame, &entityNumbers, qfalse );
+	SV_AddEntitiesVisibleFromPoint( org, frame, &entityNumbers, qfalse, client - svs.clients );
 
 	// if there were portals visible, there may be out of order entities
 	// in the list which will need to be resorted for the delta compression
