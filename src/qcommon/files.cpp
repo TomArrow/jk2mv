@@ -1246,7 +1246,8 @@ FS_Rename
 ===========
 */
 qboolean FS_Rename( const char *from, const char *to ) {
-	char			*from_ospath, *to_ospath;
+	char			from_ospath[MAX_OSPATH];
+	char			to_ospath[MAX_OSPATH];
 
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
@@ -1255,8 +1256,8 @@ qboolean FS_Rename( const char *from, const char *to ) {
 	// don't let sound stutter
 	S_ClearSoundBuffer();
 
-	from_ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, from );
-	to_ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, to );
+	Q_strncpyz(from_ospath,FS_BuildOSPath( fs_homepath->string, fs_gamedir, from ),sizeof(from_ospath));
+	Q_strncpyz(to_ospath,FS_BuildOSPath( fs_homepath->string, fs_gamedir, to),sizeof(to_ospath));
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_Rename: %s --> %s\n", from_ospath, to_ospath );
@@ -1268,13 +1269,21 @@ qboolean FS_Rename( const char *from, const char *to ) {
 		}
 	}
 
-	if ( rename( from_ospath, to_ospath ) ) {
+	if (FS_FileExists(to)) {
+		if (fs_debug->integer) {
+			Com_Printf("FS_Rename: File already exists. Removing. %s.\n", to_ospath);
+		}
+		// rename() can fail if file already exists (implementation specific) and FS_CopyFile is slower. So avoid lag by just removing the old file first.
+		FS_Remove(to_ospath);
+	}
+
+	if ( rename( from_ospath, to_ospath ) ) { // can fail on some implementations if destination file already exists
 		int errnum = errno;
 		if ( fs_debug->integer && strerror(errnum) ) {
 			Com_Printf( "FS_Rename: %s\n", strerror(errnum) );
 		}
 		// Failed, try copying it and deleting the original
-		if (!FS_CopyFile(from_ospath, to_ospath)) {
+		if (!FS_CopyFile(from,to)) {
 			return qfalse;
 		}
 		FS_Remove(from_ospath); // even if it fails.. good enough?

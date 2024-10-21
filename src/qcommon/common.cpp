@@ -140,6 +140,8 @@ static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const ch
 {
 	const char *p = msg;
 
+	static qboolean opening_qconsole = qfalse;
+
 	if ( rd_buffer ) {
 		if (strlen (msg) + strlen(rd_buffer) + strlen(S_COLOR_WHITE) + 1 > rd_buffersize) {
 			rd_flush(rd_buffer);
@@ -185,9 +187,13 @@ static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const ch
 
 		// logfile
 		if ( com_logfile && com_logfile->integer ) {
-			if ( logfile == 0 ) {
+			// TTimo: only open the qconsole.log if the filesystem is in an initialized state
+			//   also, avoid recursing in the qconsole.log opening (i.e. if fs_debug is on)
+			if ( !logfile && FS_Initialized() && !opening_qconsole ) {
 				struct tm *newtime;
 				time_t aclock;
+
+				opening_qconsole = qtrue;
 
 				time( &aclock );
 				newtime = localtime( &aclock );
@@ -202,12 +208,15 @@ static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const ch
 						FS_ForceFlush(logfile);
 					}
 				} else {
-					logfile = -1;
-					Com_Printf( "Couldn't open qconsole.log\n");
+					//logfile = -1;
+					//Com_Printf( "Couldn't open qconsole.log\n");
+					Com_Printf("Opening qconsole.log failed!\n");
+					Cvar_SetValue("logfile", 0);
 				}
 			}
 			if ( logfile > 0 && FS_Initialized()) {
-				FS_Write(line, lineLen, logfile);
+				//FS_Write(line, lineLen, logfile);
+				FS_Write(line, strlen(line), logfile);
 			}
 		}
 	}
