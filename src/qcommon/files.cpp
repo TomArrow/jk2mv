@@ -30,6 +30,12 @@
 #include <unistd.h>
 #endif
 
+#include <vector>
+#include <string>
+#include <tuple>
+
+std::vector<std::tuple<std::string, std::string>> queuedRenames;
+
 /*
 =============================================================================
 
@@ -505,6 +511,53 @@ static FILE	*FS_FileForHandle( fileHandle_t f, module_t module = MODULE_MAIN ) {
 	return fsh[f].handleFiles.file.o;
 }
 
+qboolean	FS_CheckQueuedRenames(fileHandleData_t* f) {
+	for (auto it = queuedRenames.begin(); it != queuedRenames.end(); it++) {
+		const char* queuedOsPath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, std::get<0>(*it).c_str());
+		if (!Q_stricmp(f->ospath, queuedOsPath)) {
+			if (FS_Rename(std::get<0>(*it).c_str(), std::get<1>(*it).c_str())) {
+				if (fs_debug->integer) {
+					Com_Printf("FS_CheckQueuedRenames: Renamed %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
+				}
+			}
+			else {
+				if (fs_debug->integer) {
+					Com_Printf("FS_CheckQueuedRenames: Failed to rename %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
+				}
+			}
+			queuedRenames.erase(it);
+			return qtrue; // can't rename the same file twice after all.
+		}
+	}
+	return qfalse;
+}
+
+int		FS_CheckQueuedRenamesAll() {
+	int count = 0;
+recheck:
+	for (auto it = queuedRenames.begin(); it != queuedRenames.end(); it++) {
+		if (!FS_WeHaveFileOpen(std::get<0>(*it).c_str())) {
+			if (FS_Rename(std::get<0>(*it).c_str(), std::get<1>(*it).c_str())) {
+				if (fs_debug->integer) {
+					Com_Printf("FS_CheckQueuedRenamesAll: Renamed %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
+				}
+			}
+			else {
+				if (fs_debug->integer) {
+					Com_Printf("FS_CheckQueuedRenamesAll: Failed to rename %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
+				}
+			}
+			queuedRenames.erase(it);
+			count++;
+			goto recheck;
+		}
+		else if (fs_debug->integer > 1) {
+			Com_Printf("FS_CheckQueuedRenamesAll: File still open %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
+		}
+	}
+	return count;
+}
+
 void	FS_ForceFlush( fileHandle_t f, module_t module ) {
 	FILE *file;
 
@@ -704,11 +757,12 @@ check for restricted file names, extensions etc. Overwrites file if it
 exists.
 =================
 */
-qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module ) {
+qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t module ) {
 	FILE *fo, *to;
 	char *fospath, *tospath;
 	int bytes;
 	char buffer[4096];
+	int errnum;
 
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
@@ -732,6 +786,10 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module 
 
 	fo = fopen( fospath, "rb" );
 	if ( !fo ) {
+		errnum = errno;
+		if (fs_debug->integer && strerror(errnum)) {
+			Com_Printf("FS_CopyFile: %s\n", strerror(errnum));
+		}
 		return qfalse;
 	}
 
@@ -741,6 +799,10 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module 
 
 	to = fopen( tospath, "wb" );
 	if ( !to ) {
+		errnum = errno;
+		if (fs_debug->integer && strerror(errnum)) {
+			Com_Printf("FS_CopyFile: %s\n", strerror(errnum));
+		}
 		fclose( fo );
 		return qfalse;
 	}
@@ -773,9 +835,15 @@ FS_Remove
 ===========
 */
 void FS_Remove(const char* osPath) {
+	int errnum;
 	FS_CheckFilenameIsMutable(osPath, __func__);
 	
-	remove(osPath);
+	if (remove(osPath)) {
+		errnum = errno;
+		if (fs_debug->integer && strerror(errnum)) {
+			Com_Printf("FS_Remove: %s\n", strerror(errnum));
+		}
+	}
 }
 
 /*
@@ -1154,6 +1222,25 @@ void FS_SV_Rename( const char *from, const char *to ) {
 
 /*
 ===========
+FS_RenameOrQueue
+
+===========
+*/
+qboolean FS_RenameOrQueue( const char *from, const char *to ) {
+
+	if (!FS_WeHaveFileOpen(from)) {
+		FS_Rename(from, to);
+		return qtrue;
+	}
+	if (fs_debug->integer) {
+		Com_Printf("FS_RenameOrQueue: File still open, queuing. %s -> %s\n", from, to);
+	}
+	queuedRenames.push_back(std::move(std::make_tuple(std::move(std::string(from)), std::move(std::string(to)))));
+	return qfalse;
+}
+
+/*
+===========
 FS_Rename
 
 ===========
@@ -1175,13 +1262,23 @@ qboolean FS_Rename( const char *from, const char *to ) {
 		Com_Printf( "FS_Rename: %s --> %s\n", from_ospath, to_ospath );
 	}
 
+	if (FS_CreatePath(to_ospath)) {
+		if (fs_debug->integer) {
+			Com_Printf("FS_Rename: Failed to create destination path %s.\n", to_ospath);
+		}
+	}
+
 	if ( rename( from_ospath, to_ospath ) ) {
 		int errnum = errno;
 		if ( fs_debug->integer && strerror(errnum) ) {
 			Com_Printf( "FS_Rename: %s\n", strerror(errnum) );
 		}
-
-		return qfalse;
+		// Failed, try copying it and deleting the original
+		if (!FS_CopyFile(from_ospath, to_ospath)) {
+			return qfalse;
+		}
+		FS_Remove(from_ospath); // even if it fails.. good enough?
+		return qtrue;
 	}
 
 	return qtrue;
@@ -1221,6 +1318,7 @@ void FS_FCloseAio(int handle) {
 	if (fs_debug->integer) {
 		Com_Printf("FS_FCloseAio: %s closed.\n", fsh[f].name);
 	}
+	FS_CheckQueuedRenames(&fsh[f]);
 	FS_ResetFileHandleData(&fsh[f]);
 }
 #endif
@@ -1249,6 +1347,8 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 		if ( fsh[f].handleFiles.unique ) {
 			unzClose( fsh[f].handleFiles.file.z );
 		}
+
+		FS_CheckQueuedRenames(&fsh[f]);
 #ifdef ASYNCIO
 		FS_ResetFileHandleData(&fsh[f]);
 #else
@@ -1309,6 +1409,7 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 	}
 #endif
 
+	FS_CheckQueuedRenames(&fsh[f]);
 #ifdef ASYNCIO
 	FS_ResetFileHandleData(&fsh[f]);
 #else
@@ -1426,6 +1527,18 @@ void FS_AsyncWriterThread(fileHandle_t h) {
 	event.evType = SE_AIO_FCLOSE;
 	event.evValue = h;
 	Com_PushEvent(&event);
+}
+
+fileHandle_t FS_WeHaveFileOpen(const char* filename) {
+	const char* ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
+	int		i;
+
+	for (i = 1; i < MAX_FILE_HANDLES; i++) {
+		if ((fsh[i].handleAsync || fsh[i].handleFiles.file.o != NULL) && !Q_stricmp(ospath, fsh[i].ospath)) {
+			return i;
+		}
+	}
+	return 0;
 }
 
 // Call with safe==qtrue to make sure the file isn't open in another async file handle anymore

@@ -2920,6 +2920,8 @@ void Com_Frame( void ) {
 
 	NET_HTTP_ProcessEvents();
 
+	FS_CheckQueuedRenamesAll(); // see if we can process any pending renames
+
 	//
 	// server side
 	//

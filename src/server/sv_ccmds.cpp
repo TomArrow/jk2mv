@@ -1077,7 +1077,7 @@ void SV_RenameDemo_f(void) {
 		return;
 	}
 
-	FS_Rename(from, to);
+	FS_RenameOrQueue(from, to);
 }
 
 /*
@@ -1561,7 +1561,7 @@ static void SV_Record_f(void) {
 	if (Cmd_Argc() >= 2) {
 		s = Cmd_Argv(1);
 		Q_strncpyz(demoName, s, sizeof(demoName));
-		Com_sprintf(name, sizeof(name), "demos/%s.dm_%d", demoName, MV_GetCurrentProtocol()); //Should use DEMO_EXTENSION
+		//Com_sprintf(name, sizeof(name), "demos/%s.dm_%d", demoName, MV_GetCurrentProtocol()); //Should use DEMO_EXTENSION // not used anywhere?
 	}
 	else {
 		// timestamp the file
@@ -1753,6 +1753,16 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand ("killserver", SV_KillServer_f);
 	Cmd_AddCommand ("svsay", SV_ConSay_f);
 	Cmd_AddCommand ("forcetoggle", SV_ForceToggle_f);
+
+#ifdef SVDEMO
+	Cmd_AddCommand("svrecord", SV_Record_f);// , "Record a server-side demo");
+	Cmd_AddCommand("svstoprecord", SV_StopRecord_f);//, "Stop recording a server-side demo");
+	Cmd_AddCommand("svdemometa", SV_DemoMeta_f);//, "Sets a new metadata entry for server-side demos for one player. Call with clientnum, metakey, [data]");
+	Cmd_AddCommand("svdemoclearmeta", SV_DemoClearMeta_f);//, "Clears metadata for server-side demos for one player. Call with clientnum.");
+	Cmd_AddCommand("svdemoclearprerecord", SV_DemoClearPreRecord_f);//, "Clears pre-record data for a particular client. Call with clientnum.");
+	Cmd_AddCommand("svrenamedemo", SV_RenameDemo_f);//, "Rename a server-side demo");
+	Cmd_AddCommand("sv_listrecording", SV_ListRecording_f);//, "Lists demos being recorded");
+#endif
 
 	Cmd_AddCommand("whitelistip", SV_WhitelistIP_f);
 }

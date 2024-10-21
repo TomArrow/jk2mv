@@ -700,8 +700,6 @@ enum fileCompressionScheme_t {
 	FILECOMPRESSION_LZMA // The special compressed file format with LZMA compression
 };
 
-qboolean FS_CopyFile( char *fromOSPath, char *toOSPath, char *newOSPath = NULL, const int newSize = 0 );
-
 qboolean FS_Initialized();
 
 void	FS_InitFilesystem (void);
@@ -736,6 +734,8 @@ int		FS_GetModList(  char *listbuf, int bufsize );
 void			FS_AsyncAssureFileClosed(const char* ospath);
 fileHandle_t	FS_FOpenFileWriteAsync(const char* qpath, qboolean safe = qtrue);
 #endif
+
+fileHandle_t	FS_WeHaveFileOpen(const char* filename);
 
 fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN );
 fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
@@ -832,9 +832,11 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // separated checksums will be checked for files, with the
 // sole exception of .cfg files.
 
-qboolean FS_CheckDirTraversal(const char *checkdir);
-qboolean FS_ComparePaks(char *neededpaks, int len, int *chksums, size_t maxchksums, qboolean dlstring);
-qboolean FS_Rename( const char *from, const char *to );
+qboolean	FS_CheckDirTraversal(const char *checkdir);
+qboolean	FS_ComparePaks(char *neededpaks, int len, int *chksums, size_t maxchksums, qboolean dlstring);
+qboolean	FS_Rename( const char *from, const char *to );
+qboolean	FS_RenameOrQueue(const char* from, const char* to);
+int			FS_CheckQueuedRenamesAll();
 
 const char *FS_MV_VerifyDownloadPath(const char *pk3file);
 qboolean FS_SV_VerifyZipFile( const char *zipfile, int *checksum );
@@ -850,7 +852,8 @@ void FS_HomeRmdir(const char* homePath, qboolean recursive);
 
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
-qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module = MODULE_MAIN );
+qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
+
 
 /*
 ==============================================================
