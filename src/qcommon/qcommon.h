@@ -304,7 +304,7 @@ public:
 	int droppedPackets = 0;
 	int clientNum = 0;
 	qboolean pingKnown;
-	std::vector<std::unique_ptr<usercmd_t>> cmds;
+	std::vector<std::shared_ptr<usercmd_t>> cmds; // multiple clients could be getting the same usermessage returned due to spectators, so we must make this copyable
 };
 
 /*

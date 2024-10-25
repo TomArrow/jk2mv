@@ -1745,8 +1745,27 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //	}
 
 	if (umsg) {
-		userStoredUcmdCounts[cl - svs.clients] += umsg->cmds.size();
-		userMessages[cl - svs.clients].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+		int myCl = cl - svs.clients;
+		for (int o = 0; o < sv_maxclients->integer; o++) {
+			client_t* clOther = svs.clients + o;
+			if (clOther->state == CS_ACTIVE) {
+				playerState_t* ps = SV_GameClientNum(o);
+				if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl ) { // spectators :)
+					userMessage_t* messageDupe = new userMessage_t();
+					*messageDupe = *umsg;
+					userStoredUcmdCounts[o] += messageDupe->cmds.size();
+					userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
+				}
+			}
+		}
+		playerState_t* myps = SV_GameClientNum(cl-svs.clients);
+		if (myps->clientNum == myCl && !(myps->pm_flags & PMF_FOLLOW)) {
+			userStoredUcmdCounts[myCl] += umsg->cmds.size();
+			userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+		}
+		else {
+			delete umsg;
+		}
 	}
 }
 
