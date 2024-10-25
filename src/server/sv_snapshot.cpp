@@ -982,7 +982,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		//MSG_WriteByte(&msg, svc_EOF); // done by transmit.
 
 		//if (sv_dynamicSnapshots->integer && msg.overflowed) {
-		if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 8) {
+		if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 4) {
 			// rare one broken by the last bit. shouldn't happen
 			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize);
 		}
