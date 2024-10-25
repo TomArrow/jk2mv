@@ -981,7 +981,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 
 		if (sv_dynamicSnapshots->integer && msg.overflowed) {
 			// rare one broken by the last bit. shouldn't happen
-			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize]);
+			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize);
 		}
 		else {
 			if (msg.cursize < minCurSize) {
