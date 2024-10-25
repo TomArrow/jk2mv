@@ -960,7 +960,9 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 			}
 			MSG_WriteBits(&msg, 0, 1);
 
-			if (sv_dynamicSnapshots->integer && (msg.overflowed || (msg.maxsize - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+			//if (sv_dynamicSnapshots->integer && (msg.overflowed || (msg.maxsize - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+			if ((msg.overflowed || /*(msg.maxsize - msg.cursize) < 8 || */ (FRAGMENT_SIZE - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+				// actually i'm being even more strict now. this ucmd sendback MUST fit into a single fragment, otherwise the directly following snapshot will stomp it.
 				memcpy(&msg, &msgBak, sizeof(msg));
 				sentbackCount = sentbackBackup;
 				break;
@@ -979,7 +981,8 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		MSG_WriteBits(&msg, 0, 1);
 		//MSG_WriteByte(&msg, svc_EOF); // done by transmit.
 
-		if (sv_dynamicSnapshots->integer && msg.overflowed) {
+		//if (sv_dynamicSnapshots->integer && msg.overflowed) {
+		if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 8) {
 			// rare one broken by the last bit. shouldn't happen
 			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize);
 		}
