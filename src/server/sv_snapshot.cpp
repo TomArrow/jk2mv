@@ -11,6 +11,7 @@ std::map<std::string, std::string> demoMetaData[MAX_CLIENTS];
 extern void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet);
 
 std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
+int userStoredUcmdCounts[MAX_CLIENTS];
 /*
 =============================================================================
 
@@ -875,10 +876,13 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	msg_t		msgBak;
 
 	// must be before SV_BuildClientSnapshot because otherwise stuff gets confused with outgoingsequence
-	if (sv_ucmdSendback->integer && userMessages[client - svs.clients].size() > 0) {
+	//if (sv_ucmdSendback->integer && userMessages[client - svs.clients].size() > MAX(1,sv_ucmdSendbackMinCount->integer)) {
+	if (sv_ucmdSendback->integer && (MAX(userMessages[client - svs.clients].size(),userStoredUcmdCounts[client-svs.clients]) > MAX(1,sv_ucmdSendbackMinCount->integer))) {
 		int minCurSize = 0;
 		usercmd_t	nullcmd;
 		usercmd_t* cmd, * oldcmd;
+		int sentbackCount = 0, sentbackBackup = 0;
+		msg_t		msgBak2;
 
 		// bots need to have their snapshots build, but
 		// the query them directly without needing to be sent
@@ -901,15 +905,19 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 
 		SV_WriteEOFAndHiddenUcmdMarker(&msg, &minCurSize);
 
-		MSG_WriteShort(&msg, 1); // version of this sorta ucmd sendback protocol
+		MSG_WriteShort(&msg, 2); // version of this sorta ucmd sendback protocol
+		// v1 was first working prototype
+		// v2 does the delta across all ucmds in this whole message
 
 		Com_Memset(&nullcmd, 0, sizeof(nullcmd));
 
+		oldcmd = &nullcmd;
 		auto it = userMessages[client - svs.clients].begin();
 		for (; it != userMessages[client - svs.clients].end(); it++) {
 
 			// Backup the msg state in case the snapshot would overflow it
 			memcpy(&msgBak, &msg, sizeof(msgBak));
+			sentbackBackup = sentbackCount;
 
 			MSG_WriteBits(&msg, 1, 1); // new client message
 
@@ -942,27 +950,38 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 			}
 
 			auto cmdit = (*it)->cmds.begin();
-			oldcmd = &nullcmd;
+			//oldcmd = &nullcmd;
 			for (; cmdit != (*it)->cmds.end(); cmdit++) {
 				MSG_WriteBits(&msg, 1, 1);
 				cmd = cmdit->get();
-				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd);
+				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd,qtrue);
+				sentbackCount++;
 				oldcmd = cmd;
 			}
 			MSG_WriteBits(&msg, 0, 1);
 
-			if (sv_dynamicSnapshots->integer && msg.overflowed && !msgBak.overflowed) {
+			if (sv_dynamicSnapshots->integer && (msg.overflowed || (msg.maxsize - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
 				memcpy(&msg, &msgBak, sizeof(msg));
+				sentbackCount = sentbackBackup;
 				break;
 			}
 		}
 		userMessages[client - svs.clients].erase(userMessages[client - svs.clients].begin(), it);
+		userStoredUcmdCounts[client - svs.clients] -= sentbackCount;
+		if (userStoredUcmdCounts[client - svs.clients] < 0) {
+			Com_Printf("^1userStoredUcmdCounts ended up smaller than 0!!! WEIRD! Should not happen! It's %d\n", userStoredUcmdCounts[client - svs.clients]);
+			userStoredUcmdCounts[client - svs.clients] = 0;
+		} else if ((userStoredUcmdCounts[client - svs.clients] == 0) != (userMessages[client - svs.clients].size() == 0)) {
+			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d, client is %d\n", userStoredUcmdCounts[client - svs.clients], userMessages[client - svs.clients].size(),client-svs.clients);
+			userStoredUcmdCounts[client - svs.clients] = 0;
+		}
 
 		MSG_WriteBits(&msg, 0, 1);
 		//MSG_WriteByte(&msg, svc_EOF); // done by transmit.
 
 		if (sv_dynamicSnapshots->integer && msg.overflowed) {
-			// rare one broken by the last bits
+			// rare one broken by the last bit. shouldn't happen
+			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize]);
 		}
 		else {
 			if (msg.cursize < minCurSize) {

@@ -57,6 +57,7 @@ cvar_t* sv_demoWriteMeta;
 #endif
 
 cvar_t* sv_ucmdSendback;
+cvar_t* sv_ucmdSendbackMinCount;
 
 cvar_t* sv_specAllEnts;
 

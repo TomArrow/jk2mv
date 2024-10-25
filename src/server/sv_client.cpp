@@ -291,6 +291,7 @@ gotnewcl:
 	newcl->gentity = ent;
 
 	userMessages[clientNum].clear();
+	userStoredUcmdCounts[clientNum] = 0;
 
 	// save the challenge
 	newcl->challenge = challenge;
@@ -1744,6 +1745,7 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //	}
 
 	if (umsg) {
+		userStoredUcmdCounts[cl - svs.clients] += umsg->cmds.size();
 		userMessages[cl - svs.clients].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
 	}
 }

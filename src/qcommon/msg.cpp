@@ -774,9 +774,9 @@ void MSG_ReadDeltaUsercmd(msg_t *msg, usercmd_t *from, usercmd_t *to) {
 MSG_WriteDeltaUsercmd
 =====================
 */
-void MSG_WriteDeltaUsercmdKey(msg_t *msg, int key, usercmd_t *from, usercmd_t *to) {
+void MSG_WriteDeltaUsercmdKey(msg_t *msg, int key, usercmd_t *from, usercmd_t *to, qboolean suppressError) {
 	if (to->serverTime < from->serverTime) {
-		Com_Printf(S_COLOR_YELLOW "WARNING: Command time went backwards\n");
+		if(!suppressError) Com_Printf(S_COLOR_YELLOW "WARNING: Command time went backwards\n");
 		MSG_WriteBits(msg, 0, 1);
 		MSG_WriteBits(msg, to->serverTime, 32);
 	} else if (to->serverTime - from->serverTime < 256) {

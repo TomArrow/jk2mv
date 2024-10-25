@@ -313,6 +313,7 @@ extern	cvar_t* sv_demoWriteMeta;
 #endif
 
 extern	cvar_t* sv_ucmdSendback;
+extern	cvar_t* sv_ucmdSendbackMinCount;
 
 extern	cvar_t* sv_specAllEnts;
 
@@ -518,5 +519,6 @@ void SV_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
 
 extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
+extern int userStoredUcmdCounts[MAX_CLIENTS];
 
 #endif // SERVER_H_INC

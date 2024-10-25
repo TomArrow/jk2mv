@@ -278,6 +278,7 @@ void SV_Startup( void ) {
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		userMessages[i].clear();
+		userStoredUcmdCounts[i] = 0;
 	}
 
 	svs.initialized = qtrue;
@@ -324,6 +325,7 @@ void SV_ChangeMaxClients( void ) {
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
 			userMessages[i].clear();
+			userStoredUcmdCounts[i] = 0;
 		}
 	}
 
@@ -926,6 +928,7 @@ void SV_Init (void) {
 	sv_demoWriteMeta = Cvar_Get("sv_demoWriteMeta", "1", CVAR_ARCHIVE);// , "Enables writing metadata to demos, which can be set by the server/game. This is invisible to normal clients and can be used for storing information about when the demo was recorded, start of the recording, and so on.");
 #endif
 	sv_ucmdSendback = Cvar_Get("sv_ucmdSendback", "1", CVAR_ARCHIVE); // , "Automatically take server-side demos"
+	sv_ucmdSendbackMinCount = Cvar_Get("sv_ucmdSendbackMinCount", "64", CVAR_ARCHIVE); // , "Automatically take server-side demos"
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 
