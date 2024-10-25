@@ -710,8 +710,11 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend) {
 	{
 		// send additional message fragments if the last message
 		// was too large to send at once
-		Com_Printf ("[ISM]SV_SendClientGameState() [1] for %s, writing out old fragments\n", client->name);
+		Com_Printf ("[ISM]SV_SendMessageToClient() [1] for %s, writing out old fragments\n", client->name);
 		SV_Netchan_TransmitNextFragment(&client->netchan);
+
+		// TA: This could mess up snapshot sending tho right? Since outgoingSequence will go out of sync with the snapshot.
+		// What if we just increase outgoingsequence immediately when we START sending a packet?
 	}
 
 	// record information about the message

@@ -84,7 +84,8 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 	// write the packet header
 	MSG_InitOOB(&send, send_buf, sizeof(send_buf));				// <-- only do the oob here
 
-	MSG_WriteLong(&send, chan->outgoingSequence | FRAGMENT_BIT);
+	//MSG_WriteLong(&send, chan->outgoingSequence | FRAGMENT_BIT);
+	MSG_WriteLong(&send, chan->unsentFragmentSequenceNum | FRAGMENT_BIT);
 
 	// send the qport if we are a client
 	if (chan->sock == NS_CLIENT) {
@@ -108,7 +109,8 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 		Com_Printf("%s send %4i : s=%i fragment=%i,%i\n"
 			, netsrcString[chan->sock]
 			, send.cursize
-			, chan->outgoingSequence - 1
+			//, chan->outgoingSequence - 1
+			, chan->unsentFragmentSequenceNum - 1
 			, chan->unsentFragmentStart, fragmentLength);
 	}
 
@@ -119,7 +121,7 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 	// a second packet of zero length so that the other side
 	// can tell there aren't more to follow
 	if (chan->unsentFragmentStart == chan->unsentLength && fragmentLength != FRAGMENT_SIZE) {
-		chan->outgoingSequence++;
+		//chan->outgoingSequence++;
 		chan->unsentFragments = qfalse;
 	}
 }
@@ -143,7 +145,7 @@ void Netchan_Transmit(netchan_t *chan, int length, const byte *data, qboolean fa
 	chan->unsentFragmentStart = 0;
 
 	if (chan->unsentFragments) {
-		Com_Printf("[ISM] Stomping Unsent Fragments %s\n", netsrcString[chan->sock]);
+		Com_Printf("[ISM] Stomping Unsent Fragments %s\n", netsrcString[chan->sock]); // TODO how do we make this nicer?
 	}
 
 	if (fakeSend) {
@@ -156,7 +158,9 @@ void Netchan_Transmit(netchan_t *chan, int length, const byte *data, qboolean fa
 	if (length >= FRAGMENT_SIZE) {
 		chan->unsentFragments = qtrue;
 		chan->unsentLength = length;
+		chan->unsentFragmentSequenceNum = chan->outgoingSequence;
 		Com_Memcpy(chan->unsentBuffer, data, length);
+		chan->outgoingSequence++; // do this immediately here to avoid random weirdness (like trying to create a snapshot on the number of an old outgoingSequence
 
 		// only send the first fragment now
 		Netchan_TransmitNextFragment(chan);

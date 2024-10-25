@@ -332,6 +332,7 @@ typedef struct {
 	// we need to space out the sending of large fragmented messages
 	qboolean	unsentFragments;
 	int			unsentFragmentStart;
+	int			unsentFragmentSequenceNum;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
 
