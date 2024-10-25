@@ -290,6 +290,8 @@ gotnewcl:
 	ent = SV_GentityNum( clientNum );
 	newcl->gentity = ent;
 
+	userMessages[clientNum].clear();
+
 	// save the challenge
 	newcl->challenge = challenge;
 
@@ -1535,7 +1537,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t* umsg ) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;
@@ -1577,8 +1579,13 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 
 	// save time for ping calculation
 	// With sv_pingFix enabled we store the time of the first acknowledge, instead of the last. And we use a time value that is not limited by sv_fps.
-	if ( !sv_pingFix->integer || cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked == -1 )
-		cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
+	if (!sv_pingFix->integer || cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked == -1) {
+		cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
+		if (umsg) {
+			umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
+			umsg->pingKnown = qtrue;
+		}
+	}
 
 	// if this is the first usercmd we have received
 	// this gamestate, put the client into the world
@@ -1616,6 +1623,12 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 		if ( cmds[i].serverTime <= cl->lastUsercmd.serverTime ) {
 			continue;
 		}
+
+		if (umsg) { // save this for sending back if wanted
+			std::unique_ptr<usercmd_t> tmp = std::make_unique<usercmd_t>();
+			*tmp = cmds[i];
+			umsg->cmds.push_back(std::move(tmp));
+		}
 		SV_ClientThink (cl - svs.clients, &cmds[ i ]);
 	}
 }
@@ -1639,6 +1652,7 @@ Parse a client packet
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	int			c;
 	int			serverId;
+	userMessage_t* umsg = NULL;
 
 	MSG_Bitstream(msg);
 
@@ -1693,6 +1707,13 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		cl->oldServerTime = 0;
 	}
 
+	if (sv_ucmdSendback->integer) {
+		umsg = new userMessage_t();
+		umsg->serverTime = sv.time;
+		umsg->droppedPackets = cl->netchan.dropped;
+		umsg->clientNum = cl - svs.clients;
+	}
+
 	// read optional clientCommand strings
 	do {
 		c = MSG_ReadByte( msg );
@@ -1712,15 +1733,19 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 
 	// read the usercmd_t
 	if ( c == clc_move ) {
-		SV_UserMove( cl, msg, qtrue );
+		SV_UserMove( cl, msg, qtrue, umsg );
 	} else if ( c == clc_moveNoDelta ) {
-		SV_UserMove( cl, msg, qfalse );
+		SV_UserMove( cl, msg, qfalse, umsg );
 	} else if ( c != clc_EOF ) {
 		Com_Printf( "WARNING: bad command byte for client %i\n", (int)(cl - svs.clients) );
 	}
 //	if ( msg->readcount != msg->cursize ) {
 //		Com_Printf( "WARNING: Junk at end of packet for client %i\n", cl - svs.clients );
 //	}
+
+	if (umsg) {
+		userMessages[cl - svs.clients].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+	}
 }
 
 int SV_ClientRate( client_t *client )

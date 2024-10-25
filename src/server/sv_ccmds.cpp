@@ -906,6 +906,7 @@ void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageN
 
 
 constexpr char postEOFMetadataMarker[] = "HIDDENMETA";
+constexpr char postEOFUcmdMarker[] = "HIDDENUCMD";
 
 // Write an empty message at start of demo with metadata.
 // Metadata must be in JSON format to maintain compatibility for this format,
@@ -918,7 +919,7 @@ constexpr char postEOFMetadataMarker[] = "HIDDENMETA";
 // Normally the first message in a demo is the "header" or gamestate message with first message num -1
 // With metadata, this becomes sthe first message instead. So it's first demo message num - 2
 void SV_WriteEmptyMessageWithMetadata(int lastClientCommand, fileHandle_t f, const char* metaData, int messageNum) {
-	byte			bufData[MAX_MSGLEN];
+	static byte		bufData[MAX_MSGLEN];
 	msg_t			buf;
 	int				i;
 	int				len;
@@ -964,6 +965,38 @@ void SV_WriteEmptyMessageWithMetadata(int lastClientCommand, fileHandle_t f, con
 	FS_Write(&len, 4, f);
 
 	FS_Write(buf.data, buf.cursize, f);
+}
+
+
+void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet) {
+	int				i;
+	int				len;
+	entityState_t* ent;
+	entityState_t	nullstate;
+	char* s;
+
+
+	MSG_WriteByte(buf, svc_EOF);
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	constexpr int metaMarkerLength = sizeof(postEOFUcmdMarker) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	constexpr int maxBytePerByteSaved = 2;
+	constexpr int metaMarkerPresenceMinimumByteLengthExtra = metaMarkerLength * maxBytePerByteSaved;
+
+	const int requiredCursize = buf->cursize + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	if (requiredCurSizeRet) {
+		*requiredCurSizeRet = requiredCursize;
+	}
+
+	for (int i = 0; i < metaMarkerLength; i++) {
+		MSG_WriteByte(buf, postEOFUcmdMarker[i]);
+	}
 }
 
 void SV_StopRecordDemo(client_t* cl) {

@@ -312,6 +312,8 @@ extern	cvar_t* sv_demoPreRecordKeyframeDistance;
 extern	cvar_t* sv_demoWriteMeta;
 #endif
 
+extern	cvar_t* sv_ucmdSendback;
+
 extern	cvar_t* sv_specAllEnts;
 
 // toggleable fixes
@@ -413,7 +415,7 @@ void SV_AddServerCommand( client_t *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
 qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
-void SV_SendMessageToClient( msg_t *msg, client_t *client );
+void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse);
 void SV_SendClientMessages( void );
 void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
 
@@ -511,8 +513,10 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 //
 // sv_net_chan.c
 //
-void SV_Netchan_Transmit( client_t *client, msg_t *msg);	//int length, const byte *data );
+void SV_Netchan_Transmit( client_t *client, msg_t *msg, qboolean fakeSend = qfalse);	//int length, const byte *data );
 void SV_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
+
+extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
 
 #endif // SERVER_H_INC

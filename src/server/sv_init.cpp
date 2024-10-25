@@ -275,6 +275,11 @@ void SV_Startup( void ) {
 		// we don't need nearly as many when playing locally
 		svs.numSnapshotEntities = sv_maxclients->integer * 4 * 64;
 	}
+
+	for (int i = 0; i < MAX_CLIENTS; i++) {
+		userMessages[i].clear();
+	}
+
 	svs.initialized = qtrue;
 
 	Cvar_Set( "sv_running", "1" );
@@ -318,6 +323,7 @@ void SV_ChangeMaxClients( void ) {
 		}
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
+			userMessages[i].clear();
 		}
 	}
 
@@ -919,6 +925,7 @@ void SV_Init (void) {
 	sv_demoPreRecordKeyframeDistance = Cvar_Get("sv_demoPreRecordKeyframeDistance", "5", CVAR_ARCHIVE);// , "A demo can only start with a gamestate and full non-delta snapshot. How often should we save such a gamestate message? The shorter the distance, the more precisely the pre-record duration will be kept, but also the higher the RAM usage and regularity of non-delta frames being sent to the clients.");
 	sv_demoWriteMeta = Cvar_Get("sv_demoWriteMeta", "1", CVAR_ARCHIVE);// , "Enables writing metadata to demos, which can be set by the server/game. This is invisible to normal clients and can be used for storing information about when the demo was recorded, start of the recording, and so on.");
 #endif
+	sv_ucmdSendback = Cvar_Get("sv_ucmdSendback", "1", CVAR_ARCHIVE); // , "Automatically take server-side demos"
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 

@@ -133,7 +133,7 @@ Sends a message to a connection, fragmenting if necessary
 A 0 length will still generate a packet.
 ================
 */
-void Netchan_Transmit(netchan_t *chan, int length, const byte *data) {
+void Netchan_Transmit(netchan_t *chan, int length, const byte *data, qboolean fakeSend) {
 	msg_t		send;
 	byte		send_buf[MAX_PACKETLEN];
 
@@ -145,6 +145,13 @@ void Netchan_Transmit(netchan_t *chan, int length, const byte *data) {
 	if (chan->unsentFragments) {
 		Com_Printf("[ISM] Stomping Unsent Fragments %s\n", netsrcString[chan->sock]);
 	}
+
+	if (fakeSend) {
+		// might want this for debugging here and there. Or to write messages only to the serverside demo
+		chan->outgoingSequence++;
+		return;
+	}
+
 	// fragment large reliable messages
 	if (length >= FRAGMENT_SIZE) {
 		chan->unsentFragments = qtrue;
@@ -260,7 +267,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	//
 	// discard out of order or duplicated packets
 	//
-	qboolean isOutOfOrder = qfalse;
+	chan->outOfOrder = qfalse;
 	if (sequence <= chan->incomingSequence) {
 		if (showdrop->integer || showpackets->integer) {
 			Com_Printf("%s:Out of order packet %i at %i\n"
@@ -269,7 +276,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 				, chan->incomingSequence);
 		}
 		//return qfalse;
-		isOutOfOrder = qtrue; // We still want to assemble fragmented messages, even if out of order
+		chan->outOfOrder = qtrue; // We still want to assemble fragmented messages, even if out of order
 	}
 
 	//
@@ -429,7 +436,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 						// but I am a wuss -mw
 		
 		
-		if (!isOutOfOrder) {
+		if (!chan->outOfOrder) {
 			chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
 			return qtrue;
 		}
@@ -444,7 +451,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	//
 	// the message can now be read from the current message pointer
 	//
-	if (!isOutOfOrder) {
+	if (!chan->outOfOrder) {
 		chan->incomingSequence = sequence;
 
 		return qtrue;

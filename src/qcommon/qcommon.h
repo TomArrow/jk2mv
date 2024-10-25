@@ -9,6 +9,7 @@
 #include "../sys/sys_public.h"
 
 #include <vector>
+#include <memory>
 
 #define ASYNCIO
 
@@ -174,7 +175,7 @@ NET
 #define PACKET_BACKUP	256
 //#define PACKET_BACKUP	4096
 #else
-#define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
+#define	PACKET_BACKUP	64	// number of old messages that must be kept on client and
 							// server for delta comrpession and ping estimation
 #endif
 #define	PACKET_MASK		(PACKET_BACKUP-1)
@@ -296,6 +297,16 @@ public:
 //void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
 void MSG_FromBuffered(msg_t* dst, bufferedMsg_t* src);
 
+class userMessage_t {
+public:
+	int serverTime = 0;
+	int ping = 0;
+	int droppedPackets = 0;
+	int clientNum = 0;
+	qboolean pingKnown;
+	std::vector<std::unique_ptr<usercmd_t>> cmds;
+};
+
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression
 */
@@ -323,12 +334,14 @@ typedef struct {
 	int			unsentFragmentStart;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
+
+	qboolean	outOfOrder;
 } netchan_t;
 
 void Netchan_Init( int qport );
 void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
 
-void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
+void Netchan_Transmit( netchan_t *chan, int length, const byte *data, qboolean fakeSend = qfalse );
 void Netchan_TransmitNextFragment( netchan_t *chan );
 
 qboolean Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);

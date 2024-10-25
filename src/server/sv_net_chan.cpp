@@ -127,7 +127,7 @@ SV_Netchan_Transmit
 */
 
 //extern byte chksum[65536];
-void SV_Netchan_Transmit( client_t *client, msg_t *msg) {	//int length, const byte *data ) {
+void SV_Netchan_Transmit( client_t *client, msg_t *msg, qboolean fakeSend) {	//int length, const byte *data ) {
 //	int i;
 	MSG_WriteByte( msg, svc_EOF );
 //	for(i=SV_ENCODE_START;i<msg->cursize;i++) {
@@ -135,7 +135,7 @@ void SV_Netchan_Transmit( client_t *client, msg_t *msg) {	//int length, const by
 //	}
 //	Huff_Compress( msg, SV_ENCODE_START );
 	SV_Netchan_Encode( client, msg );
-	Netchan_Transmit( &client->netchan, msg->cursize, msg->data );
+	Netchan_Transmit( &client->netchan, msg->cursize, msg->data, fakeSend );
 }
 
 /*

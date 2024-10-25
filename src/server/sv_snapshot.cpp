@@ -8,6 +8,9 @@ std::vector<std::unique_ptr<bufferedMessageContainer_t>> demoPreRecordBuffer[MAX
 std::map<std::string, std::string> demoMetaData[MAX_CLIENTS];
 #endif
 
+extern void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet);
+
+std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
 /*
 =============================================================================
 
@@ -697,7 +700,7 @@ SV_SendMessageToClient
 Called by SV_SendClientSnapshot and SV_SendClientGameState
 =======================
 */
-void SV_SendMessageToClient( msg_t *msg, client_t *client ) {
+void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend) {
 	int			rateMsec;
 
 	// MW - my attempt to fix illegible server message errors caused by
@@ -823,7 +826,7 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client ) {
 #endif
 
 	// send the datagram
-	SV_Netchan_Transmit( client, msg );	//msg->cursize, msg->data );
+	SV_Netchan_Transmit( client, msg, fakeSend );	//msg->cursize, msg->data );
 
 	// set nextSnapshotTime based on rate and requested number of updates
 
@@ -870,6 +873,106 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	static byte		msg_buf[MAX_MSGLEN];
 	msg_t		msg;
 	msg_t		msgBak;
+
+	// must be before SV_BuildClientSnapshot because otherwise stuff gets confused with outgoingsequence
+	if (sv_ucmdSendback->integer && userMessages[client - svs.clients].size() > 0) {
+		int minCurSize = 0;
+		usercmd_t	nullcmd;
+		usercmd_t* cmd, * oldcmd;
+
+		// bots need to have their snapshots build, but
+		// the query them directly without needing to be sent
+		if (client->gentity && client->gentity->r.svFlags & SVF_BOT
+#ifdef SVDEMO
+			&& !client->demo.demorecording
+#endif
+			) {
+			return;
+		}
+
+
+		// prepend message with client commands (so demos have that info)
+		MSG_Init(&msg, msg_buf, sizeof(msg_buf));
+		msg.allowoverflow = qtrue;
+
+		// NOTE, MRE: all server->client messages now acknowledge
+		// let the client know which reliable clientCommands we have received
+		MSG_WriteLong(&msg, client->lastClientCommand);
+
+		SV_WriteEOFAndHiddenUcmdMarker(&msg, &minCurSize);
+
+		MSG_WriteShort(&msg, 1); // version of this sorta ucmd sendback protocol
+
+		Com_Memset(&nullcmd, 0, sizeof(nullcmd));
+
+		auto it = userMessages[client - svs.clients].begin();
+		for (; it != userMessages[client - svs.clients].end(); it++) {
+
+			// Backup the msg state in case the snapshot would overflow it
+			memcpy(&msgBak, &msg, sizeof(msgBak));
+
+			MSG_WriteBits(&msg, 1, 1); // new client message
+
+			MSG_WriteByte(&msg, (*it)->clientNum); // clientnum
+
+			//MSG_WriteLong(&msg, (*it)->serverTime);
+			//nullcmd.serverTime = (*it)->serverTime; // make em all relative to this. that way we get to keep the real servertime and delta from it
+			// nvm cant do this because the efficient delta compression here works only in one direction and timenudge can fudge it either way
+
+			if ((*it)->cmds.size() > 0) {
+				MSG_WriteBits(&msg, 1, 1); // yes we know servertime offset
+				MSG_WriteBits(&msg, MAX(-32768, MIN(32767, (*it)->serverTime - (*it)->cmds[0]->serverTime)), -16); // servertime offset of first cmd. can i actually use whole short range safely?
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+			if ((*it)->pingKnown) { // ping is known
+				MSG_WriteBits(&msg, 1, 1);
+				MSG_WriteBits(&msg, MAX(-32768, MIN(32767, (*it)->ping)), -16); // ping should logically always be positive. is it? uh. well technically it doesnt even matter for the encoding. but if someone is hacking ping, it could be fun to see? wait no it wouldnt. meh.
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+			if ((*it)->droppedPackets > 0) {
+				MSG_WriteBits(&msg, 1, 1);
+				MSG_WriteByte(&msg, MIN(255, (*it)->droppedPackets));
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+
+			auto cmdit = (*it)->cmds.begin();
+			oldcmd = &nullcmd;
+			for (; cmdit != (*it)->cmds.end(); cmdit++) {
+				MSG_WriteBits(&msg, 1, 1);
+				cmd = cmdit->get();
+				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd);
+				oldcmd = cmd;
+			}
+			MSG_WriteBits(&msg, 0, 1);
+
+			if (sv_dynamicSnapshots->integer && msg.overflowed && !msgBak.overflowed) {
+				memcpy(&msg, &msgBak, sizeof(msg));
+				break;
+			}
+		}
+		userMessages[client - svs.clients].erase(userMessages[client - svs.clients].begin(), it);
+
+		MSG_WriteBits(&msg, 0, 1);
+		//MSG_WriteByte(&msg, svc_EOF); // done by transmit.
+
+		if (sv_dynamicSnapshots->integer && msg.overflowed) {
+			// rare one broken by the last bits
+		}
+		else {
+			if (msg.cursize < minCurSize) {
+				msg.cursize = minCurSize;
+			}
+			SV_SendMessageToClient(&msg, client, (qboolean)(sv_ucmdSendback->integer == -1));
+		}
+
+	}
+
 
 	// build the snapshot
 	SV_BuildClientSnapshot( client );
