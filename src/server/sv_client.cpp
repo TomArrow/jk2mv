@@ -1643,6 +1643,29 @@ USER CMD EXECUTION
 ===========================================================================
 */
 
+void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg) {
+	for (int o = 0; o < sv_maxclients->integer; o++) {
+		client_t* clOther = svs.clients + o;
+		if (clOther->state == CS_ACTIVE) {
+			playerState_t* ps = SV_GameClientNum(o);
+			if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl) { // spectators :)
+				userMessage_t* messageDupe = new userMessage_t();
+				*messageDupe = *umsg;
+				userStoredUcmdCounts[o] += messageDupe->cmds.size();
+				userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
+			}
+		}
+	}
+	playerState_t* myps = SV_GameClientNum(myCl);
+	if (myps->clientNum == myCl){// && !(myps->pm_flags & PMF_FOLLOW)) {
+		userStoredUcmdCounts[myCl] += umsg->cmds.size();
+		userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+	}
+	else {
+		delete umsg;
+	}
+}
+
 /*
 ===================
 SV_ExecuteClientMessage
@@ -1709,10 +1732,12 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	}
 
 	if (sv_ucmdSendback->integer) {
-		umsg = new userMessage_t();
-		umsg->serverTime = sv.time;
-		umsg->droppedPackets = cl->netchan.dropped;
-		umsg->clientNum = cl - svs.clients;
+		if (!((com_coolApi_supported_game->integer & COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED) && (SV_GentityNum(cl - svs.clients)->r.svFlags & SVF_COOLAPI_GAMEGENERATEDSENDBACKUSERCMD))) { // game can override this whole thing.
+			umsg = new userMessage_t();
+			umsg->serverTime = sv.time;
+			umsg->droppedPackets = cl->netchan.dropped;
+			umsg->clientNum = cl - svs.clients;
+		}
 	}
 
 	// read optional clientCommand strings
@@ -1745,27 +1770,28 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //	}
 
 	if (umsg) {
-		int myCl = cl - svs.clients;
-		for (int o = 0; o < sv_maxclients->integer; o++) {
-			client_t* clOther = svs.clients + o;
-			if (clOther->state == CS_ACTIVE) {
-				playerState_t* ps = SV_GameClientNum(o);
-				if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl ) { // spectators :)
-					userMessage_t* messageDupe = new userMessage_t();
-					*messageDupe = *umsg;
-					userStoredUcmdCounts[o] += messageDupe->cmds.size();
-					userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
-				}
-			}
-		}
-		playerState_t* myps = SV_GameClientNum(cl-svs.clients);
-		if (myps->clientNum == myCl && !(myps->pm_flags & PMF_FOLLOW)) {
-			userStoredUcmdCounts[myCl] += umsg->cmds.size();
-			userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
-		}
-		else {
-			delete umsg;
-		}
+		SV_AddUserMessageForClient(cl - svs.clients, umsg);
+		//int myCl = cl - svs.clients;
+		//for (int o = 0; o < sv_maxclients->integer; o++) {
+		//	client_t* clOther = svs.clients + o;
+		//	if (clOther->state == CS_ACTIVE) {
+		//		playerState_t* ps = SV_GameClientNum(o);
+		//		if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl ) { // spectators :)
+		//			userMessage_t* messageDupe = new userMessage_t();
+		//			*messageDupe = *umsg;
+		//			userStoredUcmdCounts[o] += messageDupe->cmds.size();
+		//			userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
+		//		}
+		//	}
+		//}
+		//playerState_t* myps = SV_GameClientNum(cl-svs.clients);
+		//if (myps->clientNum == myCl && !(myps->pm_flags & PMF_FOLLOW)) {
+		//	userStoredUcmdCounts[myCl] += umsg->cmds.size();
+		//	userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+		//}
+		//else {
+		//	delete umsg;
+		//}
 	}
 }
 

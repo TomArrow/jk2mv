@@ -358,6 +358,9 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 	if ( mv_blockspeedhack->integer && !(sv.fixes & MVFIX_SPEEDHACK)) cmd->angles[ROLL] = 0; // Prevent modified clients from gaining more speed than others...
 }
 
+
+void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg);
+
 //==============================================
 
 /*
@@ -1141,6 +1144,24 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		case G_COOL_API_NONEPSILONTRACE_CAPSULE:
 			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], qtrue);
 			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED) {
+		switch (args[0]) {
+
+		case G_COOL_API_SENDBACKUCMD_GAMEGENERATED:
+		{
+			userMessage_t* umsg = new userMessage_t();
+			umsg->serverTime = sv.time;
+			umsg->droppedPackets = 0;
+			umsg->clientNum = args[1];
+			umsg->pingKnown = qfalse;
+			usercmd_t* ucmd = new usercmd_t();
+			*ucmd = *VMAV(2, usercmd_t);
+			umsg->cmds.push_back(std::move(std::shared_ptr<usercmd_t>(ucmd)));
+			SV_AddUserMessageForClient(args[1], umsg);
+			return 0;
+		}
 		}
 	}
 	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MARIADB) {
