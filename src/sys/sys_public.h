@@ -75,6 +75,7 @@ extern cvar_t *com_slowDriftAdjustMaxFPS;
 extern cvar_t *com_physicsFps;
 extern cvar_t *com_deadRampFix;
 extern cvar_t *com_deadRampFixedCount;
+extern cvar_t * com_placebo;
 
 sysEvent_t	Sys_GetEvent( void );
 

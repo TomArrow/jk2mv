@@ -30,6 +30,7 @@ cvar_t* com_slowDriftAdjustMaxFPS;
 cvar_t* com_physicsFps;
 cvar_t* com_deadRampFix;
 cvar_t* com_deadRampFixedCount;
+cvar_t* com_placebo;
 
 static volatile sig_atomic_t sys_signal = 0;
 
@@ -110,6 +111,7 @@ void Sys_Init(void) {
 	com_physicsFps = Cvar_Get("com_physicsFps", "0", CVAR_ARCHIVE | CVAR_USERINFO | CVAR_GLOBAL);
 	com_deadRampFix = Cvar_Get("com_deadRampFix", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_deadRampFixedCount = Cvar_Get("com_deadRampFixedCount", "0", CVAR_VM_NOWRITE | CVAR_INIT);
+	com_placebo = Cvar_Get("com_placebo", "0", CVAR_ARCHIVE);
 }
 
 static void Q_NORETURN Sys_Exit(int ex) {
