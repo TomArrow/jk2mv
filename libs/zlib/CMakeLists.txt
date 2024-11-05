@@ -39,9 +39,11 @@ add_library(zlib STATIC adler32.c
 # cache.  These are the same variables exported by the built-in FindZLIB module.
 set(ZLIB_LIBRARIES zlib PARENT_SCOPE)
 set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/libs/zlib/include/ PARENT_SCOPE)
+set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/zlib/include/ PARENT_SCOPE)
 set(ZLIB_FOUND TRUE)
 
 mark_as_advanced(ZLIB_LIBRARIES ZLIB_INCLUDE_DIRS)
+mark_as_advanced(ZLIB_LIBRARIES ZLIB_INCLUDE_DIR)
 
 # Build as position-independent code, since it will probably be linked into a
 # dynamic library.
