@@ -44,6 +44,8 @@ static struct {
 		std::mutex mutex;
 		std::condition_variable cv_processed;
 		bool processed;
+		bool isFolder;
+		bool isRedirect;
 
 		char reqPath[MAX_OSPATH];
 		char filePath[MAX_OSPATH];
@@ -59,16 +61,42 @@ static struct {
 	unsigned int poll_delay_ms;
 } srv;
 
+const char demoBasePath[] = { "demos/races/" };
+
 static void NET_HTTP_ServerProcessEvent() {
 	std::unique_lock<std::mutex> lk(srv.event.mutex);
 
 	if (!srv.event.processed) {
-		const char *filePath = FS_MV_VerifyDownloadPath(srv.event.reqPath);
-		if (filePath) {
+		bool isDemoPath = false;
+
+		if (!srv.event.reqPath[0]) {
+			srv.event.isRedirect = true;
+			isDemoPath = true;
+			Q_strncpyz(srv.event.filePath, demoBasePath, sizeof(srv.event.filePath));
 			srv.event.allowed = true;
-			Q_strncpyz(srv.event.filePath, filePath, sizeof(srv.event.filePath));
-		} else {
-			srv.event.allowed = false;
+		}
+		else if (!Q_stricmpn(demoBasePath, srv.event.reqPath,sizeof(demoBasePath)-1) && !FS_CheckDirTraversal(srv.event.reqPath)) {
+			isDemoPath = true;
+			srv.event.allowed = true;
+			//if (!FS_FileExists(srv.event.reqPath)) {
+				char* path = FS_BuildOSPathDefault("");
+				Q_strncpyz(srv.event.filePath, path, sizeof(srv.event.filePath));
+				path[strlen(path) - 1] = '\0'; // remove trailing slash
+				srv.event.isFolder = true;
+			//}
+			//else {
+			//	Q_strncpyz(srv.event.filePath, FS_BuildOSPathDefault(srv.event.reqPath), sizeof(srv.event.filePath));
+			//}
+		}
+
+		if (!isDemoPath) {
+			const char *filePath = FS_MV_VerifyDownloadPath(srv.event.reqPath);
+			if (filePath) {
+				srv.event.allowed = true;
+				Q_strncpyz(srv.event.filePath, filePath, sizeof(srv.event.filePath));
+			} else {
+				srv.event.allowed = false;
+			}
 		}
 
 		// notify thread about processed event
@@ -188,6 +216,8 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 		// wait for free event, set event, wait for result, free event
 		std::unique_lock<std::mutex> lk(srv.event.mutex);
 		srv.event.processed = false;
+		srv.event.isFolder = false;
+		srv.event.isRedirect = false;
 
 		mgstr2str(srv.event.reqPath, sizeof(srv.event.reqPath), &hm->uri);
 		memmove(srv.event.reqPath, srv.event.reqPath + 1, strlen(srv.event.reqPath));
@@ -195,10 +225,26 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 		srv.event.cv_processed.wait(lk, [] { return srv.event.processed; });
 
 		if (srv.event.allowed) {
-			struct mg_http_serve_opts opts = {};
-			opts.mime_types = "pk3=application/octet-stream";
+			if (srv.event.isRedirect) {
+				char redirectHeader[MAX_OSPATH + 20];
+				redirectHeader[0] = '\0';
+				Q_strcat(redirectHeader,sizeof(redirectHeader), "Location: /");
+				Q_strcat(redirectHeader,sizeof(redirectHeader), srv.event.filePath);
+				Q_strcat(redirectHeader,sizeof(redirectHeader), "\r\n");
+				mg_http_reply(nc, 302, redirectHeader, "");
+			}
+			else if (srv.event.isFolder) {
+				struct mg_http_serve_opts opts = {};
+				opts.root_dir = srv.event.filePath;
+				opts.mime_types = "pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
+				mg_http_serve_dir(nc, hm, &opts);
+			}
+			else {
+				struct mg_http_serve_opts opts = {};
+				opts.mime_types = "pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
 
-			mg_http_serve_file(nc, hm, srv.event.filePath, &opts);
+				mg_http_serve_file(nc, hm, srv.event.filePath, &opts);
+			}
 		} else {
 			mg_http_reply(nc, 403, NULL, "");
 			nc->is_draining = 1;

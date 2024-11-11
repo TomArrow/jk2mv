@@ -804,6 +804,7 @@ int		FS_filelength( fileHandle_t f, module_t module = MODULE_MAIN );
 
 char	*FS_BuildOSPath(const char *base, const char *game, const char *qpath);
 char	*FS_BuildOSPath(const char *base, const char *path);
+char*	FS_BuildOSPathDefault(const char* path);
 qboolean FS_CreatePath (char *OSPath);
 
 int		FS_FTell( fileHandle_t f, module_t module = MODULE_MAIN );

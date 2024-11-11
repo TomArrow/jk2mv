@@ -1239,6 +1239,10 @@ qboolean FS_RenameOrQueue( const char *from, const char *to ) {
 	return qfalse;
 }
 
+char* FS_BuildOSPathDefault(const char* path) {
+	return FS_BuildOSPath(fs_homepath->string, fs_gamedir, path);
+}
+
 /*
 ===========
 FS_Rename
