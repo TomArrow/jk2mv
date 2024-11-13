@@ -4101,8 +4101,6 @@ static void FS_Startup( const char *gameName ) {
 	fs_basegame = Cvar_Get( "fs_basegame", "eternaljk2", CVAR_INIT );
 	fs_globalcfg = Cvar_Get( "fs_globalcfg", "1", CVAR_ARCHIVE/* | CVAR_LATCH*/ | CVAR_NORESTART );
 
-	fs_dlTommyTernalPk3 = Cvar_Get( "fs_dlTommyTernalPk3", "0", CVAR_LATCH | CVAR_ARCHIVE );
-
 	if (fs_globalcfg->integer)
 		fs_gamedirvar = fs_basegame;
 	else
@@ -4111,6 +4109,8 @@ static void FS_Startup( const char *gameName ) {
 	fs_basegame = Cvar_Get( "fs_basegame", "", CVAR_INIT );
 	fs_gamedirvar = Cvar_Get( "fs_game", "", CVAR_INIT | CVAR_SYSTEMINFO );
 #endif
+
+	fs_dlTommyTernalPk3 = Cvar_Get("fs_dlTommyTernalPk3", "0", CVAR_LATCH | CVAR_ARCHIVE);
 	fs_forcegame = Cvar_Get("fs_forcegame", "", CVAR_INIT);
 
 	assetsPath = Sys_DefaultAssetsPath();
