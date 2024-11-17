@@ -364,6 +364,9 @@ static void FS_ResetFileHandleData(fileHandleData_t* f) {
 	f->zipFileLen = 0;
 	f->zipFile = qfalse;
 	f->name[0] = '\0';
+	f->module = MODULE_MAIN; // 0
+	f->baseOffset = 0; // idk what this is tbh
+	Com_Memset(&f->compressedFileInfo, 0, sizeof(f->compressedFileInfo));
 }
 #endif
 
