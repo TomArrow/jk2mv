@@ -1434,6 +1434,9 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	if (levenshtein(cmd, "login") <= 2 || levenshtein(cmd, "register") <= 2) {
 		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, Cmd_Argv(1), Cmd_ArgsFrom(3));
 	}
+	else if (levenshtein(cmd, "changepassword") <= 3) {
+		Com_DPrintf("clientCommand: %s : %i : %s ****** %s\n", cl->name, seq, cmd, Cmd_ArgsFrom(2));
+	}
 	else {
 		Com_DPrintf("clientCommand: %s : %i : %s\n", cl->name, seq, s);
 	}
