@@ -1123,6 +1123,12 @@ void Con_DrawNotify (void)
 		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v, qtrue );
 
 		v += BIGCHAR_HEIGHT;
+
+		if (Q_stristr(chatField.buffer, "login") || Q_stristr(chatField.buffer, "register") || Q_stristr(chatField.buffer, "password")) {
+			SCR_DrawBigString(SCREEN_WIDTH / 2-100, SCREEN_HEIGHT / 2- BIGCHAR_HEIGHT, "^1!!CAREFUL!!", 1.0f);
+			SCR_DrawBigString(150, SCREEN_HEIGHT / 2, "^1DON'T TYPE ACCOUNT/LOGIN", 1.0f);
+			SCR_DrawBigString(180, SCREEN_HEIGHT / 2+ BIGCHAR_HEIGHT, "^1CREDENTIALS IN CHAT!", 1.0f);
+		}
 	}
 
 }

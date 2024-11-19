@@ -1419,6 +1419,8 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	const char	*s;
 	qboolean clientOk = qtrue;
 	const char* cmd;
+	const char* arg1;
+	int argc;
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1431,8 +1433,14 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	// dont print full login/register commands to not leak pws
 	Cmd_TokenizeString(s);
 	cmd = Cmd_Argv(0);
+	arg1 = Cmd_Argv(1);
+	argc = Cmd_Argc();
+	//if ((!Q_stricmp(cmd,"say") || !Q_stricmp(cmd, "say_team")) && (levenshtein(cmd, "login") <= 2 && argc >= 4 && argc <= 5 || levenshtein(cmd, "register") <= 2 || levenshtein(cmd, "changepassword") <= 3)) {
+
+	//}
+	//else 
 	if (levenshtein(cmd, "login") <= 2 || levenshtein(cmd, "register") <= 2) {
-		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, Cmd_Argv(1), Cmd_ArgsFrom(3));
+		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, arg1, Cmd_ArgsFrom(3));
 	}
 	else if (levenshtein(cmd, "changepassword") <= 3) {
 		Com_DPrintf("clientCommand: %s : %i : %s ****** %s\n", cl->name, seq, cmd, Cmd_ArgsFrom(2));
