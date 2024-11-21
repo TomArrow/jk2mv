@@ -1280,6 +1280,17 @@ void CL_CreateNewCommands( void ) {
 				}
 				cl.cgameMoveSet = 0;
 
+				if (cl.cgameAngleSet & 1) {
+					newCommand.angles[0] = cl.cgamePitchAngle;
+				}
+				if (cl.cgameAngleSet & 2) {
+					newCommand.angles[1] = cl.cgameYawAngle;
+				}
+				if (cl.cgameAngleSet & 4) {
+					newCommand.angles[2] = cl.cgameRollAngle;
+				}
+				// dont reset cl.cgameAngleSet to stay consistent. cgame must set it back to off
+
 				newCommand.generic_cmd = genericCommandValue;
 				genericCommandValue = 0;
 				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
@@ -1340,6 +1351,17 @@ void CL_CreateNewCommands( void ) {
 			cl.cmds[cmdNum].upmove = cl.cgameUpmove;
 		}
 		cl.cgameMoveSet = 0;
+
+		if (cl.cgameAngleSet & 1) {
+			cl.cmds[cmdNum].angles[0] = cl.cgamePitchAngle;
+		}
+		if (cl.cgameAngleSet & 2) {
+			cl.cmds[cmdNum].angles[1] = cl.cgameYawAngle;
+		}
+		if (cl.cgameAngleSet & 4) {
+			cl.cmds[cmdNum].angles[2] = cl.cgameRollAngle;
+		}
+		// dont reset cl.cgameAngleSet to stay consistent. cgame must set it back to off
 
 		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 

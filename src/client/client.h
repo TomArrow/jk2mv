@@ -125,6 +125,11 @@ typedef struct {
 	int			cgameForwardmove;
 	int			cgameMoveSet;
 
+	int			cgameYawAngle;
+	int			cgamePitchAngle;
+	int			cgameRollAngle;
+	int			cgameAngleSet;
+
 	qboolean	gcmdSendValue;
 	byte		gcmdValue;
 

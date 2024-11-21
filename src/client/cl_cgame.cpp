@@ -1532,6 +1532,16 @@ Ghoul2 Insert End
 			return 0;
 		}
 	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_SETUSERANGLES) {
+		switch (args[0]) {
+		case CG_COOL_API_SETUSERANGLES:
+			cl.cgamePitchAngle = args[1];
+			cl.cgameYawAngle = args[2];
+			cl.cgameRollAngle = args[3];
+			cl.cgameAngleSet = args[4];
+			return 0;
+		}
+	}
 	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_EZDEMOCGAMEBUFFER) {
 		switch (args[0]) {
 		case CG_COOL_API_SET_EZDEMO_BUFFER:
