@@ -1194,7 +1194,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 		}
 		int i;
 		ssMeta << "{";
-		ssMeta << "\"wr\":\"EternalJK_Server\""; // Writer (keyword used by other tools too to identify origin of demo)
+		ssMeta << "\"wr\":\"TommyTernal_Server\""; // Writer (keyword used by other tools too to identify origin of demo)
 
 		// Go through manually set metadata and add it.
 		for (auto it = demoMetaData[cl - svs.clients].begin(); it != demoMetaData[cl - svs.clients].end(); it++) {
