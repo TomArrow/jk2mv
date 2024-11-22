@@ -73,6 +73,8 @@ cvar_t	*mv_allowDownload;
 cvar_t	*cl_conXOffset;
 cvar_t	*cl_inGameVideo;
 
+cvar_t	*cl_numpadNumberBinds;
+
 cvar_t	*cl_serverStatusResendTime;
 cvar_t	*cl_trn;
 cvar_t	*cl_framerate;
@@ -3416,6 +3418,8 @@ void CL_Init( void ) {
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 
 	cl_inGameVideo = Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+
+	cl_numpadNumberBinds = Cvar_Get("cl_numpadNumberBinds", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
