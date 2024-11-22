@@ -1237,7 +1237,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 		demoPreRecordBufferIt firstOldKeyframe;
 		qboolean firstOldKeyframeFound = qfalse;
 		if (com_developer->integer > 1) {
-			Com_Printf("Demo pre-record queue size is %d, number of first message in queue is %d ... ", demoPreRecordBuffer[cl - svs.clients].begin(), demoPreRecordBuffer[cl - svs.clients].begin()->get()->msgNum);
+			Com_Printf("Demo pre-record queue size is %d, number of first message in queue is %d ... ", demoPreRecordBuffer[cl - svs.clients].size(), demoPreRecordBuffer[cl - svs.clients].size() ? demoPreRecordBuffer[cl - svs.clients].begin()->get()->msgNum : 0);
 		}
 		for (demoPreRecordBufferIt it = demoPreRecordBuffer[cl - svs.clients].begin(); it != demoPreRecordBuffer[cl - svs.clients].end(); it++) {
 			if (it->get()->isKeyframe && it->get()->time < sv.time) {
