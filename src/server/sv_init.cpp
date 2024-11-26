@@ -447,7 +447,6 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 
 #ifdef SVDEMO
 	SV_StopAutoRecordDemos();
-	SV_ClearAllDemoPreRecord();
 #endif
 
 	Com_Printf("------ Server Initialization ------\n");
@@ -772,6 +771,7 @@ Ghoul2 Insert End
 		}
 	}
 
+	SV_ClearAllDemoPreRecord();
 	SV_BeginAutoRecordDemos();
 #endif
 
