@@ -718,9 +718,9 @@ SV_SendMessageToClient
 Called by SV_SendClientSnapshot and SV_SendClientGameState
 =======================
 */
-void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend) {
+void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qboolean isSnapshot) {
 	int			rateMsec;
-	int			snapshotMsec = SV_GetClientSnapshotMsec(client);
+	int			snapshotMsec = isSnapshot ? SV_GetClientSnapshotMsec(client) : client->snapshotMsec; // only with a snapshot can we trust that SV_GetClientSnapshotMsec wont cause a segfault due to accessing ps when game isnt loaded
 
 	// MW - my attempt to fix illegible server message errors caused by
 	// packet fragmentation of initial snapshot.
@@ -1058,7 +1058,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	if ( !SV_UpdateServerCommandsToClient(client, &msg, qtrue) ) {
 		// If we can't fit all commands in a single message send what we got and
 		// don't even try to send entities
-		SV_SendMessageToClient( &msg, client );
+		SV_SendMessageToClient( &msg, client, qfalse, qtrue );
 		return;
 	}
 
@@ -1075,7 +1075,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		// entity states. As the net code doesn't send the msg_buf content after
 		// the current size of the message we don't have to clear anything and
 		// we can just use the old msg values (which point to the updated buffer).
-		SV_SendMessageToClient( &msgBak, client );
+		SV_SendMessageToClient( &msgBak, client, qfalse, qtrue );
 		return;
 	}
 
@@ -1089,7 +1089,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		// Downloads usually don't happen in situations that are likely to have
 		// message overflows, but let's make sure and apply the same logic we
 		// used for the entity states.
-		SV_SendMessageToClient( &msgBak, client );
+		SV_SendMessageToClient( &msgBak, client, qfalse, qtrue );
 		return;
 	}
 
@@ -1100,7 +1100,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	}
 
 	if (!dontSend) {
-		SV_SendMessageToClient(&msg, client);
+		SV_SendMessageToClient(&msg, client, qfalse, qtrue);
 	}
 }
 

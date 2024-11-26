@@ -419,7 +419,7 @@ void SV_AddServerCommand( client_t *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
 qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
-void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse);
+void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse, qboolean isSnapshot = qfalse);
 void SV_SendClientMessages( void );
 void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
 
