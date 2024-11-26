@@ -594,76 +594,77 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	// this is the frame we are creating
 	frame = &client->frames[ client->netchan.outgoingSequence & PACKET_MASK ];
 
-	// clear everything in this snapshot
-	entityNumbers.numSnapshotEntities = 0;
-	Com_Memset( frame->areabits, 0, sizeof( frame->areabits ) );
+// clear everything in this snapshot
+entityNumbers.numSnapshotEntities = 0;
+Com_Memset(frame->areabits, 0, sizeof(frame->areabits));
 
-	frame->num_entities = 0;
+frame->num_entities = 0;
 
-	clent = client->gentity;
-	if ( !clent || client->state == CS_ZOMBIE ) {
-		return;
+clent = client->gentity;
+if (!clent || client->state == CS_ZOMBIE) {
+	return;
+}
+
+// grab the current playerState_t
+ps = SV_GameClientNum(client - svs.clients);
+if (VM_GetGameversion(gvm) != VERSION_1_02 || mvStructConversionDisabled) {
+	frame->ps = *ps;
+}
+else {
+	// tricky but works atleast on x86
+	playerState15_t* ps15 = (playerState15_t*)ps;
+
+	memcpy(&frame->ps, ps15, ((char*)&ps15->saberIndex) - (char*)ps15);
+	memcpy(&frame->ps.saberIndex, &ps15->saberIndex, (char*)&(ps15)[1] - (char*)&ps15->saberIndex);
+}
+
+
+int							clientNum;
+// never send client's own entity, because it can
+// be regenerated from the playerstate
+clientNum = frame->ps.clientNum;
+if (clientNum < 0 || clientNum >= MAX_GENTITIES) {
+	Com_Error(ERR_DROP, "SV_SvEntityForGentity: bad gEnt");
+}
+svEnt = &sv.svEntities[clientNum];
+svEnt->snapshotCounter = sv.snapshotCounter;
+
+
+// find the client's viewpoint
+VectorCopy(ps->origin, org);
+org[2] += ps->viewheight;
+
+// add all the entities directly visible to the eye, which
+// may include portal entities that merge other viewpoints
+SV_AddEntitiesVisibleFromPoint(org, frame, &entityNumbers, qfalse, client - svs.clients);
+
+// if there were portals visible, there may be out of order entities
+// in the list which will need to be resorted for the delta compression
+// to work correctly.  This also catches the error condition
+// of an entity being included twice.
+qsort(entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities,
+	sizeof(entityNumbers.snapshotEntities[0]), SV_QsortEntityNumbers);
+
+// now that all viewpoint's areabits have been OR'd together, invert
+// all of them to make it a mask vector, which is what the renderer wants
+for (i = 0; i < MAX_MAP_AREA_BYTES / 4; i++) {
+	((int*)frame->areabits)[i] = ((int*)frame->areabits)[i] ^ -1;
+}
+
+// copy the entity states out
+frame->num_entities = 0;
+frame->first_entity = svs.nextSnapshotEntities;
+for (i = 0; i < entityNumbers.numSnapshotEntities; i++) {
+	ent = SV_GentityNum(entityNumbers.snapshotEntities[i]);
+	state = &svs.snapshotEntities[svs.nextSnapshotEntities % svs.numSnapshotEntities];
+	*state = ent->s;
+	svs.nextSnapshotEntities++;
+	// this should never hit, map should always be restarted first in SV_Frame
+	if (svs.nextSnapshotEntities >= 0x7FFFFFFE) {
+		Com_Error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
 	}
-
-	// grab the current playerState_t
-	ps = SV_GameClientNum( client - svs.clients );
-	if (VM_GetGameversion(gvm) != VERSION_1_02 || mvStructConversionDisabled) {
-		frame->ps = *ps;
-	} else {
-		// tricky but works atleast on x86
-		playerState15_t *ps15 = (playerState15_t *)ps;
-
-		memcpy(&frame->ps, ps15, ((char *)&ps15->saberIndex) - (char *)ps15);
-		memcpy(&frame->ps.saberIndex, &ps15->saberIndex, (char *)&(ps15)[1] - (char *)&ps15->saberIndex);
-	}
-
-
-	int							clientNum;
-	// never send client's own entity, because it can
-	// be regenerated from the playerstate
-	clientNum = frame->ps.clientNum;
-	if ( clientNum < 0 || clientNum >= MAX_GENTITIES ) {
-		Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
-	}
-	svEnt = &sv.svEntities[ clientNum ];
-	svEnt->snapshotCounter = sv.snapshotCounter;
-
-
-	// find the client's viewpoint
-	VectorCopy( ps->origin, org );
-	org[2] += ps->viewheight;
-
-	// add all the entities directly visible to the eye, which
-	// may include portal entities that merge other viewpoints
-	SV_AddEntitiesVisibleFromPoint( org, frame, &entityNumbers, qfalse, client - svs.clients );
-
-	// if there were portals visible, there may be out of order entities
-	// in the list which will need to be resorted for the delta compression
-	// to work correctly.  This also catches the error condition
-	// of an entity being included twice.
-	qsort( entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities,
-		sizeof( entityNumbers.snapshotEntities[0] ), SV_QsortEntityNumbers );
-
-	// now that all viewpoint's areabits have been OR'd together, invert
-	// all of them to make it a mask vector, which is what the renderer wants
-	for ( i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++ ) {
-		((int *)frame->areabits)[i] = ((int *)frame->areabits)[i] ^ -1;
-	}
-
-	// copy the entity states out
-	frame->num_entities = 0;
-	frame->first_entity = svs.nextSnapshotEntities;
-	for ( i = 0 ; i < entityNumbers.numSnapshotEntities ; i++ ) {
-		ent = SV_GentityNum(entityNumbers.snapshotEntities[i]);
-		state = &svs.snapshotEntities[svs.nextSnapshotEntities % svs.numSnapshotEntities];
-		*state = ent->s;
-		svs.nextSnapshotEntities++;
-		// this should never hit, map should always be restarted first in SV_Frame
-		if ( svs.nextSnapshotEntities >= 0x7FFFFFFE ) {
-			Com_Error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
-		}
-		frame->num_entities++;
-	}
+	frame->num_entities++;
+}
 }
 
 
@@ -676,17 +677,33 @@ to take to clear, based on the current rate
 ====================
 */
 #define	HEADER_RATE_BYTES	48		// include our header, IP header, and some overhead
-static int SV_RateMsec( client_t *client, int messageSize ) {
-	int		rate = SV_ClientRate( client );
+static int SV_RateMsec(client_t* client, int messageSize) {
+	int		rate = SV_ClientRate(client);
 	int		rateMsec;
 
 	// individual messages will never be larger than fragment size
-	if ( messageSize > 1500 ) {
+	if (messageSize > 1500) {
 		messageSize = 1500;
 	}
-	rateMsec = ( messageSize + HEADER_RATE_BYTES ) * 1000 / rate;
+	rateMsec = (messageSize + HEADER_RATE_BYTES) * 1000 / rate;
 
 	return rateMsec;
+}
+
+#define EF_SEGMENTEDREPLAY	0x08000000		// is in a segmented replay
+
+int SV_GetClientSnapshotMsec(client_t* client) {
+	playerState_t* ps = SV_GameClientNum(client - svs.clients);
+	qboolean spectator = (qboolean)(ps && ((ps->pm_flags & PMF_FOLLOW) || ps->persistant[PERS_TEAM] == TEAM_SPECTATOR));
+
+	if (com_coolApi_supported_game_vmflags && (com_coolApi_supported_game_vmflags->integer & COOL_APIFEATURE_VMGAME_FLAG_SEGMENTEDREPLAY)){
+		if (ps->eFlags & EF_SEGMENTEDREPLAY) {
+			spectator = qfalse;
+		}
+		// this sadly also means a spectator won't be able to set lower snaps if he's spectating someone in a segmented replay. but oh well!
+	}
+
+	return spectator ? client->snapshotMsecSpec : client->snapshotMsec;
 }
 
 #ifdef SVDEMO
@@ -703,6 +720,7 @@ Called by SV_SendClientSnapshot and SV_SendClientGameState
 */
 void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend) {
 	int			rateMsec;
+	int			snapshotMsec = SV_GetClientSnapshotMsec(client);
 
 	// MW - my attempt to fix illegible server message errors caused by
 	// packet fragmentation of initial snapshot.
@@ -843,9 +861,9 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend) {
 	// normal rate / snapshotMsec calculation
 	rateMsec = SV_RateMsec( client, msg->cursize );
 
-	if ( rateMsec < client->snapshotMsec ) {
+	if ( rateMsec < snapshotMsec) {
 		// never send more packets than this, no matter what the rate is at
-		rateMsec = client->snapshotMsec;
+		rateMsec = snapshotMsec;
 		client->rateDelayed = qfalse;
 	} else {
 		client->rateDelayed = qtrue;

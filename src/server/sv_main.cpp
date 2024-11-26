@@ -25,6 +25,7 @@ cvar_t	*sv_mapname;
 cvar_t	*sv_mapChecksum;
 cvar_t	*sv_serverid;
 cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
+cvar_t	*sv_minSnapsSpec;		// minimum snapshots/sec a spectator client can request, also limited by sv_maxSnaps
 cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
 cvar_t	*sv_enforceSnaps;
 cvar_t	*sv_enforceSnapsDebug;  // Generate all snapshots but only actually send the messages according to max snaps etc
@@ -1068,7 +1069,7 @@ qboolean SV_CheckPaused( void ) {
 }
 
 void SV_CheckCvars(void) {
-	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMax = -1;
+	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMinSpec = -1, lastModSnapsMax = -1;
 	static int lastModEnforceSnaps = -1;
 	qboolean changed = qfalse;
 
@@ -1096,6 +1097,7 @@ void SV_CheckCvars(void) {
 	// check limits on client "snaps" value based on server framerate and snapshot rate
 	if (sv_fps->modificationCount != lastModFramerate ||
 		sv_minSnaps->modificationCount != lastModSnapsMin ||
+		sv_minSnapsSpec->modificationCount != lastModSnapsMinSpec ||
 		sv_maxSnaps->modificationCount != lastModSnapsMax ||
 		sv_enforceSnaps->modificationCount != lastModEnforceSnaps)
 	{
@@ -1104,6 +1106,7 @@ void SV_CheckCvars(void) {
 
 		lastModFramerate = sv_fps->modificationCount;
 		lastModSnapsMin = sv_minSnaps->modificationCount;
+		lastModSnapsMinSpec = sv_minSnapsSpec->modificationCount;
 		lastModSnapsMax = sv_maxSnaps->modificationCount;
 		lastModEnforceSnaps = sv_enforceSnaps->modificationCount;
 

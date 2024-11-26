@@ -20,6 +20,7 @@
 #include "../qcommon/mariadb.h"
 
 cvar_t* com_coolApi_supported_game;
+cvar_t* com_coolApi_supported_game_vmflags;
 
 
 std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
@@ -1340,6 +1341,7 @@ static void SV_InitGameVM( qboolean restart ) {
 	mvStructConversionDisabled = qfalse;
 
 	com_coolApi_supported_game = Cvar_Get("coolApi_supported_game", "0", CVAR_ROM);
+	com_coolApi_supported_game_vmflags = Cvar_Get("coolApi_supported_game_vmflags", "0", CVAR_ROM);
 
 	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,
 		0, 0, 0, 0, 0, 0, 0, 0, MIN(mv_apienabled->integer, MV_APILEVEL));

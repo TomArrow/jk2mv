@@ -860,8 +860,9 @@ void SV_Init (void) {
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
-	sv_minSnaps = Cvar_Get("sv_minSnaps", "1", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
-	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "30", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
+	sv_minSnaps = Cvar_Get("sv_minSnaps", "100", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
+	sv_minSnapsSpec = Cvar_Get("sv_minSnapsSpec", "1", CVAR_ARCHIVE);                // allow spectators more leeway
+	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "1000", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
 	sv_enforceSnaps = Cvar_Get("sv_enforceSnaps", "0", CVAR_ARCHIVE);                // 0: users choice (limited by min/max snaps); 1: sv_fps (limited by min/max snaps)	
 	sv_enforceSnapsDebug = Cvar_Get("sv_enforceSnapsDebug", "0", CVAR_ARCHIVE);      // 0: normal behavior; 1: generate snapshots and messages on EVERY server frame, but dont actually send them unless limit allows
 	sv_minRate = Cvar_Get("sv_minRate", "1000", CVAR_ARCHIVE | CVAR_SERVERINFO );    // jk2ded hardcoded min: 1000

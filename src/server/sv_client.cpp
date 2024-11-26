@@ -1825,10 +1825,10 @@ int SV_ClientRate( client_t *client )
 	return Com_Clampi( minRate, maxRate, client->rate );
 }
 
-int SV_ClientSnaps( client_t *client )
+int SV_ClientSnaps( client_t *client, qboolean spec )
 {
 	int maxSnaps = Com_Clampi( 1, sv_fps->integer, sv_maxSnaps->integer );
-	int minSnaps = Com_Clampi( 1, maxSnaps, sv_minSnaps->integer );
+	int minSnaps = Com_Clampi( 1, maxSnaps, spec ? sv_minSnapsSpec->integer : sv_minSnaps->integer );
 
 	// Get the desired snaps value (either sv_fps or the value from the userinfo)
 	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
@@ -1839,12 +1839,18 @@ int SV_ClientSnaps( client_t *client )
 
 void SV_ClientUpdateSnaps( client_t *client )
 {
-	int snapsMsec = 1000 / SV_ClientSnaps( client );
+	int snapsMsec = 1000 / SV_ClientSnaps( client, qfalse );
+	int snapsMsecSpec = 1000 / SV_ClientSnaps( client, qtrue );
 
 	if ( snapsMsec != client->snapshotMsec ) {
 		// Reset next snapshot so we avoid desync between server frame time and snapshot send time
 		client->nextSnapshotTime = -1;
 		client->snapshotMsec = snapsMsec;
+	}
+	if (snapsMsecSpec != client->snapshotMsecSpec ) {
+		// Reset next snapshot so we avoid desync between server frame time and snapshot send time
+		client->nextSnapshotTime = -1;
+		client->snapshotMsecSpec = snapsMsecSpec;
 	}
 }
 

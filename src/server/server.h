@@ -193,6 +193,7 @@ typedef struct client_s {
 	int				ping;
 	int				rate;				// bytes / second
 	int				snapshotMsec;		// requests a snapshot every snapshotMsec unless rate choked
+	int				snapshotMsecSpec;		// same as snapshotMsec but specifically for spectators (can allow more leeway)
 	int				pureAuthentic;
 	netchan_t		netchan;
 	int				oldServerTime;		// client server time before map change
@@ -261,6 +262,7 @@ extern	server_t		sv;					// cleared each map
 extern	vm_t			*gvm;				// game virtual machine
 
 extern	cvar_t	*com_coolApi_supported_game;
+extern	cvar_t	*com_coolApi_supported_game_vmflags;
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
@@ -281,6 +283,7 @@ extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
 extern	cvar_t	*sv_minSnaps;
+extern	cvar_t	*sv_minSnapsSpec;
 extern	cvar_t	*sv_maxSnaps;
 extern	cvar_t	*sv_enforceSnaps;
 extern	cvar_t	*sv_enforceSnapsDebug; // Generate all snapshots but only actually send the messages according to max snaps etc
