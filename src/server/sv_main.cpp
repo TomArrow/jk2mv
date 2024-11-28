@@ -1007,7 +1007,7 @@ void SV_CheckTimeouts( void ) {
 	int			droppoint;
 	int			zombiepoint;
 
-	droppoint = svs.time - 1000 * sv_timeout->integer;
+	droppoint = svs.time - 1000 * MAX(10,sv_timeout->integer); // in case someone sets 9999999999 by accident and overflows to negative
 	zombiepoint = svs.time - 1000 * sv_zombietime->integer;
 
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
