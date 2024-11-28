@@ -205,6 +205,8 @@ typedef struct client_s {
 #ifdef SVDEMO
 	demoInfo_t		demo;
 #endif
+
+	qboolean		zombified;
 } client_t;
 
 //=============================================================================

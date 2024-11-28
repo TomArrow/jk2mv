@@ -211,7 +211,16 @@ void SV_DirectConnect( netadr_t from ) {
 		}
 		if ( NET_CompareBaseAdr( from, cl->netchan.remoteAddress )
 			&& ( cl->netchan.qport == qport
-			|| from.port == cl->netchan.remoteAddress.port ) ) {
+			|| from.port == cl->netchan.remoteAddress.port ) && !(cl->state == CS_ZOMBIE && cl->zombified) ) {
+
+			//if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
+
+			//	if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, cl - svs.clients)) {
+			//		continue;
+			//	}
+			//	
+			//}
+
 			Com_Printf ("%s:reconnect\n", NET_AdrToString (from));
 			newcl = cl;
 			// disconnect the client from the game first so any flags the
@@ -411,8 +420,17 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// this will remove the body, among other things
 	VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
 
-	// add the disconnect command
-	SV_SendServerCommand( drop, "disconnect" );
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
+
+		if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, drop - svs.clients)) {
+			drop->zombified = qtrue;
+		}
+	}
+
+	if (!drop->zombified) {
+		// add the disconnect command
+		SV_SendServerCommand(drop, "disconnect");
+	}
 
 	if ( drop->netchan.remoteAddress.type == NA_BOT ) {
 		SV_BotFreeClient( drop - svs.clients );
@@ -421,16 +439,21 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// Clear associated fragment buffers
 	fragmentBuffers[drop->netchan.remoteAddress.ipi][drop->netchan.remoteAddress.port].clear();
 
-	// nuke user info
-	SV_SetUserinfo( drop - svs.clients, "" );
+
+	if (!drop->zombified) {
+
+		// nuke user info
+		SV_SetUserinfo(drop - svs.clients, "");
 
 #ifdef SVDEMO
-	if (drop->demo.demorecording) {
-		SV_StopRecordDemo(drop);
-	}
-	SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
-	SV_ClearClientDemoMeta(drop);
+
+		if (drop->demo.demorecording) {
+			SV_StopRecordDemo(drop);
+		}
+		SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
+		SV_ClearClientDemoMeta(drop);
 #endif
+	}
 
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty

@@ -1586,7 +1586,7 @@ static void SV_Record_f(void) {
 		return;
 	}
 
-	if (cl->state != CS_ACTIVE) {
+	if (cl->state != CS_ACTIVE && !(cl->state == CS_ZOMBIE && cl->zombified)) {
 		Com_Printf("Client is not active.\n");
 		return;
 	}

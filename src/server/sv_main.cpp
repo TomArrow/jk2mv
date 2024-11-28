@@ -1018,8 +1018,32 @@ void SV_CheckTimeouts( void ) {
 
 		if (cl->state == CS_ZOMBIE
 		&& cl->lastPacketTime < zombiepoint) {
-			Com_DPrintf( "Going from CS_ZOMBIE to CS_FREE for %s\n", cl->name );
-			cl->state = CS_FREE;	// can now be reused
+
+			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
+
+				if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, cl - svs.clients)) {
+					cl->zombified = qtrue;
+				}
+				else if(cl->zombified){
+					cl->zombified = qfalse;
+
+					// add the disconnect command
+					SV_SendServerCommand(cl, "disconnect");
+
+					// nuke user info
+					SV_SetUserinfo(cl - svs.clients, "");
+					if (cl->demo.demorecording) {
+						SV_StopRecordDemo(cl);
+					}
+					SV_ClearClientDemoPreRecord(cl); // Happens on (re)connect too but let's be safe/clean :)
+					SV_ClearClientDemoMeta(cl);
+				}
+			}
+
+			if (!cl->zombified) {
+				Com_DPrintf("Going from CS_ZOMBIE to CS_FREE for %s\n", cl->name);
+				cl->state = CS_FREE;	// can now be reused
+			}
 			continue;
 		}
 		if ( cl->state >= CS_CONNECTED && cl->lastPacketTime < droppoint) {
