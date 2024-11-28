@@ -2416,4 +2416,8 @@ typedef enum {
 } DBRequestType_t;
 
 
+int safeatoi(const char* nptr, char** endptr, int base, int* error);
+int clampedIntMult(int a, int b);
+int clampedIntAdd(int a, int b);
+
 #endif	// __Q_SHARED_H

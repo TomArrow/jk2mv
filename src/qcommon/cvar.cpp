@@ -287,11 +287,19 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	var->modificationCount = 1;
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
-	var->integer = atoi(var->string);
+	int error = 0;
+	var->integer = safeatoi(var->string, NULL, 10, &error);
+	if (error) {
+		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
+	}
 #else
 	double strValue = strtod(var->string, NULL);
 	var->value = strValue;
-	var->integer = strValue;
+	int error = 0;
+	var->integer = safeatoi(var->string, NULL, 10, &error);
+	if (error) {
+		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
+	}
 #endif
 	var->resetString = CopyString( var_value );
 
@@ -442,11 +450,20 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 	var->string = CopyString(value);
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
-	var->integer = atoi (var->string);
+	//var->integer = atoi (var->string);
+	int error = 0;
+	var->integer = safeatoi(var->string, NULL, 10, &error);
+	if (error) {
+		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
+	}
 #else
 	double strValue = strtod(var->string, NULL);
 	var->value = strValue;
-	var->integer = strValue;
+	int error = 0;
+	var->integer = safeatoi(var->string, NULL, 10, &error);
+	if (error) {
+		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
+	}
 #endif
 
 	return var;
