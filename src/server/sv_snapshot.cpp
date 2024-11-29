@@ -851,6 +851,7 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 
 	if (client->state == CS_ZOMBIE && client->zombified) {
 		client->reliableAcknowledge = client->reliableSent;
+		fakeSend = qtrue;
 		//return;
 	}
 #endif
