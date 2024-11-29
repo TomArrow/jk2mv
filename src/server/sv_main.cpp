@@ -215,7 +215,7 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
-		if ( client->state < CS_PRIMED ) {
+		if ( client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified) ) {
 			continue;
 		}
 		SV_AddServerCommand( client, (char *)message );
