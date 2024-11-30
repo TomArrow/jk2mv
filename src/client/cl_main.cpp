@@ -36,6 +36,8 @@ cvar_t	*rconAddress;
 
 cvar_t	*cl_timeout;
 cvar_t	*cl_maxpackets;
+cvar_t	*cl_maxPacketUserCmds;
+cvar_t	*cl_dynamicUserPacket;
 cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
 cvar_t	*cl_showTimeDelta;
@@ -3400,6 +3402,8 @@ void CL_Init( void ) {
 
 	cl_maxpackets = Cvar_Get("cl_maxpackets", "1000", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_packetdup = Cvar_Get("cl_packetdup", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	cl_maxPacketUserCmds = Cvar_Get("cl_maxPacketUserCmds", "128", CVAR_ARCHIVE | CVAR_GLOBAL);
+	cl_dynamicUserPacket = Cvar_Get("cl_dynamicUserPacket", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_sensitivity = Cvar_Get("sensitivity", "5", CVAR_ARCHIVE | CVAR_GLOBAL);

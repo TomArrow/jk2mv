@@ -180,7 +180,8 @@ NET
 #endif
 #define	PACKET_MASK		(PACKET_BACKUP-1)
 
-#define	MAX_PACKET_USERCMDS		32		// max number of usercmd_t in a packet
+#define	MAX_PACKET_USERCMDS_MIN		32		// max number of usercmd_t in a packet (minimum value but can set via sv_maxPacketUserCmds)
+#define	MAX_PACKET_USERCMDS_MAX		256		// max number of usercmd_t in a packet (maximum value but can set via sv_maxPacketUserCmds)
 
 #define	PORT_ANY			-1
 
@@ -940,6 +941,7 @@ extern	cvar_t	*com_developer;
 extern	cvar_t	*com_dedicated;
 extern	cvar_t	*com_speeds;
 extern	cvar_t	*com_timescale;
+//extern	cvar_t	*com_sv_maxPacketUserCmds;
 extern	cvar_t	*com_sv_running;
 extern	cvar_t	*com_cl_running;
 extern	cvar_t	*com_viewlog;			// 0 = hidden, 1 = visible, 2 = minimized

@@ -167,6 +167,11 @@ typedef struct {
 	qboolean		predictedMovementIsSet;
 
 	int				snapshotReceivedRealTimes[PACKET_BACKUP]; // Cool API "get time since snapshot received"
+
+	// cl_dynamicUserPacket (send all cmds needed to go from the server's current commandTime to the newest available
+	int				serverMaxPacketUserCmds;
+	int				playerCommandTime;
+	qboolean		playerCommandTimeValid; // we might be spectating someone, then commandTime is invalid.
 } clientActive_t;
 
 extern	clientActive_t		cl;
@@ -516,6 +521,8 @@ extern	cvar_t	* cl_fpsGuessMethod3FrameAvgCount;
 extern	cvar_t	* cl_fpsGuessMethod3GravityMatchPrecision;
 extern	cvar_t	* cl_fpsGuessMethod3ReferenceLines;
 extern	cvar_t	*cl_maxpackets;
+extern	cvar_t  *cl_maxPacketUserCmds;
+extern	cvar_t  *cl_dynamicUserPacket;
 extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_snapOrderTolerance;
 extern	cvar_t	*cl_snapOrderToleranceDemoSkipPackets;

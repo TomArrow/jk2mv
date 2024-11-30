@@ -303,6 +303,7 @@ extern	cvar_t	*mv_serverversion;
 extern	cvar_t	*sv_hibernateFps;
 extern	cvar_t	*mv_apiConnectionless;
 extern	cvar_t	*sv_pingFix;
+extern	cvar_t	*sv_maxPacketUserCmds;
 extern	cvar_t	*sv_autoWhitelist;
 extern	cvar_t	*sv_dynamicSnapshots;
 

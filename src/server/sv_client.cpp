@@ -1575,8 +1575,9 @@ each of the backup packets.
 static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t* umsg ) {
 	int			i, key;
 	int			cmdCount;
+	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX,MAX(MAX_PACKET_USERCMDS_MIN, sv_maxPacketUserCmds->integer));
 	usercmd_t	nullcmd;
-	usercmd_t	cmds[MAX_PACKET_USERCMDS];
+	usercmd_t	cmds[MAX_PACKET_USERCMDS_MAX];
 	usercmd_t	*cmd, *oldcmd;
 
 	if ( delta ) {
@@ -1593,7 +1594,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 	}
 
 	if ( cmdCount > MAX_PACKET_USERCMDS ) {
-		Com_Printf( "cmdCount > MAX_PACKET_USERCMDS\n" );
+		Com_Printf( "cmdCount > MAX_PACKET_USERCMDS (%d)\n", MAX_PACKET_USERCMDS);
 		return;
 	}
 

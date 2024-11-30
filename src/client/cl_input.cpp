@@ -1210,10 +1210,12 @@ Create a new usercmd_t structure for this frame
 void CL_CreateNewCommands( void ) {
 	int			cmdNum;
 	int			sentPacketNum, availableCmdCount;
+	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
+	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
 
 	cl.newCmdsGenerated = qfalse;
 
-	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
+	//const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE  // YOU CANT DO THIS! the -1 and bitmark & trick only works on powers of 2! otherwise you'll get some complete weird mess. For freely configurable values, use modulo instead.
 
 	// no need to create usercmds until we have a gamestate
 	if ( cls.state < CA_PRIMED ) {
@@ -1224,9 +1226,9 @@ void CL_CreateNewCommands( void ) {
 	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
 
 	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
-	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
 
-		int oldCmdServerTime = cl.cmds[cl.cmdNumber & REAL_CMD_MASK].serverTime;
+		int oldCmdServerTime = cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
 		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
 		int frameCount = serverTimeDelta / desiredPhysicsMsec;
 
@@ -1265,7 +1267,7 @@ void CL_CreateNewCommands( void ) {
 
 				// duplicate the command a few times until we are close to cl.serverTime.
 				cl.cmdNumber++;
-				cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+				cmdNum = cl.cmdNumber % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
 				newCommand.serverTime = newClServerTime;
 
 				// COOL API, set move values.
@@ -1296,7 +1298,7 @@ void CL_CreateNewCommands( void ) {
 				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
 				cl.newCmdsGenerated = qtrue;
 				if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
-					CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &frameStartPredictMoveCopy);
+					CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) % EFFECTIVE_CMD_BACKUP], &frameStartPredictMoveCopy);
 					newClServerTime = cl.cmds[cmdNum].serverTime;
 					
 				}
@@ -1336,7 +1338,7 @@ void CL_CreateNewCommands( void ) {
 
 		// generate a command for this frame
 		cl.cmdNumber++;
-		cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+		cmdNum = cl.cmdNumber % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
 		cl.temporaryCmd = cl.cmds[cmdNum] = CL_CreateCmd();
 		cl.newCmdsGenerated = qtrue;
 
@@ -1366,7 +1368,7 @@ void CL_CreateNewCommands( void ) {
 		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
 
 			predictedMovement_t predictedMovementCopy = cl.predictedMovement;
-			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) & REAL_CMD_MASK], &predictedMovementCopy);
+			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) % EFFECTIVE_CMD_BACKUP], &predictedMovementCopy);
 			
 		}
 	}
@@ -1477,11 +1479,16 @@ void CL_WritePacket( void ) {
 	int			packetNum;
 	int			oldPacketNum;
 	int			count, key;
+	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
+	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
+	bool		commandTimeBasedUserCmds = cl_dynamicUserPacket->integer && cl.playerCommandTimeValid && cl.playerCommandTime < cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
 		return;
 	}
+
+	MAX_PACKET_USERCMDS = MAX(MAX_PACKET_USERCMDS_MIN, MIN(cl.serverMaxPacketUserCmds, MAX_PACKET_USERCMDS)); // server must support more than 32 to send more than 32
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
@@ -1522,10 +1529,51 @@ void CL_WritePacket( void ) {
 		count = MAX_PACKET_USERCMDS;
 		Com_Printf("MAX_PACKET_USERCMDS\n");
 	}
+
+	if (commandTimeBasedUserCmds) { // only send cmds the server actually needs. may mean more or less than usual.
+		if (count >= cl.cmdNumber) count = cl.cmdNumber - 1;
+		if (count > EFFECTIVE_CMD_BACKUP) count = EFFECTIVE_CMD_BACKUP;
+		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+
+		// increase count so that the entire duration from current server's commandTime to now is covered. 
+		while (cl.cmds[j].serverTime > cl.playerCommandTime) {
+			if (count >= EFFECTIVE_CMD_BACKUP) {
+				count = EFFECTIVE_CMD_BACKUP;
+				break;
+			}
+			if (count >= cl.cmdNumber) {
+				count = cl.cmdNumber - 1;
+				break;
+			}
+			count++;
+			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+		}
+		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+		// reduce count to only as much as necessary. we will never need to send cmds <= what server already has
+		while (cl.cmds[j].serverTime <= cl.playerCommandTime) {
+			if (count <= 0) {
+				count = 0;
+				break;
+			}
+			count--;
+			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+		}
+		if (count > MAX_PACKET_USERCMDS) {
+			count = MAX_PACKET_USERCMDS;
+			//Com_Printf("MAX_PACKET_USERCMDS\n"); // don't show an error here, it's not a user error or anything.
+		}
+	}
+
+	if (cl_showSend->integer) {
+		Com_Printf("(%i)", count);
+	}
+
 	if ( count >= 1 ) {
-		const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
-		if ( cl_showSend->integer ) {
-			Com_Printf( "(%i)", count );
+		//const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
+
+		if (count > EFFECTIVE_CMD_BACKUP) {
+			Com_Printf("count > EFFECTIVE_CMD_BACKUP\n"); // obviously if we're only backing up 4 commands, we can't send more.
+			count = EFFECTIVE_CMD_BACKUP;
 		}
 
 		// begin a client move command
@@ -1548,7 +1596,7 @@ void CL_WritePacket( void ) {
 
 		// write all the commands, including the predicted command
 		for ( i = 0 ; i < count ; i++ ) {
-			j = (cl.cmdNumber - count + i + 1) & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+			j = (cl.cmdNumber - count + i + 1) % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
 			cmd = &cl.cmds[j];
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;

@@ -57,6 +57,7 @@ cvar_t	*com_speeds;
 cvar_t	*com_developer;
 cvar_t	*com_dedicated;
 cvar_t	*com_timescale;
+//cvar_t	*com_sv_maxPacketUserCmds;
 cvar_t	*com_fixedtime;
 cvar_t	*com_journal;
 cvar_t	*com_timedemo;
@@ -2582,6 +2583,7 @@ void Com_Init( char *commandLine ) {
 	com_logfile = Cvar_Get ("logfile", "0", CVAR_TEMP );
 
 	com_timescale = Cvar_Get ("timescale", "1", CVAR_CHEAT | CVAR_SYSTEMINFO );
+	//com_sv_maxPacketUserCmds = Cvar_Get ("sv_maxPacketUserCmds", "32", CVAR_ROM | CVAR_SYSTEMINFO );
 	com_fixedtime = Cvar_Get ("fixedtime", "0", CVAR_CHEAT);
 	com_showtrace = Cvar_Get ("com_showtrace", "0", CVAR_CHEAT);
 	com_viewlog = Cvar_Get( "viewlog", "0", CVAR_CHEAT );

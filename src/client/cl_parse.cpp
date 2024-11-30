@@ -397,6 +397,9 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
 	}
 
+	cl.playerCommandTime = newSnap.ps.commandTime;
+	cl.playerCommandTimeValid = (qboolean)(clc.clientNum == newSnap.ps.clientNum);
+
 #ifdef XDEVELOPER
 	int newanim = newSnap.ps.torsoAnim;
 
@@ -922,6 +925,7 @@ void CL_SystemInfoChanged( void ) {
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
+	cl.serverMaxPacketUserCmds = atoi( Info_ValueForKey( systemInfo, "sv_maxPacketUserCmds" ) );
 
 	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
 	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
