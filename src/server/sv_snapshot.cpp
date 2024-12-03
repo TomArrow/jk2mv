@@ -296,8 +296,9 @@ qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean
 
 	// write any unacknowledged serverCommands
 	for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++ ) {
-		// msg overflow checks for 4 byte internally; we want to write svc_servercommand (1 byte), the index (4 byte) and the string
-		if ( sv_dynamicSnapshots->integer && allowPartial && msg->maxsize - msg->cursize - 4 < 1 + 4 + (int)strlen(client->reliableCommands[i & (MAX_RELIABLE_COMMANDS-1)]) ) {
+		// msg overflow checks for 4 byte internally; we want to write svc_servercommand (1 byte), the index (4 byte) and the string and 0 terminator (1 byte)
+		// also, multiply with 2 because worst theoretical case each byte might end up 2 bytes with huffman
+		if ( sv_dynamicSnapshots->integer && allowPartial && msg->maxsize - msg->cursize - 4 < 2 * (1 + 4 + (int)strlen(client->reliableCommands[i & (MAX_RELIABLE_COMMANDS-1)]) + 1) ) {
 			client->reliableSent = i - 1;
 			return qfalse;
 		}
