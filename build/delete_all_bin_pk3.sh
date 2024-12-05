@@ -1,0 +1,1 @@
+find . -name "jk2pro-bins.pk3" -type f -delete

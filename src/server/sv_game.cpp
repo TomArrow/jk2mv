@@ -22,6 +22,7 @@
 cvar_t* com_coolApi_supported_game;
 cvar_t* com_coolApi_supported_game_vmflags;
 
+float Q_asin(float c);
 
 std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
 
@@ -557,7 +558,12 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_ROFF_PURGE_ENT:
 		return theROFFSystem.PurgeEnt( args[1], qfalse );
 
+	case G_ACOS:
+		return FloatAsInt(Q_acos(VMF(1)));
+	case G_ASIN:
+		return FloatAsInt(Q_asin(VMF(1)));
 
+	
 
 
 		//====================================
