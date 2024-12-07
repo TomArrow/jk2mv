@@ -1079,6 +1079,7 @@ typedef struct {
 	shader_t				*flareShader;
 	shader_t				*sunShader;
 
+	qboolean				lightmapAtlasActive; // for external lightmaps or shader hack LMs we wanna disable it
 	int						numLightmaps;
 	image_t					*lightmaps[MAX_LIGHTMAPS];
 
@@ -1275,6 +1276,7 @@ extern cvar_t	*r_smartpicmip;
 
 extern	cvar_t	*r_nobind;						// turns off binding to appropriate textures
 extern	cvar_t	*r_singleShader;				// make most world faces use default shader
+extern	cvar_t	*r_shaderHackLightmapFix;		// make q3map2 shader lightmap hacks work (kinda, not sure how reliable and universal)
 extern	cvar_t	*r_colorMipLevels;				// development aid to see texture mip usage
 extern	cvar_t	*r_picmip;						// controls picmip values
 extern	cvar_t	*r_finish;

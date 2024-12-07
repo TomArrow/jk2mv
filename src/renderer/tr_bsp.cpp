@@ -178,6 +178,8 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 	float maxIntensity = 0;
 	double sumIntensity = 0;
 
+	tr.lightmapAtlasActive = qfalse;
+
 	len = l->filelen;
 	if ( !len ) {
 		return;
@@ -190,6 +192,8 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 		ri.Printf(PRINT_WARNING, "Lightmaps disabled because the current graphics adapter doesn't support the image size of the lightmap atlas.\n");
 		return;
 	}
+
+	tr.lightmapAtlasActive = qtrue;
 
 	// we are about to upload textures
 	R_SyncRenderThread();
@@ -406,11 +410,16 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 
 	for(i = 0; i < MAXLIGHTMAPS; i++)
 	{
-		atlasLightmapNum[i] = lightmapNum[i] = LittleLong( ds->lightmapNum[i] );
-		if (lightmapNum[i] > 0)
-		{
-			atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
-			lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
+		if (!tr.lightmapAtlasActive) {
+			lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
+		}
+		else {
+			atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
+			if (lightmapNum[i] > 0)
+			{
+				atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
+				lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
+			}
 		}
 	}
 
@@ -450,10 +459,18 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 		}
 		for ( j = 0 ; j < 2 ; j++ ) {
 			cv->points[i][3+j] = LittleFloat( verts[i].st[j] );
+			if (!tr.lightmapAtlasActive) { // for external or shader hack lightmaps we need the classic coords
+				for (k = 0; k < MAXLIGHTMAPS; k++)
+				{
+					cv->points[i][VERTEX_LM + j + (k * 2)] = LittleFloat(verts[i].lightmap[k][j]);
+				}
+			}
 		}
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], &cv->points[i][VERTEX_LM + (k * 2)]);
+			if (tr.lightmapAtlasActive) {
+				R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], &cv->points[i][VERTEX_LM + (k * 2)]);
+			}
 			R_ColorShiftLightingBytes( verts[i].color[k], (byte *)&cv->points[i][VERTEX_COLOR+k] );
 		}
 	}
@@ -493,11 +510,16 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 
 	for(i=0;i<MAXLIGHTMAPS;i++)
 	{
-		atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
-		if (lightmapNum[i] > 0)
-		{
-			atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
-			lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
+		if (!tr.lightmapAtlasActive) {
+			lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
+		}
+		else {
+			atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
+			if (lightmapNum[i] > 0)
+			{
+				atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
+				lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
+			}
 		}
 	}
 
@@ -529,10 +551,18 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 		}
 		for ( j = 0 ; j < 2 ; j++ ) {
 			points[i].st[j] = LittleFloat( verts[i].st[j] );
+			if (!tr.lightmapAtlasActive) {
+				for (k = 0; k < MAXLIGHTMAPS; k++)
+				{
+					points[i].lightmap[k][j] = LittleFloat(verts[i].lightmap[k][j]);
+				}
+			}
 		}
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], points[i].lightmap[k]);
+			if (tr.lightmapAtlasActive) {
+				R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], points[i].lightmap[k]);
+			}
 			R_ColorShiftLightingBytes( verts[i].color[k], points[i].color[k] );
 		}
 	}

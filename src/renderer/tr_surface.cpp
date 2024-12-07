@@ -1412,7 +1412,7 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 		tess.texCoords[0][ndx][1] = v[4];
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			if (tess.shader->lightmapIndex[k] >= 0)
+			if (tess.shader->lightmapIndex[k] >= 0 || r_shaderHackLightmapFix->integer) // fix: dont break shader hack lightmaps
 			{
 				tess.texCoords[k+1][ndx][0] = v[VERTEX_LM+(k*2)];
 				tess.texCoords[k+1][ndx][1] = v[VERTEX_LM+(k*2)+1];

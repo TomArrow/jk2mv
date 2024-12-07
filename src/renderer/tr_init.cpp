@@ -128,6 +128,7 @@ cvar_t	*r_flares;
 cvar_t	*r_aspectratio;
 cvar_t	*r_nobind;
 cvar_t	*r_singleShader;
+cvar_t	*r_shaderHackLightmapFix;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
 
@@ -1155,6 +1156,7 @@ void R_Register( void )
 	//
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0 );
 	r_singleShader = ri.Cvar_Get ("r_singleShader", "0", CVAR_CHEAT | CVAR_LATCH );
+	r_shaderHackLightmapFix = ri.Cvar_Get ("r_shaderHackLightmapFix", "1", CVAR_ARCHIVE );
 
 	r_markSurfaceAnglesAbove = ri.Cvar_Get ("r_markSurfaceAnglesAbove", "0", CVAR_TEMP );
 	r_markSurfaceAnglesBelow = ri.Cvar_Get ("r_markSurfaceAnglesBelow", "0", CVAR_TEMP);
