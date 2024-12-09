@@ -28,7 +28,7 @@ qboolean serverIsTommyTernal = qfalse;
 
 #define MIN_DEDICATED_COMHUNKMEGS 16//1 //We need more than 1 for VMs when we are also using temporary hunk memory for bot nav functions
 #define MIN_COMHUNKMEGS 128 //NOTE: Was 56
-#define DEF_COMHUNKMEGS "128"
+#define DEF_COMHUNKMEGS "512"
 //#define DEF_COMZONEMEGS "16"
 
 ////////////////////////////////////////////////
