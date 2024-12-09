@@ -29,6 +29,7 @@ qboolean serverIsTommyTernal = qfalse;
 #define MIN_DEDICATED_COMHUNKMEGS 16//1 //We need more than 1 for VMs when we are also using temporary hunk memory for bot nav functions
 #define MIN_COMHUNKMEGS 128 //NOTE: Was 56
 #define DEF_COMHUNKMEGS "512"
+#define DEF_COMHUNKMEGS_DEDICATED "128"
 //#define DEF_COMZONEMEGS "16"
 
 ////////////////////////////////////////////////
@@ -1727,8 +1728,11 @@ void Com_InitHunkMemory( void ) {
 	}
 
 	// allocate the stack based hunk allocator
-	cv = Cvar_Get( "com_hunkMegs", DEF_COMHUNKMEGS, CVAR_LATCH | CVAR_ARCHIVE | CVAR_GLOBAL );
-
+#ifdef DEDICATED
+	cv = Cvar_Get( "com_hunkMegs", DEF_COMHUNKMEGS_DEDICATED, CVAR_LATCH | CVAR_ARCHIVE | CVAR_GLOBAL );
+#else
+	cv = Cvar_Get("com_hunkMegs", DEF_COMHUNKMEGS, CVAR_LATCH | CVAR_ARCHIVE | CVAR_GLOBAL);
+#endif
 	// if we are not dedicated min allocation is 56, otherwise min is 1
 	if (com_dedicated && com_dedicated->integer) {
 		nMinAlloc = MIN_DEDICATED_COMHUNKMEGS;
