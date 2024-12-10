@@ -1225,7 +1225,7 @@ void CL_CreateNewCommands( void ) {
 	sentPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
 	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
 
-	int desiredPhysicsMsec = (MAX(1, MIN(200, 1000 / MAX(1,com_physicsFps->integer))));
+	int desiredPhysicsMsec = (MAX(1, MIN(1000, 1000 / MAX(1,com_physicsFps->integer))));
 	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
 
 		int oldCmdServerTime = cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
