@@ -1249,6 +1249,7 @@ extern cvar_t	*r_fullscreen;
 extern cvar_t	*r_allowResize;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
+extern cvar_t	*r_gammaPostprocessingPrecision;			// gamma correction precision (default jk2mv has 64)
 extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans
 extern cvar_t	*r_displayRefresh;		// optional display refresh option
 

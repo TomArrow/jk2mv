@@ -46,6 +46,7 @@ static cvar_t	*r_colorbits;
 static cvar_t	*r_ext_multisample;
 static cvar_t	*r_allowsoftwaregl;
 cvar_t			*r_gammamethod;
+cvar_t			*r_gammaPostprocessingPrecision;
 cvar_t			*r_gammabypass;
 cvar_t			*r_allowScreenSaver;
 
@@ -1038,6 +1039,7 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 	r_ext_multisample	= Cvar_Get( "r_ext_multisample",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_allowsoftwaregl	= Cvar_Get( "r_allowsoftwaregl",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_gammamethod		= Cvar_Get( "r_gammamethod",		"2",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
+	r_gammaPostprocessingPrecision = Cvar_Get( "r_gammaPostprocessingPrecision",		"256",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_gammabypass		= Cvar_Get( "r_gammabypass",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_allowScreenSaver	= Cvar_Get( "r_allowScreenSaver",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	Cvar_Get( "r_availableModes", "", CVAR_ROM );

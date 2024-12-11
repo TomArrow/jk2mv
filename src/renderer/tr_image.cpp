@@ -3585,6 +3585,8 @@ void R_UpdateImages( void ) {
 	R_BindGlowImages();
 }
 
+#define GAMMA_POSTPROCESSING_PRECISION_MAX 256
+
 /*
 ===============
 R_SetColorMappings
@@ -3654,23 +3656,24 @@ void R_SetColorMappings( void ) {
 			s_gammatable[i] = inf;
 		}
 	} else {
-		byte gammaCorrected[64];
-		
-		for (int i = 0; i < 64; i++) {
+		byte gammaCorrected[GAMMA_POSTPROCESSING_PRECISION_MAX];
+		int gammaPostProcessingPrecision = MAX(2,MIN(r_gammaPostprocessingPrecision->integer, GAMMA_POSTPROCESSING_PRECISION_MAX));
+
+		for (int i = 0; i < gammaPostProcessingPrecision; i++) {
 			if (g == 1.0f) {
-				inf = (int)(((float)i / 63.0f) * 255.0f + 0.5f);
+				inf = (int)(((float)i / (float)(gammaPostProcessingPrecision -1)) * 255.0f + 0.5f);
 			} else {
-				inf = (int)(255.0f * powf(i / 63.0f, 1.0f / g) + 0.5f);
+				inf = (int)(255.0f * powf(i / (float)(gammaPostProcessingPrecision - 1), 1.0f / g) + 0.5f);
 			}
 
 			gammaCorrected[i] = Com_Clampi(0, 255, inf << shift);
 		}
 		
-		byte *lutTable = (byte *)Hunk_AllocateTempMemory(64 * 64 * 64 * 3);
+		byte *lutTable = (byte *)Hunk_AllocateTempMemory(gammaPostProcessingPrecision * gammaPostProcessingPrecision * gammaPostProcessingPrecision * 3);
 		byte *write = lutTable;
-		for (int z = 0; z < 64; z++) {
-			for (int y = 0; y < 64; y++) {
-				for (int x = 0; x < 64; x++) {
+		for (int z = 0; z < gammaPostProcessingPrecision; z++) {
+			for (int y = 0; y < gammaPostProcessingPrecision; y++) {
+				for (int x = 0; x < gammaPostProcessingPrecision; x++) {
 					*write++ = gammaCorrected[x];
 					*write++ = gammaCorrected[y];
 					*write++ = gammaCorrected[z];
@@ -3680,7 +3683,7 @@ void R_SetColorMappings( void ) {
 
 		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
 		qglPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		qglTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, 64, 64, 64, GL_RGB, GL_UNSIGNED_BYTE, lutTable);
+		qglTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, gammaPostProcessingPrecision, gammaPostProcessingPrecision, gammaPostProcessingPrecision, GL_RGB, GL_UNSIGNED_BYTE, lutTable);
 		
 		Hunk_FreeTempMemory(lutTable);
 	}
@@ -3707,10 +3710,11 @@ R_InitImages
 void	R_InitImages( void ) {
 	// gamma render target
 	if (r_gammamethod->integer == GAMMA_POSTPROCESSING && !r_gammabypass->integer) {
+		int gammaPostProcessingPrecision = MAX(2, MIN(r_gammaPostprocessingPrecision->integer, GAMMA_POSTPROCESSING_PRECISION_MAX));
 		qglEnable(GL_TEXTURE_3D);
 		tr.gammaLUTImage = 1024 + giTextureBindNum++;
 		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
-		qglTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, 64, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		qglTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, gammaPostProcessingPrecision, gammaPostProcessingPrecision, gammaPostProcessingPrecision, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		qglTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		qglTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		qglTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

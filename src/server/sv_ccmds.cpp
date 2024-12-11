@@ -886,7 +886,7 @@ void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageN
 	len = messageNum;
 	swlen = LittleLong(len);
 	if (com_developer->integer > 1) {
-		Com_Printf("a ");
+		//Com_Printf("a ");
 	}
 	FS_Write(&swlen, 4, cl->demo.demofile);
 
@@ -894,11 +894,11 @@ void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageN
 	len = msg->cursize - headerBytes;
 	swlen = LittleLong(len);
 	if (com_developer->integer > 1) {
-		Com_Printf("b ");
+		//Com_Printf("b ");
 	}
 	FS_Write(&swlen, 4, cl->demo.demofile);
 	if (com_developer->integer > 1) {
-		Com_Printf("c ");
+		//Com_Printf("c ");
 	}
 	FS_Write(msg->data + headerBytes, len, cl->demo.demofile);
 }
@@ -1279,11 +1279,11 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 						}
 					}
 					if (com_developer->integer > 1) {
-						Com_Printf("%d", it->get()->msgNum);
+						//Com_Printf("%d", it->get()->msgNum);
 					}
 					SV_WriteDemoMessage(cl, &preRecordMsg, 0, it->get()->msgNum);
 					if (com_developer->integer > 1) {
-						Com_Printf("w ");
+						//Com_Printf("w ");
 					}
 				}
 			}
