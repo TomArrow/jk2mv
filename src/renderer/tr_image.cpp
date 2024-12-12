@@ -3614,8 +3614,16 @@ void R_SetColorMappings( void ) {
 	if (!tr.worldDir || !tr.worldDir[0]) //don't overbright the main menu
 		tr.overbrightBits = 0;
 
-	if ( tr.overbrightBits > 1 ) {
-		tr.overbrightBits = 1;
+	// allow 2 overbright bits in 24 bit, but only 1 in 16 bit (TA: ported from q3)
+	if (glConfig.colorBits > 16) {
+		if (tr.overbrightBits > 2) {
+			tr.overbrightBits = 2;
+		}
+	}
+	else {
+		if (tr.overbrightBits > 1) {
+			tr.overbrightBits = 1;
+		}
 	}
 
 	if ( tr.overbrightBits < 0 ) {

@@ -82,8 +82,7 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	int		shift=0, r, g, b;
 
 	// should NOT do it if overbrightBits is 0
-	if (tr.overbrightBits)
-		shift = 1 - tr.overbrightBits;
+	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
 
 	if (!shift)
 	{
@@ -94,9 +93,17 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	}
 
 	// shift the data based on overbright range
-	r = in[0] << shift;
-	g = in[1] << shift;
-	b = in[2] << shift;
+	if (shift < 0) {
+		shift = -shift;
+		r = in[0] >> shift;
+		g = in[1] >> shift;
+		b = in[2] >> shift;
+	}
+	else {
+		r = in[0] << shift;
+		g = in[1] << shift;
+		b = in[2] << shift;
+	}
 
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 255 ) {
@@ -129,9 +136,12 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 {
 	int		shift=0, r, g, b;
 
-	// should NOT do it if overbrightBits is 0
-	if (tr.overbrightBits)
-		shift = 1 - tr.overbrightBits;
+	//// should NOT do it if overbrightBits is 0
+	//if (tr.overbrightBits)
+	//	shift = 1 - tr.overbrightBits;
+
+	//shift = MAX(0, r_mapOverBrightBits->integer - tr.overbrightBits);
+	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
 
 	if (!shift)
 	{
@@ -139,9 +149,17 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 	}
 
 	// shift the data based on overbright range
-	r = in[0] << shift;
-	g = in[1] << shift;
-	b = in[2] << shift;
+	if (shift < 0) {
+		shift = -shift; // just adding this cuz technically its undefined otherwise, but we still wanna do it
+		r = in[0] >> shift;
+		g = in[1] >> shift;
+		b = in[2] >> shift;
+	}
+	else {
+		r = in[0] << shift;
+		g = in[1] << shift;
+		b = in[2] << shift;
+	}
 
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 255 ) {
