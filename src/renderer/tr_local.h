@@ -569,6 +569,7 @@ typedef struct {
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
+	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
 
 } trRefdef_t;
 

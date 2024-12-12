@@ -671,10 +671,12 @@ static void R_MarkLeaves (void) {
 	// hasn't changed, we don't need to mark everything again
 
 	// if r_showcluster was just turned on, remark everything
-	if ( tr.viewCluster == cluster && !tr.refdef.areamaskModified
+	if ( tr.viewCluster == cluster && !tr.refdef.areamaskModified && !tr.refdef.forceVisRefresh
 		&& !r_showcluster->modified ) {
 		return;
 	}
+
+	tr.refdef.forceVisRefresh = qfalse;
 
 	if ( r_showcluster->modified || r_showcluster->integer ) {
 		r_showcluster->modified = qfalse;

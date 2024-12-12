@@ -425,6 +425,8 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 			tr.worldMapLoaded = qfalse;
 			tr.world = NULL;
 			RE_LoadWorldMap(mapname);
+
+			tr.refdef.forceVisRefresh = qtrue; // avoid hall-of-mirrors. dunno why needed.
 		}
 
 		//reset these last...
