@@ -1758,7 +1758,7 @@ void Com_InitHunkMemory( void ) {
 	// bk001205 - was malloc
 	s_hunkData = (unsigned char *)calloc( s_hunkTotal + 31, 1 );
 	if ( !s_hunkData ) {
-		Com_Error( ERR_FATAL, "Hunk data failed to allocate %i megs", s_hunkTotal / (1024*1024) );
+		Com_Error( ERR_FATAL, "Hunk data failed to allocate %i megs. Set a higher com_hunkMegs value.", s_hunkTotal / (1024*1024) );
 	}
 	// cacheline align
 	s_hunkData = (byte *) ( ( (intptr_t)s_hunkData + 31 ) & ~31 );
@@ -1922,7 +1922,7 @@ void *Hunk_Alloc( int size, ha_pref preference ) {
 		Hunk_Log();
 		Hunk_SmallLog();
 #endif
-		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i", size );
+		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i. Set a higher com_hunkMegs value.", size );
 	}
 
 	if ( hunk_permanent == &hunk_low ) {
@@ -1981,7 +1981,7 @@ void *Hunk_AllocateTempMemory( int size ) {
 	size = sizeof( hunkHeader_t ) + PAD(size, 4);
 
 	if ( hunk_temp->temp + hunk_permanent->permanent + size > s_hunkTotal ) {
-		Com_Error( ERR_DROP, "Hunk_AllocateTempMemory: failed on %i", size );
+		Com_Error( ERR_DROP, "Hunk_AllocateTempMemory: failed on %i. Set a higher com_hunkMegs value.", size );
 	}
 
 	if ( hunk_temp == &hunk_low ) {
