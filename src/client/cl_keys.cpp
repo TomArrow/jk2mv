@@ -1046,6 +1046,7 @@ CONSOLE LINE EDITING
 static const char *completionString;
 static char shortestMatch[MAX_TOKEN_CHARS];
 static int	matchCount;
+static qboolean perfectMatch;
 
 /*
 ===============
@@ -1059,7 +1060,13 @@ static void FindMatches( const char *s ) {
 	if ( Q_stricmpn( s, completionString, (int)strlen( completionString ) ) ) {
 		return;
 	}
+
 	matchCount++;
+
+	if (!Q_stricmp(s, completionString)) {
+		perfectMatch = qtrue; // found an actual perfect match
+	}
+
 	if ( matchCount == 1 ) {
 		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
 		return;
@@ -1146,7 +1153,7 @@ void CompleteCommand( void )
 	char		temp[MAX_EDIT_LINE];
 
 	// Field_AutoComplete( &kg.g_consoleField );
-	Field_AutoComplete2( &kg.g_consoleField, qtrue, qtrue, qfalse );
+	Field_AutoComplete2( &kg.g_consoleField, qtrue, qtrue, qfalse, qfalse );
 
 	edit = &kg.g_consoleField;
 
@@ -1158,6 +1165,7 @@ void CompleteCommand( void )
 		completionString++;
 	}
 	matchCount = 0;
+	perfectMatch = qfalse;
 	shortestMatch[0] = 0;
 
 	if ( strlen( completionString ) == 0 ) {
@@ -1264,7 +1272,7 @@ void Console_Key (int key) {
 
 	if (key == A_TAB) {
 		//CompleteCommand();
-		Field_AutoComplete( &kg.g_consoleField ); // for auto-complete (copied from OpenJK)
+		Field_AutoComplete( &kg.g_consoleField,qtrue ); // for auto-complete (copied from OpenJK)
 		return;
 	}
 
@@ -1889,7 +1897,7 @@ static void Key_CompleteBind( char *args, int argNum ) { // for auto-complete (c
 		p = Com_SkipTokens( args, 2, " " );
 
 		if ( p > args )
-			Field_CompleteCommand( p, qtrue, qtrue, qtrue );
+			Field_CompleteCommand( p, qtrue, qtrue, qtrue, qtrue );
 	}
 }
 

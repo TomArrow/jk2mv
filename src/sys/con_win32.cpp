@@ -496,7 +496,7 @@ char *CON_Input( void )
 
 				Field_Clear( &f );
 				Q_strncpyz( f.buffer, qconsole_line, MAX_EDIT_LINE );
-				Field_AutoComplete( &f );
+				Field_AutoComplete( &f , qtrue);
 				Q_strncpyz( qconsole_line, f.buffer, sizeof( qconsole_line ) );
 				qconsole_linelen = (int)strlen( qconsole_line );
 				qconsole_cursor = qconsole_linelen;

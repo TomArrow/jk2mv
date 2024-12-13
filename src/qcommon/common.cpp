@@ -3172,6 +3172,7 @@ CONSOLE LINE EDITING
 static const char *completionString;
 static char shortestMatch[MAX_TOKEN_CHARS];
 static int	matchCount;
+static qboolean perfectMatch;
 // field we are working on, passed to Field_AutoComplete(&g_consoleCommand for instance)
 static field_t *completionField;
 static qboolean wasComplete;
@@ -3193,6 +3194,11 @@ static void FindMatches( const char *s ) {
 		return;
 	}
 	matchCount++;
+
+	if (!Q_stricmp(s, completionString)) {
+		perfectMatch = qtrue;
+	}
+
 	if ( matchCount == 1 ) {
 		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
 		return;
@@ -3479,6 +3485,7 @@ Field_CompleteKeyname
 void Field_CompleteKeyname( void )
 {
 	matchCount = 0;
+	perfectMatch = qfalse;
 	shortestMatch[ 0 ] = 0;
 
 	Key_KeynameCompletion( FindMatches );
@@ -3497,6 +3504,7 @@ void Field_CompleteModelname( void )
 	const char *skinSep = strchr(completionString, '/');
 
 	matchCount = 0;
+	perfectMatch = qfalse;
 	shortestMatch[ 0 ] = 0;
 
 	if (!skinSep)
@@ -3531,6 +3539,7 @@ Field_CompleteFilename
 void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt )
 {
 	matchCount = 0;
+	perfectMatch = qfalse;
 	shortestMatch[ 0 ] = 0;
 
 	FS_FilenameCompletion( dir, ext, stripExt, FindMatches );
@@ -3544,7 +3553,7 @@ void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt
 Field_CompleteCommand
 ===============
 */
-void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qboolean doArguments )
+void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qboolean doArguments, qboolean printWhenPerfectMatch)
 {
 	int completionArgument = 0;
 
@@ -3572,7 +3581,7 @@ void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qb
 #endif
 
 		if( ( p = Field_FindFirstSeparator( cmd ) ) )
-			Field_CompleteCommand( p + 1, qtrue, qtrue, doArguments ); // Compound command
+			Field_CompleteCommand( p + 1, qtrue, qtrue, doArguments, printWhenPerfectMatch); // Compound command
 		else if ( doArguments )
 			Cmd_CompleteArgument( baseCmd, cmd, completionArgument );
 	}
@@ -3581,6 +3590,7 @@ void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qb
 			completionString++;
 
 		matchCount = 0;
+		perfectMatch = qfalse;
 		shortestMatch[ 0 ] = 0;
 
 		if ( strlen( completionString ) == 0 )
@@ -3592,7 +3602,7 @@ void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qb
 		if ( doCvars )
 			Cvar_CommandCompletion( FindMatches );
 
-		if ( !Field_Complete() ) {
+		if ( !Field_Complete() && (printWhenPerfectMatch || !perfectMatch) ) {
 			// run through again, printing matches
 			if ( doCommands )
 				Cmd_CommandCompletion( PrintMatches );
@@ -3610,13 +3620,13 @@ Field_AutoComplete
 Perform Tab expansion
 ===============
 */
-void Field_AutoComplete( field_t *field ) {
+void Field_AutoComplete( field_t *field, qboolean printWhenPerfectMatch) {
 	if ( !field || !field->buffer[0] )
 		return;
 
 	completionField = field;
 
-	Field_CompleteCommand( completionField->buffer, qtrue, qtrue, qtrue );
+	Field_CompleteCommand( completionField->buffer, qtrue, qtrue, qtrue, printWhenPerfectMatch );
 }
 
 /*
@@ -3626,13 +3636,13 @@ Field_AutoComplete2
 Perform Tab expansion
 ===============
 */
-void Field_AutoComplete2( field_t *field, qboolean doCommands, qboolean doCvars, qboolean doArguments ) {
+void Field_AutoComplete2( field_t *field, qboolean doCommands, qboolean doCvars, qboolean doArguments, qboolean printWhenPerfectMatch) {
 	if ( !field || !field->buffer[0] )
 		return;
 
 	completionField = field;
 
-	Field_CompleteCommand( completionField->buffer, doCommands, doCvars, doArguments );
+	Field_CompleteCommand( completionField->buffer, doCommands, doCvars, doArguments, printWhenPerfectMatch );
 }
 
 int Field_GetLastMatchCount()

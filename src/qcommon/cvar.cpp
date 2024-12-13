@@ -1164,7 +1164,7 @@ void Cvar_CompleteCvarName( char *args, int argNum )
 		char *p = Com_SkipTokens( args, 1, " " );
 
 		if( p > args )
-			Field_CompleteCommand( p, qfalse, qtrue, qtrue );
+			Field_CompleteCommand( p, qfalse, qtrue, qtrue, qtrue );
 	}
 }
 

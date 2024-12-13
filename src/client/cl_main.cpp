@@ -1612,7 +1612,7 @@ static void CL_CompleteRedirect( char *args, int argNum )
 	char *p = Com_SkipTokens( args, 1, " " );
 
 	if( p > args )
-		Field_CompleteCommand( p, qtrue, qtrue, qtrue );
+		Field_CompleteCommand( p, qtrue, qtrue, qtrue , qtrue);
 }
 
 /*
