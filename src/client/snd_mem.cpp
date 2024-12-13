@@ -481,12 +481,14 @@ static qboolean S_LoadSound_Actual( sfx_t *sfx )
 			return qfalse;
 		}
 #ifdef _DEBUG
-		if ( info.width == 1 ) {
-			Com_Printf(S_COLOR_YELLOW "WARNING: %s is an 8 bit wav file\n", sfx->sSoundName);
-		}
+		if (com_developer->integer) {
+			if ( info.width == 1 ) {
+				Com_Printf(S_COLOR_YELLOW "WARNING: %s is an 8 bit wav file\n", sfx->sSoundName);
+			}
 
-		if ( info.rate != 22050 ) {
-			Com_Printf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->sSoundName);
+			if ( info.rate != 22050 ) {
+				Com_Printf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->sSoundName);
+			}
 		}
 #endif
 
