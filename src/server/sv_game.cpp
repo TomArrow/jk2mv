@@ -267,7 +267,7 @@ qboolean	SV_EntityContact( const vec3_t mins, const vec3_t maxs, const sharedEnt
 
 	ch = SV_ClipHandleForEntity( gEnt );
 	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs,
-		ch, -1, origin, angles, capsule, qfalse );
+		ch, -1, origin, angles, capsule, &defaultTraceCustomization);
 
 	return trace.startsolid;
 }
@@ -454,10 +454,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_ENTITY_CONTACTCAPSULE:
 		return SV_EntityContact( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), VMAV(3, const sharedEntity_t), qtrue );
 	case G_TRACE:
-		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], qfalse );
+		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &defaultTraceCustomization);
 		return 0;
 	case G_TRACECAPSULE:
-		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], qfalse  );
+		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &defaultTraceCustomization);
 		return 0;
 	case G_POINT_CONTENTS:
 		return SV_PointContents( VMAP(1, const vec_t, 3), args[2] );
@@ -1146,10 +1146,29 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		switch (args[0]) {
 
 		case G_COOL_API_NONEPSILONTRACE:
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], qtrue);
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &nonEpsilonTraceCustomization);
 			return 0;
 		case G_COOL_API_NONEPSILONTRACE_CAPSULE:
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], qtrue);
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &nonEpsilonTraceCustomization);
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
+		traceCustomization_t traceCustomization = {qfalse,qtrue,0,0};
+
+		switch (args[0]) {
+
+		case G_COOL_API_CUSTOMEPSILONTRACE:
+			traceCustomization.customEpsilon = (qboolean)args[10];
+			traceCustomization.customEpsilonValue = VMF(11);
+			traceCustomization.traceCustomFlags = args[12];
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &traceCustomization);
+			return 0;
+		case G_COOL_API_CUSTOMEPSILONTRACE_CAPSULE:
+			traceCustomization.customEpsilon = (qboolean)args[10];
+			traceCustomization.customEpsilonValue = VMF(11);
+			traceCustomization.traceCustomFlags = args[12];
+			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &traceCustomization);
 			return 0;
 		}
 	}
