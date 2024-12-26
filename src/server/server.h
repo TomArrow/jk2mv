@@ -36,6 +36,12 @@ typedef struct svEntity_s {
 } svEntity_t;
 
 typedef enum {
+	MSG_ALL,
+	MSG_DEMO,
+	MSG_CLIENT,
+} messageType_t;
+
+typedef enum {
 	SS_DEAD,			// no map loaded
 	SS_LOADING,			// spawning level entities
 	SS_GAME				// actively running
@@ -130,6 +136,7 @@ typedef struct {
 	fileHandle_t	demofile;
 	qboolean	isBot;
 	int			botReliableAcknowledge; // for bots, need to maintain a separate reliableAcknowledge to record server messages into the demo file
+	int			clientDemoReliableAcknowledge; // for clients when sv_demoSpaceSaving is 1
 	struct {
 		// this is basically the equivalent of the demowaiting and minDeltaFrame values above, except it's for the demo pre-record feature and will be done every sv_demoPreRecordKeyframeDistance seconds.
 		qboolean keyframeWaiting;
@@ -137,6 +144,13 @@ typedef struct {
 
 		int lastKeyframeTime; // When was the last keyframe (gamestate followed by non-delta frames) saved? If more than sv_demoPreRecordKeyframeDistance, we make a new keyframe.
 	} preRecord;
+	struct {
+		// for debug/developer prints
+		int		totalSizeClient;
+		int		totalSizeDemo;
+		int		sampleCount;
+	}spaceSaving;
+	int			lastSnap;
 } demoInfo_t;
 
 //typedef std::vector<bufferedMessageContainer_t>::iterator demoPreRecordBufferIt;
@@ -311,6 +325,7 @@ extern	cvar_t	*sv_dynamicSnapshots;
 extern	cvar_t* sv_autoDemo;
 extern	cvar_t* sv_autoDemoBots;
 extern	cvar_t* sv_autoDemoMaxMaps;
+extern	cvar_t* sv_demoSpaceSaving;
 extern	cvar_t* sv_demoPreRecord;
 extern	cvar_t* sv_demoPreRecordBots;
 extern	cvar_t* sv_demoPreRecordTime;
@@ -419,10 +434,10 @@ void SV_BeginAutoRecordDemos();
 // sv_snapshot.c
 //
 void SV_AddServerCommand( client_t *client, const char *cmd );
-void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
-qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial );
+void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, messageType_t msgType);
+qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial, messageType_t msgType);
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
-void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse, qboolean isSnapshot = qfalse);
+void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse, qboolean isSnapshot = qfalse, messageType_t msgType = MSG_ALL);
 void SV_SendClientMessages( void );
 void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
 
@@ -526,5 +541,6 @@ qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
 
 extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
 extern int userStoredUcmdCounts[MAX_CLIENTS];
+
 
 #endif // SERVER_H_INC

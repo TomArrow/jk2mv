@@ -489,7 +489,7 @@ void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg) {
 	// we have to do this cause we send the client->reliableSequence
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
-	SV_UpdateServerCommandsToClient(client, msg);
+	SV_UpdateServerCommandsToClient(client, msg,MSG_ALL);
 
 	// send the gamestate
 	MSG_WriteByte(msg, svc_gamestate);
@@ -576,7 +576,7 @@ void SV_SendClientGameState( client_t *client ) {
 	// we have to do this cause we send the client->reliableSequence
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
-	SV_UpdateServerCommandsToClient( client, &msg );
+	SV_UpdateServerCommandsToClient( client, &msg, MSG_ALL);
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_gamestate );
@@ -629,7 +629,7 @@ void SV_SendClientMapChange( client_t *client )
 	// we have to do this cause we send the client->reliableSequence
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
-	SV_UpdateServerCommandsToClient( client, &msg );
+	SV_UpdateServerCommandsToClient( client, &msg, MSG_ALL);
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_mapchange );
@@ -1726,6 +1726,9 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	}
 
 	cl->reliableAcknowledge = MSG_ReadLong( msg );
+	if (cl->reliableAcknowledge > cl->demo.clientDemoReliableAcknowledge) {
+		cl->demo.clientDemoReliableAcknowledge = cl->reliableAcknowledge;
+	}
 
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server

@@ -1185,6 +1185,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 
 	cl->demo.isBot = (cl->netchan.remoteAddress.type == NA_BOT) ? qtrue : qfalse;
 	cl->demo.botReliableAcknowledge = cl->reliableSent;
+	cl->demo.clientDemoReliableAcknowledge = cl->reliableSent;
 
 
 	// Save metadata message if desired

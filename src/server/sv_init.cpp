@@ -922,6 +922,7 @@ void SV_Init (void) {
 	sv_autoDemo = Cvar_Get("sv_autoDemo", "0", CVAR_ARCHIVE | CVAR_SERVERINFO); // , "Automatically take server-side demos"
 	sv_autoDemoBots = Cvar_Get("sv_autoDemoBots", "1", CVAR_ARCHIVE); // , "Record server-side demos for bots"
 	sv_autoDemoMaxMaps = Cvar_Get("sv_autoDemoMaxMaps", "0", CVAR_ARCHIVE);
+	sv_demoSpaceSaving = Cvar_Get("sv_demoSpaceSaving", "1", CVAR_ARCHIVE | CVAR_LATCH);// write separate, smaller messages (due to tighter deltas) for serverside demos
 	sv_demoPreRecord = Cvar_Get("sv_demoPreRecord", "1", CVAR_ARCHIVE);// , "Activate server demo pre-recording so demos can be retroactively recorded for duration sv_demoPreRecordTime (seconds)");
 	sv_demoPreRecordBots = Cvar_Get("sv_demoPreRecordBots", "0", CVAR_ARCHIVE);
 	sv_demoPreRecordTime = Cvar_Get("sv_demoPreRecordTime", "15", CVAR_ARCHIVE);// , "How many seconds of past packets should be stored for server demo pre-recording?");
