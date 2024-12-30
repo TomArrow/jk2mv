@@ -785,7 +785,8 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			
 
 			static int oldCommandTime = 0;
-			static int downFallVelocityDeltasAndMsecDeltas[FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT][2]{};
+			static float downFallVelocityDeltas[FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT]{};
+			static float downFallMsecDeltas[FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT]{};
 			static int downFallVelocityDeltasAndMsecDeltasIndex = 0;
 			static int lastGravity = -999;
 			//static float effectiveGravities[FPS_GUESS_METHOD3_MSEC_LIMIT]{}; // The velocity deltas resulting from various fps settings based on curent gravity. Lucky for us, this is the same regardless of current downspeed as gravity is constant and we are working in 1 dimension (Z axis)
@@ -819,10 +820,10 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 				if ((/*(!frameHasLevitation && !lastFrameHadLevitation) || */ (isMovementDown && cls.fpsGuess.lastMovementDown)) && cl.snap.ps.groundEntityNum == ENTITYNUM_NONE && cl.snap.ps.velocity[2] < cls.fpsGuess.lastVelocity[2] && commandTimeDelta <= 999) {
 
-					int downFallDelta = fabsf(cl.snap.ps.velocity[2] - cls.fpsGuess.lastVelocity[2]) + 0.5f;
+					float downFallDelta = fabsf(cl.snap.ps.velocity[2] - cls.fpsGuess.lastVelocity[2]);// +0.5f;
 					if (downFallDelta <= 999) {
-						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex % actualFrameCount][0] = downFallDelta;
-						downFallVelocityDeltasAndMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex++ % actualFrameCount][1] = commandTimeDelta;
+						downFallVelocityDeltas[downFallVelocityDeltasAndMsecDeltasIndex % actualFrameCount] = downFallDelta;
+						downFallMsecDeltas[downFallVelocityDeltasAndMsecDeltasIndex++ % actualFrameCount] = commandTimeDelta;
 						cls.fpsGuess.lastFrameWasMeasured = qtrue;
 
 						// Check if we are possibly sliding along some surface
@@ -845,10 +846,10 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			// Actual analysis.
 			if (downFallVelocityDeltasAndMsecDeltasIndex >= actualFrameCount) {
 				int totalTimeDelta = 0;
-				int totalVelocityDelta = 0;
+				float totalVelocityDelta = 0;
 				for (int frame = 0; frame < actualFrameCount; frame++) {
-					totalVelocityDelta += downFallVelocityDeltasAndMsecDeltas[frame][0];
-					totalTimeDelta += downFallVelocityDeltasAndMsecDeltas[frame][1];
+					totalVelocityDelta += downFallVelocityDeltas[frame];
+					totalTimeDelta += downFallMsecDeltas[frame];
 				}
 				float effectiveMeasuredGravity = 1000.0f*(float)totalVelocityDelta/(float)totalTimeDelta;
 

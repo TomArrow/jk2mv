@@ -273,6 +273,7 @@ static	int			fs_packFiles;			// total number of files in packs
 
 static int fs_fakeChkSum;
 static int fs_checksumFeed;
+static qboolean fs_checksumFeedSet;
 
 typedef union qfile_gus {
 	FILE*		o;
@@ -345,6 +346,7 @@ static const char	*fs_serverPakNames[MAX_SEARCH_PATHS];			// pk3 names
 static int			fs_numServerReferencedPaks;
 static int			fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static const char	*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
+static qboolean		fs_referencedPaksChanged;
 
 // last valid game folder used
 char lastValidBase[MAX_OSPATH];
@@ -4599,6 +4601,7 @@ checksums to see if any pk3 files need to be auto-downloaded.
 */
 void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames ) {
 	int		i, c, d = 0;
+	int		tmp;
 
 	Cmd_TokenizeString( pakSums );
 
@@ -4608,7 +4611,11 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 	}
 
 	for ( i = 0 ; i < c ; i++ ) {
-		fs_serverReferencedPaks[i] = atoi( Cmd_Argv( i ) );
+		tmp = atoi(Cmd_Argv(i));
+		if (tmp != fs_serverReferencedPaks[i]) {
+			fs_referencedPaksChanged = qtrue;
+		}
+		fs_serverReferencedPaks[i] = tmp;
 	}
 
 	for ( i = 0 ; i < (int)ARRAY_LEN(fs_serverReferencedPakNames) ; i++ ) {
@@ -4633,7 +4640,11 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 		Com_Printf(S_COLOR_YELLOW "WARNING: Corrupted server pak references\n");
 	}
 
-	fs_numServerReferencedPaks = MIN(c, d);
+	tmp = MIN(c, d);
+	if (tmp != fs_numServerReferencedPaks) {
+		fs_referencedPaksChanged = qtrue;
+	}
+	fs_numServerReferencedPaks = tmp;
 }
 
 /*
@@ -4691,6 +4702,8 @@ void FS_Restart2( int checksumFeed, qboolean inPlace ) {
 
 	// set the checksum feed
 	fs_checksumFeed = checksumFeed;
+	fs_checksumFeedSet = qtrue;
+	fs_referencedPaksChanged = qfalse;
 
 	// clear pak references
 	FS_ClearPakReferences(0);
@@ -4745,7 +4758,7 @@ restart if necessary
 =================
 */
 qboolean FS_ConditionalRestart( int checksumFeed ) {
-	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed ) {
+	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed || !fs_checksumFeedSet || fs_referencedPaksChanged) {
 		FS_Restart( checksumFeed );
 		return qtrue;
 	}
