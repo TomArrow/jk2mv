@@ -1228,7 +1228,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 	// in which case we also don't have to worry about demowaiting since the pre-record
 	// already takes care of that
 	if (sv_demoPreRecord->integer) {
-		if (com_developer->integer) {
+		if (com_developer->integer > 5) {
 			SV_SendServerCommand(cl, "cp \"Starting demo. Buffer size: %d/%d\n\"", demoPreRecordBuffer[cl - svs.clients].size(), demoPreRecordBuffer[cl - svs.clients].capacity());
 		}
 		if (com_developer->integer > 1) {

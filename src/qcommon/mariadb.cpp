@@ -199,9 +199,11 @@ static void DB_BackgroundThread() {
 						goto requestfailed;
 					}
 					std::string bcrypted = breq.input;
-					if (com_developer->integer) {
+#ifdef BCRYPTDEBUG // dont generally do this as it can leak pws
+					if (com_developer->integer > 2) {
 						Com_Printf("Bcrypt input: %s\n",bcrypted.c_str());
 					}
+#endif
 					for (int i = 0; i < breq.settings.size(); i++) {
 						bcrypted = bcryptString(bcrypted, &requestToProcess.errorCode, breq.settings[i]);
 						if (com_developer->integer) {
@@ -489,8 +491,13 @@ qboolean DB_FinishAndSendPreparedStatement(module_t module) {
 }
 qboolean DB_AddRequest(module_t module, byte* reference, int referenceLength, int requestType, const char* request, DBRequestType_t dbRequestType) {
 	if (!db_enabled->integer) return qfalse;
-	if (com_developer->integer) {
-		Com_Printf("SQL query: %s\n", request);
+#ifndef BCRYPTDEBUG // dont generally debug bcrypt as it can leak pws
+	if(dbRequestType != DBREQUESTTYPE_BCRYPT)
+#endif
+	{
+		if (com_developer->integer) {
+			Com_Printf("SQL query: %s\n", request);
+		}
 	}
 	DBRequest req;
 	req.requestString = request;
