@@ -18,6 +18,7 @@ cvar_t		*cl_graphshift;
 
 cvar_t* cl_showVelocity;
 cvar_t* cl_showVelocityAllowNegative;
+cvar_t* cl_drawPS;
 cvar_t* cl_fpsGuess;
 cvar_t* cl_fpsGuessMode;
 cvar_t* cl_fpsGuessMethod2DisplayMode;
@@ -437,6 +438,7 @@ void SCR_Init( void ) {
 	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
 	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
+	cl_drawPS = Cvar_Get("cl_drawPS", "0", CVAR_TEMP);
 	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
 	cl_fpsGuessMethod2DisplayMode = Cvar_Get("cl_fpsGuessMethod2DisplayMode", "1", CVAR_ARCHIVE);
 	cl_fpsGuessMethod2DebugRandMod = Cvar_Get("cl_fpsGuessMethod2DebugRandMod", "0", CVAR_TEMP);
@@ -467,6 +469,148 @@ void MV_DrawConnectingInfo( void )
 
 	Com_sprintf(txtbuf, sizeof(txtbuf), "Game-Version^1: ^71.%02d", (int)MV_GetCurrentGameversion());
 	SCR_DrawStringExt(((SCREEN_WIDTH / 2) * (1 / cls.cgxadj)) - SCR_Strlen(txtbuf) * 3.5, yPos + (line * 1), 7, txtbuf, g_color_table[7], qfalse);
+}
+
+static void SCR_DrawPS() {
+	playerState_t* ps;
+	static vec4_t transparentBlack = {0,0,0,0.3};
+	static vec4_t white = {1,1,1,1};
+	int x = 5 / cls.xadjust;
+	//int colWidth = con.charWidth * 20;
+	if (!cl_drawPS->integer) {
+		return;
+	}
+	ps = &cl.snap.ps;
+	SCR_FillRect(0, 240, 640, 240, transparentBlack);
+
+	SCR_DrawSmallStringExt(x,245/ cls.yadjust,						   va("     X %.2f",ps->origin[0]), white,qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight,      va("     Y %.2f",ps->origin[1]), white,qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 2,  va("     Z %.2f",ps->origin[2]), white,qtrue);
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 4,  va("    VX %.2f",ps->velocity[0]), white,qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 5,  va("    VY %.2f",ps->velocity[1]), white,qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 6,  va("    VZ %.2f",ps->velocity[2]), white,qtrue);
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 8,  va(" PITCH %.2f", ps->viewangles[0]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 9,  va("   YAW %.2f", ps->viewangles[1]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 10, va("  ROLL %.2f", ps->viewangles[2]), white, qtrue);
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 12, va("PITCHD %d", ps->delta_angles[0]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 13, va("  YAWD %d", ps->delta_angles[1]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 14, va(" ROLLD %d", ps->delta_angles[2]), white, qtrue);
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("LSHTLC %.2f", ps->lastHitLoc[0]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("LSHTLC %.2f", ps->lastHitLoc[1]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("LSHTLC %.2f", ps->lastHitLoc[2]), white, qtrue);
+
+#define STRINGWIDTHMAX "16"
+
+	x += con.charWidth * 20;
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 0, va("%" STRINGWIDTHMAX "s %d","commandTime", ps->commandTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 1, va("%" STRINGWIDTHMAX "s %d","bobCycle", ps->bobCycle), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 2, va("%" STRINGWIDTHMAX "s %d","weaponTime", ps->weaponTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 3, va("%" STRINGWIDTHMAX "s %d","wpnChrgTim", ps->weaponChargeTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 4, va("%" STRINGWIDTHMAX "s %d","wpnChrgSubtrTim", ps->weaponChargeSubtractTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 5, va("%" STRINGWIDTHMAX "s %d","pm_time", ps->pm_time), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 6, va("%" STRINGWIDTHMAX "s %d","eventSequence", ps->eventSequence), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 7, va("%" STRINGWIDTHMAX "s %d","torsoAnim", ps->torsoAnim), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 8, va("%" STRINGWIDTHMAX "s %d","torsoTimer", ps->torsoTimer), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 9, va("%" STRINGWIDTHMAX "s %d","legsAnim", ps->legsAnim), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 10, va("%" STRINGWIDTHMAX "s %d","legsTimer", ps->legsTimer), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %d","movementDir", ps->movementDir), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %d","events[0]", ps->events[0]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d","events[1]", ps->events[1]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d","pm_flags", ps->pm_flags), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d","groundEntityNum", ps->groundEntityNum), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d","weaponstate", ps->weaponstate), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d","eFlags", ps->eFlags), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d","externalEvent", ps->externalEvent), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 19, va("%" STRINGWIDTHMAX "s %d","gravity", ps->gravity), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 20, va("%" STRINGWIDTHMAX "s %d","speed", ps->speed), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 21, va("%" STRINGWIDTHMAX "s %d","basespeed", ps->basespeed), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 22, va("%" STRINGWIDTHMAX "s %d","extrnlEventParm", ps->externalEventParm), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 23, va("%" STRINGWIDTHMAX "s %d","viewheight", ps->viewheight), white, qtrue);
+	//SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 24, va("%" STRINGWIDTHMAX "s %d","damageEvent", ps->damageEvent), white, qtrue);
+
+
+	x += con.charWidth * 35;
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 0, va("%" STRINGWIDTHMAX "s %d", "damageEvent", ps->damageEvent), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 1, va("%" STRINGWIDTHMAX "s %d", "damageYaw", ps->damageYaw), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 2, va("%" STRINGWIDTHMAX "s %d", "damagePitch", ps->damagePitch), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 3, va("%" STRINGWIDTHMAX "s %d", "damageCount", ps->damageCount), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 4, va("%" STRINGWIDTHMAX "s %d", "damageType", ps->damageType), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 5, va("%" STRINGWIDTHMAX "s %d", "generic1", ps->generic1), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 6, va("%" STRINGWIDTHMAX "s %d", "pm_type", ps->pm_type), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 7, va("%" STRINGWIDTHMAX "s %d", "eventParms[0]", ps->eventParms[0]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 8, va("%" STRINGWIDTHMAX "s %d", "eventParms[1]", ps->eventParms[1]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 9, va("%" STRINGWIDTHMAX "s %d", "clientNum", ps->clientNum), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 10, va("%" STRINGWIDTHMAX "s %d", "weapon", ps->weapon), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %d", "jumppad_ent", ps->jumppad_ent), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %d", "loopSound", ps->loopSound), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d", "zoomMode", ps->zoomMode), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d", "zoomTime", ps->zoomTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d", "zoomLocked", ps->zoomLocked), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d", "zoomFov", ps->zoomFov), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d", "fd.frcPwrsActv", ps->fd.forcePowersActive), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId", ps->fd.forceMindtrickTargetIndex), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 19, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId2", ps->fd.forceMindtrickTargetIndex2), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 20, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId3", ps->fd.forceMindtrickTargetIndex3), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 21, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId4", ps->fd.forceMindtrickTargetIndex4), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 22, va("%" STRINGWIDTHMAX "s %.2f", "fd.frcJmpZStart", ps->fd.forceJumpZStart), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 23, va("%" STRINGWIDTHMAX "s %d", "fd.frcPwrSel", ps->fd.forcePowerSelected), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 24, va("%" STRINGWIDTHMAX "s %d", "fd.frcPwrsKnown", ps->fd.forcePowersKnown), white, qtrue);
+
+	x += con.charWidth * 35;
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 0, va("%" STRINGWIDTHMAX "s %d", "fd.forcePower", ps->fd.forcePower), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 1, va("%" STRINGWIDTHMAX "s %d", "fd.forceSide", ps->fd.forceSide), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 2, va("%" STRINGWIDTHMAX "s %d", "fd.sntryDeployd", ps->fd.sentryDeployed), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 3, va("%" STRINGWIDTHMAX "s %d", "fd.fPwrLvl[LEV]", ps->fd.forcePowerLevel[FP_LEVITATION]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 4, va("%" STRINGWIDTHMAX "s %d", "fd.fPwrLvl[SEE]", ps->fd.forcePowerLevel[FP_SEE]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 5, va("%" STRINGWIDTHMAX "s %d", "gnricEnemyIndex", ps->genericEnemyIndex), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 6, va("%" STRINGWIDTHMAX "s %d", "activeForcePass", ps->activeForcePass), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 7, va("%" STRINGWIDTHMAX "s %d", "hasDtPckPlanted", ps->hasDetPackPlanted), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 8, va("%" STRINGWIDTHMAX "s %d", "emplacedIndex", ps->emplacedIndex), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 9, va("%" STRINGWIDTHMAX "s %d", "fd.frcRagRecTim", ps->fd.forceRageRecoveryTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 10, va("%" STRINGWIDTHMAX "s %d", "rocketLockIndex", ps->rocketLockIndex), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %d", "rocketLockTime", ps->rocketLockTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %d", "rocketTargtTime", ps->rocketTargetTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d", "holocronBits", ps->holocronBits), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d", "isJediMaster", ps->isJediMaster), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d", "forceRestricted", ps->forceRestricted), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d", "trueJedi", ps->trueJedi), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d", "trueNonJedi", ps->trueNonJedi), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d", "fallingToDeath", ps->fallingToDeath), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 19, va("%" STRINGWIDTHMAX "s %d", "electrifyTime", ps->electrifyTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 20, va("%" STRINGWIDTHMAX "s %d", "fd.fPwrDeb[LEV]", ps->fd.forcePowerDebounce[FP_LEVITATION]), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 21, va("%" STRINGWIDTHMAX "s %d", "saberMove", ps->saberMove), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 22, va("%" STRINGWIDTHMAX "s %d", "saberActive", ps->saberActive), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 23, va("%" STRINGWIDTHMAX "s %d", "saberInFlight", ps->saberInFlight), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 24, va("%" STRINGWIDTHMAX "s %d", "saberBlocked", ps->saberBlocked), white, qtrue);
+
+	x += con.charWidth * 35;
+
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 0, va("%" STRINGWIDTHMAX "s %d", "saberEntityNum", ps->saberEntityNum), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 1, va("%" STRINGWIDTHMAX "s %d", "saberCanThrow", ps->saberCanThrow), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 2, va("%" STRINGWIDTHMAX "s %d", "forceHandExtend", ps->forceHandExtend), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 3, va("%" STRINGWIDTHMAX "s %d", "forceDodgeAnim", ps->forceDodgeAnim), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 4, va("%" STRINGWIDTHMAX "s %d", "fd.sbrAnimLevel", ps->fd.saberAnimLevel), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 5, va("%" STRINGWIDTHMAX "s %d", "fd.sbrDrwAnmLvl", ps->fd.saberDrawAnimLevel), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 6, va("%" STRINGWIDTHMAX "s %d", "sbrAtckChainCnt", ps->saberAttackChainCount), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 7, va("%" STRINGWIDTHMAX "s %d", "saberHolstered", ps->saberHolstered), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 8, va("%" STRINGWIDTHMAX "s %d", "usingATST", ps->usingATST), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 9, va("%" STRINGWIDTHMAX "s %d", "atstAltFire", ps->atstAltFire), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 10, va("%" STRINGWIDTHMAX "s %d", "duelIndex", ps->duelIndex), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %d", "duelTime", ps->duelTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %d", "duelInProgress", ps->duelInProgress), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d", "saberLockTime", ps->saberLockTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d", "saberLockEnemy", ps->saberLockEnemy), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d", "saberLockFrame", ps->saberLockFrame), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d", "saberLockAdvnce", ps->saberLockAdvance), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d", "inAirAnim", ps->inAirAnim), white, qtrue);
+	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d", "dualBlade", ps->dualBlade), white, qtrue);
 }
 
 static void SCR_DrawFPSGuess() {
@@ -780,6 +924,8 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	}
 
 	SCR_DrawFPSGuess();
+
+	SCR_DrawPS();
 
 	// console draws next
 	Con_DrawConsole ();

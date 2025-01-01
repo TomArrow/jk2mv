@@ -513,6 +513,7 @@ extern	cvar_t	*cl_timegraph;
 extern	cvar_t	* cl_showVelocity;
 extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_fpsGuess;
+extern	cvar_t	* cl_drawPS;
 extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
 extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
