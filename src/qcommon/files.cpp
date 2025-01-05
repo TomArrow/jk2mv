@@ -1067,6 +1067,7 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module ) {
 	fsh[f].handleFiles.file.o = fopen( ospath, "wb" );
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
 #ifdef ASYNCIO
@@ -1100,6 +1101,7 @@ fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module ) {
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	ospath = FS_BuildOSPath( fs_homepath->string, filename );
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_FOpenFileAppend: %s\n", ospath );
@@ -1149,6 +1151,8 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 	// search homepath
 	ospath = FS_BuildOSPath( fs_homepath->string, filename, "" );
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
+
 	// remove trailing slash
 	ospath[strlen(ospath)-1] = '\0';
 
@@ -1547,17 +1551,6 @@ void FS_AsyncWriterThread(fileHandle_t h) {
 	Com_PushEvent(&event);
 }
 
-fileHandle_t FS_WeHaveFileOpen(const char* filename) {
-	const char* ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
-	int		i;
-
-	for (i = 1; i < MAX_FILE_HANDLES; i++) {
-		if ((fsh[i].handleAsync || fsh[i].handleFiles.file.o != NULL) && !Q_stricmp(ospath, fsh[i].ospath)) {
-			return i;
-		}
-	}
-	return 0;
-}
 
 // Call with safe==qtrue to make sure the file isn't open in another async file handle anymore
 fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
@@ -1593,6 +1586,21 @@ fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
 }
 #endif
 
+fileHandle_t FS_WeHaveFileOpen(const char* filename) {
+	const char* ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
+	int		i;
+
+	for (i = 1; i < MAX_FILE_HANDLES; i++) {
+		if ((
+#ifdef ASYNCIO // TODO idk if this define even used consistently anymore..
+			fsh[i].handleAsync ||
+#endif
+			fsh[i].handleFiles.file.o != NULL) && !Q_stricmp(ospath, fsh[i].ospath)) {
+			return i;
+		}
+	}
+	return 0;
+}
 
 /*
 ===========
@@ -1629,6 +1637,7 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	fsh[f].handleFiles.file.o = fopen( ospath, "wb" );
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
 #ifdef ASYNCIO
@@ -1669,6 +1678,7 @@ fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module) {
 	fsh[f].handleFiles.file.o = fopen(ospath, "wb");
 
 	Q_strncpyz(fsh[f].name, filename, sizeof(fsh[f].name));
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
 #ifdef ASYNCIO
@@ -1704,6 +1714,8 @@ fileHandle_t FS_FOpenFileAppend( const char *filename, module_t module ) {
 	S_ClearSoundBuffer();
 
 	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
+
+	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_FOpenFileAppend: %s\n", ospath );
@@ -2015,6 +2027,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 						fsh[*file].handleFiles.file.z = pak->handle;
 
 					Q_strncpyz(fsh[*file].name, filename, sizeof(fsh[*file].name));
+					Q_strncpyz(fsh[*file].ospath, pak->pakFilename, MAX_OSPATH); // TODO can we do sth smarter here than just the pk3 file?
 					fsh[*file].zipFile = qtrue;
 
 					// set the file position in the zip file (also sets the current file info)
@@ -2095,6 +2108,7 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 			}
 
 			Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
+			Q_strncpyz(fsh[*file].ospath, netpath, MAX_OSPATH);
 			fsh[*file].zipFile = qfalse;
 
 			if (compressedType) {

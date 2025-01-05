@@ -50,6 +50,8 @@ static struct {
 		char reqPath[MAX_OSPATH];
 		char filePath[MAX_OSPATH];
 		bool allowed;
+		int	disallowedCode;
+		const char* disallowedReason;
 	} event;
 
 	// connected clients. NA_BAD means slot is not used
@@ -61,13 +63,17 @@ static struct {
 	unsigned int poll_delay_ms;
 } srv;
 
-const char demoBasePath[] = { "demos/races/" };
+const char demoBasePath[] = "demos/races/";
+//const char demoBasePath[] = "demos/"; // for debugging
 
 static void NET_HTTP_ServerProcessEvent() {
 	std::unique_lock<std::mutex> lk(srv.event.mutex);
 
 	if (!srv.event.processed) {
 		bool isDemoPath = false;
+
+		srv.event.disallowedCode = 403;
+		srv.event.disallowedReason = "";
 
 		if (!srv.event.reqPath[0]) {
 			srv.event.isRedirect = true;
@@ -78,6 +84,11 @@ static void NET_HTTP_ServerProcessEvent() {
 		else if (!Q_stricmpn(demoBasePath, srv.event.reqPath,sizeof(demoBasePath)-1) && !FS_CheckDirTraversal(srv.event.reqPath)) {
 			isDemoPath = true;
 			srv.event.allowed = true;
+			if (FS_WeHaveFileOpen(srv.event.reqPath)) { // dont allow if we are still writing to the demo
+				srv.event.allowed = false;
+				srv.event.disallowedCode = 503;
+				srv.event.disallowedReason = "Can't download file, file is in use or being written to.";
+			}
 			//if (!FS_FileExists(srv.event.reqPath)) {
 				char* path = FS_BuildOSPathDefault("");
 				Q_strncpyz(srv.event.filePath, path, sizeof(srv.event.filePath));
@@ -246,7 +257,7 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 				mg_http_serve_file(nc, hm, srv.event.filePath, &opts);
 			}
 		} else {
-			mg_http_reply(nc, 403, NULL, "");
+			mg_http_reply(nc, srv.event.disallowedCode ? srv.event.disallowedCode : 403, NULL, srv.event.disallowedReason ? srv.event.disallowedReason : "");
 			nc->is_draining = 1;
 		}
 		break;
