@@ -608,7 +608,7 @@ static void DoLine2( const vec3_t start, const vec3_t end, const vec3_t up, floa
 	tess.indexes[tess.numIndexes++] = vbase + 3;
 }
 
-static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t up, float spanWidth )
+static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t up, float spanWidth, qboolean forceColorOverride )
 {
 	float		spanWidth2;
 	int			vbase;
@@ -616,6 +616,13 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	vbase = tess.numVertexes;
 
 	spanWidth2 = -spanWidth;
+
+	if (forceColorOverride) {
+		if (!tess.anyVertexColorOverrides) { // TODO can we make this more performant/elegant? this is gross.
+			Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
+		}
+		tess.anyVertexColorOverrides = qtrue;
+	}
 
 	// FIXME: use quad stamp?
 	VectorMA( start, spanWidth, up, tess.xyz[tess.numVertexes] );
@@ -625,6 +632,12 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	if (forceColorOverride) {
+		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	}
 	tess.numVertexes++;
 
 	VectorMA( start, spanWidth2, up, tess.xyz[tess.numVertexes] );
@@ -634,6 +647,12 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	if (forceColorOverride) {
+		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	}
 	tess.numVertexes++;
 
 	VectorMA( end, spanWidth, up, tess.xyz[tess.numVertexes] );
@@ -644,6 +663,12 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	if (forceColorOverride) {
+		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	}
 	tess.numVertexes++;
 
 	VectorMA( end, spanWidth2, up, tess.xyz[tess.numVertexes] );
@@ -653,6 +678,12 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	if (forceColorOverride) {
+		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
+		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
+	}
 	tess.numVertexes++;
 
 	tess.indexes[tess.numIndexes++] = vbase;
@@ -702,7 +733,7 @@ void RB_SurfaceOrientedLine( void )
 	// compute side vector
 	VectorNormalize( e->axis[1] );
 	VectorCopy(e->axis[1], right);
-	DoLine_Oriented( start, end, right, e->data.line.width*0.5f );
+	DoLine_Oriented( start, end, right, e->data.line.width*0.5f, (qboolean)(e->saberLength == -1.0f) );
 }
 
 /*
@@ -1364,6 +1395,8 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 			float newVel = rampHelper == 2 ? VectorLength(newVelocity) : VectorLength2(newVelocity); // we only care about horizontal speed usually
 
 			if (oldVel != newVel) {
+				tess.anyVertexColorOverrides = qtrue;
+				tess.vertexColorOverrides[indices[i - 2] + Bob][3] = tess.vertexColorOverrides[indices[i - 1] + Bob][3] = tess.vertexColorOverrides[indices[i] + Bob][3] = 255; // alpha
 				tess.vertexColorOverrides[indices[i - 2] + Bob][2] = tess.vertexColorOverrides[indices[i - 1] + Bob][2] = tess.vertexColorOverrides[indices[i] + Bob][2] = 127;
 				tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = 127;
 				tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = 127;

@@ -337,6 +337,7 @@ void DeformText( const char *text ) {
 	if (r_rampHelper->integer) {
 		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
+	tess.anyVertexColorOverrides = qfalse;
 
 	color[0] = color[1] = color[2] = color[3] = 255;
 
@@ -406,6 +407,7 @@ static void AutospriteDeform( void ) {
 	if (r_rampHelper->integer) {
 		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
+	tess.anyVertexColorOverrides = qfalse;
 
 	if ( backEnd.currentEntity != &tr.worldEntity ) {
 		GlobalVectorToLocal( backEnd.viewParms.ori.axis[1], leftDir );

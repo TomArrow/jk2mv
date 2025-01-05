@@ -1574,6 +1574,7 @@ struct shaderCommands_s
 
 	byte		vertexIsMarked[SHADER_MAX_VERTEXES]; 
 	color4ub_t	vertexColorOverrides[SHADER_MAX_VERTEXES]; // for ramp helper
+	qboolean	anyVertexColorOverrides;
 
 	shader_t	*shader;
 	double		shaderTime;

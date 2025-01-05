@@ -603,6 +603,7 @@ void R_BuildCloudData( shaderCommands_t *input )
 	if (r_rampHelper->integer) {
 		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
+	tess.anyVertexColorOverrides = qfalse;
 
 	if ( input->shader->sky.cloudHeight )
 	{
