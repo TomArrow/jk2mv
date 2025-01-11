@@ -95,6 +95,14 @@ endif()
 message(STATUS "${BITS}-bit build (${CPU_TYPE})")
 
 
+macro(boolean_number var)
+  if(${var})
+    set(${var} 1 ${ARGN})
+  else()
+    set(${var} 0 ${ARGN})
+  endif()
+endmacro()
+
 ###############################################################################
 # COMPILER SETTINGS
 ###############################################################################
