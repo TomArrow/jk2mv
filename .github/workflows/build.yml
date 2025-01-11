@@ -212,7 +212,7 @@ jobs:
 
   macos:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
-    runs-on: macos-12
+    runs-on: macos-14
     strategy:
       matrix:
         build_type: [Debug, Release]
