@@ -297,8 +297,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        arch: [x86, x86_64]
-        #container_image: ["ubuntu:22.04", "i386/ubuntu:22.04"]
+        #arch: [x86, x86_64]
+        container_image: ["ubuntu:22.04"] #, "i386/ubuntu:22.04"]
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
 
