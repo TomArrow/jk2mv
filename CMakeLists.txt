@@ -381,6 +381,7 @@ option(WITH_UNIT_TESTS "" OFF)
 option(USE_SYSTEM_INSTALLED_LIB "" OFF)
 option(WITH_EXTERNAL_ZLIB "" ON)
 option(MARIADB_FORCE_EXTERNAL_ZLIB "" ON)
+option(IGNORE_PACKAGING "" ON) # dont let mariadb packaging interferre with our own
 #set(ALL_PLUGINS_STATIC ON)
 #set(WITH_MSI OFF)
 #set(WITH_UNIT_TESTS OFF)
