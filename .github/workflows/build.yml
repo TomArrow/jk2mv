@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
 
     - name: Add msbuild to PATH
@@ -85,7 +85,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
 
     - name: Add msbuild to PATH
@@ -150,7 +150,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
 
     - name: Install WinXP Toolset
@@ -222,7 +222,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
 
     - name: Set CMake parameters
@@ -304,7 +304,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: true
+        submodules: recursive
         fetch-depth: 0
 
     - name: Determine parameters
