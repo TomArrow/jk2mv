@@ -14,6 +14,7 @@ jobs:
     name: Build VS 2022 (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
+      fail-fast: false
       matrix:
         build_type: [RelWithDebInfo]
         arch: [Win32]
@@ -78,6 +79,7 @@ jobs:
     name: Build VS 2022 (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
+      fail-fast: false
       matrix:
         build_type: [Debug, RelWithDebInfo]
         arch: [Win32, x64]
@@ -143,6 +145,7 @@ jobs:
     name: Build VS 2019 (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2019
     strategy:
+      fail-fast: false
       matrix:
         build_type: [Debug, RelWithDebInfo]
         arch: [Win32]
@@ -214,6 +217,7 @@ jobs:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: macos-14
     strategy:
+      fail-fast: false
       matrix:
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
@@ -296,6 +300,7 @@ jobs:
     name: Build Linux (${{ matrix.portable }} - ${{ matrix.container_image }}), ${{ matrix.build_type }}
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         #arch: [x86, x86_64]
         container_image: ["ubuntu:22.04"] #, "i386/ubuntu:22.04"]

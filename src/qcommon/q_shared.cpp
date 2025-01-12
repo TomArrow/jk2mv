@@ -798,7 +798,7 @@ int Q_stricmp(const char *s1, const char *s2) {
 qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
 	char c = *p++;
 	int i;
-	int val;
+	int val = 0;
 
 	qboolean doWrite = qtrue;
 	if (!color || !(color + 3)) {
