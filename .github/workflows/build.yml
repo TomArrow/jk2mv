@@ -405,7 +405,7 @@ jobs:
       - name: Create binary archives
         run: |
             ls -l
-            find ./artifacts -type d -mindepth 1 -maxdepth 1 -exec 7z a -r "{}.zip" "artifacts/{}/*" \;
+            find ./artifacts -type d -mindepth 1 -maxdepth 1 -exec 7z a -r "{}.zip" "{}/*" \;
 
       - name: Create latest build
         uses: crowbarmaster/GH-Automatic-Releases@latest
@@ -415,5 +415,5 @@ jobs:
           prerelease: false
           title: Latest Build
           files: |
-            *.zip
+            artifacts/*.zip
             
