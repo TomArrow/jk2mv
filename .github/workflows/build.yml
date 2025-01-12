@@ -40,12 +40,12 @@ jobs:
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v3'
+    #- uses: 'actions/upload-artifact@v4'
     #  with:
     #    name: Windows Binaries (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v3'
+    - uses: 'actions/upload-artifact@v4'
       with:
         name: Windows Package (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
         path: ${{github.workspace}}/build/actions/out/*.exe
@@ -104,12 +104,12 @@ jobs:
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v3'
+    #- uses: 'actions/upload-artifact@v4'
     #  with:
     #    name: Windows Binaries (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v3'
+    - uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'RelWithDebInfo' }}
       with:
         name: Windows Package (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -175,12 +175,12 @@ jobs:
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v3'
+    #- uses: 'actions/upload-artifact@v4'
     #  with:
     #    name: Windows Binaries (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v3'
+    - uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'RelWithDebInfo' }}
       with:
         name: Windows Package (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -255,12 +255,12 @@ jobs:
       shell: bash
       run: make package
 
-    #- uses: 'actions/upload-artifact@v3'
+    #- uses: 'actions/upload-artifact@v4'
     #  with:
     #    name: macOS Binaries (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v3'
+    - uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'Release' }}
       with:
         name: macOS Package (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -329,7 +329,7 @@ jobs:
         podman pull docker.io/${{ matrix.container_image }}
         podman run --name buildenv -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
         podman exec buildenv apt-get update
-        podman exec buildenv apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm
+        podman exec buildenv apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file
         mkdir -p ${{github.workspace}}/build/actions
 
     - name: Configure CMake
@@ -344,12 +344,12 @@ jobs:
       shell: bash
       run: podman exec -w /jk2mv/build/actions buildenv make package
 
-    #- uses: 'actions/upload-artifact@v3'
+    #- uses: 'actions/upload-artifact@v4'
     #  with:
     #    name: ${{ steps.parameters.outputs.BINARTIFACTNAME }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v3'
+    - uses: 'actions/upload-artifact@v4'
       if: ${{ matrix.build_type == 'Release' }}
       with:
         name: ${{ steps.parameters.outputs.PKGARTIFACTNAME }}
