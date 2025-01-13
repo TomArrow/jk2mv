@@ -1218,6 +1218,7 @@ void Console_Key (int key) {
 		(keynames[ key ].lower == 'm' && kg.keys[A_CTRL].down) ||
 		(keynames[ key ].lower == 'j' && kg.keys[A_CTRL].down) )
 	{
+		int cmplen = 0;
 		// if not in the game explicitly prepent a slash if needed
 		/*if ( cls.state != CA_ACTIVE && kg.g_consoleField.buffer[0] != '\\'
 			&& kg.g_consoleField.buffer[0] != '/' ) {
@@ -1232,10 +1233,17 @@ void Console_Key (int key) {
 			CompleteCommand();
 		}
 
-		if (con_timestamps && con_timestamps->integer)
-			Com_Printf("\\%s\n", kg.g_consoleField.buffer);
-		else
-			Com_Printf ( "]%s\n", kg.g_consoleField.buffer );
+		cmplen = strlen(kg.g_consoleField.buffer);
+		while (cmplen > 1 && kg.g_consoleField.buffer[cmplen-1] == ' ') {
+			cmplen--;
+		}
+
+		if (!com_silentScreenshots->integer || (Q_stricmpn(kg.g_consoleField.buffer,"screenshot", cmplen) && Q_stricmpn(kg.g_consoleField.buffer,"screenshot_tga", cmplen))) {
+			if (con_timestamps && con_timestamps->integer)
+				Com_Printf("\\%s\n", kg.g_consoleField.buffer);
+			else
+				Com_Printf("]%s\n", kg.g_consoleField.buffer);
+		}
 
 		// leading slash is an explicit command
 		if ( kg.g_consoleField.buffer[0] == '\\' || kg.g_consoleField.buffer[0] == '/' ) {

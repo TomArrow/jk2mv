@@ -653,6 +653,7 @@ qboolean Cvar_Command( void );
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
 
+void Cvar_WriteNonDefaultVariables(fileHandle_t f,qboolean realTime);
 void Cvar_WriteVariables(fileHandle_t f, qboolean locals);
 // writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
@@ -951,6 +952,7 @@ extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
+extern	cvar_t	*com_silentScreenshots;
 
 extern	cvar_t	*cool_apiFeatures;
 

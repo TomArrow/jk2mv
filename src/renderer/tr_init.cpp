@@ -854,7 +854,7 @@ void R_ScreenShotTGA_f (void) {
 
 	Q_strncpyz(tr.screenshotTGAName, checkname, sizeof(tr.screenshotTGAName));
 	tr.screenshotTGA = qtrue;
-	tr.screenshotTGASilent = silent;
+	tr.screenshotTGASilent = (qboolean)(silent || com_silentScreenshots->integer);
 }
 
 //jpeg  vession
@@ -906,7 +906,7 @@ void R_ScreenShot_f (void) {
 	Q_strncpyz(tr.screenshotJPEGName, checkname, sizeof(tr.screenshotJPEGName));
 	tr.screenshotJPEG = qtrue;
 	tr.screenshotJPEGQuality = r_screenshotJpegQuality->integer;
-	tr.screenshotJPEGSilent = silent;
+	tr.screenshotJPEGSilent = (qboolean)(silent || com_silentScreenshots->integer);
 }
 
 //============================================================================

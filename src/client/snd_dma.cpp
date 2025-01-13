@@ -2253,6 +2253,7 @@ void S_Update( void ) {
 	int			i;
 	int			total;
 	channel_t	*ch;
+	bool wasMuted = SNDDMA_ConditionallyMuted();
 
 
 	if ( !s_soundStarted || s_soundMuted) {
@@ -2262,8 +2263,13 @@ void S_Update( void ) {
 
 	S_CheckMuteWhenMinimized();
 
-	if ( SNDDMA_ConditionallyMuted()) {
-		Com_DPrintf("conditionally muted\n");
+	if ( SNDDMA_ConditionallyMuted() != wasMuted) {
+		if (wasMuted) {
+			Com_DPrintf("conditionally unmuted\n");
+		}
+		else {
+			Com_DPrintf("conditionally muted\n");
+		}
 		return;
 	}
 

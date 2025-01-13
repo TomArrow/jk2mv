@@ -883,6 +883,40 @@ void Cvar_WriteVariables( fileHandle_t f, qboolean locals ) {
 	}
 }
 
+void Cvar_WriteNonDefaultVariables(fileHandle_t f, qboolean realTime) {
+	cvar_t	*var;
+	char	buffer[1024];
+	cvar_t *sortedCvars[MAX_CVARS];
+	qboolean doLatched = (qboolean)!realTime;
+
+	int i;
+	int numSorted = 0;
+	for (var = cvar_vars ; var ; var = var->next) {
+		if((var->flags & CVAR_ARCHIVE) || realTime) {
+			if (Q_stricmp(var->resetString, doLatched && var->latchedString ? var->latchedString : var->string)) {
+				sortedCvars[numSorted++] = var;
+			}
+		}
+	}
+
+	if (!numSorted)
+		return;
+
+	qsort(sortedCvars, numSorted, sizeof(sortedCvars[0]), Cvar_CvarCmp);
+
+	for (i = 0; i < numSorted ; ++i) {
+		var = sortedCvars[i];
+
+		// write the latched value, even if it hasn't taken effect yet
+		if ( var->latchedString && doLatched) {
+			Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->latchedString);
+		} else {
+			Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string);
+		}
+		FS_Printf (f, "%s", buffer);
+	}
+}
+
 /*
 ============
 Cvar_List_f
