@@ -375,19 +375,22 @@ add_subdirectory(libs/mongoose)
 
 # MariaDB
 
+#options to override option definitions inside
+option(IGNORE_PACKAGING "" ON) # dont let mariadb packaging interferre with our own
 option(ALL_PLUGINS_STATIC "" ON)
 option(WITH_MSI "" OFF)
 option(WITH_UNIT_TESTS "" OFF)
 option(USE_SYSTEM_INSTALLED_LIB "" OFF)
 option(WITH_EXTERNAL_ZLIB "" ON)
 option(MARIADB_FORCE_EXTERNAL_ZLIB "" ON)
-option(IGNORE_PACKAGING "" ON) # dont let mariadb packaging interferre with our own
-#set(ALL_PLUGINS_STATIC ON)
-#set(WITH_MSI OFF)
-#set(WITH_UNIT_TESTS OFF)
-#set(USE_SYSTEM_INSTALLED_LIB OFF)
-#set(WITH_EXTERNAL_ZLIB ON)
-#set(MARIADB_FORCE_EXTERNAL_ZLIB ON)
+#and then set anyway to update cache
+set(IGNORE_PACKAGING ON)
+set(ALL_PLUGINS_STATIC ON)
+set(WITH_MSI OFF)
+set(WITH_UNIT_TESTS OFF)
+set(USE_SYSTEM_INSTALLED_LIB OFF)
+set(WITH_EXTERNAL_ZLIB ON)
+set(MARIADB_FORCE_EXTERNAL_ZLIB ON)
 if(NOT UseInternalZLIB) # gotta do it here so mariadb can find it if needed since we're telling mariadb to NOT use its own
 	find_package(ZLIB)
 	if(NOT ZLIB_FOUND)
