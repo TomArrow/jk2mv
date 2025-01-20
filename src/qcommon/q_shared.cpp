@@ -112,6 +112,18 @@ void COM_DefaultExtension(char *path, size_t maxSize, const char *extension) {
 
 /*
 ==================
+COM_AddExtension
+==================
+*/
+void COM_AddExtension(char *path, size_t maxSize, const char *extension) {
+	char	oldPath[MAX_QPATH];
+
+	Q_strncpyz(oldPath, path, sizeof(oldPath));
+	Com_sprintf(path, maxSize, "%s%s", oldPath, extension);
+}
+
+/*
+==================
 COM_DefaultExtension
 
 Append extension if it's missing or existing extension doesn't match

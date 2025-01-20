@@ -221,6 +221,8 @@ cvar_t *r_printMissingModels;
 cvar_t *r_newRemaps;
 cvar_t *r_newRemapsTmpFix;
 
+cvar_t *r_imageLoadDotFix;
+
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
 PFNGLCLIENTACTIVETEXTUREARBPROC qglClientActiveTextureARB;
@@ -1151,6 +1153,7 @@ void R_Register( void )
 	r_subdivisions = ri.Cvar_Get("r_subdivisions", "4", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_ignoreFastPath = ri.Cvar_Get("r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_newRemapsTmpFix = ri.Cvar_Get("r_newRemapsTmpFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // TA: Since newremaps are kinda broken atm and i cba to fix it properly, but I also don't wanna entirely revert them, I do this temporary fix to make vanilla behavior work again (not missing texture rectangles all over the place)
+	r_imageLoadDotFix = ri.Cvar_Get("r_imageLoadDotFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // more tolerant/logical image loading that will treat us better in case of images that have dots in their name outside of their extension
 	r_newRemaps = ri.Cvar_Get("r_newRemaps", "0", CVAR_CHEAT ); // Only used for testing. Classic remaps are supposed to remain fullbright,
 	                                                            // because that is how they have been used by maps and serverside mods for
 	                                                            // more than 20 years. Servers can set a configstring for "mvremap" now.

@@ -3063,7 +3063,47 @@ void LoadPNG(const char *filename, byte **data, int *width, int *height, pixelFo
 
 
 
+static void R_ImageExtension(char* out, int outSize, const char* shortname, const char* extension, int forceExtension) {
+	int len;
+	const char* ext = NULL;
+	const char* s;
 
+	switch (forceExtension) {
+	case 0:
+		// default behavior
+		// doesn't rly make sense tbh. first we strip it and then we let it keep a default if it has one? wut
+		COM_StripExtension(shortname, out, outSize);
+		COM_DefaultExtension(out, outSize, extension);
+		break;
+	case 1:
+		// force extension after stripping
+		COM_StripExtension(shortname, out, outSize);
+		COM_AddExtension(out, outSize, extension);
+		break;
+	case 2:
+		// only strip extension if it is an image format extension (so we don't strip endings of filenames that have dots)
+		len = strlen(shortname);
+
+		s = shortname;
+		while (*s) {
+			if (*s == '.') {
+				ext = s;
+			}
+			s++;
+		}
+
+		if (ext && (!Q_stricmp(ext, ".tga") || !Q_stricmp(ext, ".jpg") || !Q_stricmp(ext, ".png") || !Q_stricmp(ext, ".bmp") || !Q_stricmp(ext, ".hdr") || !Q_stricmp(ext, ".pcx"))) { 
+
+			// only strip if it's a known image extension
+			COM_StripExtension(shortname, out, outSize);
+		}
+		else {
+			Q_strncpyz(out, shortname, outSize);
+		}
+		COM_AddExtension(out, outSize, extension);
+		break;
+	}
+}
 /*
 =================
 R_LoadImage
@@ -3075,41 +3115,46 @@ Loads any of the supported image types into a cannonical
 void R_LoadImage( const char *shortname, byte **pic, int *width, int *height, pixelFormat_t *format )
 {
 	char	name[MAX_QPATH];
+	int forceExtension;
+	int forceExtensionMax = r_imageLoadDotFix->integer ? 2 : 0;
 
 	*pic = NULL;
 	*width = 0;
 	*height = 0;
 	*format = PXF_RGBA;
 
-	// First try without JKA assets
-	COM_StripExtension(shortname,name,sizeof(name));
-	COM_DefaultExtension(name, sizeof(name), ".jpg");
-	LoadJPG( name, pic, width, height, format, qtrue);
+	for (forceExtension = 0; forceExtension <= forceExtensionMax && !*pic; forceExtension++) {
+		// when forceextension 1, we wanna force an extension
+		// when forceextension 2, we wanna use a fallback method more compatible with q3
+		// where filenames that contain dots also work for images and don't fail loading
 
-	if (!*pic) {
-		COM_StripExtension(shortname,name,sizeof(name));
-		COM_DefaultExtension(name, sizeof(name), ".png");
-		LoadPNG( name, pic, width, height, format, qtrue); 			// try png first
-	}
-	if (!*pic) {
-		COM_StripExtension(shortname,name,sizeof(name));
-		COM_DefaultExtension(name, sizeof(name), ".tga");
-		LoadTGA( name, pic, width, height, format, qtrue);            
-	}
-	if (!*pic) {
-		COM_StripExtension(shortname,name,sizeof(name));
-		COM_DefaultExtension(name, sizeof(name), ".jpg");
-		LoadJPG( name, pic, width, height, format, qfalse);          
-	}
-	if (!*pic) {
-		COM_StripExtension(shortname,name,sizeof(name));
-		COM_DefaultExtension(name, sizeof(name), ".png");
-		LoadJPG( name, pic, width, height, format, qfalse);           
-	}
-	if (!*pic) {
-		COM_StripExtension(shortname,name,sizeof(name));
-		COM_DefaultExtension(name, sizeof(name), ".tga");
-		LoadJPG( name, pic, width, height, format, qfalse);            
+		// First try without JKA assets
+		R_ImageExtension(name, sizeof(name), shortname, ".jpg", forceExtension);
+		LoadJPG( name, pic, width, height, format, qtrue);
+
+		if (!*pic) {
+			R_ImageExtension(name, sizeof(name), shortname, ".png", forceExtension);
+			LoadPNG( name, pic, width, height, format, qtrue); 			// try png first
+		}
+		if (!*pic) {
+			R_ImageExtension(name, sizeof(name), shortname, ".tga", forceExtension);
+			LoadTGA( name, pic, width, height, format, qtrue);            
+		}
+		if (!*pic) {
+			R_ImageExtension(name, sizeof(name), shortname, ".jpg", forceExtension);
+			LoadJPG( name, pic, width, height, format, qfalse);          
+		}
+		if (!*pic) {
+			R_ImageExtension(name, sizeof(name), shortname, ".png", forceExtension);
+			LoadJPG( name, pic, width, height, format, qfalse);           
+		}
+		if (!*pic) {
+			R_ImageExtension(name, sizeof(name), shortname, ".tga", forceExtension);
+			LoadJPG( name, pic, width, height, format, qfalse);            
+		}
+		if (*pic && forceExtension) {
+			Com_Printf("^3R_LoadImage: '%s' was loaded with forceExtension %d (r_imageLoadDotFix). If this is part of your mod, consider changing the name for backwards JK2 compatibility.\n", shortname,forceExtension);
+		}
 	}
 
 	if (*pic) {

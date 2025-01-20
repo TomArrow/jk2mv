@@ -1359,6 +1359,8 @@ extern	cvar_t *r_environmentMapping;
 extern	cvar_t *r_printMissingModels;
 extern	cvar_t *r_newRemaps;
 extern	cvar_t *r_newRemapsTmpFix;
+
+extern	cvar_t *r_imageLoadDotFix;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, double t );
