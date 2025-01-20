@@ -590,7 +590,7 @@ Ghoul2 Insert End
 	}
 
 	// decide which serverversion to host
-	mv_serverversion = Cvar_Get("mv_serverversion", "1.04", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
+	mv_serverversion = Cvar_Get("mv_serverversion", "1.02", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
 	if (FS_AllPath_Base_FileExists("assets5.pk3") && (!strcmp(mv_serverversion->string, "auto") || !strcmp(mv_serverversion->string, "1.04"))) {
 		Com_Printf("serverversion set to 1.04\n");
 		MV_SetCurrentGameversion(VERSION_1_04);
@@ -825,7 +825,7 @@ void SV_Init (void) {
 
 	Cvar_Get("JK2MV", JK2MV_VERSION, CVAR_SERVERINFO | CVAR_ROM);
 
-	mv_serverversion = Cvar_Get("mv_serverversion", "1.04", CVAR_ARCHIVE | CVAR_LATCH);
+	mv_serverversion = Cvar_Get("mv_serverversion", "1.02", CVAR_ARCHIVE | CVAR_LATCH);
 
 	mv_fixnamecrash = Cvar_Get("mv_fixnamecrash", "1", CVAR_ARCHIVE);
 	mv_fixforcecrash = Cvar_Get("mv_fixforcecrash", "1", CVAR_ARCHIVE);

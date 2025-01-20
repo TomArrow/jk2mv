@@ -1444,6 +1444,9 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	const char* cmd;
 	const char* arg1;
 	int argc;
+	char		lowercaseCmd[20]; // for levenshtein check. doesnt need to be longer. that long of a cmd wouldn't trigger it anyway
+	int			cmdLen,i;
+
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1458,14 +1461,21 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	cmd = Cmd_Argv(0);
 	arg1 = Cmd_Argv(1);
 	argc = Cmd_Argc();
-	//if ((!Q_stricmp(cmd,"say") || !Q_stricmp(cmd, "say_team")) && (levenshtein(cmd, "login") <= 2 && argc >= 4 && argc <= 5 || levenshtein(cmd, "register") <= 2 || levenshtein(cmd, "changepassword") <= 3)) {
+
+	Q_strncpyz(lowercaseCmd, cmd, sizeof(lowercaseCmd));
+	cmdLen = strlen(lowercaseCmd);
+	for (i = 0; i < cmdLen; i++) {
+		lowercaseCmd[i] = tolower(lowercaseCmd[i]);
+	}
+
+	//if ((!Q_stricmp(cmd,"say") || !Q_stricmp(cmd, "say_team")) && (levenshtein(lowercaseCmd, "login") <= 2 && argc >= 4 && argc <= 5 || levenshtein(lowercaseCmd, "register") <= 2 || levenshtein(lowercaseCmd, "changepassword") <= 3)) {
 
 	//}
 	//else 
-	if (levenshtein(cmd, "login") <= 2 || levenshtein(cmd, "register") <= 2) {
+	if (levenshtein("login",lowercaseCmd) <= 2 || levenshtein("register",lowercaseCmd) <= 2) {
 		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, arg1, Cmd_ArgsFrom(3));
 	}
-	else if (levenshtein(cmd, "changepassword") <= 3) {
+	else if (levenshtein("changepassword",lowercaseCmd) <= 3) {
 		Com_DPrintf("clientCommand: %s : %i : %s ****** %s\n", cl->name, seq, cmd, Cmd_ArgsFrom(2));
 	}
 	else {
