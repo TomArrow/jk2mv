@@ -3647,8 +3647,12 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	if ( !image ) {
 		ri.Printf( PRINT_DEVELOPER, "Couldn't find image for shader %s\n", name );
 		shader.defaultShader = qtrue;
-		//return FinishShader();
-		image = tr.defaultImage;
+		if (r_newRemapsTmpFix->integer) {
+			return FinishShader();
+		}
+		else {
+			image = tr.defaultImage;
+		}
 	}
 
 	//
@@ -3826,6 +3830,17 @@ qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex,
 
 	sh = R_FindShader( name, lightmapIndex, styles, qtrue );
 
+	if (r_newRemapsTmpFix->integer) {
+		// we want to return 0 if the shader failed to
+		// load for some reason, but R_FindShader should
+		// still keep a name allocated for it, so if
+		// something calls RE_RegisterShader again with
+		// the same name, we don't try looking for it again
+		if (sh->defaultShader) {
+			return 0;
+		}
+	}
+
 	return sh->index;
 }
 
@@ -3850,6 +3865,17 @@ qhandle_t RE_RegisterShader( const char *name ) {
 	}
 
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qtrue );
+
+	if (r_newRemapsTmpFix->integer) {
+		// we want to return 0 if the shader failed to
+		// load for some reason, but R_FindShader should
+		// still keep a name allocated for it, so if
+		// something calls RE_RegisterShader again with
+		// the same name, we don't try looking for it again
+		if (sh->defaultShader) {
+			return 0;
+		}
+	}
 
 	return sh->index;
 }
@@ -3885,13 +3911,15 @@ qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 	// Restore value
 	r_celshadalgo->integer = old_r_celshadalgo;
 
-	// we want to return 0 if the shader failed to
-	// load for some reason, but R_FindShader should
-	// still keep a name allocated for it, so if
-	// something calls RE_RegisterShader again with
-	// the same name, we don't try looking for it again
-	if ( sh->defaultShader ) {
-		return 0;
+	if (r_newRemapsTmpFix->integer) {
+		// we want to return 0 if the shader failed to
+		// load for some reason, but R_FindShader should
+		// still keep a name allocated for it, so if
+		// something calls RE_RegisterShader again with
+		// the same name, we don't try looking for it again
+		if (sh->defaultShader) {
+			return 0;
+		}
 	}
 
 	return sh->index;
