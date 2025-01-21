@@ -943,32 +943,20 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 }
 
 
-/*
-=======================
-SV_SendClientSnapshot
+void SV_SendClientUcmdSendback(client_t* client, qboolean force) {
 
-Also called by SV_FinalMessage
-
-=======================
-*/
-void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 	static byte		msg_buf[MAX_MSGLEN];
-	msg_t			msg;
 	msg_t			msgBak;
-	messageType_t	typeFrom = MSG_ALL;
-	messageType_t	typeTo = MSG_ALL;
-	int				msgType;
-
-#ifdef SVDEMO
-	if (sv_demoSpaceSaving->integer && client->netchan.remoteAddress.type != NA_BOT) {
-		typeFrom = MSG_DEMO;
-		typeTo = MSG_CLIENT;
-	}
-#endif
+	msg_t			msg;
 
 	// must be before SV_BuildClientSnapshot because otherwise stuff gets confused with outgoingsequence
 	//if (sv_ucmdSendback->integer && userMessages[client - svs.clients].size() > MAX(1,sv_ucmdSendbackMinCount->integer)) {
-	if (sv_ucmdSendback->integer && (MAX(userMessages[client - svs.clients].size(),userStoredUcmdCounts[client-svs.clients]) > MAX(1,sv_ucmdSendbackMinCount->integer))) {
+	if (sv_ucmdSendback->integer && 
+		(
+			(MAX(userMessages[client - svs.clients].size(), userStoredUcmdCounts[client - svs.clients]) > MAX(1, sv_ucmdSendbackMinCount->integer))
+			|| force
+			)
+		) {
 		int minCurSize = 0;
 		usercmd_t	nullcmd;
 		usercmd_t* cmd, * oldcmd;
@@ -1045,7 +1033,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 			for (; cmdit != (*it)->cmds.end(); cmdit++) {
 				MSG_WriteBits(&msg, 1, 1);
 				cmd = cmdit->get();
-				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd,qtrue);
+				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd, qtrue);
 				sentbackCount++;
 				oldcmd = cmd;
 			}
@@ -1066,8 +1054,9 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		if (userStoredUcmdCounts[client - svs.clients] < 0) {
 			Com_Printf("^1userStoredUcmdCounts ended up smaller than 0!!! WEIRD! Should not happen! It's %d\n", userStoredUcmdCounts[client - svs.clients]);
 			userStoredUcmdCounts[client - svs.clients] = 0;
-		} else if ((userStoredUcmdCounts[client - svs.clients] == 0) != (userMessages[client - svs.clients].size() == 0)) {
-			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d, client is %d\n", userStoredUcmdCounts[client - svs.clients], userMessages[client - svs.clients].size(),client-svs.clients);
+		}
+		else if ((userStoredUcmdCounts[client - svs.clients] == 0) != (userMessages[client - svs.clients].size() == 0)) {
+			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d, client is %d\n", userStoredUcmdCounts[client - svs.clients], userMessages[client - svs.clients].size(), client - svs.clients);
 			userStoredUcmdCounts[client - svs.clients] = 0;
 		}
 
@@ -1075,8 +1064,8 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		//MSG_WriteByte(&msg, svc_EOF); // done by transmit.
 
 		if (/*sv_dynamicSnapshots->integer&&*/  msg.overflowed) {
-		//if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 4) {
-			// rare one broken by the last bit. shouldn't happen
+			//if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 4) {
+				// rare one broken by the last bit. shouldn't happen
 			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize);
 		}
 		else {
@@ -1087,6 +1076,32 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 		}
 
 	}
+}
+
+/*
+=======================
+SV_SendClientSnapshot
+
+Also called by SV_FinalMessage
+
+=======================
+*/
+void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
+	static byte		msg_buf[MAX_MSGLEN];
+	msg_t			msg;
+	msg_t			msgBak;
+	messageType_t	typeFrom = MSG_ALL;
+	messageType_t	typeTo = MSG_ALL;
+	int				msgType;
+
+#ifdef SVDEMO
+	if (sv_demoSpaceSaving->integer && client->netchan.remoteAddress.type != NA_BOT) {
+		typeFrom = MSG_DEMO;
+		typeTo = MSG_CLIENT;
+	}
+#endif
+
+	SV_SendClientUcmdSendback(client, qfalse);
 
 
 	// build the snapshot

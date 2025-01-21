@@ -999,6 +999,8 @@ void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet) {
 	}
 }
 
+void SV_SendClientUcmdSendback(client_t* client, qboolean force);
+
 void SV_StopRecordDemo(client_t* cl) {
 	int		len;
 
@@ -1010,6 +1012,8 @@ void SV_StopRecordDemo(client_t* cl) {
 	if (com_developer->integer > 1) {
 		Com_Printf("Stopping demo recording ... ");
 	}
+
+	SV_SendClientUcmdSendback(cl,qtrue); // force dump any usercmds in when demos finish so nothing gets lost 
 
 	// finish up
 	len = -1;
