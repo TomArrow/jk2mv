@@ -693,6 +693,8 @@ void DB_Init() {
 		DB_SetOptions();
 #ifdef USE_MARIADB
 		dbThread = new std::thread(DB_BackgroundThread);
+#else
+		dbThread = nullptr;
 #endif
 	}
 
@@ -779,7 +781,10 @@ void DB_Shutdown() {
 		dbSyncedData.terminate = qtrue;
 	}
 	dbSyncedData.changeNotifier.notify_one();
-	dbThread->join();
-	delete dbThread;
+	if (dbThread) {
+		dbThread->join();
+		delete dbThread;
+		dbThread = nullptr;
+	}
 }
 
