@@ -16,11 +16,13 @@
 // check for bcrypt availability
 #if defined __has_include
 #if __has_include(<bcrypt.h>)
+#ifdef WITH_BCRYPT
 #define WIN32_USE_BCRYPT 1
 #include <bcrypt.h>
 #include <winternl.h>
 #include <ntstatus.h>
 #pragma comment(lib, "bcrypt.lib")
+#endif
 #endif
 #endif
 
