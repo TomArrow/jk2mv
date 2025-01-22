@@ -143,7 +143,7 @@ static std::string bcryptString(std::string input, int* status, std::string sett
 
 	Com_Printf("db bcrypt; settings: %s\nRaw pw: %s, bcrypt: %s, bcrypt_errno: %d\n", settings, pw, output, bcrypt_errno);
 }
-
+#ifdef USE_MARIADB
 static void DB_BackgroundThread() {
 
 	Com_Printf("MariaDB background thread started.\n");
@@ -432,7 +432,7 @@ static void DB_BackgroundThread() {
 
 	/**/
 }
-
+#endif
 qboolean DB_AddRequest(DBRequest&& req) {
 	if (!db_enabled->integer) return qfalse;
 	{
@@ -691,9 +691,12 @@ void DB_Init() {
 
 	if (!dbThread) {
 		DB_SetOptions();
+#ifdef USE_MARIADB
 		dbThread = new std::thread(DB_BackgroundThread);
+#endif
 	}
 
+#ifdef USE_MARIADB
 	qtime_t	time;
 	char	timestamp[20];
 	Com_RealTime(&time);
@@ -704,6 +707,7 @@ void DB_Init() {
 		req.requestString = va("INSERT INTO test (testtext) VALUES ('%s')", timestamp);
 		DB_AddRequest(std::move(req));
 	}
+#endif
 }
 
 // Escape stuff lifted from MariaDB because I'd need a connection to escape otherwise.

@@ -1,7 +1,13 @@
 
 #ifndef MARIADBHEADER
 #define MARIADBHEADER
+
+#ifdef WITH_MARIADB
+#define USE_MARIADB
+#endif
+#ifdef USE_MARIADB
 #include "conncpp.hpp"
+#endif
 #include "qcommon.h"
 #include <queue>
 
@@ -152,6 +158,7 @@ public:
 			stringValue = new std::string(*valueA);
 			type = SQLVALUE_TYPE_TEXT;
 		}
+#ifdef USE_MARIADB
 		else if constexpr (std::is_same<T, sql::Blob*>()) {
 			type = SQLVALUE_TYPE_BINARY;
 			sql::Blob* blob = (sql::Blob*)valueA;
@@ -168,6 +175,7 @@ public:
 				binaryData->resize(blob->tellg());
 			}
 		}
+#endif
 		else {
 			throw std::invalid_argument("Invalid SQLDelayedValue constructor type");
 		}
@@ -206,7 +214,7 @@ public:
 	{
 		*this = std::move(movedFrom);
 	}
-
+#ifdef USE_MARIADB
 	inline void bind(sql::PreparedStatement* statement, int index) {
 		if (index == 0) {
 			return; // Sometimes we have same set of binds for multiple statements but with different values being used or not being used. So if index not found, just discard. It doesn't seem like sqlite throws an error even if we use 0 as an index but whatever, safe is safe. (this was a comment for sqlite version, not sure if it applies, too lazy to read and understand it again)
@@ -245,6 +253,7 @@ public:
 			break;
 		}
 	}
+#endif
 
 	/*inline int bind(sqlite3_stmt* statement) {
 		int index = sqlite3_bind_parameter_index(statement, columnNameValue->c_str());
@@ -308,6 +317,7 @@ public:
 	SQLDelayedValues() {
 
 	}
+#ifdef USE_MARIADB
 	SQLDelayedValues(sql::ResultSet* sourceRow) {
 		std::unique_ptr<sql::ResultSetMetaData> meta(sourceRow->getMetaData());
 		int columnCount = meta->getColumnCount();
@@ -381,6 +391,7 @@ public:
 			}
 		}
 	}
+#endif
 	auto operator=(SQLDelayedValues&& other) {
 		values = std::move(other.values);
 		other.invalidated = qtrue;
