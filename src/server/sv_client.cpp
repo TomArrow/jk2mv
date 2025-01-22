@@ -1118,6 +1118,48 @@ static void SV_ResetPureClient_f( client_t *cl ) {
 	cl->pureAuthentic = 0;
 }
 
+const char* checkedTypeKeys[CHECKEDTYPE_TYPECOUNT] = {
+	"rate",
+	"snaps"
+};
+
+int SV_GetUserInfoKeyVerifiedNumber(client_t* cl, checkedNumberType_t type) {
+	const char* valueString;
+	const char* s;
+	bool invalidValue = false;
+
+	if (type >= CHECKEDTYPE_TYPECOUNT || type < 0) {
+		Com_Error(ERR_FATAL,"SV_GetUserInfoKeyVerifiedNumber: Unknown type %d", (int)type);
+		return 0;
+	}
+
+	valueString = Info_ValueForKey(cl->userinfo, checkedTypeKeys[type]);
+
+	if (!*valueString) {
+		invalidValue = true;
+	}
+	else {
+		s = valueString;
+		while (*s) {
+			if (!(*s >= '0' && *s <= '9' || *s == '-')) {
+				invalidValue = true;
+				break;
+			}
+			s++;
+		}
+	}
+	if (invalidValue) {
+		cl->invalidValues |= (1 << (int)type);
+	}
+	else {
+		cl->invalidValues &= ~(1 << (int)type);
+	}
+
+	cl->lastInvalidValuesWarning = 0;
+
+	return atoi(valueString);
+}
+
 /*
 =================
 SV_UserinfoChanged
@@ -1138,7 +1180,8 @@ void SV_UserinfoChanged( client_t *cl ) {
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	cl->rate = atoi( Info_ValueForKey(cl->userinfo, "rate") );
+	cl->rate = SV_GetUserInfoKeyVerifiedNumber(cl,CHECKEDTYPE_RATE);
+	cl->snaps = SV_GetUserInfoKeyVerifiedNumber(cl, CHECKEDTYPE_SNAPS);
 	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 && cl->rate < 99999 ) {
 		cl->rate = 99999;	// lans should not rate limit
 	}
@@ -1868,7 +1911,8 @@ int SV_ClientSnaps( client_t *client, qboolean spec )
 	int minSnaps = Com_Clampi( 1, maxSnaps, spec ? sv_minSnapsSpec->integer : sv_minSnaps->integer );
 
 	// Get the desired snaps value (either sv_fps or the value from the userinfo)
-	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
+	//int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
+	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : client->snaps;
 
 	// Ensure the snaps value is within the allowed range
 	return Com_Clampi( minSnaps, maxSnaps, wishSnaps );

@@ -1203,6 +1203,38 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 }
 
 
+void SV_CheckInvalidUserInfoValues(client_t* cl) {
+	const char* warning = NULL;
+	int timeout = 120000;
+	bool critical = false;
+	if (cl->invalidValues & (1 << (int)CHECKEDTYPE_RATE)) {
+		warning = "^1Your 'rate' value is invalid. Please check it and set a proper value.";
+		critical = true;
+	} else if (cl->invalidValues & (1 << (int)CHECKEDTYPE_SNAPS)) {
+		warning = "^1Your 'snaps' value is invalid. Please check it and set a proper value.";
+		critical = true;
+	} else if (cl->rate < 5000) {
+		warning = "^3Your 'rate' value is extremely low. Please consider a higher value.";
+		timeout = 60000 * 20; // every 20 min
+	} else if (cl->snaps < 30) {
+		// we only wanna warn about this in spec i guess but too lazy to code that rn. whatever.
+		warning = "^3Your 'snaps' value is extremely low. Please consider a higher value.";
+		timeout = 60000 * 60; // every 60 min
+	}
+	if (!warning || cl->lastInvalidValuesWarning && svs.time - timeout < cl->lastInvalidValuesWarning && svs.time > cl->lastInvalidValuesWarning) {
+		return;
+	}
+	SV_SendServerCommand(cl,va("print \"%s\n\"",warning));
+	if (critical) {
+		SV_SendServerCommand(cl, va("cp \"%s\n\"", warning));
+		Com_Printf("^3Sending critical warning to client %s: %s\n",cl->name, warning);
+	}
+	else {
+		Com_Printf("^3Sending non-critical warning to client %s: %s\n", cl->name, warning);
+	}
+	cl->lastInvalidValuesWarning = svs.time;
+}
+
 /*
 =======================
 SV_SendClientMessages
@@ -1240,6 +1272,9 @@ void SV_SendClientMessages( void ) {
 		if ( sv.vmPlayerSnapshots && !VM_Call(gvm, GAME_MVAPI_PLAYERSNAPSHOT, i) ) {
 			continue;
 		}
+
+		// warn user if he has invalid snaps/rate settings
+		SV_CheckInvalidUserInfoValues(c);
 
 		// generate and send a new message
 		SV_SendClientSnapshot( c, softLimit);

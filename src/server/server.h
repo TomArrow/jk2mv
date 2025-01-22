@@ -162,6 +162,12 @@ typedef struct leakyBucket_s {
 	unsigned short		burst;
 } leakyBucket_t;
 
+typedef enum checkedNumberType_s {
+	CHECKEDTYPE_RATE,
+	CHECKEDTYPE_SNAPS,
+	CHECKEDTYPE_TYPECOUNT,
+} checkedNumberType_t;
+
 typedef struct client_s {
 	clientState_t	state;
 	char			userinfo[MAX_INFO_STRING];		// name, etc
@@ -206,6 +212,7 @@ typedef struct client_s {
 	clientSnapshot_t	frames[PACKET_BACKUP];	// updates can be delta'd from here
 	int				ping;
 	int				rate;				// bytes / second
+	int				snaps;
 	int				snapshotMsec;		// requests a snapshot every snapshotMsec unless rate choked
 	int				snapshotMsecSpec;		// same as snapshotMsec but specifically for spectators (can allow more leeway)
 	int				pureAuthentic;
@@ -215,6 +222,9 @@ typedef struct client_s {
 
 	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
+
+	int				invalidValues;		// checkedNumberType_t
+	int				lastInvalidValuesWarning;
 
 #ifdef SVDEMO
 	demoInfo_t		demo;
