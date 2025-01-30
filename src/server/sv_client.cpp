@@ -1150,6 +1150,7 @@ int SV_GetUserInfoKeyVerifiedNumber(client_t* cl, checkedNumberType_t type) {
 	}
 	if (invalidValue) {
 		cl->invalidValues |= (1 << (int)type);
+		Com_Printf("^3Invalid '%s' value detected for client '%s' (%d): '%s'", checkedTypeKeys[type],cl->name,cl-svs.clients,valueString);
 	}
 	else {
 		cl->invalidValues &= ~(1 << (int)type);

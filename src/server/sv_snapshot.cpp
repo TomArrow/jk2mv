@@ -1214,11 +1214,11 @@ void SV_CheckInvalidUserInfoValues(client_t* cl) {
 		warning = "^1Your 'snaps' value is invalid. Please check it and set a proper value.";
 		critical = true;
 	} else if (cl->rate < 5000) {
-		warning = "^3Your 'rate' value is extremely low. Please consider a higher value.";
+		warning = va("^3Your 'rate' value is extremely low (%d). Please consider a higher value.",cl->rate);
 		timeout = 60000 * 20; // every 20 min
 	} else if (cl->snaps < 30) {
 		// we only wanna warn about this in spec i guess but too lazy to code that rn. whatever.
-		warning = "^3Your 'snaps' value is extremely low. Please consider a higher value.";
+		warning = va("^3Your 'snaps' value is extremely low (%d). Please consider a higher value.",cl->snaps);
 		timeout = 60000 * 60; // every 60 min
 	}
 	if (!warning || cl->lastInvalidValuesWarning && svs.time - timeout < cl->lastInvalidValuesWarning && svs.time > cl->lastInvalidValuesWarning) {
