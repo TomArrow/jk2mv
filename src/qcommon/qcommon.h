@@ -44,7 +44,7 @@ typedef struct {
 	qboolean	mod;
 } field_t;
 
-typedef void ( *callbackFunc_t )( const char *s );
+typedef void ( *callbackFunc_t )( const char *s, qboolean meme );
 typedef void (*completionFunc_t)( char *args, int argNum );
 
 // common.cpp
@@ -63,7 +63,7 @@ int FloatAsInt( float f );
 extern qboolean com_demoplaying;
 
 // cl_keys.cpp
-void Key_KeynameCompletion ( void(*callback)( const char *s ) );
+void Key_KeynameCompletion ( void(*callback)( const char *s, qboolean meme ) );
 
 // files.cpp
 void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt, callbackFunc_t callback );
@@ -541,6 +541,7 @@ typedef void (*xcommand_t) (void);
 void	Cmd_Init (void);
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
+void	Cmd_AddMemeCommand( const char *cmd_name, xcommand_t function ); // no autocomplete unless typed exact
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
@@ -549,7 +550,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 
 void	Cmd_RemoveCommand( const char *cmd_name );
 
-void	Cmd_CommandCompletion( void(*callback)(const char *s) );
+void	Cmd_CommandCompletion( void(*callback)(const char *s, qboolean meme) );
 // callback with each valid string
 
 int		Cmd_Argc (void);
@@ -639,7 +640,7 @@ void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize 
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize, qboolean isVmCall );
 // returns an empty string if not defined
 
-void	Cvar_CommandCompletion( void(*callback)(const char *s) );
+void	Cvar_CommandCompletion( void(*callback)(const char *s, qboolean meme) );
 // callback with each valid string
 
 void 	Cvar_Reset( const char *var_name );

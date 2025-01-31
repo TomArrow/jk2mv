@@ -4989,7 +4989,7 @@ void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt,
 			Q_strncpyz( filename, converted, sizeof( filename ) );
 		}
 
-		callback( filename );
+		callback( filename, qfalse );
 	}
 	FS_FreeFileList( filenames );
 

@@ -285,6 +285,7 @@ typedef struct cmd_function_s
 	const char				*name;
 	xcommand_t				function;
 	completionFunc_t		complete; // for auto-complete (copied from OpenJK)
+	qboolean				meme; // dont autocomplete unless exact match
 } cmd_function_t;
 
 
@@ -433,6 +434,35 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd->function = function;
 	cmd->complete = NULL; // for auto-complete (copied from OpenJK)
 	cmd->next = cmd_functions;
+	cmd->meme = qfalse;
+	cmd_functions = cmd;
+}
+/*
+============
+Cmd_AddMemeCommand
+============
+*/
+void	Cmd_AddMemeCommand( const char *cmd_name, xcommand_t function ) {
+	cmd_function_t	*cmd;
+
+	// fail if the command already exists
+	for ( cmd = cmd_functions ; cmd ; cmd=cmd->next ) {
+		if ( !strcmp( cmd_name, cmd->name ) ) {
+			// allow completion-only commands to be silently doubled
+			if ( function != NULL ) {
+				Com_DPrintf ("Cmd_AddCommand: %s already defined\n", cmd_name);
+			}
+			return;
+		}
+	}
+
+	// use a small malloc to avoid zone fragmentation
+	cmd = (struct cmd_function_s *)S_Malloc (sizeof(cmd_function_t));
+	cmd->name = CopyString( cmd_name );
+	cmd->function = function;
+	cmd->complete = NULL; // for auto-complete (copied from OpenJK)
+	cmd->next = cmd_functions;
+	cmd->meme = qtrue;
 	cmd_functions = cmd;
 }
 
@@ -469,11 +499,11 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 Cmd_CommandCompletion
 ============
 */
-void	Cmd_CommandCompletion( void(*callback)(const char *s) ) {
+void	Cmd_CommandCompletion( void(*callback)(const char *s, qboolean meme) ) {
 	cmd_function_t	*cmd;
 
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
-		callback( cmd->name );
+		callback( cmd->name, cmd->meme );
 	}
 }
 

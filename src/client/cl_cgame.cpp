@@ -321,8 +321,13 @@ void CL_SetTurnExtents(float turnAdd, float turnSub, int turnTime)
 CL_AddCgameCommand
 =====================
 */
-void CL_AddCgameCommand( const char *cmdName ) {
-	Cmd_AddCommand( cmdName, NULL );
+void CL_AddCgameCommand( const char *cmdName, qboolean meme ) {
+	if (meme) {
+		Cmd_AddMemeCommand(cmdName, NULL);
+	}
+	else {
+		Cmd_AddCommand(cmdName, NULL);
+	}
 }
 
 /*
@@ -935,7 +940,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		Cbuf_AddText( VMAS(1) );
 		return 0;
 	case CG_ADDCOMMAND:
-		CL_AddCgameCommand( VMAS(1) );
+		CL_AddCgameCommand( VMAS(1),qfalse );
 		return 0;
 	case CG_REMOVECOMMAND:
 		Cmd_RemoveCommand( VMAS(1) );
@@ -1616,6 +1621,15 @@ Ghoul2 Insert End
 
 		case CG_COOL_API_GLRESOLUTIONCHANGED:
 			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+			break;
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_ADDMEMECOMMAND) {
+		switch (args[0]) {
+
+		case CG_COOL_API_ADDMEMECOMMAND:
+			CL_AddCgameCommand(VMAS(1),qtrue); // means no autocomplete to this, it must be typed exactly
+			return 0;
 			break;
 		}
 	}

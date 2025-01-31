@@ -1054,11 +1054,18 @@ FindMatches
 
 ===============
 */
-static void FindMatches( const char *s ) {
+static void FindMatches( const char *s, qboolean meme ) {
 	int		i;
 
-	if ( Q_stricmpn( s, completionString, (int)strlen( completionString ) ) ) {
-		return;
+	if (meme) {
+		if (Q_stricmp(s, completionString)) {
+			return;
+		}
+	}
+	else {
+		if (Q_stricmpn(s, completionString, (int)strlen(completionString))) {
+			return;
+		}
 	}
 
 	matchCount++;
@@ -1867,7 +1874,7 @@ Key_KeynameCompletion
 void Key_KeynameCompletion( callbackFunc_t callback ) { // for auto-complete (copied from OpenJK)
 	for ( size_t i=0; i<numKeynames; i++ ) {
 		if ( keynames[i].name )
-			callback( keynames[i].name );
+			callback( keynames[i].name, qfalse );
 	}
 }
 

@@ -2620,7 +2620,7 @@ void Com_Init( char *commandLine ) {
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
 	cl_commandsize = Cvar_Get("cl_commandsize", "512", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
 
-	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT|COOL_APIFEATURE_GETTEMPORARYUSERCMD|COOL_APIFEATURE_EXPANDEDSETUSERCMD|COOL_APIFEATURE_EZDEMOCGAMEBUFFER| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED| COOL_APIFEATURE_MARIADB | COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK | COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS | COOL_APIFEATURE_G_USERCMDSTORE | COOL_APIFEATURE_RESOLUTIONCHANGED| COOL_APIFEATURE_NONEPSILONTRACE| COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS | COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED | COOL_APIFEATURE_SETUSERANGLES | COOL_APIFEATURE_VMCUSTOMFLAGS| COOL_APIFEATURE_KEEPZOMBIE | COOL_APIFEATURE_CUSTOMEPSILONTRACE), CVAR_INIT | CVAR_VM_NOWRITE);
+	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT|COOL_APIFEATURE_GETTEMPORARYUSERCMD|COOL_APIFEATURE_EXPANDEDSETUSERCMD|COOL_APIFEATURE_EZDEMOCGAMEBUFFER| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED| COOL_APIFEATURE_MARIADB | COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK | COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS | COOL_APIFEATURE_G_USERCMDSTORE | COOL_APIFEATURE_RESOLUTIONCHANGED| COOL_APIFEATURE_NONEPSILONTRACE| COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS | COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED | COOL_APIFEATURE_SETUSERANGLES | COOL_APIFEATURE_VMCUSTOMFLAGS| COOL_APIFEATURE_KEEPZOMBIE | COOL_APIFEATURE_CUSTOMEPSILONTRACE| COOL_APIFEATURE_ADDMEMECOMMAND), CVAR_INIT | CVAR_VM_NOWRITE);
 	// 2024-09-25 bump to 2: CG/G_COOL_API_DB_AddRequestTyped
 	// 2024-09-25 bump to 3: Prepared statements and such
 	cool_apiFeatures = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
@@ -3247,11 +3247,18 @@ FindMatches
 
 ===============
 */
-static void FindMatches( const char *s ) {
+static void FindMatches( const char *s, qboolean meme) {
 	int		i;
 
-	if (Q_stricmpn(s, completionString, (int)strlen(completionString))) {
-		return;
+	if (meme) { // meme cmds must be spelled exactly
+		if (Q_stricmp(s, completionString)) {
+			return;
+		}
+	}
+	else {
+		if (Q_stricmpn(s, completionString, (int)strlen(completionString))) {
+			return;
+		}
 	}
 	matchCount++;
 
@@ -3314,7 +3321,7 @@ FindSkinMatches
 
 ===============
 */
-static void FindSkinMatches( const char *s ) {
+static void FindSkinMatches( const char *s, qboolean meme ) {
 	int			i;
 	char		arg[MAX_TOKEN_CHARS];
 
@@ -3348,7 +3355,7 @@ PrintSkinMatches
 
 ===============
 */
-static void PrintSkinMatches( const char *s ) {
+static void PrintSkinMatches( const char *s, qboolean meme ) {
 	char		arg[MAX_TOKEN_CHARS];
 
 	FullSkinName(arg, sizeof(arg), shortestMatch, s);
@@ -3364,7 +3371,7 @@ PrintModelMatches
 
 ===============
 */
-static void PrintModelMatches( const char *s ) {
+static void PrintModelMatches( const char *s, qboolean meme ) {
 	if (!Q_stricmpn(s, shortestMatch, (int)strlen(shortestMatch))) {
 		Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "Model " S_COLOR_WHITE "%s\n", s);
 	}
@@ -3377,9 +3384,16 @@ PrintMatches
 
 ===============
 */
-static void PrintMatches( const char *s ) {
-	if (!Q_stricmpn(s, shortestMatch, (int)strlen(shortestMatch))) {
-		Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "Cmd  " S_COLOR_WHITE "%s\n", s);
+static void PrintMatches( const char *s, qboolean meme ) {
+	if (meme) {
+		if (!Q_stricmp(s, shortestMatch)) {
+			Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "Cmd  " S_COLOR_WHITE "%s\n", s);
+		}
+	}
+	else {
+		if (!Q_stricmpn(s, shortestMatch, (int)strlen(shortestMatch))) {
+			Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "Cmd  " S_COLOR_WHITE "%s\n", s);
+		}
 	}
 }
 
@@ -3405,7 +3419,7 @@ PrintKeyMatches
 
 ===============
 */
-static void PrintKeyMatches( const char *s ) {
+static void PrintKeyMatches( const char *s, qboolean meme ) {
 	if ( !Q_stricmpn( s, shortestMatch, (int)strlen( shortestMatch ) ) ) {
 		Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "Key  " S_COLOR_WHITE "%s\n", s );
 	}
@@ -3418,7 +3432,7 @@ PrintFileMatches
 
 ===============
 */
-static void PrintFileMatches( const char *s ) {
+static void PrintFileMatches( const char *s, qboolean meme ) {
 	if (!Q_stricmpn(s, shortestMatch, (int)strlen(shortestMatch))) {
 		Com_Printf_Ext(qtrue, S_COMPLETION_COLOR "File " S_COLOR_WHITE "%s\n", s);
 	}
@@ -3430,7 +3444,7 @@ PrintCvarMatches
 
 ===============
 */
-static void PrintCvarMatches( const char *s ) {
+static void PrintCvarMatches( const char *s, qboolean meme) {
 	char value[TRUNCATE_LENGTH] = {0};
 
 	if ( !Q_stricmpn( s, shortestMatch, (int)strlen( shortestMatch ) ) ) {

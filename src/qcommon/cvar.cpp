@@ -173,7 +173,7 @@ void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize 
 Cvar_CommandCompletion
 ============
 */
-void	Cvar_CommandCompletion( void(*callback)(const char *s) ) {
+void	Cvar_CommandCompletion( void(*callback)(const char *s,qboolean meme) ) {
 	cvar_t		*cvar;
 
 	for ( cvar = cvar_vars ; cvar ; cvar = cvar->next ) {
@@ -182,7 +182,7 @@ void	Cvar_CommandCompletion( void(*callback)(const char *s) ) {
 		{
 			continue;
 		}
-		callback( cvar->name );
+		callback( cvar->name, qfalse );
 	}
 }
 
