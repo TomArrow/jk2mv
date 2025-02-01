@@ -4272,7 +4272,7 @@ static void FS_Startup( const char *gameName ) {
 			char packstr[MAX_QPATH];
 			Com_sprintf(packstr, sizeof(packstr), "\n%s/%s.pk3", search->pack->pakGamename, search->pack->pakBasename);
 
-			if (!fs_dlTommyTernalPk3->integer && (!Q_stricmp(packstr,"\nbase/jk2pro-bins.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-bins.pk3"))) { // done in a shitty way i think, idk. this build system throws shit in random places depending on whether i build linux or windows, client or dedi etc. what a mess.
+			if (!fs_dlTommyTernalPk3->integer && (!Q_stricmp(packstr, "\nbase/jk2pro-assets.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-assets.pk3") || !Q_stricmp(packstr,"\nbase/jk2pro-bins.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-bins.pk3"))) { // done in a shitty way i think, idk. this build system throws shit in random places depending on whether i build linux or windows, client or dedi etc. what a mess.
 				search->pack->noref = qtrue;
 				search->pack->referenced = 0;
 			} 
