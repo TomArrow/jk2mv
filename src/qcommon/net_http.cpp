@@ -15,7 +15,7 @@ static size_t mgstr2str(char *out, size_t outlen, const struct mg_str *in) {
 	size_t cpylen = in->len;
 	if (cpylen > outlen - 1) cpylen = outlen - 1;
 
-	memcpy(out, in->ptr, cpylen);
+	memcpy(out, in->buf, cpylen);
 	out[cpylen] = '\0';
 
 	return cpylen;
@@ -219,6 +219,11 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 		// store last progress time in nc->data
 		int64_t now = mg_millis();
 		memcpy(nc->data, &now, sizeof(now));
+		break;
+	}
+	case MG_EV_HTTP_HDRS: {
+		// do/can we need this for anything?
+		//MG_INFO(("Test"));
 		break;
 	}
 	case MG_EV_HTTP_MSG: {
@@ -454,7 +459,7 @@ static void NET_HTTP_DownloadEvent(struct mg_connection *nc, int ev, void *ev_da
 			"Host: %.*s\r\n"
 			"User-Agent: " Q3_VERSION "\r\n"
 			"\r\n",
-			mg_url_uri(cldl->url), (int) host.len, host.ptr);
+			mg_url_uri(cldl->url), (int) host.len, host.buf);
 		break;
 	} case MG_EV_READ: {
 		std::unique_lock<std::mutex> lk(m_cldls);
@@ -462,18 +467,18 @@ static void NET_HTTP_DownloadEvent(struct mg_connection *nc, int ev, void *ev_da
 		struct mg_http_message msg;
 
 		if (!cldl->total_bytes && mg_http_parse((char *)io->buf, io->len, &msg)) {
-			if (mg_vcmp(&msg.uri, "200")) {
-				snprintf(cldl->err_msg, sizeof(cldl->err_msg), "HTTP Error: %.*s %.*s", (int)msg.uri.len, msg.uri.ptr, (int)msg.proto.len, msg.proto.ptr);
+			if (mg_strcmp(msg.uri, mg_str("200"))) {
+				snprintf(cldl->err_msg, sizeof(cldl->err_msg), "HTTP Error: %.*s %.*s", (int)msg.uri.len, msg.uri.buf, (int)msg.proto.len, msg.proto.buf);
 				cldl->err_msg[sizeof(cldl->err_msg) - 1] = '\0';
 				cldl->error = true;
 				nc->is_closing = 1;
 				return;
 			}
 
-			if (msg.body.len && (char *)io->buf + io->len >= msg.body.ptr) {
+			if (msg.body.len && (char *)io->buf + io->len >= msg.body.buf) {
 				cldl->total_bytes = msg.body.len;
 
-				mg_iobuf_del(io, 0, msg.body.ptr - (char *)io->buf);
+				mg_iobuf_del(io, 0, msg.body.buf - (char *)io->buf);
 				NET_HTTP_DownloadRecvData(io, nc, &lk);
 			}
 		} else {
