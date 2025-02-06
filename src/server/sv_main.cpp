@@ -37,6 +37,7 @@ cvar_t	*sv_maxPing;
 cvar_t	*sv_gametype;
 cvar_t	*sv_pure;
 cvar_t	*sv_floodProtect;
+cvar_t	*sv_floodProtectSaveposRespos;
 cvar_t	*sv_allowAnonymous;
 cvar_t	*sv_needpass;
 cvar_t	*mv_serverversion;

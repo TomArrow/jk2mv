@@ -871,6 +871,7 @@ void SV_Init (void) {
 	sv_minPing = Cvar_Get ("sv_minPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxPing = Cvar_Get ("sv_maxPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_floodProtect = Cvar_Get ("sv_floodProtect", "3", CVAR_ARCHIVE | CVAR_SERVERINFO );
+	sv_floodProtectSaveposRespos = Cvar_Get ("sv_floodProtectSaveposRespos", "20", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_allowAnonymous = Cvar_Get ("sv_allowAnonymous", "0", CVAR_SERVERINFO);
 
 	// systeminfo

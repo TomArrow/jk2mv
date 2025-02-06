@@ -1545,7 +1545,17 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	// Applying floodprotect only to "CS_ACTIVE" clients leaves too much room for abuse. Extending floodprotect to clients pre CS_ACTIVE shouldn't cause any issues, as the download-commands are handled within the engine and floodprotect only filters calls to the VM.
 	if ( !com_cl_running->integer && /* cl->state >= CS_ACTIVE && */ sv_floodProtect->integer )
 	{
-		if ( sv_floodProtect->integer == 1 && svs.time < cl->nextReliableTime )
+		if (!Q_stricmpn(s, "savepos", 7) || !Q_stricmpn(s, "respos", 6)) { // let us spam these a lil bit more, its often annoying otherwise
+			if (sv_floodProtectSaveposRespos->integer == 1 && svs.time < cl->nextReliableTime)
+			{
+				clientOk = qfalse;
+			}
+			else if (SVC_RateLimit(&cl->cmdBucketSaveposRespos, sv_floodProtectSaveposRespos->integer, 1000, svs.time))
+			{
+				clientOk = qfalse;
+			}
+		}
+		else if (sv_floodProtect->integer == 1 && svs.time < cl->nextReliableTime)
 		{
 			clientOk = qfalse;
 		}

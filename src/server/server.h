@@ -219,6 +219,7 @@ typedef struct client_s {
 	netchan_t		netchan;
 	int				oldServerTime;		// client server time before map change
 	leakyBucket_t	cmdBucket;			// for command flood protection
+	leakyBucket_t	cmdBucketSaveposRespos;			// for command flood protection of respos/savepos
 
 	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
@@ -321,6 +322,7 @@ extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
 extern	cvar_t	*sv_pure;
 extern	cvar_t	*sv_floodProtect;
+extern	cvar_t	*sv_floodProtectSaveposRespos;
 extern	cvar_t	*sv_allowAnonymous;
 extern	cvar_t	*sv_needpass;
 extern	cvar_t	*mv_serverversion;
