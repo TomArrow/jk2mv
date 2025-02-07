@@ -664,6 +664,7 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	client->lastUserInfoCount = 0; //reset the count
 
 	client->deltaMessage = -1;
+	client->deltaMessageWarning = 0;
 	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 	client->lastUsercmd = *cmd;
 
@@ -1649,6 +1650,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 	} else {
 		cl->deltaMessage = -1;
 	}
+	cl->deltaMessageWarning = 0;
 
 	cmdCount = MSG_ReadByte( msg );
 
@@ -1703,6 +1705,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 
 	if ( cl->state != CS_ACTIVE ) {
 		cl->deltaMessage = -1;
+		cl->deltaMessageWarning = 0;
 		return;
 	}
 

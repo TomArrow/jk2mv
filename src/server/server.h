@@ -203,6 +203,8 @@ typedef struct client_s {
 	int				downloadSendTime;	// time we last got an ack from the client
 
 	int				deltaMessage;		// frame last client usercmd message
+	int				deltaMessageWarning;	// for debugging: avoid spamming "delta request from out of date blahblah". 1= out of date packet. 2=out of date entities. reset when deltamessage changes
+	int				deltaMessageWarningLast;	// svs.time of last such warning
 	int				nextReliableTime;	// svs.time when another reliable command will be allowed
 	int				lastPacketTime;		// svs.time when packet was last received
 	int				lastConnectTime;	// svs.time when connection started

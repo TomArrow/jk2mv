@@ -700,6 +700,7 @@ Ghoul2 Insert End
 					client->gentity = ent;
 
 					client->deltaMessage = -1;
+					client->deltaMessageWarning = 0;
 					client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 
 					VM_Call( gvm, GAME_CLIENT_BEGIN, i );

@@ -661,12 +661,12 @@ void MSG_WriteDeltaKey(msg_t *msg, int key, int oldV, int newV, int bits)
 		return;
 	}
 	MSG_WriteBits(msg, 1, 1);
-	MSG_WriteBits(msg, (newV ^ key) & ((1 << bits) - 1), bits);
+	MSG_WriteBits(msg, (newV ^ key) & ((1 << bits) - 1), bits); // TA: ((1 << bits) - 1) sets all bits from bit 0 to bit 15
 }
 
 int	MSG_ReadDeltaKey(msg_t *msg, int key, int oldV, int bits) {
 	if (MSG_ReadBits(msg, 1)) {
-		return MSG_ReadBits(msg, bits) ^ (key & kbitmask[bits]);
+		return MSG_ReadBits(msg, bits) ^ (key & kbitmask[bits]); // kbitmask[bits] has all bits from bit 0 to bit 16 (!!!) set. so 16th bit ends up random depending on key
 	}
 	return oldV;
 }
