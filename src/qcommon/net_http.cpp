@@ -238,7 +238,14 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 		mgstr2str(srv.event.reqPath, sizeof(srv.event.reqPath), &hm->uri);
 		memmove(srv.event.reqPath, srv.event.reqPath + 1, strlen(srv.event.reqPath));
 
-		srv.event.cv_processed.wait(lk, [] { return srv.event.processed; });
+		srv.event.cv_processed.wait(lk, [] { return srv.event.processed || srv.end_poll_loop.load(); }); // gotta check for srv.end_poll_loop and notify when shutting down, or we might get stuck here.
+
+		if (srv.end_poll_loop.load()) {
+			srv.event.processed = true;
+			srv.event.allowed = false;
+			srv.event.disallowedCode = 503;
+			srv.event.disallowedReason = "Server shutting down or restarting.";
+		}
 
 		if (srv.event.allowed) {
 			if (srv.event.isRedirect) {
@@ -338,6 +345,9 @@ void NET_HTTP_StopServer() {
 	Com_Printf("HTTP Downloads: shutting down webserver...\n");
 
 	srv.end_poll_loop = true;
+
+	srv.event.cv_processed.notify_one(); // fix for occasional deadlock when http server thread is waiting for a process to get finished but we are actually already shutting down.
+
 	srv.thread.join();
 
 	mg_mgr_free(&srv.mgr);
