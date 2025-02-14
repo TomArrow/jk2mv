@@ -82,6 +82,8 @@ cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
 cvar_t	*com_debugMessage;
 
+cvar_t	*mg_loglevel;
+
 #ifdef _WIN32
 cvar_t	*com_affinity;
 cvar_t	*com_priority;
@@ -2598,6 +2600,7 @@ void Com_Init( char *commandLine ) {
 	com_timedemo = Cvar_Get ("timedemo", "0", 0);
 	com_cameraMode = Cvar_Get ("com_cameraMode", "0", CVAR_CHEAT);
 	com_debugMessage = Cvar_Get ("com_debugMessage", "0", CVAR_TEMP);
+	mg_loglevel = Cvar_Get ("mg_loglevel", "0", CVAR_TEMP);
 
 #ifdef _WIN32
 	com_affinity = Cvar_Get("com_affinity", "0", 0);

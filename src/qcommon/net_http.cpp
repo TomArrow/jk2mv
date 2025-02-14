@@ -11,6 +11,8 @@
 
 #define POLL_MSEC 100
 
+void NET_HTTP_UpdateLogLevel();
+
 static size_t mgstr2str(char *out, size_t outlen, const struct mg_str *in) {
 	size_t cpylen = in->len;
 	if (cpylen > outlen - 1) cpylen = outlen - 1;
@@ -34,6 +36,7 @@ Webserver
 static struct {
 	std::thread thread;
 	std::atomic_bool end_poll_loop;
+	std::atomic_int loglevel;
 
 	struct mg_mgr mgr;
 	struct mg_connection *con;
@@ -68,6 +71,8 @@ const char demoBasePath[] = "demos/races/";
 
 static void NET_HTTP_ServerProcessEvent() {
 	std::unique_lock<std::mutex> lk(srv.event.mutex);
+
+	NET_HTTP_UpdateLogLevel(); // idk how safe it rly is to put it here but i think its prolly not gonna be a big problem since mongoose only uses debug level in one place
 
 	if (!srv.event.processed) {
 		bool isDemoPath = false;
@@ -254,21 +259,24 @@ static void NET_HTTP_ServerEvent(struct mg_connection *nc, int ev, void *ev_data
 				Q_strcat(redirectHeader,sizeof(redirectHeader), "Location: /");
 				Q_strcat(redirectHeader,sizeof(redirectHeader), srv.event.filePath);
 				Q_strcat(redirectHeader,sizeof(redirectHeader), "\r\n");
+				MG_INFO((va("Redirecting to %s in response to %s",srv.event.filePath, srv.event.reqPath)));
 				mg_http_reply(nc, 302, redirectHeader, "");
 			}
 			else if (srv.event.isFolder) {
 				struct mg_http_serve_opts opts = {};
 				opts.root_dir = srv.event.filePath;
-				opts.mime_types = "pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
+				opts.mime_types = "*=application/octet-stream,pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
+				MG_INFO((va("Serving directory in response to %s: %s", srv.event.reqPath,srv.event.filePath)));
 				mg_http_serve_dir(nc, hm, &opts);
 			}
 			else {
 				struct mg_http_serve_opts opts = {};
-				opts.mime_types = "pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
-
+				opts.mime_types = "*=application/octet-stream,pk3=application/octet-stream,dm_15=application/octet-stream,dm_16=application/octet-stream";
+				MG_INFO((va("Serving file in response to %s: %s", srv.event.reqPath,srv.event.filePath)));
 				mg_http_serve_file(nc, hm, srv.event.filePath, &opts);
 			}
 		} else {
+			MG_INFO((va("Disallowed request for %s: Code %d: %s", srv.event.reqPath, srv.event.disallowedCode, srv.event.disallowedReason ? srv.event.disallowedReason : "")));
 			mg_http_reply(nc, srv.event.disallowedCode ? srv.event.disallowedCode : 403, NULL, srv.event.disallowedReason ? srv.event.disallowedReason : "");
 			nc->is_draining = 1;
 		}
@@ -605,15 +613,42 @@ void NET_HTTP_StopDownload(dlHandle_t handle) {
 ========================================================
 */
 
+static void NET_HTTP_Mongoose_Log(char ch, void* param) {
+	static char buf[MAX_STRING_CHARS-64]; // just do 64 less for a prefix
+	static size_t len=0;
+	buf[len++] = ch;
+	if (ch == '\n' || len >= sizeof(buf)) {
+		buf[len++] = '\0';
+		if (ch == '\n') {
+			Com_Printf("Mongoose: %s", buf);
+		}
+		else {
+			Com_Printf("Mongoose: %s\n", buf);
+		}
+		len = 0;
+	}
+}
+
 /*
 ====================
 NET_HTTP_Init
 ====================
 */
+static int mg_loglevelModifiedCount = 0;
 void NET_HTTP_Init() {
 	Com_DPrintf("Mongoose: " MG_VERSION "\n");
-	int loglevel = Cvar_VariableIntegerValue("mg_loglevel", qfalse);
+	int loglevel = mg_loglevel->integer;
 	mg_log_set(loglevel);
+	mg_loglevelModifiedCount = mg_loglevel->modificationCount;
+	mg_log_set_fn(NET_HTTP_Mongoose_Log, NULL);
+}
+
+void NET_HTTP_UpdateLogLevel() {
+	if (mg_loglevel->modificationCount != mg_loglevelModifiedCount) {
+		int loglevel = mg_loglevel->integer;
+		mg_log_set(loglevel);
+		mg_loglevelModifiedCount = mg_loglevel->modificationCount;
+	}
 }
 
 /*
