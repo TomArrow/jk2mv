@@ -312,6 +312,7 @@ void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, messageType_
 qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial, messageType_t msgType) {
 	int		i;
 	int		reliableAcknowledge;
+	int		countSent = 0;
 
 #ifdef SVDEMO
 	if (client->demo.isBot && client->demo.demorecording) {
@@ -335,10 +336,21 @@ qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean
 	}
 
 	// write any unacknowledged serverCommands
-	for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++ ) {
+	for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++, countSent++) {
 		// msg overflow checks for 4 byte internally; we want to write svc_servercommand (1 byte), the index (4 byte) and the string and 0 terminator (1 byte)
 		// also, multiply with 2 because worst theoretical case each byte might end up 2 bytes with huffman
 		if ( sv_dynamicSnapshots->integer && allowPartial && msg->maxsize - msg->cursize - 4 < 2 * (1 + 4 + (int)strlen(client->reliableCommands[i & (MAX_RELIABLE_COMMANDS-1)]) + 1) ) {
+			client->reliableSent = i - 1;
+			return qfalse;
+		}
+
+		// try to reduce the risk of a "CL_GetServerCommand: a reliable command was cycled out" error by limiting the total amount of 
+		// new servercommands we send in a single message
+		// This server is modded to have a higher serverside buffer (MAX_RELIABLE_COMMANDS) than a vanilla client
+		// So don't send more than the client will conservatively be able to process
+		// Also consider demo playback, so do like half of what the client would probably be able to handle because 
+		// it might parse two messages in a single frame. I suppose it might parse even more but oh well, nothing is perfect.
+		if ( sv_dynamicSnapshots->integer && allowPartial && countSent >= (MAX_RELIABLE_COMMANDS_VANILLA/2)) {
 			client->reliableSent = i - 1;
 			return qfalse;
 		}
