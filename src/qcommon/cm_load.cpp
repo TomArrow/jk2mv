@@ -907,8 +907,15 @@ clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean cap
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );
 
-	if (entityContents != -1) { // if -1, it was a capsule later changed into a box, so we just keep the contents
+	if (entityContents != -1) { 
+		// if -1, it was a capsule later changed into a box, so we just keep the contents
+		// if 1, it's CONTENTS_SOLID but for example vanilla turrets have this but G_RunObject expects CONTENTS_BODY or objects block themselves (disgusting yea...)
+		// TODO let mod decide
 		box_brush->contents = entityContents ? entityContents : CONTENTS_BODY; // 0 = use default (CONTENTS_BODY)
+		if (box_brush->contents & CONTENTS_SOLID) {
+			box_brush->contents &= ~CONTENTS_SOLID;
+			box_brush->contents |= CONTENTS_BODY;
+		}
 	}
 
 	if ( capsule ) {
