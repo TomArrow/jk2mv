@@ -10,6 +10,7 @@
 #endif
 #include "qcommon.h"
 #include <queue>
+#include <chrono>
 
 extern cvar_t* db_enabled;
 

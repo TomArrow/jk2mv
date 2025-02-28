@@ -549,7 +549,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip, traceCustomization_t* traceCustomi
 		if ( clip->trace.allsolid ) {
 			return;
 		}
-		touch = SV_GentityNum( touchlist[i] );
+ 		touch = SV_GentityNum( touchlist[i] );
 
 		// see if we should ignore this entity
 		if ( clip->passEntityNum != ENTITYNUM_NONE ) {
