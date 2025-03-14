@@ -5126,11 +5126,11 @@ uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
 
 					if (pak->gvc & PACKGVC_1_02)
 						returnValue |= FILE_VERSION_1_02;
-					else if (pak->gvc & PACKGVC_1_03)
+					if (pak->gvc & PACKGVC_1_03)
 						returnValue |= FILE_VERSION_1_03;
-					else if (pak->gvc & PACKGVC_1_04)
+					if (pak->gvc & PACKGVC_1_04)
 						returnValue |= FILE_VERSION_1_04;
-					else if (pak->isJKA)
+					if (pak->isJKA)
 						returnValue |= FILE_VERSION_JKA;
 
 					return returnValue;
