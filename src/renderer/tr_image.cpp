@@ -3146,11 +3146,11 @@ void R_LoadImage( const char *shortname, byte **pic, int *width, int *height, pi
 		}
 		if (!*pic) {
 			R_ImageExtension(name, sizeof(name), shortname, ".png", forceExtension);
-			LoadJPG( name, pic, width, height, format, qfalse);           
+			LoadPNG( name, pic, width, height, format, qfalse);           
 		}
 		if (!*pic) {
 			R_ImageExtension(name, sizeof(name), shortname, ".tga", forceExtension);
-			LoadJPG( name, pic, width, height, format, qfalse);            
+			LoadTGA( name, pic, width, height, format, qfalse);            
 		}
 		if (*pic && forceExtension) {
 			Com_Printf("^3R_LoadImage: '%s' was loaded with forceExtension %d (r_imageLoadDotFix). If this is part of your mod, consider changing the name for backwards JK2 compatibility.\n", shortname,forceExtension);
