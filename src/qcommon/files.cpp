@@ -5083,3 +5083,62 @@ qboolean FS_DeleteDLFile(const char *qpath) {
 
 	return (qboolean)!!remove(ospath);
 }
+
+uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
+	fileHandle_t	f;
+	searchpath_t *search;
+
+	if (fileName == NULL || fileName[0] == '\0') {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	// qpaths are not supposed to have a leading slash
+	if (fileName[0] == '/' || fileName[0] == '\\') {
+		fileName++;
+	}
+
+	// make absolutely sure that it can't back up the path.
+	// The searchpaths do guarantee that something will always
+	// be prepended, so we don't need to worry about "c:" or "//limbo"
+	if (strstr(fileName, "..") || strstr(fileName, "::")) {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	FS_FOpenFileRead(fileName, &f, qfalse, module, qfalse, qfalse);
+
+	if (!f) {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	// find file that would be opened by FS_FOpenFileRead taking all
+	// its quirks and special cases into account
+	if (fsh[f].zipFile) {
+		for (search = fs_searchpaths; search; search = search->next) {
+			if (search->pack) {
+				pack_t *pak = search->pack;
+
+				if (fsh[f].handleFiles.file.z == pak->handle) {
+					// found it!
+
+					uint32_t returnValue = FILE_VERSION_UNKNOWN;
+
+					FS_FCloseFile(f, module);
+
+					if (pak->gvc & PACKGVC_1_02)
+						returnValue |= FILE_VERSION_1_02;
+					else if (pak->gvc & PACKGVC_1_03)
+						returnValue |= FILE_VERSION_1_03;
+					else if (pak->gvc & PACKGVC_1_04)
+						returnValue |= FILE_VERSION_1_04;
+					else if (pak->isJKA)
+						returnValue |= FILE_VERSION_JKA;
+
+					return returnValue;
+				}
+			}
+		}
+	}
+
+	FS_FCloseFile(f, module);
+	return FILE_VERSION_UNKNOWN;
+}

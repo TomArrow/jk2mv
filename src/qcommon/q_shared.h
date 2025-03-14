@@ -1070,6 +1070,14 @@ typedef enum {
 	FS_SEEK_SET
 } fsOrigin_t;
 
+typedef enum {
+	FILE_VERSION_UNKNOWN = 0,
+	FILE_VERSION_1_02 = (1 << 0),
+	FILE_VERSION_1_03 = (1 << 1),
+	FILE_VERSION_1_04 = (1 << 2),
+	FILE_VERSION_JKA = (1 << 3),
+} fs_file_version_t;
+
 //=============================================
 
 int Q_isprint( int c );

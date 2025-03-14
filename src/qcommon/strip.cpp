@@ -1773,6 +1773,32 @@ void SP_CheckForLanguageUpdates(void)
 	}
 }
 
+const char *SP_GetLanguageStringFromNumber(int language)
+{
+	switch (language)
+	{
+	case SP_LANGUAGE_ENGLISH:
+		return "english";
+	case SP_LANGUAGE_FRENCH:
+		return "french";
+	case SP_LANGUAGE_GERMAN:
+		return "german";
+	case SP_LANGUAGE_BRITISH:
+		return "british";
+	case SP_LANGUAGE_KOREAN:
+		return "korean";
+	case SP_LANGUAGE_TAIWANESE:
+		return "taiwanese";
+	case SP_LANGUAGE_ITALIAN:
+		return "italian";
+	case SP_LANGUAGE_SPANISH:
+		return "spanish";
+	case SP_LANGUAGE_JAPANESE:
+		return "japanese";
+	default:
+		return "english";
+	}
+}
 
 int Language_GetIntegerValue(void)
 {

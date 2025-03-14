@@ -561,6 +561,8 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_multiversion.h"
 		"mvsdk/code/ui/ui_multiversion_syscalls.h"
 
+		"mvsdk/code/cgame/holocronicons.h"
+
 		"mvsdk/code/game/bg_weapons.h"
 		"mvsdk/code/game/q_shared.h"
 		"mvsdk/code/game/bg_multiversion.h"
@@ -571,6 +573,7 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_gameinfo.c"
 		"mvsdk/code/ui/ui_shared.c"
 		"mvsdk/code/ui/ui_multiversion.c"
+		"mvsdk/code/ui/ui_saber.c"
 
 		"mvsdk/code/game/bg_misc.c"
 		"mvsdk/code/game/bg_weapons.c"

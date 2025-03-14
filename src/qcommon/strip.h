@@ -32,7 +32,7 @@ enum
 	SP_LANGUAGE_SPANISH,
 	SP_LANGUAGE_JAPANESE,
 	SP_LANGUAGE_10,
-	SP_LANGUGAGE_MAX,
+	SP_LANGUAGE_MAX,
 	SP_LANGUAGE_ALL = 255
 };
 
@@ -296,6 +296,8 @@ cStringsSingle			*SP_GetString(const char *Reference);
 const char				*SP_GetStringText(unsigned short ID);
 const char				*SP_GetStringTextString(const char *Reference);
 const qboolean			SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize);
+
+const char				*SP_GetLanguageStringFromNumber(int language);
 
 // Initialization
 void					SP_Init(void);

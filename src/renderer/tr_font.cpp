@@ -376,6 +376,15 @@ CFontInfo::CFontInfo(const char *fontName)
 		mAsianHack = fontdat->mKoreanHack;
 		mbRoundCalcs = !!strstr(fontName,"ergo");
 
+		// cope with bad fontdat headers...
+		//
+		if (mHeight == 0)
+		{
+			mHeight = mPointSize;
+            mAscender = mPointSize - Round( ((float)mPointSize/10.0f)+2 );	// have to completely guess at the baseline... sigh.
+            mDescender = mHeight - mAscender;
+		}
+
 		ri.FS_FreeFile(buff);
 
 		mShader = RE_RegisterShaderNoMip(m_sFontName);

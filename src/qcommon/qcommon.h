@@ -872,6 +872,7 @@ void FS_HomeRmdir(const char* homePath, qboolean recursive);
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
+uint32_t FS_GetFileVersion(const char *fileName, module_t module);
 
 
 /*

@@ -57,6 +57,7 @@ set(AssetsFiles
 	"ui/jk2mp/ingame.menu"
 	"ui/jk2mp/ingame_camera.menu"
 	"ui/jk2mp/ingame_server.menu"
+	"ui/jk2mp/menudef.h"
 	"ui/jk2mpingame.txt"
 	
 	"Readme_QuiGonJinn_Skin.txt"

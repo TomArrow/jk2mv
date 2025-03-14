@@ -753,6 +753,17 @@ void CL_UISetVirtualScreen(float w, float h) {
 	cls.uiyadj = SCREEN_HEIGHT / h;
 }
 
+int CL_UIGetNumLanguages(void)
+{
+	return SP_LANGUAGE_MAX - 1;
+}
+
+void CL_UIGetLanguageName(int languageIndex, char *buffer)
+{
+	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
+	Q_strncpyz(buffer, language, 128);
+}
+
 /*
 ====================
 CL_UISystemCalls
@@ -1148,14 +1159,6 @@ Ghoul2 Insert End
 		return (int)VM_GetGameversion(uivm);
 	}
 
-	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
-		switch (args[0]) {
-		case UI_COOL_API_GLRESOLUTIONCHANGED:
-			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-			break;
-		}
-	}
-
 	if (VM_MVAPILevel(uivm) >= 3) {
 		switch (args[0]) {
 		case UI_MVAPI_R_ADDREFENTITYTOSCENE2:
@@ -1192,6 +1195,52 @@ Ghoul2 Insert End
 			return FS_RMDLPrefix(VMAS(1));
 		case UI_MVAPI_DELDLFILE:
 			return UI_DeleteDLFile(VMAV(1, const dlfile_t));
+		}
+	}
+
+	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
+		switch (args[0]) {
+		case UI_COOL_API_GLRESOLUTIONCHANGED:
+			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+		}
+	}
+
+	// COMPAT_FIX
+	if (1 /* com_coolApi_supported_ui->integer & COOL_APIFEATURE_ */) {
+		switch (args[0]) {
+		case UI_SP_GETNUMLANGUAGES:
+			return CL_UIGetNumLanguages();
+		case UI_SP_GETLANGUAGENAME:
+			CL_UIGetLanguageName(args[1], VMAP(2, char, 128));
+			return 0;
+		case UI_G2_HAVEWEGHOULMODELS:
+			return 0;
+		case UI_G2_GIVEMEVECTORFROMMATRIX:
+			return 0;
+		case UI_G2_GETBOLT:
+			return 0;
+		case UI_G2_INITGHOUL2MODEL:
+			return 0;
+		case UI_G2_SETSKIN:
+			return 0;
+		case UI_G2_CLEANMODELS:
+			return 0;
+		case UI_G2_PLAYANIM:
+			return 0;
+		case UI_G2_GETGLANAME:
+			return 0;
+		case UI_G2_HASGHOUL2MODELONINDEX:
+			return 0;
+		case UI_G2_REMOVEGHOUL2MODEL:
+			return 0;
+		case UI_G2_ADDBOLT:
+			return 0;
+		case UI_G2_SETTIME:
+			return 0;
+		case UI_G2_ATTACHG2MODEL:
+			return 0;
+		case UI_FS_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_UI);
 		}
 	}
 
