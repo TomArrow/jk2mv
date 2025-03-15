@@ -753,12 +753,12 @@ void CL_UISetVirtualScreen(float w, float h) {
 	cls.uiyadj = SCREEN_HEIGHT / h;
 }
 
-int CL_UIGetNumLanguages(void)
+int CL_UI_GetNumLanguages(void)
 {
 	return SP_LANGUAGE_MAX - 1;
 }
 
-void CL_UIGetLanguageName(int languageIndex, char *buffer)
+void CL_UI_GetLanguageName(int languageIndex, char *buffer)
 {
 	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
 	Q_strncpyz(buffer, language, 128);
@@ -1209,36 +1209,59 @@ Ghoul2 Insert End
 	if (1 /* com_coolApi_supported_ui->integer & COOL_APIFEATURE_ */) {
 		switch (args[0]) {
 		case UI_SP_GETNUMLANGUAGES:
-			return CL_UIGetNumLanguages();
+			return CL_UI_GetNumLanguages();
+
 		case UI_SP_GETLANGUAGENAME:
-			CL_UIGetLanguageName(args[1], VMAP(2, char, 128));
+			CL_UI_GetLanguageName(args[1], VMAP(2, char, 128));
 			return 0;
+
 		case UI_G2_HAVEWEGHOULMODELS:
-			return 0;
+			return G2API_HaveWeGhoul2Models((g2handle_t)args[1]);
+
 		case UI_G2_GIVEMEVECTORFROMMATRIX:
+			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
 			return 0;
+
 		case UI_G2_GETBOLT:
-			return 0;
+			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+
 		case UI_G2_INITGHOUL2MODEL:
-			return 0;
+			return G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4], (qhandle_t) args[5], args[6], args[7]);
+
 		case UI_G2_SETSKIN:
-			return 0;
+			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
+
 		case UI_G2_CLEANMODELS:
+			G2API_CleanGhoul2Models(VMAV(1, g2handle_t));
 			return 0;
+
 		case UI_G2_PLAYANIM:
-			return 0;
+			return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5], args[6], VMF(7), args[8], VMF(9), args[10]);
+
 		case UI_G2_GETGLANAME:
+		{
+			char *local;
+			local = G2API_GetGLAName((g2handle_t)args[1], args[2]);
+			if (local)
+			{
+				char *point = VMAP(3, char, strlen(local) + 1);
+				strcpy(point, local);
+			}
 			return 0;
+		}
+
 		case UI_G2_HASGHOUL2MODELONINDEX:
-			return 0;
+			return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
+
 		case UI_G2_REMOVEGHOUL2MODEL:
-			return 0;
+			return G2API_RemoveGhoul2Model(VMAV(1, g2handle_t), args[2]);
+
 		case UI_G2_ADDBOLT:
-			return 0;
-		case UI_G2_SETTIME:
-			return 0;
+			return G2API_AddBolt((g2handle_t)args[1], args[2], VMAS(3));
+
 		case UI_G2_ATTACHG2MODEL:
-			return 0;
+			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
+
 		case UI_FS_GET_FILE_VERSION:
 			return FS_GetFileVersion(VMAS(1), MODULE_UI);
 		}
