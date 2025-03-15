@@ -101,8 +101,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 				maxModelIndex[RicksCrazyOnServer] = modelIndex;
 				// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 			it->mModel = RE_RegisterModel(fileName);
-			model_t		*mod_m = R_GetModelByHandle(it->mModel);
-			if (mod_m->type == MOD_BAD)
+			it->currentModel = R_GetModelByHandle(it->mModel);
+			if (it->currentModel->type == MOD_BAD)
 			{
 				return -1;
 			}
@@ -142,8 +142,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 	{
 		newModel.mModel = RE_RegisterModel(fileName);
 	}
-	model_t		*mod_m = R_GetModelByHandle(newModel.mModel);
-	if (mod_m->type == MOD_BAD)
+	newModel.currentModel = R_GetModelByHandle(newModel.mModel);
+	if (newModel.currentModel->type == MOD_BAD)
 	{
 		if (ghoul2.size() == 0)//very first model created
 		{//you can't have an empty vector, so let's not give it one
@@ -182,11 +182,20 @@ qboolean G2API_SetLodBias(CGhoul2Info *ghlInfo, int lodBias)
 	return qfalse;
 }
 
-qboolean G2API_SetSkin(CGhoul2Info *ghlInfo, qhandle_t customSkin)
+qboolean G2API_SetSkin(g2handle_t g2h, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin)
 {
-	if (ghlInfo)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
+		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
+
 		ghlInfo->mCustomSkin = customSkin;
+		if (renderSkin)
+		{//this is going to set the surfs on/off matching the skin file
+			G2_SetSurfaceOnOffFromSkin( ghlInfo, renderSkin );
+		}
+
 		return qtrue;
 	}
 	return qfalse;
@@ -210,7 +219,7 @@ qboolean G2API_SetSurfaceOnOff(g2handle_t g2h, const char *surfaceName, const in
 		CGhoul2Info &ghlInfo = ghoul2->front();
 
 		ghlInfo.mMeshFrameNum = 0;
-		return G2_SetSurfaceOnOff(ghlInfo.mFileName, ghlInfo.mSlist, surfaceName, flags);
+		return G2_SetSurfaceOnOff(&ghlInfo, ghlInfo.mSlist, surfaceName, flags);
 	}
 
 	return qfalse;
@@ -220,7 +229,7 @@ int G2API_GetSurfaceOnOff(CGhoul2Info *ghlInfo, const char *surfaceName)
 {
 	if (ghlInfo)
 	{
-		return G2_IsSurfaceOff(ghlInfo->mFileName, ghlInfo->mSlist, surfaceName);
+		return G2_IsSurfaceOff(ghlInfo, ghlInfo->mSlist, surfaceName);
 	}
 	return -1;
 }
@@ -272,7 +281,7 @@ int G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName)
 {
 	if (ghlInfo)
 	{
-		return G2_IsSurfaceRendered(ghlInfo->mFileName, surfaceName, ghlInfo->mSlist);
+		return G2_IsSurfaceRendered(ghlInfo, surfaceName, ghlInfo->mSlist);
 	}
 	return -1;
 }

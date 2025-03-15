@@ -113,6 +113,8 @@ typedef std::vector <std::pair<int,mdxaBone_t> > mdxaBone_v;
 #define		GHOUL2_NOMODEL	 0x004
 #define		GHOUL2_NEWORIGIN 0x008
 
+struct model_s;
+
 // NOTE order in here matters. We save out from mModelindex to mFlags, but not the STL vectors that are at the top or the bottom.
 class CGhoul2Info
 {
@@ -139,6 +141,7 @@ public:
 	size_t				*mTransformedVertsArray;	// used to create an array of pointers to transformed verts per surface for collision detection
 	mdxaBone_v		mTempBoneList;
 	int				mSkin;
+	const model_s	*currentModel;
 
 	CGhoul2Info():
 	mModelindex(-1),
@@ -155,7 +158,8 @@ public:
 	mMeshFrameNum(-1),
 	mFlags(0),
 	mTransformedVertsArray(0),
-	mSkin(0)
+	mSkin(0),
+	currentModel(nullptr)
 	{
 		mFileName[0] = 0;
 	}

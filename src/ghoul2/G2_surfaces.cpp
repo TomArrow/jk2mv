@@ -97,14 +97,14 @@ int G2_IsSurfaceLegal(void *mod, const char *surfaceName, int *flags)
  *    pointer to surface if successful, false otherwise
  *
  ************************************************************************************************/
-mdxmSurface_t *G2_FindSurface(const char *fileName, surfaceInfo_v &slist, const char *surfaceName,
+mdxmSurface_t *G2_FindSurface(CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName,
 							 int *surfIndex/*NULL*/)
 {
-	int						i = 0;
+	int i = 0;
 	// find the model we want
-	model_t				*mod = R_GetModelByHandle(RE_RegisterModel(fileName));
+	model_t *mod = (model_t *)ghlInfo->currentModel;
 	mdxmHierarchyOffsets_t *surfIndexes = (mdxmHierarchyOffsets_t *)((byte *)mod->mdxm + sizeof(mdxmHeader_t));
-	mdxmSurfHierarchy_t	*surfInfo;
+	mdxmSurfHierarchy_t *surfInfo;
 
 	// did we find a ghoul 2 model or not?
 	if (!mod->mdxm)
@@ -147,13 +147,13 @@ mdxmSurface_t *G2_FindSurface(const char *fileName, surfaceInfo_v &slist, const 
 }
 
 // set a named surface offFlags - if it doesn't find a surface with this name in the list then it will add one.
-qboolean G2_SetSurfaceOnOff (const char *fileName, surfaceInfo_v &slist, const char *surfaceName, const int offFlags)
+qboolean G2_SetSurfaceOnOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName, const int offFlags)
 {
 	int					surfIndex = -1;
 	surfaceInfo_t		temp_slist_entry;
 	mdxmSurface_t		*surf;
 	// find the model we want
-	model_t				*mod = R_GetModelByHandle(RE_RegisterModel(fileName));
+	model_t				*mod = (model_t *)ghlInfo->currentModel;
 
 	// did we find a ghoul 2 model or not?
 	if (!mod->mdxm)
@@ -163,11 +163,16 @@ qboolean G2_SetSurfaceOnOff (const char *fileName, surfaceInfo_v &slist, const c
 	}
 
 	// first find if we already have this surface in the list
-	surf = G2_FindSurface(fileName, slist, surfaceName, &surfIndex);
+	surf = G2_FindSurface(ghlInfo, slist, surfaceName, &surfIndex);
 	if (surf)
 	{
 		// set descendants value
-		slist[surfIndex].offFlags = offFlags;
+
+		// slist[surfIndex].offFlags = offFlags;
+		// seems to me that we shouldn't overwrite the other flags.
+		// the only bit we really care about in the incoming flags is the off bit
+		slist[surfIndex].offFlags &= ~(G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
+		slist[surfIndex].offFlags |= offFlags & (G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
 		return qtrue;
 	}
 	else
@@ -177,26 +182,55 @@ qboolean G2_SetSurfaceOnOff (const char *fileName, surfaceInfo_v &slist, const c
 		int surfaceNum = G2_IsSurfaceLegal((void*)mod, surfaceName, &flags);
 		if (surfaceNum != -1)
 		{
+			int newflags = flags;
 			// the only bit we really care about in the incoming flags is the off bit
-			flags &= !(G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
-			flags |= offFlags & (G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
+			newflags &= ~(G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
+			newflags |= offFlags & (G2SURFACEFLAG_OFF | G2SURFACEFLAG_NODESCENDANTS);
 
-			// insert here then
-			temp_slist_entry.offFlags = flags;
-			temp_slist_entry.surface = surfaceNum;
+			if (newflags != flags)
+			{	// insert here then because it changed, no need to add an override otherwise
+				temp_slist_entry.offFlags = newflags;
+				temp_slist_entry.surface = surfaceNum;
 
-			slist.push_back(temp_slist_entry);
-
+				slist.push_back(temp_slist_entry);
+			}
 			return qtrue;
 		}
 	}
 	return qfalse;
 }
 
-// return a named surfaces off flags - should tell you if this surface is on or off.
-int G2_IsSurfaceOff (const char *fileName, surfaceInfo_v &slist, const char *surfaceName)
+void G2_SetSurfaceOnOffFromSkin (CGhoul2Info *ghlInfo, qhandle_t renderSkin)
 {
-	model_t				*mod = R_GetModelByHandle(RE_RegisterModel(fileName));
+	int j;
+	const skin_t	*skin = R_GetSkinByHandle( renderSkin );
+
+	ghlInfo->mSlist.clear();	//remove any overrides we had before.
+	ghlInfo->mMeshFrameNum = 0;
+
+	for ( j = 0 ; j < skin->numSurfaces ; j++ )
+	{
+		// the names have both been lowercased
+		if ( !Q_stricmp( skin->surfaces[j]->shader->name , "*off") ) 
+		{
+			G2_SetSurfaceOnOff(ghlInfo, ghlInfo->mSlist, skin->surfaces[j]->name, G2SURFACEFLAG_OFF);
+		}
+		else 
+		{
+			int	flags;
+			int surfaceNum = G2_IsSurfaceLegal((void *)ghlInfo->currentModel, skin->surfaces[j]->name, &flags);
+			if ( (surfaceNum != -1) && (!(flags&G2SURFACEFLAG_OFF)) )	//only turn on if it's not an "_off" surface
+			{
+				G2_SetSurfaceOnOff(ghlInfo, ghlInfo->mSlist, skin->surfaces[j]->name, 0);
+			}
+		}
+	}
+}
+
+// return a named surfaces off flags - should tell you if this surface is on or off.
+int G2_IsSurfaceOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName)
+{
+	model_t				*mod = (model_t *)ghlInfo->currentModel;
 	int					surfIndex = -1;
 	mdxmSurface_t		*surf = 0;
 
@@ -207,7 +241,7 @@ int G2_IsSurfaceOff (const char *fileName, surfaceInfo_v &slist, const char *sur
 	}
 
 	// first find if we already have this surface in the list
-	surf = G2_FindSurface(fileName, slist, surfaceName, &surfIndex);
+	surf = G2_FindSurface(ghlInfo, slist, surfaceName, &surfIndex);
 	if (surf)
 	{
 		// set descendants value
@@ -572,65 +606,70 @@ int G2_GetSurfaceIndex(const char *fileName, const char *surfaceName)
 	return G2_IsSurfaceLegal(mod, surfaceName, &flags);
 }
 
-int G2_IsSurfaceRendered(const char *fileName, const char *surfaceName, surfaceInfo_v &slist)
+int G2_IsSurfaceRendered(CGhoul2Info *ghlInfo, const char *surfaceName, surfaceInfo_v &slist)
 {
-	model_t				*mod = R_GetModelByHandle(RE_RegisterModel(fileName));
-	int					surfIndex = -1;
-	mdxmSurface_t		*surf = 0;
-	mdxmSurface_t		*parentSurf = 0;
-	int					flags = 0;
-	int					parentFlags = 0;
-	int					surfNum = 0;
-	int					parentSurfNum = 0;
-	mdxmHierarchyOffsets_t	*surfIndexes = (mdxmHierarchyOffsets_t *)((byte *)mod->mdxm + sizeof(mdxmHeader_t));
-	mdxmSurfHierarchy_t		*surfInfo = 0;
-	mdxmSurfHierarchy_t		*parentSurfInfo = 0;
-
-	// did we find a ghoul 2 model or not?
-	if (!mod->mdxm)
+	int						flags = 0;//, surfFlags = 0;
+	int						surfIndex = 0;
+	assert(ghlInfo->currentModel);
+	assert(ghlInfo->currentModel->mdxm);
+	if (!ghlInfo->currentModel->mdxm)
 	{
-		return 0;
+		return -1;
 	}
 
-	// find the original surface in the surface list
-	surfNum = G2_IsSurfaceLegal(mod, surfaceName, &flags);
-
-	// now see if we already have overriden this surface in the slist
-	surf = G2_FindSurface(fileName, slist, surfaceName, &surfIndex);
-	if (surf)
-	{
-		// set descendants value
-		flags = slist[surfIndex].offFlags;
-	}
-
-	// ok, at this point in flags we have what this surface is set to, and the index of the surface itself
 	// now travel up the skeleton to see if any of it's ancestors have a 'no descendants' turned on
 
-	surfInfo = (mdxmSurfHierarchy_t *)((byte *)surfIndexes + surfIndexes->offsets[surfNum]);
-	surfNum = surfInfo->parentIndex;
-	// walk the surface hierarchy up until we hit the root
-	while (surfNum != -1)
+	// find the original surface in the surface list
+	int surfNum = G2_IsSurfaceLegal((model_t *)ghlInfo->currentModel, surfaceName, &flags);
+	if ( surfNum != -1 )
+	{//must be legal
+		const mdxmHierarchyOffsets_t	*surfIndexes = (mdxmHierarchyOffsets_t *)((byte *)ghlInfo->currentModel->mdxm + sizeof(mdxmHeader_t));
+		const mdxmSurfHierarchy_t *surfInfo = (mdxmSurfHierarchy_t *)((byte *)surfIndexes + surfIndexes->offsets[surfNum]);
+		surfNum = surfInfo->parentIndex;
+		// walk the surface hierarchy up until we hit the root
+		while (surfNum != -1)
+		{
+			const mdxmSurface_t		*parentSurf;
+			int						parentFlags;
+			const mdxmSurfHierarchy_t		*parentSurfInfo;
+
+			parentSurfInfo = (mdxmSurfHierarchy_t *)((byte *)surfIndexes + surfIndexes->offsets[surfNum]);
+
+			// find the original surface in the surface list
+			//G2 was bug, above comment was accurate, but we don't want the original flags, we want the parent flags
+			G2_IsSurfaceLegal((model_t *)ghlInfo->currentModel, parentSurfInfo->name, &parentFlags);
+
+			// now see if we already have overriden this surface in the slist 
+			parentSurf = G2_FindSurface(ghlInfo, slist, parentSurfInfo->name, &surfIndex);
+			if (parentSurf)
+			{
+				// set descendants value
+				parentFlags = slist[surfIndex].offFlags;
+			}
+			// now we have the parent flags, lets see if any have the 'no descendants' flag set
+			if (parentFlags & G2SURFACEFLAG_NODESCENDANTS)
+			{
+				flags |= G2SURFACEFLAG_OFF;
+				break; 
+			}
+			// set up scan of next parent
+			surfNum = parentSurfInfo->parentIndex;
+		}
+	}
+	else
 	{
-		parentSurfInfo = (mdxmSurfHierarchy_t *)((byte *)surfIndexes + surfIndexes->offsets[surfNum]);
-
-		// find the original surface in the surface list
-		parentSurfNum = G2_IsSurfaceLegal(mod, surfaceName, &parentFlags);
-
-		// now see if we already have overriden this surface in the slist
-		parentSurf = G2_FindSurface(fileName, slist, parentSurfInfo->name, &surfIndex);
-		if (parentSurf)
+		return -1;
+	}
+	if ( flags == 0 )
+	{//it's not being overridden by a parent
+		// now see if we already have overriden this surface in the slist 
+		const mdxmSurface_t *surf = G2_FindSurface(ghlInfo, slist, surfaceName, &surfIndex);
+		if (surf)
 		{
 			// set descendants value
-			parentFlags = slist[surfIndex].offFlags;
+			flags = slist[surfIndex].offFlags;
 		}
-		// now we have the parent flags, lets see if any have the 'no descendants' flag set
-		if (parentFlags & G2SURFACEFLAG_NODESCENDANTS)
-		{
-			flags = G2SURFACEFLAG_OFF;
-		}
-		// set up scan of next parent
-		surfNum = parentSurfInfo->parentIndex;
+	  	// ok, at this point in flags we have what this surface is set to, and the index of the surface itself
 	}
 	return flags;
-
 }
