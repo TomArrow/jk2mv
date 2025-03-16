@@ -1708,9 +1708,9 @@ Ghoul2 Insert End
 		}
 	}
 
-	if (1 /* com_coolApi_supported_cgame->integer & COOL_APIFEATURE_ */) {
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
 		switch (args[0]) {
-		case CG_FS_GET_FILE_VERSION:
+		case CG_COOL_API_GET_FILE_VERSION:
 			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
 		}
 	}

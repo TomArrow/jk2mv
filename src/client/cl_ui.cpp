@@ -1205,40 +1205,39 @@ Ghoul2 Insert End
 		}
 	}
 
-	// COMPAT_FIX
-	if (1 /* com_coolApi_supported_ui->integer & COOL_APIFEATURE_ */) {
+	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
 		switch (args[0]) {
-		case UI_SP_GETNUMLANGUAGES:
+		case UI_COOL_API_GET_NUM_LANGUAGES:
 			return CL_UI_GetNumLanguages();
 
-		case UI_SP_GETLANGUAGENAME:
+		case UI_COOL_API_GET_LANGUAGE_NAME:
 			CL_UI_GetLanguageName(args[1], VMAP(2, char, 128));
 			return 0;
 
-		case UI_G2_HAVEWEGHOULMODELS:
+		case UI_COOL_API_HAVE_WE_GHOUL2_MODELS:
 			return G2API_HaveWeGhoul2Models((g2handle_t)args[1]);
 
-		case UI_G2_GIVEMEVECTORFROMMATRIX:
+		case UI_COOL_API_GIVE_ME_VECTOR_FROM_MATRIX:
 			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
 			return 0;
 
-		case UI_G2_GETBOLT:
+		case UI_COOL_API_GET_BOLT_MATRIX:
 			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
 
-		case UI_G2_INITGHOUL2MODEL:
+		case UI_COOL_API_INIT_GHOUL2_MODEL:
 			return G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4], (qhandle_t) args[5], args[6], args[7]);
 
-		case UI_G2_SETSKIN:
+		case UI_COOL_API_SET_SKIN:
 			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
 
-		case UI_G2_CLEANMODELS:
+		case UI_COOL_API_CLEAN_GHOUL2_MODELS:
 			G2API_CleanGhoul2Models(VMAV(1, g2handle_t));
 			return 0;
 
-		case UI_G2_PLAYANIM:
+		case UI_COOL_API_SET_BONE_ANIM:
 			return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5], args[6], VMF(7), args[8], VMF(9), args[10]);
 
-		case UI_G2_GETGLANAME:
+		case UI_COOL_API_GET_GLA_NAME:
 		{
 			char *local;
 			local = G2API_GetGLAName((g2handle_t)args[1], args[2]);
@@ -1250,19 +1249,19 @@ Ghoul2 Insert End
 			return 0;
 		}
 
-		case UI_G2_HASGHOUL2MODELONINDEX:
+		case UI_COOL_API_HAS_GHOUL2_MODEL_ON_INDEX:
 			return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
 
-		case UI_G2_REMOVEGHOUL2MODEL:
+		case UI_COOL_API_REMOVE_GHOUL2_MODEL:
 			return G2API_RemoveGhoul2Model(VMAV(1, g2handle_t), args[2]);
 
-		case UI_G2_ADDBOLT:
+		case UI_COOL_API_ADD_BOLT:
 			return G2API_AddBolt((g2handle_t)args[1], args[2], VMAS(3));
 
-		case UI_G2_ATTACHG2MODEL:
+		case UI_COOL_API_ATTACH_G2_MODEL:
 			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
 
-		case UI_FS_GET_FILE_VERSION:
+		case UI_COOL_API_GET_FILE_VERSION:
 			return FS_GetFileVersion(VMAS(1), MODULE_UI);
 		}
 	}
