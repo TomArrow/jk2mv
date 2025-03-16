@@ -1708,6 +1708,12 @@ Ghoul2 Insert End
 		}
 	}
 
+	if (1 /* com_coolApi_supported_cgame->integer & COOL_APIFEATURE_ */) {
+		switch (args[0]) {
+		case CG_FS_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
+		}
+	}
 
 	if (VM_MVAPILevel(cgvm) >= 1) {
 		switch (args[0]) {
