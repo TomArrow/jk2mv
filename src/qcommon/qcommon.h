@@ -957,7 +957,8 @@ extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
 extern	cvar_t	*com_silentScreenshots;
 
-extern	cvar_t	*cool_apiFeatures;
+extern	cvar_t	*com_cool_apiFeatures;
+extern	cvar_t	*com_cool_apiDBVersion;
 
 extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;
