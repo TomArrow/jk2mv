@@ -156,9 +156,10 @@ void		G2API_LoadGhoul2Models(g2handle_t g2h, char *buffer);
 void		G2API_LoadSaveCodeDestructGhoul2Info(g2handle_t g2h);
 void		G2API_FreeSaveBuffer(char *buffer);
 char		*G2API_GetAnimFileNameIndex(qhandle_t modelIndex);
-int			G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName);
+int			G2API_GetSurfaceRenderStatus(g2handle_t g2h, int modelIndex, const char *surfaceName);
 void		G2API_CopySpecificG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2hTo, int modelTo);
 void		G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr);
+qboolean	G2API_SkinlessModel(g2handle_t g2h, int modelIndex);
 
 extern qboolean gG2_GBMNoReconstruct;
 extern qboolean gG2_GBMUseSPMethod;

@@ -277,10 +277,13 @@ int G2API_GetParentSurface(CGhoul2Info *ghlInfo, const int index)
 	return -1;
 }
 
-int G2API_GetSurfaceRenderStatus(CGhoul2Info *ghlInfo, const char *surfaceName)
+int G2API_GetSurfaceRenderStatus(g2handle_t g2h, int modelIndex, const char *surfaceName)
 {
-	if (ghlInfo)
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
 	{
+		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
 		return G2_IsSurfaceRendered(ghlInfo, surfaceName, ghlInfo->mSlist);
 	}
 	return -1;
@@ -1290,6 +1293,40 @@ qboolean G2API_SetNewOrigin(g2handle_t g2h, const int boltIndex)
 		return qtrue;
 	}
 	return qfalse;
+}
+
+//see if surfs have any shader info...
+qboolean G2API_SkinlessModel(g2handle_t g2h, int modelIndex)
+{
+	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+
+	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
+	{
+		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
+		model_t	*mod = (model_t *)ghlInfo->currentModel;
+
+		if (mod &&
+			mod->mdxm)
+		{
+            mdxmSurfHierarchy_t	*surf;
+			int i;
+
+			surf = (mdxmSurfHierarchy_t *) ( (byte *)mod->mdxm + mod->mdxm->ofsSurfHierarchy );
+
+			for (i = 0; i < mod->mdxm->numSurfaces; i++) 
+			{
+				if (surf->shader && surf->shader[0])
+				{ //found a surface with a shader name, ok.
+                    return qfalse;
+				}
+
+  				surf = (mdxmSurfHierarchy_t *)( (byte *)surf + (size_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surf->numChildren ] ));
+			}
+		}
+	}
+
+	//found nothing.
+	return qtrue;
 }
 
 #if 0
