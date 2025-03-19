@@ -336,7 +336,7 @@ void G2_RemoveRedundantGeneratedSurfaces(surfaceInfo_v &slist, int *activeSurfac
 
 qboolean G2_SetRootSurface(g2handle_t g2h, CGhoul2Info_v &ghoul2, const int modelIndex, const char *surfaceName)
 {
-	model_t				*mod_m = R_GetModelByHandle(RE_RegisterModel(ghoul2[modelIndex].mFileName));
+	model_t				*mod_m = (model_t *) ghoul2[modelIndex].currentModel;
 	model_t				*mod_a = R_GetModelByHandle(mod_m->mdxm->animIndex);
 	int					surf;
 	int					flags;
@@ -511,7 +511,7 @@ int G2_AddSurface(CGhoul2Info *ghoul2, int surfaceNumber, int polyNumber, float 
 
 	// decide if LOD is legal
 	model_t			*currentModel;
-	currentModel = R_GetModelByHandle(RE_RegisterModel(ghoul2->mFileName));
+	currentModel = (model_t *) ghoul2->currentModel;
 	lod = G2_DecideTraceLod(*(CGhoul2Info *)(ghoul2), lod, currentModel);
 
 	// first up, see if we have a free one already set up  - look only from the end of the constant surfaces onwards
