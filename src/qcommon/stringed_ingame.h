@@ -68,37 +68,37 @@ int		SE_GetFlagMask		( LPCSTR psFlagName );
 // note that so far the only place in the game that needs to know these is the font system so it can know how to
 //	interpret char codes, for this reason I'm only exposing these simple bool queries...
 //
-inline SE_BOOL Language_IsRussian(void)
+inline SE_BOOL SE_Language_IsRussian(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "russian")) ? SE_TRUE : SE_FALSE;	
 }
 
-inline SE_BOOL Language_IsPolish(void)
+inline SE_BOOL SE_Language_IsPolish(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "polish")) ? SE_TRUE : SE_FALSE;	
 }
 
-inline SE_BOOL Language_IsKorean(void)
+inline SE_BOOL SE_Language_IsKorean(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "korean")) ? SE_TRUE : SE_FALSE;
 }
 
-inline SE_BOOL Language_IsTaiwanese(void)
+inline SE_BOOL SE_Language_IsTaiwanese(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "taiwanese")) ? SE_TRUE : SE_FALSE;
 }
 
-inline SE_BOOL Language_IsJapanese(void)
+inline SE_BOOL SE_Language_IsJapanese(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "japanese")) ? SE_TRUE : SE_FALSE;
 }
 
-inline SE_BOOL Language_IsChinese(void)
+inline SE_BOOL SE_Language_IsChinese(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "chinese")) ? SE_TRUE : SE_FALSE;
 }
 
-inline SE_BOOL Language_IsThai(void)
+inline SE_BOOL SE_Language_IsThai(void)
 {
 	return (se_language && !Q_stricmp(se_language->string, "thai")) ? SE_TRUE : SE_FALSE;
 }

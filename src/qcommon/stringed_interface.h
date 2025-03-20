@@ -6,7 +6,6 @@
 #ifndef STRINGED_INTERFACE_H
 #define STRINGED_INTERFACE_H
 
-#pragma warning ( disable : 4786 )			// disable the usual stupid and pointless STL warning
 #include <string>
 using namespace std;
 

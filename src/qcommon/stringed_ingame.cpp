@@ -10,22 +10,18 @@
 //
 // stuff common to all qcommon files...
 #include "../server/server.h"
-#include "../game/q_shared.h"
+#include "q_shared.h"
 #include "qcommon.h"
 //
 //////////////////////////////////////////////////
 
 
-#pragma warning ( disable : 4511 )			// copy constructor could not be generated
-#pragma warning ( disable : 4512 )			// assignment operator could not be generated
-#pragma warning ( disable : 4663 )			// C++ language change: blah blah template crap blah blah
 #include "stringed_ingame.h"
 #include "stringed_interface.h"
 
 ///////////////////////////////////////////////
 //
 // some STL stuff...
-#pragma warning ( disable : 4786 )			// disable the usual stupid and pointless STL warning
 #include <list>
 #include <map>
 #include <set>
@@ -763,7 +759,7 @@ LPCSTR Leetify( LPCSTR psString )
 		char *p;
 		for (int i=0; i<sizeof(cReplace); i+=2)
 		{
-			while ((p=strchr(str.c_str(),cReplace[i]))!=NULL)
+			while ((p=(char *)strchr(str.c_str(),cReplace[i]))!=NULL)
 				*p = cReplace[i+1];
 		}
 	}

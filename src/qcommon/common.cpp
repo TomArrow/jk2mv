@@ -12,6 +12,7 @@
 #include "../client/client.h"
 #include "../server/server.h"
 #include "strip.h"
+#include "stringed_ingame.h"
 #include <mv_setup.h>
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -2676,6 +2677,7 @@ void Com_Init( char *commandLine ) {
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
 
 	SP_Init();
+	SE_Init();
 	Sys_Init();
 	NET_HTTP_Init();
 
@@ -3141,7 +3143,8 @@ void MSG_shutdownHuffman();
 void Com_Shutdown (void)
 {
 	CM_ClearMap();
-	SP_Shutdown ();
+	SP_Shutdown();
+	SE_ShutDown();
 
 	// write config file if anything changed
 	Com_WriteConfiguration();
@@ -3766,4 +3769,33 @@ int FloatAsInt( float f )
 	floatint_t fi;
 	fi.f = f;
 	return fi.i;
+}
+
+qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize)
+{
+	qboolean result = qtrue;
+	const char *string = "";
+	const char *prefix = "";
+
+	if (dstsize <= 0)
+	{
+		return qfalse;
+	}
+
+	string = SP_GetStringTextString(reference);
+
+	if (string[0] == '\0')
+	{
+		string = SE_GetString(reference);
+	}
+
+	if (string[0] == '\0')
+	{
+		prefix = "??";
+		string = reference;
+		result = qfalse;
+	}
+
+	Com_sprintf(dst, dstsize, "%s%s", prefix, string);
+	return result;
 }

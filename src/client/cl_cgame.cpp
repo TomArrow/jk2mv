@@ -27,6 +27,7 @@ Ghoul2 Insert Start
 #endif
 
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 
 #include "../qcommon/mariadb.h"
 
@@ -1538,7 +1539,7 @@ Ghoul2 Insert End
 		return G2API_SetNewOrigin((g2handle_t)args[1], /*(const int)VMA(2)*/args[2]);
 
 	case CG_SP_GETSTRINGTEXTSTRING:
-		return SP_VMGetStringText(VMAS(1), VMAP(2, char, args[3]), args[3]);
+		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
 
 	case CG_SP_REGISTER:
 		return !!SP_Register(VMAS(1), SP_REGISTER_CLIENT);

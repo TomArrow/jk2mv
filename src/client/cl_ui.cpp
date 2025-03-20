@@ -4,6 +4,7 @@
 
 #include "../game/botlib.h"
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 
 /*
 Ghoul2 Insert Start
@@ -1138,11 +1139,7 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 		return !!SP_Register(VMAS(1), SP_REGISTER_MENU);
 
 	case UI_SP_GETSTRINGTEXTSTRING:
-		const char* text;
-
-		text = SP_GetStringTextString(VMAS(1));
-		Q_strncpyz( VMAP(2, char, args[3]), text, args[3] );
-		return qtrue;
+		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
 
 /*
 Ghoul2 Insert Start

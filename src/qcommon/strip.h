@@ -295,13 +295,13 @@ cStringsSingle			*SP_GetString(unsigned short ID);
 cStringsSingle			*SP_GetString(const char *Reference);
 const char				*SP_GetStringText(unsigned short ID);
 const char				*SP_GetStringTextString(const char *Reference);
-const qboolean			SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize);
 
 const char				*SP_GetLanguageStringFromNumber(int language);
 
 // Initialization
 void					SP_Init(void);
 void					SP_Shutdown(void);
+void					SP_CheckForLanguageUpdates(void);
 
 #endif
 

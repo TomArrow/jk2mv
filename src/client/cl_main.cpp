@@ -2,6 +2,7 @@
 
 #include "client.h"
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 #include <limits.h>
 #include "snd_local.h"
 #include <mv_setup.h>
@@ -2935,7 +2936,6 @@ CL_Frame
 */
 static unsigned int frameCount;
 static float avgFrametime=0.0;
-extern void SP_CheckForLanguageUpdates(void);
 void CL_Frame ( int msec ) {
 	qboolean render = qfalse;
 
@@ -2950,6 +2950,7 @@ void CL_Frame ( int msec ) {
 
 	SP_CheckForLanguageUpdates();	// will take zero time to execute unless language changes, then will reload strings.
 									//	of course this still doesn't work for menus...
+	SE_CheckForLanguageUpdates();
 
 	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
 		&& !com_sv_running->integer ) {

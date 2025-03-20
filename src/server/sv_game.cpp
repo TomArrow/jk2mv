@@ -540,7 +540,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case SP_REGISTER_SERVER_CMD:
 		return SP_RegisterServer( VMAS(1) );
 	case SP_GETSTRINGTEXTSTRING:
-		return SP_VMGetStringText( VMAS(1), VMAP(2, char, args[3]), args[3] );
+		return Com_GetLocalizedString( VMAS(1), VMAP(2, char, args[3]), args[3] );
 
 	case G_ROFF_CLEAN:
 		return theROFFSystem.Clean(qfalse);

@@ -12,15 +12,12 @@
 //
 // stuff common to all qcommon files...
 #include "../server/server.h"
-#include "../game/q_shared.h"
+#include "q_shared.h"
 #include "qcommon.h"
 //
 //////////////////////////////////////////////////
 
 
-#pragma warning ( disable : 4511 )			// copy constructor could not be generated
-#pragma warning ( disable : 4512 )			// assignment operator could not be generated
-#pragma warning ( disable : 4663 )			// C++ language change: blah blah template crap blah blah
 #include "stringed_interface.h"
 #include "stringed_ingame.h"
 
@@ -133,7 +130,7 @@ static void SE_R_ListFiles( const char *psExtension, const char *psDir, string &
 {
 //	Com_Printf(va("Scanning Dir: %s\n",psDir));
 
-	char	**sysFiles, **dirFiles;
+	const char	**sysFiles, **dirFiles;
 	int		numSysFiles, i, numdirs;
 
 	dirFiles = FS_ListFiles( psDir, "/", &numdirs);
