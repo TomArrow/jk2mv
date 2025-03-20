@@ -759,10 +759,10 @@ int CL_UI_GetNumLanguages(void)
 	return SP_LANGUAGE_MAX - 1;
 }
 
-void CL_UI_GetLanguageName(int languageIndex, char *buffer)
+void CL_UI_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize)
 {
 	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
-	Q_strncpyz(buffer, language, 128);
+	Q_strncpyz(buffer, language, bufferSize);
 }
 
 /*
@@ -1208,7 +1208,7 @@ Ghoul2 Insert End
 			return CL_UI_GetNumLanguages();
 
 		case UI_COOL_API_GET_LANGUAGE_NAME:
-			CL_UI_GetLanguageName(args[1], VMAP(2, char, 128));
+			CL_UI_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
 			return 0;
 
 		case UI_COOL_API_HAVE_WE_GHOUL2_MODELS:
@@ -1235,16 +1235,8 @@ Ghoul2 Insert End
 			return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5], args[6], VMF(7), args[8], VMF(9), args[10]);
 
 		case UI_COOL_API_GET_GLA_NAME:
-		{
-			char *local;
-			local = G2API_GetGLAName((g2handle_t)args[1], args[2]);
-			if (local)
-			{
-				char *point = VMAP(3, char, strlen(local) + 1);
-				strcpy(point, local);
-			}
+			Q_strncpyz(VMAP(3, char, args[4]), G2API_GetGLAName((g2handle_t)args[1], args[2]), args[4]);
 			return 0;
-		}
 
 		case UI_COOL_API_HAS_GHOUL2_MODEL_ON_INDEX:
 			return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
