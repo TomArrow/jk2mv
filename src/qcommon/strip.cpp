@@ -39,7 +39,6 @@ char FlagList[FLAGLIST_MAX][FLAG_LENGTH];
 
 /*static*/ cvar_t	*sp_language;
 static cvar_t	*sp_show_strip;
-static cvar_t	*sp_showEmptyReferences;
 
 #endif
 
@@ -1688,10 +1687,7 @@ const char *SP_GetStringTextString(const char *Reference)
 	index = SP_GetStringID(Reference);
 	if (index == -1)
 	{
-		if (sp_showEmptyReferences->integer)
-			return Reference;
-		else
-			return "";
+		return "";
 	}
 
 	return SP_GetStringText(index);
@@ -1723,7 +1719,6 @@ void SP_Init(void)
 {
 	sp_language = Cvar_Get("sp_language", va("%d", SP_LANGUAGE_ENGLISH), CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
 	sp_show_strip = Cvar_Get ("sp_show_strip", "0", 0);
-	sp_showEmptyReferences = Cvar_Get("sp_showEmptyReferences", "0", 0);
 
 	SP_UpdateLanguage();
 	sp_language->modified = qfalse;
