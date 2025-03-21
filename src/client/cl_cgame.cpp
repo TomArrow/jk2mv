@@ -1711,17 +1711,27 @@ Ghoul2 Insert End
 
 	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
 		switch (args[0]) {
+		case CG_COOL_API_GET_NUM_LANGUAGES:
+			return Com_GetNumLanguages();
+
+		case CG_COOL_API_GET_LANGUAGE_NAME:
+			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
+			return 0;
+
 		case CG_COOL_API_SET_SKIN:
 			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
 
-		case CG_COOL_API_GET_FILE_VERSION:
-			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
+		case CG_COOL_API_SKINLESS_MODEL:
+			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
 
 		case CG_COOL_API_GET_SURFACE_RENDER_STATUS:
 			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
 
-		case CG_COOL_API_SKINLESS_MODEL:
-			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
+		case CG_COOL_API_ATTACH_G2_MODEL:
+			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
+
+		case CG_COOL_API_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
 		}
 	}
 

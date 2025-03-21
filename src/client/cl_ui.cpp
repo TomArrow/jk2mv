@@ -754,17 +754,6 @@ void CL_UISetVirtualScreen(float w, float h) {
 	cls.uiyadj = SCREEN_HEIGHT / h;
 }
 
-int CL_UI_GetNumLanguages(void)
-{
-	return SP_LANGUAGE_MAX - 1;
-}
-
-void CL_UI_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize)
-{
-	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
-	Q_strncpyz(buffer, language, bufferSize);
-}
-
 /*
 ====================
 CL_UISystemCalls
@@ -1205,10 +1194,10 @@ Ghoul2 Insert End
 	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
 		switch (args[0]) {
 		case UI_COOL_API_GET_NUM_LANGUAGES:
-			return CL_UI_GetNumLanguages();
+			return Com_GetNumLanguages();
 
 		case UI_COOL_API_GET_LANGUAGE_NAME:
-			CL_UI_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
+			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
 			return 0;
 
 		case UI_COOL_API_HAVE_WE_GHOUL2_MODELS:
@@ -1226,6 +1215,12 @@ Ghoul2 Insert End
 
 		case UI_COOL_API_SET_SKIN:
 			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
+
+		case UI_COOL_API_SKINLESS_MODEL:
+			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
+
+		case UI_COOL_API_GET_SURFACE_RENDER_STATUS:
+			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
 
 		case UI_COOL_API_CLEAN_GHOUL2_MODELS:
 			G2API_CleanGhoul2Models(VMAV(1, g2handle_t));

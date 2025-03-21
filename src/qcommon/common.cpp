@@ -3801,3 +3801,14 @@ qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize
 	Com_sprintf(dst, dstsize, "%s%s", prefix, string);
 	return result;
 }
+
+int Com_GetNumLanguages(void)
+{
+	return SP_LANGUAGE_MAX - 1;
+}
+
+void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize)
+{
+	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
+	Q_strncpyz(buffer, language, bufferSize);
+}

@@ -60,6 +60,8 @@ int Field_GetLastMatchCount();
 qboolean Field_WasComplete();
 int FloatAsInt( float f );
 qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize);
+int Com_GetNumLanguages(void);
+void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize);
 
 extern qboolean com_demoplaying;
 
