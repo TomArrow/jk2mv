@@ -22,11 +22,6 @@
 //		5 = CTF
 //------------------------------------------------------------------------------------------------
 {
-	assetGlobalDef
-	{
-		small2Font "arialnb" 14
-	}
-
 	menuDef 
 	{
 		name						"ingame_player"
@@ -105,7 +100,7 @@
 		{
 			name				playerconfigtitle
 			style				WINDOW_STYLE_EMPTY
-			text				@MENUS_PLAYER_CONFIGURATION
+			text				@MENUS2_PLAYER_CONFIGURATION
 			rect				20 5 560 28
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			280
@@ -140,7 +135,7 @@
 			name 				namefield
 			type 				ITEM_TYPE_EDITFIELD
 			style 				0
-			text 				@MENUS_NAME1
+			text 				@MENUS0_NAME
 			cvar 				"ui_Name"
 			maxchars 			26
 			rect 				20 33 300 20
@@ -154,7 +149,7 @@
 			backcolor 			0 0 0 0
 			border 				0
 			bordercolor 			0 0 0 0
-			descText			@MENUS_ENTER_YOUR_NAME_HERE
+			descText			@MENUS2_ENTER_YOUR_NAME_HERE
 			visible 			1 
 			action 
 			{ 
@@ -205,7 +200,7 @@
 		{
 			name				modeltitle
 			style				0	
-			text				@MENUS_CHARACTER_MODEL
+			text				@MENUS2_CHARACTER_MODEL
 			rect				3 52 570 0
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			285
@@ -233,7 +228,7 @@
 		{
 			name				setcolor
 			style				0	
-			text				@MENUS_TEAM_COLOR
+			text				@MENUS2_TEAM_COLOR
 			ownerdraw			UI_SKIN_COLOR
 			rect				50 78 160 20
 			textalign			ITEM_ALIGN_LEFT
@@ -246,7 +241,7 @@
 			forecolor			1 .682 0 1
 			border				0
 			bordercolor			0 0 0 0
-			descText			@MENUS_CHOOSE_THE_COLOR_FOR
+			descText			@MENUS2_CHOOSE_THE_COLOR_FOR
 			cvarTest			"ui_about_gametype"
 			hideCvar 
 			{ 
@@ -267,7 +262,7 @@
 		{
 			name				setcolor
 			style				0	
-			text				@MENUS_TEAM_COLOR
+			text				@MENUS2_TEAM_COLOR
 			ownerdraw			UI_SKIN_COLOR
 			rect				50 78 160 20
 			textalign			ITEM_ALIGN_LEFT
@@ -280,7 +275,7 @@
 			forecolor			0.7 0.7 0.7 1
 			border			0
 			bordercolor			0 0 0 0
-			descText			@MENUS_CHOOSE_THE_COLOR_FOR
+			descText			@MENUS2_CHOOSE_THE_COLOR_FOR
 			cvarTest			"ui_about_gametype"
 			showCvar 
 			{ 
@@ -316,7 +311,7 @@
 			border 			1
 			bordercolor 		1 .682 0 1
 			forecolor 			1 1 1 1
-			descText			@MENUS_CHOOSE_THE_MODEL_FOR
+			descText			@MENUS2_CHOOSE_THE_MODEL_FOR
 			visible 			1
 			textscale 			0.7
 			action 
@@ -340,7 +335,7 @@
 		{
 			name				customtitle
 			style				0	
-			text				@MENUS_CUSTOM
+			text				@MENUS1_CUSTOM
 			rect				425 130 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
@@ -359,7 +354,7 @@
 			name				custom
 			group				none
 			background			"gfx/mp/custom_mp_default"
-			descText			@MENUS_CUSTOMPLAYER_DESC
+			descText			@ETERNAL_CUSTOMPLAYER_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
 			rect				465 160 75 75
@@ -449,7 +444,7 @@
 		{
 			name				sabertitle
 			style				0	
-			text				@MENUS_SABER_TITLE
+			text				@ETERNAL_SABER_TITLE
 			rect				430 297 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
@@ -467,8 +462,8 @@
 		{
 			name				saber
 			group				none
-			background			"gfx/menus/saberonly"
-			descText			@MENUS_SABER_TITLE_DESC
+			background			"gfx/menus/saberonly_jka"
+			descText			@ETERNAL_SABER_TITLE_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
 			rect				465 322 75 75
@@ -506,7 +501,7 @@
 			name				forcetitle
 			group				yesforce
 			style				0	
-			text				@MENUS_THE_FORCE
+			text				@MENUS2_THE_FORCE
 			rect				220 298 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
@@ -533,14 +528,14 @@
 			name				rankdisplay
 			group				"yesforce"
 			style				0	
-			text				@MENUS_FORCE_MASTERY
+			text				@MENUS0_FORCE_MASTERY
 			ownerdraw			UI_FORCE_RANK
 			rect				20 320 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 .682 0 .8
 			outlinecolor			1 .5 .5 .5
 			backcolor			0 0 0 0
@@ -560,7 +555,7 @@
 			name				setside
 			group				"yesforce"
 			style				0	
-			text				@MENUS_FORCE_SIDE
+			text				@MENUS0_FORCE_SIDE
 			ownerdraw			UI_FORCE_SIDE
 			rect				20 340 175 16
 			textalign			ITEM_ALIGN_LEFT
@@ -568,8 +563,8 @@
 			outlinecolor			1 .5 .5 .5
 			backcolor			0 0 0 0
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 .682 0 .8
 			visible				1 
 			cvarTest			"ui_about_gametype"
@@ -592,7 +587,7 @@
 			name				setpoints
 			group				"yesforce"
 			style				0	
-			text				@MENUS_POINTS_REMAINING
+			text				@MENUS0_POINTS_REMAINING
 			ownerdraw			UI_FORCE_POINTS
 			rect				20 360 175 16
 			textalign			ITEM_ALIGN_LEFT
@@ -600,8 +595,8 @@
 			outlinecolor			1 .5 .5 .5
 			backcolor			0 0 0 0
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 .682 0 .8
 			visible				1 
 			cvarTest			"ui_about_gametype"
@@ -619,7 +614,7 @@
 			name				jedinonjedi
 			group				jedinonjedi
 			style				0	
-			text				@MENUS_JEDI_NONJEDI
+			text				@MENUS3_JEDI_NONJEDI
 			ownerdraw			UI_JEDI_NONJEDI
 			rect				183 370 105 32
 			textalign			ITEM_ALIGN_LEFT
@@ -627,12 +622,12 @@
 			outlinecolor			1 .5 .5 .5
 			backcolor			0 0 0 0
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 1 1 1
 			border				0
 			bordercolor			0 0 0 0
-			descText			@MENUS_CHOOSE_JEDI_NONJEDI
+			descText			@MENUS3_CHOOSE_JEDI_NONJEDI
 			visible				1 
 			action 
 			{ 
@@ -657,7 +652,7 @@
 			font				2
 			textscale			1
 			forecolor			.5 .5 .5 1
-			descText			@MENUS_SET_UP_THE_FORCE_ABILITIES
+			descText			@MENUS2_SET_UP_THE_FORCE_ABILITIES
 			visible			1
 			cvarTest			"ui_about_gametype"
 			hideCvar 
@@ -692,7 +687,7 @@
 			name				forcetitle
 			group				noforce
 			style				0	
-			text				@MENUS_NOFORCE_DISABLED_0
+			text				@MENUS3_NOFORCE_DISABLED_0
 			rect				220 298 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
@@ -718,13 +713,13 @@
 			name				text2
 			group				"noforce"
 			style				0	
-			text				@MENUS_NOFORCE_DISABLED_1
+			text				@MENUS3_NOFORCE_DISABLED_1
 			rect				20 320 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			outlinecolor		1 .5 .5 .5
 			backcolor			0 0 0 0
 			forecolor			1 .682 0 .8
@@ -747,7 +742,7 @@
 			name				forcetitle
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_HOLO_0
+			text				@MENUS3_NOFORCE_HOLO_0
 			rect				220 298 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
@@ -770,13 +765,13 @@
 			name				text1
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_HOLO_1
+			text				@MENUS3_NOFORCE_HOLO_1
 			rect				20 330 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 .682 0 .8
 			outlinecolor			1 .5 .5 .5
 			cvarTest			"ui_about_gametype"
@@ -793,13 +788,13 @@
 			name				text2
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_HOLO_2
+			text				@MENUS3_NOFORCE_HOLO_2
 			rect				20 350 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			outlinecolor		1 .5 .5 .5
 			backcolor			0 0 0 0
 			forecolor			1 .682 0 .8
@@ -817,13 +812,13 @@
 			name				text3
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_HOLO_3
+			text				@MENUS3_NOFORCE_HOLO_3
 			rect				20 370 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			outlinecolor		1 .5 .5 .5
 			backcolor			0 0 0 0
 			forecolor			1 .682 0 .8
@@ -845,7 +840,7 @@
 			name				forcetitle
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_JEDI_0
+			text				@MENUS3_NOFORCE_JEDI_0
 			rect				220 298 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
@@ -869,13 +864,13 @@
 			name				text1
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_JEDI_1
+			text				@MENUS3_NOFORCE_JEDI_1
 			rect				20 330 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			forecolor			1 .682 0 .8
 			outlinecolor		1 .5 .5 .5
 			cvarTest			"ui_about_gametype"
@@ -892,13 +887,13 @@
 			name				text2
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_JEDI_2
+			text				@MENUS3_NOFORCE_JEDI_2
 			rect				20 350 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			outlinecolor		1 .5 .5 .5
 			backcolor			0 0 0 0
 			forecolor			1 .682 0 .8
@@ -916,13 +911,13 @@
 			name				text3
 			group				none
 			style				0	
-			text				@MENUS_NOFORCE_JEDI_3
+			text				@MENUS3_NOFORCE_JEDI_3
 			rect				20 370 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			outlinecolor		1 .5 .5 .5
 			backcolor			0 0 0 0
 			forecolor			1 .682 0 .8
@@ -956,7 +951,7 @@
 		{
 			name				applycurrent
 			group				"playerapply"
-			text				@MENUS_APPLY
+			text				@MENUS2_APPLY
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				5 412 105 32
@@ -966,7 +961,7 @@
 			font				2
 			textscale			1
 			forecolor			1 .682 0 1
-			descText			@MENUS_APPLY_CHANGES_AND_JOIN
+			descText			@MENUS2_APPLY_CHANGES_AND_JOIN
 			visible			1
 			action 
 			{ 
@@ -990,7 +985,7 @@
 		{
 			name				applyjoin
 			group				"playerforcejoin"
-			text				@MENUS_JOIN_GAME
+			text				@MENUS0_JOIN_GAME
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				5 412 105 32
@@ -1000,7 +995,7 @@
 			font				2
 			textscale			1
 			forecolor			1 .682 0 1
-			descText			@MENUS_APPLY_CHANGES_AND_JOIN
+			descText			@MENUS2_APPLY_CHANGES_AND_JOIN
 			visible			1
 			action 
 			{ 
@@ -1036,7 +1031,7 @@
 		{
 			name				applyred
 			group				"playerforcered"
-			text				@MENUS_JOIN_RED
+			text				@MENUS0_JOIN_RED
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				110 412 105 32
@@ -1055,7 +1050,7 @@
 				"3" ;
 				"4"
 			}
-			descText			@MENUS_CHANGES_AND_JOIN_THE
+			descText			@MENUS2_CHANGES_AND_JOIN_THE
 			visible				1
 			action 
 			{ 
@@ -1091,7 +1086,7 @@
 		{
 			name				applyblue
 			group				"playerforceblue"
-			text				@MENUS_JOIN_BLUE
+			text				@MENUS0_JOIN_BLUE
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				215 412 105 32
@@ -1110,7 +1105,7 @@
 				"3" ;
 				"4"
 			}
-			descText			@MENUS_AND_JOIN_THE_BLUE_TEAM
+			descText			@MENUS2_AND_JOIN_THE_BLUE_TEAM
 			visible				1
 			action 
 			{ 
@@ -1146,7 +1141,7 @@
 		{
 			name				applyspectate
 			group				"playerforcespectate"
-			text				@MENUS_SPECTATE
+			text				@MENUS0_SPECTATE
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				320 412 105 32
@@ -1156,7 +1151,7 @@
 			font				2
 			textscale			1
 			forecolor			1 .682 0 1
-			descText			@MENUS_APPLY_CHANGES_BUT_REMAIN
+			descText			@MENUS2_APPLY_CHANGES_BUT_REMAIN
 			visible			1
 			action 
 			{ 

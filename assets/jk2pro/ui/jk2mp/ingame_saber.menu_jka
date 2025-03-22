@@ -52,7 +52,7 @@
 			name				playerconfigtitle
 			style				WINDOW_STYLE_SHADER
 			background			"gfx/menus/menu_blendbox"
-			text				@MENUS_LIGHTSABER_CREATION
+			text				@ETERNAL_LIGHTSABER_CREATION
 			rect				20 5 390 28
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			195
@@ -74,8 +74,8 @@
 		{
 			name				typebut
 			group				none
-			text				@MENUS_SABER_TYPE
-			descText			@MENUS_SABER_TYPE_DESC
+			text				@ETERNAL_SABER_TYPE
+			descText			@ETERNAL_SABER_TYPE_DESC
 			style				WINDOW_STYLE_EMPTY
 			rect				15 38 160 24
 			font				3
@@ -133,13 +133,13 @@
 		{
 			name				typebut_single
 			group				none
-			text				@MENUS_SINGLESABER
-			descText			@MENUS_SINGLESABER_DESC
+			text				@ETERNAL_SINGLESABER
+			descText			@ETERNAL_SINGLESABER_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				15 72 160 16
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			textstyle			0
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
@@ -177,13 +177,13 @@
 		{
 			name				typebut_dual
 			group				none
-			text				@MENUS_DUALSABERS
-			descText			@MENUS_DUALSABERS_DESC
+			text				@ETERNAL_DUALSABERS
+			descText			@ETERNAL_DUALSABERS_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				15 88 160 16
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			textstyle			0
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
@@ -221,13 +221,13 @@
 		{
 			name				typebut_staff
 			group				none
-			text				@MENUS_SABERSTAFF
-			descText			@MENUS_SABERSTAFF_DESC
+			text				@ETERNAL_SABERSTAFF
+			descText			@ETERNAL_SABERSTAFF_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
 			rect				15 104 160 16
-			font				4
-			textscale			1
+			font				2
+			textscale			0.75
 			textstyle			0
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
@@ -268,8 +268,8 @@
 		{
 			name				hilttype
 			group				none
-			text				@MENUS_HILT1
-			descText			@MENUS_SABER_HILTS_DESC
+			text				@ETERNAL_HILT1
+			descText			@ETERNAL_SABER_HILTS_DESC
 			style				WINDOW_STYLE_EMPTY
 			rect				200 34 160 24
 			font				3
@@ -290,8 +290,8 @@
 		{
 			name				hilttype
 			group				none
-			text				@MENUS_HILT1
-			descText			@MENUS_SABER_HILTS_DESC
+			text				@ETERNAL_HILT1
+			descText			@ETERNAL_SABER_HILTS_DESC
 			style				WINDOW_STYLE_EMPTY
 			rect				200 34 160 24
 			font				3
@@ -312,8 +312,8 @@
 		{
 			name				hilttype
 			group				none
-			text				@MENUS_HILT2
-			descText			@MENUS_SABER_HILTS_DESC
+			text				@ETERNAL_HILT2
+			descText			@ETERNAL_SABER_HILTS_DESC
 			style				WINDOW_STYLE_EMPTY
 			rect				200 105 160 24
 			font				3
@@ -356,9 +356,9 @@
 			style				WINDOW_STYLE_EMPTY
 			elementwidth 			120
 			elementheight			16
-			font				4
+			font				2
 			textaligny			16
-			textscale			1
+			textscale			0.75
 			border				1
 			bordersize			1
 			bordercolor			0 0 .8 1
@@ -368,7 +368,7 @@
 			elementtype			LISTBOX_TEXT
 			feeder 				FEEDER_SABER_SINGLE_INFO
 			
-			descText			@MENUS_HILT1_DESC
+			descText			@ETERNAL_HILT1_DESC
 			elementtype			LISTBOX_TEXT
 			textalign			ITEM_ALIGN_LEFT
 			
@@ -394,9 +394,9 @@
 			style				WINDOW_STYLE_EMPTY
 			elementwidth 			120
 			elementheight			16
-			font				4
+			font				2
 			textaligny			16
-			textscale			1
+			textscale			0.75
 			border				1
 			bordersize			1
 			bordercolor			0 0 .8 1
@@ -406,7 +406,7 @@
 			elementtype			LISTBOX_TEXT
 			feeder 				FEEDER_SABER_STAFF_INFO
 
-			descText			@MENUS_HILT1_DESC
+			descText			@ETERNAL_HILT1_DESC
 			
 			cvarTest			ui_saber_type
 			hideCvar			{ "single"; "dual" }
@@ -430,9 +430,9 @@
 			style				WINDOW_STYLE_EMPTY
 			elementwidth 			120
 			elementheight			16
-			font				4
+			font				2
 			textaligny			16
-			textscale			1
+			textscale			0.75
 			border				1
 			bordersize			1
 			bordercolor			0 0 .8 1
@@ -442,8 +442,8 @@
 			elementtype			LISTBOX_TEXT
 			feeder 				FEEDER_SABER_SINGLE_INFO
 			
-//			text				@MENUS_HILT1
-			descText			@MENUS_HILT1_DESC
+//			text				@ETERNAL_HILT1
+			descText			@ETERNAL_HILT1_DESC
 			elementtype			LISTBOX_TEXT
 			textalign			ITEM_ALIGN_LEFT
 			
@@ -469,9 +469,9 @@
 			style				WINDOW_STYLE_EMPTY
 			elementwidth 			120
 			elementheight			16
-			font				4
+			font				2
 			textaligny			16
-			textscale			1
+			textscale			0.75
 			border				1
 			bordersize			1
 			bordercolor			0 0 .8 1
@@ -482,8 +482,8 @@
 			feeder 				FEEDER_SABER_SINGLE_INFO
 
 
-//			text				@MENUS_HILT2
-			descText			@MENUS_HILT2_DESC
+//			text				@ETERNAL_HILT2
+			descText			@ETERNAL_HILT2_DESC
 			forecolor			.615 .615 .956 1
 			
 			cvarTest			ui_saber_type
@@ -506,8 +506,8 @@
 		{
 			name				bladecolortitle
 			group				none
-			text				@MENUS_BLADE_COLOR
-			descText			@MENUS_BLADE_COLOR_DESC
+			text				@ETERNAL_BLADE_COLOR
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			style				WINDOW_STYLE_EMPTY
 			rect				15 181 160 24
 			font				2
@@ -531,7 +531,7 @@
 			rect				15 197 24 24
 			background			"gfx/menus/saber_icon_blue"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -562,7 +562,7 @@
 			rect				40 197 24 24
 			background			"gfx/menus/saber_icon_green"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -593,7 +593,7 @@
 			rect				65 197 24 24
 			background			"gfx/menus/saber_icon_orange"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -624,7 +624,7 @@
 			rect				90 197 24 24
 			background			"gfx/menus/saber_icon_purple"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -655,7 +655,7 @@
 			rect				115 197 24 24
 			background			"gfx/menus/saber_icon_yellow"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -685,7 +685,7 @@
 			type				ITEM_TYPE_BUTTON
 			rect				140 197 24 24
 			background			"gfx/menus/saber_icon_red"
-			descText			@MENUS_BLADE_COLOR_DESC
+			descText			@ETERNAL_BLADE_COLOR_DESC
 			forecolor			.75 .75 .75 1
 			border				1
 			bordersize			1
@@ -713,8 +713,8 @@
 		{
 			name				colorbut2
 			group				none
-			text				@MENUS_COLOR2
-			descText			@MENUS_COLOR2_DESC
+			text				@ETERNAL_COLOR2
+			descText			@ETERNAL_COLOR2_DESC
 			//type				ITEM_TYPE_MULTI
 			style				WINDOW_STYLE_EMPTY
 			rect				270 181 160 16
@@ -740,7 +740,7 @@
 			rect				270 197 24 24
 			background			"gfx/menus/saber_icon_blue"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -773,7 +773,7 @@
 			rect				295 197 24 24
 			background			"gfx/menus/saber_icon_green"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -806,7 +806,7 @@
 			rect				320 197 24 24
 			background			"gfx/menus/saber_icon_orange"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -839,7 +839,7 @@
 			rect				345 197 24 24
 			background			"gfx/menus/saber_icon_purple"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -872,7 +872,7 @@
 			rect				370 197 24 24
 			background			"gfx/menus/saber_icon_yellow"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -905,7 +905,7 @@
 			rect				395 197 24 24
 			background			"gfx/menus/saber_icon_red"
 			forecolor			.75 .75 .75 1
-			descText			@MENUS_COLOR2_DESC
+			descText			@ETERNAL_COLOR2_DESC
 			border				1
 			bordersize			1
 			bordercolor			.33 .33 .5 1
@@ -1007,7 +1007,7 @@
 		{
 			name				applycurrent
 			group				"playerapply"
-			text				@MENUS_APPLY_CHANGES
+			text				@MENUS0_APPLY_CHANGES
 			type				1
 			style				WINDOW_STYLE_EMPTY
 			rect				160 360 110 32
@@ -1017,7 +1017,7 @@
 			font				2
 			textscale			1
 			forecolor			1 .682 0 1
-			descText			@MENUS_APPLY_CHANGES_AND_JOIN
+			descText			@MENUS2_APPLY_CHANGES_AND_JOIN
 			visible			1
 			action 
 			{ 

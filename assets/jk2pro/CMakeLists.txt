@@ -59,7 +59,22 @@ set(AssetsFiles
 	"ui/jk2mp/ingame_server.menu"
 	"ui/jk2mp/menudef.h"
 	"ui/jk2mpingame.txt"
-	
+
+	"ext_data/sabers/kyle.sab"
+	"gfx/menus/configforce.jpg"
+	"gfx/menus/saber_icon_blue.jpg"
+	"gfx/menus/saber_icon_green.jpg"
+	"gfx/menus/saber_icon_orange.jpg"
+	"gfx/menus/saber_icon_purple.jpg"
+	"gfx/menus/saber_icon_red.jpg"
+	"gfx/menus/saber_icon_yellow.jpg"
+	"gfx/menus/saberonly_jka.jpg"
+	"gfx/mp/custom_mp_default.jpg"
+	"strings/English/eternal.str"
+	"ui/jk2mp/ingame_player.menu_jka"
+	"ui/jk2mp/ingame_player2.menu_jka"
+	"ui/jk2mp/ingame_saber.menu_jka"
+
 	"Readme_QuiGonJinn_Skin.txt"
 	"sound/chars/secret_quigon/misc/choke1.mp3"
 	"sound/chars/secret_quigon/misc/choke2.mp3"
