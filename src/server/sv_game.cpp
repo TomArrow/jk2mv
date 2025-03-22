@@ -1291,6 +1291,17 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 
 		case G_COOL_API_GET_FILE_VERSION:
 			return FS_GetFileVersion(VMAS(1), MODULE_GAME);
+
+		case G_COOL_API_CREATE_FILE_LIST:
+			return FS_CreateFileList(VMAS(1), VMAS(2));
+
+		case G_COOL_API_CLOSE_FILE_LIST:
+			FS_CloseFileList();
+			return 0;
+
+		case G_COOL_API_GET_NEXT_FILE:
+			FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
+			return 0;
 		}
 	}
 

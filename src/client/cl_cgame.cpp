@@ -1732,6 +1732,20 @@ Ghoul2 Insert End
 
 		case CG_COOL_API_GET_FILE_VERSION:
 			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
+
+		case CG_COOL_API_GET_FILE_LIST:
+			return FS_GetFileList(VMAS(1), VMAS(2), VMAP(3, char, args[4]), args[4]);
+
+		case CG_COOL_API_CREATE_FILE_LIST:
+			return FS_CreateFileList(VMAS(1), VMAS(2));
+
+		case CG_COOL_API_CLOSE_FILE_LIST:
+			FS_CloseFileList();
+			return 0;
+
+		case CG_COOL_API_GET_NEXT_FILE:
+			FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
+			return 0;
 		}
 	}
 
