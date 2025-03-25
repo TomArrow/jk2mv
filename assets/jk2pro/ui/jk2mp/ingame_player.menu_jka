@@ -207,8 +207,8 @@
 //			textaligny			12
 			outlinecolor			1 .5 .5 .5
 			backcolor			0 0 0 0
-//			font				4
-//			textscale			1
+//			font				2
+//			textscale			0.75
 			font				2
 			textscale			1
 			forecolor			.549 .854 1 1
