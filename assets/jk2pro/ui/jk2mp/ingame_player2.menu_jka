@@ -8,12 +8,12 @@
 		visible					0
 		fullscreen					0
 		outOfBoundsClick										// this closes the window if it gets a click out of the rectangle
-		rect						105 40 430 425
+		rect						105 40 430 400
 		focusColor					1 1 1 1					// Focus color for text and items
 		style						1
 		border					1
 		descX						320
-		descY						450
+		descY						415
 		descScale					1
 		descColor				1 .682 0 .8
 		descAlignment				ITEM_ALIGN_CENTER		
@@ -36,7 +36,7 @@
 			name				background_pic
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				0 0 430 425
+			rect				0 0 430 400
 			background			"gfx/menus/menu_box_ingame"
 			forecolor			1 1 1 1
 			visible			1
@@ -172,16 +172,30 @@
 			group				none
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				15 80 160 24
-			forecolor			.549 .854 1 1
+			rect				15 80 100 24
+			forecolor			1 .682 0 1
 			text				@ETERNAL_COLOR
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			-1
-			font				3
-			textscale 			1
+			font				2
+			textscale 			0.9
 			visible 			1
-			decoration
+			//decoration
+			mouseEnter
+			{ 
+				show			color_glow
+			}
+			mouseExit 
+			{ 
+				hide			color_glow
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav"
+				show			tints
+				hide			tints2
+			}
 		}
 
 		itemDef
@@ -206,7 +220,311 @@
 				play			"sound/interface/choose_color.wav"
 			}
 		}
+		
+		itemDef 
+		{
+			name				rgb
+			group				none
+			text				@ETERNAL_RGB
+			descText			@ETERNAL_RGB_DESC
+			type				ITEM_TYPE_BUTTON
+			style				WINDOW_STYLE_EMPTY
+			rect				160 80 100 24
+			font				2
+			textscale			0.9
+			textaligny			-1
+			textalign			ITEM_ALIGN_LEFT
+			textstyle			0
+			textalignx			0
+			backcolor			0 0 0 0
+			forecolor			1 .682 0 1
+			visible			1
 
+			mouseEnter 
+			{ 
+				show			rgb_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgb_glow
+			}	  	  
+			action 
+			{
+				play			"sound/interface/button1.wav"
+				show			tints2
+				hide			tints
+				
+			//	setitemcolor	standard forecolor 1 .682 0 1
+			//	setitemcolor	rgb forecolor 1 1 1 1
+			}
+		}
+		itemDef 
+		{
+			name				rgbred
+			group				tints2
+			type				ITEM_TYPE_INTSLIDER
+			text				@ETERNAL_RED_VALUE
+			cvarint				"ui_char_color_red" 50 0 255
+			rect				0 104 175 18
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			70
+			textaligny			0
+			font 				2
+			textscale 			0.75
+			forecolor			.615 .615 .956 1
+			visible			0
+			// appearance_slot	3
+			descText			@ETERNAL_RED_VALUE_DESC
+			
+			mouseEnter 
+			{ 
+				show			rgbred_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbred_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				rgbgreen
+			group				tints2
+			type				ITEM_TYPE_INTSLIDER
+			text				@ETERNAL_GREEN_VALUE
+			cvarint				"ui_char_color_green" 50 0 255
+			rect				0 124 175 18
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			70
+			textaligny			0
+			font 				2
+			textscale 			0.75
+			forecolor			.615 .615 .956 1
+			visible			0
+			// appearance_slot	3
+			descText			@ETERNAL_GREEN_VALUE_DESC
+
+			mouseEnter 
+			{ 
+				show			rgbgreen_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbgreen_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				rgbblue
+			group				tints2
+			type				ITEM_TYPE_INTSLIDER
+			text				@ETERNAL_BLUE_VALUE
+			cvarint				"ui_char_color_blue" 50 0 255
+			rect				0 144 175 18
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			70
+			textaligny			0
+			font 				2
+			textscale 			0.75
+			forecolor			.615 .615 .956 1
+			visible			0
+			// appearance_slot	3
+			descText			@ETERNAL_BLUE_VALUE_DESC
+			
+			mouseEnter 
+			{ 
+				show			rgbblue_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbblue_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				rgbred_value
+			group				tints2
+			type 				ITEM_TYPE_NUMERICFIELD
+			style 0			
+			text				""
+			cvar 				"ui_char_color_red"
+			maxchars			3
+			maxPaintChars 		3
+			rect 				197 104 100 18
+			textalign			ITEM_ALIGN_RIGHT		
+			textalignx 			15
+			textaligny 			-2
+			font				2
+			textscale			0.75
+			forecolor			1 1 1 1
+			outlinecolor 		1 .5 .5 .5
+			backcolor 			0 0 0 0
+			border 			1
+			bordercolor 		0 0 0 0
+			visible 			0
+			descText			@ETERNAL_RED_VALUE_DESC
+			mouseEnter 
+			{ 
+				show			rgbred_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbred_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				rgbgreen_value
+			group				tints2
+			type 				ITEM_TYPE_NUMERICFIELD
+			style 0			
+			text				""
+			cvar 				"ui_char_color_green"
+			maxchars 			3
+			maxPaintChars 		3
+			rect 				197 124 100 18
+			textalign			ITEM_ALIGN_RIGHT		
+			textalignx 			15
+			textaligny 			-2
+			font				2
+			textscale			0.75
+			forecolor			1 1 1 1
+			outlinecolor 		1 .5 .5 .5
+			backcolor 			0 0 0 0
+			border 			1
+			bordercolor			0 0 0 0
+			visible 			0
+			descText			@ETERNAL_GREEN_VALUE_DESC
+			mouseEnter 
+			{ 
+				show			rgbgreen_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbgreen_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				rgbblue_value
+			group				tints2
+			type 				ITEM_TYPE_NUMERICFIELD
+			style 0			
+			text				""
+			cvar 				"ui_char_color_blue"
+			maxchars 			3
+			maxPaintChars 		3 
+			rect 				197 144 100 18
+			textalign			ITEM_ALIGN_RIGHT		
+			textalignx 			15
+			textaligny 			-2
+			font				2
+			textscale			0.75
+			forecolor			1 1 1 1
+			outlinecolor 			1 .5 .5 .5
+			backcolor 			0 0 0 0
+			border 				1
+			bordercolor 			0 0 0 0
+			visible 			0
+			descText			@ETERNAL_BLUE_VALUE_DESC
+			mouseEnter 
+			{ 
+				show			rgbblue_glow
+			}
+			mouseExit 
+			{ 
+				hide			rgbblue_glow
+			}	
+			action 
+			{ 
+				play			"sound/interface/button1"
+			}
+		}
+
+		itemDef 
+		{
+			name				color_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				15 80 100 24
+			background			"gfx/menus/menu_buttonback"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef 
+		{
+			name				rgb_glow
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				160 80 100 24
+			background			"gfx/menus/menu_buttonback"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef
+		{
+			name				rgbred_glow
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				0 104 300 18
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef
+		{
+			name				rgbgreen_glow
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				0 124 300 18
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+
+		itemDef
+		{
+			name				rgbblue_glow
+			group				highlights
+			style				WINDOW_STYLE_SHADER
+			rect				0 144 300 18
+			background			"gfx/menus/menu_blendbox"
+			forecolor			1 1 1 1
+			visible			0
+			decoration
+		}
+		
 ///////////////////////
 //APPEARANCE
 //////////////////////
@@ -217,7 +535,7 @@
 			group				none
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				15 160 180 24
+			rect				15 165 180 24
 			forecolor			.549 .854 1 1
 			text				@ETERNAL_APPEARANCE
 			textalign			ITEM_ALIGN_LEFT
@@ -235,7 +553,7 @@
 			name				headbut_glow
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				15 184 90 16
+			rect				15 189 90 16
 			background			"gfx/menus/menu_buttonback"
 			forecolor			1 1 1 1
 			visible			0
@@ -250,7 +568,7 @@
 			descText			@ETERNAL_SELECT_HEAD
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				15 184 90 16
+			rect				15 189 90 16
 			font				2
 			textscale			.9
 			textaligny			-5
@@ -285,7 +603,7 @@
 			name				torsobut_glow
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				111 184 90 16
+			rect				111 189 90 16
 			background			"gfx/menus/menu_buttonback"
 			forecolor			1 1 1 1
 			visible				0
@@ -300,7 +618,7 @@
 			descText			@ETERNAL_SELECT_TORSO
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				111 184 90 16
+			rect				111 189 90 16
 			font				2
 			textscale			.9
 			textaligny			-5
@@ -334,7 +652,7 @@
 			name				legsbut_glow
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				209 184 90 16
+			rect				209 189 90 16
 			background			"gfx/menus/menu_buttonback"
 			forecolor			1 1 1 1
 			visible				0
@@ -349,7 +667,7 @@
 			descText			@ETERNAL_SELECT_LEGS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				209 184 90 16
+			rect				209 189 90 16
 			font				2
 			textscale			.9
 			textaligny			-5
@@ -397,7 +715,7 @@
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
 			forecolor			-1			//use playercolor
-			rect				15 206 292 93
+			rect				15 211 292 93
 			visible			1
 			action
 			{
@@ -422,7 +740,7 @@
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
 			forecolor			-1			//use playercolor
-			rect				15 206 292 93
+			rect				15 211 292 93
 			visible			0
 			action
 			{
@@ -447,7 +765,7 @@
 			backcolor			.66 .66 1 .25
 			bordercolor			.66 .66 1 1
 			forecolor			-1			//use playercolor
-			rect				15 206 292 93
+			rect				15 211 292 93
 			visible			0
 			action
 			{
@@ -461,7 +779,7 @@
 			name				backButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				30 370 110 32
+			rect				30 345 110 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -476,7 +794,7 @@
 			descText			@ETERNAL_RETURN_PREVIOUS
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_EMPTY
-			rect				30 370 110 32
+			rect				30 345 110 32
 			font				2
 			textscale			.9
 			textalign			ITEM_ALIGN_CENTER
@@ -513,7 +831,7 @@
 			name				applyjoinButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				290 370 110 32
+			rect				290 345 110 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -527,7 +845,7 @@
 			text				@MENUS2_APPLY
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				290 370 110 32
+			rect				290 345 110 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			55
 			textaligny			2

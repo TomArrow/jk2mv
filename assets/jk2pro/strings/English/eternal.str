@@ -99,4 +99,28 @@ LANG_ENGLISH        "SPECIES"
 REFERENCE           TORSO
 LANG_ENGLISH        "TORSO"
 
+REFERENCE           RGB
+LANG_ENGLISH        "RGB"
+
+REFERENCE           RGB_DESC
+LANG_ENGLISH        "Customized RGB colors"
+
+REFERENCE           RED_VALUE
+LANG_ENGLISH        "Red:"
+
+REFERENCE           RED_VALUE_DESC
+LANG_ENGLISH        "Red component value"
+
+REFERENCE           GREEN_VALUE
+LANG_ENGLISH        "Green:"
+
+REFERENCE           GREEN_VALUE_DESC
+LANG_ENGLISH        "Green component value"
+
+REFERENCE           BLUE_VALUE
+LANG_ENGLISH        "Blue:"
+
+REFERENCE           BLUE_VALUE_DESC
+LANG_ENGLISH        "Blue component value"
+
 ENDMARKER
