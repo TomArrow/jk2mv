@@ -3479,6 +3479,7 @@ void CL_Init( void ) {
 	Cvar_Get("char_color_red", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("char_color_green", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("char_color_blue", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_alpha", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	// cgame might not be initialized before menu is used
 	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );
