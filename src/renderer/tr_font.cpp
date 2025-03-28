@@ -864,7 +864,14 @@ void RE_Font_DrawString(float ox, float oy, const char *psText, const float *rgb
 				if (psText[i] == '^') {
 					if ((i < 1 || psText[i - 1] != '^') &&
 						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode
-						i += 2;
+						if (Q_IsColorStringHex(&psText[i + 1])) {
+							int skipCount = 0;
+							Q_parseColorHex(&psText[i + 1], 0, &skipCount);
+							i += 1 + skipCount;
+						}
+						else {
+							i += 2;
+						}
 					}
 				}
 
@@ -908,22 +915,37 @@ void RE_Font_DrawString(float ox, float oy, const char *psText, const float *rgb
 		switch( uiLetter )
 		{
 		case '^':
-			if ((MV_GetCurrentGameversion() == VERSION_1_02) && ntModDetected) {
+			if (Q_IsColorStringHex(psText))
+			{
 				vec4_t color;
-				colour = ColorIndexNT(*psText);
-				Com_Memcpy( color, g_color_table_nt[colour], sizeof( color ) );
-				color[3] = rgba[3];
-				RE_SetColor( color );
-			} else {
-				colour = ColorIndex(*psText);
-				if (!gbInShadow || (MV_GetCurrentGameversion() == VERSION_1_02)) {
-					vec4_t color;
-					Com_Memcpy( color, g_color_table[colour], sizeof( color ) );
-					color[3] = rgba[3];
-					RE_SetColor( color );
+				int skipCount;
+				if (Q_parseColorHex(psText, color, &skipCount)) {
+					psText += skipCount;
+					if (!gbInShadow)
+					{
+						RE_SetColor(color);
+					}
 				}
 			}
-			++psText;
+			else {
+				if ((MV_GetCurrentGameversion() == VERSION_1_02) && ntModDetected) {
+					vec4_t color;
+					colour = ColorIndexNT(*psText);
+					Com_Memcpy(color, g_color_table_nt[colour], sizeof(color));
+					color[3] = rgba[3];
+					RE_SetColor(color);
+				}
+				else {
+					colour = ColorIndex(*psText);
+					if (!gbInShadow || (MV_GetCurrentGameversion() == VERSION_1_02)) {
+						vec4_t color;
+						Com_Memcpy(color, g_color_table[colour], sizeof(color));
+						color[3] = rgba[3];
+						RE_SetColor(color);
+					}
+				}
+				++psText;
+			}
 			break;
 		case 10:						//linefeed
 			fx = fox;
@@ -937,6 +959,31 @@ void RE_Font_DrawString(float ox, float oy, const char *psText, const float *rgb
 			fx += (float)pLetter->horizAdvance * fScale * tr.ratio;
 			break;
 
+#if 0
+		case '^':
+			if (Q_IsColorStringHex(psText))
+			{
+				vec4_t color;
+				int skipCount;
+				if (Q_parseColorHex(psText, color, &skipCount)) {
+					psText += skipCount;
+					if (!gbInShadow)
+					{
+						RE_SetColor(color);
+					}
+				}
+			}
+			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
+			{
+				colour = ColorIndex(*psText);
+				if (!gbInShadow)
+				{
+					RE_SetColor(g_color_table[colour]);
+				}
+				++psText;
+			}
+			break;
+#endif
 		default:
 			qbThisCharCountsAsLetter = qtrue;
 			pLetter = curfont->GetLetter( uiLetter, &hShader );			// Description of pLetter
