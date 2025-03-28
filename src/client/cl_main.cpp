@@ -21,6 +21,7 @@
 #endif
 
 qboolean disconnecting;
+//#define NOCONNECT
 
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;

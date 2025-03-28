@@ -466,6 +466,9 @@ CL_GetServerCommand
 Set up argc/argv for the given command
 ===================
 */
+
+extern cvar_t* r_fullbright;
+
 qboolean CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;

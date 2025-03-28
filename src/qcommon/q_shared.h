@@ -1111,6 +1111,10 @@ typedef struct
 	byte	b7;
 } qint64;
 
+void Q_StripColor(char *text, qboolean doHex); //strips both colors
+const char *Q_strchrs( const char *string, const char *search );
+void Q_strstrip( char *string, const char *strip, const char *repl );
+
 //=============================================
 /*
 short	BigShort(short l);
