@@ -751,7 +751,7 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define S_COLOR_JK2MV   "^n" // Different in Debug/Release
 #define S_COLOR_LT_TRANSPARENT "^o"
 
-extern vec4_t	g_color_table[];
+extern vec4_t	g_color_table[16];
 extern vec4_t	g_color_table_nt[128];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b

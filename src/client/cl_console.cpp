@@ -14,6 +14,8 @@ cvar_t		*con_scale;
 cvar_t		*con_speed;
 cvar_t		*con_timestamps;
 
+cvar_t		*con_blackColorOverride;
+
 #define	DEFAULT_CONSOLE_WIDTH	78
 #define CON_WRAP				((ColorIndex_Extended(COLOR_LT_TRANSPARENT) << 8) | '\\')
 #define CON_BLANK_CHAR			' '
@@ -381,6 +383,7 @@ void Con_Init (void) {
 	con_speed = Cvar_Get ("con_speed", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_scale = Cvar_Get ("con_scale", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_timestamps = Cvar_Get ("con_timestamps", "0", CVAR_GLOBAL | CVAR_ARCHIVE);
+	con_blackColorOverride = Cvar_Get("con_blackColorOverride", "11", CVAR_GLOBAL|CVAR_ARCHIVE);
 
 	Field_Clear( &kg.g_consoleField );
 	kg.g_consoleField.widthInChars = DEFAULT_CONSOLE_WIDTH - 1; // Command prompt
@@ -440,6 +443,8 @@ void Con_Linefeed (void)
 		con.text[line + i] = CON_BLANK;
 }
 
+extern cvar_t* r_fullbright;
+
 /*
 ================
 CL_ConsolePrint
@@ -453,6 +458,9 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	int		y;
 	int		c;
 	int		color;
+	vec4_t			colorVec;
+	vec4_t			colorVecDiff;
+	int				prev;
 
 	// for some demos we don't want to ever show anything on the console
 	if ( cl_noprint && cl_noprint->integer ) {
@@ -475,7 +483,26 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = (unsigned char) *txt) != 0 ) {
-		if ( !extendedColors && use102color && ntModDetected && Q_IsColorStringNT( (unsigned char*) txt ) ) {
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt + 1)) {
+			int skipCount = 0;
+			Q_parseColorHex(txt + 1, colorVec, &skipCount);
+			txt += 1 + skipCount;
+			// Find closest color
+			// Just use the extended table who cares
+			float closestColorDistance = 999999999999;
+			int chosenColor = 7;
+			for (int i = 0; i < (sizeof(g_color_table) / sizeof(g_color_table[0])); i++) {
+				VectorSubtract(g_color_table[i], colorVec, colorVecDiff);
+				float distanceHere = VectorLength(colorVecDiff);
+				if (distanceHere < closestColorDistance) {
+					closestColorDistance = distanceHere;
+					chosenColor = i;
+				}
+			}
+			color = chosenColor;
+			continue;
+		}
+		else if ( !extendedColors && use102color && ntModDetected && Q_IsColorStringNT( (unsigned char*) txt ) ) {
 			color = ColorIndexNT( *(txt+1) );
 			txt += 2;
 			continue;
@@ -486,6 +513,10 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors ) {
 			else color = ColorIndex( *(txt+1) );
 			txt += 2;
 			continue;
+		}
+
+		if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
+			color = con_blackColorOverride->integer;
 		}
 
 		txt++;
