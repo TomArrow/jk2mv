@@ -874,6 +874,8 @@ qboolean CL_CgameEnableSubmodelBypass( qboolean enable ) {
 	return cls.submodelBypass;
 }
 
+extern int vmContext;
+
 /*
 ====================
 CL_CgameSystemCalls
@@ -881,7 +883,6 @@ CL_CgameSystemCalls
 The cgame module is making a system call
 ====================
 */
-extern bool RicksCrazyOnServer;
 intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -895,7 +896,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	}
 
 	// set cgame ghoul2 context
-	RicksCrazyOnServer = false;
+	vmContext = 0;
 
 	switch( args[0] ) {
 	case CG_PRINT:

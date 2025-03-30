@@ -60,7 +60,6 @@ set(AssetsFiles
 	"ui/jk2mp/menudef.h"
 	"ui/jk2mpingame.txt"
 
-	"ext_data/sabers/kyle.sab"
 	"gfx/menus/configforce.jpg"
 	"gfx/menus/saber_icon_blue.jpg"
 	"gfx/menus/saber_icon_green.jpg"

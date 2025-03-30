@@ -940,7 +940,7 @@
 			group				models
 			type 				ITEM_TYPE_MODEL
 			rect				0 -20 430 430
-			asset_model			"models/weapons2/saber_reborn/saber_w.glm"
+			asset_model			"models/weapons2/saber/saber_w.glm"
 			isSaber			1
 			model_angle			180
 			model_rotation		20
@@ -959,7 +959,7 @@
 			group				models
 			type 				ITEM_TYPE_MODEL
 			rect				0 40 430 430
-			asset_model			"models/weapons2/saber_reborn/saber_w.glm"
+			asset_model			"models/weapons2/saber/saber_w.glm"
 			isSaber2			1
 			model_angle			180
 			model_rotation		20

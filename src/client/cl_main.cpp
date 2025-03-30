@@ -1095,6 +1095,8 @@ void CL_ShutdownAll(void) {
 	cls.soundRegistered = qfalse;
 }
 
+void FixGhoul2InfoLeaks(int vmContext);
+
 /*
 =================
 CL_FlushMemory
@@ -1104,8 +1106,6 @@ ways a client gets into a game
 Also called by Com_Error
 =================
 */
-extern void FixGhoul2InfoLeaks(bool);
-
 void CL_FlushMemory( qboolean disconnecting ) {
 
 	// shutdown all the client stuff
@@ -1114,7 +1114,8 @@ void CL_FlushMemory( qboolean disconnecting ) {
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running->integer ) {
 		// clear collision map data
-		FixGhoul2InfoLeaks(false);
+		FixGhoul2InfoLeaks(0);
+		FixGhoul2InfoLeaks(2);
 		CM_ClearMap();
 		// clear the whole hunk
 		Hunk_Clear();

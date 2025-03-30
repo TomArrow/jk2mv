@@ -754,6 +754,8 @@ void CL_UISetVirtualScreen(float w, float h) {
 	cls.uiyadj = SCREEN_HEIGHT / h;
 }
 
+extern int vmContext;
+
 /*
 ====================
 CL_UISystemCalls
@@ -761,7 +763,6 @@ CL_UISystemCalls
 The ui module is making a system call
 ====================
 */
-
 intptr_t CL_UISystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -774,6 +775,9 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 			args[0] += 2;
 		}
 	}
+
+	// set ui ghoul2 context
+	vmContext = 2;
 
 	switch( args[0] ) {
 	case UI_ERROR:

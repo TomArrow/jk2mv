@@ -365,6 +365,8 @@ void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg);
 
 //==============================================
 
+extern int vmContext;
+
 /*
 ====================
 SV_GameSystemCalls
@@ -372,7 +374,6 @@ SV_GameSystemCalls
 The module is making a system call
 ====================
 */
-extern bool RicksCrazyOnServer;
 intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -383,7 +384,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	}
 
 	// set game ghoul2 context
-	RicksCrazyOnServer = true;
+	vmContext = 1;
 
 	switch( args[0] ) {
 	case G_PRINT:
@@ -1381,6 +1382,8 @@ void SV_ShutdownGameProgs( void ) {
 	sv.submodelBypass = qfalse;
 }
 
+void FixGhoul2InfoLeaks(int vmContext);
+
 /*
 ==================
 SV_InitGameVM
@@ -1388,12 +1391,11 @@ SV_InitGameVM
 Called for both a full init and a restart
 ==================
 */
-extern void FixGhoul2InfoLeaks(bool);
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
 
-	FixGhoul2InfoLeaks(true);
+	FixGhoul2InfoLeaks(1);
 
 	// clear physics interaction links
 	SV_ClearWorld ();
