@@ -28,12 +28,12 @@
 		visible						0
 		fullscreen					0
 		outOfBoundsClick										// this closes the window if it gets a click out of the rectangle
-		rect						20 25 600 440
+		rect						20 32 600 448
 		focusColor					1 1 1 1					// Focus color for text and items
 		style						1
 		border						1
 		descX						320
-		descY						428
+		descY						443
 		descScale					1
 		descColor				1 .682 0 .8
 		descAlignment					ITEM_ALIGN_CENTER		
@@ -58,7 +58,7 @@
 			name				background_pic
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				0 0 600 440
+			rect				0 0 600 455
 			background			"gfx/menus/menu_box_ingame"
 			forecolor			1 1 1 1
 			visible				1
@@ -72,7 +72,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				0 420 600 20
+			rect				0 428 600 20
 			backcolor			.298 .305 .690 1
 			forecolor			.549 .854 1 1
 			visible				1
@@ -153,7 +153,7 @@
 			visible 			1 
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 			}
 			mouseenter 
 			{ 
@@ -174,7 +174,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				15 65 570 230
+			rect				15 73 570 230
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -217,7 +217,7 @@
 			visible				1 
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 			}
 		}
 
@@ -253,7 +253,7 @@
 			visible				1 
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 			}
 		}
 
@@ -288,7 +288,7 @@
 			decoration
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 			}
 		}
 
@@ -310,14 +310,10 @@
 			backcolor 			0 0 0 1
 			border 			1
 			bordercolor 		1 .682 0 1
-			forecolor 			1 1 1 1
+			forecolor 			1 .682 0 .8
 			descText			@MENUS2_CHOOSE_THE_MODEL_FOR
 			visible 			1
 			textscale 			0.7
-			action 
-			{ 
-				play			"sound/interface/button1"
-			}
 			mouseenter 
 			{ 
 				setitemcolor 	headlist bordercolor 1 0 0 1 
@@ -391,7 +387,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				15 299 410 100
+			rect				15 307 410 100
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -405,7 +401,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				17 300 410 18
+			rect				17 308 410 18
 			backcolor			.298 .305 .690 1
 			forecolor			1 1 1 1
 			visible				1
@@ -418,7 +414,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				430 299 155 100
+			rect				430 307 155 100
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -433,7 +429,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				432 300 155 18
+			rect				432 308 155 18
 			backcolor			.298 .305 .690 1
 			forecolor			1 1 1 1
 			visible				1
@@ -445,7 +441,7 @@
 			name				sabertitle
 			style				0	
 			text				@ETERNAL_SABER_TITLE
-			rect				430 297 150 26
+			rect				430 305 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
 			textaligny			-3
@@ -466,7 +462,7 @@
 			descText			@ETERNAL_SABER_TITLE_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
-			rect				465 322 75 75
+			rect				465 330 75 75
 			font				3
 			textscale			1
 			textalignx			65
@@ -502,7 +498,7 @@
 			group				yesforce
 			style				0	
 			text				@MENUS2_THE_FORCE
-			rect				220 298 0 0
+			rect				220 306 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			textaligny			-4
@@ -530,7 +526,7 @@
 			style				0	
 			text				@MENUS0_FORCE_MASTERY
 			ownerdraw			UI_FORCE_RANK
-			rect				20 320 175 16
+			rect				20 328 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
@@ -557,7 +553,7 @@
 			style				0	
 			text				@MENUS0_FORCE_SIDE
 			ownerdraw			UI_FORCE_SIDE
-			rect				20 340 175 16
+			rect				20 348 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -576,7 +572,7 @@
 			decoration 
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 			}
 
 		}
@@ -589,7 +585,7 @@
 			style				0	
 			text				@MENUS0_POINTS_REMAINING
 			ownerdraw			UI_FORCE_POINTS
-			rect				20 360 175 16
+			rect				20 368 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -616,7 +612,7 @@
 			style				0	
 			text				@MENUS3_JEDI_NONJEDI
 			ownerdraw			UI_JEDI_NONJEDI
-			rect				183 370 105 32
+			rect				183 378 105 32
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -645,7 +641,7 @@
 			type				1
 			style				WINDOW_STYLE_SHADER
 			background			"gfx/menus/configforce"
-			rect				275 320 75 75
+			rect				275 328 75 75
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			97
 			textaligny			2
@@ -662,7 +658,7 @@
 			}
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				close			ingame_player
 				open			ingame_playerforce
 				hide			highlights
@@ -688,7 +684,7 @@
 			group				noforce
 			style				0	
 			text				@MENUS3_NOFORCE_DISABLED_0
-			rect				220 298 0 0
+			rect				220 306 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -714,7 +710,7 @@
 			group				"noforce"
 			style				0	
 			text				@MENUS3_NOFORCE_DISABLED_1
-			rect				20 320 400 20
+			rect				20 328 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -743,7 +739,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_0
-			rect				220 298 0 0
+			rect				220 306 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			backcolor			0 0 0 0
@@ -766,7 +762,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_1
-			rect				20 330 400 20
+			rect				20 338 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -789,7 +785,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_2
-			rect				20 350 400 20
+			rect				20 358 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -813,7 +809,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_3
-			rect				20 370 400 20
+			rect				20 378 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -841,7 +837,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_0
-			rect				220 298 0 0
+			rect				220 306 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -865,7 +861,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_1
-			rect				20 330 400 20
+			rect				20 338 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -888,7 +884,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_2
-			rect				20 350 400 20
+			rect				20 358 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -912,7 +908,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_3
-			rect				20 370 400 20
+			rect				20 378 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -939,7 +935,7 @@
 			name				applyjoinButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				5 412 105 32
+			rect				5 420 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -954,7 +950,7 @@
 			text				@MENUS2_APPLY
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				5 412 105 32
+			rect				5 420 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -965,7 +961,7 @@
 			visible			1
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				uiScript		setForce "none"
 				hide			highlights
 				uiScript		closeingame
@@ -988,7 +984,7 @@
 			text				@MENUS0_JOIN_GAME
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				5 412 105 32
+			rect				5 420 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -999,7 +995,7 @@
 			visible			1
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				uiScript 		setForce "free"
 				hide			highlights
 				uiScript 		closeingame
@@ -1020,7 +1016,7 @@
 			name				applyredButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				110 412 105 32
+			rect				110 420 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1034,7 +1030,7 @@
 			text				@MENUS0_JOIN_RED
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				110 412 105 32
+			rect				110 420 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1054,7 +1050,7 @@
 			visible				1
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				uiScript		setForce "red"
 				hide			highlights
 				uiScript 		closeingame
@@ -1075,7 +1071,7 @@
 			name				applyblueButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				215 412 105 32
+			rect				215 420 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1089,7 +1085,7 @@
 			text				@MENUS0_JOIN_BLUE
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				215 412 105 32
+			rect				215 420 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1109,7 +1105,7 @@
 			visible				1
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				uiScript 		setForce "blue"
 				hide			highlights
 				uiScript 		closeingame
@@ -1130,7 +1126,7 @@
 			name				applyspectateButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				320 412 105 32
+			rect				320 420 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1144,7 +1140,7 @@
 			text				@MENUS0_SPECTATE
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				320 412 105 32
+			rect				320 420 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1155,7 +1151,7 @@
 			visible			1
 			action 
 			{ 
-				play			"sound/interface/button1"
+				play			"sound/interface/button1.wav"
 				uiScript 		setForce "s"
 				hide			highlights
 				uiScript 		closeingame

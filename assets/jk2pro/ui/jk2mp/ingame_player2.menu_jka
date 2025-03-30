@@ -139,7 +139,7 @@
 			textalignx			0
 			backcolor			0 0 0 0
 			forecolor			.615 .615 .956 1
-			feeder			19	//FEEDER_PLAYER_SPECIES
+			feeder				FEEDER_PLAYER_SPECIES
 			cvar				"ui_char_model"
 			cvarStrList			feeder
 
@@ -206,8 +206,8 @@
 			style				WINDOW_STYLE_FILLED
 			elementwidth		32
 			elementheight		32
-			elementtype			1 			//LISTBOX_IMAGE
-			feeder				23		//FEEDER_COLORCHOICES
+			elementtype			LISTBOX_IMAGE
+			feeder				FEEDER_COLORCHOICES
 			horizontalscroll
 			border			1
 			bordersize			1
@@ -215,10 +215,6 @@
 			bordercolor			.66 .66 1 1
 			rect				15 104 292 48
 			visible			1
-			action 
-			{
-				play			"sound/interface/choose_color.wav"
-			}
 		}
 		
 		itemDef 
@@ -283,10 +279,6 @@
 			mouseExit 
 			{ 
 				hide			rgbred_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -315,10 +307,6 @@
 			mouseExit 
 			{ 
 				hide			rgbgreen_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -347,10 +335,6 @@
 			mouseExit 
 			{ 
 				hide			rgbblue_glow
-			}	
-			action 
-			{ 
-				play			"sound/interface/button1"
 			}
 		}
 
@@ -707,8 +691,8 @@
 			style				WINDOW_STYLE_FILLED
 			elementwidth		72
 			elementheight		72
-			elementtype			1 			//LISTBOX_IMAGE
-			feeder			20 			//FEEDER_PLAYER_SKIN_HEAD
+			elementtype			LISTBOX_IMAGE
+			feeder				FEEDER_PLAYER_SKIN_HEAD
 			horizontalscroll
 			border			1
 			bordersize			1
@@ -719,7 +703,6 @@
 			visible			1
 			action
 			{
-				play			"sound/interface/choose_head.wav"
 				uiScript 		"char_skin"
 			}
 		}
@@ -732,8 +715,8 @@
 			style				WINDOW_STYLE_FILLED
 			elementwidth		72
 			elementheight		72
-			elementtype			1 			//LISTBOX_IMAGE
-			feeder			21 			//FEEDER_PLAYER_SKIN_TORSO
+			elementtype			LISTBOX_IMAGE
+			feeder				FEEDER_PLAYER_SKIN_TORSO
 			horizontalscroll
 			border			1
 			bordersize			1
@@ -744,7 +727,6 @@
 			visible			0
 			action
 			{
-				play			"sound/interface/choose_torso.wav"
 				uiScript 		"char_skin"
 			}
 		}
@@ -757,8 +739,8 @@
 			style				WINDOW_STYLE_FILLED
 			elementwidth		72
 			elementheight		72
-			elementtype			1 			//LISTBOX_IMAGE
-			feeder			22 			//FEEDER_PLAYER_SKIN_LEGS
+			elementtype			LISTBOX_IMAGE
+			feeder				FEEDER_PLAYER_SKIN_LEGS
 			horizontalscroll
 			border			1
 			bordersize			1
@@ -769,7 +751,6 @@
 			visible			0
 			action
 			{
-				play			"sound/interface/choose_head.wav"
 				uiScript 		"char_skin"
 			}
 		}
@@ -815,7 +796,7 @@
 			  	  
 			action 
 			{ 
-				play			"sound/interface/esc.wav" ; 
+				play			"sound/interface/button1.wav" ; 
 				close			ingame_player2 ;
 				open			ingame_player ;
 			}

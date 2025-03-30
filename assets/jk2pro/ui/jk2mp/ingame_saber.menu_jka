@@ -156,7 +156,7 @@
 			}
 			action 
 			{
-				play			"sound/interface/choose_saber.wav"
+				play			"sound/weapons/saber/saberon.wav"
 				setcvar		ui_saber_type	"single"
 				uiScript  		"saber_type"
 				setcvar		ui_saber		"single_1"
@@ -200,7 +200,7 @@
 			}
 			action 
 			{
-				play			"sound/interface/choose_saber.wav"
+				play			"sound/weapons/saber/saberon.wav"
 				setcvar		ui_saber_type	"dual"
 				uiScript  		"saber_type"
 				setcvar		ui_saber		"single_1"
@@ -244,7 +244,7 @@
 			} 
 			action 
 			{
-				play			"sound/interface/choose_saber.wav"
+				play			"sound/weapons/saber/saberon.wav"
 				setcvar		ui_saber_type	"staff"
 				uiScript  		"saber_type"
 				setcvar		ui_saber		"dual_1"
@@ -378,7 +378,6 @@
 			visible				1			 
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt"			
 				uiScript  		"saber_hilt"
 			}
@@ -414,7 +413,6 @@
 			visible				1
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberstaff"			
 				uiScript  		"saber_hilt"
 			}
@@ -453,7 +451,6 @@
 			visible				1			 
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt1"			
 				uiScript  		"saber_hilt"
 			}
@@ -492,7 +489,6 @@
 			visible				1
 			action 
 			{
-				play			"sound/interface/choose_hilt.wav"
 				uiScript		"setscreensaberhilt2"			
 				uiScript  		"saber2_hilt"
 			}
@@ -548,7 +544,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar		ui_saber_color	 "blue"
 			}
 		}
@@ -579,7 +575,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber_color  "green"
 			}
 		}
@@ -610,7 +606,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber_color   "orange"
 			}
 		}
@@ -641,7 +637,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber_color   "purple"
 			}
 		}
@@ -672,7 +668,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber_color	 "yellow"
 			}
 		}
@@ -703,7 +699,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber_color	 "red"
 			}
 		}
@@ -759,7 +755,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar		ui_saber2_color  "blue"
 			}
 		}
@@ -792,7 +788,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber2_color  "green"
 			}
 		}
@@ -825,7 +821,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar		ui_saber2_color	 "orange"
 			}
 		}
@@ -858,7 +854,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar		ui_saber2_color	 "purple"
 			}
 		}
@@ -891,7 +887,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar		ui_saber2_color  "yellow"
 			}
 		}
@@ -924,7 +920,7 @@
 			}	  	  
 			action 
 			{
-				play			"sound/interface/choose_blade.wav"
+				play			"sound/weapons/saber/saberhup3.wav"
 				setcvar 		ui_saber2_color	 "red"
 			}
 		}
