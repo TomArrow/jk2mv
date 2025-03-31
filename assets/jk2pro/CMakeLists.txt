@@ -133,6 +133,26 @@ set(AssetsFiles
 	"models/players/secret_quigon/red_glow.jpg"
 	"models/players/secret_quigon/skin.jpg"
 	"models/players/secret_quigon/sounds.cfg"
+
+	"models/players/cultist/icon_brown.jpg"
+	"models/players/human_merc/icon_key_carrier.jpg"
+	"models/players/human_merc/icon_racto.jpg"
+	"models/players/imperial/icon_commander.jpg"
+	"models/players/imperial/icon_officer.jpg"
+	"models/players/jawa/icon_default.jpg"
+	"models/players/jedi/icon_j2.jpg"
+	"models/players/kyle/icon_fpls.jpg"
+	"models/players/kyle/icon_fpls2.jpg"
+	"models/players/morgan/icon_default.jpg"
+	"models/players/reborn/icon_acrobat.jpg"
+	"models/players/reborn/icon_boss.jpg"
+	"models/players/reborn/icon_default.jpg"
+	"models/players/reborn/icon_fencer.jpg"
+	"models/players/reborn/icon_forceuser.jpg"
+	"models/players/reborn_twin/icon_boss.jpg"
+	"models/players/tavion_new/icon_possessed.jpg"
+	"models/players/trandoshan/icon_sp.jpg"
+	"models/players/weequay/icon_sp.jpg"
 )
 
 source_group("jk2pro-assets" FILES ${AssetsFiles})
