@@ -332,7 +332,7 @@
 			name				customtitle
 			style				0	
 			text				@MENUS1_CUSTOM
-			rect				425 130 150 26
+			rect				425 91 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
 			textaligny			-3
@@ -353,7 +353,7 @@
 			descText			@ETERNAL_CUSTOMPLAYER_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
-			rect				465 160 75 75
+			rect				465 121 75 75
 			font				3
 			textscale			1
 			textaligny			-1
@@ -376,6 +376,44 @@
 				close			ingame_player
 				open			ingame_player2
 			}  	  
+		}
+
+		// Head size slider
+		itemDef
+		{
+			name				headSizeText
+			group				none
+			type				ITEM_TYPE_TEXT
+			text				@ETERNAL_HEAD_SIZE
+			rect				425 237 150 26
+			textalign			ITEM_ALIGN_CENTER
+			textalignx			75
+			textaligny			-3
+			font				2
+			textscale			1
+			style				0
+			forecolor			.549 .854 1 1
+			outlinecolor		1 .5 .5 .5
+			backcolor			0 0 0 0
+			visible				1
+			decoration
+		}
+
+		itemDef 
+		{
+			name				headSizeSlider
+			group				none
+			type				ITEM_TYPE_INTSLIDER
+			cvarint				"ui_headSize" 64 1 96
+			rect				454 267 96 16
+			textalign			ITEM_ALIGN_LEFT
+			textalignx			0
+			textaligny			0
+			font 				2
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			descText			@ETERNAL_HEAD_SIZE_DESC
 		}
 
 //------------------------------------------------------------------------------------------------

@@ -123,4 +123,10 @@ LANG_ENGLISH        "Blue:"
 REFERENCE           BLUE_VALUE_DESC
 LANG_ENGLISH        "Blue component value"
 
+REFERENCE           HEAD_SIZE
+LANG_ENGLISH        "Head size"
+
+REFERENCE           HEAD_SIZE_DESC
+LANG_ENGLISH        "Increase or decrease head size."
+
 ENDMARKER
