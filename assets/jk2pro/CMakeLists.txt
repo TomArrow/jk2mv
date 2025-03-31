@@ -83,6 +83,7 @@ set(AssetsFiles
 	"ui/jahud.menu"
 	"ui/jahud.txt"
 
+	"ext_data/sabers/default.sab"
 	"gfx/menus/configforce.jpg"
 	"gfx/menus/saber_icon_blue.jpg"
 	"gfx/menus/saber_icon_green.jpg"

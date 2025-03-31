@@ -3472,7 +3472,7 @@ void CL_Init( void ) {
 	//Cvar_Get ("cg_optimizedPredict", "0", CVAR_ARCHIVE );
 
 	//default sabers
-	Cvar_Get("saber1", "Kyle", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("saber1", "default", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("saber2", "none", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("cl_saberModel", "models/weapons2/saber/saber_w.glm", CVAR_ARCHIVE | CVAR_GLOBAL);
 

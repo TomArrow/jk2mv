@@ -1,0 +1,11 @@
+default
+{
+    name           @MENUS0_DEFAULT
+    saberType      SABER_SINGLE
+    saberModel     "models/weapons2/saber/saber_w.glm"
+    soundOn        "sound/weapons/saber/saberon.wav"
+    soundLoop      "sound/weapons/saber/saberhum1.wav"
+    soundOff       "sound/weapons/saber/saberoffquick.wav"
+    saberLength    40
+    saberColor     blue
+}
