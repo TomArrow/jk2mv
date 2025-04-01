@@ -1369,6 +1369,7 @@ Called every time a map changes
 ===============
 */
 void SV_ShutdownGameProgs( void ) {
+	FS_CloseFileList();
 	if ( !gvm ) {
 		return;
 	}
@@ -1440,6 +1441,7 @@ Called on a map_restart, but not on a normal map change
 ===================
 */
 void SV_RestartGameProgs( void ) {
+	FS_CloseFileList();
 	if ( !gvm ) {
 		return;
 	}

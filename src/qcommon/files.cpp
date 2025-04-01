@@ -4046,6 +4046,8 @@ void FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles ) {
 	searchpath_t	*p, *next;
 	int	i;
 
+	FS_CloseFileList();
+
 	for(i = 1; i < MAX_FILE_HANDLES; i++) {
 		switch (fsh[i].module) {
 		case MODULE_GAME:

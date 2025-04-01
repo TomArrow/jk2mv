@@ -807,6 +807,7 @@ CL_ShutdonwCGame
 void CL_ShutdownCGame( void ) {
 	cls.keyCatchers &= ~KEYCATCH_CGAME;
 	cls.cgameStarted = qfalse;
+	FS_CloseFileList();
 	if ( !cgvm ) {
 		return;
 	}

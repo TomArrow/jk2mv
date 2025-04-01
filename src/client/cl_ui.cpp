@@ -1275,6 +1275,7 @@ CL_ShutdownUI
 void CL_ShutdownUI( void ) {
 	cls.keyCatchers &= ~KEYCATCH_UI;
 	cls.uiStarted = qfalse;
+	FS_CloseFileList();
 	if ( !uivm ) {
 		return;
 	}
