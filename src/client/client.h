@@ -404,6 +404,7 @@ typedef struct clientStatic_s {
 		fileHandle_t	chat;
 	} log;
 
+	#define SHOWMOUSE_PAST_SAMPLES 400
 
 	#define FPS_GUESS_METHOD2_MSEC_LIMIT 100
 	#define FPS_GUESS_METHOD2_FRAMEAVG_COUNT 30
@@ -434,6 +435,16 @@ typedef struct clientStatic_s {
 		qboolean lastFrameWasMeasured;
 		qboolean lastFrameWasSlide;
 	} fpsGuess;
+
+	struct {
+		vec2_t	angleDelta[SHOWMOUSE_PAST_SAMPLES];
+		float	angleChangeSpeed[SHOWMOUSE_PAST_SAMPLES];
+		int		angleDeltaIndex;
+		vec2_t	oldAngle;
+		int		oldCommandTime;
+		int		oldDrawDeltaIndex;
+		vec2_t	centerOffset;
+	} showMouse;
 
 	struct { // Data for a reasonable number of past frames.
 		float maxVelocity;
@@ -512,6 +523,11 @@ extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
 extern	cvar_t	* cl_showVelocity;
 extern	cvar_t	* cl_showVelocityAllowNegative;
+extern	cvar_t	* cl_showMouse;
+extern	cvar_t	* cl_showMouseScale;
+extern	cvar_t	* cl_showMouseYScale;
+extern	cvar_t	* cl_showMouseDecay;
+extern	cvar_t	* cl_showMouseFadeExp;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_drawPS;
 extern	cvar_t	* cl_fpsGuessMode;

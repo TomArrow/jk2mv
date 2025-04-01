@@ -19,6 +19,11 @@ cvar_t		*cl_graphshift;
 cvar_t* cl_showVelocity;
 cvar_t* cl_showVelocityAllowNegative;
 cvar_t* cl_drawPS;
+cvar_t* cl_showMouse;
+cvar_t* cl_showMouseScale;
+cvar_t* cl_showMouseYScale;
+cvar_t* cl_showMouseDecay;
+cvar_t* cl_showMouseFadeExp;
 cvar_t* cl_fpsGuess;
 cvar_t* cl_fpsGuessMode;
 cvar_t* cl_fpsGuessMethod2DisplayMode;
@@ -437,6 +442,11 @@ void SCR_Init( void ) {
 
 	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
 	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
+	cl_showMouse = Cvar_Get("cl_showMouse", "0", CVAR_ARCHIVE);
+	cl_showMouseScale = Cvar_Get("cl_showMouseScale", "2.0", CVAR_ARCHIVE);
+	cl_showMouseYScale = Cvar_Get("cl_showMouseYScale", "2.0", CVAR_ARCHIVE);
+	cl_showMouseDecay = Cvar_Get("cl_showMouseDecay", "0.95", CVAR_ARCHIVE);
+	cl_showMouseFadeExp = Cvar_Get("cl_showMouseFadeExp", "4.0", CVAR_ARCHIVE);
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
 	cl_drawPS = Cvar_Get("cl_drawPS", "0", CVAR_TEMP);
 	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
@@ -611,6 +621,55 @@ static void SCR_DrawPS() {
 	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d", "saberLockAdvnce", ps->saberLockAdvance), white, qtrue);
 	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d", "inAirAnim", ps->inAirAnim), white, qtrue);
 	SCR_DrawSmallStringExt(x, 245 / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d", "dualBlade", ps->dualBlade), white, qtrue);
+}
+
+static void SCR_DrawShowMouse() {
+	if (!cl_showMouse->integer || !cls.showMouse.angleDeltaIndex) {
+		return;
+	}
+	static vec4_t lineColorNormal{ 1.0f,1.0f,1.0f,1.0f };
+	static vec4_t lineColorFast{ 1.0f,0.0f,0.0f,1.0f };
+	vec4_t lineColor{ 1.0f,0.0f,0.0f,1.0f };
+	int startIndex = MAX(0,cls.showMouse.angleDeltaIndex - SHOWMOUSE_PAST_SAMPLES); // -1 +1 (-1 because angleDeltaIndex is the next one actually, and +1 to not overflow)
+	float xNow = cls.glconfig.vidWidth*0.5f, yNow = cls.glconfig.vidHeight * 0.5f;
+	float xScale = cl_showMouseScale->value;
+	float yScale = cl_showMouseScale->value* cl_showMouseYScale->value;
+
+	if (cls.showMouse.oldDrawDeltaIndex) {
+		int compensateStartIndex = MAX(startIndex, cls.showMouse.oldDrawDeltaIndex);
+		float xCompensate = 0;
+		float yCompensate = 0;
+		for (int i = compensateStartIndex; i < cls.showMouse.angleDeltaIndex; i++) {
+			int indexHere = i % SHOWMOUSE_PAST_SAMPLES;
+			xCompensate += cls.showMouse.angleDelta[indexHere][0]* xScale;
+			yCompensate += cls.showMouse.angleDelta[indexHere][1]* yScale;
+		}
+		cls.showMouse.centerOffset[0] += xCompensate;
+		cls.showMouse.centerOffset[1] += yCompensate;
+	}
+
+	cls.showMouse.centerOffset[0] *= cl_showMouseDecay->value;
+	cls.showMouse.centerOffset[1] *= cl_showMouseDecay->value;
+
+	xNow += cls.showMouse.centerOffset[0];
+	yNow += cls.showMouse.centerOffset[1];
+
+	//for (int i = startIndex; i < cls.showMouse.angleDeltaIndex; i++) {
+	for (int i = cls.showMouse.angleDeltaIndex-1; i >= startIndex; i--) {
+		float opacity = 1.0f- (float)(cls.showMouse.angleDeltaIndex - 1 - i)/ (float)(SHOWMOUSE_PAST_SAMPLES-1);
+		int indexHere = i % SHOWMOUSE_PAST_SAMPLES;
+		float speedMult = Com_Clamp(0.0f,1.0f, cls.showMouse.angleChangeSpeed[indexHere]/10.0f);
+		opacity = powf(opacity, cl_showMouseFadeExp->value);
+		VectorMA(vec3_origin, speedMult, lineColorFast, lineColor);
+		VectorMA(lineColor, 1.0f-speedMult, lineColorNormal, lineColor);
+		lineColor[3] = opacity;
+		re.SetColor(lineColor);
+		re.DrawLine(xNow, yNow, xNow - cls.showMouse.angleDelta[indexHere][0]*xScale, yNow - cls.showMouse.angleDelta[indexHere][1]*yScale, 2, 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
+		re.SetColor(NULL);
+		xNow -= cls.showMouse.angleDelta[indexHere][0]*xScale;
+		yNow -= cls.showMouse.angleDelta[indexHere][1]*yScale;
+	}
+	cls.showMouse.oldDrawDeltaIndex = cls.showMouse.angleDeltaIndex;
 }
 
 static void SCR_DrawFPSGuess() {
@@ -924,6 +983,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	}
 
 	SCR_DrawFPSGuess();
+	SCR_DrawShowMouse();
 
 	SCR_DrawPS();
 
