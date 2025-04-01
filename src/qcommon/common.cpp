@@ -1243,6 +1243,47 @@ void Z_Free(void *pvAddress)
 	Zone_FreeBlock(pMemory);
 }
 
+void *Z_Realloc(void *pvAddress, int iNewSize, qboolean bZeroit)
+{
+	if (pvAddress == NULL)
+	{
+		Com_Error(ERR_FATAL, "Z_Realloc(): pvAddress == NULL");
+		return pvAddress;
+	}
+
+	zoneHeader_t *pMemory = ((zoneHeader_t *) pvAddress) - 1;
+
+	if (pMemory == NULL)
+	{
+		Com_Error(ERR_FATAL, "Z_Realloc(): pMemory == NULL");
+		return pvAddress;
+	}
+
+	memtag_t eTag = pMemory->eTag;
+
+	if (eTag == TAG_STATIC)
+	{
+		return pvAddress;
+	}
+
+	int iSize = Z_Size(pvAddress);
+
+	if (iSize == iNewSize)
+	{
+		return pvAddress;
+	}
+
+	void *p = Z_Malloc(iNewSize, eTag, bZeroit);
+
+	if (iSize > iNewSize)
+	{
+		iSize = iNewSize;
+	}
+
+	memcpy(p, pvAddress, iSize * sizeof(char));
+	Z_Free(pvAddress);
+	return p;
+}
 
 int Z_MemSize(memtag_t eTag)
 {

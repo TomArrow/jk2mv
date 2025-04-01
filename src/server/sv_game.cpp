@@ -1301,6 +1301,31 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		case G_COOL_API_GET_NEXT_FILE:
 			FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
 			return 0;
+
+		case G_COOL_API_ALLOCATE_MEMORY:
+			return VM_AllocateMemory(VMAV(1, uint32_t), args[2], args[3]);
+
+		case G_COOL_API_REALLOCATE_MEMORY:
+			return VM_ReallocateMemory(args[1], args[2]);
+
+		case G_COOL_API_FREE_MEMORY:
+			VM_FreeMemory(args[1]);
+			return 0;
+
+		case G_COOL_API_WRITE_MEMORY:
+			VM_WriteMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
+			return 0;
+
+		case G_COOL_API_READ_MEMORY:
+			VM_ReadMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
+			return 0;
+
+		case G_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
+			return VM_GetElementSizeFromMemory(args[1]);
+
+		case G_COOL_API_FREE_ALL_MEMORY:
+			VM_FreeAllMemory(VM_CONTEXT_GAME);
+			return 0;
 		}
 	}
 
@@ -1374,6 +1399,7 @@ void SV_ShutdownGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
+	VM_FreeAllMemory(VM_CONTEXT_GAME);
 	VM_Free( gvm );
 	gvm = NULL;
 	sv.fixes = MVFIX_NONE;
@@ -1446,6 +1472,7 @@ void SV_RestartGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
+	VM_FreeAllMemory(VM_CONTEXT_GAME);
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );

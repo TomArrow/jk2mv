@@ -199,6 +199,13 @@ struct vm_s {
 	int			coolApiSupport;
 };
 
+struct vmAllocatedMemory_t
+{
+	uint32_t elementCount;
+	uint32_t elementSize;
+	uint8_t *memory;
+	qboolean inUse;
+};
 
 extern	vm_t	*currentVM;
 extern	int		vm_debugLevel;

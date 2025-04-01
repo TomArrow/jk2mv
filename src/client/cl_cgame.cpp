@@ -812,6 +812,7 @@ void CL_ShutdownCGame( void ) {
 		return;
 	}
 	VM_Call( cgvm, CG_SHUTDOWN );
+	VM_FreeAllMemory(VM_CONTEXT_CGAME);
 	VM_Free( cgvm );
 	cgvm = NULL;
 	cls.fixes = MVFIX_NONE;
@@ -1745,6 +1746,31 @@ Ghoul2 Insert End
 
 		case CG_COOL_API_GET_NEXT_FILE:
 			FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
+			return 0;
+
+		case CG_COOL_API_ALLOCATE_MEMORY:
+			return VM_AllocateMemory(VMAV(1, uint32_t), args[2], args[3]);
+
+		case CG_COOL_API_REALLOCATE_MEMORY:
+			return VM_ReallocateMemory(args[1], args[2]);
+
+		case CG_COOL_API_FREE_MEMORY:
+			VM_FreeMemory(args[1]);
+			return 0;
+
+		case CG_COOL_API_WRITE_MEMORY:
+			VM_WriteMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
+			return 0;
+
+		case CG_COOL_API_READ_MEMORY:
+			VM_ReadMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
+			return 0;
+
+		case CG_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
+			return VM_GetElementSizeFromMemory(args[1]);
+
+		case CG_COOL_API_FREE_ALL_MEMORY:
+			VM_FreeAllMemory(VM_CONTEXT_CGAME);
 			return 0;
 		}
 	}

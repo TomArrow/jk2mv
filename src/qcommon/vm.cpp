@@ -47,6 +47,9 @@ static vmSymbol_t nullSymbol;
 // cgame/game/ui context
 vmContext_t vmContext;
 
+static vmAllocatedMemory_t *vmAllocatedMemory[MAX_VM] = {NULL, NULL, NULL};
+static uint32_t vmAllocatedMemoryCount[MAX_VM] = {0, 0, 0};
+
 // used by Com_Error to get rid of running vm's before longjmp
 static int forced_unload;
 
@@ -1350,4 +1353,290 @@ mvversion_t VM_GetGameversion(const vm_t *vm) {
 
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
 	vm->gameversion = gameversion;
+}
+
+qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_t elementSize)
+{
+	memtag_t tag;
+	uint32_t count;
+
+	switch (vmContext)
+	{
+	default:
+	case VM_CONTEXT_CGAME:
+		tag = TAG_VM_CGAME;
+		break;
+	case VM_CONTEXT_GAME:
+		tag = TAG_VM_GAME;
+		break;
+	case VM_CONTEXT_UI:
+		tag = TAG_VM_UI;
+		break;
+	}
+
+	if (memoryIndex == NULL)
+	{
+		return qfalse;
+	}
+
+	*memoryIndex = 0;
+	count = vmAllocatedMemoryCount[vmContext];
+
+	if (count == UINT32_MAX)
+	{
+		return qfalse;
+	}
+
+	if (CanMultiplicationOverflowUInt32(elementCount, elementSize))
+	{
+		return qfalse;
+	}
+
+	if ((elementCount * elementSize) >= INT_MAX)
+	{
+		return qfalse;
+	}
+
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		vmAllocatedMemory[vmContext] = (vmAllocatedMemory_t *) Z_Malloc(1 * sizeof(vmAllocatedMemory_t), tag, qtrue);
+	}
+	else
+	{
+		if (CanMultiplicationOverflowUInt32((count + 1), sizeof(vmAllocatedMemory_t)))
+		{
+			return qfalse;
+		}
+
+		if (((count + 1) * sizeof(vmAllocatedMemory_t)) >= INT_MAX)
+		{
+			return qfalse;
+		}
+
+		vmAllocatedMemory[vmContext] = (vmAllocatedMemory_t *) Z_Realloc(vmAllocatedMemory[vmContext], (count + 1) * sizeof(vmAllocatedMemory_t), qtrue);
+	}
+
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		return qfalse;
+	}
+
+	vmAllocatedMemory[vmContext][count].elementCount = elementCount;
+	vmAllocatedMemory[vmContext][count].elementSize = elementSize;
+	vmAllocatedMemory[vmContext][count].memory = (uint8_t *) Z_Malloc(elementCount * elementSize, tag, qtrue);
+
+	if (vmAllocatedMemory[vmContext][count].memory == NULL)
+	{
+		return qfalse;
+	}
+
+	*memoryIndex = count;
+	vmAllocatedMemoryCount[vmContext]++;
+	return qtrue;
+}
+
+qboolean VM_ReallocateMemory(uint32_t memoryIndex, uint32_t elementCount)
+{
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext] == NULL");
+		return qfalse;
+	}
+
+	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		return qfalse;
+	}
+
+	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		return qfalse;
+	}
+
+	if (CanMultiplicationOverflowUInt32(vmAllocatedMemory[vmContext][memoryIndex].elementSize, elementCount))
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): uint32_t overflow: vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount");
+		return qfalse;
+	}
+
+	if ((vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount) >= INT_MAX)
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): integer overflow: vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount");
+		return qfalse;
+	}
+
+	vmAllocatedMemory[vmContext][memoryIndex].memory = (uint8_t *) Z_Realloc(
+		vmAllocatedMemory[vmContext][memoryIndex].memory,
+		vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount,
+		qtrue
+	);
+
+	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+void VM_FreeMemory(uint32_t memoryIndex)
+{
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_FreeMemory(): vmAllocatedMemory[vmContext] == NULL");
+		return;
+	}
+
+	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	{
+		Com_Error(ERR_FATAL, "VM_FreeMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		return;
+	}
+
+	vmAllocatedMemory[vmContext][memoryIndex].elementCount = 0;
+	vmAllocatedMemory[vmContext][memoryIndex].elementSize = 0;
+	Z_Free(vmAllocatedMemory[vmContext][memoryIndex].memory);
+	vmAllocatedMemory[vmContext][memoryIndex].memory = NULL;
+}
+
+void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory)
+{
+	uint8_t *memory;
+
+	if (sourceMemory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): sourceMemory == NULL");
+		return;
+	}
+
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): vmAllocatedMemory[vmContext] == NULL");
+		return;
+	}
+
+	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		return;
+	}
+
+	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		return;
+	}
+
+	if (elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount)
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount");
+		return;
+	}
+
+	memory = vmAllocatedMemory[vmContext][memoryIndex].memory;
+	memory = &memory[elementIndex * vmAllocatedMemory[vmContext][memoryIndex].elementSize];
+
+	memcpy(
+		memory,
+		sourceMemory,
+		vmAllocatedMemory[vmContext][memoryIndex].elementSize
+	);
+}
+
+void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory)
+{
+	uint8_t *memory;
+
+	if (destinationMemory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): destinationMemory == NULL");
+		return;
+	}
+
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): vmAllocatedMemory[vmContext] == NULL");
+		return;
+	}
+
+	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		return;
+	}
+
+	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		return;
+	}
+
+	if (elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount)
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount");
+		return;
+	}
+
+	memory = vmAllocatedMemory[vmContext][memoryIndex].memory;
+	memory = &memory[elementIndex * vmAllocatedMemory[vmContext][memoryIndex].elementSize];
+
+	memcpy(
+		destinationMemory,
+		memory,
+		vmAllocatedMemory[vmContext][memoryIndex].elementSize
+	);
+}
+
+uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex)
+{
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): vmAllocatedMemory[vmContext] == NULL");
+		return 0;
+	}
+
+	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	{
+		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		return 0;
+	}
+
+	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	{
+		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		return 0;
+	}
+
+	return vmAllocatedMemory[vmContext][memoryIndex].elementSize;
+}
+
+void VM_FreeAllMemory(vmContext_t vmContext)
+{
+	memtag_t tag;
+
+	if (vmAllocatedMemory[vmContext] == NULL)
+	{
+		return;
+	}
+
+	switch (vmContext)
+	{
+	default:
+	case VM_CONTEXT_CGAME:
+		tag = TAG_VM_CGAME;
+		break;
+	case VM_CONTEXT_GAME:
+		tag = TAG_VM_GAME;
+		break;
+	case VM_CONTEXT_UI:
+		tag = TAG_VM_UI;
+		break;
+	}
+
+	Z_TagFree(tag);
+	vmAllocatedMemory[vmContext] = NULL;
+	vmAllocatedMemoryCount[vmContext] = 0;
 }
