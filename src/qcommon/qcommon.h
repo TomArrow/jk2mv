@@ -24,6 +24,15 @@
 
 extern qboolean serverIsTommyTernal;
 
+enum vmContext_t
+{
+	VM_CONTEXT_CGAME,
+	VM_CONTEXT_GAME,
+	VM_CONTEXT_UI,
+};
+
+extern vmContext_t vmContext;
+
 //For determining whether to allow 1.02 color codes:
 #define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
 

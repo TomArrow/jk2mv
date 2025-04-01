@@ -874,8 +874,6 @@ qboolean CL_CgameEnableSubmodelBypass( qboolean enable ) {
 	return cls.submodelBypass;
 }
 
-extern int vmContext;
-
 /*
 ====================
 CL_CgameSystemCalls
@@ -896,7 +894,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	}
 
 	// set cgame ghoul2 context
-	vmContext = 0;
+	vmContext = VM_CONTEXT_CGAME;
 
 	switch( args[0] ) {
 	case CG_PRINT:
@@ -1439,16 +1437,16 @@ Ghoul2 Insert Start
 		return 0;
 
 	case CG_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_CGAME) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_CGAME) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_CGAME) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],

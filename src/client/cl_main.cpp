@@ -1095,7 +1095,7 @@ void CL_ShutdownAll(void) {
 	cls.soundRegistered = qfalse;
 }
 
-void FixGhoul2InfoLeaks(int vmContext);
+void FixGhoul2InfoLeaks(vmContext_t vmContext);
 
 /*
 =================
@@ -1114,8 +1114,8 @@ void CL_FlushMemory( qboolean disconnecting ) {
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running->integer ) {
 		// clear collision map data
-		FixGhoul2InfoLeaks(0);
-		FixGhoul2InfoLeaks(2);
+		FixGhoul2InfoLeaks(VM_CONTEXT_CGAME);
+		FixGhoul2InfoLeaks(VM_CONTEXT_UI);
 		CM_ClearMap();
 		// clear the whole hunk
 		Hunk_Clear();

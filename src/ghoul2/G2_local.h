@@ -77,7 +77,7 @@ void		G2_RemoveRedundantBolts(boltInfo_v &bltlist, surfaceInfo_v &slist, int *ac
 
 
 // API calls - G2_API.cpp
-int			G2API_GetMaxModelIndex(int vmContext);
+int			G2API_GetMaxModelIndex(vmContext_t vmContext);
 qhandle_t	G2API_PrecacheGhoul2Model(const char *fileName);
 CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h);
 

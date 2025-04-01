@@ -365,8 +365,6 @@ void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg);
 
 //==============================================
 
-extern int vmContext;
-
 /*
 ====================
 SV_GameSystemCalls
@@ -384,7 +382,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	}
 
 	// set game ghoul2 context
-	vmContext = 1;
+	vmContext = VM_CONTEXT_GAME;
 
 	switch( args[0] ) {
 	case G_PRINT:
@@ -997,16 +995,16 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1382,7 +1380,7 @@ void SV_ShutdownGameProgs( void ) {
 	sv.submodelBypass = qfalse;
 }
 
-void FixGhoul2InfoLeaks(int vmContext);
+void FixGhoul2InfoLeaks(vmContext_t vmContext);
 
 /*
 ==================
@@ -1395,7 +1393,7 @@ static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
 
-	FixGhoul2InfoLeaks(1);
+	FixGhoul2InfoLeaks(VM_CONTEXT_GAME);
 
 	// clear physics interaction links
 	SV_ClearWorld ();

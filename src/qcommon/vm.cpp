@@ -44,6 +44,9 @@ int		vm_debugLevel;
 qboolean vm_profileInclusive;
 static vmSymbol_t nullSymbol;
 
+// cgame/game/ui context
+vmContext_t vmContext;
+
 // used by Com_Error to get rid of running vm's before longjmp
 static int forced_unload;
 

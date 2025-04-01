@@ -32,12 +32,9 @@ extern mdxaBone_t		worldMatrixInv;
 
 typedef std::map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
 
-static CGhoul2Info_m	ghoultable[3];
+static CGhoul2Info_m	ghoultable[MAX_VM];
 static g2handle_t		nextGhoul2Handle = (g2handle_t)1;
-static int				maxModelIndex[3];
-
-// game/cgame/ui context
-int vmContext;
+static int				maxModelIndex[MAX_VM];
 
 CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
 	CGhoul2Info_m::iterator ghlIt = ghoultable[vmContext].find(g2h);
@@ -50,7 +47,7 @@ CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
 	return &ghlIt->second;
 }
 
-void FixGhoul2InfoLeaks(int vmContext)
+void FixGhoul2InfoLeaks(vmContext_t vmContext)
 {
 	ghoultable[vmContext].clear();
 	maxModelIndex[vmContext] = 0;
@@ -61,7 +58,7 @@ void G2API_CleanGhoul2Models(g2handle_t *g2hPtr) {
 	*g2hPtr = 0;
 }
 
-int G2API_GetMaxModelIndex(int vmContext) {
+int G2API_GetMaxModelIndex(vmContext_t vmContext) {
 	return maxModelIndex[vmContext];
 }
 
