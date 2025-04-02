@@ -129,4 +129,13 @@ LANG_ENGLISH        "Head size"
 REFERENCE           HEAD_SIZE_DESC
 LANG_ENGLISH        "Increase or decrease head size."
 
+REFERENCE           SABER_DESANN
+LANG_ENGLISH        "Desann"
+
+REFERENCE           SABER_LUKE
+LANG_ENGLISH        "Luke"
+
+REFERENCE           SABER_REBORN
+LANG_ENGLISH        "Reborn"
+
 ENDMARKER

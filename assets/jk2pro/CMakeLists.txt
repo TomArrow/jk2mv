@@ -84,6 +84,10 @@ set(AssetsFiles
 	"ui/jahud.txt"
 
 	"ext_data/sabers/default.sab"
+	"ext_data/sabers/desann.sab"
+	"ext_data/sabers/luke.sab"
+	"ext_data/sabers/reborn.sab"
+
 	"gfx/menus/configforce.jpg"
 	"gfx/menus/saber_icon_blue.jpg"
 	"gfx/menus/saber_icon_green.jpg"
