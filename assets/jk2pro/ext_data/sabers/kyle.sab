@@ -1,6 +1,6 @@
-default
+kyle
 {
-    name           @MENUS0_DEFAULT
+    name           @ETERNAL_SABER_KYLE
     saberType      SABER_SINGLE
     saberModel     "models/weapons2/saber/saber_w.glm"
     soundOn        "sound/weapons/saber/saberon.wav"

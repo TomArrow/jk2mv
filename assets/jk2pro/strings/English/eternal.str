@@ -132,6 +132,9 @@ LANG_ENGLISH        "Increase or decrease head size."
 REFERENCE           SABER_DESANN
 LANG_ENGLISH        "Desann"
 
+REFERENCE           SABER_KYLE
+LANG_ENGLISH        "Kyle"
+
 REFERENCE           SABER_LUKE
 LANG_ENGLISH        "Luke"
 

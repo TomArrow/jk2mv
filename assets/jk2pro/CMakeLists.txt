@@ -83,8 +83,8 @@ set(AssetsFiles
 	"ui/jahud.menu"
 	"ui/jahud.txt"
 
-	"ext_data/sabers/default.sab"
 	"ext_data/sabers/desann.sab"
+	"ext_data/sabers/kyle.sab"
 	"ext_data/sabers/luke.sab"
 	"ext_data/sabers/reborn.sab"
 

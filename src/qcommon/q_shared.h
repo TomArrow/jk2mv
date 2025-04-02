@@ -378,7 +378,7 @@ typedef enum
 
 } saber_colors_t;
 
-#define DEFAULT_SABER1 "default"
+#define DEFAULT_SABER1 "kyle"
 #define DEFAULT_SABER2 "none"
 
 typedef enum
