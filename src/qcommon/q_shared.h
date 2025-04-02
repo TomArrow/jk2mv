@@ -378,6 +378,9 @@ typedef enum
 
 } saber_colors_t;
 
+#define DEFAULT_SABER1 "default"
+#define DEFAULT_SABER2 "none"
+
 typedef enum
 {
 	FP_FIRST = 0,//marker
