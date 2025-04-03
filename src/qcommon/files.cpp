@@ -4046,8 +4046,6 @@ void FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles ) {
 	searchpath_t	*p, *next;
 	int	i;
 
-	FS_CloseFileList();
-
 	for(i = 1; i < MAX_FILE_HANDLES; i++) {
 		switch (fsh[i].module) {
 		case MODULE_GAME:
@@ -5141,50 +5139,75 @@ uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
 	return FILE_VERSION_UNKNOWN;
 }
 
-static const char **fileList = NULL;
-static int fileCount = 0;
-static int fileCurrent = 0;
-
-void FS_CloseFileList(void)
+qboolean FS_CreateFileList(uint32_t *listIndex, const char *path, const char *extension, const char *filter, uint32_t *filesCount)
 {
-	if (fileList == NULL)
-		return;
+	const char **fileList;
+	char buffer[MAX_QPATH];
+	char fileName[MAX_QPATH];
+	int count;
+	uint32_t i;
 
-	FS_FreeFileList(fileList);
-	fileList = NULL;
-	fileCount = 0;
-	fileCurrent = 0;
-}
-
-int FS_CreateFileList(const char *path, const char *extension)
-{
-	if (fileList != NULL)
-		FS_CloseFileList();
-
-	fileList = FS_ListFilteredFiles(path, extension, NULL, &fileCount, qfalse);
-
-	if (fileCount <= 0)
-		FS_CloseFileList();
-
-	return fileCount;
-}
-
-void FS_GetNextFile(char *buffer, int bufferSize)
-{
-	if (bufferSize <= 0)
-		return;
-
-	buffer[0] = '\0';
-
-	if (fileList == NULL)
-		return;
-
-	if (fileCurrent < 0 || fileCurrent >= fileCount)
+	if (listIndex == NULL)
 	{
-		FS_CloseFileList();
-		return;
+		return qfalse;
 	}
 
-	strncpy(buffer, fileList[fileCurrent], (size_t) bufferSize);
-	fileCurrent++;
+	if (filesCount == NULL)
+	{
+		return qfalse;
+	}
+
+	*listIndex = 0;
+	*filesCount = 0;
+
+	if (filter == NULL)
+	{
+		fileList = FS_ListFilteredFiles(path, extension, NULL, &count, qfalse);
+	}
+	else
+	{
+		Q_strncpyz(buffer, filter, sizeof(buffer));
+		fileList = FS_ListFilteredFiles(path, extension, buffer, &count, qfalse);
+	}
+
+	if (fileList == NULL)
+	{
+		return qfalse;
+	}
+
+	if (count <= 0)
+	{
+		return qfalse;
+	}
+
+	*filesCount = (uint32_t) count;
+
+	if (!VM_AllocateMemory(listIndex, *filesCount, MAX_QPATH))
+	{
+		FS_FreeFileList(fileList);
+		return qfalse;
+	}
+
+	for (i = 0; i < *filesCount; i++)
+	{
+		Com_Memset(fileName, '\0', sizeof(fileName));
+		Q_strncpyz(fileName, fileList[i], sizeof(fileName));
+		VM_WriteMemory(*listIndex, i, (const uint8_t *) fileName);
+	}
+
+	FS_FreeFileList(fileList);
+	return qtrue;
+}
+
+void FS_CloseFileList(uint32_t listIndex)
+{
+	VM_FreeMemory(listIndex);
+}
+
+void FS_ReadFromFileList(uint32_t listIndex, uint32_t fileIndex, char *destinationFileName, uint32_t destinationSize)
+{
+	char fileName[MAX_QPATH];
+
+	VM_ReadMemory(listIndex, fileIndex, (uint8_t *) fileName);
+	Q_strncpyz(destinationFileName, fileName, destinationSize);
 }

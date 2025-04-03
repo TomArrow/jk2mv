@@ -1248,14 +1248,14 @@ Ghoul2 Insert End
 			return FS_GetFileVersion(VMAS(1), MODULE_UI);
 
 		case UI_COOL_API_CREATE_FILE_LIST:
-			return FS_CreateFileList(VMAS(1), VMAS(2));
+			return FS_CreateFileList(VMAV(1, uint32_t), VMAS(2), VMAS(3), VMAS(4), VMAV(5, uint32_t));
 
 		case UI_COOL_API_CLOSE_FILE_LIST:
-			FS_CloseFileList();
+			FS_CloseFileList(args[1]);
 			return 0;
 
-		case UI_COOL_API_GET_NEXT_FILE:
-			FS_GetNextFile(VMAP(1, char, args[2]), args[2]);
+		case UI_COOL_API_READ_FROM_FILE_LIST:
+			FS_ReadFromFileList(args[1], args[2], VMAP(3, char, args[4]), args[4]);
 			return 0;
 
 		case UI_COOL_API_ALLOCATE_MEMORY:
@@ -1297,7 +1297,6 @@ CL_ShutdownUI
 void CL_ShutdownUI( void ) {
 	cls.keyCatchers &= ~KEYCATCH_UI;
 	cls.uiStarted = qfalse;
-	FS_CloseFileList();
 	if ( !uivm ) {
 		return;
 	}

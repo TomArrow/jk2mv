@@ -886,9 +886,9 @@ qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
 uint32_t FS_GetFileVersion(const char *fileName, module_t module);
-int FS_CreateFileList(const char *path, const char *extension);
-void FS_CloseFileList(void);
-void FS_GetNextFile(char *buffer, int bufferSize);
+qboolean FS_CreateFileList(uint32_t *listIndex, const char *path, const char *extension, const char *filter, uint32_t *filesCount);
+void FS_CloseFileList(uint32_t listIndex);
+void FS_ReadFromFileList(uint32_t listIndex, uint32_t fileIndex, char *destinationFileName, uint32_t destinationSize);
 
 
 /*
