@@ -774,9 +774,6 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 		}
 	}
 
-	// set ui ghoul2 context
-	vmContext = VM_CONTEXT_UI;
-
 	switch( args[0] ) {
 	case UI_ERROR:
 		Com_Error( ERR_DROP, "%s", VMAS(1) );
@@ -1210,7 +1207,7 @@ Ghoul2 Insert End
 			return 0;
 
 		case UI_COOL_API_GET_BOLT_MATRIX:
-			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_UI) + 1), VMAP(9, const vec_t, 3));
+			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 		case UI_COOL_API_INIT_GHOUL2_MODEL:
 			return G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4], (qhandle_t) args[5], args[6], args[7]);
@@ -1283,7 +1280,7 @@ Ghoul2 Insert End
 			return VM_GetElementSizeFromMemory(args[1]);
 
 		case UI_COOL_API_CLEAR_MEMORY:
-			VM_ClearMemory(VM_CONTEXT_UI);
+			VM_ClearMemory(vm_currentIndex);
 			return 0;
 		}
 	}
@@ -1305,7 +1302,6 @@ void CL_ShutdownUI( void ) {
 		return;
 	}
 	VM_Call( uivm, UI_SHUTDOWN );
-	VM_ClearMemory(VM_CONTEXT_UI);
 	VM_Free( uivm );
 	uivm = NULL;
 }

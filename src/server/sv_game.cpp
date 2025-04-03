@@ -381,9 +381,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 	}
 
-	// set game ghoul2 context
-	vmContext = VM_CONTEXT_GAME;
-
 	switch( args[0] ) {
 	case G_PRINT:
 		Com_Printf( "%s", VMAS(1) );
@@ -995,16 +992,16 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(VM_CONTEXT_GAME) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1324,7 +1321,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			return VM_GetElementSizeFromMemory(args[1]);
 
 		case G_COOL_API_CLEAR_MEMORY:
-			VM_ClearMemory(VM_CONTEXT_GAME);
+			VM_ClearMemory(vm_currentIndex);
 			return 0;
 		}
 	}
@@ -1399,15 +1396,12 @@ void SV_ShutdownGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
-	VM_ClearMemory(VM_CONTEXT_GAME);
 	VM_Free( gvm );
 	gvm = NULL;
 	sv.fixes = MVFIX_NONE;
 	sv.vmPlayerSnapshots = qfalse;
 	sv.submodelBypass = qfalse;
 }
-
-void FixGhoul2InfoLeaks(vmContext_t vmContext);
 
 /*
 ==================
@@ -1419,8 +1413,6 @@ Called for both a full init and a restart
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
-
-	FixGhoul2InfoLeaks(VM_CONTEXT_GAME);
 
 	// clear physics interaction links
 	SV_ClearWorld ();
@@ -1472,7 +1464,6 @@ void SV_RestartGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
-	VM_ClearMemory(VM_CONTEXT_GAME);
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );

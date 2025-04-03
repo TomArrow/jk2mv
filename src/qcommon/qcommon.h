@@ -24,15 +24,6 @@
 
 extern qboolean serverIsTommyTernal;
 
-enum vmContext_t
-{
-	VM_CONTEXT_CGAME,
-	VM_CONTEXT_GAME,
-	VM_CONTEXT_UI,
-};
-
-extern vmContext_t vmContext;
-
 //For determining whether to allow 1.02 color codes:
 #define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
 
@@ -77,7 +68,7 @@ void VM_FreeMemory(uint32_t memoryIndex);
 void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory);
 void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory);
 uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex);
-void VM_ClearMemory(vmContext_t vmContext);
+void VM_ClearMemory(int vmIndex);
 
 extern qboolean com_demoplaying;
 
@@ -455,6 +446,7 @@ typedef enum {
 } sharedTraps_t;
 
 #define	MAX_VM		3
+extern int vm_currentIndex;
 
 void	VM_Init( void );
 vm_t	*VM_Create(const char *module, qboolean mvOverride, intptr_t(*systemCalls)(intptr_t *), vmInterpret_t interpret);
@@ -513,6 +505,8 @@ int VM_MVMenuLevel(const vm_t *vm);
 
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
+
+void FixGhoul2InfoLeaks(int vmIndex);
 
 /*
 ==============================================================

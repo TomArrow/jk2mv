@@ -456,6 +456,7 @@ void DoSyscall(void)
 	}
 
 	currentVM = savedVM;
+	vm_currentIndex = currentVM->index;
 }
 
 /*
@@ -1734,6 +1735,7 @@ int VM_CallCompiled(vm_t *vm, int *args)
 	int		arg;
 
 	currentVM = vm;
+	vm_currentIndex = currentVM->index;
 
 	// interpret the code
 	vm->currentlyInterpreting = qtrue;

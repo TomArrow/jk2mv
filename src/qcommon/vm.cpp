@@ -33,22 +33,20 @@ and one exported function: Perform
 
 */
 
+#include <unordered_map>
 #include "vm_local.h"
 
 
 vm_t	*currentVM = NULL;
 vm_t	*lastVM	= NULL;
+int		vm_currentIndex = -1;
 int		vm_debugLevel;
 
 #define MAX_APINUM	1000
 qboolean vm_profileInclusive;
 static vmSymbol_t nullSymbol;
 
-// cgame/game/ui context
-vmContext_t vmContext;
-
-static vmAllocatedMemory_t *vmAllocatedMemory[MAX_VM] = {NULL, NULL, NULL};
-static uint32_t vmAllocatedMemoryCount[MAX_VM] = {0, 0, 0};
+static std::unordered_map<uint32_t, vmAllocatedMemory_t> vmAllocatedMemory[MAX_VM];
 
 // used by Com_Error to get rid of running vm's before longjmp
 static int forced_unload;
@@ -720,6 +718,17 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 	Q_strncpyz(vm->name, module, sizeof(vm->name));
 
 	vm->mvmenu = 0;
+	vm->index = i;
+	vm->memoryTag = (memtag_t) (TAG_VM_0 + vm->index);
+
+	if (vm->memoryTag > TAG_VM_2)
+	{
+		Com_Error(ERR_FATAL, "VM_Create(): failed to set memory tag");
+	}
+
+	vm->allocatedMemory = &vmAllocatedMemory[vm->index];
+	VM_ClearMemory(vm->index);
+	FixGhoul2InfoLeaks(vm->index);
 
 	if (interpret == VMI_NATIVE) {
 		// try to load as a system dll
@@ -810,6 +819,12 @@ void VM_Free( vm_t *vm ) {
 		}
 	}
 
+	if (vm->name[0])
+	{
+		VM_ClearMemory(vm->index);
+		FixGhoul2InfoLeaks(vm->index);
+	}
+
 	if(vm->destroy)
 		vm->destroy(vm);
 
@@ -832,6 +847,7 @@ void VM_Free( vm_t *vm ) {
 
 	currentVM = NULL;
 	lastVM = NULL;
+	vm_currentIndex = -1;
 }
 
 void VM_Clear(void) {
@@ -1034,6 +1050,7 @@ intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int call
 	oldVM = currentVM;
 	currentVM = vm;
 	lastVM = vm;
+	vm_currentIndex = currentVM->index;
 
 	if ( vm_debugLevel ) {
 	  Com_Printf( "VM_Call( %d )\n", callnum );
@@ -1085,8 +1102,10 @@ intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int call
 	}
 	--vm->callLevel;
 
-	if ( oldVM != NULL )
+	if ( oldVM != NULL ) {
 	  currentVM = oldVM;
+	  vm_currentIndex = currentVM->index;
+	}
 	return r;
 }
 
@@ -1355,24 +1374,25 @@ void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
 	vm->gameversion = gameversion;
 }
 
+qboolean VM_GetMemoryFromIndex(uint32_t memoryIndex, vmAllocatedMemory_t **memory)
+{
+	vm_t *vm = &vmTable[vm_currentIndex];
+	auto iter = vm->allocatedMemory->find(memoryIndex);
+
+	if (iter == vm->allocatedMemory->end())
+	{
+		return qfalse;
+	}
+
+	*memory = &iter->second;
+	return qtrue;
+}
+
 qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_t elementSize)
 {
-	memtag_t tag;
-	uint32_t count;
-
-	switch (vmContext)
-	{
-	default:
-	case VM_CONTEXT_CGAME:
-		tag = TAG_VM_CGAME;
-		break;
-	case VM_CONTEXT_GAME:
-		tag = TAG_VM_GAME;
-		break;
-	case VM_CONTEXT_UI:
-		tag = TAG_VM_UI;
-		break;
-	}
+	uint32_t index;
+	vmAllocatedMemory_t memory;
+	vm_t *vm = &vmTable[vm_currentIndex];
 
 	if (memoryIndex == NULL)
 	{
@@ -1380,9 +1400,9 @@ qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_
 	}
 
 	*memoryIndex = 0;
-	count = vmAllocatedMemoryCount[vmContext];
+	index = vm->allocatedMemoryIndex;
 
-	if (count == UINT32_MAX)
+	if (index == UINT32_MAX)
 	{
 		return qfalse;
 	}
@@ -1397,85 +1417,59 @@ qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_
 		return qfalse;
 	}
 
-	if (vmAllocatedMemory[vmContext] == NULL)
-	{
-		vmAllocatedMemory[vmContext] = (vmAllocatedMemory_t *) Z_Malloc(1 * sizeof(vmAllocatedMemory_t), tag, qtrue);
-	}
-	else
-	{
-		if (CanMultiplicationOverflowUInt32((count + 1), sizeof(vmAllocatedMemory_t)))
-		{
-			return qfalse;
-		}
+	memory.elementCount = elementCount;
+	memory.elementSize = elementSize;
+	memory.memory = (uint8_t *) Z_Malloc(elementCount * elementSize, vm->memoryTag, qtrue);
 
-		if (((count + 1) * sizeof(vmAllocatedMemory_t)) >= INT_MAX)
-		{
-			return qfalse;
-		}
-
-		vmAllocatedMemory[vmContext] = (vmAllocatedMemory_t *) Z_Realloc(vmAllocatedMemory[vmContext], (count + 1) * sizeof(vmAllocatedMemory_t), qtrue);
-	}
-
-	if (vmAllocatedMemory[vmContext] == NULL)
+	if (memory.memory == NULL)
 	{
 		return qfalse;
 	}
 
-	vmAllocatedMemory[vmContext][count].elementCount = elementCount;
-	vmAllocatedMemory[vmContext][count].elementSize = elementSize;
-	vmAllocatedMemory[vmContext][count].memory = (uint8_t *) Z_Malloc(elementCount * elementSize, tag, qtrue);
+	vm->allocatedMemory->insert({index, memory});
+	*memoryIndex = index;
+	vm->allocatedMemoryIndex++;
 
-	if (vmAllocatedMemory[vmContext][count].memory == NULL)
-	{
-		return qfalse;
-	}
-
-	*memoryIndex = count;
-	vmAllocatedMemoryCount[vmContext]++;
 	return qtrue;
 }
 
 qboolean VM_ReallocateMemory(uint32_t memoryIndex, uint32_t elementCount)
 {
-	if (vmAllocatedMemory[vmContext] == NULL)
+	vmAllocatedMemory_t *memory;
+
+	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
 	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext] == NULL");
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): invalid memoryIndex");
 		return qfalse;
 	}
 
-	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	if (memory->memory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): memory is NULL");
 		return qfalse;
 	}
 
-	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	if (CanMultiplicationOverflowUInt32(memory->elementSize, elementCount))
 	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): uint32_t overflow");
 		return qfalse;
 	}
 
-	if (CanMultiplicationOverflowUInt32(vmAllocatedMemory[vmContext][memoryIndex].elementSize, elementCount))
+	if ((memory->elementSize * elementCount) >= INT_MAX)
 	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): uint32_t overflow: vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount");
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): int overflow");
 		return qfalse;
 	}
 
-	if ((vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount) >= INT_MAX)
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): integer overflow: vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount");
-		return qfalse;
-	}
-
-	vmAllocatedMemory[vmContext][memoryIndex].memory = (uint8_t *) Z_Realloc(
-		vmAllocatedMemory[vmContext][memoryIndex].memory,
-		vmAllocatedMemory[vmContext][memoryIndex].elementSize * elementCount,
+	memory->memory = (uint8_t *) Z_Realloc(
+		memory->memory,
+		memory->elementSize * elementCount,
 		qtrue
 	);
 
-	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
+	if (memory->memory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
+		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): reallocation failed");
 		return qfalse;
 	}
 
@@ -1484,159 +1478,123 @@ qboolean VM_ReallocateMemory(uint32_t memoryIndex, uint32_t elementCount)
 
 void VM_FreeMemory(uint32_t memoryIndex)
 {
-	if (vmAllocatedMemory[vmContext] == NULL)
+	vm_t *vm = &vmTable[vm_currentIndex];
+	vmAllocatedMemory_t *memory;
+
+	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
 	{
-		Com_Error(ERR_FATAL, "VM_FreeMemory(): vmAllocatedMemory[vmContext] == NULL");
+		Com_Error(ERR_FATAL, "VM_FreeMemory(): invalid memoryIndex");
 		return;
 	}
 
-	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
-	{
-		Com_Error(ERR_FATAL, "VM_FreeMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
-		return;
-	}
-
-	vmAllocatedMemory[vmContext][memoryIndex].elementCount = 0;
-	vmAllocatedMemory[vmContext][memoryIndex].elementSize = 0;
-	Z_Free(vmAllocatedMemory[vmContext][memoryIndex].memory);
-	vmAllocatedMemory[vmContext][memoryIndex].memory = NULL;
+	memory->elementCount = 0;
+	memory->elementSize = 0;
+	Z_Free(memory->memory);
+	memory->memory = NULL;
+	vm->allocatedMemory->erase(memoryIndex);
 }
 
 void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory)
 {
-	uint8_t *memory;
+	vmAllocatedMemory_t *memory;
+
+	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
+	{
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): invalid memoryIndex");
+		return;
+	}
 
 	if (sourceMemory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): sourceMemory == NULL");
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): sourceMemory is NULL");
 		return;
 	}
 
-	if (vmAllocatedMemory[vmContext] == NULL)
+	if (memory->memory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): vmAllocatedMemory[vmContext] == NULL");
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): memory is NULL");
 		return;
 	}
 
-	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	if (elementIndex >= memory->elementCount)
 	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		Com_Error(ERR_FATAL, "VM_WriteMemory(): invalid elementIndex");
 		return;
 	}
 
-	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
-		return;
-	}
-
-	if (elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount)
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount");
-		return;
-	}
-
-	memory = vmAllocatedMemory[vmContext][memoryIndex].memory;
-	memory = &memory[elementIndex * vmAllocatedMemory[vmContext][memoryIndex].elementSize];
-
-	memcpy(
-		memory,
+	Com_Memcpy(
+		&memory->memory[elementIndex * memory->elementSize],
 		sourceMemory,
-		vmAllocatedMemory[vmContext][memoryIndex].elementSize
+		memory->elementSize
 	);
 }
 
 void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory)
 {
-	uint8_t *memory;
+	vmAllocatedMemory_t *memory;
+
+	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
+	{
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): invalid memoryIndex");
+		return;
+	}
 
 	if (destinationMemory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): destinationMemory == NULL");
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): destinationMemory is NULL");
 		return;
 	}
 
-	if (vmAllocatedMemory[vmContext] == NULL)
+	if (memory->memory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): vmAllocatedMemory[vmContext] == NULL");
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): memory is NULL");
 		return;
 	}
 
-	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	if (elementIndex >= memory->elementCount)
 	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		Com_Error(ERR_FATAL, "VM_ReadMemory(): invalid elementIndex");
 		return;
 	}
 
-	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
-		return;
-	}
-
-	if (elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount)
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): elementIndex >= vmAllocatedMemory[vmContext][memoryIndex].elementCount");
-		return;
-	}
-
-	memory = vmAllocatedMemory[vmContext][memoryIndex].memory;
-	memory = &memory[elementIndex * vmAllocatedMemory[vmContext][memoryIndex].elementSize];
-
-	memcpy(
+	Com_Memcpy(
 		destinationMemory,
-		memory,
-		vmAllocatedMemory[vmContext][memoryIndex].elementSize
+		&memory->memory[elementIndex * memory->elementSize],
+		memory->elementSize
 	);
 }
 
 uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex)
 {
-	if (vmAllocatedMemory[vmContext] == NULL)
+	vmAllocatedMemory_t *memory;
+
+	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
 	{
-		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): vmAllocatedMemory[vmContext] == NULL");
+		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): invalid memoryIndex");
 		return 0;
 	}
 
-	if (memoryIndex >= vmAllocatedMemoryCount[vmContext])
+	if (memory->memory == NULL)
 	{
-		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): memoryIndex >= vmAllocatedMemoryCount[vmContext]");
+		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): memory is NULL");
 		return 0;
 	}
 
-	if (vmAllocatedMemory[vmContext][memoryIndex].memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): vmAllocatedMemory[vmContext][memoryIndex].memory == NULL");
-		return 0;
-	}
-
-	return vmAllocatedMemory[vmContext][memoryIndex].elementSize;
+	return memory->elementSize;
 }
 
-void VM_ClearMemory(vmContext_t vmContext)
+void VM_ClearMemory(int vmIndex)
 {
-	memtag_t tag;
+	vm_t *vm;
 
-	if (vmAllocatedMemory[vmContext] == NULL)
+	vm = &vmTable[vmIndex];
+
+	if (!vm->name[0])
 	{
 		return;
 	}
 
-	switch (vmContext)
-	{
-	default:
-	case VM_CONTEXT_CGAME:
-		tag = TAG_VM_CGAME;
-		break;
-	case VM_CONTEXT_GAME:
-		tag = TAG_VM_GAME;
-		break;
-	case VM_CONTEXT_UI:
-		tag = TAG_VM_UI;
-		break;
-	}
-
-	Z_TagFree(tag);
-	vmAllocatedMemory[vmContext] = NULL;
-	vmAllocatedMemoryCount[vmContext] = 0;
+	Z_TagFree(vm->memoryTag);
+	vm->allocatedMemory->clear();
+	vm->allocatedMemoryIndex = 0;
 }
