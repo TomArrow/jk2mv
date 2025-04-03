@@ -496,21 +496,27 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if (cl_showMouse->integer) {
 
 		if (cls.showMouse.oldCommandTime != cl.snap.ps.commandTime) {
+			showMouseSample_t* sample;
 			int cmdTimeDelta = cl.snap.ps.commandTime - cls.showMouse.oldCommandTime;
 			int curIndex = cls.showMouse.angleDeltaIndex % SHOWMOUSE_PAST_SAMPLES;
 			if (cls.showMouse.angleDeltaIndex <= 0) {
 				cls.showMouse.angleDeltaIndex = 0;
-				cls.showMouse.angleChangeSpeed[0] = 0;
-				cls.showMouse.angleDelta[0][0] = 0;
-				cls.showMouse.angleDelta[0][1] = 0;
+				sample = &cls.showMouse.samples[0];
+				sample->angleChangeSpeed = 0;
+				sample->angleDelta[0] = 0;
+				sample->angleDelta[1] = 0;
 			}
 			else {
 				float change1, change2, speed;
 				change1 = -AngleSubtract(cl.snap.ps.viewangles[1],cls.showMouse.oldAngle[0]);
 				change2 = AngleSubtract(cl.snap.ps.viewangles[0], cls.showMouse.oldAngle[1]);
-				cls.showMouse.angleDelta[curIndex][0] = change1;
-				cls.showMouse.angleDelta[curIndex][1] = change2;
-				cls.showMouse.angleChangeSpeed[curIndex] = sqrtf(change1*change1+change2*change2)/(float)cmdTimeDelta;
+				sample = &cls.showMouse.samples[curIndex];
+				sample->angleDelta[0] = change1;
+				sample->angleDelta[1] = change2;
+				sample->angleChangeSpeed = sqrtf(change1*change1+change2*change2)/(float)cmdTimeDelta;
+				sample->angleChangeSpeedXY[0] = fabsf(change1)/(float)cmdTimeDelta;
+				sample->angleChangeSpeedXY[1] = fabsf(change2)/(float)cmdTimeDelta;
+				sample->cmdTimeDelta = cmdTimeDelta;
 				cls.showMouse.oldAngle[0] = cl.snap.ps.viewangles[1];
 				cls.showMouse.oldAngle[1] = cl.snap.ps.viewangles[0];
 			}

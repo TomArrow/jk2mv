@@ -22,8 +22,13 @@ cvar_t* cl_drawPS;
 cvar_t* cl_showMouse;
 cvar_t* cl_showMouseScale;
 cvar_t* cl_showMouseYScale;
+cvar_t* cl_showMouseVelocityScale;
+cvar_t* cl_showMouseVelocityYScale;
+cvar_t* cl_showMouseVelocityTimeScale;
 cvar_t* cl_showMouseDecay;
 cvar_t* cl_showMouseFadeExp;
+cvar_t* cl_showMouseVelocityExp;
+cvar_t* cl_showMouseVelocityLog;
 cvar_t* cl_fpsGuess;
 cvar_t* cl_fpsGuessMode;
 cvar_t* cl_fpsGuessMethod2DisplayMode;
@@ -445,8 +450,13 @@ void SCR_Init( void ) {
 	cl_showMouse = Cvar_Get("cl_showMouse", "0", CVAR_ARCHIVE);
 	cl_showMouseScale = Cvar_Get("cl_showMouseScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseYScale = Cvar_Get("cl_showMouseYScale", "2.0", CVAR_ARCHIVE);
+	cl_showMouseVelocityScale = Cvar_Get("cl_showMouseVelocityScale", "150.0", CVAR_ARCHIVE);
+	cl_showMouseVelocityYScale = Cvar_Get("cl_showMouseVelocityYScale", "2.0", CVAR_ARCHIVE);
+	cl_showMouseVelocityTimeScale = Cvar_Get("cl_showMouseVelocityTimeScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseDecay = Cvar_Get("cl_showMouseDecay", "0.95", CVAR_ARCHIVE);
 	cl_showMouseFadeExp = Cvar_Get("cl_showMouseFadeExp", "4.0", CVAR_ARCHIVE);
+	cl_showMouseVelocityExp = Cvar_Get("cl_showMouseVelocityExp", "0.5", CVAR_ARCHIVE);
+	cl_showMouseVelocityLog = Cvar_Get("cl_showMouseVelocityLog", "0", CVAR_ARCHIVE);
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
 	cl_drawPS = Cvar_Get("cl_drawPS", "0", CVAR_TEMP);
 	cl_fpsGuessMode = Cvar_Get("cl_fpsGuessMode", "0", CVAR_ARCHIVE);
@@ -627,13 +637,19 @@ static void SCR_DrawShowMouse() {
 	if (!cl_showMouse->integer || !cls.showMouse.angleDeltaIndex) {
 		return;
 	}
+	showMouseSample_t* sample;
 	static vec4_t lineColorNormal{ 1.0f,1.0f,1.0f,1.0f };
 	static vec4_t lineColorFast{ 1.0f,0.0f,0.0f,1.0f };
 	vec4_t lineColor{ 1.0f,0.0f,0.0f,1.0f };
 	int startIndex = MAX(0,cls.showMouse.angleDeltaIndex - SHOWMOUSE_PAST_SAMPLES); // -1 +1 (-1 because angleDeltaIndex is the next one actually, and +1 to not overflow)
 	float xNow = cls.glconfig.vidWidth*0.5f, yNow = cls.glconfig.vidHeight * 0.5f;
+	float xNowVel = cls.glconfig.vidWidth*0.8, yBaseVel = cls.glconfig.vidHeight * 0.8f;
 	float xScale = cl_showMouseScale->value;
 	float yScale = cl_showMouseScale->value* cl_showMouseYScale->value;
+	float xScaleVelocity = cl_showMouseVelocityScale->value;
+	float yScaleVelocity = cl_showMouseVelocityScale->value* cl_showMouseVelocityYScale->value;
+	const float timeWidth = 5000.0f; // 5 seconds over entire screen width.
+	float millisecondWidth = (float)cls.glconfig.winWidth * 0.8f / timeWidth;
 
 	if (cls.showMouse.oldDrawDeltaIndex) {
 		int compensateStartIndex = MAX(startIndex, cls.showMouse.oldDrawDeltaIndex);
@@ -641,8 +657,9 @@ static void SCR_DrawShowMouse() {
 		float yCompensate = 0;
 		for (int i = compensateStartIndex; i < cls.showMouse.angleDeltaIndex; i++) {
 			int indexHere = i % SHOWMOUSE_PAST_SAMPLES;
-			xCompensate += cls.showMouse.angleDelta[indexHere][0]* xScale;
-			yCompensate += cls.showMouse.angleDelta[indexHere][1]* yScale;
+			sample = &cls.showMouse.samples[indexHere];
+			xCompensate += sample->angleDelta[0]* xScale;
+			yCompensate += sample->angleDelta[1]* yScale;
 		}
 		cls.showMouse.centerOffset[0] += xCompensate;
 		cls.showMouse.centerOffset[1] += yCompensate;
@@ -658,16 +675,31 @@ static void SCR_DrawShowMouse() {
 	for (int i = cls.showMouse.angleDeltaIndex-1; i >= startIndex; i--) {
 		float opacity = 1.0f- (float)(cls.showMouse.angleDeltaIndex - 1 - i)/ (float)(SHOWMOUSE_PAST_SAMPLES-1);
 		int indexHere = i % SHOWMOUSE_PAST_SAMPLES;
-		float speedMult = Com_Clamp(0.0f,1.0f, cls.showMouse.angleChangeSpeed[indexHere]/10.0f);
+		sample = &cls.showMouse.samples[indexHere];
+		float speedMult = Com_Clamp(0.0f,1.0f, sample->angleChangeSpeed/10.0f);
 		opacity = powf(opacity, cl_showMouseFadeExp->value);
 		VectorMA(vec3_origin, speedMult, lineColorFast, lineColor);
 		VectorMA(lineColor, 1.0f-speedMult, lineColorNormal, lineColor);
 		lineColor[3] = opacity;
 		re.SetColor(lineColor);
-		re.DrawLine(xNow, yNow, xNow - cls.showMouse.angleDelta[indexHere][0]*xScale, yNow - cls.showMouse.angleDelta[indexHere][1]*yScale, 2, 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
+		re.DrawLine(xNow, yNow, xNow - sample->angleDelta[0]*xScale, yNow - sample->angleDelta[1]*yScale, 2, 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
+		if (xNowVel > 0.0f) {
+			float segTimeWidth = millisecondWidth * (float)sample->cmdTimeDelta * cl_showMouseVelocityTimeScale->value;
+			float height[2] = {
+				cl_showMouseVelocityLog->integer ? 
+				logf(sample->angleChangeSpeedXY[0] * xScaleVelocity * 1000.0f)
+				: powf(sample->angleChangeSpeedXY[0] * xScaleVelocity * 10.0f,cl_showMouseVelocityExp->value) ,
+				cl_showMouseVelocityLog->integer ?
+				logf(sample->angleChangeSpeedXY[1] * yScaleVelocity * 1000.0f)
+				: powf(sample->angleChangeSpeedXY[1] * yScaleVelocity * 10.0f,cl_showMouseVelocityExp->value)
+			};
+			re.DrawStretchPic(xNowVel - segTimeWidth, yBaseVel - height[0], segTimeWidth, height[0], 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
+			re.DrawStretchPic(xNowVel - segTimeWidth, yBaseVel + 1.0f, segTimeWidth, height[1], 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
+			xNowVel -= segTimeWidth;
+		}
 		re.SetColor(NULL);
-		xNow -= cls.showMouse.angleDelta[indexHere][0]*xScale;
-		yNow -= cls.showMouse.angleDelta[indexHere][1]*yScale;
+		xNow -= sample->angleDelta[0]*xScale;
+		yNow -= sample->angleDelta[1]*yScale;
 	}
 	cls.showMouse.oldDrawDeltaIndex = cls.showMouse.angleDeltaIndex;
 }

@@ -332,6 +332,13 @@ typedef struct fpsGuessMethod3HistorySample_s {
 	float measuredEffectiveGravity;
 } fpsGuessMethod3HistorySample_t;
 
+typedef struct showMouseSample_s {
+	vec2_t		angleDelta;
+	float		angleChangeSpeed;
+	float		angleChangeSpeedXY[2];
+	int			cmdTimeDelta;
+} showMouseSample_t;
+
 typedef struct clientStatic_s {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
@@ -437,8 +444,7 @@ typedef struct clientStatic_s {
 	} fpsGuess;
 
 	struct {
-		vec2_t	angleDelta[SHOWMOUSE_PAST_SAMPLES];
-		float	angleChangeSpeed[SHOWMOUSE_PAST_SAMPLES];
+		showMouseSample_t	samples[SHOWMOUSE_PAST_SAMPLES];
 		int		angleDeltaIndex;
 		vec2_t	oldAngle;
 		int		oldCommandTime;
@@ -526,8 +532,13 @@ extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_showMouse;
 extern	cvar_t	* cl_showMouseScale;
 extern	cvar_t	* cl_showMouseYScale;
+extern	cvar_t	* cl_showMouseVelocityScale;
+extern	cvar_t	* cl_showMouseVelocityYScale;
+extern	cvar_t	* cl_showMouseVelocityTimeScale;
 extern	cvar_t	* cl_showMouseDecay;
 extern	cvar_t	* cl_showMouseFadeExp;
+extern	cvar_t	* cl_showMouseVelocityExp;
+extern	cvar_t	* cl_showMouseVelocityLog;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_drawPS;
 extern	cvar_t	* cl_fpsGuessMode;
