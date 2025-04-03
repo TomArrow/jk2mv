@@ -1323,8 +1323,8 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		case G_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
 			return VM_GetElementSizeFromMemory(args[1]);
 
-		case G_COOL_API_FREE_ALL_MEMORY:
-			VM_FreeAllMemory(VM_CONTEXT_GAME);
+		case G_COOL_API_CLEAR_MEMORY:
+			VM_ClearMemory(VM_CONTEXT_GAME);
 			return 0;
 		}
 	}
@@ -1399,7 +1399,7 @@ void SV_ShutdownGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
-	VM_FreeAllMemory(VM_CONTEXT_GAME);
+	VM_ClearMemory(VM_CONTEXT_GAME);
 	VM_Free( gvm );
 	gvm = NULL;
 	sv.fixes = MVFIX_NONE;
@@ -1472,7 +1472,7 @@ void SV_RestartGameProgs( void ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
-	VM_FreeAllMemory(VM_CONTEXT_GAME);
+	VM_ClearMemory(VM_CONTEXT_GAME);
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );

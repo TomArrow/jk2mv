@@ -77,7 +77,7 @@ void VM_FreeMemory(uint32_t memoryIndex);
 void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory);
 void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory);
 uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex);
-void VM_FreeAllMemory(vmContext_t vmContext);
+void VM_ClearMemory(vmContext_t vmContext);
 
 extern qboolean com_demoplaying;
 

@@ -1613,7 +1613,7 @@ uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex)
 	return vmAllocatedMemory[vmContext][memoryIndex].elementSize;
 }
 
-void VM_FreeAllMemory(vmContext_t vmContext)
+void VM_ClearMemory(vmContext_t vmContext)
 {
 	memtag_t tag;
 

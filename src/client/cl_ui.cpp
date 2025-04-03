@@ -1282,8 +1282,8 @@ Ghoul2 Insert End
 		case UI_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
 			return VM_GetElementSizeFromMemory(args[1]);
 
-		case UI_COOL_API_FREE_ALL_MEMORY:
-			VM_FreeAllMemory(VM_CONTEXT_UI);
+		case UI_COOL_API_CLEAR_MEMORY:
+			VM_ClearMemory(VM_CONTEXT_UI);
 			return 0;
 		}
 	}
@@ -1305,7 +1305,7 @@ void CL_ShutdownUI( void ) {
 		return;
 	}
 	VM_Call( uivm, UI_SHUTDOWN );
-	VM_FreeAllMemory(VM_CONTEXT_UI);
+	VM_ClearMemory(VM_CONTEXT_UI);
 	VM_Free( uivm );
 	uivm = NULL;
 }

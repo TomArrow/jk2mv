@@ -812,7 +812,7 @@ void CL_ShutdownCGame( void ) {
 		return;
 	}
 	VM_Call( cgvm, CG_SHUTDOWN );
-	VM_FreeAllMemory(VM_CONTEXT_CGAME);
+	VM_ClearMemory(VM_CONTEXT_CGAME);
 	VM_Free( cgvm );
 	cgvm = NULL;
 	cls.fixes = MVFIX_NONE;
@@ -1769,8 +1769,8 @@ Ghoul2 Insert End
 		case CG_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
 			return VM_GetElementSizeFromMemory(args[1]);
 
-		case CG_COOL_API_FREE_ALL_MEMORY:
-			VM_FreeAllMemory(VM_CONTEXT_CGAME);
+		case CG_COOL_API_CLEAR_MEMORY:
+			VM_ClearMemory(VM_CONTEXT_CGAME);
 			return 0;
 		}
 	}
