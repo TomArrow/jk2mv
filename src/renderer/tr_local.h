@@ -1877,6 +1877,16 @@ typedef struct {
 	int		commandId;
 	shader_t	*shader;
 	float	x, y;
+	float	x2, y2;
+	float	width;
+	float	s1, t1;
+	float	s2, t2;
+} drawLineCommand_t;
+
+typedef struct {
+	int		commandId;
+	shader_t	*shader;
+	float	x, y;
 	float	m[2][2];
 	float	s1, t1;
 	float	s2, t2;
@@ -1917,6 +1927,7 @@ typedef enum {
 	RC_WORLD_EFFECTS,
 	RC_GAMMA_CORRECTION,
 	RC_READ_PIXELS,
+	RC_DRAW_LINE,
 } renderCommand_t;
 
 
@@ -1959,6 +1970,8 @@ void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 void RE_SetColor( const vec4_t rgba );
 void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,
 	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust );
+void RE_DrawLine(float x, float y, float x2, float y2, float width, float s1, float t1,
+	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust);
 void RE_RotatePic ( float x, float y, float w, float h, float s1, float t1,
 	float s2, float t2,float a, qhandle_t hShader, float xadjust, float yadjust );
 void RE_RotatePic2 ( float x, float y, float w, float h, float s1, float t1,

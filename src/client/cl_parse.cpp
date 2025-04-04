@@ -493,6 +493,38 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		VectorCopy(cl.snap.ps.velocity, lastVelocity);
 	}
 
+	if (cl_showMouse->integer) {
+
+		if (cls.showMouse.oldCommandTime != cl.snap.ps.commandTime) {
+			showMouseSample_t* sample;
+			int cmdTimeDelta = cl.snap.ps.commandTime - cls.showMouse.oldCommandTime;
+			int curIndex = cls.showMouse.angleDeltaIndex % SHOWMOUSE_PAST_SAMPLES;
+			if (cls.showMouse.angleDeltaIndex <= 0) {
+				cls.showMouse.angleDeltaIndex = 0;
+				sample = &cls.showMouse.samples[0];
+				sample->angleChangeSpeed = 0;
+				sample->angleDelta[0] = 0;
+				sample->angleDelta[1] = 0;
+			}
+			else {
+				float change1, change2, speed;
+				change1 = -AngleSubtract(cl.snap.ps.viewangles[1],cls.showMouse.oldAngle[0]);
+				change2 = AngleSubtract(cl.snap.ps.viewangles[0], cls.showMouse.oldAngle[1]);
+				sample = &cls.showMouse.samples[curIndex];
+				sample->angleDelta[0] = change1;
+				sample->angleDelta[1] = change2;
+				sample->angleChangeSpeed = sqrtf(change1*change1+change2*change2)/(float)cmdTimeDelta;
+				sample->angleChangeSpeedXY[0] = fabsf(change1)/(float)cmdTimeDelta;
+				sample->angleChangeSpeedXY[1] = fabsf(change2)/(float)cmdTimeDelta;
+				sample->cmdTimeDelta = cmdTimeDelta;
+				cls.showMouse.oldAngle[0] = cl.snap.ps.viewangles[1];
+				cls.showMouse.oldAngle[1] = cl.snap.ps.viewangles[0];
+			}
+			cls.showMouse.angleDeltaIndex++;
+			cls.showMouse.oldCommandTime = cl.snap.ps.commandTime;
+		}
+	}
+
 	if (cl_fpsGuess->integer) {
 		// FPS guessing
 		qboolean isMovementDown = (qboolean)(cl.snap.ps.origin[2] < cls.fpsGuess.lastPosition[2]);
