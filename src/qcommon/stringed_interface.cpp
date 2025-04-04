@@ -22,7 +22,6 @@
 #include "stringed_ingame.h"
 
 #include <string>
-using namespace std;
 
 #ifdef _STRINGED
 #include <stdlib.h>
@@ -126,7 +125,7 @@ void SE_FreeFileDataAfterLoad( unsigned char *psLoadedFile )
 // quake-style method of doing things since their file-list code doesn't have a 'recursive' flag...
 //
 int giFilesFound;
-static void SE_R_ListFiles( const char *psExtension, const char *psDir, string &strResults )
+static void SE_R_ListFiles( const char *psExtension, const char *psDir, std::string &strResults )
 {
 //	Com_Printf(va("Scanning Dir: %s\n",psDir));
 
@@ -139,7 +138,7 @@ static void SE_R_ListFiles( const char *psExtension, const char *psDir, string &
 		if (dirFiles[i][0] && dirFiles[i][0] != '.')	// skip blanks, plus ".", ".." etc
 		{
 			char	sDirName[MAX_QPATH];
-			sprintf(sDirName, "%s/%s", psDir, dirFiles[i]);
+			Com_sprintf(sDirName,sizeof(sDirName), "%s/%s", psDir, dirFiles[i]);
 			//
 			// for some reason the quake filesystem in this game now returns an extra slash on the end,
 			//	didn't used to. Sigh...
@@ -186,7 +185,7 @@ static void SE_R_ListFiles( const char *psExtension, const char *psDir, string &
 //
 // expected result is a ';'-delineated string (including last one) containing file-list search results
 //
-int SE_BuildFileList( const char *psStartDir, string &strResults )
+int SE_BuildFileList( const char *psStartDir, std::string &strResults )
 {
 #ifndef _STRINGED
 	giFilesFound = 0;
@@ -198,7 +197,7 @@ int SE_BuildFileList( const char *psStartDir, string &strResults )
 #else
 	// .ST files...
 	//
-	int iFilesFound = BuildFileList(	va("%s\\*%s",psStartDir, sSE_INGAME_FILE_EXTENSION),	// LPCSTR psPathAndFilter, 
+	int iFilesFound = BuildFileList(	va("%s\\*%s",psStartDir, sSE_INGAME_FILE_EXTENSION),	// const char* psPathAndFilter, 
 										true					// bool bRecurseSubDirs
 										);
 
