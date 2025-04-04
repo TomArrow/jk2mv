@@ -401,6 +401,10 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 		code = ERR_FATAL;
 	}
 
+	if ( com_dedicated != NULL && com_dedicated->integer ) {
+		code = ERR_FATAL;
+	}
+
 #ifndef DEDICATED
 	clRenderInfo.wallhackOk = qtrue;
 #endif
