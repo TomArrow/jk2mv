@@ -184,7 +184,10 @@ void Q_NORETURN QDECL Sys_Error(const char *error, ...) {
 	// server binary is meant to be a command line program so you would
 	// expect to see the error printed.
 #if !defined(DEDICATED)
-	Sys_ErrorDialog(string);
+	if (com_dedicated == NULL || !com_dedicated->integer)
+	{
+		Sys_ErrorDialog(string);
+	}
 #endif
 
 	Sys_Exit(3);
