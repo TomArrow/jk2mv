@@ -142,6 +142,8 @@ static qboolean	rd_silent;
 static char		*rd_buffer;
 static size_t	rd_buffersize;
 static void		(*rd_flush)( char *buffer );
+static char	com_errorMessage[MAXPRINTMSG];
+static errorParm_t com_errorCode;
 
 void Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)( char *), qboolean silent)
 {
@@ -348,6 +350,37 @@ void QDECL Com_OPrintf( const char *fmt, ...)
 #endif
 }
 
+void Com_CatchError(void)
+{
+	switch (com_errorCode) {
+	case ERR_SERVERDISCONNECT:
+		VM_Forced_Unload_Start();
+		CL_Disconnect(qtrue);
+		CL_FlushMemory(qtrue);
+		VM_Forced_Unload_Done();
+		com_errorEntered = qfalse;
+		Com_EndRedirect();
+		break;
+	case ERR_DROP:
+		Com_Printf("********************\n");
+		Com_Printf("ERROR: %s\n", com_errorMessage);
+		Sys_PrintBacktrace();
+		Com_Printf("********************\n");
+		// fallthrough
+	case ERR_DISCONNECT:
+		VM_Forced_Unload_Start();
+		SV_Shutdown(va("Server crashed: %s", com_errorMessage));
+		CL_Disconnect(qtrue);
+		CL_FlushMemory(qtrue);
+		VM_Forced_Unload_Done();
+		com_errorEntered = qfalse;
+		Com_EndRedirect();
+		break;
+	default:
+		break;
+	}
+}
+
 /*
 =============
 Com_Error
@@ -357,7 +390,6 @@ do the apropriate things.
 =============
 */
 Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
-	static char	com_errorMessage[MAXPRINTMSG];
 	va_list		argptr;
 	static int	lastErrorTime;
 	static int	errorCount;
@@ -365,7 +397,7 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 
 	// when we are running automated scripts, make sure we
 	// know if anything failed
-	if ( com_buildScript && com_buildScript->integer ) {
+	if ( com_buildScript != NULL && com_buildScript->integer ) {
 		code = ERR_FATAL;
 	}
 
@@ -401,31 +433,13 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 		Cvar_Set("com_errorMessage", com_errorMessage);
 	}
 
+	com_errorCode = code;
+
 	switch (code) {
 	case ERR_SERVERDISCONNECT:
-		VM_Forced_Unload_Start();
-		CL_Disconnect( qtrue );
-		CL_FlushMemory( qtrue );
-		VM_Forced_Unload_Done();
-		com_errorEntered = qfalse;
-		Com_EndRedirect();
-		longjmp(abortframe, -1);
-		break;
 	case ERR_DROP:
-		Com_Printf("********************\n");
-		Com_Printf("ERROR: %s\n", com_errorMessage);
-		Sys_PrintBacktrace();
-		Com_Printf("********************\n");
-		// fallthrough
 	case ERR_DISCONNECT:
-		VM_Forced_Unload_Start();
-		SV_Shutdown (va("Server crashed: %s",  com_errorMessage));
-		CL_Disconnect( qtrue );
-		CL_FlushMemory( qtrue );
-		VM_Forced_Unload_Done();
-		com_errorEntered = qfalse;
-		Com_EndRedirect();
-		longjmp(abortframe, -1);
+		longjmp(abortframe, 1);
 	default:
 		VM_Forced_Unload_Start();
 		CL_Shutdown ();
@@ -2571,7 +2585,7 @@ void Com_Init( char *commandLine ) {
 
 	Com_Printf( "%s %s %s\n", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 
-	if (setjmp(abortframe)) {
+	if (setjmp(abortframe) > 0) {
 		Sys_Error("Error during initialization\n");
 	}
 
@@ -2990,7 +3004,8 @@ void Com_Frame( void ) {
 	int timeBeforeClient = 0;
 	int timeAfter = 0;
 
-	if (setjmp(abortframe)) {
+	if (setjmp(abortframe) > 0) {
+		Com_CatchError();
 		return;			// an ERR_DROP was thrown
 	}
 
