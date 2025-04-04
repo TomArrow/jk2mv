@@ -33,7 +33,6 @@ and one exported function: Perform
 
 */
 
-#include <unordered_map>
 #include "vm_local.h"
 
 
@@ -45,8 +44,6 @@ int		vm_debugLevel;
 #define MAX_APINUM	1000
 qboolean vm_profileInclusive;
 static vmSymbol_t nullSymbol;
-
-static std::unordered_map<uint32_t, vmAllocatedMemory_t> vmAllocatedMemory[MAX_VM];
 
 // used by Com_Error to get rid of running vm's before longjmp
 static int forced_unload;
@@ -719,15 +716,7 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 
 	vm->mvmenu = 0;
 	vm->index = i;
-	vm->memoryTag = (memtag_t) (TAG_VM_0 + vm->index);
 
-	if (vm->memoryTag > TAG_VM_2)
-	{
-		Com_Error(ERR_FATAL, "VM_Create(): failed to set memory tag");
-	}
-
-	vm->allocatedMemory = &vmAllocatedMemory[vm->index];
-	VM_ClearMemory(vm->index);
 	FixGhoul2InfoLeaks(vm->index);
 
 	if (interpret == VMI_NATIVE) {
@@ -821,7 +810,6 @@ void VM_Free( vm_t *vm ) {
 
 	if (vm->name[0])
 	{
-		VM_ClearMemory(vm->index);
 		FixGhoul2InfoLeaks(vm->index);
 	}
 
@@ -1372,229 +1360,4 @@ mvversion_t VM_GetGameversion(const vm_t *vm) {
 
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
 	vm->gameversion = gameversion;
-}
-
-qboolean VM_GetMemoryFromIndex(uint32_t memoryIndex, vmAllocatedMemory_t **memory)
-{
-	vm_t *vm = &vmTable[vm_currentIndex];
-	auto iter = vm->allocatedMemory->find(memoryIndex);
-
-	if (iter == vm->allocatedMemory->end())
-	{
-		return qfalse;
-	}
-
-	*memory = &iter->second;
-	return qtrue;
-}
-
-qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_t elementSize)
-{
-	uint32_t index;
-	vmAllocatedMemory_t memory;
-	vm_t *vm = &vmTable[vm_currentIndex];
-
-	if (memoryIndex == NULL)
-	{
-		return qfalse;
-	}
-
-	*memoryIndex = 0;
-	index = vm->allocatedMemoryIndex;
-
-	if (index == UINT32_MAX)
-	{
-		return qfalse;
-	}
-
-	if (CanMultiplicationOverflowUInt32(elementCount, elementSize))
-	{
-		return qfalse;
-	}
-
-	if ((elementCount * elementSize) >= INT_MAX)
-	{
-		return qfalse;
-	}
-
-	memory.elementCount = elementCount;
-	memory.elementSize = elementSize;
-	memory.memory = (uint8_t *) Z_Malloc(elementCount * elementSize, vm->memoryTag, qtrue);
-
-	if (memory.memory == NULL)
-	{
-		return qfalse;
-	}
-
-	vm->allocatedMemory->insert({index, memory});
-	*memoryIndex = index;
-	vm->allocatedMemoryIndex++;
-
-	return qtrue;
-}
-
-qboolean VM_ReallocateMemory(uint32_t memoryIndex, uint32_t elementCount)
-{
-	vmAllocatedMemory_t *memory;
-
-	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): invalid memoryIndex");
-		return qfalse;
-	}
-
-	if (memory->memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): memory is NULL");
-		return qfalse;
-	}
-
-	if (CanMultiplicationOverflowUInt32(memory->elementSize, elementCount))
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): uint32_t overflow");
-		return qfalse;
-	}
-
-	if ((memory->elementSize * elementCount) >= INT_MAX)
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): int overflow");
-		return qfalse;
-	}
-
-	memory->memory = (uint8_t *) Z_Realloc(
-		memory->memory,
-		memory->elementSize * elementCount,
-		qtrue
-	);
-
-	if (memory->memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_ReallocateMemory(): reallocation failed");
-		return qfalse;
-	}
-
-	return qtrue;
-}
-
-void VM_FreeMemory(uint32_t memoryIndex)
-{
-	vm_t *vm = &vmTable[vm_currentIndex];
-	vmAllocatedMemory_t *memory;
-
-	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
-	{
-		Com_Error(ERR_FATAL, "VM_FreeMemory(): invalid memoryIndex");
-		return;
-	}
-
-	memory->elementCount = 0;
-	memory->elementSize = 0;
-	Z_Free(memory->memory);
-	memory->memory = NULL;
-	vm->allocatedMemory->erase(memoryIndex);
-}
-
-void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory)
-{
-	vmAllocatedMemory_t *memory;
-
-	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): invalid memoryIndex");
-		return;
-	}
-
-	if (sourceMemory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): sourceMemory is NULL");
-		return;
-	}
-
-	if (memory->memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): memory is NULL");
-		return;
-	}
-
-	if (elementIndex >= memory->elementCount)
-	{
-		Com_Error(ERR_FATAL, "VM_WriteMemory(): invalid elementIndex");
-		return;
-	}
-
-	Com_Memcpy(
-		&memory->memory[elementIndex * memory->elementSize],
-		sourceMemory,
-		memory->elementSize
-	);
-}
-
-void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory)
-{
-	vmAllocatedMemory_t *memory;
-
-	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): invalid memoryIndex");
-		return;
-	}
-
-	if (destinationMemory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): destinationMemory is NULL");
-		return;
-	}
-
-	if (memory->memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): memory is NULL");
-		return;
-	}
-
-	if (elementIndex >= memory->elementCount)
-	{
-		Com_Error(ERR_FATAL, "VM_ReadMemory(): invalid elementIndex");
-		return;
-	}
-
-	Com_Memcpy(
-		destinationMemory,
-		&memory->memory[elementIndex * memory->elementSize],
-		memory->elementSize
-	);
-}
-
-uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex)
-{
-	vmAllocatedMemory_t *memory;
-
-	if (!VM_GetMemoryFromIndex(memoryIndex, &memory))
-	{
-		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): invalid memoryIndex");
-		return 0;
-	}
-
-	if (memory->memory == NULL)
-	{
-		Com_Error(ERR_FATAL, "VM_GetElementSizeFromMemory(): memory is NULL");
-		return 0;
-	}
-
-	return memory->elementSize;
-}
-
-void VM_ClearMemory(int vmIndex)
-{
-	vm_t *vm;
-
-	vm = &vmTable[vmIndex];
-
-	if (!vm->name[0])
-	{
-		return;
-	}
-
-	Z_TagFree(vm->memoryTag);
-	vm->allocatedMemory->clear();
-	vm->allocatedMemoryIndex = 0;
 }

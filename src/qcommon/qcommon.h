@@ -62,13 +62,6 @@ int FloatAsInt( float f );
 qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize);
 int Com_GetNumLanguages(void);
 void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize);
-qboolean VM_AllocateMemory(uint32_t *memoryIndex, uint32_t elementCount, uint32_t elementSize);
-qboolean VM_ReallocateMemory(uint32_t memoryIndex, uint32_t elementCount);
-void VM_FreeMemory(uint32_t memoryIndex);
-void VM_WriteMemory(uint32_t memoryIndex, uint32_t elementIndex, const uint8_t *sourceMemory);
-void VM_ReadMemory(uint32_t memoryIndex, uint32_t elementIndex, uint8_t *destinationMemory);
-uint32_t VM_GetElementSizeFromMemory(uint32_t memoryIndex);
-void VM_ClearMemory(int vmIndex);
 
 extern qboolean com_demoplaying;
 
@@ -886,9 +879,6 @@ qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
 uint32_t FS_GetFileVersion(const char *fileName, module_t module);
-qboolean FS_CreateFileList(uint32_t *listIndex, const char *path, const char *extension, const char *filter, uint32_t *filesCount);
-void FS_CloseFileList(uint32_t listIndex);
-void FS_ReadFromFileList(uint32_t listIndex, uint32_t fileIndex, char *destinationFileName, uint32_t destinationSize);
 
 
 /*
@@ -1067,7 +1057,6 @@ int   Z_MemSize	( memtag_t eTag );
 void  Z_TagFree	( memtag_t eTag );
 void  Z_Free	( void *ptr );
 int	  Z_Size	( void *pvAddress);
-void *Z_Realloc(void *pvAddress, int iNewSize, qboolean bZeroit);
 void Com_ShutdownZoneMemory(void);
 
 void Hunk_Clear( void );

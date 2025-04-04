@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include <unordered_map>
 #include "qcommon.h"
 #include "qfiles.h"
 #include <stdint.h>
@@ -144,13 +143,6 @@ typedef struct vmSymbol_s {
 	char	symName[1];		// variable sized
 } vmSymbol_t;
 
-struct vmAllocatedMemory_t
-{
-	uint32_t elementCount;
-	uint32_t elementSize;
-	uint8_t *memory;
-};
-
 #define	VM_OFFSET_PROGRAM_STACK		0
 #define	VM_OFFSET_SYSTEM_CALL		4
 
@@ -205,11 +197,7 @@ struct vm_s {
 	mvversion_t	gameversion;
 
 	int			coolApiSupport;
-
-	std::unordered_map<uint32_t, vmAllocatedMemory_t> *allocatedMemory;
-	uint32_t allocatedMemoryIndex;
-	memtag_t memoryTag;
-	int index;
+	int			index;
 };
 
 extern	vm_t	*currentVM;

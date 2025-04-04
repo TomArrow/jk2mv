@@ -1178,20 +1178,3 @@ int clampedIntAdd(int a, int b) {
 
 	return a + b;
 }
-
-qboolean CanMultiplicationOverflowUInt32(uint32_t a, uint32_t b)
-{
-	if (a == 0 || b == 0)
-	{
-		return qfalse;
-	}
-
-	if (a > UINT32_MAX / b)
-	{
-		return qtrue;
-	}
-	else
-	{
-		return qfalse;
-	}
-}

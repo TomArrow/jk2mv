@@ -2438,6 +2438,4 @@ int safeatoi(const char* nptr, char** endptr, int base, int* error);
 int clampedIntMult(int a, int b);
 int clampedIntAdd(int a, int b);
 
-qboolean CanMultiplicationOverflowUInt32(uint32_t a, uint32_t b);
-
 #endif	// __Q_SHARED_H

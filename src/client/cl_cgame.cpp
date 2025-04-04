@@ -1731,42 +1731,6 @@ Ghoul2 Insert End
 
 		case CG_COOL_API_GET_FILE_LIST:
 			return FS_GetFileList(VMAS(1), VMAS(2), VMAP(3, char, args[4]), args[4]);
-
-		case CG_COOL_API_CREATE_FILE_LIST:
-			return FS_CreateFileList(VMAV(1, uint32_t), VMAS(2), VMAS(3), VMAS(4), VMAV(5, uint32_t));
-
-		case CG_COOL_API_CLOSE_FILE_LIST:
-			FS_CloseFileList(args[1]);
-			return 0;
-
-		case CG_COOL_API_READ_FROM_FILE_LIST:
-			FS_ReadFromFileList(args[1], args[2], VMAP(3, char, args[4]), args[4]);
-			return 0;
-
-		case CG_COOL_API_ALLOCATE_MEMORY:
-			return VM_AllocateMemory(VMAV(1, uint32_t), args[2], args[3]);
-
-		case CG_COOL_API_REALLOCATE_MEMORY:
-			return VM_ReallocateMemory(args[1], args[2]);
-
-		case CG_COOL_API_FREE_MEMORY:
-			VM_FreeMemory(args[1]);
-			return 0;
-
-		case CG_COOL_API_WRITE_MEMORY:
-			VM_WriteMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
-			return 0;
-
-		case CG_COOL_API_READ_MEMORY:
-			VM_ReadMemory(args[1], args[2], VMAIV(3, uint8_t, VM_GetElementSizeFromMemory(args[1])));
-			return 0;
-
-		case CG_COOL_API_GET_ELEMENT_SIZE_FROM_MEMORY:
-			return VM_GetElementSizeFromMemory(args[1]);
-
-		case CG_COOL_API_CLEAR_MEMORY:
-			VM_ClearMemory(vm_currentIndex);
-			return 0;
 		}
 	}
 
