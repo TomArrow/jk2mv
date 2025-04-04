@@ -1,0 +1,364 @@
+// In Game HUD 
+// 
+// defines from ui_shared.h
+
+{
+	menuDef 
+	{
+		name					"mainhud"
+		fullScreen				0						// MENU_FALSE
+		rect					0 0 640 480					// Size and position of the menu
+		visible					1					// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+		descX					320
+		descY					434
+		descColor				.96 .933 .40 1				// Focus color for text and items
+	}
+
+	//	LEFT SIDE HUD - contains the armor and health
+	//
+	menuDef 
+	{
+		name					"lefthud"
+		fullScreen				0						// MENU_FALSE
+		rect					0 368 112 112				// Size and position of the menu
+		visible				1						// Visible on open
+
+		// Metal Frame
+		itemDef 
+		{
+			name				"frame"
+			forecolor			1 1 1 1
+			background			"gfx/hud/hudleft_jka"
+			rect				0 0 112 112				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+
+		// Health tics
+		itemDef 
+		{
+			name				health_tic1
+			background			"gfx/hud/health_tic_1"
+			forecolor			1 1 1 1
+			rect				20 24 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				health_tic2
+			background			"gfx/hud/health_tic_2"
+			forecolor			1 1 1 1
+			rect				38 33 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				health_tic3
+			background			"gfx/hud/health_tic_3"
+			forecolor			1 1 1 1
+			rect				52 47 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				health_tic4
+			background			"gfx/hud/health_tic_4"
+			forecolor			1 1 1 1
+			rect				60 65 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		// Armor tics
+		itemDef 
+		{
+			name				armor_tic1
+			background			"gfx/hud/armor_tic_1"
+			forecolor			1 1 1 1
+			rect				9 -6 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				armor_tic2
+			background			"gfx/hud/armor_tic_2"
+			forecolor			1 1 1 1
+			rect				34 3 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				armor_tic3
+			background			"gfx/hud/armor_tic_3"
+			forecolor			1 1 1 1
+			rect				54 24 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				armor_tic4
+			background			"gfx/hud/armor_tic_4"
+			forecolor			1 1 1 1
+			rect				63 48 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		// Scan line
+//		itemDef 
+//		{
+//			name				scanline
+//			group				none
+//			background			"gfx/hud/hudleft_scanline"
+//			forecolor			1 1 1 1
+//			rect				23 8 80 80			// (these positions are relative to the initial position of the menu) 
+//												// X pos, Y pos, char size, char height
+//			visible			1
+//		}		
+
+		// Numeric counter for armor
+		itemDef 
+		{
+			name				armoramount
+			group				none
+			forecolor			0.0 .613 .097 1
+			rect				85 98 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+			visible			1
+		}		
+
+		// Numeric counter for health
+		itemDef 
+		{
+			name				healthamount
+			group				none
+			forecolor			.835 .015 .015 1
+			rect				59 98 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}
+	}
+
+	//	RIGHT SIDE HUD - contains force and ammo amounts
+	//
+	menuDef 
+	{
+		name					"righthud"
+		fullScreen				0						// MENU_FALSE
+		rect					640 368 -112 112				// Size and position of the menu
+		visible				1						// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+		appearanceIncrement		75						// In miliseconds
+		descX					320
+		descY					434
+		descColor				.96 .933 .40 1				// Focus color for text and items
+
+		// Scan line
+//		itemDef 
+//		{
+//			name				scanline
+//			group				none
+//			background			"gfx/hud/hudleft_scanline"
+//			forecolor			1 1 1 1
+//			rect				-23 8 -80 80			// (these positions are relative to the initial position of the menu) 
+//												// X pos, Y pos, char size, char height
+//		}		
+
+		// Metal Frame
+		itemDef 
+		{
+			name				"frame"
+			forecolor			1 1 1 1
+			background			"gfx/hud/hudleft_jka"
+			rect				0 0 -112 112			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+
+		// Ammo tics
+		itemDef 
+		{
+			name				ammo_tic1
+			background			"gfx/hud/ammo_tic_1"
+			forecolor			1 1 1 1
+			rect				-48  25 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				ammo_tic2
+			background			"gfx/hud/ammo_tic_2"
+			forecolor			1 1 1 1
+			rect				-66  33 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				ammo_tic3
+			background			"gfx/hud/ammo_tic_3"
+			forecolor			1 1 1 1
+			rect				-80  47 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				ammo_tic4
+			background			"gfx/hud/ammo_tic_4"
+			forecolor			1 1 1 1
+			rect				-88  65 28 28			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		// Force tics
+		itemDef 
+		{
+			name				force_tic1
+			background			"gfx/hud/force_tic_1"
+			forecolor			1 1 1 1
+			rect				-65  -5 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				force_tic2
+			background			"gfx/hud/force_tic_2"
+			forecolor			1 1 1 1
+			rect				-89  4 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				force_tic3
+			background			"gfx/hud/force_tic_3"
+			forecolor			1 1 1 1
+			rect				-109  24 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+		itemDef 
+		{
+			name				force_tic4
+			background			"gfx/hud/force_tic_4"
+			forecolor			1 1 1 1
+			rect				-119  48 56 56			// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, graphic size, graphic height
+		}		
+
+
+		// Numeric counter for force
+		itemDef 
+		{
+			name				forceamount
+			group				none
+			rect				-109 98 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+			forecolor			.359 .524 .722 1
+		}		
+
+		// Numeric counter for ammo
+		itemDef 
+		{
+			name				ammoamount
+			group				none
+			rect				-83 98 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+			forecolor			1.0 .658 .062 1
+		}		
+
+		// When ammo is infinite (used in MP)
+		itemDef 
+		{
+			name				ammoinfinite
+			group				none
+			rect				-75 87 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+			forecolor			1.0 .658 .062 1
+		}		
+
+
+		// Saber style graphics
+		itemDef 
+		{
+			name				saberstyle_strong
+			background			"gfx/hud/saber_strong"
+			forecolor			1 1 1 1
+			rect				-49 24 26 26				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+		itemDef 
+		{
+			name				saberstyle_medium
+			background			"gfx/hud/saber_med"
+			forecolor			1 1 1 1
+			rect				-70 43 26 26				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+		itemDef 
+		{
+			name				saberstyle_fast
+			background			"gfx/hud/saber_fast"
+			forecolor			1 1 1 1
+			rect				-85 69 24 24				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+		// Tells current score of game
+		itemDef 
+		{
+			name				score_line
+			forecolor			1 1 1 1
+			rect				-150 92 6 12				// (these positions are relative to the initial position of the menu) 
+												// X pos, Y pos, char size, char height
+		}		
+
+	}
+
+	menuDef 
+	{
+		name					"weaponselecthud"
+		fullScreen				0						// MENU_FALSE
+		rect					30 410 0 0					// Size and position of the menu
+		visible				1						// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+	}
+
+	menuDef 
+	{
+		name					"forceselecthud"
+		fullScreen				0						// MENU_FALSE
+		rect					30 410 0 0					// Size and position of the menu
+		visible				1						// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+	}
+
+	menuDef 
+	{
+		name					"inventoryselecthud"
+		fullScreen				0						// MENU_FALSE
+		rect					30 410 0 0					// Size and position of the menu
+		visible				1						// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+	}
+
+
+	// Used as background for the Weapon, Force Powers, and Inventory HUDs
+	menuDef 
+	{
+		name					"iconbackground"
+		fullScreen				0						// MENU_FALSE
+		rect					90 440 460 60				// Size and position of the menu
+		visible				1						// Visible on open
+		focusColor				1 1 1 1					// Focus color for text and items
+	}
+}

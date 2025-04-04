@@ -1693,31 +1693,6 @@ const char *SP_GetStringTextString(const char *Reference)
 	return SP_GetStringText(index);
 }
 
-const qboolean SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize)
-{
-	if (dstsize <= 0)
-	{
-		return qfalse;
-	}
-
-	int index = SP_GetStringID(Reference);
-
-	if (index != -1)
-	{
-		cStringsSingle	*string = SP_GetString(index);;
-		char			*value = string->GetText();;
-
-		if (value)
-		{
-			Q_strncpyz(dst, value, dstsize);
-			return qtrue;
-		}
-	}
-
-	Q_strncpyz(dst, "??", dstsize);
-	return qfalse;
-}
-
 static void SP_UpdateLanguage(void)
 {
 	std::map<unsigned char, cStringPackageSingle *>::iterator	it;
@@ -1773,6 +1748,32 @@ void SP_CheckForLanguageUpdates(void)
 	}
 }
 
+const char *SP_GetLanguageStringFromNumber(int language)
+{
+	switch (language)
+	{
+	case SP_LANGUAGE_ENGLISH:
+		return "english";
+	case SP_LANGUAGE_FRENCH:
+		return "french";
+	case SP_LANGUAGE_GERMAN:
+		return "german";
+	case SP_LANGUAGE_BRITISH:
+		return "british";
+	case SP_LANGUAGE_KOREAN:
+		return "korean";
+	case SP_LANGUAGE_TAIWANESE:
+		return "taiwanese";
+	case SP_LANGUAGE_ITALIAN:
+		return "italian";
+	case SP_LANGUAGE_SPANISH:
+		return "spanish";
+	case SP_LANGUAGE_JAPANESE:
+		return "japanese";
+	default:
+		return "english";
+	}
+}
 
 int Language_GetIntegerValue(void)
 {

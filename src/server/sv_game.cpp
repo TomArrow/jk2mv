@@ -372,7 +372,6 @@ SV_GameSystemCalls
 The module is making a system call
 ====================
 */
-extern bool RicksCrazyOnServer;
 intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -381,9 +380,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			args[0]++;
 		}
 	}
-
-	// set game ghoul2 context
-	RicksCrazyOnServer = true;
 
 	switch( args[0] ) {
 	case G_PRINT:
@@ -540,7 +536,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case SP_REGISTER_SERVER_CMD:
 		return SP_RegisterServer( VMAS(1) );
 	case SP_GETSTRINGTEXTSTRING:
-		return SP_VMGetStringText( VMAS(1), VMAP(2, char, args[3]), args[3] );
+		return Com_GetLocalizedString( VMAS(1), VMAP(2, char, args[3]), args[3] );
 
 	case G_ROFF_CLEAN:
 		return theROFFSystem.Clean(qfalse);
@@ -996,16 +992,16 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1264,6 +1260,36 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 	}
 
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
+		switch (args[0]) {
+		case G_COOL_API_GET_NUM_LANGUAGES:
+			return Com_GetNumLanguages();
+
+		case G_COOL_API_GET_LANGUAGE_NAME:
+			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
+			return 0;
+
+		case G_COOL_API_GIVE_ME_VECTOR_FROM_MATRIX:
+			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
+			return 0;
+
+		case G_COOL_API_SET_SKIN:
+			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
+
+		case G_COOL_API_SKINLESS_MODEL:
+			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
+
+		case G_COOL_API_GET_SURFACE_RENDER_STATUS:
+			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
+
+		case G_COOL_API_ATTACH_G2_MODEL:
+			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
+
+		case G_COOL_API_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_GAME);
+		}
+	}
+
 	if (VM_MVAPILevel(gvm) >= 1) {
 		switch (args[0]) {
 		case G_MVAPI_LOCATE_GAME_DATA:
@@ -1347,12 +1373,9 @@ SV_InitGameVM
 Called for both a full init and a restart
 ==================
 */
-extern void FixGhoul2InfoLeaks(bool);
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
-
-	FixGhoul2InfoLeaks(true);
 
 	// clear physics interaction links
 	SV_ClearWorld ();

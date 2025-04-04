@@ -3146,11 +3146,11 @@ void R_LoadImage( const char *shortname, byte **pic, int *width, int *height, pi
 		}
 		if (!*pic) {
 			R_ImageExtension(name, sizeof(name), shortname, ".png", forceExtension);
-			LoadJPG( name, pic, width, height, format, qfalse);           
+			LoadPNG( name, pic, width, height, format, qfalse);           
 		}
 		if (!*pic) {
 			R_ImageExtension(name, sizeof(name), shortname, ".tga", forceExtension);
-			LoadJPG( name, pic, width, height, format, qfalse);            
+			LoadTGA( name, pic, width, height, format, qfalse);            
 		}
 		if (*pic && forceExtension) {
 			Com_Printf("^3R_LoadImage: '%s' was loaded with forceExtension %d (r_imageLoadDotFix). If this is part of your mod, consider changing the name for backwards JK2 compatibility.\n", shortname,forceExtension);
@@ -4016,64 +4016,16 @@ qhandle_t RE_RegisterIndividualSkin( const char *name , qhandle_t hSkin)
 		// parse the shader name
 		token = CommaParse( &text_p );
 
-		if ( r_loadSkinsJKA->integer == 2 && !strcmp( &surfName[strlen(surfName)-4], "_off") )
-		{
-			if ( !strcmp( token ,"*off" ) )
-			{
-				continue;	//don't need these double offs
-			}
-			surfName[strlen(surfName)-4] = 0;	//remove the "_off"
-		}
 		if ( ARRAY_LEN(skin->surfaces) <= (unsigned)skin->numSurfaces )
 		{
 			assert( ARRAY_LEN(skin->surfaces) > (unsigned)skin->numSurfaces );
 			ri.Printf( PRINT_ALL, "WARNING: RE_RegisterSkin( '%s' ) more than %u surfaces!\n", name, (unsigned int )(sizeof(skin->surfaces) / sizeof(*(skin->surfaces))) );
 			break;
 		}
-
-		int reDefinitionOf = 0; // see if that name is already defined
-		for (int i = 0; i < skin->numSurfaces; i++) {
-			if (!Q_stricmp(surfName, skin->surfaces[i]->name)) {
-				reDefinitionOf = i;
-			}
-		}
-
-		if (reDefinitionOf) {
-			surf = skin->surfaces[reDefinitionOf];
-			if (!surf->turnedOff) { // If it's already turned off, no use parsing the other stuff
-				if (!Q_stricmp(token, "*off")) { // Ugly hack to make JKA skins with turned off surfaces work better :P
-					surf->shader = R_FindShader("textures/system/nodraw", lightmapsNone, stylesDefault, qtrue);
-					surf->turnedOff = qtrue;
-				}
-				else {
-					// We already have one texture for that surface. User shouldn't have defined more than one.
-				}
-			}
-		}
-		else {
-			surf = skin->surfaces[skin->numSurfaces] = (skinSurface_t*)Hunk_Alloc(sizeof(*skin->surfaces[0]), h_low);
-			Q_strncpyz(surf->name, surfName, sizeof(surf->name));
-			/*
-			if (gServerSkinHack)
-			{
-				surf->shader = R_FindServerShader( token, lightmapsNone, stylesDefault, qtrue );
-			}
-			else
-			{
-			*/
-			if (!Q_stricmp(token, "*off")) { // Ugly hack to make JKA skins with turned off surfaces work better :P
-				surf->shader = R_FindShader("textures/system/nodraw", lightmapsNone, stylesDefault, qtrue);
-				surf->turnedOff = qtrue;
-			}
-			else {
-				surf->shader = R_FindShader(token, lightmapsNone, stylesDefault, qtrue);
-				surf->turnedOff = qfalse;
-			}
-			/*
-			}
-			*/
-			skin->numSurfaces++;
-		}
+		surf = skin->surfaces[ skin->numSurfaces ] = (skinSurface_t *) Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
+		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
+		surf->shader = R_FindShader( token, lightmapsNone, stylesDefault, qtrue );
+		skin->numSurfaces++;
 	}
 
 	ri.FS_FreeFile( text );

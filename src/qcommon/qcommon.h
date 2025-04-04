@@ -59,6 +59,9 @@ void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qb
 int Field_GetLastMatchCount();
 qboolean Field_WasComplete();
 int FloatAsInt( float f );
+qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize);
+int Com_GetNumLanguages(void);
+void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize);
 
 extern qboolean com_demoplaying;
 
@@ -436,6 +439,7 @@ typedef enum {
 } sharedTraps_t;
 
 #define	MAX_VM		3
+extern int vm_currentIndex;
 
 void	VM_Init( void );
 vm_t	*VM_Create(const char *module, qboolean mvOverride, intptr_t(*systemCalls)(intptr_t *), vmInterpret_t interpret);
@@ -494,6 +498,8 @@ int VM_MVMenuLevel(const vm_t *vm);
 
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
+
+void FixGhoul2InfoLeaks(int vmIndex);
 
 /*
 ==============================================================
@@ -872,6 +878,7 @@ void FS_HomeRmdir(const char* homePath, qboolean recursive);
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
 qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
+uint32_t FS_GetFileVersion(const char *fileName, module_t module);
 
 
 /*
@@ -956,7 +963,9 @@ extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
 extern	cvar_t	*com_silentScreenshots;
 
-extern	cvar_t	*cool_apiFeatures;
+extern	cvar_t	*com_cool_apiFeatures;
+extern	cvar_t	*com_cool_apiDBVersion;
+extern	cvar_t	*com_cool_apiJKAVersion;
 
 extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;

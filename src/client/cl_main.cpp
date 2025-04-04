@@ -2,6 +2,7 @@
 
 #include "client.h"
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 #include <limits.h>
 #include "snd_local.h"
 #include <mv_setup.h>
@@ -1103,8 +1104,6 @@ ways a client gets into a game
 Also called by Com_Error
 =================
 */
-extern void FixGhoul2InfoLeaks(bool);
-
 void CL_FlushMemory( qboolean disconnecting ) {
 
 	// shutdown all the client stuff
@@ -1113,7 +1112,6 @@ void CL_FlushMemory( qboolean disconnecting ) {
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running->integer ) {
 		// clear collision map data
-		FixGhoul2InfoLeaks(false);
 		CM_ClearMap();
 		// clear the whole hunk
 		Hunk_Clear();
@@ -2935,7 +2933,6 @@ CL_Frame
 */
 static unsigned int frameCount;
 static float avgFrametime=0.0;
-extern void SP_CheckForLanguageUpdates(void);
 void CL_Frame ( int msec ) {
 	qboolean render = qfalse;
 
@@ -2950,6 +2947,7 @@ void CL_Frame ( int msec ) {
 
 	SP_CheckForLanguageUpdates();	// will take zero time to execute unless language changes, then will reload strings.
 									//	of course this still doesn't work for menus...
+	SE_CheckForLanguageUpdates();
 
 	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
 		&& !com_sv_running->integer ) {
@@ -3468,6 +3466,16 @@ void CL_Init( void ) {
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
 	//Cvar_Get ("cg_optimizedPredict", "0", CVAR_ARCHIVE );
+
+	//default sabers
+	Cvar_Get("saber1", DEFAULT_SABER1, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("saber2", DEFAULT_SABER2, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+
+	//skin color
+	Cvar_Get("char_color_red", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_green", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_blue", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("char_color_alpha", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	// cgame might not be initialized before menu is used
 	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );

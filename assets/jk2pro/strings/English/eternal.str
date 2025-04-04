@@ -1,0 +1,144 @@
+VERSION             "1"
+
+REFERENCE           APPEARANCE
+LANG_ENGLISH        "APPEARANCE"
+
+REFERENCE           BLADE_COLOR
+LANG_ENGLISH        "BLADE COLOR"
+
+REFERENCE           BLADE_COLOR_DESC
+LANG_ENGLISH        "Select the color for your lightsaber blade."
+
+REFERENCE           CHOOSE_SPECIES
+LANG_ENGLISH        "Choose a species."
+
+REFERENCE           COLOR
+LANG_ENGLISH        "COLOR"
+
+REFERENCE           COLOR2
+LANG_ENGLISH        "COLOR 2"
+
+REFERENCE           COLOR2_DESC
+LANG_ENGLISH        "Select a second blade color."
+
+REFERENCE           CUSTOMPLAYER_DESC
+LANG_ENGLISH        "Create your own character."
+
+REFERENCE           CUSTOM_CHARACTER
+LANG_ENGLISH        "Custom Character"
+
+REFERENCE           DUALSABERS
+LANG_ENGLISH        "Dual Sabers"
+
+REFERENCE           DUALSABERS_DESC
+LANG_ENGLISH        "Use 2 one-handed sabers, only one fighting style."
+
+REFERENCE           HEAD
+LANG_ENGLISH        "HEAD"
+
+REFERENCE           HILT1
+LANG_ENGLISH        "HILT"
+
+REFERENCE           HILT1_DESC
+LANG_ENGLISH        "Select a hilt."
+
+REFERENCE           HILT2
+LANG_ENGLISH        "HILT 2"
+
+REFERENCE           HILT2_DESC
+LANG_ENGLISH        "Select a second hilt."
+
+REFERENCE           LEGS
+LANG_ENGLISH        "LEGS"
+
+REFERENCE           LIGHTSABER_CREATION
+LANG_ENGLISH        "LIGHTSABER CREATION"
+
+REFERENCE           RETURN_PREVIOUS
+LANG_ENGLISH        "Return to previous menu."
+
+REFERENCE           SABERSTAFF
+LANG_ENGLISH        "Two-Handed Saber"
+
+REFERENCE           SABERSTAFF_DESC
+LANG_ENGLISH        "Use one two-handed saber, only one fighting style."
+
+REFERENCE           SABER_HILTS_DESC
+LANG_ENGLISH        "Choose your saber hilt(s)."
+
+REFERENCE           SABER_TITLE
+LANG_ENGLISH        "Saber"
+
+REFERENCE           SABER_TITLE_DESC
+LANG_ENGLISH        "Configure your lightsaber."
+
+REFERENCE           SABER_TYPE
+LANG_ENGLISH        "SABER TYPE"
+
+REFERENCE           SABER_TYPE_DESC
+LANG_ENGLISH        "Select your saber type."
+
+REFERENCE           SELECT_HEAD
+LANG_ENGLISH        "Select a head style."
+
+REFERENCE           SELECT_LEGS
+LANG_ENGLISH        "Select a legs style."
+
+REFERENCE           SELECT_TORSO
+LANG_ENGLISH        "Select a torso style."
+
+REFERENCE           SINGLESABER
+LANG_ENGLISH        "Standard Saber"
+
+REFERENCE           SINGLESABER_DESC
+LANG_ENGLISH        "Use one one-handed saber, choice of 3 fighting styles."
+
+REFERENCE           SPECIES
+LANG_ENGLISH        "SPECIES"
+
+REFERENCE           TORSO
+LANG_ENGLISH        "TORSO"
+
+REFERENCE           RGB
+LANG_ENGLISH        "RGB"
+
+REFERENCE           RGB_DESC
+LANG_ENGLISH        "Customized RGB colors"
+
+REFERENCE           RED_VALUE
+LANG_ENGLISH        "Red:"
+
+REFERENCE           RED_VALUE_DESC
+LANG_ENGLISH        "Red component value"
+
+REFERENCE           GREEN_VALUE
+LANG_ENGLISH        "Green:"
+
+REFERENCE           GREEN_VALUE_DESC
+LANG_ENGLISH        "Green component value"
+
+REFERENCE           BLUE_VALUE
+LANG_ENGLISH        "Blue:"
+
+REFERENCE           BLUE_VALUE_DESC
+LANG_ENGLISH        "Blue component value"
+
+REFERENCE           HEAD_SIZE
+LANG_ENGLISH        "Head size"
+
+REFERENCE           HEAD_SIZE_DESC
+LANG_ENGLISH        "Increase or decrease head size."
+
+REFERENCE           SABER_DESANN
+LANG_ENGLISH        "Desann"
+
+REFERENCE           SABER_KYLE
+LANG_ENGLISH        "Kyle"
+
+REFERENCE           SABER_LUKE
+LANG_ENGLISH        "Luke"
+
+REFERENCE           SABER_REBORN
+LANG_ENGLISH        "Reborn"
+
+ENDMARKER

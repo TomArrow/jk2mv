@@ -27,6 +27,7 @@ Ghoul2 Insert Start
 #endif
 
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 
 #include "../qcommon/mariadb.h"
 
@@ -880,7 +881,6 @@ CL_CgameSystemCalls
 The cgame module is making a system call
 ====================
 */
-extern bool RicksCrazyOnServer;
 intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -892,9 +892,6 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		else if (args[0] == 285)
 			args[0] = CG_G2_INITGHOUL2MODEL;
 	}
-
-	// set cgame ghoul2 context
-	RicksCrazyOnServer = false;
 
 	switch( args[0] ) {
 	case CG_PRINT:
@@ -1437,16 +1434,16 @@ Ghoul2 Insert Start
 		return 0;
 
 	case CG_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1538,7 +1535,7 @@ Ghoul2 Insert End
 		return G2API_SetNewOrigin((g2handle_t)args[1], /*(const int)VMA(2)*/args[2]);
 
 	case CG_SP_GETSTRINGTEXTSTRING:
-		return SP_VMGetStringText(VMAS(1), VMAP(2, char, args[3]), args[3]);
+		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
 
 	case CG_SP_REGISTER:
 		return !!SP_Register(VMAS(1), SP_REGISTER_CLIENT);
@@ -1708,6 +1705,34 @@ Ghoul2 Insert End
 		}
 	}
 
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
+		switch (args[0]) {
+		case CG_COOL_API_GET_NUM_LANGUAGES:
+			return Com_GetNumLanguages();
+
+		case CG_COOL_API_GET_LANGUAGE_NAME:
+			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
+			return 0;
+
+		case CG_COOL_API_SET_SKIN:
+			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
+
+		case CG_COOL_API_SKINLESS_MODEL:
+			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
+
+		case CG_COOL_API_GET_SURFACE_RENDER_STATUS:
+			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
+
+		case CG_COOL_API_ATTACH_G2_MODEL:
+			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
+
+		case CG_COOL_API_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
+
+		case CG_COOL_API_GET_FILE_LIST:
+			return FS_GetFileList(VMAS(1), VMAS(2), VMAP(3, char, args[4]), args[4]);
+		}
+	}
 
 	if (VM_MVAPILevel(cgvm) >= 1) {
 		switch (args[0]) {

@@ -1534,6 +1534,10 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			else if ( !Q_stricmp( token, "identity" ) )
 			{
 				stage->rgbGen = CGEN_IDENTITY;
+				if (shader.isPlayerIcon && r_fixPlayerIconBrightness->integer)
+				{
+					stage->rgbGen = CGEN_IDENTITY_LIGHTING;
+				}
 			}
 			else if ( !Q_stricmp( token, "identityLighting" ) )
 			{
@@ -1561,6 +1565,14 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			else if ( !Q_stricmp( token, "lightingDiffuse" ) )
 			{
 				stage->rgbGen = CGEN_LIGHTING_DIFFUSE;
+			}
+			else if ( !Q_stricmp( token, "lightingDiffuseEntity" ) )
+			{
+				if (shader.lightmapIndex[0] != LIGHTMAP_NONE)
+				{
+					ri.Printf( PRINT_WARNING, "WARNING: rgbGen lightingDiffuseEntity used on a misc_model! in shader \'%s\'\n", shader.name );
+				}
+				stage->rgbGen = CGEN_LIGHTING_DIFFUSE_ENTITY;
 			}
 			else if ( !Q_stricmp( token, "oneMinusVertex" ) )
 			{
@@ -1783,6 +1795,10 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			stage->rgbGen = CGEN_IDENTITY_LIGHTING;
 		} else {
 			stage->rgbGen = CGEN_IDENTITY;
+		}
+		if (shader.isPlayerIcon && r_fixPlayerIconBrightness->integer)
+		{
+			stage->rgbGen = CGEN_IDENTITY_LIGHTING;
 		}
 	}
 
@@ -2224,6 +2240,21 @@ static qboolean ParseShader( const char **text )
 	int s;
 
 	s = 0;
+
+	// check for player icon
+	// models/players/*/icon_*
+	shader.isPlayerIcon = qfalse;
+	if (Q_stricmpn(shader.name, "models/players/", 15) == 0 && shader.name[15] != '\0' && shader.name[15] != '/')
+	{
+		char *p = strchr(&shader.name[15], '/');
+		if (p != NULL && Q_stricmpn(&p[1], "icon_", 5) == 0)
+		{
+			if (strchr(&p[1], '/') == NULL)
+			{
+				shader.isPlayerIcon = qtrue;
+			}
+		}
+	}
 
 	token = COM_ParseExt( text, qtrue );
 	if ( token[0] != '{' )

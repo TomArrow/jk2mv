@@ -4,6 +4,7 @@
 
 #include "../game/botlib.h"
 #include "../qcommon/strip.h"
+#include "../qcommon/stringed_ingame.h"
 
 /*
 Ghoul2 Insert Start
@@ -760,7 +761,6 @@ CL_UISystemCalls
 The ui module is making a system call
 ====================
 */
-
 intptr_t CL_UISystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -1127,11 +1127,7 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 		return !!SP_Register(VMAS(1), SP_REGISTER_MENU);
 
 	case UI_SP_GETSTRINGTEXTSTRING:
-		const char* text;
-
-		text = SP_GetStringTextString(VMAS(1));
-		Q_strncpyz( VMAP(2, char, args[3]), text, args[3] );
-		return qtrue;
+		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
 
 /*
 Ghoul2 Insert Start
@@ -1146,14 +1142,6 @@ Ghoul2 Insert End
 
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(uivm);
-	}
-
-	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
-		switch (args[0]) {
-		case UI_COOL_API_GLRESOLUTIONCHANGED:
-			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-			break;
-		}
 	}
 
 	if (VM_MVAPILevel(uivm) >= 3) {
@@ -1192,6 +1180,72 @@ Ghoul2 Insert End
 			return FS_RMDLPrefix(VMAS(1));
 		case UI_MVAPI_DELDLFILE:
 			return UI_DeleteDLFile(VMAV(1, const dlfile_t));
+		}
+	}
+
+	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
+		switch (args[0]) {
+		case UI_COOL_API_GLRESOLUTIONCHANGED:
+			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
+		}
+	}
+
+	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
+		switch (args[0]) {
+		case UI_COOL_API_GET_NUM_LANGUAGES:
+			return Com_GetNumLanguages();
+
+		case UI_COOL_API_GET_LANGUAGE_NAME:
+			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
+			return 0;
+
+		case UI_COOL_API_HAVE_WE_GHOUL2_MODELS:
+			return G2API_HaveWeGhoul2Models((g2handle_t)args[1]);
+
+		case UI_COOL_API_GIVE_ME_VECTOR_FROM_MATRIX:
+			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
+			return 0;
+
+		case UI_COOL_API_GET_BOLT_MATRIX:
+			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
+
+		case UI_COOL_API_INIT_GHOUL2_MODEL:
+			return G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4], (qhandle_t) args[5], args[6], args[7]);
+
+		case UI_COOL_API_SET_SKIN:
+			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
+
+		case UI_COOL_API_SKINLESS_MODEL:
+			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
+
+		case UI_COOL_API_GET_SURFACE_RENDER_STATUS:
+			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
+
+		case UI_COOL_API_CLEAN_GHOUL2_MODELS:
+			G2API_CleanGhoul2Models(VMAV(1, g2handle_t));
+			return 0;
+
+		case UI_COOL_API_SET_BONE_ANIM:
+			return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5], args[6], VMF(7), args[8], VMF(9), args[10]);
+
+		case UI_COOL_API_GET_GLA_NAME:
+			Q_strncpyz(VMAP(3, char, args[4]), G2API_GetGLAName((g2handle_t)args[1], args[2]), args[4]);
+			return 0;
+
+		case UI_COOL_API_HAS_GHOUL2_MODEL_ON_INDEX:
+			return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
+
+		case UI_COOL_API_REMOVE_GHOUL2_MODEL:
+			return G2API_RemoveGhoul2Model(VMAV(1, g2handle_t), args[2]);
+
+		case UI_COOL_API_ADD_BOLT:
+			return G2API_AddBolt((g2handle_t)args[1], args[2], VMAS(3));
+
+		case UI_COOL_API_ATTACH_G2_MODEL:
+			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
+
+		case UI_COOL_API_GET_FILE_VERSION:
+			return FS_GetFileVersion(VMAS(1), MODULE_UI);
 		}
 	}
 

@@ -38,6 +38,7 @@ and one exported function: Perform
 
 vm_t	*currentVM = NULL;
 vm_t	*lastVM	= NULL;
+int		vm_currentIndex = -1;
 int		vm_debugLevel;
 
 #define MAX_APINUM	1000
@@ -714,6 +715,9 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 	Q_strncpyz(vm->name, module, sizeof(vm->name));
 
 	vm->mvmenu = 0;
+	vm->index = i;
+
+	FixGhoul2InfoLeaks(vm->index);
 
 	if (interpret == VMI_NATIVE) {
 		// try to load as a system dll
@@ -804,6 +808,11 @@ void VM_Free( vm_t *vm ) {
 		}
 	}
 
+	if (vm->name[0])
+	{
+		FixGhoul2InfoLeaks(vm->index);
+	}
+
 	if(vm->destroy)
 		vm->destroy(vm);
 
@@ -826,6 +835,7 @@ void VM_Free( vm_t *vm ) {
 
 	currentVM = NULL;
 	lastVM = NULL;
+	vm_currentIndex = -1;
 }
 
 void VM_Clear(void) {
@@ -1028,6 +1038,7 @@ intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int call
 	oldVM = currentVM;
 	currentVM = vm;
 	lastVM = vm;
+	vm_currentIndex = currentVM->index;
 
 	if ( vm_debugLevel ) {
 	  Com_Printf( "VM_Call( %d )\n", callnum );
@@ -1079,8 +1090,10 @@ intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int call
 	}
 	--vm->callLevel;
 
-	if ( oldVM != NULL )
+	if ( oldVM != NULL ) {
 	  currentVM = oldVM;
+	  vm_currentIndex = currentVM->index;
+	}
 	return r;
 }
 

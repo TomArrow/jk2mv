@@ -3520,15 +3520,35 @@ FS_Path_f
 void FS_Path_f( void ) {
 	searchpath_t	*s;
 	int				i;
+	char packVersion[] = "unknown 1.02 1.03 1.04 JKA ";
 
 	Com_Printf ("Current search path:\n");
 	for (s = fs_searchpaths; s; s = s->next) {
 		if (s->pack) {
-			Com_Printf ("%s (%i files) [ %s%s%s%s]\n", s->pack->pakFilename, s->pack->numfiles,
-				s->pack->gvc == PACKGVC_UNKNOWN ? "unknown " : "",
-				s->pack->gvc & PACKGVC_1_02 ? "1.02 " : "",
-				s->pack->gvc & PACKGVC_1_03 ? "1.03 " : "",
-				s->pack->gvc & PACKGVC_1_04 ? "1.04 " : "");
+			packVersion[0] = '\0';
+
+			if (s->pack->gvc & PACKGVC_1_02)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.02 ");
+			}
+			if (s->pack->gvc & PACKGVC_1_03)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.03 ");
+			}
+			if (s->pack->gvc & PACKGVC_1_04)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.04 ");
+			}
+			if (s->pack->isJKA == qtrue)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "JKA ");
+			}
+			if (packVersion[0] == '\0')
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "unknown ");
+			}
+
+			Com_Printf("%s (%i files) [ %s]\n", s->pack->pakFilename, s->pack->numfiles, packVersion);
 
 			if ( fs_numServerPaks ) {
 				if ( !FS_PakIsPure(s->pack) ) {
@@ -3783,11 +3803,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 		if (assetsJK2) {
 			if (strcmp(filename, "assets0.pk3") && strcmp(filename, "assets1.pk3") &&
 				strcmp(filename, "assets2.pk3") && strcmp(filename, "assets5.pk3")) {
-				continue;
-			}
-		} else if ( assetsJKA ) {
-			if (strcmp(filename, "assets0.pk3") && strcmp(filename, "assets1.pk3") &&
-			    strcmp(filename, "assets2.pk3") && strcmp(filename, "assets3.pk3")) {
 				continue;
 			}
 		}
@@ -4857,6 +4872,7 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 	// Only check the unresolved path for invalid characters, the os probably knows what it's doing
 	if ( FS_ContainsInvalidCharacters(qpath) ) {
 		Com_Printf( "FS_FOpenFileByMode: invalid filename (%s)\n", qpath );
+		*f = 0;
 		return -1;
 	}
 
@@ -5082,4 +5098,63 @@ qboolean FS_DeleteDLFile(const char *qpath) {
 	FS_ReplaceSeparators(ospath);
 
 	return (qboolean)!!remove(ospath);
+}
+
+uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
+	fileHandle_t	f;
+	searchpath_t *search;
+
+	if (fileName == NULL || fileName[0] == '\0') {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	// qpaths are not supposed to have a leading slash
+	if (fileName[0] == '/' || fileName[0] == '\\') {
+		fileName++;
+	}
+
+	// make absolutely sure that it can't back up the path.
+	// The searchpaths do guarantee that something will always
+	// be prepended, so we don't need to worry about "c:" or "//limbo"
+	if (strstr(fileName, "..") || strstr(fileName, "::")) {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	FS_FOpenFileRead(fileName, &f, qfalse, module, qfalse, qfalse);
+
+	if (!f) {
+		return FILE_VERSION_UNKNOWN;
+	}
+
+	// find file that would be opened by FS_FOpenFileRead taking all
+	// its quirks and special cases into account
+	if (fsh[f].zipFile) {
+		for (search = fs_searchpaths; search; search = search->next) {
+			if (search->pack) {
+				pack_t *pak = search->pack;
+
+				if (fsh[f].handleFiles.file.z == pak->handle) {
+					// found it!
+
+					uint32_t returnValue = FILE_VERSION_UNKNOWN;
+
+					FS_FCloseFile(f, module);
+
+					if (pak->gvc & PACKGVC_1_02)
+						returnValue |= FILE_VERSION_1_02;
+					if (pak->gvc & PACKGVC_1_03)
+						returnValue |= FILE_VERSION_1_03;
+					if (pak->gvc & PACKGVC_1_04)
+						returnValue |= FILE_VERSION_1_04;
+					if (pak->isJKA)
+						returnValue |= FILE_VERSION_JKA;
+
+					return returnValue;
+				}
+			}
+		}
+	}
+
+	FS_FCloseFile(f, module);
+	return FILE_VERSION_UNKNOWN;
 }

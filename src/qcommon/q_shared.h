@@ -378,6 +378,9 @@ typedef enum
 
 } saber_colors_t;
 
+#define DEFAULT_SABER1 "kyle"
+#define DEFAULT_SABER2 "none"
+
 typedef enum
 {
 	FP_FIRST = 0,//marker
@@ -1069,6 +1072,14 @@ typedef enum {
 	FS_SEEK_END,
 	FS_SEEK_SET
 } fsOrigin_t;
+
+typedef enum {
+	FILE_VERSION_UNKNOWN = 0,
+	FILE_VERSION_1_02 = (1 << 0),
+	FILE_VERSION_1_03 = (1 << 1),
+	FILE_VERSION_1_04 = (1 << 2),
+	FILE_VERSION_JKA = (1 << 3),
+} fs_file_version_t;
 
 //=============================================
 
@@ -2365,6 +2376,7 @@ typedef struct ezDemoBuffer_s {
 #define COOL_APIFEATURE_KEEPZOMBIE (1<<16)
 #define COOL_APIFEATURE_CUSTOMEPSILONTRACE (1<<17)
 #define COOL_APIFEATURE_ADDMEMECOMMAND (1<<18)
+#define COOL_APIFEATURE_JEDI_ACADEMY (1<<19)
 
 
 #define COOL_APIFEATURE_VMGAME_FLAG_SEGMENTEDREPLAY (1<<0)

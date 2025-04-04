@@ -197,8 +197,8 @@ struct vm_s {
 	mvversion_t	gameversion;
 
 	int			coolApiSupport;
+	int			index;
 };
-
 
 extern	vm_t	*currentVM;
 extern	int		vm_debugLevel;

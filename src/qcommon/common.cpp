@@ -12,6 +12,7 @@
 #include "../client/client.h"
 #include "../server/server.h"
 #include "strip.h"
+#include "stringed_ingame.h"
 #include <mv_setup.h>
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -23,6 +24,27 @@
 #include <mutex>
 
 qboolean serverIsTommyTernal = qfalse;
+const int supportedCoolApiFeatures =
+  COOL_APIFEATURE_SETPREDICTEDMOVEMENT
+| COOL_APIFEATURE_GETTEMPORARYUSERCMD
+| COOL_APIFEATURE_EXPANDEDSETUSERCMD
+| COOL_APIFEATURE_EZDEMOCGAMEBUFFER
+| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED
+| COOL_APIFEATURE_MARIADB
+| COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK
+| COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS
+| COOL_APIFEATURE_G_USERCMDSTORE
+| COOL_APIFEATURE_RESOLUTIONCHANGED
+| COOL_APIFEATURE_NONEPSILONTRACE
+| COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS
+| COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED
+| COOL_APIFEATURE_SETUSERANGLES
+| COOL_APIFEATURE_VMCUSTOMFLAGS
+| COOL_APIFEATURE_KEEPZOMBIE
+| COOL_APIFEATURE_CUSTOMEPSILONTRACE
+| COOL_APIFEATURE_ADDMEMECOMMAND
+| COOL_APIFEATURE_JEDI_ACADEMY
+;
 
 #define MAX_NUM_ARGVS	50
 
@@ -76,7 +98,9 @@ cvar_t	*com_cameraMode;
 cvar_t	*com_busyWait;
 cvar_t	*com_silentScreenshots;
 
-cvar_t	*cool_apiFeatures;
+cvar_t	*com_cool_apiFeatures;
+cvar_t	*com_cool_apiDBVersion;
+cvar_t	*com_cool_apiJKAVersion;
 
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
@@ -118,6 +142,8 @@ static qboolean	rd_silent;
 static char		*rd_buffer;
 static size_t	rd_buffersize;
 static void		(*rd_flush)( char *buffer );
+static char	com_errorMessage[MAXPRINTMSG];
+static errorParm_t com_errorCode;
 
 void Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)( char *), qboolean silent)
 {
@@ -324,6 +350,37 @@ void QDECL Com_OPrintf( const char *fmt, ...)
 #endif
 }
 
+void Com_CatchError(void)
+{
+	switch (com_errorCode) {
+	case ERR_SERVERDISCONNECT:
+		VM_Forced_Unload_Start();
+		CL_Disconnect(qtrue);
+		CL_FlushMemory(qtrue);
+		VM_Forced_Unload_Done();
+		com_errorEntered = qfalse;
+		Com_EndRedirect();
+		break;
+	case ERR_DROP:
+		Com_Printf("********************\n");
+		Com_Printf("ERROR: %s\n", com_errorMessage);
+		Sys_PrintBacktrace();
+		Com_Printf("********************\n");
+		// fallthrough
+	case ERR_DISCONNECT:
+		VM_Forced_Unload_Start();
+		SV_Shutdown(va("Server crashed: %s", com_errorMessage));
+		CL_Disconnect(qtrue);
+		CL_FlushMemory(qtrue);
+		VM_Forced_Unload_Done();
+		com_errorEntered = qfalse;
+		Com_EndRedirect();
+		break;
+	default:
+		break;
+	}
+}
+
 /*
 =============
 Com_Error
@@ -333,7 +390,6 @@ do the apropriate things.
 =============
 */
 Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
-	static char	com_errorMessage[MAXPRINTMSG];
 	va_list		argptr;
 	static int	lastErrorTime;
 	static int	errorCount;
@@ -341,7 +397,11 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 
 	// when we are running automated scripts, make sure we
 	// know if anything failed
-	if ( com_buildScript && com_buildScript->integer ) {
+	if ( com_buildScript != NULL && com_buildScript->integer ) {
+		code = ERR_FATAL;
+	}
+
+	if ( com_dedicated != NULL && com_dedicated->integer ) {
 		code = ERR_FATAL;
 	}
 
@@ -377,31 +437,13 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
 		Cvar_Set("com_errorMessage", com_errorMessage);
 	}
 
+	com_errorCode = code;
+
 	switch (code) {
 	case ERR_SERVERDISCONNECT:
-		VM_Forced_Unload_Start();
-		CL_Disconnect( qtrue );
-		CL_FlushMemory( qtrue );
-		VM_Forced_Unload_Done();
-		com_errorEntered = qfalse;
-		Com_EndRedirect();
-		longjmp(abortframe, -1);
-		break;
 	case ERR_DROP:
-		Com_Printf("********************\n");
-		Com_Printf("ERROR: %s\n", com_errorMessage);
-		Sys_PrintBacktrace();
-		Com_Printf("********************\n");
-		// fallthrough
 	case ERR_DISCONNECT:
-		VM_Forced_Unload_Start();
-		SV_Shutdown (va("Server crashed: %s",  com_errorMessage));
-		CL_Disconnect( qtrue );
-		CL_FlushMemory( qtrue );
-		VM_Forced_Unload_Done();
-		com_errorEntered = qfalse;
-		Com_EndRedirect();
-		longjmp(abortframe, -1);
+		longjmp(abortframe, 1);
 	default:
 		VM_Forced_Unload_Start();
 		CL_Shutdown ();
@@ -1218,7 +1260,6 @@ void Z_Free(void *pvAddress)
 
 	Zone_FreeBlock(pMemory);
 }
-
 
 int Z_MemSize(memtag_t eTag)
 {
@@ -2506,7 +2547,7 @@ void Com_Init( char *commandLine ) {
 
 	Com_Printf( "%s %s %s\n", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 
-	if (setjmp(abortframe)) {
+	if (setjmp(abortframe) > 0) {
 		Sys_Error("Error during initialization\n");
 	}
 
@@ -2623,10 +2664,11 @@ void Com_Init( char *commandLine ) {
 	com_renderfps = Cvar_Get("com_renderfps", "0", CVAR_ARCHIVE);
 	cl_commandsize = Cvar_Get("cl_commandsize", "512", CVAR_ARCHIVE);//Loda - FPS UNLOCK ENGINE
 
-	cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d",COOL_APIFEATURE_SETPREDICTEDMOVEMENT|COOL_APIFEATURE_GETTEMPORARYUSERCMD|COOL_APIFEATURE_EXPANDEDSETUSERCMD|COOL_APIFEATURE_EZDEMOCGAMEBUFFER| COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED| COOL_APIFEATURE_MARIADB | COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK | COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS | COOL_APIFEATURE_G_USERCMDSTORE | COOL_APIFEATURE_RESOLUTIONCHANGED| COOL_APIFEATURE_NONEPSILONTRACE| COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS | COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED | COOL_APIFEATURE_SETUSERANGLES | COOL_APIFEATURE_VMCUSTOMFLAGS| COOL_APIFEATURE_KEEPZOMBIE | COOL_APIFEATURE_CUSTOMEPSILONTRACE| COOL_APIFEATURE_ADDMEMECOMMAND), CVAR_INIT | CVAR_VM_NOWRITE);
+	com_cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d", supportedCoolApiFeatures), CVAR_INIT | CVAR_VM_NOWRITE);
 	// 2024-09-25 bump to 2: CG/G_COOL_API_DB_AddRequestTyped
 	// 2024-09-25 bump to 3: Prepared statements and such
-	cool_apiFeatures = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
+	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
+	com_cool_apiJKAVersion = Cvar_Get("cool_apiJKAVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
 
 	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);
@@ -2654,6 +2696,7 @@ void Com_Init( char *commandLine ) {
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
 
 	SP_Init();
+	SE_Init();
 	Sys_Init();
 	NET_HTTP_Init();
 
@@ -2923,7 +2966,8 @@ void Com_Frame( void ) {
 	int timeBeforeClient = 0;
 	int timeAfter = 0;
 
-	if (setjmp(abortframe)) {
+	if (setjmp(abortframe) > 0) {
+		Com_CatchError();
 		return;			// an ERR_DROP was thrown
 	}
 
@@ -3119,7 +3163,8 @@ void MSG_shutdownHuffman();
 void Com_Shutdown (void)
 {
 	CM_ClearMap();
-	SP_Shutdown ();
+	SP_Shutdown();
+	SE_ShutDown();
 
 	// write config file if anything changed
 	Com_WriteConfiguration();
@@ -3744,4 +3789,44 @@ int FloatAsInt( float f )
 	floatint_t fi;
 	fi.f = f;
 	return fi.i;
+}
+
+qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize)
+{
+	qboolean result = qtrue;
+	const char *string = "";
+	const char *prefix = "";
+
+	if (dstsize <= 0)
+	{
+		return qfalse;
+	}
+
+	string = SP_GetStringTextString(reference);
+
+	if (string[0] == '\0')
+	{
+		string = SE_GetString(reference);
+	}
+
+	if (string[0] == '\0')
+	{
+		prefix = "??";
+		string = reference;
+		result = qfalse;
+	}
+
+	Com_sprintf(dst, dstsize, "%s%s", prefix, string);
+	return result;
+}
+
+int Com_GetNumLanguages(void)
+{
+	return SP_LANGUAGE_MAX - 1;
+}
+
+void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize)
+{
+	const char *language = SP_GetLanguageStringFromNumber(languageIndex);
+	Q_strncpyz(buffer, language, bufferSize);
 }
