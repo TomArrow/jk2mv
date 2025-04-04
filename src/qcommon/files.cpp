@@ -3520,15 +3520,35 @@ FS_Path_f
 void FS_Path_f( void ) {
 	searchpath_t	*s;
 	int				i;
+	char packVersion[] = "unknown 1.02 1.03 1.04 JKA ";
 
 	Com_Printf ("Current search path:\n");
 	for (s = fs_searchpaths; s; s = s->next) {
 		if (s->pack) {
-			Com_Printf ("%s (%i files) [ %s%s%s%s]\n", s->pack->pakFilename, s->pack->numfiles,
-				s->pack->gvc == PACKGVC_UNKNOWN ? "unknown " : "",
-				s->pack->gvc & PACKGVC_1_02 ? "1.02 " : "",
-				s->pack->gvc & PACKGVC_1_03 ? "1.03 " : "",
-				s->pack->gvc & PACKGVC_1_04 ? "1.04 " : "");
+			packVersion[0] = '\0';
+
+			if (s->pack->gvc & PACKGVC_1_02)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.02 ");
+			}
+			if (s->pack->gvc & PACKGVC_1_03)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.03 ");
+			}
+			if (s->pack->gvc & PACKGVC_1_04)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "1.04 ");
+			}
+			if (s->pack->isJKA == qtrue)
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "JKA ");
+			}
+			if (packVersion[0] == '\0')
+			{
+				Q_strcat(packVersion, sizeof(packVersion), "unknown ");
+			}
+
+			Com_Printf("%s (%i files) [ %s]\n", s->pack->pakFilename, s->pack->numfiles, packVersion);
 
 			if ( fs_numServerPaks ) {
 				if ( !FS_PakIsPure(s->pack) ) {
