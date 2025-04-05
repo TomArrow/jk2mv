@@ -89,7 +89,7 @@ public:
 
 	void	Clear( SE_BOOL bChangingLanguages );
 	void	SetupNewFileParse( const char* psFileName, SE_BOOL bLoadDebug );
-	SE_BOOL	ReadLine( const char* &psParsePos, char *psDest );
+	SE_BOOL	ReadLine( const char* &psParsePos, char *psDest, int psDestSize);
 	const char*	ParseLine( const char* psLine );
 	int		GetFlagMask( const char* psFlagName );
 	const char*	ExtractLanguageFromPath( const char* psFileName );
@@ -158,7 +158,7 @@ char *CStringEdPackage::Filename_PathOnly(const char* psFilename)
 {
 	static char sString[ iSE_MAX_FILENAME_LENGTH ];
 
-	strcpy(sString,psFilename);	
+	Q_strncpyz(sString,psFilename,sizeof(sString));
 		
 	char *p1= strrchr(sString,'\\');
 	char *p2= strrchr(sString,'/');
@@ -180,7 +180,7 @@ char *CStringEdPackage::Filename_WithoutExt(const char* psFilename)
 {
 	static char sString[ iSE_MAX_FILENAME_LENGTH ];
 
-	strcpy(sString,psFilename);
+	Q_strncpyz(sString,psFilename,sizeof(sString));
 
 	char *p = strrchr(sString,'.');		
 	char *p2= strrchr(sString,'\\');
@@ -216,7 +216,7 @@ char *CStringEdPackage::Filename_WithoutPath(const char* psFilename)
 		psFilename++;
 	}
 
-	strcpy(sString,psCopyPos);
+	Q_strncpyz(sString,psCopyPos, sizeof(sString));
 
 	return sString;
 }
@@ -232,7 +232,7 @@ void CStringEdPackage::SetupNewFileParse( const char* psFileName, SE_BOOL bLoadD
 {
 	char sString[ iSE_MAX_FILENAME_LENGTH ];
 
-	strcpy(sString, Filename_WithoutPath( Filename_WithoutExt( psFileName ) ));
+	Q_strncpyz(sString, Filename_WithoutPath( Filename_WithoutExt( psFileName ) ),sizeof(sString));
 	Q_strupr(sString);
 
 	m_strCurrentFileRef_ParseOnly = sString;	// eg "OBJECTIVES"
@@ -336,7 +336,7 @@ void CStringEdPackage::REMKill( char *psBuffer )
 
 // returns true while new lines available to be read...
 //
-SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest )
+SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest, int psDestSize )
 {
 	if (psParsePos[0])
 	{	
@@ -344,7 +344,7 @@ SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest )
 		if (psLineEnd)
 		{
 			int iCharsToCopy = (psLineEnd - psParsePos);
-			strncpy(psDest, psParsePos, iCharsToCopy);
+			Q_strnncpyz(psDest, psParsePos, iCharsToCopy, psDestSize);
 					psDest[iCharsToCopy] = '\0';
 			psParsePos += iCharsToCopy;
 			while (*psParsePos && strchr("\r\n",*psParsePos))
@@ -356,7 +356,7 @@ SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest )
 		{
 			// last line...
 			//
-			strcpy(psDest, psParsePos);
+			Q_strncpyz(psDest, psParsePos, sizeof(psDest));
 			psParsePos += strlen(psParsePos);
 		}
 
@@ -614,7 +614,7 @@ const char* CStringEdPackage::ParseLine( const char* psLine )
 			{
 				static const char sSeperators[] = " \t";
 				char sFlags[1024]={0};	// 1024 chars should be enough to store 8 flag names
-				strncpy(sFlags, psLine, sizeof(sFlags)-1);
+				Q_strncpyz(sFlags, psLine, sizeof(sFlags));
 				char *psToken = strtok( sFlags, sSeperators );
 				while( psToken != NULL )
 				{
@@ -659,11 +659,7 @@ const char* CStringEdPackage::ParseLine( const char* psLine )
 				}
 				char sThisLanguage[1024]={0};
 				size_t iCharsToCopy = psWordEnd - psLine;
-				if (iCharsToCopy > sizeof(sThisLanguage)-1)
-				{
-					iCharsToCopy = sizeof(sThisLanguage)-1;
-				}
-				strncpy(sThisLanguage, psLine, iCharsToCopy);	// already declared as {0} so no need to zero-cap dest buffer
+				Q_strnncpyz(sThisLanguage, psLine, iCharsToCopy,sizeof(sThisLanguage));	// already declared as {0} so no need to zero-cap dest buffer
 
 				psLine += strlen(sThisLanguage);
 				const char* _psSentence = ConvertCRLiterals_Read( InsideQuotes( psLine ) );
@@ -834,7 +830,7 @@ static const char* SE_Load_Actual( const char* psFileName, SE_BOOL bLoadDebug, S
 		TheStringPackage.SetupNewFileParse( psFileName, bLoadDebug );
 
 		char sLineBuffer[16384];	// should be enough for one line of text (some of them can be BIG though)
-		while ( !psErrorMessage && TheStringPackage.ReadLine((const char* &) psParsePos, sLineBuffer ) )
+		while ( !psErrorMessage && TheStringPackage.ReadLine((const char* &) psParsePos, sLineBuffer,sizeof(sLineBuffer)) )
 		{
 			if (strlen(sLineBuffer))
 			{
@@ -874,7 +870,7 @@ static const char* SE_GetFoundFile(std::string &strResult )
 	if (!strlen(strResult.c_str()))
 		return NULL;
 	
-	strncpy(sTemp,strResult.c_str(),sizeof(sTemp)-1);
+	Q_strncpyz(sTemp,strResult.c_str(),sizeof(sTemp));
 	sTemp[sizeof(sTemp)-1]='\0';
 
 	char *psSemiColon = strchr(sTemp,';');
@@ -911,15 +907,15 @@ const char* SE_Load( const char* psFileName, SE_BOOL bLoadDebug = SE_TRUE, SE_BO
 	char sTemp[1000]={0};
 	if (!strchr(psFileName,'/'))
 	{
-		strcpy(sTemp,sSE_STRINGS_DIR);
-		strcat(sTemp,"/");
+		Q_strncpyz(sTemp,sSE_STRINGS_DIR,sizeof(sTemp));
+		Q_strcat(sTemp,sizeof(sTemp),"/");
 		if (se_language)
 		{
-			strcat(sTemp,se_language->string);
-			strcat(sTemp,"/");
+			Q_strcat(sTemp, sizeof(sTemp),se_language->string);
+			Q_strcat(sTemp, sizeof(sTemp),"/");
 		}
 	}
-	strcat(sTemp,psFileName);
+	Q_strcat(sTemp, sizeof(sTemp),psFileName);
 	COM_DefaultExtension( sTemp, sizeof(sTemp), sSE_INGAME_FILE_EXTENSION);
 	psFileName = &sTemp[0];
 	//
@@ -933,12 +929,12 @@ const char* SE_Load( const char* psFileName, SE_BOOL bLoadDebug = SE_TRUE, SE_BO
 	if ( !psErrorMessage )
 	{
 		char sFileName[ iSE_MAX_FILENAME_LENGTH ];
-		strncpy( sFileName, psFileName, sizeof(sFileName)-1 );
+		Q_strncpyz( sFileName, psFileName, sizeof(sFileName));
 				 sFileName[ sizeof(sFileName)-1 ] = '\0';
 		char *p = strrchr( sFileName, '.' );
 		if (p && strlen(p) == strlen(sSE_EXPORT_FILE_EXTENSION))
 		{
-			strcpy( p, sSE_EXPORT_FILE_EXTENSION );
+			Q_strncpyz( p, sSE_EXPORT_FILE_EXTENSION,sizeof(sFileName)-(p-sFileName));
 		
 			psErrorMessage = SE_Load_Actual( sFileName, bLoadDebug, SE_TRUE );
 		}

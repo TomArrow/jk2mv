@@ -1105,6 +1105,7 @@ char	*Q_strrchr( const char* string, int c );
 
 // buffer size safe library replacements
 void	Q_strncpyz( char *dest, const char *src, int destsize );
+void	Q_strnncpyz(char* dest, const char* src, int charsToCopy, int destsize);
 void	Q_strcat( char *dest, int size, const char *src );
 int		Q_strlen(const char *s);
 

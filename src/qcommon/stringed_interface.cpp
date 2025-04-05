@@ -155,7 +155,7 @@ static void SE_R_ListFiles( const char *psExtension, const char *psDir, std::str
 	for(i=0; i<numSysFiles; i++)
 	{
 		char	sFilename[MAX_QPATH];
-		sprintf(sFilename,"%s/%s", psDir, sysFiles[i]);		
+		Com_sprintf(sFilename,sizeof(sFilename),"%s/%s", psDir, sysFiles[i]);
 			
 //		Com_Printf("%sFound file: %s",!i?"\n":"",sFilename);
 
