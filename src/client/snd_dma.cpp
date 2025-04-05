@@ -2096,7 +2096,7 @@ void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwat
 		if ((mapname) && (strcmp(mapname, s_LevelName) != 0))
 		{
 			EALFileInit(mapname);
-			strcpy(s_LevelName, mapname);
+			Q_strncpyz(s_LevelName, mapname,sizeof(s_LevelName));
 		}
 
 		listener_number = entityNum;

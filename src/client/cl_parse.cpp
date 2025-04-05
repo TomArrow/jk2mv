@@ -1390,11 +1390,11 @@ void CL_ParseCommandString( msg_t *msg ) {
 			if (!strcmp(cmd, "chat") || !strcmp(cmd, "tchat"))
 				Com_Printf("%s\n", Cmd_ArgsFrom(1));
 			else if (!strcmp(cmd, "print")) {
-				void CL_CheckSVStripEdRef(char* buf, const char* str);
+				void CL_CheckSVStripEdRef(char* buf, int bufSize, const char* str);
 
 				char buf[1024] = { 0 };
 
-				CL_CheckSVStripEdRef(buf, Cmd_ArgsFrom(1));
+				CL_CheckSVStripEdRef(buf,sizeof(buf), Cmd_ArgsFrom(1));
 
 				Com_Printf("%s", buf);
 			}

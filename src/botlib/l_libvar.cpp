@@ -70,7 +70,7 @@ static libvar_t *LibVarAlloc(const char *var_name)
 	v = (libvar_t *)GetMemory((unsigned long)(sizeof(libvar_t) + strlen(var_name) + 1));
 	Com_Memset(v, 0, sizeof(libvar_t));
 	v->name = (char *) v + sizeof(libvar_t);
-	strcpy(v->name, var_name);
+	Q_strncpyz(v->name, var_name, strlen(var_name) + 1);
 	//add the variable in the list
 	v->next = libvarlist;
 	libvarlist = v;
@@ -178,7 +178,7 @@ libvar_t *LibVar(const char *var_name, const char *value)
 	v = LibVarAlloc(var_name);
 	//variable string
 	v->string = (char *)GetMemory((unsigned long)strlen(value) + 1);
-	strcpy(v->string, value);
+	Q_strncpyz(v->string, value, (unsigned long)strlen(value) + 1);
 	//the value
 	v->value = LibVarStringValue(v->string);
 	//variable is modified
@@ -233,7 +233,7 @@ void LibVarSet(const char *var_name, const char *value)
 	} //end else
 	//variable string
 	v->string = (char *)GetMemory((unsigned long)strlen(value) + 1);
-	strcpy(v->string, value);
+	Q_strncpyz(v->string, value, (unsigned long)strlen(value) + 1);
 	//the value
 	v->value = LibVarStringValue(v->string);
 	//variable is modified

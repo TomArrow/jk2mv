@@ -619,11 +619,11 @@ static void SV_Status_f( void )
 
 		if (cl->state == CS_CONNECTED)
 		{
-			strcpy(state, "CNCT ");
+			Q_strncpyz(state, "CNCT ",sizeof(state));
 		}
 		else if (cl->state == CS_ZOMBIE)
 		{
-			strcpy(state, "ZMBI ");
+			Q_strncpyz(state, "ZMBI ", sizeof(state));
 		}
 		else
 		{
@@ -686,7 +686,7 @@ static void SV_ConSay_f(void) {
 		return;
 	}
 
-	strcpy (text, "Server: ");
+	Q_strncpyz (text, "Server: ",sizeof(text));
 	p = Cmd_Args();
 
 	if ( *p == '"' ) {

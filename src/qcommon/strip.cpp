@@ -271,8 +271,8 @@ void GetLine(char *&Data, int &Size, int &token, char *&data)
 		return;
 	}
 
-//	strcpy(temp_data, "   DATA \"test of the data\ntest test\ndfa dfd");
-//	strcpy(temp_data, "   DATA");
+//	Q_strncpyz(temp_data, "   DATA \"test of the data\ntest test\ndfa dfd");
+//	Q_strncpyz(temp_data, "   DATA");
 
 	pos = temp_data;
 	while((*pos) && strchr(" \n\r", *pos))
@@ -337,7 +337,7 @@ void GetLine(char *&Data, int &Size, int &token, char *&data)
 		}
 		*pos = 0;
 
-		strcpy(save_data, test_token);
+		Q_strncpyz(save_data, test_token,sizeof(save_data));
 	}
 }
 
@@ -495,7 +495,7 @@ void cStrings::SetReference(char *newReference)
 	}
 
 	Reference = new char[strlen(newReference)+1];
-	strcpy(Reference, newReference);
+	Q_strncpyz(Reference, newReference, strlen(newReference) + 1);
 }
 
 bool cStrings::UnderstandToken(int token, char *data)
@@ -665,7 +665,7 @@ void cStringsED::SetText(unsigned int index, char *newText)
 	}
 
 	Text[index] = new char[strlen(newText)+1];
-	strcpy(Text[index], newText);
+	Q_strncpyz(Text[index], newText);
 }
 
 void cStringsED::SetNotes(char *newNotes)
@@ -682,7 +682,7 @@ void cStringsED::SetNotes(char *newNotes)
 	}
 
 	Notes = new char[strlen(newNotes)+1];
-	strcpy(Notes, newNotes);
+	Q_strncpyz(Notes, newNotes);
 }
 
 
@@ -807,18 +807,22 @@ void cStringsSingle::SetText(const char *newText)
 
 #ifndef _STRIPED_
 	// Following is for TESTING for SOF.
+	int destSize;
 	if(sp_show_strip->value)
 	{
 		Dest = Text = new char[length + 6];
-		strcpy(Dest,"SP:");
+		destSize = length + 6;
+		Q_strncpyz(Dest,"SP:", length + 6);
+		destSize -= strlen(Dest);
 		Dest += strlen(Dest);
 	}
 	else
 #endif
 	{
 		Dest = Text = new char[length];
+		destSize = length;
 	}
-	strcpy(Dest, newText);
+	Q_strncpyz(Dest, newText, destSize);
 }
 
 // fix problems caused by fucking morons entering clever "rich" chars in to new text files *after* the auto-stripper
@@ -970,7 +974,7 @@ void cStringPackage::SetReference(char *newReference)
 	}
 
 	Reference = new char[strlen(newReference)+1];
-	strcpy(Reference, newReference);
+	Q_strncpyz(Reference, newReference, strlen(newReference) + 1);
 }
 
 #ifndef _STRIPED_
@@ -1133,7 +1137,7 @@ void cStringPackageED::SetDescription(char *newDescription)
 	}
 
 	Description = new char[strlen(newDescription)+1];
-	strcpy(Description, newDescription);
+	Q_strncpyz(Description, newDescription);
 }
 
 cStringsED *cStringPackageED::FindString(int &index)

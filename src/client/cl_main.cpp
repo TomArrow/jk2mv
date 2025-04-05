@@ -2519,7 +2519,7 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 #ifndef MAX_STRIPED_SV_STRING
 #define MAX_STRIPED_SV_STRING 1024
 #endif
-void CL_CheckSVStripEdRef(char *buf, const char *str)
+void CL_CheckSVStripEdRef(char *buf, int bufSize, const char *str)
 { //I don't really like doing this. But it utilizes the system that was already in place.
 	int i = 0;
 	int b = 0;
@@ -2535,7 +2535,7 @@ void CL_CheckSVStripEdRef(char *buf, const char *str)
 		return;
 	}
 
-	strcpy(buf, str);
+	Q_strncpyz(buf, str, bufSize);
 
 	strLen = (int)strlen(str);
 
@@ -2710,7 +2710,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 			char sTemp[MAX_STRIPED_SV_STRING];
 
 			s = MSG_ReadString( msg );
-			CL_CheckSVStripEdRef(sTemp, s);
+			CL_CheckSVStripEdRef(sTemp,sizeof(sTemp), s);
 			Q_strncpyz( clc.serverMessage, sTemp, sizeof( clc.serverMessage ) );
 			Com_Printf( "%s", sTemp );
 		}

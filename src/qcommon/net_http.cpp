@@ -440,7 +440,7 @@ static void NET_HTTP_DownloadRecvData(struct mg_iobuf *io, struct mg_connection 
 		lock->lock();
 
 		if (total < bytesAvailable) {
-			strcpy(cldl->err_msg, "HTTP Error: 0 bytes written to file\n");
+			Q_strncpyz(cldl->err_msg, "HTTP Error: 0 bytes written to file\n",sizeof(cldl->err_msg));
 			cldl->error = true;
 			nc->is_closing = 1;
 			return;

@@ -2215,7 +2215,7 @@ void LoadTGA ( const char *name, byte **pic, int *width, int *height, pixelForma
 
 	*pic = NULL;
 
-#define TGA_FORMAT_ERROR(blah) {sprintf(sErrorString,blah); bFormatErrors = true; goto TGADone;}
+#define TGA_FORMAT_ERROR(blah) {Com_sprintf(sErrorString,sizeof(sErrorString),blah); bFormatErrors = true; goto TGADone;}
 //#define TGA_FORMAT_ERROR(blah) ri.Error( ERR_DROP, blah );
 
 	//
@@ -3922,7 +3922,7 @@ return= true if three part skins found
 output= qualified names to three skins if return is true, undefined if false
 ===============
 */
-bool RE_SplitSkins(const char *INname, char *skinhead, char *skintorso, char *skinlower)
+bool RE_SplitSkins(const char *INname, char *skinhead, char *skintorso, char *skinlower, int partSize)
 {	//INname= "models/players/jedi_tf/|head01_skin1|torso01|lower01";
 	if (strchr(INname, '|'))
 	{
@@ -3932,9 +3932,9 @@ bool RE_SplitSkins(const char *INname, char *skinhead, char *skintorso, char *sk
 		*p=0;
 		p++;
 		//fill in the base path
-		strcpy (skinhead, name);
-		strcpy (skintorso, name);
-		strcpy (skinlower, name);
+		Q_strncpyz (skinhead, name, partSize);
+		Q_strncpyz (skintorso, name, partSize);
+		Q_strncpyz (skinlower, name, partSize);
 
 		//now get the the individual files
 
@@ -3947,8 +3947,8 @@ bool RE_SplitSkins(const char *INname, char *skinhead, char *skintorso, char *sk
 		}
 		*p2=0;
 		p2++;
-		strcat (skinhead, p);
-		strcat (skinhead, ".skin");
+		Q_strcat (skinhead, partSize, p);
+		Q_strcat (skinhead, partSize, ".skin");
 
 
 		//advance to third
@@ -3960,11 +3960,11 @@ bool RE_SplitSkins(const char *INname, char *skinhead, char *skintorso, char *sk
 		}
 		*p=0;
 		p++;
-		strcat (skintorso,p2);
-		strcat (skintorso, ".skin");
+		Q_strcat (skintorso, partSize,p2);
+		Q_strcat (skintorso, partSize, ".skin");
 
-		strcat (skinlower,p);
-		strcat (skinlower, ".skin");
+		Q_strcat (skinlower, partSize,p);
+		Q_strcat (skinlower, partSize, ".skin");
 
 		return true;
 	}
@@ -4111,7 +4111,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		char skinhead[MAX_QPATH]={0};
 		char skintorso[MAX_QPATH]={0};
 		char skinlower[MAX_QPATH]={0};
-		if ( RE_SplitSkins(name, (char*)&skinhead, (char*)&skintorso, (char*)&skinlower ) )
+		if ( RE_SplitSkins(name, (char*)&skinhead, (char*)&skintorso, (char*)&skinlower, MAX_QPATH) )
 		{//three part
 			hSkin = RE_RegisterIndividualSkin(skinhead, hSkin);
 			if (hSkin)

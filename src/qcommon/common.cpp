@@ -1443,9 +1443,10 @@ const char *CopyString( const char *in ) {
 
 const char *CopyString( const char *in, memtag_t eTag ) {
 	char	*out;
+	int size = strlen(in) + 1;
 
-	out = (char *)Z_Malloc(strlen(in) + 1, eTag);
-	strcpy(out, in);
+	out = (char *)Z_Malloc(size, eTag);
+	Q_strncpyz(out, in, size);
 	return out;
 }
 

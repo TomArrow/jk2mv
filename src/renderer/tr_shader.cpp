@@ -1699,8 +1699,8 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				strcat( buffer, token );
-				strcat( buffer, " " );
+				Q_strcat( buffer,sizeof(buffer), token );
+				Q_strcat( buffer,sizeof(buffer), " " );
 			}
 
 			ParseTexMod( buffer, stage );
@@ -1738,8 +1738,8 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				strcat( buffer, token );
-				strcat( buffer, " " );
+				Q_strcat( buffer,sizeof(buffer), token );
+				Q_strcat( buffer,sizeof(buffer), " " );
 			}
 
 			ParseSurfaceSprites( buffer, stage );
@@ -1763,15 +1763,15 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 		{
 			char buffer[1024] = "";
 			char param[128];
-			strcpy(param,token);
+			Q_strncpyz(param,token,sizeof(param));
 
 			while ( 1 )
 			{
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				strcat( buffer, token );
-				strcat( buffer, " " );
+				Q_strcat( buffer,sizeof(buffer), token );
+				Q_strcat( buffer,sizeof(buffer), " " );
 			}
 
 			ParseSurfaceSpritesOptional( param, buffer, stage );
@@ -4069,6 +4069,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 	char *hashMem;
 	int shaderTextHashTableSizes[MAX_SHADERTEXT_HASH], hash, size;
 	int sum;
+	int shaderTextSize;
 
 	// scan for shader files
 	shaderFiles[0] = ri.FS_ListFiles( path, ".shader_mv", &numShaderFilesType[0] );
@@ -4119,12 +4120,14 @@ static void ScanAndLoadShaderFiles( const char *path )
 		}
 	}
 
-	// build single large buffer
-	s_shaderText = (char *)ri.Hunk_Alloc( sum + numShaderFiles + 1, h_low );
+	// build single large 
+	shaderTextSize = sum + numShaderFiles + 1;
+	s_shaderText = (char *)ri.Hunk_Alloc(shaderTextSize, h_low );
 	pw = s_shaderText;
 	for ( i = 0; i < numShaderFiles ; i++ ) {
-		strcat( pw, buffers[i] );
-		strcat( pw, "\n" );
+		Q_strcat( pw, shaderTextSize, buffers[i] );
+		Q_strcat( pw, shaderTextSize, "\n" );
+		shaderTextSize -= strlen(pw);
 		pw += strlen( pw );
 		ri.FS_FreeFile( (void*) buffers[i] );
 	}
@@ -4191,6 +4194,7 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 	char	*p;
 	int		numDynGlowShaders;
 	int		sum, i;
+	int		dynglowShaderSize;
 
 	shaderFiles = ri.FS_ListFiles( path, ".dynGlow", &numDynGlowShaders );
 	assert(numDynGlowShaders >= 0);
@@ -4223,7 +4227,8 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 	}
 
 	// build single large buffer
-	mv_dynGlowShaders = (char *)ri.Hunk_Alloc( sum + numDynGlowShaders + 1, h_low );
+	dynglowShaderSize = sum + numDynGlowShaders + 1;
+	mv_dynGlowShaders = (char *)ri.Hunk_Alloc(dynglowShaderSize, h_low );
 
 	p = mv_dynGlowShaders;
 	for ( i = numDynGlowShaders - 1; i >= 0 ; i-- ) {
@@ -4232,8 +4237,9 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 			continue;
 		}
 
-		strcat( p, dynGlowBuffers[i] );
-		strcat( p, "\n" );
+		Q_strcat( p, dynglowShaderSize, dynGlowBuffers[i] );
+		Q_strcat( p, dynglowShaderSize, "\n" );
+		dynglowShaderSize -= strlen(p);
 		p += strlen(p);
 		ri.FS_FreeFile( (void*) dynGlowBuffers[i] );
 	}
