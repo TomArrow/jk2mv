@@ -439,7 +439,6 @@ typedef enum {
 } sharedTraps_t;
 
 #define	MAX_VM		3
-extern int vm_currentIndex;
 
 void	VM_Init( void );
 vm_t	*VM_Create(const char *module, qboolean mvOverride, intptr_t(*systemCalls)(intptr_t *), vmInterpret_t interpret);
@@ -498,8 +497,7 @@ int VM_MVMenuLevel(const vm_t *vm);
 
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
-
-void FixGhoul2InfoLeaks(int vmIndex);
+int VM_GetIndex(const vm_t *vm);
 
 /*
 ==============================================================

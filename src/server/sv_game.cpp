@@ -381,6 +381,9 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 	}
 
+	int vmIndex = VM_GetIndex(gvm);
+	SetGhoul2TableIndex(vmIndex);
+
 	switch( args[0] ) {
 	case G_PRINT:
 		Com_Printf( "%s", VMAS(1) );
@@ -992,16 +995,16 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vm_currentIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1355,10 +1358,17 @@ Called every time a map changes
 ===============
 */
 void SV_ShutdownGameProgs( void ) {
+	int vmIndex;
+
 	if ( !gvm ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
+
+	vmIndex = VM_GetIndex(gvm);
+	FixGhoul2InfoLeaks(vmIndex);
+	SetGhoul2TableIndex(-1);
+
 	VM_Free( gvm );
 	gvm = NULL;
 	sv.fixes = MVFIX_NONE;
@@ -1422,10 +1432,16 @@ Called on a map_restart, but not on a normal map change
 ===================
 */
 void SV_RestartGameProgs( void ) {
+	int vmIndex;
+
 	if ( !gvm ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
+
+	vmIndex = VM_GetIndex(gvm);
+	FixGhoul2InfoLeaks(vmIndex);
+	SetGhoul2TableIndex(-1);
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );
