@@ -2779,7 +2779,7 @@ void UpdateLoopingSounds()
 	float pos[3];
 	float fVolume = 0.003922f;	// 1.f / 255.f
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	// Clear AL Error State
 	alGetError();
 #endif
@@ -2849,7 +2849,7 @@ void UpdateRawSamples()
 	int i,j,src;
 
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	// Clear Open AL Error
 	alGetError();
 #endif

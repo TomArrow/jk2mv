@@ -918,6 +918,13 @@ typedef struct clientRendererInfo_s {
 
 const char	*CopyString( const char *in );
 const char	*CopyString( const char *in, memtag_t eTag );
+
+struct stringPool_s;
+typedef struct stringPool_s stringPool_t;
+stringPool_t	*Z_StringPoolNew(unsigned int blockSize, memtag_t eTag);
+void			Z_StringPoolFree(stringPool_t * pool);
+const char		*Z_StringPoolAdd(stringPool_t * pool, const char * string);
+
 void		Info_Print( const char *s );
 
 void		Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)(char *), qboolean silent);
@@ -1020,7 +1027,7 @@ temp file loading
 
 */
 
-#if defined(_DEBUG) && !defined(BSPC)
+#if defined(DEBUG) && !defined(BSPC)
 	#define ZONE_DEBUG
 #endif
 

@@ -2466,7 +2466,7 @@ qboolean R_LoadMDXM( model_t *mod, void *buffer, const char *mod_name, qboolean 
 		surfInfo = (mdxmSurfHierarchy_t *)( (byte *)surfInfo + (size_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surfInfo->numChildren ] ));
 	}
 
-#if _DEBUG
+#if DEBUG
 	if (com_developer->integer) {
 		ri.Printf(PRINT_ALL, "For Ghoul2 mesh file %s\n", mod_name);
 	}
@@ -2526,7 +2526,7 @@ qboolean R_LoadMDXM( model_t *mod, void *buffer, const char *mod_name, qboolean 
 			// find the next surface
 			surf = (mdxmSurface_t *)( (byte *)surf + surf->ofsEnd );
 		}
-#if _DEBUG
+#if DEBUG
 		if (com_developer->integer) {
 			ri.Printf(PRINT_ALL, "Lod %d has %d tris in %d surfaces with %d bones\n", l, triCount, mdxm->numSurfaces, mdxm->numBones);
 		}

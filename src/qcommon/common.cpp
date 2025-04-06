@@ -254,7 +254,7 @@ static void Com_Puts_Ext( qboolean extendedColors, qboolean skipNotify, const ch
 		}
 	}
 
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(DEBUG)
 	if ( *msg )
 	{
 		OutputDebugStringA ( Q_CleanStr((char *)msg, (qboolean)MV_USE102COLOR, serverIsTommyTernal) );
@@ -1217,6 +1217,13 @@ int Z_Size(void *pvAddress)
 	return pMemory->iSize;
 }
 
+memtag_t Z_Tag(void *pvAddress)
+{
+	zoneHeader_t *pMemory = ((zoneHeader_t *)pvAddress) - 1;
+
+	return pMemory->eTag;
+}
+
 
 // Frees a block of memory...
 //
@@ -1300,7 +1307,7 @@ void *S_Malloc( int iSize ) {
 }
 
 
-#ifdef _DEBUG
+#ifdef DEBUG
 static void Z_MemRecoverTest_f(void)
 {
 	// needs to be in _DEBUG only, not good for final game!
@@ -1399,7 +1406,7 @@ void Com_InitZoneMemory( void )
 	memset(&TheZone, 0, sizeof(TheZone));
 	TheZone.Header.iMagic = ZONE_MAGIC;
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	com_validateZone = Cvar_Get("com_validateZone", "1", 0);
 #else
 	com_validateZone = Cvar_Get("com_validateZone", "0", 0);
@@ -1408,7 +1415,7 @@ void Com_InitZoneMemory( void )
 	Cmd_AddCommand("zone_stats", Z_Stats_f);
 	Cmd_AddCommand("zone_details", Z_Details_f);
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	Cmd_AddCommand("zone_memrecovertest", Z_MemRecoverTest_f);
 #endif
 }
@@ -1450,6 +1457,65 @@ const char *CopyString( const char *in, memtag_t eTag ) {
 	return out;
 }
 
+/*
+========================
+StringPool
+
+Growing pool for allocating immutable C strings in Zone Memory
+blockSize should be tuned to balance fragmentation and waste
+Strings longer than blockSize can be safely added
+========================
+*/
+
+struct stringPool_s {
+	unsigned int		size;
+	unsigned int		tail;
+	struct stringPool_s	*next;
+	char				buffer[0];
+};
+
+stringPool_t *Z_StringPoolNew(unsigned int blockSize, memtag_t eTag) {
+	stringPool_t *block = (stringPool_t *)Z_Malloc(offsetof(stringPool_t, buffer) + blockSize, eTag, qfalse);
+
+	block->size = blockSize;
+	block->tail = 0;
+	block->next = NULL;
+
+	return block;
+}
+
+void Z_StringPoolFree(stringPool_t * pool) {
+	stringPool_t *block = pool;
+
+	while (block) {
+		stringPool_t *nextBlock = block->next;
+		Z_Free(block);
+		block = nextBlock;
+	}
+}
+
+const char *Z_StringPoolAdd(stringPool_t * pool, const char * string) {
+	stringPool_t *block = pool;
+	unsigned int len = strlen(string) + 1;
+	unsigned int total = 0;
+
+	while (block->size < block->tail + len) {
+		total += block->size;
+
+		if (!block->next) {
+			unsigned int size = MAX(len, pool->size);
+			memtag_t eTag = Z_Tag(block);
+			block->next = Z_StringPoolNew(size, eTag);
+		}
+
+		block = block->next;
+	}
+
+	memcpy(block->buffer + block->tail, string, len);
+	block->tail += len;
+
+	return block->buffer + block->tail - len;
+}
 
 /*
 ==============================================================================
@@ -2127,7 +2193,7 @@ void Hunk_Trash( void ) {
 	if ( s_hunkData == NULL )
 		return;
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	Com_Error(ERR_DROP, "hunk trashed");
 	return;
 #endif
@@ -3511,7 +3577,7 @@ Field_CheckRep
 ==================
 */
 void Field_CheckRep( field_t *edit ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 	int len = strlen(edit->buffer);
 
 	assert( len < MAX_EDIT_LINE );
@@ -3532,7 +3598,7 @@ void Field_CheckRep( field_t *edit ) {
 		assert( edit->currentTail <= edit->historyTail || edit->historyHead <= edit->currentTail );
 
 	assert( edit->buffer == edit->bufferHistory[edit->currentTail] );
-#endif // NDEBUG
+#endif // DEBUG
 }
 
 /*
