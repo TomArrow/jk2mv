@@ -370,7 +370,6 @@ void __attribute__((optimize("O0"))) VM_CompiledSyscall() {
     opStack += opStackIndex;
     *opStack = currentVM->systemCall(args);
     currentVM = savedvm;
-    vm_currentIndex = currentVM->index;
 }
 
 void VM_CompiledErrorJump() {
@@ -987,7 +986,6 @@ int __attribute__((optimize("O0"))) VM_CallCompiled(vm_t *vm, int *args) {
     int		arg;
 
     currentVM = vm;
-    vm_currentIndex = currentVM->index;
 
     // interpret the code
     vm->currentlyInterpreting = qtrue;

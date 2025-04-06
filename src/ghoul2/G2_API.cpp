@@ -35,11 +35,12 @@ typedef std::map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
 static CGhoul2Info_m	ghoultable[MAX_VM];
 static g2handle_t		nextGhoul2Handle = (g2handle_t)1;
 static int				maxModelIndex[MAX_VM];
+static int				g2TableIndex = -1;
 
 CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
-	CGhoul2Info_m::iterator ghlIt = ghoultable[vm_currentIndex].find(g2h);
+	CGhoul2Info_m::iterator ghlIt = ghoultable[g2TableIndex].find(g2h);
 
-	if (ghlIt == ghoultable[vm_currentIndex].end())
+	if (ghlIt == ghoultable[g2TableIndex].end())
 	{
 		return NULL;
 	}
@@ -47,14 +48,14 @@ CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
 	return &ghlIt->second;
 }
 
-void FixGhoul2InfoLeaks(int vmIndex)
+void FixGhoul2InfoLeaks(int tableIndex)
 {
-	ghoultable[vmIndex].clear();
-	maxModelIndex[vmIndex] = 0;
+	ghoultable[tableIndex].clear();
+	maxModelIndex[tableIndex] = 0;
 }
 
 void G2API_CleanGhoul2Models(g2handle_t *g2hPtr) {
-	ghoultable[vm_currentIndex].erase(*g2hPtr);
+	ghoultable[g2TableIndex].erase(*g2hPtr);
 	*g2hPtr = 0;
 }
 
@@ -85,7 +86,7 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 		*g2hPtr = g2h = nextGhoul2Handle++;
 	}
 
-	CGhoul2Info_v &ghoul2 = ghoultable[vm_currentIndex][g2h];
+	CGhoul2Info_v &ghoul2 = ghoultable[g2TableIndex][g2h];
 
 	// find a free spot in the list
 	for (CGhoul2Info_v::iterator it = ghoul2.begin(); it != ghoul2.end(); ++it)
@@ -94,8 +95,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 		{
 			// this is only valid and used on the game side. Client side ignores this
 			it->mModelindex = modelIndex;
-			if (maxModelIndex[vm_currentIndex] < modelIndex)
-				maxModelIndex[vm_currentIndex] = modelIndex;
+			if (maxModelIndex[g2TableIndex] < modelIndex)
+				maxModelIndex[g2TableIndex] = modelIndex;
 				// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 			it->mModel = RE_RegisterModel(fileName);
 			it->currentModel = R_GetModelByHandle(it->mModel);
@@ -127,8 +128,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 
 	// if we got this far, then we didn't find a spare position, so lets insert a new one
 	newModel.mModelindex = modelIndex;
-	if (maxModelIndex[vm_currentIndex] < modelIndex)
-		maxModelIndex[vm_currentIndex] = modelIndex;
+	if (maxModelIndex[g2TableIndex] < modelIndex)
+		maxModelIndex[g2TableIndex] = modelIndex;
 	// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 	if (customShader <= -20)
 	{ //This means the server is making the function call. And the server does not like registering models.
@@ -1227,7 +1228,7 @@ void G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr)
 	}
 
 	*g2hToPtr = g2hTo = nextGhoul2Handle++;
-	ghoultable[vm_currentIndex][g2hTo] = CGhoul2Info_v();
+	ghoultable[g2TableIndex][g2hTo] = CGhoul2Info_v();
 
 	G2API_CopyGhoul2Instance(g2hFrom, g2hTo, -1);
 	return;
@@ -1324,6 +1325,11 @@ qboolean G2API_SkinlessModel(g2handle_t g2h, int modelIndex)
 
 	//found nothing.
 	return qtrue;
+}
+
+void SetGhoul2TableIndex(int index)
+{
+	g2TableIndex = index;
 }
 
 #if 0

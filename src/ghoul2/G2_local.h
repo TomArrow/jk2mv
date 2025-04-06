@@ -161,6 +161,9 @@ void		G2API_CopySpecificG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2
 void		G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr);
 qboolean	G2API_SkinlessModel(g2handle_t g2h, int modelIndex);
 
+void		FixGhoul2InfoLeaks(int tableIndex);
+void		SetGhoul2TableIndex(int index);
+
 extern qboolean gG2_GBMNoReconstruct;
 extern qboolean gG2_GBMUseSPMethod;
 // From tr_ghoul2.cpp
