@@ -28,12 +28,12 @@
 		visible						0
 		fullscreen					0
 		outOfBoundsClick										// this closes the window if it gets a click out of the rectangle
-		rect						20 32 600 448
+		rect						20 32 600 418
 		focusColor					1 1 1 1					// Focus color for text and items
 		style						1
 		border						1
 		descX						320
-		descY						443
+		descY						413
 		descScale					1
 		descColor				1 .682 0 .8
 		descAlignment					ITEM_ALIGN_CENTER		
@@ -58,7 +58,7 @@
 			name				background_pic
 			group				none
 			style				WINDOW_STYLE_SHADER
-			rect				0 0 600 455
+			rect				0 0 600 419
 			background			"gfx/menus/menu_box_ingame"
 			forecolor			1 1 1 1
 			visible				1
@@ -72,47 +72,11 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				0 428 600 20
+			rect				0 398 600 20
 			backcolor			.298 .305 .690 1
 			forecolor			.549 .854 1 1
 			visible				1
 			decoration
-		}
-		
-
-//------------------------------------------------------------------------------------------------
-// Player Configuration
-//------------------------------------------------------------------------------------------------
-// Player Configuration title		
-		itemDef 
-		{
-			name				playerconfigtitle_glow
-			group				none
-			style				WINDOW_STYLE_SHADER
-			background			"gfx/menus/menu_buttonback"			// Frame around button
-			rect				20 3 560 30
-			forecolor			1 1 1 1
-			visible				1
-			decoration
-		}
-		
-		itemDef 
-		{
-			name				playerconfigtitle
-			style				WINDOW_STYLE_EMPTY
-			text				@MENUS2_PLAYER_CONFIGURATION
-			rect				20 5 560 28
-			textalign			ITEM_ALIGN_CENTER		
-			textalignx			280
-			textaligny			2
-			outlinecolor			1 .5 .5 .5
-			backcolor			0 0 0 0
-			font				3
-			textscale			1
-			forecolor			.549 .854 1 1
-			border				0
-			bordercolor			0 0 0 0
-			visible				1 
 		}
 
 //------------------------------------------------------------------------------------------------
@@ -123,7 +87,7 @@
 			name				nameglow
 			group				mods
 			style				WINDOW_STYLE_SHADER
-			rect				25 31 300 24
+			rect				25 1 300 24
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			visible			0
@@ -138,7 +102,7 @@
 			text 				@MENUS0_NAME
 			cvar 				"ui_Name"
 			maxchars 			26
-			rect 				20 33 300 20
+			rect 				20 3 300 20
 			textalign			ITEM_ALIGN_LEFT		
 			textalignx 			0
 			textaligny 			-5
@@ -174,7 +138,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				15 73 570 230
+			rect				15 43 570 230
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -189,7 +153,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				17 57 570 20
+			rect				17 27 570 20
 			backcolor			.298 .305 .690 1
 			forecolor			.549 .854 1 1
 			visible				1
@@ -201,7 +165,7 @@
 			name				modeltitle
 			style				0	
 			text				@MENUS2_CHARACTER_MODEL
-			rect				3 52 570 0
+			rect				3 22 570 0
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			285
 //			textaligny			12
@@ -230,7 +194,7 @@
 			style				0	
 			text				@MENUS2_TEAM_COLOR
 			ownerdraw			UI_SKIN_COLOR
-			rect				50 78 160 20
+			rect				50 48 160 20
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			-5
@@ -264,7 +228,7 @@
 			style				0	
 			text				@MENUS2_TEAM_COLOR
 			ownerdraw			UI_SKIN_COLOR
-			rect				50 78 160 20
+			rect				50 48 160 20
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			-5
@@ -298,8 +262,8 @@
 		itemDef 
 		{
 			name 				headlist
-//			rect 				20 90 388 82
-			rect 				20 90 404 194			
+//			rect 				20 60 388 82
+			rect 				20 60 404 194			
 			type 				ITEM_TYPE_LISTBOX
 			style 			WINDOW_STYLE_FILLED
 			elementwidth 		64
@@ -332,7 +296,7 @@
 			name				customtitle
 			style				0	
 			text				@MENUS1_CUSTOM
-			rect				425 91 150 26
+			rect				425 61 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
 			textaligny			-3
@@ -353,7 +317,7 @@
 			descText			@ETERNAL_CUSTOMPLAYER_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
-			rect				465 121 75 75
+			rect				465 91 75 75
 			font				3
 			textscale			1
 			textaligny			-1
@@ -385,7 +349,7 @@
 			group				none
 			type				ITEM_TYPE_TEXT
 			text				@ETERNAL_HEAD_SIZE
-			rect				425 237 150 26
+			rect				425 207 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
 			textaligny			-3
@@ -405,7 +369,7 @@
 			group				none
 			type				ITEM_TYPE_INTSLIDER
 			cvarint				"ui_headSize" 64 1 96
-			rect				454 267 96 16
+			rect				454 237 96 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
@@ -425,7 +389,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				15 307 410 100
+			rect				15 277 410 100
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -439,7 +403,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				17 308 410 18
+			rect				17 278 410 18
 			backcolor			.298 .305 .690 1
 			forecolor			1 1 1 1
 			visible				1
@@ -452,7 +416,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_EMPTY
-			rect				430 307 155 100
+			rect				430 277 155 100
 			border				1
 			bordercolor			.298 .305 .690 1
 			bordersize			2
@@ -467,7 +431,7 @@
 			name				background
 			group				none
 			style				WINDOW_STYLE_FILLED
-			rect				432 308 155 18
+			rect				432 278 155 18
 			backcolor			.298 .305 .690 1
 			forecolor			1 1 1 1
 			visible				1
@@ -479,7 +443,7 @@
 			name				sabertitle
 			style				0	
 			text				@ETERNAL_SABER_TITLE
-			rect				430 305 150 26
+			rect				430 275 150 26
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			75
 			textaligny			-3
@@ -500,7 +464,7 @@
 			descText			@ETERNAL_SABER_TITLE_DESC
 			type				ITEM_TYPE_BUTTON
 			style				WINDOW_STYLE_SHADER
-			rect				465 330 75 75
+			rect				465 300 75 75
 			font				3
 			textscale			1
 			textalignx			65
@@ -536,7 +500,7 @@
 			group				yesforce
 			style				0	
 			text				@MENUS2_THE_FORCE
-			rect				220 306 0 0
+			rect				220 276 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			textaligny			-4
@@ -564,7 +528,7 @@
 			style				0	
 			text				@MENUS0_FORCE_MASTERY
 			ownerdraw			UI_FORCE_RANK
-			rect				20 328 175 16
+			rect				20 298 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			textaligny			0
@@ -591,7 +555,7 @@
 			style				0	
 			text				@MENUS0_FORCE_SIDE
 			ownerdraw			UI_FORCE_SIDE
-			rect				20 348 175 16
+			rect				20 318 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -623,7 +587,7 @@
 			style				0	
 			text				@MENUS0_POINTS_REMAINING
 			ownerdraw			UI_FORCE_POINTS
-			rect				20 368 175 16
+			rect				20 338 175 16
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -650,7 +614,7 @@
 			style				0	
 			text				@MENUS3_JEDI_NONJEDI
 			ownerdraw			UI_JEDI_NONJEDI
-			rect				183 378 105 32
+			rect				183 348 105 32
 			textalign			ITEM_ALIGN_LEFT
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -679,7 +643,7 @@
 			type				1
 			style				WINDOW_STYLE_SHADER
 			background			"gfx/menus/configforce"
-			rect				275 328 75 75
+			rect				275 298 75 75
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			97
 			textaligny			2
@@ -722,7 +686,7 @@
 			group				noforce
 			style				0	
 			text				@MENUS3_NOFORCE_DISABLED_0
-			rect				220 306 0 0
+			rect				220 276 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -748,7 +712,7 @@
 			group				"noforce"
 			style				0	
 			text				@MENUS3_NOFORCE_DISABLED_1
-			rect				20 328 400 20
+			rect				20 298 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -777,7 +741,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_0
-			rect				220 306 0 0
+			rect				220 276 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			backcolor			0 0 0 0
@@ -800,7 +764,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_1
-			rect				20 338 400 20
+			rect				20 308 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -823,7 +787,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_2
-			rect				20 358 400 20
+			rect				20 328 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -847,7 +811,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_HOLO_3
-			rect				20 378 400 20
+			rect				20 348 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -875,7 +839,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_0
-			rect				220 306 0 0
+			rect				220 276 0 0
 			textalign			ITEM_ALIGN_CENTER		
 			textalignx			0
 			outlinecolor			1 .5 .5 .5
@@ -899,7 +863,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_1
-			rect				20 338 400 20
+			rect				20 308 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -922,7 +886,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_2
-			rect				20 358 400 20
+			rect				20 328 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -946,7 +910,7 @@
 			group				none
 			style				0	
 			text				@MENUS3_NOFORCE_JEDI_3
-			rect				20 378 400 20
+			rect				20 348 400 20
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			200
 			textaligny			0
@@ -973,7 +937,7 @@
 			name				applyjoinButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				5 420 105 32
+			rect				5 390 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -988,7 +952,7 @@
 			text				@MENUS2_APPLY
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				5 420 105 32
+			rect				5 390 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1022,7 +986,7 @@
 			text				@MENUS0_JOIN_GAME
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				5 420 105 32
+			rect				5 390 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1054,7 +1018,7 @@
 			name				applyredButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				110 420 105 32
+			rect				110 390 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1068,7 +1032,7 @@
 			text				@MENUS0_JOIN_RED
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				110 420 105 32
+			rect				110 390 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1109,7 +1073,7 @@
 			name				applyblueButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				215 420 105 32
+			rect				215 390 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1123,7 +1087,7 @@
 			text				@MENUS0_JOIN_BLUE
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				215 420 105 32
+			rect				215 390 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
@@ -1164,7 +1128,7 @@
 			name				applyspectateButton
 			group				highlights 
 			style				WINDOW_STYLE_SHADER
-			rect				320 420 105 32
+			rect				320 390 105 32
 			background			"gfx/menus/menu_buttonback"			// Frame around button
 			forecolor			1 1 1 1
 			decoration
@@ -1178,7 +1142,7 @@
 			text				@MENUS0_SPECTATE
 			type				1
 			style				WINDOW_STYLE_EMPTY
-			rect				320 420 105 32
+			rect				320 390 105 32
 			textalign			ITEM_ALIGN_CENTER
 			textalignx			52
 			textaligny			2
