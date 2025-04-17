@@ -332,11 +332,18 @@ typedef struct fpsGuessMethod3HistorySample_s {
 	float measuredEffectiveGravity;
 } fpsGuessMethod3HistorySample_t;
 
+
+typedef enum showMouseSampleFlags_s {
+	SMSF_CLOSE_TO_VERTICAL_LIMIT = (1 << 0),
+	SMSF_TOUCHING_VERTICAL_LIMIT = (1 << 1)
+} showMouseSampleFlags_t;
+
 typedef struct showMouseSample_s {
 	vec2_t		angleDelta;
 	float		angleChangeSpeed;
 	float		angleChangeSpeedXY[2];
 	int			cmdTimeDelta;
+	int			flags;
 } showMouseSample_t;
 
 typedef struct clientStatic_s {

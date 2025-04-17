@@ -505,6 +505,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 				sample->angleChangeSpeed = 0;
 				sample->angleDelta[0] = 0;
 				sample->angleDelta[1] = 0;
+				sample->flags = 0;
 			}
 			else {
 				float change1, change2, speed;
@@ -517,9 +518,15 @@ void CL_ParseSnapshot( msg_t *msg ) {
 				sample->angleChangeSpeedXY[0] = fabsf(change1)/(float)cmdTimeDelta;
 				sample->angleChangeSpeedXY[1] = fabsf(change2)/(float)cmdTimeDelta;
 				sample->cmdTimeDelta = cmdTimeDelta;
+				sample->flags = 0;
 				cls.showMouse.oldAngle[0] = cl.snap.ps.viewangles[1];
 				cls.showMouse.oldAngle[1] = cl.snap.ps.viewangles[0];
 			}
+			if (cl.snap.ps.viewangles[0] > 87.89f || cl.snap.ps.viewangles[0] < -87.89f) {
+				sample->flags |= SMSF_TOUCHING_VERTICAL_LIMIT;
+			} else if (cl.snap.ps.viewangles[0] >= 87.0f || cl.snap.ps.viewangles[0] <= -87.0f) {
+				sample->flags |= SMSF_CLOSE_TO_VERTICAL_LIMIT; // mostly for reframed demos with angle snapping
+			} 
 			cls.showMouse.angleDeltaIndex++;
 			cls.showMouse.oldCommandTime = cl.snap.ps.commandTime;
 		}

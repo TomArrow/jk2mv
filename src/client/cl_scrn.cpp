@@ -640,6 +640,8 @@ static void SCR_DrawShowMouse() {
 	showMouseSample_t* sample;
 	static vec4_t lineColorNormal{ 1.0f,1.0f,1.0f,1.0f };
 	static vec4_t lineColorFast{ 1.0f,0.0f,0.0f,1.0f };
+	static vec4_t lineColorVerticalLimit{ 0.0f,1.0f,0.0f,1.0f };
+	static vec4_t lineColorVerticalLimitClose{ 0.0f,1.0f,1.0f,1.0f };
 	vec4_t lineColor{ 1.0f,0.0f,0.0f,1.0f };
 	int startIndex = MAX(0,cls.showMouse.angleDeltaIndex - SHOWMOUSE_PAST_SAMPLES); // -1 +1 (-1 because angleDeltaIndex is the next one actually, and +1 to not overflow)
 	float xNow = cls.glconfig.vidWidth*0.5f, yNow = cls.glconfig.vidHeight * 0.5f;
@@ -678,8 +680,15 @@ static void SCR_DrawShowMouse() {
 		sample = &cls.showMouse.samples[indexHere];
 		float speedMult = Com_Clamp(0.0f,1.0f, sample->angleChangeSpeed/10.0f);
 		opacity = powf(opacity, cl_showMouseFadeExp->value);
-		VectorMA(vec3_origin, speedMult, lineColorFast, lineColor);
-		VectorMA(lineColor, 1.0f-speedMult, lineColorNormal, lineColor);
+		if (sample->flags & SMSF_TOUCHING_VERTICAL_LIMIT) {
+			VectorCopy(lineColorVerticalLimit, lineColor);
+		} else if (sample->flags & SMSF_CLOSE_TO_VERTICAL_LIMIT) {
+			VectorCopy(lineColorVerticalLimitClose, lineColor);
+		}
+		else {
+			VectorMA(vec3_origin, speedMult, lineColorFast, lineColor);
+			VectorMA(lineColor, 1.0f - speedMult, lineColorNormal, lineColor);
+		}
 		lineColor[3] = opacity;
 		re.SetColor(lineColor);
 		re.DrawLine(xNow, yNow, xNow - sample->angleDelta[0]*xScale, yNow - sample->angleDelta[1]*yScale, 2, 0, 0, 0, 0, cls.whiteShader, cls.xadjust, cls.yadjust);
