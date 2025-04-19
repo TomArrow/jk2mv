@@ -450,11 +450,11 @@ void SCR_Init( void ) {
 	cl_showMouse = Cvar_Get("cl_showMouse", "0", CVAR_ARCHIVE);
 	cl_showMouseScale = Cvar_Get("cl_showMouseScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseYScale = Cvar_Get("cl_showMouseYScale", "2.0", CVAR_ARCHIVE);
-	cl_showMouseVelocityScale = Cvar_Get("cl_showMouseVelocityScale", "150.0", CVAR_ARCHIVE);
+	cl_showMouseVelocityScale = Cvar_Get("cl_showMouseVelocityScale", "5", CVAR_ARCHIVE);
 	cl_showMouseVelocityYScale = Cvar_Get("cl_showMouseVelocityYScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseVelocityTimeScale = Cvar_Get("cl_showMouseVelocityTimeScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseDecay = Cvar_Get("cl_showMouseDecay", "0.0", CVAR_ARCHIVE);
-	cl_showMouseFadeExp = Cvar_Get("cl_showMouseFadeExp", "4.0", CVAR_ARCHIVE);
+	cl_showMouseFadeExp = Cvar_Get("cl_showMouseFadeExp", "1", CVAR_ARCHIVE);
 	cl_showMouseVelocityExp = Cvar_Get("cl_showMouseVelocityExp", "0.5", CVAR_ARCHIVE);
 	cl_showMouseVelocityLog = Cvar_Get("cl_showMouseVelocityLog", "0", CVAR_ARCHIVE);
 	cl_fpsGuess = Cvar_Get("cl_fpsGuess", "0", CVAR_ARCHIVE);
