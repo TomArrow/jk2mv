@@ -1,0 +1,5 @@
+// hud menu defs
+// 
+{
+	loadMenu { "ui/jk2consolehud.menu" }
+}

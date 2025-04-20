@@ -32,6 +32,8 @@ set(AssetsFiles
 	"gfx/hud/health_tic_3.tga"
 	"gfx/hud/health_tic_4.tga"
 	"gfx/hud/hudleft_jka.tga"
+	"gfx/hud/hudleft_256.tga"
+	"gfx/hud/hudrightframe_256.tga"
 	"gfx/hud/saber_fast.tga"
 	"gfx/hud/saber_med.tga"
 	"gfx/hud/saber_strong.tga"
@@ -65,6 +67,7 @@ set(AssetsFiles
 	"shaders/ctf3_yellowteam.shader"
 	"shaders/japro_tcRender.shader"
 	"shaders/q3mod.shader"
+	"shaders/consolehud_static.shader"
 
 	"sound/chars/mothma/misc/40MOM017.mp3"
 	"sound/chars/mothma/misc/40MOM019.mp3"
@@ -82,6 +85,8 @@ set(AssetsFiles
 	"ui/jk2mpingame.txt"
 	"ui/jahud.menu"
 	"ui/jahud.txt"
+	"ui/jk2consolehud.menu"
+	"ui/jk2consolehud.txt"
 
 	"ext_data/sabers/desann.sab"
 	"ext_data/sabers/kyle.sab"

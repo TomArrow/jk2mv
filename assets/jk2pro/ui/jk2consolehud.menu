@@ -1,0 +1,104 @@
+// HUD menu
+// 
+// defines from ui_shared.h
+
+	assetGlobalDef 
+	{
+		smallFont				"ocr_a" 18						// font
+		mediumFont				"ergoec" 18						// font
+		bigFont				"anewhope" 20					// font	
+
+		//cursor				"cursor"					// cursor	
+		itemFocusSound			"sound/interface/menuroam.wav"		// sound for item getting focus (via keyboard or mouse )	
+
+		fadeClamp				1.0								// sets the fadeup alpha
+		fadeCycle				1								// how often fade happens in milliseconds
+		fadeAmount				0.1								// amount to adjust alpha per cycle
+		shadowColor				0.1 0.1 0.1 0.25				// shadow color
+		focuscolor				0 0 1 1
+		arrowBlinkTime			0.3 //in seconds
+	 }
+{
+	menuDef 
+	{
+		name					"mainhud"
+		fullScreen				0								// MENU_TRUE				
+		rect					0 0 640 480						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+		appearanceIncrement		75								// In miliseconds
+		descX					320
+		descY					434
+		descColor				.96 .933 .40 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+
+	}
+
+	//	RIGHT SIDE HUD	//
+	menuDef 
+	{
+		name					"righthud"
+		fullScreen				0								// MENU_TRUE				
+		rect					510 360 80 80					// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+		appearanceIncrement		75								// In miliseconds
+		descX					320
+		descY					434
+		descColor				.96 .933 .40 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+	}
+
+	//	LEFT SIDE HUD	//
+	menuDef 
+	{
+		name					"lefthud"
+		fullScreen				0								// MENU_TRUE				
+		rect					50 360 80 80						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+		appearanceIncrement		75								// In miliseconds
+		descX					320
+		descY					434
+		descColor				.96 .933 .40 1					// Focus color for text and items
+		descAlignment			ITEM_ALIGN_CENTER		
+	}
+
+	menuDef 
+	{
+		name					"weaponselecthud"
+		fullScreen				0								// MENU_TRUE				
+		rect					30 370 0 0						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+	}
+
+	menuDef 
+	{
+		name					"forceselecthud"
+		fullScreen				0								// MENU_TRUE				
+		rect					30 370 0 0						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+	}
+
+	menuDef 
+	{
+		name					"inventoryselecthud"
+		fullScreen				0								// MENU_TRUE				
+		rect					30 370 0 0						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+	}
+
+
+	// Used as background for the Weapon, Force Powers, and Inventory HUDs
+	menuDef 
+	{
+		name					"iconbackground"
+		fullScreen				0								// MENU_TRUE				
+		rect					30 370 0 0						// Size and position of the menu
+		visible					1								// Visible on open
+		focusColor				1 1 1 1							// Focus color for text and items
+	}
+}
