@@ -595,6 +595,7 @@ extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
 extern	cvar_t	*cl_aviMotionJpeg;
 extern  cvar_t  *cl_aviMotionJpegQuality;
+extern	cvar_t	*cl_aviPipeFormat;
 
 extern	cvar_t	*cl_activeAction;
 
@@ -664,6 +665,8 @@ void CL_ShaderStateChanged( void );
 //EternalJK2MV
 void CL_RandomizeColors(const char* in, char *out);
 void CL_LogPrintf(fileHandle_t fileHandle, const char *fmt, ...);
+
+qboolean CL_NoDelay( void );
 
 //
 // cl_input
@@ -824,7 +827,7 @@ void tc_vis_render(void);
 //
 // cl_avi.c
 //
-qboolean CL_OpenAVIForWriting( const char *filename );
+qboolean CL_OpenAVIForWriting( const char *filename, qboolean pipe );
 void CL_TakeVideoFrame( void );
 void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
 void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );

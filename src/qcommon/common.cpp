@@ -3022,7 +3022,7 @@ int Com_TimeVal(int minMsec) {
 Com_Frame
 =================
 */
-void Com_Frame( void ) {
+void Com_Frame( qboolean noDelay) {
 	int		msec, minMsec;
 	int		timeVal;
 	static int	lastTime = 0, bias = 0;
@@ -3056,6 +3056,8 @@ void Com_Frame( void ) {
 		if (com_dedicated->integer)
 			minMsec = SV_FrameMsec();
 		else {
+			if (noDelay)
+				minMsec = 0; // did i put this in the right place?
 			if (com_minimized->integer && com_maxfpsMinimized->integer > 0)
 				minMsec = 1000 / com_maxfpsMinimized->integer;
 			else if (com_unfocused->integer && com_maxfpsUnfocused->integer > 0)

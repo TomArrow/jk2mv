@@ -15,6 +15,11 @@
 
 //============================================================================
 
+// AVI pipes
+
+fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename);
+void FS_PipeClose(fileHandle_t f);
+
 // for auto-complete (copied from OpenJK)
 #define CONSOLE_PROMPT_CHAR ']'
 #define	MAX_EDIT_LINE		256
@@ -704,6 +709,7 @@ issues.
 #define NUM_ID_PAKS		9
 
 #define	MAX_FILE_HANDLES	256 // increased from 64 in jk2mv
+#define	FS_INVALID_HANDLE	0
 
 typedef enum {
 	MODULE_MAIN,
@@ -1079,7 +1085,7 @@ void Com_TouchMemory( void );
 
 // commandLine should not include the executable name (argv[0])
 void Com_Init( char *commandLine );
-void Com_Frame( void );
+void Com_Frame( qboolean noDelay );
 void Com_Shutdown( void );
 
 

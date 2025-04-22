@@ -210,6 +210,11 @@ time_t Sys_FileTime(const char *path) {
 	return buf.st_mtime;
 }
 
+#if DEDICATED
+#else
+qboolean CL_NoDelay(void);
+#endif
+
 /*
 =================
 Sys_SigHandler
@@ -304,7 +309,11 @@ int main(int argc, char* argv[]) {
 		}
 
 		// run the game
-		Com_Frame();
+#if DEDICATED
+		Com_Frame(qfalse);
+#else
+		Com_Frame(CL_NoDelay());
+#endif
 	}
 
 	Com_Quit(sys_signal);

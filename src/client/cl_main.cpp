@@ -55,6 +55,7 @@ cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_aviMotionJpegQuality;
 cvar_t	*cl_forceavidemo;
+cvar_t	*cl_aviPipeFormat;
 
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;
@@ -164,18 +165,27 @@ video [filename]
 void CL_Video_f( void )
 {
 	char  filename[ MAX_OSPATH ];
+	const char* ext;
+	qboolean pipe;
 	int   i, last;
 
 	if( !clc.demoplaying )
 		{
-			Com_Printf( "The video command can only be used when playing back demos\n" );
+			Com_Printf("The %s command can only be used when playing back demos\n", Cmd_Argv(0));
 			return;
 		}
+
+	pipe = (qboolean)(Q_stricmp(Cmd_Argv(0), "video-pipe") == 0);
+
+	if (pipe)
+		ext = "mp4";
+	else
+		ext = "avi";
 
 	if( Cmd_Argc( ) == 2 )
 		{
 			// explicit filename
-			Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
+			Com_sprintf(filename, sizeof(filename), "videos/video%04d.%s", i, ext);
 		}
 	else
 		{
@@ -194,8 +204,8 @@ void CL_Video_f( void )
 					last -= c * 10;
 					d = last;
 
-					Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
-						     a, b, c, d );
+					Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.%s",
+						     a, b, c, d, ext );
 
 					if( !FS_FileExists( filename ) )
 						break; // file doesn't exist
@@ -208,7 +218,7 @@ void CL_Video_f( void )
 				}
 		}
 
-	CL_OpenAVIForWriting( filename );
+	CL_OpenAVIForWriting( filename, pipe );
 }
 
 /*
@@ -2847,6 +2857,22 @@ void CL_CheckTimeout( void ) {
 
 //============================================================================
 
+
+/*
+==================
+CL_NoDelay
+==================
+*/
+qboolean CL_NoDelay(void)
+{
+	extern cvar_t* com_timedemo;
+
+	if (CL_VideoRecording() || (com_timedemo->integer && clc.demofile != FS_INVALID_HANDLE))
+		return qtrue;
+
+	return qfalse;
+}
+
 /*
 ==================
 CL_CheckUserinfo
@@ -3392,6 +3418,11 @@ void CL_Init( void ) {
 	cl_aviMotionJpegQuality = Cvar_Get("cl_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
 	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
 
+	cl_aviPipeFormat = Cvar_Get("cl_aviPipeFormat",
+		"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420p "
+		"-bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
+		CVAR_ARCHIVE);
+
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
 	cl_yawspeed = Cvar_Get("cl_yawspeed", "140", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -3547,6 +3578,7 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("saveDemo", demoAutoSave_f);
 	Cmd_AddCommand ("saveDemoLast", demoAutoSaveLast_f);
 	Cmd_AddCommand ("video", CL_Video_f);
+	Cmd_AddCommand ("video-pipe", CL_Video_f); // from quake3e
 	Cmd_AddCommand ("stopvideo", CL_StopVideo_f);
 	Cmd_AddCommand ("silent", CL_Silent_f);
 	Cmd_SetCommandCompletionFunc( "silent", CL_CompleteRedirect );
