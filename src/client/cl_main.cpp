@@ -3420,7 +3420,7 @@ void CL_Init( void ) {
 
 	cl_aviPipeFormat = Cvar_Get("cl_aviPipeFormat",
 		"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420p "
-		"-bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
+		"-bf 2 -max_muxing_queue_size 4096 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
 		CVAR_ARCHIVE);
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
