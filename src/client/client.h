@@ -240,7 +240,7 @@ typedef struct {
 	int udpdl;
 
 	// demo information
-	char		demoName[MAX_QPATH];
+	char		demoName[MAX_OSPATH];
 	qboolean	spDemoRecording;
 	qboolean	demorecording;
 	qboolean	demoplaying;

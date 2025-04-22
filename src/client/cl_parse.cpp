@@ -63,11 +63,13 @@ static void Ezdemo_HandleEvent(entityState_t state);
 #define FRAGS_DOOM 		8
 #define FRAGS_LUNGE		16
 #define FRAGS_BLUEBS	32
-#define BS_ATTEMPTS		64
+//#define BS_ATTEMPTS		64
 
 #define FRAGS_ABLUE		64
 #define FRAGS_AYELLOW	128
 #define FRAGS_ARED		256
+#define BS_ATTEMPTS		512
+#define DBS_ATTEMPTS	1024
 
 #define EZDEMO_RETS				2
 #define EZDEMO_CAPTURES			4
@@ -92,6 +94,7 @@ qboolean ezdemoActive = qfalse;
 void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old,
 					 qboolean unchanged) {
 	entityState_t	*state;
+	static int		oldSaberMove[MAX_CLIENTS];
 
 	// save the parsed entity state into the big circular buffer so
 	// it can be used as the source for a later delta
@@ -112,6 +115,20 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 	cl.parseEntitiesNum++;
 	frame->numEntities++;
 
+	if (state->number >= 0 && state->number < MAX_CLIENTS) {
+		int newsabermove = state->saberMove;
+		if ((ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT && state->number != ezdemoPlayerstateClientNum) ||
+			(ezdemoShowOnlyKillsBy != EZDEMO_PREDICTEDCLIENT && ezdemoShowOnlyKillsBy >= 0 && ezdemoShowOnlyKillsBy != state->number)) {
+		}
+		else {
+			if (ezdemoActive && (newsabermove == LS_A_BACK && ezdemoFragOptions & BS_ATTEMPTS || newsabermove == LS_A_BACK_CR && ezdemoFragOptions & DBS_ATTEMPTS)) {
+				if (ezdemoActive && newsabermove != oldSaberMove[state->number]) {
+					Ezdemo_AddEvent(state->number);
+				}
+			}
+		}
+		oldSaberMove[state->number] = newsabermove;
+	}
 	if (ezdemoActive && (state->eType == ET_EVENTS + EV_OBITUARY || state->eType == ET_EVENTS + EV_CTFMESSAGE)) {
 		Ezdemo_HandleEvent(*state);
 	}
@@ -250,6 +267,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	int			oldMessageNum;
 	int			i, packetNum;
 	static int	serverTimeOlderThanPreviousCount = 0; // Count of snaps received with a lower servertime than the old snap we have.
+	static int	oldsabermove;
 
 	// get the reliable sequence acknowledge number
 	// NOTE: now sent with all server to client messages
@@ -443,6 +461,18 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// copy to the current good spot
 	cl.snap = newSnap;
 	cl.snap.ping = 999;
+
+	int newsabermove = newSnap.ps.saberMove;
+
+	if (ezdemoActive && (newsabermove == LS_A_BACK && ezdemoFragOptions & BS_ATTEMPTS || newsabermove == LS_A_BACK_CR && ezdemoFragOptions & DBS_ATTEMPTS)) {
+		if (ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT || ezdemoShowOnlyKillsBy < 0) {
+			if (newsabermove != oldsabermove) {
+				Ezdemo_AddEvent(ezdemoPlayerstateClientNum);
+			}
+		}
+	}
+
+	oldsabermove = newsabermove;
 
 #define SHOWVELOCITY_MAX_PAST_FRAMES 250
 	if (cl_showVelocity->integer) {
@@ -1720,7 +1750,9 @@ void CL_Ezdemo_f(void) {
 		Com_Printf("Usage: ezdemo <demo name/number> [options] - find events in a demo and fast-forward to them\n");
 		Com_Printf("Options include:\n");
 		Com_Printf("   dbs    - show dbs frags           [\n");
+		Com_Printf("   dbsa   - show dbs attempts           [\n");
 		Com_Printf("   bs     - show bs frags            [\n");
+		Com_Printf("   bsa    - show bs attempts            [\n");
 		Com_Printf("   bluebs - show blue bs frags       [  can be combined\n");
 		Com_Printf("   lunge  - show blue uppercut frags [\n");
 		Com_Printf("   dfa    - show dfa frags           [\n");
@@ -1762,9 +1794,14 @@ void CL_Ezdemo_f(void) {
 			ezdemoFragOptions |= BS_ATTEMPTS;
 		}
 #endif
+		else if (!Q_stricmp(buf, "bsa")) {
+			ezdemoFragOptions |= BS_ATTEMPTS;
+		}
+		else if (!Q_stricmp(buf, "dbsa")) {
+			ezdemoFragOptions |= DBS_ATTEMPTS;
+		}
 		else if (!Q_stricmp(buf, "dbs")) {
 			ezdemoFragOptions |= FRAGS_DBS;
-
 		}
 		else if (!Q_stricmp(buf, "bs")) {
 			ezdemoFragOptions |= FRAGS_BS;
