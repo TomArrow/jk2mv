@@ -817,7 +817,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt + 1)) {
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && *txt == Q_COLOR_ESCAPE && Q_IsColorStringHex((unsigned char*)txt + 1)) {
 			int skipCount = 0;
 			Q_parseColorHex(txt + 1, colorVec, &skipCount);
 			txt += 1 + skipCount;
@@ -1047,13 +1047,13 @@ void Con_DrawNotify (void)
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
 					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						strcat(sTemp, va("^%i", ColorIndexNT(currentColor)));
+						Q_strcat(sTemp, sizeof(sTemp), va("^%i", ColorIndexNT(currentColor)));
 					}
 					else {
-						strcat(sTemp, va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
+						Q_strcat(sTemp, sizeof(sTemp), va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
 					}
 				}
-				strcat(sTemp,va("%c",text[x].f.character));
+				Q_strcat(sTemp, sizeof(sTemp), va("%c",text[x].f.character));
 			}
 			//
 			// and print...
@@ -1202,7 +1202,7 @@ void Con_DrawSolidConsole( float frac ) {
 	// Draw time and date
 	time(&rawtime);
 	newtime = localtime(&rawtime);
-	if (newtime->tm_hour >= 12) strcpy(am_pm, "PM");
+	if (newtime->tm_hour >= 12) Q_strncpyz(am_pm, "PM",sizeof(am_pm));
 	if (newtime->tm_hour > 12) newtime->tm_hour -= 12;
 	if (newtime->tm_hour == 0) newtime->tm_hour = 12;
 	Com_sprintf(ts, sizeof(ts), "%.19s %s ", asctime(newtime), am_pm);
@@ -1279,13 +1279,13 @@ void Con_DrawSolidConsole( float frac ) {
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
 					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						strcat(sTemp, va("^%i", currentColor));
+						Q_strcat(sTemp,sizeof(sTemp), va("^%i", currentColor));
 					}
 					else {
-						strcat(sTemp, va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
+						Q_strcat(sTemp, sizeof(sTemp), va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
 					}
 				}
-				strcat(sTemp,va("%c",text[x].f.character));
+				Q_strcat(sTemp, sizeof(sTemp),va("%c",text[x].f.character));
 			}
 			//
 			// and print...

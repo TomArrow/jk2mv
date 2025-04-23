@@ -504,8 +504,8 @@ void BotSetBrushModelTypes(void)
 	//
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
-		if (!AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY)) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model))) continue;
 		if (model[0]) modelnum = atoi(model+1);
 		else modelnum = 0;
 
