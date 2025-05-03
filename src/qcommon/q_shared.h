@@ -2349,10 +2349,12 @@ typedef struct ezDemoEvent_s {
 	int serverTime;
 	byte clientNum;
 	byte clientNum2;
+	int duration;
 } ezDemoEvent_t;
 
+#define EZDEMO_MAX_EVENT_COUNT 20000
 typedef struct ezDemoBuffer_s {
-	ezDemoEvent_t events[20000];
+	ezDemoEvent_t events[EZDEMO_MAX_EVENT_COUNT];
 	int eventCount;
 } ezDemoBuffer_t;
 

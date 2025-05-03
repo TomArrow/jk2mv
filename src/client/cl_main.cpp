@@ -56,6 +56,7 @@ cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_aviMotionJpegQuality;
 cvar_t	*cl_forceavidemo;
 cvar_t	*cl_aviPipeFormat;
+cvar_t	*cl_aviPipeExtension;
 
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;
@@ -178,7 +179,7 @@ void CL_Video_f( void )
 	pipe = (qboolean)(Q_stricmp(Cmd_Argv(0), "video-pipe") == 0);
 
 	if (pipe)
-		ext = "mp4";
+		ext = cl_aviPipeExtension->string;
 	else
 		ext = "avi";
 
@@ -3422,6 +3423,7 @@ void CL_Init( void ) {
 		"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420p "
 		"-bf 2 -max_muxing_queue_size 4096 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
 		CVAR_ARCHIVE);
+	cl_aviPipeExtension = Cvar_Get("cl_aviPipeExtension","mp4",	CVAR_ARCHIVE);
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 

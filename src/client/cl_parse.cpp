@@ -50,7 +50,7 @@ ezDemoBuffer_t		ezDemoBuffer;
 
 #ifdef CL_EZDEMO
 
-static void Ezdemo_AddEvent(int client);
+static void Ezdemo_AddEvent(int client, int duration);
 static qboolean Ezdemo_ClientValid(int client);
 static entityState_t* Ezdemo_EntForClientNum(int client);
 static qboolean Ezdemo_CheckOptions(const int clientNum, const int event);
@@ -70,6 +70,7 @@ static void Ezdemo_HandleEvent(entityState_t state);
 #define FRAGS_ARED		256
 #define BS_ATTEMPTS		512
 #define DBS_ATTEMPTS	1024
+#define ANY_ATTACK		2048
 
 #define EZDEMO_RETS				2
 #define EZDEMO_CAPTURES			4
@@ -90,6 +91,29 @@ qboolean ezdemoActive = qfalse;
 
 
 #endif
+
+qboolean CL_SaberInAttack(int move)
+{
+	if (move >= LS_A_TL2BR && move <= LS_A_T2B)
+	{
+		return qtrue;
+	}
+	switch (move)
+	{
+	case LS_A_BACK:
+	case LS_A_BACK_CR:
+	case LS_A_BACKSTAB:
+	case LS_A_LUNGE:
+	case LS_A_JUMP_T__B_:
+	case LS_A_FLIP_STAB:
+	case LS_A_FLIP_SLASH:
+	case LS_JUMPATTACK_ARIAL_LEFT: // jka cartwheel. eh. what about this in client parse code?
+	case LS_JUMPATTACK_ARIAL_RIGHT: // jka cartwheel. eh. what about this in client parse code?
+		return qtrue;
+		break;
+	}
+	return qfalse;
+}
 
 void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old,
 					 qboolean unchanged) {
@@ -123,7 +147,12 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 		else {
 			if (ezdemoActive && (newsabermove == LS_A_BACK && ezdemoFragOptions & BS_ATTEMPTS || newsabermove == LS_A_BACK_CR && ezdemoFragOptions & DBS_ATTEMPTS)) {
 				if (ezdemoActive && newsabermove != oldSaberMove[state->number]) {
-					Ezdemo_AddEvent(state->number);
+					Ezdemo_AddEvent(state->number, 0);
+				}
+			}
+			else if ((ezdemoFragOptions & ANY_ATTACK) && (CL_SaberInAttack(newsabermove) || CL_SaberInAttack(oldSaberMove[state->number]))) {
+				if (ezdemoActive && newsabermove != oldSaberMove[state->number]) {
+					Ezdemo_AddEvent(state->number,0); // uhm... we dont really know do we. prolly some way to figure out tho.
 				}
 			}
 		}
@@ -423,7 +452,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	if (newanim == 809 || newanim == 807 || newanim == 804) {
 		if (ezdemoActive && newanim != oldanim && ezdemoFragOptions & BS_ATTEMPTS) {
-			Ezdemo_AddEvent(ezdemoPlayerstateClientNum);
+			Ezdemo_AddEvent(ezdemoPlayerstateClientNum, 0);
 		}
 	}
 
@@ -464,10 +493,28 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	int newsabermove = newSnap.ps.saberMove;
 
-	if (ezdemoActive && (newsabermove == LS_A_BACK && ezdemoFragOptions & BS_ATTEMPTS || newsabermove == LS_A_BACK_CR && ezdemoFragOptions & DBS_ATTEMPTS)) {
-		if (ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT || ezdemoShowOnlyKillsBy < 0) {
+	if (ezdemoActive && (ezdemoShowOnlyKillsBy == EZDEMO_PREDICTEDCLIENT || ezdemoShowOnlyKillsBy < 0)) {
+		qboolean attackEnding = qfalse;
+		if ((newsabermove == LS_A_BACK && ezdemoFragOptions & BS_ATTEMPTS || newsabermove == LS_A_BACK_CR && ezdemoFragOptions & DBS_ATTEMPTS)) {
 			if (newsabermove != oldsabermove) {
-				Ezdemo_AddEvent(ezdemoPlayerstateClientNum);
+				Ezdemo_AddEvent(ezdemoPlayerstateClientNum, 0);
+			}
+		}
+		else if ((ezdemoFragOptions & ANY_ATTACK) && (CL_SaberInAttack(newsabermove) || (attackEnding=CL_SaberInAttack(oldsabermove)))) {
+			if (newsabermove != oldsabermove) {
+				int timer = 0;
+				if (!attackEnding) {
+					timer = newSnap.ps.torsoTimer;
+					if (timer > 2000) {
+						Com_DPrintf("^3EzDemo ANY_ATTACK: ps.torsoTimer is > 2000: %d", newSnap.ps.torsoTimer);
+						timer = 2000;
+					}
+					if (timer <= 0) {
+						Com_DPrintf("^3EzDemo ANY_ATTACK: ps.torsoTimer is <= 0: %d", newSnap.ps.torsoTimer);
+						timer = 0;
+					}
+				}
+				Ezdemo_AddEvent(ezdemoPlayerstateClientNum, timer);
 			}
 		}
 	}
@@ -1751,6 +1798,7 @@ void CL_Ezdemo_f(void) {
 		Com_Printf("Options include:\n");
 		Com_Printf("   dbs    - show dbs frags           [\n");
 		Com_Printf("   dbsa   - show dbs attempts           [\n");
+		Com_Printf("   attack - show all saber attacks     [\n");
 		Com_Printf("   bs     - show bs frags            [\n");
 		Com_Printf("   bsa    - show bs attempts            [\n");
 		Com_Printf("   bluebs - show blue bs frags       [  can be combined\n");
@@ -1799,6 +1847,9 @@ void CL_Ezdemo_f(void) {
 		}
 		else if (!Q_stricmp(buf, "dbsa")) {
 			ezdemoFragOptions |= DBS_ATTEMPTS;
+		}
+		else if (!Q_stricmp(buf, "attack") || !Q_stricmp(buf, "anyattack")) {
+			ezdemoFragOptions |= ANY_ATTACK;
 		}
 		else if (!Q_stricmp(buf, "dbs")) {
 			ezdemoFragOptions |= FRAGS_DBS;
@@ -1950,7 +2001,7 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 			if (Ezdemo_ClientValid(attacker)) {
 
 				if ((ezdemoFragOptions & FRAGS_DOOM && mod == MOD_FALLING) || (mod != MOD_FALLING && Ezdemo_CheckOptions(attacker, EV_OBITUARY))) {
-					Ezdemo_AddEvent(attacker);
+					Ezdemo_AddEvent(attacker, 0);
 
 					lastObi.attacker = attacker;
 					lastObi.target = target;
@@ -1992,7 +2043,7 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 					lastCtf.msg = ctfMsg;
 					lastCtf.time = cl.snap.serverTime;
 
-					Ezdemo_AddEvent(clIndex);
+					Ezdemo_AddEvent(clIndex, 0);
 				}
 			}
 
@@ -2019,7 +2070,7 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 					lastCtf.msg = ctfMsg;
 					lastCtf.time = cl.snap.serverTime;
 
-					Ezdemo_AddEvent(clIndex);
+					Ezdemo_AddEvent(clIndex, 0);
 				}
 			}
 
@@ -2039,7 +2090,7 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 				lastCtf.msg = ctfMsg;
 				lastCtf.time = cl.snap.serverTime;
 
-				Ezdemo_AddEvent(clIndex);
+				Ezdemo_AddEvent(clIndex,0);
 			}
 
 			break;
@@ -2051,10 +2102,13 @@ static void Ezdemo_HandleEvent(entityState_t state) {
 }
 
 //Add an event at this cl.serverTime with this client (we wanna be speccing this client at the time of this event).
-static void Ezdemo_AddEvent(const int clientNum) {
+static void Ezdemo_AddEvent(const int clientNum, int duration) {
 
-	ezDemoBuffer.events[ezDemoBuffer.eventCount].serverTime = cl.snap.serverTime;
-	ezDemoBuffer.events[ezDemoBuffer.eventCount++].clientNum = clientNum;
+	if (ezDemoBuffer.eventCount < EZDEMO_MAX_EVENT_COUNT) {
+		ezDemoBuffer.events[ezDemoBuffer.eventCount].serverTime = cl.snap.serverTime;
+		ezDemoBuffer.events[ezDemoBuffer.eventCount].duration = duration;
+		ezDemoBuffer.events[ezDemoBuffer.eventCount++].clientNum = clientNum;
+	}
 
 	if(ezdemoEventCount < 1000){ // With very long demos we get MAX_CVAR error here, so limit it. For more we need the buffer and write it directly to cgame.
 		const char* varname = va("pd%d", ++ezdemoEventCount);

@@ -596,6 +596,7 @@ extern	cvar_t	*cl_aviFrameRate;
 extern	cvar_t	*cl_aviMotionJpeg;
 extern  cvar_t  *cl_aviMotionJpegQuality;
 extern	cvar_t	*cl_aviPipeFormat;
+extern	cvar_t	*cl_aviPipeExtension;
 
 extern	cvar_t	*cl_activeAction;
 

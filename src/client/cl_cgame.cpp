@@ -1598,8 +1598,10 @@ Ghoul2 Insert End
 			size_t ezDemoEventSize = args[2];
 			int ezDemoMaxEventCount = args[3];
 			int* ezDemoEventCount = VMAP(4, int, 1);
-			ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+			//ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+			void* ezDemoBufferCgame = VM_ArgPtr(args[0], args[1], ezDemoEventSize * ezDemoMaxEventCount); // is this gonna work right always? idk
 			int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
+			ezDemoEventSize = MIN(ezDemoEventSize,sizeof(ezDemoEvent_t));
 			for (i = 0; i < communicatedEventCount; i++) {
 				Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
 			}
