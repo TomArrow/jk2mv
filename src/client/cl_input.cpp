@@ -761,6 +761,14 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 	}
 }
 
+int	CL_GetClientCommandServerTime() {
+	if (cl_timeNudgeAntiLagHack->integer) {
+		return cl.serverTimeNoTN;
+	}
+	else {
+		return cl.serverTime;
+	}
+}
 
 /*
 ==============
@@ -789,7 +797,7 @@ void CL_FinishMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
 
 	// send the current server time so the amount of movement
 	// can be determined without allowing cheating
-	cmd->serverTime = cl.serverTime;
+	cmd->serverTime = CL_GetClientCommandServerTime();
 
 	if (cl.cgameViewAngleForceTime > cl.serverTime)
 	{
@@ -1158,7 +1166,7 @@ rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, flo
 
 qboolean CL_DeadRampCMDFix(usercmd_t* cmd, usercmd_t* lastCmd, predictedMovement_t* frameStartPredictMoveCopy) {
 	int originalServerTime = cmd->serverTime;
-	int msecDelta = cl.serverTime - lastCmd->serverTime;
+	int msecDelta = originalServerTime - lastCmd->serverTime; // wait wut. why cl.serverTime? shouldnt that be cmd->serverTime?
 	bool deadRamp = true;
 	int offset = 0;
 	int realOffset = 0;
@@ -1212,6 +1220,7 @@ void CL_CreateNewCommands( void ) {
 	int			sentPacketNum, availableCmdCount;
 	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
 	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
+	int			clServerTime = CL_GetClientCommandServerTime();
 
 	cl.newCmdsGenerated = qfalse;
 
@@ -1226,10 +1235,10 @@ void CL_CreateNewCommands( void ) {
 	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
 
 	int desiredPhysicsMsec = (MAX(1, MIN(1000, 1000 / MAX(1,com_physicsFps->integer))));
-	if (com_physicsFps->integer && cl.cmdNumber > 0 && cl.serverTime > cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime && (cl.serverTime- cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
+	if (com_physicsFps->integer && cl.cmdNumber > 0 && clServerTime > cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime && (clServerTime - cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
 
 		int oldCmdServerTime = cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
-		int serverTimeDelta = cl.serverTime - oldCmdServerTime;
+		int serverTimeDelta = clServerTime - oldCmdServerTime;
 		int frameCount = serverTimeDelta / desiredPhysicsMsec;
 
 

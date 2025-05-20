@@ -92,6 +92,8 @@ typedef struct {
 
 	int			serverTime;			// may be paused during play
 	int			oldServerTime;		// to prevent time from flowing bakcwards
+	int			serverTimeNoTN;
+	int			oldServerTimeNoTN;
 	int			oldFrameServerTime;	// to check tournament restarts
 	int			serverTimeDelta;	// cl.serverTime = cls.realtime + cl.serverTimeDelta
 									// this value changes as net lag varies
@@ -564,6 +566,8 @@ extern	cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;
+extern	cvar_t	*cl_timeNudgeAntiLagHack;
+extern	cvar_t	*cl_timeNudgeSafeServerTime;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 

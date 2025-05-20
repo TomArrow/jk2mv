@@ -1954,8 +1954,9 @@ void CL_AdjustTimeDelta( void ) {
 
 	if ( deltaDelta > RESET_TIME ) {
 		cl.serverTimeDelta = newDelta;
-		cl.oldServerTime = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
-		cl.serverTime = cl.snap.serverTime;
+		cl.oldServerTime = cl.oldServerTimeNoTN = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
+		cl.serverTime = cl.serverTimeNoTN = cl.snap.serverTime;
+		Cvar_Set("cl_timeNudgeSafeServerTime", va("%d", cl.serverTimeNoTN));
 		if ( cl_showTimeDelta->integer ) {
 			Com_Printf( "<RESET> " );
 		}
@@ -2012,6 +2013,7 @@ void CL_FirstSnapshot( void ) {
 	// set the timedelta so we are exactly on this first frame
 	cl.serverTimeDelta = cl.snap.serverTime - cls.realtime;
 	cl.oldServerTime = cl.snap.serverTime;
+	cl.oldServerTimeNoTN = cl.snap.serverTime;
 
 	clc.timeDemoBaseTime = cl.snap.serverTime;
 
@@ -2102,13 +2104,20 @@ void CL_SetCGameTime( void ) {
 #endif
 
 		cl.serverTime = cls.realtime + cl.serverTimeDelta - tn;
+		cl.serverTimeNoTN = cls.realtime + cl.serverTimeDelta;
 
 		// guarantee that time will never flow backwards, even if
 		// serverTimeDelta made an adjustment or cl_timeNudge was changed
 		if ( cl.serverTime < cl.oldServerTime ) {
 			cl.serverTime = cl.oldServerTime;
 		}
+		if ( cl.serverTimeNoTN < cl.oldServerTimeNoTN) {
+			cl.serverTimeNoTN = cl.oldServerTimeNoTN;
+		}
 		cl.oldServerTime = cl.serverTime;
+		cl.oldServerTimeNoTN = cl.serverTimeNoTN;
+
+		Cvar_Set("cl_timeNudgeSafeServerTime", va("%d", cl.serverTimeNoTN));
 
 		// note if we are almost past the latest frame (without timeNudge),
 		// so we will try and adjust back a bit when the next snapshot arrives

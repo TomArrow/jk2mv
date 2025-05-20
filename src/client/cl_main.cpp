@@ -41,6 +41,8 @@ cvar_t	*cl_maxPacketUserCmds;
 cvar_t	*cl_dynamicUserPacket;
 cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
+cvar_t	*cl_timeNudgeAntiLagHack;
+cvar_t	*cl_timeNudgeSafeServerTime;
 cvar_t	*cl_showTimeDelta;
 cvar_t	*cl_freezeDemo;
 
@@ -3402,6 +3404,8 @@ void CL_Init( void ) {
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
+	cl_timeNudgeAntiLagHack = Cvar_Get ("cl_timeNudgeAntiLagHack", "1", CVAR_CHEAT );
+	cl_timeNudgeSafeServerTime = Cvar_Get("cl_timeNudgeSafeServerTime", "-1", CVAR_ROM | CVAR_VM_NOWRITE);
 	cl_snapOrderTolerance = Cvar_Get ("cl_snapOrderTolerance", "100", CVAR_ARCHIVE);
 	cl_snapOrderToleranceDemoSkipPackets = Cvar_Get("cl_snapOrderToleranceDemoSkipPackets", "1", CVAR_ARCHIVE);
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
