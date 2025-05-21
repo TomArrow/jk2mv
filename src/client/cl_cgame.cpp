@@ -1933,6 +1933,11 @@ int CL_GetLowValueMedianDelta(int newDelta) {
 		cl.serverTimeDeltaSmooth.lastDeltaTime = cls.realtime;
 	}
 
+	if (cl.serverTimeDeltaSmooth.pastDeltasCount < SERVERTIME_DELTA_SMOOTH_SAMPLES) {
+		// lets get a few valid samples first.
+		return newDelta;
+	}
+
 	// allow some natural fluctuation but keep it in check.
 	if (newDelta > cl.serverTimeDeltaSmooth.medianValue + 10) {
 		newDelta = cl.serverTimeDeltaSmooth.medianValue + 10;
