@@ -82,6 +82,7 @@ typedef struct {
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
 #define	MAX_PARSE_ENTITIES	4096
+#define SERVERTIME_DELTA_SMOOTH_SAMPLES	100 // samples used for averaging
 //#define	MAX_PARSE_ENTITIES	32768
 
 typedef struct {
@@ -174,6 +175,18 @@ typedef struct {
 	int				serverMaxPacketUserCmds;
 	int				playerCommandTime;
 	qboolean		playerCommandTimeValid; // we might be spectating someone, then commandTime is invalid.
+
+	struct {
+		// Every 1/10s we save a sample into pastDeltas.
+		// Then we copy the pastDeltas, sort them, and index 4 is the value we use.
+		// Essentially it's the median of the lowest 10 values.
+		// During strong lag, that should give us a solid idea of the true latency
+		// to the server
+		int	pastDeltas[SERVERTIME_DELTA_SMOOTH_SAMPLES];
+		int pastDeltasCount;
+		int lastDeltaTime; // we save a sample once every 1/10 s. So 10 seconds will fill up our sample buffer
+		int medianValue;
+	} serverTimeDeltaSmooth;
 } clientActive_t;
 
 extern	clientActive_t		cl;
@@ -568,6 +581,7 @@ extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_timeNudgeAntiLagHack;
 extern	cvar_t	*cl_timeNudgeSafeServerTime;
+extern	cvar_t	*cl_smoothenSnapLag;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 

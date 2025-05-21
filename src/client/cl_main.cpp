@@ -43,6 +43,7 @@ cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
 cvar_t	*cl_timeNudgeAntiLagHack;
 cvar_t	*cl_timeNudgeSafeServerTime;
+cvar_t	*cl_smoothenSnapLag;
 cvar_t	*cl_showTimeDelta;
 cvar_t	*cl_freezeDemo;
 
@@ -3406,6 +3407,7 @@ void CL_Init( void ) {
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
 	cl_timeNudgeAntiLagHack = Cvar_Get ("cl_timeNudgeAntiLagHack", "1", CVAR_CHEAT );
 	cl_timeNudgeSafeServerTime = Cvar_Get("cl_timeNudgeSafeServerTime", "-1", CVAR_ROM | CVAR_VM_NOWRITE);
+	cl_smoothenSnapLag = Cvar_Get("cl_smoothenSnapLag", "1", CVAR_ARCHIVE);
 	cl_snapOrderTolerance = Cvar_Get ("cl_snapOrderTolerance", "100", CVAR_ARCHIVE);
 	cl_snapOrderToleranceDemoSkipPackets = Cvar_Get("cl_snapOrderToleranceDemoSkipPackets", "1", CVAR_ARCHIVE);
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );

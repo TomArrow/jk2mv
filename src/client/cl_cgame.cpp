@@ -1908,6 +1908,42 @@ void CL_CGameRendering( stereoFrame_t stereo ) {
 	VM_Debug( 0 );
 }
 
+int	sortDeltas(const void *a, const void *b) {
+	return (*(int*)a - *(int*)b);
+}
+
+int CL_GetLowValueMedianDelta(int newDelta) {
+
+	if (!cl_smoothenSnapLag->integer) {
+		return newDelta;
+	}
+
+	if (cls.realtime - cl.serverTimeDeltaSmooth.lastDeltaTime >= 100 || !cl.serverTimeDeltaSmooth.lastDeltaTime || cl.serverTimeDeltaSmooth.pastDeltasCount) {
+		int deltasCopy[SERVERTIME_DELTA_SMOOTH_SAMPLES];
+		int deltasCount;
+		int medianIndex;
+
+		cl.serverTimeDeltaSmooth.pastDeltas[cl.serverTimeDeltaSmooth.pastDeltasCount++ % SERVERTIME_DELTA_SMOOTH_SAMPLES] = newDelta;
+		// recalculate median
+		deltasCount = MIN(cl.serverTimeDeltaSmooth.pastDeltasCount, SERVERTIME_DELTA_SMOOTH_SAMPLES);
+		memcpy(deltasCopy, cl.serverTimeDeltaSmooth.pastDeltas,deltasCount*sizeof(deltasCopy[0]));
+		qsort(deltasCopy, deltasCount, sizeof(deltasCopy[0]), sortDeltas);
+		medianIndex = deltasCount / 20; // divide by 10, then by 2
+		cl.serverTimeDeltaSmooth.medianValue = deltasCopy[medianIndex];
+		cl.serverTimeDeltaSmooth.lastDeltaTime = cls.realtime;
+	}
+
+	// allow some natural fluctuation but keep it in check.
+	if (newDelta > cl.serverTimeDeltaSmooth.medianValue + 10) {
+		newDelta = cl.serverTimeDeltaSmooth.medianValue + 10;
+	}
+	else if (newDelta < cl.serverTimeDeltaSmooth.medianValue - 10) {
+		newDelta = cl.serverTimeDeltaSmooth.medianValue - 10;
+	}
+
+	return newDelta;
+}
+
 
 /*
 =================
@@ -1945,6 +1981,7 @@ void CL_AdjustTimeDelta( void ) {
 	}
 
 	newDelta = cl.snap.serverTime - cls.realtime;
+	newDelta = CL_GetLowValueMedianDelta(newDelta);
 	deltaDelta = abs( newDelta - cl.serverTimeDelta );
 
 	slowDriftAdjustMinMsec = com_slowDriftAdjustMaxFPS->integer ? 1000/ com_slowDriftAdjustMaxFPS->integer : 0;
