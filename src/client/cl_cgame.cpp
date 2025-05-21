@@ -1914,9 +1914,9 @@ int	sortDeltas(const void *a, const void *b) {
 
 int CL_GetLowValueMedianDelta(int newDelta) {
 
-	if (!cl_smoothenSnapLag->integer) {
-		return newDelta;
-	}
+	//if (!cl_smoothenSnapLag->integer) {
+	//	return newDelta;
+	//}
 
 	if (cls.realtime - cl.serverTimeDeltaSmooth.lastDeltaTime >= 100 || !cl.serverTimeDeltaSmooth.lastDeltaTime || cl.serverTimeDeltaSmooth.pastDeltasCount) {
 		int deltasCopy[SERVERTIME_DELTA_SMOOTH_SAMPLES];
@@ -1972,6 +1972,8 @@ void CL_AdjustTimeDelta( void ) {
 	int		deltaDelta;
 	int		slowDriftAdjustMinMsec;
 	static int	oldSlowDriftAdjustServerTime;
+	int		resetTime = RESET_TIME;
+	int		softResetTime = 100;
 
 	cl.newSnapshots = qfalse;
 
@@ -1981,7 +1983,11 @@ void CL_AdjustTimeDelta( void ) {
 	}
 
 	newDelta = cl.snap.serverTime - cls.realtime;
-	newDelta = CL_GetLowValueMedianDelta(newDelta);
+	if (cl_smoothenSnapLag->integer) {
+		newDelta = CL_GetLowValueMedianDelta(newDelta);
+		resetTime = 1000;
+		softResetTime = 200;
+	}
 	deltaDelta = abs( newDelta - cl.serverTimeDelta );
 
 	slowDriftAdjustMinMsec = com_slowDriftAdjustMaxFPS->integer ? 1000/ com_slowDriftAdjustMaxFPS->integer : 0;
@@ -1989,7 +1995,7 @@ void CL_AdjustTimeDelta( void ) {
 		slowDriftAdjustMinMsec = 200; // Let's not let ppl set com_slowDriftAdjustMaxFPS to less than 5 fps. Idk if its really a problem but it's not really needed and we avoid potential weirdness
 	}
 
-	if ( deltaDelta > RESET_TIME ) {
+	if ( deltaDelta > resetTime) {
 		cl.serverTimeDelta = newDelta;
 		cl.oldServerTime = cl.oldServerTimeNoTN = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
 		cl.serverTime = cl.serverTimeNoTN = cl.snap.serverTime;
@@ -1997,7 +2003,7 @@ void CL_AdjustTimeDelta( void ) {
 		if ( cl_showTimeDelta->integer ) {
 			Com_Printf( "<RESET> " );
 		}
-	} else if ( deltaDelta > 100 ) {
+	} else if ( deltaDelta > softResetTime) {
 		// fast adjust, cut the difference in half
 		if ( cl_showTimeDelta->integer ) {
 			Com_Printf( "<FAST> " );
