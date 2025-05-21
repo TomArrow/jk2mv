@@ -1054,7 +1054,7 @@ void SV_CheckTimeouts( void ) {
 			// cause a timeout
 			if ( ++cl->timeoutCount > 5 ) {
 				SV_DropClient (cl, "timed out");
-				cl->state = CS_FREE;	// don't bother with zombie state
+				//cl->state = CS_FREE;	// don't bother with zombie state (yes do cuz we want to zombify)
 			}
 		} else {
 			cl->timeoutCount = 0;
