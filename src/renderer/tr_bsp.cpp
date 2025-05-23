@@ -652,6 +652,7 @@ static void ParseTriSurf( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, in
 	}
 
 	SetFlagsForShaderForSurface(surf, ds->shaderNum);
+	surf->trisoupMapSurf = qtrue;
 
 	numVerts = LittleLong( ds->numVerts );
 	numIndexes = LittleLong( ds->numIndexes );

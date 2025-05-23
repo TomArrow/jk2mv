@@ -292,7 +292,7 @@ static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
 
 	bool water = surf->contents & (CONTENTS_WATER | CONTENTS_LAVA | CONTENTS_SLIME);
 
-	if (r_solidity->integer &&/* surf->shader->solidity == -1*/ !(surf->contents & CONTENTS_SOLID) && !water && clRenderInfo.wallhackOk) {
+	if (r_solidity->integer &&/* surf->shader->solidity == -1*/ (!(surf->contents & CONTENTS_SOLID) && !water || r_solidityHideTrisoup->integer && surf->trisoupMapSurf) && clRenderInfo.wallhackOk) {
 		// this is a bit shitty i think as it relies on the correct shader being present. 
 		// a proper implementation should somehow correlate with the contents of the brushes.
 		// I have no idea how to do it tho and too lazy to think about it.

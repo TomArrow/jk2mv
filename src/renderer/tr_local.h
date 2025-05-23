@@ -793,6 +793,7 @@ typedef struct msurface_s {
 	int					fogIndex;
 	int					contents;		// so we can determine whether to draw a particular surface based on content flags
 	int					flags;		// surfaceflags (might come in handy?)
+	qboolean			trisoupMapSurf;
 
 	surfaceType_t		*data;			// any of srf*_t
 } msurface_t;
@@ -1361,6 +1362,7 @@ extern	cvar_t	*r_loadSkinsJKA;
 extern	cvar_t	*r_solidity;
 extern	cvar_t	*r_solidityTexture;
 extern	cvar_t	*r_solidityWaterShader;
+extern	cvar_t	*r_solidityHideTrisoup;
 
 /*
 Ghoul2 Insert Start

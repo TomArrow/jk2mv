@@ -225,6 +225,7 @@ cvar_t *r_newRemapsTmpFix;
 cvar_t *r_solidity;
 cvar_t *r_solidityTexture;
 cvar_t *r_solidityWaterShader;
+cvar_t *r_solidityHideTrisoup;
 
 cvar_t *r_imageLoadDotFix;
 
@@ -1289,6 +1290,7 @@ Ghoul2 Insert End
 	r_solidity = Cvar_Get("r_solidity", "0", CVAR_TEMP); // 1 = dont draw nonsolid surfaces, draw clips; 2 = override texture
 	r_solidityTexture = Cvar_Get("r_solidityTexture", "textures/yavin/brock1", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
 	r_solidityWaterShader = Cvar_Get("r_solidityWaterShader", "tcRenderShaderWater", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
+	r_solidityHideTrisoup = Cvar_Get("r_solidityHideTrisoup", "0", CVAR_ARCHIVE); // shader to use with r_solidity 2/3
 
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
