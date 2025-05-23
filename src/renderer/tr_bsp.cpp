@@ -420,6 +420,22 @@ static shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, cons
 	return shader;
 }
 
+static void SetFlagsForShaderForSurface( msurface_t* surf, int shaderNum )
+{
+	// TODO Find a way to see which brush it belongs to and get the texture of that brush instead.
+	// else we will have it on a per-surface basis and it may not end up valid (e.g. mixed solid and nonsolid on same brush)
+	dshader_t	*dsh;
+
+	shaderNum = LittleLong( shaderNum );
+	if ( shaderNum < 0 || shaderNum >= s_worldData.numShaders ) {
+		ri.Error( ERR_DROP, "ShaderForShaderNum: bad num %i", shaderNum );
+	}
+	dsh = &s_worldData.shaders[ shaderNum ];
+
+	surf->contents = dsh->contentFlags;
+	surf->flags = dsh->surfaceFlags;
+}
+
 /*
 ===============
 ParseFace
@@ -458,6 +474,8 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 		surf->shader = tr.defaultShader;
 	}
 
+	SetFlagsForShaderForSurface(surf, ds->shaderNum);
+
 	numPoints = LittleLong( ds->numVerts );
 	if (numPoints > MAX_FACE_POINTS) {
 		ri.Printf( PRINT_WARNING, "WARNING: MAX_FACE_POINTS exceeded: %i\n", numPoints);
@@ -477,6 +495,8 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 	cv->numPoints = numPoints;
 	cv->numIndices = numIndexes;
 	cv->ofsIndices = ofsIndexes;
+	cv->flags = surf->flags;
+	cv->contents = surf->contents;
 
 	verts += LittleLong( ds->firstVert );
 	for ( i = 0 ; i < numPoints ; i++ ) {
@@ -558,6 +578,8 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 		surf->shader = tr.defaultShader;
 	}
 
+	SetFlagsForShaderForSurface(surf,ds->shaderNum);
+
 	// we may have a nodraw surface, because they might still need to
 	// be around for movement clipping
 	if ( s_worldData.shaders[ LittleLong( ds->shaderNum ) ].surfaceFlags & SURF_NODRAW ) {
@@ -629,6 +651,8 @@ static void ParseTriSurf( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, in
 		surf->shader = tr.defaultShader;
 	}
 
+	SetFlagsForShaderForSurface(surf, ds->shaderNum);
+
 	numVerts = LittleLong( ds->numVerts );
 	numIndexes = LittleLong( ds->numIndexes );
 
@@ -693,6 +717,8 @@ static void ParseFlare( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int 
 	if ( r_singleShader->integer && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
+
+	SetFlagsForShaderForSurface(surf, ds->shaderNum);
 
 	flare = (struct srfFlare_s *)ri.Hunk_Alloc( sizeof( *flare ), h_low );
 	flare->surfaceType = SF_FLARE;

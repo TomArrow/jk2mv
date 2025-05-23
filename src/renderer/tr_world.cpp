@@ -279,9 +279,29 @@ static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
 		dlightBits = ( dlightBits != 0 );
 	}
 
-	surf->shader->isWorldShader = qtrue;
+	if (!surf->shader->isWorldShader) {
+		surf->shader->isWorldShader = qtrue;
+		// this is so disgusting LOL
+		for (int i = 0; i < MAX_SHADER_STAGES; i++) {
+			if (!surf->shader->stages[i]) continue; // do we have to break instead? can there be gaps in stages? NO IDEA IM LAZY. 
+			for (int j = 0; j < NUM_TEXTURE_BUNDLES; j++) {
+				surf->shader->stages[i]->bundle[j].isWorldBundle = qtrue;
+			}
+		}
+	}
 
-	R_AddDrawSurf( surf->data, surf->shader, surf->fogIndex, dlightBits );
+	bool water = surf->contents & (CONTENTS_WATER | CONTENTS_LAVA | CONTENTS_SLIME);
+
+	if (r_solidity->integer &&/* surf->shader->solidity == -1*/ !(surf->contents & CONTENTS_SOLID) && !water && clRenderInfo.wallhackOk) {
+		// this is a bit shitty i think as it relies on the correct shader being present. 
+		// a proper implementation should somehow correlate with the contents of the brushes.
+		// I have no idea how to do it tho and too lazy to think about it.
+		return;
+	}
+
+
+
+	R_AddDrawSurf( surf->data, (water && r_solidity->integer) ? tr.solidityWaterShader: surf->shader, surf->fogIndex, dlightBits );
 }
 
 /*

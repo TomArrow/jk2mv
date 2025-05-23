@@ -314,6 +314,12 @@ void R_BindAnimatedImage( textureBundle_t *bundle ) {
 		return;
 	}
 
+	// TODO also consider surfaces that are very transparent/purposely invisible.
+	if (r_solidity->integer > 1 && clRenderInfo.wallhackOk && !bundle->isLightmap && bundle->isWorldBundle) {
+		GL_Bind(tr.solidityImage);
+		return;
+	}
+
 	if ( bundle->numImageAnimations <= 1 ) {
 		GL_Bind( bundle->image[0] );
 		return;
@@ -453,7 +459,7 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
 		Com_Memset(tess.vertexIsMarked,0,sizeof(tess.vertexIsMarked));
 	}
-	if (r_rampHelper->integer) {
+	if (r_rampHelper->integer || r_solidity->integer > 2) {
 		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
 	tess.anyVertexColorOverrides = qfalse;
@@ -1347,7 +1353,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			//
 			if ( pStage->bundle[0].vertexLightmap && ( r_vertexLight->integer && !r_uiFullScreen->integer ) && r_lightmap->integer )
 			{
-				GL_Bind( tr.whiteImage );
+				GL_Bind(tr.whiteImage);
 			}
 			else
 				R_BindAnimatedImage( &pStage->bundle[0] );

@@ -15,7 +15,7 @@
 // if you dare to exceed this...
 #define MAX_FACE_VERTS 64
 
-typedef enum {TRIGGER_BRUSH, CLIP_BRUSH, SLICK_BRUSH} visBrushType_t;
+typedef enum {TRIGGER_BRUSH, CLIP_BRUSH, CLIP_SOLIDITY_BRUSH, SLICK_BRUSH} visBrushType_t;
 
 typedef struct {
 	int numVerts;
@@ -50,6 +50,7 @@ static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type);
 
 static visBrushNode_t *trigger_head = NULL;
 static visBrushNode_t *clip_head = NULL;
+static visBrushNode_t *clip_solidity_head = NULL;
 static visBrushNode_t *slick_head = NULL;
 
 /* needed for winding_cmp */
@@ -60,6 +61,10 @@ cvar_t *triggers_draw;
 cvar_t *clips_draw;
 cvar_t *slicks_draw;
 
+extern cvar_t *r_nocull;
+extern cvar_t *r_solidity;
+extern cvar_t *r_solidityTexture;
+
 static cvar_t *trigger_shader_setting;
 static cvar_t *clip_shader_setting;
 static cvar_t *slick_shader_setting;
@@ -67,9 +72,11 @@ static cvar_t *slick_shader_setting;
 static qhandle_t trigger_shader;
 static qhandle_t clip_shader;
 static qhandle_t slick_shader;
+static qhandle_t clip_shader_solidity;
 
 static vec4_t trigger_color = { 0, 128, 0, 255 };
 static vec4_t clip_color = { 128, 0, 0, 255 };
+static vec4_t clip_solidity_color = { 255, 255, 255, 255 };
 static vec4_t slick_color = { 0, 64, 128, 255 };
 
 static const cplane_t *frustum;
@@ -92,6 +99,7 @@ void tc_vis_init(void) {
 
 	trigger_shader = re.RegisterShader(trigger_shader_setting->string);
 	clip_shader = re.RegisterShader(clip_shader_setting->string);
+	clip_shader_solidity = re.ext.RegisterShader3D(r_solidityTexture->string);
 	slick_shader = re.RegisterShader(slick_shader_setting->string);
 	if (trigger_shader == 0) {
 		trigger_shader = re.RegisterShader("white");
@@ -141,7 +149,10 @@ void tc_vis_render(void) {
 	if (triggers_draw->integer) {
 		draw(trigger_head, trigger_shader, TRIGGER_BRUSH);
 	}
-	if (clips_draw->integer) {
+	if (r_solidity->integer > 1) {
+		draw(clip_solidity_head, clip_shader_solidity, CLIP_SOLIDITY_BRUSH);
+	}
+	else if (clips_draw->integer) {
 		draw(clip_head, clip_shader, CLIP_BRUSH);
 	}
 	if (slicks_draw->integer) {
@@ -205,6 +216,7 @@ static void add_clips(void) {
 		cbrush_t *brush = &cm.brushes[i];
 		if (brush->contents & CONTENTS_PLAYERCLIP) {
 			gen_visible_brush(i, vec3_origin, CLIP_BRUSH, clip_color);
+			gen_visible_brush(i, vec3_origin, CLIP_SOLIDITY_BRUSH, clip_solidity_color);
 		}
 	}
 }
@@ -301,6 +313,9 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		break;
 	case CLIP_BRUSH:
 		head = &clip_head;
+		break;
+	case CLIP_SOLIDITY_BRUSH:
+		head = &clip_solidity_head;
 		break;
 	case SLICK_BRUSH:
 		head = &slick_head;
@@ -425,12 +440,35 @@ static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type) {
 	//frustum = re.ext.GetFrustum();
 	//vec3_t viewPos;
 	//VectorCopy(re.ext.GetViewPosition(), viewPos);
+	const orientation_t* ori = re.ext.GetViewOrientation();
+	qboolean behind;
+	vec3_t vecToVert;
+	qboolean cull = (qboolean)!(r_nocull && r_nocull->integer);
+
+	// todo view axis culling
 
 	while (brush) {
 		//don't do pvs optimization just check distance as well this gives better performance and results since pvs is expensive and oftentimes the edges are within structural brushes making it not reliable
-		//if (DistanceSquared(viewPos, brush->faces[0].verts[0].xyz) < 8192 * 8192) 
+		if (!cull || DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz) < 8192 * 8192)
 		{
 			for (int i = 0; i < brush->numFaces; ++i) {
+				behind = cull ? qtrue : qfalse;
+
+				// check if any points are in front of us
+				for (int j = 0; j < brush->faces[i].numVerts && behind; j++)
+				{
+					VectorSubtract(brush->faces[i].verts[j].xyz, ori->origin, vecToVert);
+					if (DotProduct(vecToVert, ori->axis[0]) >= 0.0f) {
+						behind = qfalse;
+						break;
+					}
+				}
+
+				if (behind) {
+					continue;
+				}
+				
+				// TODO shade by angle with r_solidity 3 (like in tr_world.cpp)
 				if (type == SLICK_BRUSH) { // walk slightly along normal to make more visible
 					static polyVert_t extruded[800];
 					memcpy(extruded, brush->faces[i].verts, MIN(sizeof(polyVert_t) * 800, sizeof(polyVert_t) * brush->faces[i].numVerts));

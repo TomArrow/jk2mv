@@ -2163,27 +2163,28 @@ void ParseMaterial( const char **text )
 typedef struct {
 	const char	*name;
 	uint32_t	clearSolid, surfaceFlags, contents;
+	int			solidity;
 } infoParm_t;
 
 
 static const infoParm_t	infoParms[] = {
 	// Game content Flags
-	{"nonsolid",	~CONTENTS_SOLID,	0,				0 },						// special hack to clear solid flag
+	{"nonsolid",	~CONTENTS_SOLID,	0,				0, -1 },						// special hack to clear solid flag
 	{"nonopaque",	~CONTENTS_OPAQUE,	0,				0 },						// special hack to clear opaque flag
-	{"lava",		~CONTENTS_SOLID,	0,				CONTENTS_LAVA },			// very damaging
-	{"slime",		~CONTENTS_SOLID,	0,				CONTENTS_SLIME },			// mildly damaging
-	{"water",		~CONTENTS_SOLID,	0,				CONTENTS_WATER },
-	{"fog",			~CONTENTS_SOLID,	0,				CONTENTS_FOG},				// carves surfaces entering
-	{"shotclip",	~CONTENTS_SOLID,	0,				CONTENTS_SHOTCLIP },		/* block shots, but not people */
-	{"playerclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_PLAYERCLIP },		/* block only the player */
-	{"monsterclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_MONSTERCLIP },
-	{"botclip",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_BOTCLIP },			/* for bots */
-	{"trigger",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TRIGGER },
-	{"nodrop",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_NODROP },			// don't drop items or leave bodies (death fog, lava, etc)
+	{"lava",		~CONTENTS_SOLID,	0,				CONTENTS_LAVA, -1 },			// very damaging
+	{"slime",		~CONTENTS_SOLID,	0,				CONTENTS_SLIME, -1 },			// mildly damaging
+	{"water",		~CONTENTS_SOLID,	0,				CONTENTS_WATER, -1 },
+	{"fog",			~CONTENTS_SOLID,	0,				CONTENTS_FOG, -1},				// carves surfaces entering
+	{"shotclip",	~CONTENTS_SOLID,	0,				CONTENTS_SHOTCLIP, -1 },		/* block shots, but not people */
+	{"playerclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_PLAYERCLIP, 1 },		/* block only the player */
+	{"monsterclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_MONSTERCLIP, -1 },
+	{"botclip",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_BOTCLIP , -1},			/* for bots */
+	{"trigger",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TRIGGER, -1 },
+	{"nodrop",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_NODROP, -1 },			// don't drop items or leave bodies (death fog, lava, etc)
 	{"terrain",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TERRAIN },		   	/* use special terrain collsion */
-	{"ladder",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_LADDER },			// climb up in it like water
-	{"abseil",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_ABSEIL },			// can abseil down this brush
-	{"outside",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_OUTSIDE },			// volume is considered to be in the outside (i.e. not indoors)
+	{"ladder",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_LADDER, -1 },			// climb up in it like water
+	{"abseil",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_ABSEIL, -1 },			// can abseil down this brush
+	{"outside",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_OUTSIDE, -1 },			// volume is considered to be in the outside (i.e. not indoors)
 
 	{"detail",		CONTENTS_ALL,					0,				CONTENTS_DETAIL },			// don't include in structural bsp
 	{"trans",		CONTENTS_ALL,					0,				CONTENTS_TRANSLUCENT },		// surface has an alpha component
@@ -2220,6 +2221,11 @@ static void ParseSurfaceParm( const char **text ) {
 			shader.surfaceFlags |= infoParms[i].surfaceFlags;
 			shader.contentFlags |= infoParms[i].contents;
 			shader.contentFlags &= infoParms[i].clearSolid;
+			if (infoParms[i].solidity == 1) {
+				shader.solidity = 1;
+			} else if (infoParms[i].solidity == -1 && shader.solidity == 0) {
+				shader.solidity = -1;
+			}
 			break;
 		}
 	}
@@ -3910,6 +3916,39 @@ qhandle_t RE_RegisterShader( const char *name ) {
 
 	return sh->index;
 }
+/*
+====================
+RE_RegisterShaderDiffuse
+
+This is the exported shader entry point for the rest of the system
+It will always return an index that will be valid.
+====================
+*/
+qhandle_t RE_RegisterShader3D( const char *name ) {
+	shader_t	*sh;
+
+	if ( strlen( name ) >= MAX_QPATH ) {
+		Com_Printf( "Shader name exceeds MAX_QPATH\n" );
+		return 0;
+	}
+
+	// I tried lightmapsNone which should set CGEN_LIGHTNING_DIFFUSE but it just leaves things black so idk.
+	// figure out sth better someday or find out how to fix the issues
+	sh = R_FindShader( name, lightmapsVertex, stylesDefault, qtrue );
+
+	if (r_newRemapsTmpFix->integer) {
+		// we want to return 0 if the shader failed to
+		// load for some reason, but R_FindShader should
+		// still keep a name allocated for it, so if
+		// something calls RE_RegisterShader again with
+		// the same name, we don't try looking for it again
+		if (sh->defaultShader) {
+			return 0;
+		}
+	}
+
+	return sh->index;
+}
 
 
 /*
@@ -4420,6 +4459,7 @@ static void CreateExternalShaders( void ) {
 	tr.projectionShadowShader = R_FindShader( "projectionShadow", lightmapsNone, stylesDefault, qtrue );
 	tr.flareShader = R_FindShader( "flareShader", lightmapsNone, stylesDefault, qtrue );
 	tr.sunShader = R_FindShader( "sun", lightmapsNone, stylesDefault, qtrue );
+	tr.solidityWaterShader = R_FindShader( r_solidityWaterShader->string, lightmapsNone, stylesDefault, qtrue );
 }
 
 /*

@@ -222,6 +222,10 @@ cvar_t *r_fixPlayerIconBrightness;
 cvar_t *r_newRemaps;
 cvar_t *r_newRemapsTmpFix;
 
+cvar_t *r_solidity;
+cvar_t *r_solidityTexture;
+cvar_t *r_solidityWaterShader;
+
 cvar_t *r_imageLoadDotFix;
 
 #ifndef DEDICATED
@@ -1282,6 +1286,10 @@ Ghoul2 Insert End
 
 	r_modelpoolmegs = Cvar_Get("r_modelpoolmegs", "20", CVAR_ARCHIVE | CVAR_GLOBAL);
 
+	r_solidity = Cvar_Get("r_solidity", "0", CVAR_TEMP); // 1 = dont draw nonsolid surfaces, draw clips; 2 = override texture
+	r_solidityTexture = Cvar_Get("r_solidityTexture", "textures/yavin/brock1", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
+	r_solidityWaterShader = Cvar_Get("r_solidityWaterShader", "tcRenderShaderWater", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
+
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
 #ifndef DEDICATED
@@ -1569,6 +1577,15 @@ void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 }
 
 #endif //!DEDICATED
+
+static const orientation_t* RE_GetViewOrientation(void)
+{
+	static orientation_t ori;
+	VectorCopy(tr.viewParms.ori.origin,ori.origin);
+	memcpy(ori.axis, tr.viewParms.ori.axis, sizeof(ori.axis));
+	return &ori;
+}
+
 /*
 @@@@@@@@@@@@@@@@@@@@@
 GetRefAPI
@@ -1650,6 +1667,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	re.CaptureFrameRaw = RE_CaptureFrameRaw;
 	re.CaptureFrameJPEG = RE_CaptureFrameJPEG;
+
+	re.ext.GetViewOrientation = RE_GetViewOrientation;
+	re.ext.RegisterShader3D = RE_RegisterShader3D;
 #endif //!DEDICATED
 	return &re;
 }

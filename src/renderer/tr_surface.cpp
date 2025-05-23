@@ -1321,9 +1321,11 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int			dlightBits;
 	bool		markSurfaceAngles;
 	bool		rampHelper;
+	bool		solidityAngleColors;
 
 	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
 	rampHelper = r_rampHelper->integer;
+	solidityAngleColors = r_solidity->integer > 2;
 
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
@@ -1420,6 +1422,29 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
 			}*/
 			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
+		}
+		else if (solidityAngleColors && ((i+1)%3)==0) {
+			// We want to mark all surfaces with a color corresponding to their normal
+			vec3_t side1, side2, normal, newVelocity;
+			float change;
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
+			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
+			CrossProduct(side1, side2, normal);
+			VectorNormalize(normal);
+
+			VectorScale(normal, 128.0f, normal);
+			normal[0] += 127.0f;
+			normal[1] += 127.0f;
+			if (normal[2] < 0) {
+				normal[2] = -normal[2] + 127.0f;
+			}
+
+			tess.anyVertexColorOverrides = qtrue;
+			tess.vertexColorOverrides[indices[i - 2] + Bob][3] = tess.vertexColorOverrides[indices[i - 1] + Bob][3] = tess.vertexColorOverrides[indices[i] + Bob][3] = 255; // alpha
+			tess.vertexColorOverrides[indices[i - 2] + Bob][2] = tess.vertexColorOverrides[indices[i - 1] + Bob][2] = tess.vertexColorOverrides[indices[i] + Bob][2] = MAX(0,MIN(255,(int)normal[0]));
+			tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MAX(0, MIN(255, (int)normal[1]));
+			tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = MAX(0, MIN(255, (int)normal[2]));
+
 		}
 	}
 

@@ -121,6 +121,12 @@ typedef struct {
 
 	int (*CaptureFrameRaw)( byte *buffer, int bufSize, int padding );
 	int (*CaptureFrameJPEG)( byte *buffer, int bufSize, int quality );
+
+	struct 
+	{
+		const orientation_t*	(*GetViewOrientation)						();
+		qhandle_t(*RegisterShader3D)(const char* name);
+	} ext;
 } refexport_t;
 
 //

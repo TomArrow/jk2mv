@@ -20,3 +20,14 @@ tcRenderShader_nocull
 		rgbGen vertex
 	}
 }
+
+tcRenderShaderWater
+{
+	polygonOffset
+	nopicmip
+	{
+		map $whiteimage
+		blendFunc GL_ONE GL_ONE
+		rgbGen const ( 0.1 0.1 0.05 )
+	}
+}

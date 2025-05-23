@@ -369,6 +369,7 @@ typedef struct {
 	byte			vertexLightmap;
 	byte			isVideoMap;
 
+	qboolean		isWorldBundle; // HAHAHAHAHAHAHA i suck
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -513,10 +514,12 @@ Ghoul2 Insert End
 
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
 	struct shader_s *remappedShaderAdvanced;          // current shader from the advanced remaps this one is remapped to
+	//struct shader_s *solidityShader;				  // shader to use when solidity is activated (using similar concept as remappedShaderAdvanced to preserve lightmap) (actually dont do this for now, its a little over the top, just change the rendered image)
 
 	struct	shader_s	*next;
 
 	qboolean isWorldShader; // UGLY hack.
+	int solidity; // 0 = undefined. 1 = playerclip. -1 = nonsolid
 } shader_t;
 
 /*
@@ -738,6 +741,9 @@ typedef struct {
 	int			ofsIndices;
 	float		points[1][VERTEXSIZE];	// variable sized
 										// there is a variable length list of indices here also
+
+	int			flags;
+	int			contents;
 } srfSurfaceFace_t;
 
 
@@ -785,6 +791,8 @@ typedef struct msurface_s {
 	int					viewCount;		// if == tr.viewCount, already added
 	struct shader_s		*shader;
 	int					fogIndex;
+	int					contents;		// so we can determine whether to draw a particular surface based on content flags
+	int					flags;		// surfaceflags (might come in handy?)
 
 	surfaceType_t		*data;			// any of srf*_t
 } msurface_t;
@@ -1063,6 +1071,7 @@ typedef struct {
 	image_t					*flareImage;
 	image_t					*whiteImage;			// full of 0xff
 	image_t					*identityLightImage;	// full of tr.identityLightByte
+	image_t					*solidityImage;			// image to use when r_solidity 1
 
 	// Handle to the Glow Effect Vertex Shader. - AReis
 	GLuint					glowVShader;
@@ -1085,6 +1094,7 @@ typedef struct {
 
 	shader_t				*flareShader;
 	shader_t				*sunShader;
+	shader_t				*solidityWaterShader;
 
 	qboolean				lightmapAtlasActive; // for external lightmaps or shader hack LMs we wanna disable it
 	int						numLightmaps;
@@ -1348,6 +1358,10 @@ extern	cvar_t	*r_printShaders;
 extern	cvar_t	*r_convertModelBones;
 extern	cvar_t	*r_loadSkinsJKA;
 
+extern	cvar_t	*r_solidity;
+extern	cvar_t	*r_solidityTexture;
+extern	cvar_t	*r_solidityWaterShader;
+
 /*
 Ghoul2 Insert Start
 */
@@ -1522,6 +1536,7 @@ extern	const byte	stylesDefault[MAXLIGHTMAPS];
 qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex, const byte *styles ) ;
 qhandle_t		 RE_RegisterShader( const char *name );
 qhandle_t		 RE_RegisterShaderNoMip( const char *name );
+qhandle_t		 RE_RegisterShader3D( const char *name );
 qhandle_t RE_RegisterShaderFromImage(const char *name, int *lightmapIndex, byte *styles, image_t *image, qboolean mipRawImage);
 
 shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage, qboolean isAdvancedRemap = qfalse );

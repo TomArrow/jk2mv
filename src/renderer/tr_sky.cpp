@@ -600,7 +600,7 @@ void R_BuildCloudData( shaderCommands_t *input )
 	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
 		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
 	}
-	if (r_rampHelper->integer) {
+	if (r_rampHelper->integer || r_solidity->integer > 2) {
 		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
 	}
 	tess.anyVertexColorOverrides = qfalse;

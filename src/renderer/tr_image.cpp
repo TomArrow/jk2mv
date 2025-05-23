@@ -3573,6 +3573,18 @@ static void R_BindGlowImages( void ) {
 
 /*
 ==================
+R_SetSolidityImage
+==================
+*/
+void R_SetSolidityImage(void) {
+	tr.solidityImage = R_FindImageFile(r_solidityTexture->string,qtrue,qtrue,qtrue,GL_REPEAT);
+	if (!tr.solidityImage) {
+		tr.solidityImage = tr.defaultImage;
+	}
+}
+
+/*
+==================
 R_CreateBuiltinImages
 ==================
 */
@@ -3784,6 +3796,8 @@ void	R_InitImages( void ) {
 
 	// create default texture and white texture
 	R_CreateBuiltinImages();
+
+	R_SetSolidityImage();
 }
 
 /*
