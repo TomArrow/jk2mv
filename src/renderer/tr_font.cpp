@@ -737,6 +737,11 @@ int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale
 	char		parseText[8192];
 	float 		fTotalWidth = 0.0f;
 
+	if (psText == NULL)
+	{
+		return 0;
+	}
+
 	//It gets confused about ^blah here too and reports an inaccurate length as a result
 	const char *pch = psText;
 	while (*pch && i < sizeof(parseText)-1) {
@@ -852,6 +857,11 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 	bool				colorShadow = (MV_GetCurrentGameversion() == VERSION_1_02 || mv_coloredTextShadows->integer == 1) && mv_coloredTextShadows->integer;
 	int					colourChain = 0;
 #endif
+
+	if (psText == NULL)
+	{
+		return;
+	}
 
 	if(iFontHandle & STYLE_BLINK)
 	{
