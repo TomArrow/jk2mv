@@ -739,6 +739,7 @@ int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale
 
 	if (psText == NULL)
 	{
+		Com_Error(ERR_DROP, "RE_Font_StrLenPixels: psText == NULL");
 		return 0;
 	}
 
@@ -860,6 +861,7 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 
 	if (psText == NULL)
 	{
+		Com_Error(ERR_DROP, "RE_Font_DrawString: psText == NULL");
 		return;
 	}
 
