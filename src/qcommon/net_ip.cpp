@@ -70,6 +70,7 @@ static cvar_t	*net_socksPassword;
 
 static cvar_t	*net_ip;
 static cvar_t	*net_port;
+static cvar_t	*net_portReal;
 
 static cvar_t	*net_dropsim;
 
@@ -830,6 +831,7 @@ void NET_OpenIP( void )
 			ip_socket = NET_IPSocket( net_ip->string, port + i, &err );
 			if ( ip_socket != INVALID_SOCKET ) {
 				Cvar_SetValue( "net_port", port + i );
+				Cvar_SetValue( "net_portReal", port + i );
 
 				if ( net_socksEnabled->integer )
 					NET_OpenSocks( port + i );
@@ -868,6 +870,7 @@ static qboolean NET_GetCvars( void ) {
 	net_ip->modified = qfalse;
 
 	net_port = Cvar_Get( "net_port", XSTRING( PORT_SERVER ), CVAR_LATCH );
+	net_portReal = Cvar_Get( "net_port", "", CVAR_ROM|CVAR_VM_NOWRITE );
 	modified += net_port->modified;
 	net_port->modified = qfalse;
 

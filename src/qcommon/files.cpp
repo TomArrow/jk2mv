@@ -248,6 +248,7 @@ typedef struct searchpath_s {
 } searchpath_t;
 
 static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
+static	char		fs_cfglogdir[MAX_OSPATH];
 static	cvar_t		*fs_debug;
 //#ifndef PORTABLE
 static	cvar_t		*fs_portable;
@@ -266,6 +267,7 @@ static	cvar_t		*fs_dlTommyTernalPk3;
 static	cvar_t		*fs_globalcfg;
 #endif
 static	cvar_t		*fs_forcegame;
+static	cvar_t		*fs_cfgLogPath;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -372,6 +374,38 @@ static void FS_ResetFileHandleData(fileHandleData_t* f) {
 	Com_Memset(&f->compressedFileInfo, 0, sizeof(f->compressedFileInfo));
 }
 #endif
+
+
+const char* get_filename_ext(const char* filename) {
+	const char* dot = strrchr(filename, '.');
+	if (!dot || dot == filename) return "";
+	return dot + 1;
+}
+
+
+static char* logCfgExtensions[] = {
+	"log",
+	"cfg",
+};
+static int logCfgExtensionsAmount = sizeof(logCfgExtensions) / sizeof(logCfgExtensions[0]);
+
+static qboolean FS_LogCfgExtension(const char* ext) {
+	int i;
+
+	for (i = 0; i < logCfgExtensionsAmount; i++) {
+		if (!Q_stricmp(ext, logCfgExtensions[i]))
+			return qtrue;
+	}
+	return qfalse;
+}
+static const char* FS_GetWriteGameDir(const char* filename) {
+	if (fs_cfglogdir[0] && FS_LogCfgExtension(get_filename_ext(filename))) {
+		return fs_cfglogdir;
+	}
+	else {
+		return fs_gamedir;
+	}
+}
 
 qboolean FS_idPak(pack_t *pack);
 qboolean FS_IsInvalidWriteOSPath(const char *ospath);
@@ -519,7 +553,7 @@ static FILE	*FS_FileForHandle( fileHandle_t f, module_t module = MODULE_MAIN ) {
 
 qboolean	FS_CheckQueuedRenames(fileHandleData_t* f) {
 	for (auto it = queuedRenames.begin(); it != queuedRenames.end(); it++) {
-		const char* queuedOsPath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, std::get<0>(*it).c_str());
+		const char* queuedOsPath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(std::get<0>(*it).c_str()), std::get<0>(*it).c_str());
 		if (!Q_stricmp(f->ospath, queuedOsPath)) {
 			if (FS_Rename(std::get<0>(*it).c_str(), std::get<1>(*it).c_str())) {
 				if (fs_debug->integer) {
@@ -779,8 +813,8 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t mod
 		return qfalse;
 	}
 
-	fospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, fromFile );
-	tospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, toFile );
+	fospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(fromFile), fromFile );
+	tospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(toFile), toFile );
 
 	if ( FS_IsInvalidWriteOSPath( tospath ) ) {
 		Com_Error( ERR_DROP, "FS_CopyFile: blocked illegal write path\n" );
@@ -831,7 +865,7 @@ FS_HomeRemove
 */
 void FS_HomeRemove( const char *homePath ) {
 	remove( FS_BuildOSPath( fs_homepath->string,
-				fs_gamedir, homePath ) );
+		FS_GetWriteGameDir(homePath), homePath ) );
 }
 
 /*
@@ -917,7 +951,7 @@ qboolean FS_FileExists( const char *file )
 	FILE *f;
 	char *testpath;
 
-	testpath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, file );
+	testpath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(file), file );
 
 	f = fopen( testpath, "rb" );
 	if (f) {
@@ -1270,8 +1304,8 @@ qboolean FS_Rename( const char *from, const char *to ) {
 	// don't let sound stutter
 	S_ClearSoundBuffer();
 
-	Q_strncpyz(from_ospath,FS_BuildOSPath( fs_homepath->string, fs_gamedir, from ),sizeof(from_ospath));
-	Q_strncpyz(to_ospath,FS_BuildOSPath( fs_homepath->string, fs_gamedir, to),sizeof(to_ospath));
+	Q_strncpyz(from_ospath,FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(from), from ),sizeof(from_ospath));
+	Q_strncpyz(to_ospath,FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(to), to),sizeof(to_ospath));
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_Rename: %s --> %s\n", from_ospath, to_ospath );
@@ -1553,9 +1587,10 @@ void FS_AsyncWriterThread(fileHandle_t h) {
 }
 
 
+
 // Call with safe==qtrue to make sure the file isn't open in another async file handle anymore
 fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
-	const char* ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
+	const char* ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
 
 	if (safe) {
 		FS_AsyncAssureFileClosed(ospath);
@@ -1588,7 +1623,7 @@ fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
 #endif
 
 fileHandle_t FS_WeHaveFileOpen(const char* filename) {
-	const char* ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
+	const char* ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
 	int		i;
 
 	for (i = 1; i < MAX_FILE_HANDLES; i++) {
@@ -1622,7 +1657,7 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	fsh[f].zipFile = qfalse;
 	fsh[f].compressedFileInfo = {};
 
-	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
+	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_FOpenFileWrite: %s\n", ospath );
@@ -1714,7 +1749,7 @@ fileHandle_t FS_FOpenFileAppend( const char *filename, module_t module ) {
 	// don't let sound stutter
 	S_ClearSoundBuffer();
 
-	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
+	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
 
 	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
@@ -1756,7 +1791,7 @@ qboolean FS_IsFifo( const char *filename ) {
 	char *ospath;
 	struct stat f_stat;
 
-	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
+	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
 
 	if ( stat(ospath, &f_stat) == -1 ) {
 		return qfalse;
@@ -1815,11 +1850,6 @@ int FS_FilenameCompare( const char *s1, const char *s2 ) {
 	return 0;		// strings are equal
 }
 
-const char *get_filename_ext(const char *filename) {
-	const char *dot = strrchr(filename, '.');
-	if (!dot || dot == filename) return "";
-	return dot + 1;
-}
 
 /*
 ===========
@@ -4150,6 +4180,11 @@ static void FS_Startup( const char *gameName ) {
 
 	fs_dlTommyTernalPk3 = Cvar_Get("fs_dlTommyTernalPk3", "0", CVAR_LATCH | CVAR_ARCHIVE);
 	fs_forcegame = Cvar_Get("fs_forcegame", "", CVAR_INIT);
+#if DEDICATED
+	fs_cfgLogPath = Cvar_Get("fs_cfgLogPath", "", CVAR_INIT | CVAR_VM_NOWRITE);
+#else
+	fs_cfgLogPath = Cvar_Get("fs_cfgLogPath", "", CVAR_ROM);
+#endif
 
 	assetsPath = Sys_DefaultAssetsPath();
 	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
@@ -4175,6 +4210,27 @@ static void FS_Startup( const char *gameName ) {
 #endif
 		return;
 	}
+
+	fs_cfglogdir[0] = '\0';
+#ifdef DEDICATED
+	// this is really just to be able to run multiple installs from the same folder while sharing demos/pk3s etc
+	if (fs_cfgLogPath->string[0] && Q_stricmp(fs_cfgLogPath->string, fs_gamedir)) {
+		if (fs_basepath->string[0]) {
+			FS_AddGameDirectory(fs_basepath->string, fs_cfgLogPath->string);
+		}
+		if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string, fs_basepath->string)) {
+			FS_AddGameDirectory(fs_homepath->string, fs_cfgLogPath->string);
+		}
+		if (!FS_CheckDirTraversal(fs_cfgLogPath->string))
+		{
+			Q_strncpyz(fs_cfglogdir, fs_cfgLogPath->string, sizeof(fs_cfglogdir));
+		}
+		else {
+			Com_Printf("fs_cfgLogPath: %s contains invalid patterns\n", fs_cfgLogPath->string);
+		}
+		Q_strncpyz(fs_cfglogdir, fs_cfgLogPath->string, sizeof(fs_cfglogdir));
+	}
+#endif
 
 	// Try to load JKA assets if a path has been specified
 	if ( fs_loadjka->integer && fs_basejka->string[0] ) {
@@ -4236,8 +4292,15 @@ static void FS_Startup( const char *gameName ) {
 				FS_AddGameDirectory(fs_homepath->string, fs_forcegame->string);
 			}
 		}
-		Q_strncpyz( fs_gamedir, fs_forcegame->string, sizeof( fs_gamedir ) );
+		if (!FS_CheckDirTraversal(fs_forcegame->string))
+		{
+			Q_strncpyz(fs_gamedir, fs_forcegame->string, sizeof(fs_gamedir));
+		}
+		else {
+			Com_Printf("fs_forcegame: %s contains invalid patterns\n", fs_forcegame->string);
+		}
 	}
+
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -4882,7 +4945,7 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 
 	// Prevent writing to files with some extensions to prevent bypassing several restrictions
 	if ( mode != FS_READ  &&
-		FS_IsInvalidWriteOSPath(FS_BuildOSPath(fs_homepath->string, fs_gamedir, qpath)) ) {
+		FS_IsInvalidWriteOSPath(FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(qpath), qpath)) ) {
 		Com_Error( ERR_DROP, "FS_FOpenFileByMode: blocked illegal write path\n" );
 	}
 
@@ -5173,7 +5236,7 @@ fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename) {
 		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
 	}
 
-	ospath = FS_BuildOSPath(fs_homepath->string, fs_gamedir, filename);
+	ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
 
 	if (fs_debug->integer) {
 		Com_Printf("FS_PipeOpenWrite: %s\n", ospath);
