@@ -350,6 +350,11 @@ extern	cvar_t* sv_demoWriteMeta;
 extern	cvar_t* sv_ucmdSendback;
 extern	cvar_t* sv_ucmdSendbackMinCount;
 
+extern	cvar_t* sv_crossServerCommands;
+extern	cvar_t* sv_crossServerCommandRemoteServer;
+extern	cvar_t* sv_crossServerCommandPassword;
+extern	cvar_t* sv_crossServerCommandIdent;
+
 extern	cvar_t* sv_specAllEnts;
 
 // toggleable fixes
@@ -390,6 +395,10 @@ extern qboolean mvStructConversionDisabled;
 qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period, int now);
 void SVC_LoadWhitelist( void );
 void SVC_WhitelistAdr( netadr_t adr );
+extern int serverUniqueCrossServerCommandsId;
+bool SVC_CrossServerCommandsActive();
+void SVC_CrossServerCommandForwardToSubscribers(netadr_t* addr, const char* rawString);
+void SVC_CrossServerCommandsMaintenance();
 
 //
 // sv_init.c

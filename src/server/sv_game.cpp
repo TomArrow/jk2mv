@@ -124,6 +124,21 @@ void SV_GameSendServerCommand( int clientNum, const char *text ) {
 	}
 }
 
+/*
+===============
+SV_BroadcastCrossServerCommand
+
+Broadcasts a cross-server command
+===============
+*/
+void SV_BroadcastCrossServerCommand( const char *text ) {
+	if (!SVC_CrossServerCommandsActive()) {
+		return;
+	}
+	const char* finalCmd = va("csc \"%s\" %d %d c \"%s\" \"%s\" %s",sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, serverUniqueCrossServerCommandsId, sv_crossServerCommandIdent->string, sv_hostname->string,text);
+	SVC_CrossServerCommandForwardToSubscribers(NULL, finalCmd);
+}
+
 
 /*
 ===============
@@ -1168,6 +1183,15 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			traceCustomization.customEpsilonValue = VMF(11);
 			traceCustomization.traceCustomFlags = args[12];
 			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &traceCustomization);
+			return 0;
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_CROSS_SERVER_COMMANDS) {
+
+		switch (args[0]) {
+
+		case G_COOL_API_CROSS_SERVER_COMMAND:
+			SV_BroadcastCrossServerCommand(VMAS(1));
 			return 0;
 		}
 	}

@@ -63,6 +63,11 @@ cvar_t* sv_demoWriteMeta;
 cvar_t* sv_ucmdSendback;
 cvar_t* sv_ucmdSendbackMinCount;
 
+cvar_t* sv_crossServerCommands;
+cvar_t* sv_crossServerCommandRemoteServer;
+cvar_t* sv_crossServerCommandPassword;
+cvar_t* sv_crossServerCommandIdent;
+
 cvar_t* sv_specAllEnts;
 
 // jk2mv's toggleable fixes
@@ -78,6 +83,18 @@ cvar_t	*mv_fixplayerghosting;
 
 // jk2mv engine flags
 cvar_t	*mv_resetServerTime;
+
+typedef struct crossServerCommandSubscriber_s {
+	netadr_t	addr;
+	int			lastTimeSubscribed;
+} crossServerCommandSubscriber_t;
+
+std::vector<crossServerCommandSubscriber_t> crossServerCommandSubscribers; // TODO use std::set for slightly better theoretical performance?
+
+netadr_t	crossServerCommandsRemoteServer;
+bool		crossServerCommandsRemoteServerSet = false;
+int			serverUniqueCrossServerCommandsId = -1;
+int			crossServerLastSubscribed = -1;
 
 /*
 =============================================================================
@@ -590,12 +607,136 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	} else {
 		SVC_WhitelistAdr( from );
 
-		Cmd_DropArg (1);
-		Cmd_DropArg (0);
 		Cmd_Execute ();
 	}
 
 	Com_EndRedirect ();
+}
+
+bool SVC_AddCrossServerCommandSubscriber(netadr_t addr) {
+	for (auto it = crossServerCommandSubscribers.begin(); it != crossServerCommandSubscribers.end(); it++) {
+		if (it->addr.ipi == addr.ipi && it->addr.port == addr.port && it->addr.type == addr.type) {
+			it->lastTimeSubscribed = Sys_Milliseconds();
+			return false;
+		}
+	}
+	crossServerCommandSubscriber_t newSubscriber = {addr,Sys_Milliseconds()};
+	crossServerCommandSubscribers.push_back(newSubscriber);
+	return true;
+}
+void SVC_CrossServerCommandsMaintenance() {
+	int curMilli = Sys_Milliseconds();
+	// prune old subscribers
+	for (int i = crossServerCommandSubscribers.size() - 1; i >= 0;i--) {
+		if ((curMilli - crossServerCommandSubscribers[i].lastTimeSubscribed) > 60000 || crossServerCommandSubscribers[i].lastTimeSubscribed > curMilli) {
+			if (com_developer->integer > 1) {
+				Com_Printf("^3Pruning cross-server command subscriber: %s\n",NET_AdrToString(crossServerCommandSubscribers[i].addr));
+			}
+			crossServerCommandSubscribers.erase(crossServerCommandSubscribers.begin()+i);
+		}
+	}
+	if (crossServerCommandsRemoteServerSet && ((curMilli - crossServerLastSubscribed) > 10000 || crossServerLastSubscribed > curMilli)) {
+		const char* str = va("csc \"%s\" %d %d s \"%s\" \"%s\"", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, serverUniqueCrossServerCommandsId, sv_crossServerCommandIdent->string, sv_hostname->string);
+		NET_OutOfBandData(NS_CLIENT, crossServerCommandsRemoteServer, (byte*)str, strlen(str) + 1, sizeof("csc") - 1);
+		crossServerLastSubscribed = curMilli;
+	}
+}
+void SVC_CrossServerCommandForwardToSubscribers(netadr_t* addr, const char* rawString) {
+	for (auto it = crossServerCommandSubscribers.begin(); it != crossServerCommandSubscribers.end(); it++) {
+		if (addr && it->addr.ipi == addr->ipi && it->addr.port == addr->port && it->addr.type == addr->type) {
+			continue; // this is where it came from
+		}
+		if (crossServerCommandsRemoteServerSet && it->addr.ipi == crossServerCommandsRemoteServer.ipi && it->addr.port == crossServerCommandsRemoteServer.port && it->addr.type == crossServerCommandsRemoteServer.type) {
+			continue; // we check this separately but technically shouldn't happen unless misconfigured
+		}
+		if (com_developer->integer > 1) {
+			Com_Printf("^3Forwarding/sending cross-server command to '%s'\n",NET_AdrToString(it->addr));
+		}
+		NET_OutOfBandData(NS_CLIENT,it->addr,(byte*)rawString,strlen(rawString)+1,sizeof("csc")-1); // NS_CLIENT because this has to be received by the server (idk dumb)
+	}
+	if (crossServerCommandsRemoteServerSet) { // separately send to remote server
+		if (addr && crossServerCommandsRemoteServer.ipi == addr->ipi && crossServerCommandsRemoteServer.port == addr->port && crossServerCommandsRemoteServer.type == addr->type) {
+			return; // this is where it came from
+		}
+		if (com_developer->integer > 1) {
+			Com_Printf("^3Forwarding/sending cross-server command to remote '%s'\n", NET_AdrToString(crossServerCommandsRemoteServer));
+		}
+		NET_OutOfBandData(NS_CLIENT, crossServerCommandsRemoteServer, (byte*)rawString, strlen(rawString) + 1, sizeof("csc") - 1); 
+	}
+}
+
+/*
+===============
+SVC_CrossServerCommand
+
+Cross-server command received.
+
+Returns true if it's a command (not a subscription) and all checks passed.
+===============
+*/
+bool SVC_CrossServerCommand( netadr_t from ) {
+	qboolean	valid;
+
+	if (!strlen(sv_crossServerCommandPassword->string) ||
+		strcmp(Cmd_Argv(1), sv_crossServerCommandPassword->string)) {
+		valid = qfalse;
+		Com_DPrintf("Bad cross server command from %s: %s\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
+	}
+	else {
+		valid = qtrue;
+		if (com_developer->integer) {
+			Com_DPrintf("Cross server command from %s: %s\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
+		}
+	}
+
+	int cscUniqueServerId = atoi(Cmd_Argv(2));
+	int cscForwardingUniqueServerId = atoi(Cmd_Argv(3));
+	if (serverUniqueCrossServerCommandsId == cscUniqueServerId) {
+		if (com_developer->integer) {
+			Com_Printf("^1Likely badly configured cross server commands. Got back my own cmd. Not executing/forwarding.\n");
+		}
+		return false;
+	}
+	if (serverUniqueCrossServerCommandsId == cscForwardingUniqueServerId) {
+		if (com_developer->integer) {
+			Com_Printf("^1Likely badly configured cross server commands. Got back my own forwarded cmd. Not executing/forwarding.\n");
+		}
+		return false;
+	}
+
+	if ( !strlen(sv_crossServerCommandPassword->string ) ) {
+		Com_Printf ("No cross-server command password set.\n");
+	} else if ( !valid ) {
+		Com_Printf ("Bad cross-server command password.\n");
+	} else {
+		SVC_WhitelistAdr( from );
+
+		if (!stricmp("s", Cmd_Argv(4))) {
+			// he is subscribing
+			if (SVC_AddCrossServerCommandSubscriber(from)) {
+				Com_DPrintf("Cross server command subscription from %s.\n", NET_AdrToString(from));
+			}
+			return false;
+		}
+		else if(!stricmp("c", Cmd_Argv(4))) {
+			const char* forward = va("csc \"%s\" c %d %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, Cmd_ArgsFrom(3));
+			Cmd_DropArg(4);
+			Cmd_DropArg(3);
+			Cmd_DropArg(2);
+			Cmd_DropArg(1);
+			Cmd_DropArg(0);
+			if (VM_Call(gvm, GAME_COOL_API_CROSS_SERVER_COMMAND_RECEIVED)) { // game can prevent forwarding if desired.
+				SVC_CrossServerCommandForwardToSubscribers(&from, forward);
+			}
+			return true;
+		}
+		else {
+			Com_Printf("Bad cross-server command from %s: %s.\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
+		}
+		
+	}
+	return false;
+
 }
 
 /*
@@ -721,6 +862,15 @@ static bool SVC_IsWhitelisted( netadr_t adr ) {
 	}
 }
 
+bool SVC_CrossServerCommandsActive() {
+	if (sv_crossServerCommands->integer && !sv_crossServerCommandPassword->string[0]) {
+		Com_Printf("^1Warning: sv_crossServerCommands is active but sv_crossServerCommandPassword is not set. Disabling feature.\n");
+		Cvar_Set("sv_crossServerCommands","0");
+		return false;
+	}
+	return sv_crossServerCommands->integer && sv_crossServerCommandPassword->string[0];
+}
+
 //
 
 typedef enum {
@@ -733,6 +883,7 @@ typedef enum {
 	SVC_RCON,
 	SVC_DISCONNECT,
 	SVC_MVAPI,
+	SVC_CROSS_SERVER_COMMAND,
 	SVC_MAX
 } svcType_t;
 
@@ -760,7 +911,8 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		"getchallenge",
 		"rcon",
 		"disconnect",
-		"mvapi"
+		"mvapi",
+		"csc" // cross-server-command
 	};
 
 	char	*s;
@@ -780,12 +932,24 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	MSG_BeginReadingOOB( msg );
 	MSG_ReadLong( msg );		// skip the -1 marker
 
-	if (!Q_strncmp("connect", (const char *)&msg->data[4], 7)) {
+	if (!Q_strncmp("connect", (const char *)&msg->data[4], sizeof("connect")-1)) {
 		Huff_Decompress(msg, 12);
 		cmd = SVC_CONNECT;
 	}
+	if (!Q_strncmp("csc", (const char *)&msg->data[4], sizeof("csc") - 1)) {
+		if (!SVC_CrossServerCommandsActive()) {
+			return;
+		}
+		Huff_Decompress(msg, 8);
+		cmd = SVC_CROSS_SERVER_COMMAND;
+	}
 
-	s = MSG_ReadStringLine( msg );
+	if (cmd == SVC_CROSS_SERVER_COMMAND) {
+		s = MSG_ReadBigString(msg); // since this has to contain the start ("csc") and some other stuff, and cmds themselves can max out the 1024 limit, need big string here
+	}
+	else {
+		s = MSG_ReadStringLine(msg);
+	}
 	Cmd_TokenizeString( s );
 	c = Q_strlwr(Cmd_Argv(0));
 
@@ -860,6 +1024,9 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 
 			currmessage[0] = 0;
 		}
+		break;
+	case SVC_CROSS_SERVER_COMMAND:
+		SVC_CrossServerCommand(from);
 		break;
 	default:
 		Com_DPrintf("bad connectionless packet from %s:\n%s\n", NET_AdrToString(from), s);
@@ -1096,7 +1263,7 @@ qboolean SV_CheckPaused( void ) {
 }
 
 void SV_CheckCvars(void) {
-	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMinSpec = -1, lastModSnapsMax = -1;
+	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMinSpec = -1, lastModSnapsMax = -1, lastCrossServerCommandsRemoteServerModifiedCount = -1;
 	static int lastModEnforceSnaps = -1;
 	qboolean changed = qfalse;
 
@@ -1119,6 +1286,19 @@ void SV_CheckCvars(void) {
 		{
 			Cvar_Set("sv_hostname", hostname);
 		}
+	}
+
+	if (sv_crossServerCommandRemoteServer->modificationCount != lastCrossServerCommandsRemoteServerModifiedCount) {
+		if (!sv_crossServerCommandRemoteServer->string[0]) {
+			crossServerCommandsRemoteServerSet = false;
+		}
+		else {
+			crossServerCommandsRemoteServerSet = NET_StringToAdr(sv_crossServerCommandRemoteServer->string, &crossServerCommandsRemoteServer);
+			if (!crossServerCommandsRemoteServerSet) {
+				Com_Printf("^1Error parsing sv_crossServerCommandRemoteServer. Remote server will not be used.");
+			}
+		}
+		lastCrossServerCommandsRemoteServerModifiedCount = sv_crossServerCommandRemoteServer->modificationCount;
 	}
 
 	// check limits on client "snaps" value based on server framerate and snapshot rate
@@ -1279,6 +1459,8 @@ void SV_Frame( int msec ) {
 
 	// update ping based on the all received frames
 	SV_CalcPings();
+
+	SVC_CrossServerCommandsMaintenance();
 
 	if (com_dedicated->integer) SV_BotFrame( sv.time );
 

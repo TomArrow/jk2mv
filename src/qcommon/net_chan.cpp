@@ -687,9 +687,11 @@ void QDECL NET_OutOfBandPrint(netsrc_t sock, netadr_t adr, const char *format, .
 NET_OutOfBandPrint
 
 Sends a data message in an out-of-band datagram (only used for "connect")
+
+TA: Also using for "csc" (cross-server commands) now
 ================
 */
-void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len) {
+void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len, int cmdLen) {
 	byte		string[MAX_MSGLEN * 2];
 	int			i;
 	msg_t		mbuf;
@@ -706,7 +708,7 @@ void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len)
 
 	mbuf.data = string;
 	mbuf.cursize = len + 4;
-	Huff_Compress(&mbuf, 12);
+	Huff_Compress(&mbuf, 5 + cmdLen); //12);
 	// send the datagram
 	NET_SendPacket(sock, mbuf.cursize, mbuf.data, adr);
 }

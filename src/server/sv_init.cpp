@@ -2,6 +2,7 @@
 #include "server.h"
 
 #include <mv_setup.h>
+#include "../qcommon/randombytes.h"
 
 #include "../qcommon/q_shared.h"
 
@@ -629,6 +630,13 @@ Ghoul2 Insert End
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
+	// make a random id for this server to avoid recursion with badly configured cross-server commands.
+	if (randombytes(&serverUniqueCrossServerCommandsId, 4)) {
+		// guess it failed. fall back to this.
+		serverUniqueCrossServerCommandsId = sv.serverId;
+	}
+	Cvar_Set("sv_serverUniqueCrossServerCommandsId", va("%i", serverUniqueCrossServerCommandsId));
+
 #ifdef SVDEMO
 	time(&sv.realMapTimeStarted);
 	sv.demosPruned = qfalse;
@@ -933,6 +941,11 @@ void SV_Init (void) {
 #endif
 	sv_ucmdSendback = Cvar_Get("sv_ucmdSendback", "1", CVAR_ARCHIVE); // , "Automatically take server-side demos"
 	sv_ucmdSendbackMinCount = Cvar_Get("sv_ucmdSendbackMinCount", "64", CVAR_ARCHIVE); // , "Automatically take server-side demos"
+
+	sv_crossServerCommands = Cvar_Get("sv_crossServerCommands", "0", CVAR_ARCHIVE);
+	sv_crossServerCommandRemoteServer = Cvar_Get("sv_crossServerCommandRemoteServer", "", CVAR_ARCHIVE);
+	sv_crossServerCommandPassword = Cvar_Get("sv_crossServerCommandPassword", "", CVAR_ARCHIVE);
+	sv_crossServerCommandIdent = Cvar_Get("sv_crossServerCommandIdent", "", CVAR_ARCHIVE);
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 
