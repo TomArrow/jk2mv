@@ -12,6 +12,7 @@ int Key_GetProtocolKey(mvversion_t protocol, int key16);
 field_t		chatField;
 qboolean	chat_team;
 qboolean	chat_demoMoment;
+qboolean	chat_crossServer;
 
 int			chat_playerNum;
 
@@ -1447,6 +1448,8 @@ void Message_Key( int key ) {
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
 			else if (chat_team)
 				Com_sprintf( buffer, sizeof( buffer ), "say_team \"%s\"\n", chatField.buffer );
+			else if (chat_crossServer && (tommyTernalFlags & TTFLAGSSERVERINFO_HASCROSSSERVERCHAT))
+				Com_sprintf( buffer, sizeof( buffer ), "say_cross \"%s\"\n", chatField.buffer );
 			else
 				Com_sprintf( buffer, sizeof( buffer ), "say \"%s\"\n", coloredString );
 			CL_AddReliableCommand( buffer );

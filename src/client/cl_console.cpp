@@ -72,6 +72,7 @@ void Con_MessageMode_f (void) {		//yell
 	chat_playerNum = -1;
 	chat_team = qfalse;
 	chat_demoMoment = qfalse;
+	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (16 * cls.cgxadj);
 
@@ -87,6 +88,7 @@ void Con_MessageMode2_f (void) {	//team chat
 	chat_playerNum = -1;
 	chat_team = qtrue;
 	chat_demoMoment = qfalse;
+	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (25 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -110,6 +112,7 @@ void Con_MessageMode3_f (void) {	//target chat
 	}
 	chat_team = qfalse;
 	chat_demoMoment = qfalse;
+	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (24 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -128,6 +131,7 @@ void Con_MessageMode4_f (void) {	//attacker
 	}
 	chat_team = qfalse;
 	chat_demoMoment = qfalse;
+	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = 30 / cls.cgxadj;
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -146,10 +150,30 @@ void Con_MessageMode5_f (void) {	// We send a message to ourselves starting with
 	}
 	chat_team = qfalse;
 	chat_demoMoment = qtrue;
+	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = 24 / cls.cgxadj; // Idk, just guessing
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
 }
+
+/*
+================
+Con_MessageMode6_f (cross-server)
+================
+*/
+void Con_MessageMode6_f(void) {		//yell
+	chat_playerNum = -1;
+	chat_team = qfalse;
+	chat_demoMoment = qfalse;
+	if (tommyTernalFlags & TTFLAGSSERVERINFO_HASCROSSSERVERCHAT) {
+		chat_crossServer = qtrue;
+	}
+	Field_Clear(&chatField);
+	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (16 * cls.cgxadj);
+
+	cls.keyCatchers ^= KEYCATCH_MESSAGE;
+}
+
 
 /*
 ================
@@ -636,10 +660,17 @@ void Con_Init (void) {
 
 	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
 	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
+	Cmd_AddCommand ("messagemode_all", Con_MessageMode_f);
 	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
+	Cmd_AddCommand ("messagemode_team", Con_MessageMode2_f);
 	Cmd_AddCommand ("messagemode3", Con_MessageMode3_f);
+	Cmd_AddCommand ("messagemode_whisper", Con_MessageMode3_f);
 	Cmd_AddCommand ("messagemode4", Con_MessageMode4_f);
+	Cmd_AddCommand ("messagemode_lastattacker", Con_MessageMode4_f);
 	Cmd_AddCommand ("messagemode5", Con_MessageMode5_f);
+	Cmd_AddCommand ("messagemode_demomoment", Con_MessageMode5_f);
+	Cmd_AddCommand ("messagemode6", Con_MessageMode6_f);
+	Cmd_AddCommand ("messagemode_crossserver", Con_MessageMode6_f);
 	Cmd_AddCommand ("clear", Con_Clear_f);
 	Cmd_AddCommand ("condump", Con_Dump_f);
 	Cmd_SetCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
@@ -1101,7 +1132,11 @@ void Con_DrawNotify (void)
 	// draw the chat line
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
 	{
-		if (chat_demoMoment) {
+		if (chat_crossServer) {
+			chattext = "Say cross-server:";
+			skip = 18;
+		} 
+		else if (chat_demoMoment) {
 			chattext = "Demo moment:";
 			skip = 13;
 		} 

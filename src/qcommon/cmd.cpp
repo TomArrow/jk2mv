@@ -374,6 +374,23 @@ char *Cmd_ArgsFrom( int arg ) {
 
 	return cmd_args;
 }
+char * Cmd_ArgsFromQuoted( int arg ) {
+	static	char		cmd_args[BIG_INFO_STRING];
+
+	cmd_args[0] = 0;
+	if (arg < 0)
+		arg = 0;
+	for ( int i = arg ; i < cmd_argc ; i++ ) {
+		Q_strcat( cmd_args, sizeof( cmd_args ),"\"");
+		Q_strcat( cmd_args, sizeof( cmd_args ), cmd_argv[i] );
+		Q_strcat(cmd_args, sizeof(cmd_args), "\"");
+		if ( i + 1 != cmd_argc ) {
+			Q_strcat( cmd_args, sizeof( cmd_args ), " " );
+		}
+	}
+
+	return cmd_args;
+}
 
 const char *Cmd_Cmd( void ) {
 	return cmd_cmd;

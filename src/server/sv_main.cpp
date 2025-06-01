@@ -711,15 +711,15 @@ bool SVC_CrossServerCommand( netadr_t from ) {
 	} else {
 		SVC_WhitelistAdr( from );
 
-		if (!stricmp("s", Cmd_Argv(4))) {
+		if (!Q_stricmp("s", Cmd_Argv(4))) {
 			// he is subscribing
 			if (SVC_AddCrossServerCommandSubscriber(from)) {
 				Com_DPrintf("Cross server command subscription from %s.\n", NET_AdrToString(from));
 			}
 			return false;
 		}
-		else if(!stricmp("c", Cmd_Argv(4))) {
-			const char* forward = va("csc \"%s\" c %d %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, Cmd_ArgsFrom(3));
+		else if(!Q_stricmp("c", Cmd_Argv(4))) {
+			const char* forward = va("csc \"%s\" c %d %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, Cmd_ArgsFromQuoted(3));
 			Cmd_DropArg(4);
 			Cmd_DropArg(3);
 			Cmd_DropArg(2);

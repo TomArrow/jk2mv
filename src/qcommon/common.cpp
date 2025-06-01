@@ -24,6 +24,7 @@
 #include <mutex>
 
 qboolean serverIsTommyTernal = qfalse;
+int tommyTernalFlags = 0;
 const int supportedCoolApiFeatures =
   COOL_APIFEATURE_SETPREDICTEDMOVEMENT
 | COOL_APIFEATURE_GETTEMPORARYUSERCMD

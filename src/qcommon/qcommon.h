@@ -27,7 +27,13 @@ void FS_PipeClose(fileHandle_t f);
 #define FIELD_HISTORY_SIZE	32
 #define KILL_RING_SIZE		16
 
+#define TTFLAGSSERVERINFO_HASANTILOOPSTATS		(1<<0) 
+#define TTFLAGSSERVERINFO_HASFORCESPEEDSMASH	(1<<1) 
+#define TTFLAGSSERVERINFO_HASFORCEJUMPCHARGE	(1<<2) 
+#define TTFLAGSSERVERINFO_HASCROSSSERVERCHAT	(1<<3)
+
 extern qboolean serverIsTommyTernal;
+extern int tommyTernalFlags;
 
 //For determining whether to allow 1.02 color codes:
 #define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
@@ -568,6 +574,7 @@ char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 char	*Cmd_Args (void);
 char	*Cmd_ArgsFrom( int arg );
+char	*Cmd_ArgsFromQuoted( int arg );
 const char	*Cmd_Cmd( void );
 void	Cmd_ArgsBuffer( char *buffer, int bufferLength );
 void	Cmd_DropArg( int arg );

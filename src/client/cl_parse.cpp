@@ -1194,9 +1194,11 @@ void CL_ParseGamestate( msg_t *msg ) {
 				}
 				if (!Q_stricmpn(Info_ValueForKey(s, "gamename"), "tommyternal", 11)) { // is it dumb to make it dependent on mvsdk instead of server engine? idk
 					serverIsTommyTernal = qtrue;
+					tommyTernalFlags = atoi(Info_ValueForKey(s, "ttFlags"));
 				}
 				else {
 					serverIsTommyTernal = qfalse;
+					tommyTernalFlags = 0;
 				}
 			}
 
