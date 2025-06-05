@@ -513,6 +513,7 @@ static void draw(visBrushNode_t *brush, visBrushNode_t** sortList, int count, qh
 	int countDrawn = 0;
 
 	// todo view axis culling
+	if (!count || !sortList) return;
 
 	while (brush) {
 		//brush->distance = DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz);
