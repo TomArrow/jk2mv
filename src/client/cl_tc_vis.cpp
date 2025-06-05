@@ -10,6 +10,9 @@
 #include "client.h"
 #include "../qcommon/cm_local.h"
 #include "../qcommon/cm_patch.h"
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
 
 
 // if you dare to exceed this...
@@ -27,6 +30,8 @@ typedef struct {
 typedef struct visBrushNode_s {
 	int numFaces;
 	visFace_t *faces;
+	vec3_t center;
+	float distance;
 
 	// This is a linked list.
 	// Why? I dont know.
@@ -45,13 +50,21 @@ static int winding_cmp(const void *a, const void *b);
 static void add_vert_to_face(visFace_t *face, vec3_t vert, vec4_t color, vec2_t tex_coords);
 static float *get_uv_coords(vec2_t uv, vec3_t vert, vec3_t normal);
 static void free_vis_brushes(visBrushNode_t *brushes);
-static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type);
+static void draw(visBrushNode_t *brush, visBrushNode_t **sortList, int count, qhandle_t shader, visBrushType_t type);
 
 
 static visBrushNode_t *trigger_head = NULL;
 static visBrushNode_t *clip_head = NULL;
 static visBrushNode_t *clip_solidity_head = NULL;
 static visBrushNode_t *slick_head = NULL;
+
+static int				trigger_count = 0;
+static int				clip_count = 0;
+static int				slick_count = 0;
+
+static visBrushNode_t** trigger_sortlist;
+static visBrushNode_t** clip_sortlist;
+static visBrushNode_t** slick_sortlist;
 
 /* needed for winding_cmp */
 static vec3_t w_center, w_normal, w_ref_vec;
@@ -60,6 +73,8 @@ static float w_ref_vec_len;
 cvar_t *triggers_draw;
 cvar_t *clips_draw;
 cvar_t *slicks_draw;
+
+static cvar_t *draw_maxfaces;
 
 extern cvar_t *r_nocull;
 extern cvar_t *r_solidity;
@@ -81,17 +96,31 @@ static vec4_t slick_color = { 0, 64, 128, 255 };
 
 static const cplane_t *frustum;
 
+static void init_sortlist(visBrushNode_t* head, visBrushNode_t** sortlist) {
+	visBrushNode_t* node = head;
+	int index = 0;
+	while (node) {
+		sortlist[index] = node;
+		index++;
+		node = node->next;
+	}
+}
+
 void tc_vis_init(void) {
-	free_vis_brushes(trigger_head);
-	free_vis_brushes(clip_head);
-	free_vis_brushes(slick_head);
+	free_vis_brushes(trigger_head); trigger_count = 0; if (trigger_sortlist) { delete[] trigger_sortlist; }
+	free_vis_brushes(clip_head); clip_count = 0; if (clip_sortlist) { delete[] clip_sortlist; }
+	free_vis_brushes(slick_head); slick_count = 0; if (slick_sortlist) { delete[] slick_sortlist; }
 	trigger_head = NULL;
 	clip_head = NULL;
-	slick_head = NULL;
+	slick_head = NULL; 
+	trigger_sortlist = NULL;
+	clip_sortlist = NULL;
+	slick_sortlist = NULL;
 
 	triggers_draw = Cvar_Get("r_renderTriggerBrushes", "0", CVAR_ARCHIVE);
 	clips_draw = Cvar_Get("r_renderClipBrushes", "0", CVAR_ARCHIVE);
 	slicks_draw = Cvar_Get("r_renderSlickSurfaces", "0", CVAR_ARCHIVE);
+	draw_maxfaces = Cvar_Get("r_renderBrushesMaxFacesPerType", "100", CVAR_ARCHIVE);
 
 	trigger_shader_setting = Cvar_Get("r_renderTriggerBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 	clip_shader_setting = Cvar_Get("r_renderClipBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
@@ -114,6 +143,19 @@ void tc_vis_init(void) {
 	add_triggers();
 	add_clips();
 	add_slicks();
+
+	if (trigger_count > 0) {
+		trigger_sortlist = new visBrushNode_t*[trigger_count];
+		init_sortlist(trigger_head, trigger_sortlist);
+	}
+	if (clip_count > 0) {
+		clip_sortlist = new visBrushNode_t*[clip_count];
+		init_sortlist(clip_head, clip_sortlist);
+	}
+	if (slick_count > 0) {
+		slick_sortlist = new visBrushNode_t*[slick_count];
+		init_sortlist(slick_head, slick_sortlist);
+	}
 }
 
 /*
@@ -147,16 +189,16 @@ static qboolean InPVS(const vec3_t p)
 void tc_vis_render(void) {
 	//SetPVSLocation(re->ext.GetViewPosition());
 	if (triggers_draw->integer) {
-		draw(trigger_head, trigger_shader, TRIGGER_BRUSH);
+		draw(trigger_head, trigger_sortlist, trigger_count, trigger_shader, TRIGGER_BRUSH);
 	}
 	if (r_solidity->integer > 1) {
-		draw(clip_solidity_head, clip_shader_solidity, CLIP_SOLIDITY_BRUSH);
+		draw(clip_solidity_head,clip_sortlist, clip_count, clip_shader_solidity, CLIP_SOLIDITY_BRUSH);
 	}
 	else if (clips_draw->integer) {
-		draw(clip_head, clip_shader, CLIP_BRUSH);
+		draw(clip_head, clip_sortlist, clip_count, clip_shader, CLIP_BRUSH);
 	}
 	if (slicks_draw->integer) {
-		draw(slick_head, slick_shader, SLICK_BRUSH);
+		draw(slick_head, slick_sortlist, slick_count, slick_shader, SLICK_BRUSH);
 	}
 }
 
@@ -242,6 +284,8 @@ static void add_slicks(void) {
 static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, vec4_t color) {
 	cbrush_t *brush = &cm.brushes[brushnum];
 	visBrushNode_t *node = (visBrushNode_t*)malloc(sizeof(visBrushNode_t));
+	int	verts = 0;
+	vec3_t center = { 0,0,0 };
 	node->numFaces = brush->numsides;
 	node->faces = (visFace_t*)malloc(node->numFaces * sizeof(visFace_t));
 	for (int i = 0; i < node->numFaces; i++) {
@@ -278,6 +322,13 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 				VectorAdd(p, v2, v2);
 				VectorAdd(p, v3, v3);
 
+				VectorAdd(center,v1,center);
+				verts++;
+				VectorAdd(center,v2,center);
+				verts++;
+				VectorAdd(center,v3,center);
+				verts++;
+
 				vec2_t uv;
 				if (type != SLICK_BRUSH || walkable(p1))
 					add_vert_to_face(&node->faces[i], v1, color, get_uv_coords(uv, p, p1->normal));
@@ -305,20 +356,28 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		qsort(face->verts, face->numVerts, sizeof(face->verts[0]), winding_cmp);
 	}
 
+	if (verts > 0) {
+		VectorScale(center, 1.0f / (float)verts, center);
+		VectorCopy(center,node->center);
+	}
+
 	visBrushNode_t **head = NULL;
 	switch (type)
 	{
 	case TRIGGER_BRUSH:
 		head = &trigger_head;
+		trigger_count++;
 		break;
 	case CLIP_BRUSH:
 		head = &clip_head;
+		clip_count++;
 		break;
 	case CLIP_SOLIDITY_BRUSH:
 		head = &clip_solidity_head;
 		break;
 	case SLICK_BRUSH:
 		head = &slick_head;
+		slick_count++;
 		break;
 	};
 
@@ -436,7 +495,13 @@ static void free_vis_brushes(visBrushNode_t *brushes) {
 	}
 }
 
-static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type) {
+struct
+{
+	bool operator()(visBrushNode_t* a, visBrushNode_t* b) const { return a->distance < b->distance; }
+}
+compareBrushDistance;
+
+static void draw(visBrushNode_t *brush, visBrushNode_t** sortList, int count, qhandle_t shader, visBrushType_t type) {
 	//frustum = re.ext.GetFrustum();
 	//vec3_t viewPos;
 	//VectorCopy(re.ext.GetViewPosition(), viewPos);
@@ -444,12 +509,25 @@ static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type) {
 	qboolean behind;
 	vec3_t vecToVert;
 	qboolean cull = (qboolean)!(r_nocull && r_nocull->integer);
+	int i;
+	int countDrawn = 0;
 
 	// todo view axis culling
 
 	while (brush) {
+		//brush->distance = DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz);
+		brush->distance = DistanceSquared(ori->origin, brush->center);
+		if (fpclassify(brush->distance) == FP_NAN) {
+			brush->distance = std::numeric_limits<float>::infinity(); // make sure sorting doesn't break in case anything truly strange happens.
+		}
+		brush = brush->next;
+	}
+	std::sort(sortList,sortList+count, compareBrushDistance);
+
+	for (i = 0; i < count && countDrawn < draw_maxfaces->integer; i++) {
+		brush = sortList[i];
 		//don't do pvs optimization just check distance as well this gives better performance and results since pvs is expensive and oftentimes the edges are within structural brushes making it not reliable
-		if (!cull || DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz) < 8192 * 8192)
+		//if (!cull || DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz) < 8192 * 8192)
 		{
 			for (int i = 0; i < brush->numFaces; ++i) {
 				behind = cull ? qtrue : qfalse;
@@ -481,6 +559,7 @@ static void draw(visBrushNode_t *brush, qhandle_t shader, visBrushType_t type) {
 				else {
 					re.AddPolyToScene(shader, brush->faces[i].numVerts, brush->faces[i].verts, 1);
 				}
+				countDrawn++;
 			}
 		}
 		brush = brush->next;
