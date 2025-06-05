@@ -1004,6 +1004,10 @@ static void Upload32( byte * const *mipmaps, qboolean customMip, image_t *image,
 			qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniso);
 		}
 	}
+	
+	if (r_imageLoadLowMem->integer) { // try to see if the driver will free up the RAM used to cache while sending to CPU. slower probably but might use less RAM?
+		qglFinish();
+	}
 
 	GL_CheckErrors();
 }
