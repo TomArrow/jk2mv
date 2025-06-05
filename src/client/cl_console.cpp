@@ -1220,6 +1220,14 @@ void Con_DrawSolidConsole( float frac ) {
 	re.SetColor( g_color_table[ColorIndex_Extended(COLOR_JK2MV)] );
 	SCR_DrawPic( 0, y, SCREEN_WIDTH, 2, cls.whiteShader );
 
+	if (cl.mapname[0]) {
+		i = (int)strlen(cl.mapname);
+		for (x = 0; x < i; x++) {
+			SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x + 1) * con.charWidth,
+				(lines - (con.charHeight * 3 + con.charHeight / 2)) + padding, cl.mapname[x]);
+		}
+	}
+
 #if 0
 	i = (int)strlen(Q3_VERSION);
 	for (x = 0; x<i; x++) {

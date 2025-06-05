@@ -37,6 +37,8 @@ set(AssetsFiles
 	"gfx/hud/saber_fast.tga"
 	"gfx/hud/saber_med.tga"
 	"gfx/hud/saber_strong.tga"
+	
+	"gfx/hud/jkmod_clock_bg.tga"
 
 	"gfx/hud/keys/back_off.tga"
 	"gfx/hud/keys/back_on.tga"
