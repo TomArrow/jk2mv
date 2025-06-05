@@ -293,6 +293,12 @@ void *RE_RegisterServerModels_Malloc(int iSize, const char *psModelFileName, qbo
 	return ModelBin.pModelDiskImage;
 }
 
+#ifndef DEDICATED
+void RE_GLFinish() { // for freeing up RAM during image loading
+	qglFinish();
+}
+#endif
+
 // dump any models not being used by this level if we're running low on memory...
 //
 static int GetModelDataAllocSize(void)

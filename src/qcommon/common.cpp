@@ -1014,6 +1014,7 @@ static const StaticMem_t gNumberString[] = {
 static qboolean gbMemFreeupOccured = qfalse;
 void *Z_Malloc(int iSize, memtag_t eTag, qboolean bZeroit /* = qfalse */)
 {
+	qboolean triedGlFinish = qfalse;
 	gbMemFreeupOccured = qfalse;
 
 	if (iSize == 0)
@@ -1029,6 +1030,12 @@ void *Z_Malloc(int iSize, memtag_t eTag, qboolean bZeroit /* = qfalse */)
 	zoneHeader_t *pMemory = NULL;
 	while (pMemory == NULL)
 	{
+
+		if (gbMemFreeupOccured)
+		{
+			Sys_Sleep(1000);	// sleep for a second, so Windows has a chance to shuffle mem to de-swiss-cheese it (TA: ported from JA)
+		}
+
 		if (bZeroit) {
 			pMemory = (zoneHeader_t *) calloc ( iRealSize, 1 );
 		} else {
@@ -1106,6 +1113,17 @@ void *Z_Malloc(int iSize, memtag_t eTag, qboolean bZeroit /* = qfalse */)
 					continue;
 				}
 			}
+
+#ifndef DEDICATED 
+			// explanation: We might be loading images into VRAM. They might still be cached in normal RAM. By doing this, at least on some drivers/hardware, we flush them into VRAM fully.
+			extern void RE_GLFinish();
+			if (!triedGlFinish) {
+				RE_GLFinish();
+				triedGlFinish = qtrue;
+				gbMemFreeupOccured = qtrue;
+				continue;
+			}
+#endif
 
 			// sigh, dunno what else to try, I guess we'll have to give up and report this as an out-of-mem error...
 			//
