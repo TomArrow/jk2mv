@@ -12,6 +12,8 @@
 	TAGDEF(UNKNOWN),
 	TAGDEF(HUNK),						// special usage for config and product id files when FS_Read called before hunk is initialised
 	TAGDEF(HUNKALLOC),					// mem that was formerly from the hunk AFTER the SetMark (ie discarded during vid_reset)
+	TAGDEF(HUNK_MARK1),					// mem that was formerly from the hunk AFTER the SetMark (ie discarded during vid_reset)
+	TAGDEF(HUNK_MARK2),					// mem that was formerly from the hunk AFTER the SetMark (ie discarded during vid_reset)
 	TAGDEF(EVENT),
 	TAGDEF(FILESYS),					// general filesystem usage
 	TAGDEF(GENERAL),
@@ -48,6 +50,7 @@
 	TAGDEF(SPECIAL_MEM_TEST),			// special usage for testing z_malloc recover only
 
 	TAGDEF(DOWNLOADBLACKLIST),
+	TAGDEF(TEMP_HUNKALLOC),
 	TAGDEF(AVI),						// image buffers for avi recording
 
 /*	TAGDEF(SHADER),

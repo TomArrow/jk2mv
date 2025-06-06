@@ -991,6 +991,8 @@ extern	cvar_t	*mg_loglevel;
 
 extern	cvar_t	*com_renderfps;
 
+extern	cvar_t	*com_hunkDynamic;
+
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;
 extern	cvar_t	*sv_paused;
@@ -1076,6 +1078,7 @@ void  Z_TagFree	( memtag_t eTag );
 void  Z_Free	( void *ptr );
 int	  Z_Size	( void *pvAddress);
 void Com_ShutdownZoneMemory(void);
+void Com_ShutdownHunkMemory(void);
 
 void Hunk_Clear( void );
 void Hunk_ClearToMark( void );

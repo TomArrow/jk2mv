@@ -124,6 +124,9 @@ static void Q_NORETURN Sys_Exit(int ex) {
 
 	Sys_PlatformExit();
 
+	if (com_hunkDynamic->integer) {
+		Com_ShutdownHunkMemory();
+	}
 	Com_ShutdownZoneMemory();
 
 	CON_Shutdown();
