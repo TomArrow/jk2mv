@@ -11,20 +11,27 @@
 #include "../qcommon/cm_local.h"
 #include "../qcommon/cm_patch.h"
 #include <algorithm>
-#include <cfloat>
+#include <cfloat>s
 #include <cmath>
+
+#define OVERCOMPLICATED_OPTIMIZATIONS 0
 
 
 // if you dare to exceed this...
 #define MAX_FACE_VERTS 64
 
-typedef enum {TRIGGER_BRUSH, CLIP_BRUSH, CLIP_SOLIDITY_BRUSH, SLICK_BRUSH} visBrushType_t;
+typedef enum {TRIGGER_BRUSH, CLIP_BRUSH,/* CLIP_SOLIDITY_BRUSH,*/ SLICK_BRUSH} visBrushType_t;
 
 typedef struct {
 	int numVerts;
 	polyVert_t *verts;
-	vec3_t mins;
-	vec3_t maxs;
+	//vec3_t mins; // not used anymore
+	//vec3_t maxs;
+	//vec3_t normal;
+	union {
+		byte		solidityModulate[4];
+		uint32_t	solidityModulateui;
+	};
 } visFace_t;
 
 typedef struct visBrushNode_s {
@@ -37,30 +44,44 @@ typedef struct visBrushNode_s {
 	// Why? I dont know.
 	// Let me know if you do.
 	struct visBrushNode_s *next;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	struct visBrushNode_s *prev; // let's have it doubly-linked so i can easily rearrange.
+#endif
 } visBrushNode_t;
 
+typedef enum vertColoringType_s {
+	VERTCOLOR_KEEP,
+	VERTCOLOR_OVERRIDE,
+	VERTCOLOR_SOLIDITY,
+}vertColoringType_t;
 
 static void add_triggers(void);
 static void add_clips(void);
 static void add_slicks(void);
-static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, vec4_t color);
+static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, color4u_t* color);
 static qboolean intersect_planes(cplane_t *p1, cplane_t *p2, cplane_t *p3, vec3_t p);
 static qboolean point_in_brush(vec3_t point, cbrush_t *brush);
 static int winding_cmp(const void *a, const void *b);
-static void add_vert_to_face(visFace_t *face, vec3_t vert, vec4_t color, vec2_t tex_coords);
+static void add_vert_to_face(visFace_t *face, vec3_t vert, color4u_t* color, vec2_t tex_coords);
 static float *get_uv_coords(vec2_t uv, vec3_t vert, vec3_t normal);
 static void free_vis_brushes(visBrushNode_t *brushes);
-static void draw(visBrushNode_t *brush, visBrushNode_t **sortList, int count, qhandle_t shader, visBrushType_t type);
+static void draw(visBrushNode_t** head, visBrushNode_t **sortList, bool* wasSorted, int count, int countFaces, qhandle_t shader, visBrushType_t type, uint32_t colorOverride = 0, vertColoringType_t coloring = VERTCOLOR_KEEP);
 
 
 static visBrushNode_t *trigger_head = NULL;
 static visBrushNode_t *clip_head = NULL;
-static visBrushNode_t *clip_solidity_head = NULL;
+//static visBrushNode_t *clip_solidity_head = NULL;
 static visBrushNode_t *slick_head = NULL;
 
 static int				trigger_count = 0;
 static int				clip_count = 0;
 static int				slick_count = 0;
+static int				trigger_count_faces = 0;
+static int				clip_count_faces = 0;
+static int				slick_count_faces = 0;
+static bool				triggers_were_sorted = false;
+static bool				clips_were_sorted = false;
+static bool				slicks_were_sorted = false;
 
 static visBrushNode_t** trigger_sortlist;
 static visBrushNode_t** clip_sortlist;
@@ -75,6 +96,10 @@ cvar_t *clips_draw;
 cvar_t *slicks_draw;
 
 static cvar_t *draw_maxfaces;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+static cvar_t *draw_earlycull;
+static cvar_t *draw_earlydistcull;
+#endif
 
 extern cvar_t *r_nocull;
 extern cvar_t *r_solidity;
@@ -89,10 +114,10 @@ static qhandle_t clip_shader;
 static qhandle_t slick_shader;
 static qhandle_t clip_shader_solidity;
 
-static vec4_t trigger_color = { 0, 128, 0, 255 };
-static vec4_t clip_color = { 128, 0, 0, 255 };
-static vec4_t clip_solidity_color = { 255, 255, 255, 255 };
-static vec4_t slick_color = { 0, 64, 128, 255 };
+static color4u_t trigger_color = { 0, 128, 0, 255 };
+static color4u_t clip_color = { 128, 0, 0, 255 };
+static color4u_t clip_solidity_color = { 255, 255, 255, 255 };
+static color4u_t slick_color = { 0, 64, 128, 255 };
 
 static const cplane_t *frustum;
 
@@ -107,20 +132,27 @@ static void init_sortlist(visBrushNode_t* head, visBrushNode_t** sortlist) {
 }
 
 void tc_vis_init(void) {
-	free_vis_brushes(trigger_head); trigger_count = 0; if (trigger_sortlist) { delete[] trigger_sortlist; }
-	free_vis_brushes(clip_head); clip_count = 0; if (clip_sortlist) { delete[] clip_sortlist; }
-	free_vis_brushes(slick_head); slick_count = 0; if (slick_sortlist) { delete[] slick_sortlist; }
+	free_vis_brushes(trigger_head); trigger_count =trigger_count_faces = 0; if (trigger_sortlist) { delete[] trigger_sortlist; }
+	free_vis_brushes(clip_head); clip_count =clip_count_faces = 0; if (clip_sortlist) { delete[] clip_sortlist; }
+	free_vis_brushes(slick_head); slick_count = slick_count_faces = 0; if (slick_sortlist) { delete[] slick_sortlist; }
 	trigger_head = NULL;
 	clip_head = NULL;
 	slick_head = NULL; 
 	trigger_sortlist = NULL;
 	clip_sortlist = NULL;
 	slick_sortlist = NULL;
+	triggers_were_sorted = false;
+	clips_were_sorted = false;
+	slicks_were_sorted = false;
 
 	triggers_draw = Cvar_Get("r_renderTriggerBrushes", "0", CVAR_ARCHIVE);
 	clips_draw = Cvar_Get("r_renderClipBrushes", "0", CVAR_ARCHIVE);
 	slicks_draw = Cvar_Get("r_renderSlickSurfaces", "0", CVAR_ARCHIVE);
-	draw_maxfaces = Cvar_Get("r_renderBrushesMaxFacesPerType", "100", CVAR_ARCHIVE);
+	draw_maxfaces = Cvar_Get("r_renderBrushesMaxFacesPerType", "300", CVAR_ARCHIVE);
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	draw_earlycull = Cvar_Get("r_renderBrushesEarlyCull", "0", CVAR_ARCHIVE);
+	draw_earlydistcull = Cvar_Get("r_renderBrushesDistanceCull", "8192", CVAR_ARCHIVE);
+#endif
 
 	trigger_shader_setting = Cvar_Get("r_renderTriggerBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 	clip_shader_setting = Cvar_Get("r_renderClipBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
@@ -189,16 +221,35 @@ static qboolean InPVS(const vec3_t p)
 void tc_vis_render(void) {
 	//SetPVSLocation(re->ext.GetViewPosition());
 	if (triggers_draw->integer) {
-		draw(trigger_head, trigger_sortlist, trigger_count, trigger_shader, TRIGGER_BRUSH);
+		draw(&trigger_head, trigger_sortlist, &triggers_were_sorted, trigger_count, trigger_count_faces, trigger_shader, TRIGGER_BRUSH);
 	}
-	if (r_solidity->integer > 1) {
-		draw(clip_solidity_head,clip_sortlist, clip_count, clip_shader_solidity, CLIP_SOLIDITY_BRUSH);
+	if (r_solidity->integer > 1 || clips_draw->integer) {
+		static uint32_t oldColor = clip_color.ui;
+		static bool oldSolidity = false;
+		uint32_t newColor = clip_color.ui;
+		bool solidity = false;
+		if (r_solidity->integer > 1) {
+			newColor = clip_solidity_color.ui;
+			if (r_solidity->integer > 2) {
+				solidity = true;
+			}
+		}
+		else if (clips_draw->integer) {
+			newColor = clip_color.ui;
+		}
+		if (newColor == oldColor && solidity == oldSolidity) {
+			draw(&clip_head, clip_sortlist, &clips_were_sorted, clip_count,clip_count_faces, r_solidity->integer > 1 ? clip_shader_solidity : clip_shader, CLIP_BRUSH, newColor, VERTCOLOR_KEEP);
+		} else {
+			draw(&clip_head, clip_sortlist, &clips_were_sorted, clip_count,clip_count_faces, r_solidity->integer > 1 ? clip_shader_solidity : clip_shader, CLIP_BRUSH, newColor, solidity ? VERTCOLOR_SOLIDITY : VERTCOLOR_OVERRIDE);
+			oldColor = newColor;
+			oldSolidity = solidity;
+		}
 	}
 	else if (clips_draw->integer) {
-		draw(clip_head, clip_sortlist, clip_count, clip_shader, CLIP_BRUSH);
+		draw(&clip_head, clip_sortlist, &clips_were_sorted, clip_count, clip_count_faces, clip_shader, CLIP_BRUSH, clip_color.ui, VERTCOLOR_OVERRIDE);
 	}
 	if (slicks_draw->integer) {
-		draw(slick_head, slick_sortlist, slick_count, slick_shader, SLICK_BRUSH);
+		draw(&slick_head, slick_sortlist, &slicks_were_sorted, slick_count, slick_count_faces, slick_shader, SLICK_BRUSH);
 	}
 }
 
@@ -247,18 +298,18 @@ static void add_triggers(void) {
 		if (is_trigger && model > 0) {
 			cLeaf_t *leaf = &cm.cmodels[model].leaf;
 			for (int i = 0; i < leaf->numLeafBrushes; i++) {
-				gen_visible_brush(cm.leafbrushes[leaf->firstLeafBrush + i], origin, TRIGGER_BRUSH, trigger_color);
+				gen_visible_brush(cm.leafbrushes[leaf->firstLeafBrush + i], origin, TRIGGER_BRUSH, &trigger_color);
 			}
 		}
 	}
 }
 
-static void add_clips(void) {
+static void add_clips(void) { // todo also add triggers in this way with cONTENts_trigger. not rlly reliable but to supplement for unknown trigger types
 	for (int i = 0; i < cm.numBrushes; i++) {
 		cbrush_t *brush = &cm.brushes[i];
 		if (brush->contents & CONTENTS_PLAYERCLIP) {
-			gen_visible_brush(i, vec3_origin, CLIP_BRUSH, clip_color);
-			gen_visible_brush(i, vec3_origin, CLIP_SOLIDITY_BRUSH, clip_solidity_color);
+			gen_visible_brush(i, vec3_origin, CLIP_BRUSH, &clip_color);
+			//gen_visible_brush(i, vec3_origin, CLIP_SOLIDITY_BRUSH, clip_solidity_color);
 		}
 	}
 }
@@ -274,14 +325,14 @@ static void add_slicks(void) {
 			cbrushside_t* side = &brush->sides[s];
 			int surfaceFlags = cm.shaders[side->shaderNum].surfaceFlags;
 			if (surfaceFlags & SURF_SLICK && walkable(side->plane)) {
-				gen_visible_brush(i, vec3_origin, SLICK_BRUSH, slick_color);
+				gen_visible_brush(i, vec3_origin, SLICK_BRUSH, &slick_color);
 				break;
 			}
 		}
 	}
 }
 
-static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, vec4_t color) {
+static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, color4u_t* color) {
 	cbrush_t *brush = &cm.brushes[brushnum];
 	visBrushNode_t *node = (visBrushNode_t*)malloc(sizeof(visBrushNode_t));
 	int	verts = 0;
@@ -345,15 +396,39 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		visFace_t *face = &node->faces[i];
 		VectorCopy(brush->sides[i].plane->normal, w_normal);
 		VectorClear(w_center);
-		ClearBounds(face->mins, face->maxs);
+		//ClearBounds(face->mins, face->maxs);
 		for (int j = 0; j < face->numVerts; j++) {
 			VectorAdd(w_center, face->verts[j].xyz, w_center);
-			AddPointToBounds(face->verts[j].xyz, face->mins, face->maxs);
+			//AddPointToBounds(face->verts[j].xyz, face->mins, face->maxs);
 		}
 		VectorScale(w_center, 1.0f / face->numVerts, w_center);
 		VectorSubtract(face->verts[0].xyz, w_center, w_ref_vec);
 		w_ref_vec_len = VectorLength(w_ref_vec);
 		qsort(face->verts, face->numVerts, sizeof(face->verts[0]), winding_cmp);
+
+
+		if (face->numVerts < 3) {// wtf
+			face->solidityModulate[0] =	127;
+			face->solidityModulate[1] = 127;
+			face->solidityModulate[2] = 127;
+			face->solidityModulate[3] = 255;
+		}
+		else {
+			vec3_t normal;
+
+			VectorCopy(brush->sides[i].plane->normal,normal);
+			VectorScale(normal, 128.0f, normal);
+			normal[0] += 127.0f;
+			normal[1] += 127.0f;
+			if (normal[2] < 0) {
+				normal[2] = -normal[2] + 127.0f;
+			}
+
+			face->solidityModulate[3] = 255;
+			face->solidityModulate[2] = MAX(0, MIN(255, (int)normal[0]));
+			face->solidityModulate[1] = MAX(0, MIN(255, (int)normal[1]));
+			face->solidityModulate[0] = MAX(0, MIN(255, (int)normal[2]));
+		}
 	}
 
 	if (verts > 0) {
@@ -367,17 +442,20 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 	case TRIGGER_BRUSH:
 		head = &trigger_head;
 		trigger_count++;
+		trigger_count_faces +=node->numFaces;
 		break;
 	case CLIP_BRUSH:
 		head = &clip_head;
 		clip_count++;
+		clip_count_faces += node->numFaces;
 		break;
-	case CLIP_SOLIDITY_BRUSH:
-		head = &clip_solidity_head;
-		break;
+	//case CLIP_SOLIDITY_BRUSH:
+		//head = &clip_solidity_head;
+		//break;
 	case SLICK_BRUSH:
 		head = &slick_head;
 		slick_count++;
+		slick_count_faces += node->numFaces;
 		break;
 	};
 
@@ -385,6 +463,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 	
 	assert(head);
 	node->next = *head;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	if (*head) {
+		(*head)->prev = node;
+	}
+#endif
 	*head = node;
 }
 
@@ -451,15 +534,15 @@ static int winding_cmp(const void *a, const void *b) {
 	return 0;
 }
 
-static void add_vert_to_face(visFace_t *face, vec3_t vert, vec4_t color, vec2_t tex_coords) {
+static void add_vert_to_face(visFace_t *face, vec3_t vert, color4u_t* color, vec2_t tex_coords) {
 	if (face->numVerts >= MAX_FACE_VERTS)
 		return;
 
 	VectorCopy(vert, face->verts[face->numVerts].xyz);
-	face->verts[face->numVerts].modulate[0] = color[0];
-	face->verts[face->numVerts].modulate[1] = color[1];
-	face->verts[face->numVerts].modulate[2] = color[2];
-	face->verts[face->numVerts].modulate[3] = color[3];
+	face->verts[face->numVerts].modulate[0] = color->b[0];
+	face->verts[face->numVerts].modulate[1] = color->b[1];
+	face->verts[face->numVerts].modulate[2] = color->b[2];
+	face->verts[face->numVerts].modulate[3] = color->b[3];
 	face->verts[face->numVerts].st[0] = tex_coords[0];
 	face->verts[face->numVerts].st[1] = tex_coords[1];
 	face->numVerts++;
@@ -501,7 +584,7 @@ struct
 }
 compareBrushDistance;
 
-static void draw(visBrushNode_t *brush, visBrushNode_t** sortList, int count, qhandle_t shader, visBrushType_t type) {
+static void draw(visBrushNode_t **head, visBrushNode_t** sortList, bool* wasSortedLastTime, int count, int countFaces, qhandle_t shader, visBrushType_t type, uint32_t colorOverride, vertColoringType_t coloring) {
 	//frustum = re.ext.GetFrustum();
 	//vec3_t viewPos;
 	//VectorCopy(re.ext.GetViewPosition(), viewPos);
@@ -511,40 +594,137 @@ static void draw(visBrushNode_t *brush, visBrushNode_t** sortList, int count, qh
 	qboolean cull = (qboolean)!(r_nocull && r_nocull->integer);
 	int i;
 	int countDrawn = 0;
+	bool doSort = countFaces > draw_maxfaces->integer;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	qboolean earlyCull = (qboolean)(draw_earlycull->integer>0);
+	qboolean keepIt = qtrue;
+	float distCull = draw_earlydistcull->value * draw_earlydistcull->value;
+	bool doShorterSort = doSort && (draw_earlydistcull->value > 0 || earlyCull);
+#endif
+	visBrushNode_t* brush = *head;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	bool wasResorted = false;
+#endif
+	visBrushNode_t* lastBrush = NULL;
+	visBrushNode_t* nextBrush = NULL;
+	int totalBrushCount = count;
 
 	// todo view axis culling
 	if (!count || !sortList) return;
 
-	while (brush) {
-		//brush->distance = DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz);
-		brush->distance = DistanceSquared(ori->origin, brush->center);
-		if (fpclassify(brush->distance) == FP_NAN) {
-			brush->distance = std::numeric_limits<float>::infinity(); // make sure sorting doesn't break in case anything truly strange happens.
-		}
-		brush = brush->next;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	if (doSort) {
+		count = 0;
 	}
-	std::sort(sortList,sortList+count, compareBrushDistance);
+	if (doSort || coloring || *wasSortedLastTime) { // if we don't need to recolor and we don't need to sort, skip this one loop
+#else
+	if (doSort || coloring) { // if we don't need to recolor and we don't need to sort, skip this one loop
+#endif
+		while (brush) {
+			brush->distance = 0;
+			if (doSort) {
+				brush->distance = DistanceSquared(ori->origin, brush->center);
+				if (fpclassify(brush->distance) == FP_NAN) {
+					brush->distance = std::numeric_limits<float>::infinity(); // make sure sorting doesn't break in case anything truly strange happens.
+				}
+#if OVERCOMPLICATED_OPTIMIZATIONS
+				keepIt = qtrue;
+				if (doShorterSort) { // some kind of pre-selection of elements. might be faster but some of these ops might be performed more often than otherwise. let user decide, shrug
 
-	for (i = 0; i < count && countDrawn < draw_maxfaces->integer; i++) {
-		brush = sortList[i];
-		//don't do pvs optimization just check distance as well this gives better performance and results since pvs is expensive and oftentimes the edges are within structural brushes making it not reliable
-		//if (!cull || DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz) < 8192 * 8192)
-		{
-			for (int i = 0; i < brush->numFaces; ++i) {
-				behind = cull ? qtrue : qfalse;
+					if (keepIt && distCull > 0 && brush->distance > distCull) {
+						keepIt = qfalse;
+					}
+					if (keepIt && earlyCull) {
+						// cull early to reduce sorting workload? then again, is it faster to sort, or faster to loop here?
+						behind = cull ? qtrue : qfalse;
 
-				// check if any points are in front of us
-				for (int j = 0; j < brush->faces[i].numVerts && behind; j++)
-				{
-					VectorSubtract(brush->faces[i].verts[j].xyz, ori->origin, vecToVert);
-					if (DotProduct(vecToVert, ori->axis[0]) >= 0.0f) {
-						behind = qfalse;
-						break;
+						// check if any points are in front of us
+						for (int i = 0; i < brush->numFaces; ++i) {
+							for (int j = 0; j < brush->faces[i].numVerts && behind; j++)
+							{
+								VectorSubtract(brush->faces[i].verts[j].xyz, ori->origin, vecToVert);
+								if (DotProduct(vecToVert, ori->axis[0]) >= 0.0f) {
+									behind = qfalse;
+									break;
+								}
+							}
+						}
+						if (behind) {
+							keepIt = qfalse;
+						}
+					}
+
+				}
+				if (keepIt) {
+					sortList[count++] = brush;
+				}
+#endif
+			}
+#if OVERCOMPLICATED_OPTIMIZATIONS
+			else if (*wasSortedLastTime) {
+				sortList[count++] = brush; // need to restore the sortlist to its full form.
+			}
+#endif
+			if (coloring) { // recolor quick. this wont need to be repeated on every frame, just when changing settings (call to draw makes sure)
+				uint32_t newColor = colorOverride;
+				for (int i = 0; i < brush->numFaces; ++i) {
+
+					if (coloring == VERTCOLOR_SOLIDITY) {
+						newColor = brush->faces[i].solidityModulateui;
+					}
+
+					for (int j = 0; j < brush->faces[i].numVerts; j++)
+					{
+						brush->faces[i].verts[j].modulateui = newColor;
 					}
 				}
 
-				if (behind) {
-					continue;
+			}
+			brush = brush->next;
+		}
+
+		if (doSort) {
+#if OVERCOMPLICATED_OPTIMIZATIONS
+			if (!std::is_sorted(sortList, sortList + count, compareBrushDistance)) {
+				std::sort(sortList, sortList + count, compareBrushDistance);
+				wasResorted = true;
+			}
+#else
+			std::sort(sortList, sortList + count, compareBrushDistance);
+#endif
+		}
+	}
+
+#if OVERCOMPLICATED_OPTIMIZATIONS
+	*wasSortedLastTime = doSort;
+#endif
+
+	for (i = 0; i < count; i++) {
+		brush = sortList[i];
+		nextBrush = (i == count - 1) ? NULL : sortList[i + 1];
+		//don't do pvs optimization just check distance as well this gives better performance and results since pvs is expensive and oftentimes the edges are within structural brushes making it not reliable
+		//if (!cull || DistanceSquared(ori->origin, brush->faces[0].verts[0].xyz) < 8192 * 8192)
+		if(countDrawn < draw_maxfaces->integer){
+			for (int i = 0; i < brush->numFaces; ++i) {
+#if OVERCOMPLICATED_OPTIMIZATIONS
+				if (!earlyCull) 
+#endif
+				{
+					behind = cull ? qtrue : qfalse;
+
+					// check if any points are in front of us
+					for (int j = 0; j < brush->faces[i].numVerts && behind; j++)
+					{
+						VectorSubtract(brush->faces[i].verts[j].xyz, ori->origin, vecToVert);
+						if (DotProduct(vecToVert, ori->axis[0]) >= 0.0f) {
+							behind = qfalse;
+							break;
+						}
+					}
+
+					if (behind) {
+						continue;
+					}
 				}
 				
 				// TODO shade by angle with r_solidity 3 (like in tr_world.cpp)
@@ -563,6 +743,39 @@ static void draw(visBrushNode_t *brush, visBrushNode_t** sortList, int count, qh
 				countDrawn++;
 			}
 		}
-		brush = brush->next;
+#if OVERCOMPLICATED_OPTIMIZATIONS
+		if (wasResorted) { // is this good even? idk
+			// rearrange linked list according to new sort 
+			// first remove the current element from the linked list
+			if (brush->prev != lastBrush) {
+
+				// first unlink myself and be free.
+				if (brush->prev) {
+					brush->prev->next = brush->next;
+				}
+				if (brush->next) {
+					brush->next->prev = brush->prev;
+				}
+
+				if (!lastBrush) {
+					// special case if we are at the beginning. need to set it as head
+					brush->next = *head;
+					(*head)->prev = brush;
+					brush->prev = NULL;
+					*head = brush;
+				}
+				else {
+					brush->prev = lastBrush;
+					brush->next = NULL;
+					if (lastBrush->next) {
+						brush->next = lastBrush->next;
+						brush->next->prev = brush;
+					}
+					lastBrush->next = brush;
+				}
+			}
+		}
+		lastBrush = brush;
+#endif
 	}
 }
