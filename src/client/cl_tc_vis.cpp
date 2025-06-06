@@ -11,7 +11,7 @@
 #include "../qcommon/cm_local.h"
 #include "../qcommon/cm_patch.h"
 #include <algorithm>
-#include <cfloat>s
+#include <cfloat>
 #include <cmath>
 
 #define OVERCOMPLICATED_OPTIMIZATIONS 0
