@@ -1936,7 +1936,8 @@ Hunk_MemoryRemaining
 */
 int	Hunk_MemoryRemaining( void ) {
 	if (com_hunkDynamic->integer) {
-		return (64 * 1024 * 1024) - (Z_MemSize(TAG_HUNK_MARK1) + Z_MemSize(TAG_HUNK_MARK2));	//Yeah. Whatever. We've got no size now.
+		return INT_MAX; // 4000000; // we can't give back that fake value like jka cuz cgame actually still tracks this value. so give back a high value.
+		//return (64 * 1024 * 1024) - (Z_MemSize(TAG_HUNK_MARK1) + Z_MemSize(TAG_HUNK_MARK2));	//Yeah. Whatever. We've got no size now.
 	}
 	else {
 		int		low, high;
