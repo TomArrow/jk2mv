@@ -19,14 +19,17 @@
 
 #include "../qcommon/mariadb.h"
 
+cvar_t* com_coolApi_supported_game_userCmdStoreVersion;
 cvar_t* com_coolApi_supported_game;
 cvar_t* com_coolApi_supported_game_vmflags;
 
 float Q_asin(float c);
 
-std::vector<std::unique_ptr<usercmd_t>> userCmdStore[MAX_CLIENTS];
+typedef unsigned char posHashType_t;
+std::vector<std::tuple<std::unique_ptr<usercmd_t>, posHashType_t>> userCmdStore[MAX_CLIENTS]; // int added as position hash in usercmd store version 1
 
 botlib_export_t	*botlib_export;
+
 
 #ifdef G2_COLLISION_ENABLED
 extern CMiniHeap *G2VertSpaceServer;
@@ -1113,7 +1116,8 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
 				std::unique_ptr<usercmd_t> ucmd(new usercmd_t);
 				*ucmd = *VMAV(2, usercmd_t);
-				userCmdStore[args[1]].push_back(std::move(ucmd));
+				posHashType_t posHash = args[3];
+				userCmdStore[args[1]].push_back(std::move(std::make_tuple(std::move(ucmd),posHash)));
 				return userCmdStore[args[1]].size() - 1;
 			}
 			return 0;
@@ -1145,7 +1149,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 				if (args[2] < 0 || (size_t)args[2] >= userCmdStore[args[1]].size()) {
 					return qfalse;
 				}
-				*VMAV(3, usercmd_t) = *userCmdStore[args[1]][args[2]];
+				*VMAV(3, usercmd_t) = *std::get<0>(userCmdStore[args[1]][args[2]]);
+				if (com_coolApi_supported_game_userCmdStoreVersion->integer >= 1) {
+					*VMAV(4, posHashType_t) = std::get<1>(userCmdStore[args[1]][args[2]]);
+				}
 				return qtrue;
 			}
 			return qfalse;
@@ -1423,6 +1430,7 @@ static void SV_InitGameVM( qboolean restart ) {
 	mvStructConversionDisabled = qfalse;
 
 	com_coolApi_supported_game = Cvar_Get("coolApi_supported_game", "0", CVAR_ROM);
+	com_coolApi_supported_game_userCmdStoreVersion = Cvar_Get("coolApi_supported_game_userCmdStoreVersion", "0", CVAR_ROM);
 	com_coolApi_supported_game_vmflags = Cvar_Get("coolApi_supported_game_vmflags", "0", CVAR_ROM);
 
 	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,

@@ -290,6 +290,7 @@ extern	serverStatic_t	svs;				// persistant server info across maps
 extern	server_t		sv;					// cleared each map
 extern	vm_t			*gvm;				// game virtual machine
 
+extern	cvar_t	*com_coolApi_supported_game_userCmdStoreVersion;
 extern	cvar_t	*com_coolApi_supported_game;
 extern	cvar_t	*com_coolApi_supported_game_vmflags;
 extern	cvar_t	*sv_fps;

@@ -103,6 +103,7 @@ cvar_t	*com_silentScreenshots;
 cvar_t	*com_cool_apiFeatures;
 cvar_t	*com_cool_apiDBVersion;
 cvar_t	*com_cool_apiJKAVersion;
+cvar_t	*com_cool_apiUserCmdStoreVersion;
 
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
@@ -2843,6 +2844,7 @@ void Com_Init( char *commandLine ) {
 	// 2024-09-25 bump to 3: Prepared statements and such
 	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
 	com_cool_apiJKAVersion = Cvar_Get("cool_apiJKAVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
+	com_cool_apiUserCmdStoreVersion = Cvar_Get("cool_apiUserCmdStoreVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
 
 	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);
