@@ -475,7 +475,7 @@ void CMod_LoadEntityString( lump_t *l, const char *name ) {
 		return;
 	}
 
-	cm.entityString = (char *)Hunk_Alloc( l->filelen, h_high );
+	cm.entityString = (char *)Hunk_Alloc( l->filelen+1, h_high ); // we need +1 so we have a zero terminator for files that dont come with one, when using com_hunkDynamic for some reason this problem happens on linux but not really on win? maybe win automatically adds a bit of extra 0? idk
 	cm.numEntityChars = l->filelen;
 	Com_Memcpy (cm.entityString, cmod_base + l->fileofs, l->filelen);
 }
