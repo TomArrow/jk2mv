@@ -462,9 +462,9 @@ static void RB_SurfaceSaberGlow()
 
 	if (e->renderfx & RF_SABERGLOWENDS) {
 		// hack for a special saber ends shader drawn at tip and bottom
-		DoSprite(e->origin, 22.0f, 0.0f);
+		DoSprite(e->origin, 44.0f, 0.0f);
 		VectorMA(e->origin, e->saberLength, e->axis[0], end);
-		DoSprite(end, 22.0f, 0.0f);
+		DoSprite(end, 44.0f, 0.0f);
 		return;
 	}
 
