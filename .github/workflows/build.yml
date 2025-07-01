@@ -392,7 +392,7 @@ jobs:
 
   create-latest:
     if: github.event_name == 'push' && github.ref == 'refs/heads/everything'
-    needs: [vs2022-installer,vs2022,vs2019_xp,macos,linux]
+    needs: [vs2022-installer,vs2022,macos,linux]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
