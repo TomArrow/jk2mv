@@ -459,6 +459,15 @@ static void RB_SurfaceSaberGlow()
 
 	e = &backEnd.currentEntity->e;
 
+
+	if (e->renderfx & RF_SABERGLOWENDS) {
+		// hack for a special saber ends shader drawn at tip and bottom
+		DoSprite(e->origin, 22.0f, 0.0f);
+		VectorMA(e->origin, e->saberLength, e->axis[0], end);
+		DoSprite(end, 22.0f, 0.0f);
+		return;
+	}
+
 	// Render the glow part of the blade
 	for ( float i = e->saberLength; i > 0; i -= e->radius * 0.65f )
 	{
