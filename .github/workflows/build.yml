@@ -413,7 +413,7 @@ jobs:
         uses: TomArrow/GH-Automatic-Releases@v1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: "latest"
+          automatic_release_tag: "latest-postxp"
           prerelease: false
           title: Latest Build
           files: |
