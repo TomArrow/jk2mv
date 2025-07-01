@@ -310,7 +310,9 @@ float CL_KeyState( kbutton_t *key, qboolean temporaryViewAnglesOnly) {
 	int			msec;
 
 	msec = key->msec;
-	key->msec = 0;
+	if (!temporaryViewAnglesOnly) {
+		key->msec = 0;
+	}
 
 	if ( key->active ) {
 		// still down
