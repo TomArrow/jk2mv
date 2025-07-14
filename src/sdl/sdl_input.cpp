@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_syswm.h>
 #include "../qcommon/qcommon.h"
 #include "../qcommon/q_shared.h"
 #include "../client/client.h"
@@ -749,6 +750,25 @@ static void IN_ProcessEvents( int eventTime )
 	{
 		switch( e.type )
 		{
+#if MONITORSTATUS_MAYBE_KNOWABLE
+			case SDL_SYSWMEVENT:
+				//Com_DPrintf("SDL_SYSWMEVENT %d\n", e.syswm.msg->msg.win.msg);
+				if (e.syswm.msg->msg.win.msg == WM_POWERBROADCAST) {
+					if (e.syswm.msg->msg.win.wParam == PBT_POWERSETTINGCHANGE) {
+						POWERBROADCAST_SETTING* setting = (POWERBROADCAST_SETTING*)e.syswm.msg->msg.win.lParam;
+						if (IsEqualGUID(setting->PowerSetting, GUID_MONITOR_POWER_ON)) {
+							DWORD state = *(DWORD*)setting->Data;
+							Com_DPrintf("Sys_WinPowerMsgHook: Monitor Power On is %d\n", state);
+							Cvar_SetValue("com_screensaverActive", (qboolean)(!state));
+						}else if (IsEqualGUID(setting->PowerSetting, GUID_CONSOLE_DISPLAY_STATE)) {
+							DWORD state = *(DWORD*)setting->Data;
+							Com_DPrintf("Sys_WinPowerMsgHook: Console Displaya State is %d\n", state);
+							Cvar_SetValue("com_screensaverActive", (qboolean)(!state));
+						}
+					}
+				}
+				break;
+#endif
 			case SDL_KEYDOWN:
 				if ((e.key.keysym.mod & KMOD_LALT) && !(e.key.keysym.mod & KMOD_CTRL))
 					textInput = qfalse;

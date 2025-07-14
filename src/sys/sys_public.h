@@ -77,6 +77,15 @@ extern cvar_t *com_deadRampFix;
 extern cvar_t *com_deadRampFixedCount;
 extern cvar_t * com_placebo;
 
+#if defined(_WIN32) && !defined(DEDICATED)
+#define MONITORSTATUS_MAYBE_KNOWABLE 1
+#endif
+
+#if MONITORSTATUS_MAYBE_KNOWABLE
+extern cvar_t* com_maxfpsScreenSaver;
+extern cvar_t* com_screensaverActive;
+#endif
+
 sysEvent_t	Sys_GetEvent( void );
 
 void	Sys_Init (void);

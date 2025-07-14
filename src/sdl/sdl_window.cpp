@@ -7,6 +7,10 @@
 
 #define CLIENT_WINDOW_TITLE "EternalJK2"
 
+
+void Sys_RegisterPowerNotifications(SDL_Window* window);
+void Sys_UnRegisterPowerNotifications(SDL_Window* window);
+
 enum rserr_t
 {
 	RSERR_OK,
@@ -103,6 +107,7 @@ static const vidmode_t r_vidModes[] = {
 static const int	s_numVidModes = ARRAY_LEN( r_vidModes );
 
 #define R_MODE_FALLBACK 3 // 640x480
+
 
 qboolean R_GetModeInfo( int *width, int *height, int mode ) {
 	const vidmode_t	*vm;
@@ -629,6 +634,9 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 
 		SDL_GetWindowPosition( screen, &x, &y );
 		Com_DPrintf( "Existing window at %dx%d before being destroyed\n", x, y );
+#if MONITORSTATUS_MAYBE_KNOWABLE
+		Sys_UnRegisterPowerNotifications(screen);
+#endif
 		SDL_DestroyWindow( screen );
 		screen = NULL;
 	} else {
@@ -846,6 +854,11 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 				Com_DPrintf( "SDL_CreateWindow failed: %s\n", SDL_GetError( ) );
 				continue;
 			}
+#if MONITORSTATUS_MAYBE_KNOWABLE
+			else {
+				Sys_RegisterPowerNotifications(screen);
+			}
+#endif
 
 #ifndef MACOS_X
 			SDL_SetWindowIcon(screen, icon);
@@ -909,6 +922,9 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		}
 		else
 		{
+#if MONITORSTATUS_MAYBE_KNOWABLE
+			Sys_RegisterPowerNotifications(screen);
+#endif
 #ifndef MACOS_X
 			SDL_SetWindowIcon(screen, icon);
 #endif
@@ -1121,6 +1137,9 @@ void WIN_Shutdown( void )
 	}
 
 	if ( screen ) {
+#if MONITORSTATUS_MAYBE_KNOWABLE
+		Sys_UnRegisterPowerNotifications(screen);
+#endif
 		SDL_DestroyWindow( screen );
 		screen = NULL;
 	}

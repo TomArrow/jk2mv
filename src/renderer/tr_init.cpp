@@ -122,6 +122,7 @@ cvar_t	*r_texturebitslm;
 cvar_t	*r_drawBuffer;
 cvar_t	*r_lightmap;
 cvar_t	*r_vertexLight;
+cvar_t	*r_styleOnly;
 cvar_t	*r_uiFullScreen;
 cvar_t	*r_shadows;
 cvar_t	*r_flares;
@@ -1156,6 +1157,7 @@ void R_Register( void )
 	r_simpleMipMaps = ri.Cvar_Get("r_simpleMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_openglMipMaps = ri.Cvar_Get("r_openglMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_vertexLight = ri.Cvar_Get("r_vertexLight", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
+	r_styleOnly = ri.Cvar_Get("r_styleOnly", "-1", CVAR_TEMP);
 	r_uiFullScreen = ri.Cvar_Get( "r_uifullscreen", "0", 0);
 	r_subdivisions = ri.Cvar_Get("r_subdivisions", "4", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_ignoreFastPath = ri.Cvar_Get("r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
@@ -1554,11 +1556,16 @@ void RE_SetLightStyle(int style, int color)
 {
 	if ((unsigned)style >= (unsigned)MAX_LIGHT_STYLES)
 	{
-		ri.Error( ERR_FATAL, "RE_SetLightStyle: %d is out of range", (int)style );
+		ri.Error(ERR_FATAL, "RE_SetLightStyle: %d is out of range", (int)style);
 		return;
 	}
 
-	memcpy(styleColors[style], &color, 4);
+	if (r_styleOnly->integer < 0 || r_styleOnly->integer == style) {
+		memcpy(styleColors[style], &color, 4);
+	}
+	else {
+		memset(styleColors[style], 0, 4);
+	}
 }
 
 void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
