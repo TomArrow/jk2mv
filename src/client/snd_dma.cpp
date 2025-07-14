@@ -1579,17 +1579,25 @@ void S_Activate(qboolean activate)
 void S_CheckMuteWhenMinimized(void)
 {
 	if (com_minimized->modificationCount +
+#if MONITORSTATUS_MAYBE_KNOWABLE
 		com_screensaverActive->modificationCount +
+#endif
 		com_unfocused->modificationCount != s_lastMuteModCount)
 	{
 		int disable =
+#if MONITORSTATUS_MAYBE_KNOWABLE
 			(com_screensaverActive->integer && s_muteWhenScreensaver->integer) ||
+#endif
 			(com_minimized->integer && s_muteWhenMinimized->integer) ||
 			(com_unfocused->integer && s_muteWhenUnfocused->integer);
 
 		S_Activate((qboolean)!disable);
 
-		s_lastMuteModCount = com_screensaverActive->modificationCount +com_minimized->modificationCount +
+		s_lastMuteModCount = 
+#if MONITORSTATUS_MAYBE_KNOWABLE
+			com_screensaverActive->modificationCount +
+#endif
+			com_minimized->modificationCount +
 			com_unfocused->modificationCount;
 	}
 }
