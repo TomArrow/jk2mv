@@ -14,6 +14,7 @@ set(AssetsFiles
 	"gfx/effects/mp_y_forcefield.jpg"
 	"gfx/effects/mp_y_forcefield_d.jpg"
 	"gfx/effects/mp_y_forcefield_d1.jpg"
+	"gfx/effects/sabers/saberendsglow.tga"
 
 	"gfx/hud/ammo_tic_1.tga"
 	"gfx/hud/ammo_tic_2.tga"
@@ -70,6 +71,7 @@ set(AssetsFiles
 	"shaders/japro_tcRender.shader"
 	"shaders/q3mod.shader"
 	"shaders/consolehud_static.shader"
+	"shaders/various.shader"
 
 	"sound/chars/mothma/misc/40MOM017.mp3"
 	"sound/chars/mothma/misc/40MOM019.mp3"
