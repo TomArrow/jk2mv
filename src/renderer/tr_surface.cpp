@@ -280,9 +280,9 @@ inline uint32_t ComputeFinalVertexColor(const byte *colors)
 			break;
 		}
 	}
-	result.b[0] = Com_Clamp(0, 255, r >> 8);
-	result.b[1] = Com_Clamp(0, 255, g >> 8);
-	result.b[2] = Com_Clamp(0, 255, b >> 8);
+	result.b[0] = Com_Clampi(0, 255, r >> 8);
+	result.b[1] = Com_Clampi(0, 255, g >> 8);
+	result.b[2] = Com_Clampi(0, 255, b >> 8);
 
 	return result.ui;
 }
