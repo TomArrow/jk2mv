@@ -142,6 +142,7 @@ cvar_t		*s_doppler;
 cvar_t		*s_s_language;
 cvar_t		*s_muteWhenMinimized;
 cvar_t		*s_muteWhenUnfocused;
+cvar_t		*s_muteWhenScreensaver;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
 static	channel_t		*freelist = NULL;
@@ -315,6 +316,7 @@ void S_Init( void )
 	s_s_language = Cvar_Get("s_language", "english", CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
 	s_muteWhenUnfocused = Cvar_Get("s_muteWhenUnfocused", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	s_muteWhenMinimized = Cvar_Get("s_muteWhenMinimized", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
+	s_muteWhenScreensaver = Cvar_Get("s_muteWhenScreensaver", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	s_lastMuteModCount = -1;
 
@@ -1577,15 +1579,17 @@ void S_Activate(qboolean activate)
 void S_CheckMuteWhenMinimized(void)
 {
 	if (com_minimized->modificationCount +
+		com_screensaverActive->modificationCount +
 		com_unfocused->modificationCount != s_lastMuteModCount)
 	{
 		int disable =
+			(com_screensaverActive->integer && s_muteWhenScreensaver->integer) ||
 			(com_minimized->integer && s_muteWhenMinimized->integer) ||
 			(com_unfocused->integer && s_muteWhenUnfocused->integer);
 
 		S_Activate((qboolean)!disable);
 
-		s_lastMuteModCount = com_minimized->modificationCount +
+		s_lastMuteModCount = com_screensaverActive->modificationCount +com_minimized->modificationCount +
 			com_unfocused->modificationCount;
 	}
 }

@@ -1,11 +1,11 @@
 #include <SDL.h>
-#if MONITORSTATUS_MAYBE_KNOWABLE
-#include <SDL_syswm.h>
-#endif
 #include "../qcommon/qcommon.h"
 #include "../qcommon/q_shared.h"
 #include "../client/client.h"
 #include "../sys/sys_local.h"
+#if MONITORSTATUS_MAYBE_KNOWABLE
+#include <SDL_syswm.h>
+#endif
 
 static cvar_t *in_keyboardDebug = NULL;
 
@@ -761,11 +761,17 @@ static void IN_ProcessEvents( int eventTime )
 						if (IsEqualGUID(setting->PowerSetting, GUID_MONITOR_POWER_ON)) {
 							DWORD state = *(DWORD*)setting->Data;
 							Com_DPrintf("Sys_WinPowerMsgHook: Monitor Power On is %d\n", state);
-							Cvar_SetValue("com_screensaverActive", (qboolean)(!state));
+							qboolean amScreensaving = (qboolean)(!state);
+							if (com_screensaverActive->integer != amScreensaving) {
+								Cvar_SetValue("com_screensaverActive", amScreensaving);
+							}
 						}else if (IsEqualGUID(setting->PowerSetting, GUID_CONSOLE_DISPLAY_STATE)) {
 							DWORD state = *(DWORD*)setting->Data;
 							Com_DPrintf("Sys_WinPowerMsgHook: Console Displaya State is %d\n", state);
-							Cvar_SetValue("com_screensaverActive", (qboolean)(!state));
+							qboolean amScreensaving = (qboolean)(!state);
+							if (com_screensaverActive->integer != amScreensaving) {
+								Cvar_SetValue("com_screensaverActive", amScreensaving);
+							}
 						}
 					}
 				}
