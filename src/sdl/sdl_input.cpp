@@ -1,5 +1,7 @@
 #include <SDL.h>
+#if MONITORSTATUS_MAYBE_KNOWABLE
 #include <SDL_syswm.h>
+#endif
 #include "../qcommon/qcommon.h"
 #include "../qcommon/q_shared.h"
 #include "../client/client.h"
