@@ -1345,15 +1345,21 @@ reshade::api::command_list* reshadeCommandList = NULL;
 reshade::api::resource_view reshadeResourceView;
 bool reshadeResourceViewSet = false;
 static void R_ReshadeCallbackEffectRuntime(reshade::api::effect_runtime* er) {
-	Com_Printf("^3Reshade API: effect runtime initialized.\n");
+	if (r_reshadeFix->integer || com_developer->integer > 1) {
+		Com_Printf("^3Reshade API: effect runtime initialized.\n");
+	}
 	reshadeEffectRuntime = er;
 }
 static void R_ReshadeCallbackCommandList(reshade::api::command_list* cl) {
-	Com_Printf("^3Reshade API: command list initialized.\n");
+	if (r_reshadeFix->integer || com_developer->integer > 1) {
+		Com_Printf("^3Reshade API: command list initialized.\n");
+	}
 	reshadeCommandList = cl;
 }
 static void R_ReshadeCallbackResourceView(reshade::api::device* device, reshade::api::resource resource, reshade::api::resource_usage usage_type, const reshade::api::resource_view_desc& desc, reshade::api::resource_view view) {
-	Com_Printf("^3Reshade API: resource view initialized.\n");
+	if (r_reshadeFix->integer || com_developer->integer > 1) {
+		Com_Printf("^3Reshade API: resource view initialized.\n");
+	}
 	reshadeResourceView = view;
 	reshadeResourceViewSet = true;
 }
