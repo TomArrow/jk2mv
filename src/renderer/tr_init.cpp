@@ -8,6 +8,7 @@
 #if !defined __TR_WORLDEFFECTS_H
 	#include "tr_WorldEffects.h"
 #endif
+#include <reshade.hpp>
 #endif //!DEDICATED
 
 #include "tr_font.h"
@@ -1332,6 +1333,14 @@ Ghoul2 Insert End
 #define G2_VERT_SPACE_SERVER_SIZE 256
 #endif
 
+#ifndef DEDICATED
+reshade::api::effect_runtime* reshadeEffectRuntime = NULL;
+static void R_ReshadeCallback(reshade::api::effect_runtime* er) {
+	Com_Printf("^3Reshade API: effect runtime initialized.\n");
+	reshadeEffectRuntime = er;
+}
+#endif
+
 /*
 ===============
 R_Init
@@ -1340,6 +1349,7 @@ R_Init
 void R_Init( void ) {
 	int i;
 	byte *ptr;
+	static bool reshadeInited = false;
 
 	ri.Printf( PRINT_DEVELOPER, "----- R_Init -----\n" );
 
@@ -1348,6 +1358,10 @@ void R_Init( void ) {
 	Com_Memset( &backEnd, 0, sizeof( backEnd ) );
 #ifndef DEDICATED
 	Com_Memset( &tess, 0, sizeof( tess ) );
+#endif
+
+#ifndef DEDICATED
+	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
 #endif
 
 //	Swap_Init();
@@ -1439,6 +1453,10 @@ void RE_Shutdown( qboolean destroyWindow ) {
 
 	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
 
+#ifndef DEDICATED
+	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
+	reshadeEffectRuntime = NULL;
+#endif
 
 	ri.Cmd_RemoveCommand ("imagelist");
 	ri.Cmd_RemoveCommand ("shaderlist");

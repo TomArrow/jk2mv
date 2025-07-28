@@ -326,6 +326,9 @@ if (BuildMVMP)
 
 	# EAX
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/eax")
+	
+	# ReShade API
+	set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/reshade_api")
 
 	# JPEG
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} ${JPEG_INCLUDE_DIR})

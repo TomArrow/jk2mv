@@ -7,6 +7,8 @@
 #include "../ghoul2/G2_local.h"
 #include "matcomp.h"
 
+#include <reshade.hpp>
+
 static	int			r_firstSceneDrawSurf;
 
 static	int			r_numdlights;
@@ -380,6 +382,8 @@ void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, flo
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
+extern reshade::api::effect_runtime* reshadeEffectRuntime;
+
 /*
 @@@@@@@@@@@@@@@@@@@@@
 RE_RenderScene
@@ -532,6 +536,10 @@ void RE_RenderScene( const refdef_t *fd ) {
 	refEntParent = -1;
 
 	RE_RenderWorldEffects();
+
+	if (reshadeEffectRuntime) {
+		//reshadeEffectRuntime->render_effects();
+	}
 
 	tr.frontEndMsec += ri.Milliseconds() - startTime;
 }
