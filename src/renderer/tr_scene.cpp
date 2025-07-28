@@ -7,7 +7,9 @@
 #include "../ghoul2/G2_local.h"
 #include "matcomp.h"
 
+#if DORESHADE
 #include <reshade.hpp>
+#endif
 
 static	int			r_firstSceneDrawSurf;
 
@@ -382,7 +384,9 @@ void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, flo
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
+#if DORESHADE
 extern reshade::api::effect_runtime* reshadeEffectRuntime;
+#endif
 
 /*
 @@@@@@@@@@@@@@@@@@@@@
@@ -537,9 +541,14 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	RE_RenderWorldEffects();
 
+#if DORESHADE
 	if (reshadeEffectRuntime) {
+		//reshadeEffectRuntime->get_command_queue();
+		//reshadeEffectRuntime->get_current_back_buffer();
+		//reshadeEffectRuntime->
 		//reshadeEffectRuntime->render_effects();
 	}
+#endif
 
 	tr.frontEndMsec += ri.Milliseconds() - startTime;
 }

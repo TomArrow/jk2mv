@@ -8,8 +8,11 @@
 #if !defined __TR_WORLDEFFECTS_H
 	#include "tr_WorldEffects.h"
 #endif
-#include <reshade.hpp>
 #endif //!DEDICATED
+
+#if DORESHADE
+#include <reshade.hpp>
+#endif
 
 #include "tr_font.h"
 
@@ -1333,7 +1336,7 @@ Ghoul2 Insert End
 #define G2_VERT_SPACE_SERVER_SIZE 256
 #endif
 
-#ifndef DEDICATED
+#if DORESHADE
 reshade::api::effect_runtime* reshadeEffectRuntime = NULL;
 static void R_ReshadeCallback(reshade::api::effect_runtime* er) {
 	Com_Printf("^3Reshade API: effect runtime initialized.\n");
@@ -1360,7 +1363,7 @@ void R_Init( void ) {
 	Com_Memset( &tess, 0, sizeof( tess ) );
 #endif
 
-#ifndef DEDICATED
+#if DORESHADE
 	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
 #endif
 
@@ -1453,7 +1456,7 @@ void RE_Shutdown( qboolean destroyWindow ) {
 
 	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
 
-#ifndef DEDICATED
+#if DORESHADE
 	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
 	reshadeEffectRuntime = NULL;
 #endif

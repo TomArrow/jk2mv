@@ -8,6 +8,9 @@
 #ifndef DEDICATED
 #include "qgl.h"
 #include "glext.h"
+#if _WIN32
+#define DORESHADE 1
+#endif
 #else
 typedef unsigned int GLuint;
 typedef int GLenum;
