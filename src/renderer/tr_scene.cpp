@@ -385,7 +385,8 @@ void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, flo
 }
 
 #if DORESHADE
-extern reshade::api::effect_runtime* reshadeEffectRuntime;
+extern reshade::api::effect_runtime*	reshadeEffectRuntime;
+extern reshade::api::command_list*		reshadeCommandList;
 #endif
 
 /*
@@ -542,11 +543,11 @@ void RE_RenderScene( const refdef_t *fd ) {
 	RE_RenderWorldEffects();
 
 #if DORESHADE
-	if (reshadeEffectRuntime) {
+	if (reshadeEffectRuntime && reshadeCommandList) {
 		//reshadeEffectRuntime->get_command_queue();
-		//reshadeEffectRuntime->get_current_back_buffer();
+		//reshadeEffectRuntime->get_current_back_buffer().;
 		//reshadeEffectRuntime->
-		//reshadeEffectRuntime->render_effects();
+		//reshadeEffectRuntime->render_effects(reshadeCommandList,);
 	}
 #endif
 

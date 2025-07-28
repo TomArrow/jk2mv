@@ -1338,9 +1338,14 @@ Ghoul2 Insert End
 
 #if DORESHADE
 reshade::api::effect_runtime* reshadeEffectRuntime = NULL;
-static void R_ReshadeCallback(reshade::api::effect_runtime* er) {
+reshade::api::command_list* reshadeCommandList = NULL;
+static void R_ReshadeCallbackEffectRuntime(reshade::api::effect_runtime* er) {
 	Com_Printf("^3Reshade API: effect runtime initialized.\n");
 	reshadeEffectRuntime = er;
+}
+static void R_ReshadeCallbackCommandList(reshade::api::command_list* cl) {
+	Com_Printf("^3Reshade API: command list initialized.\n");
+	reshadeCommandList = cl;
 }
 #endif
 
@@ -1364,7 +1369,8 @@ void R_Init( void ) {
 #endif
 
 #if DORESHADE
-	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
+	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
+	reshade::register_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
 #endif
 
 //	Swap_Init();
@@ -1457,8 +1463,10 @@ void RE_Shutdown( qboolean destroyWindow ) {
 	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
 
 #if DORESHADE
-	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallback);
+	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
+	reshade::unregister_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
 	reshadeEffectRuntime = NULL;
+	reshadeCommandList = NULL;
 #endif
 
 	ri.Cmd_RemoveCommand ("imagelist");
