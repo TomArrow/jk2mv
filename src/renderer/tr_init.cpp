@@ -235,6 +235,8 @@ cvar_t *r_solidityHideTrisoup;
 
 cvar_t *r_imageLoadDotFix;
 
+cvar_t *r_reshadeFix;
+
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
 PFNGLCLIENTACTIVETEXTUREARBPROC qglClientActiveTextureARB;
@@ -1167,6 +1169,7 @@ void R_Register( void )
 	r_ignoreFastPath = ri.Cvar_Get("r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_newRemapsTmpFix = ri.Cvar_Get("r_newRemapsTmpFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // TA: Since newremaps are kinda broken atm and i cba to fix it properly, but I also don't wanna entirely revert them, I do this temporary fix to make vanilla behavior work again (not missing texture rectangles all over the place)
 	r_imageLoadDotFix = ri.Cvar_Get("r_imageLoadDotFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // more tolerant/logical image loading that will treat us better in case of images that have dots in their name outside of their extension
+	r_reshadeFix = ri.Cvar_Get("r_reshadeFix", "0", CVAR_ARCHIVE);
 	r_newRemaps = ri.Cvar_Get("r_newRemaps", "0", CVAR_CHEAT ); // Only used for testing. Classic remaps are supposed to remain fullbright,
 	                                                            // because that is how they have been used by maps and serverside mods for
 	                                                            // more than 20 years. Servers can set a configstring for "mvremap" now.
@@ -1339,6 +1342,8 @@ Ghoul2 Insert End
 #if DORESHADE
 reshade::api::effect_runtime* reshadeEffectRuntime = NULL;
 reshade::api::command_list* reshadeCommandList = NULL;
+reshade::api::resource_view reshadeResourceView;
+bool reshadeResourceViewSet = false;
 static void R_ReshadeCallbackEffectRuntime(reshade::api::effect_runtime* er) {
 	Com_Printf("^3Reshade API: effect runtime initialized.\n");
 	reshadeEffectRuntime = er;
@@ -1346,6 +1351,11 @@ static void R_ReshadeCallbackEffectRuntime(reshade::api::effect_runtime* er) {
 static void R_ReshadeCallbackCommandList(reshade::api::command_list* cl) {
 	Com_Printf("^3Reshade API: command list initialized.\n");
 	reshadeCommandList = cl;
+}
+static void R_ReshadeCallbackResourceView(reshade::api::device* device, reshade::api::resource resource, reshade::api::resource_usage usage_type, const reshade::api::resource_view_desc& desc, reshade::api::resource_view view) {
+	Com_Printf("^3Reshade API: resource view initialized.\n");
+	reshadeResourceView = view;
+	reshadeResourceViewSet = true;
 }
 #endif
 
@@ -1371,6 +1381,7 @@ void R_Init( void ) {
 #if DORESHADE
 	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
 	reshade::register_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
+	reshade::register_event<reshade::addon_event::init_resource_view>(R_ReshadeCallbackResourceView);
 #endif
 
 //	Swap_Init();
@@ -1465,6 +1476,8 @@ void RE_Shutdown( qboolean destroyWindow ) {
 #if DORESHADE
 	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
 	reshade::unregister_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
+	reshade::unregister_event<reshade::addon_event::init_resource_view>(R_ReshadeCallbackResourceView);
+	reshadeResourceViewSet = false;
 	reshadeEffectRuntime = NULL;
 	reshadeCommandList = NULL;
 #endif

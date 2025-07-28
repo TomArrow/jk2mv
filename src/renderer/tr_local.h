@@ -1388,6 +1388,8 @@ extern	cvar_t *r_newRemaps;
 extern	cvar_t *r_newRemapsTmpFix;
 
 extern	cvar_t *r_imageLoadDotFix;
+
+extern	cvar_t * r_reshadeFix;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, double t );
