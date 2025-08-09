@@ -1,0 +1,53 @@
+// V24 Advanced Features Menu
+{
+	menuDef
+	{
+		name                "ingame_setup_v24"
+		fullscreen          0
+		visible             0
+		rect                180 40 430 425
+		focusColor          1 1 1 1
+		style               1
+		border              1
+		descX               320
+		descY               450
+		descScale           0.7
+		descColor           .235 .882 .847 1
+		descAlignment       ITEM_ALIGN_CENTER
+		onClose { close ingame_setup ; }
+
+		itemDef { name background style WINDOW_STYLE_SHADER rect 0 0 430 425 background "gfx/menus/menu_box_ingame" forecolor 1 1 1 1 visible 1 decoration }
+
+		itemDef { name title style WINDOW_STYLE_SHADER background "gfx/menus/menu_blendbox" text "V24 Advanced" rect 35 5 360 28 textalign ITEM_ALIGN_CENTER textalignx 180 textaligny 2 font 3 textscale 0.9 forecolor .549 .854 1 1 visible 1 descText "Advanced feature toggles (page 1)" }
+
+		// Section separators
+		itemDef { name sep_left style WINDOW_STYLE_SHADER rect 10 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+		itemDef { name sep_right style WINDOW_STYLE_SHADER rect 210 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+
+		// Column 1 toggles (left)
+		itemDef { name v24_wallhack type ITEM_TYPE_MULTI text "WallHack" cvar cg_wallHack cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 50 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .9 .5 .5 1 visible 1 descText "Debug visibility aid (disable on public servers)" }
+		itemDef { name v24_brightskins type ITEM_TYPE_MULTI text "BrightSkins" cvar cg_brightskins cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 70 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name v24_hitbox type ITEM_TYPE_MULTI text "HitBoxes" cvar cg_drawHitBox cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 90 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name v24_autobackstab type ITEM_TYPE_MULTI text "AutoBackStab" cvar cg_autoBackStab cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 110 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .8 .956 1 visible 1 descText "Backstab helper toggle" }
+		itemDef { name v24_autokick type ITEM_TYPE_MULTI text "AutoKick" cvar cg_autoKick cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 130 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .8 .956 1 visible 1 descText "Kick helper toggle" }
+		itemDef { name v24_autoaim type ITEM_TYPE_MULTI text "AutoAim" cvar cg_autoAim cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 150 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .8 .956 1 visible 1 descText "Auto aim (training / analysis)" }
+		itemDef { name v24_saberbox type ITEM_TYPE_MULTI text "SaberBox" cvar cg_debugSaberBox cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 170 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .5 .7 1 1 visible 1 descText "Display saber collision box" }
+		itemDef { name v24_playerinfo type ITEM_TYPE_MULTI text "PlayerInfo" cvar cg_playerInfo cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 190 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .5 .7 1 1 visible 1 descText "Extra on-target info HUD" }
+		itemDef { name v24_killfeed type ITEM_TYPE_MULTI text "KillFeed" cvar cg_drawKillMessage cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 210 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .5 .7 1 1 visible 1 descText "Enable enhanced kill messages" }
+
+		// Column 2 toggles (right)
+		itemDef { name v24_strafehelper type ITEM_TYPE_MULTI text "StrafeHelp" cvar cg_strafeHelper cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 50 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Full strafe helper overlay" }
+		itemDef { name v24_speedometer type ITEM_TYPE_MULTI text "Speedometer" cvar cg_speedometer cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 70 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Show current speed" }
+		itemDef { name v24_racetimer type ITEM_TYPE_MULTI text "RaceTimer" cvar cg_raceTimer cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 90 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Race / run timing HUD" }
+		itemDef { name v24_realaccel type ITEM_TYPE_MULTI text "RealAccel" cvar cg_realAccelSlopes cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 110 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Acceleration analysis overlays" }
+		itemDef { name v24_fpsdisplay type ITEM_TYPE_MULTI text "FPS HUD" cvar cg_drawFPS cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 130 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Show frame / physics stats" }
+		itemDef { name v24_showpos type ITEM_TYPE_MULTI text "ShowPos" cvar cg_showpos cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 150 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Coordinates / angle readout" }
+		itemDef { name v24_movementkeys type ITEM_TYPE_MULTI text "MoveKeys" cvar cg_movementKeys cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 170 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "On-screen key input display" }
+		itemDef { name v24_chatsounds type ITEM_TYPE_MULTI text "ChatSounds" cvar cg_chatSounds cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 190 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Play sound on chat lines" }
+		itemDef { name v24_brightchat type ITEM_TYPE_MULTI text "CleanChat" cvar cg_cleanChatbox cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 210 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .6 .9 .6 1 visible 1 descText "Minimal chat style" }
+
+		// Navigation buttons
+		itemDef { name backbtn type ITEM_TYPE_BUTTON text "<<< Back" rect 35 390 120 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24 ; open ingame_setup_modoptions ; } descText "Return to Mod Options" }
+		itemDef { name nextbtn type ITEM_TYPE_BUTTON text "More >>>" rect 260 390 120 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24 ; open ingame_setup_v24_page2 ; } descText "Page 2 (detailed helpers)" }
+	}
+}

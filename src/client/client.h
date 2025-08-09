@@ -424,6 +424,20 @@ extern	cvar_t	*cl_packetdup;
 extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;
+extern	cvar_t	*cl_autoNudge; // automatic timenudge factor (0 disables)
+extern	cvar_t *cl_autoNudgeSmoothing; // smoothing factor 0..1
+extern	cvar_t *cl_autoNudgeMax; // absolute cap for auto-derived timenudge magnitude
+extern	cvar_t *cl_effectiveTimeNudge; // read-only current applied timenudge after auto + clamps
+extern cvar_t *cl_autoNudgeInterval; // ms between recomputations of target (0 = every frame)
+extern cvar_t *cl_autoNudgeDeadband; // ignore adjustments smaller than this (ms) to reduce shaking
+extern cvar_t *cl_autoNudgeMaxStep; // maximum ms we allow per applied change (post smoothing)
+extern  cvar_t *cl_hpAdaptive; // enable high-ping adaptive system
+extern  cvar_t *cl_hpMaxLead; // max ms we allow client to lead server (absolute timenudge magnitude from auto)
+extern  cvar_t *cl_hpJitterWindow; // number of recent pings considered for jitter/stddev (<= PACKET_BACKUP)
+extern  cvar_t *cl_hpJitterDampen; // 0..1 how strongly jitter reduces lead
+extern	cvar_t	*cl_timeNudgeAntiLagHack;
+extern	cvar_t	*cl_timeNudgeSafeServerTime;
+extern	cvar_t	*cl_smoothenSnapLag;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 

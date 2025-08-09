@@ -32,6 +32,166 @@ Ghoul2 Insert Start
 extern CMiniHeap *G2VertSpaceClient;
 #endif
 
+vec3_t psVelocity; // disgusting hack for ramphelper
+
+cvar_t* com_coolApi_supported_cgame;
+
+// ------------------------------------------------------------
+// AutoNudge (cl_autoNudge) support
+// ------------------------------------------------------------
+// Provides an automatic timenudge based on recent median ping.
+// cl_autoNudge is a scale factor (0 disables). Effective timenudge = -medianPing * cl_autoNudge (rounded).
+// Falls back to user-set cl_timeNudge when disabled.
+static float CL_AvgPing_AutoNudge(void) {
+	int samples[PACKET_BACKUP];
+	int count = 0;
+	for (int i = 0; i < PACKET_BACKUP; ++i) {
+		int p = cl.snapshots[i].ping;
+		if (p > 0 && p < 999) {
+			samples[count++] = p;
+		}
+	}
+	if (!count) return 0.0f;
+	// simple bubble sort - PACKET_BACKUP small enough
+	for (int i = count - 1; i > 0; --i) {
+		for (int j = 0; j < i; ++j) {
+			if (samples[j] > samples[j+1]) {
+				int t = samples[j]; samples[j] = samples[j+1]; samples[j+1] = t;
+			}
+		}
+	}
+	if ((count & 1) == 0) {
+		return (samples[count/2] + samples[count/2 - 1]) * 0.5f;
+	}
+	return (float)samples[count/2];
+}
+
+static ID_INLINE int CL_EffectiveTimeNudge(void) {
+	static int lastComputeTime = 0;
+	static float lastRawTarget = 0.0f; // target before smoothing
+	int manual = cl_timeNudge ? cl_timeNudge->integer : 0;
+	if (!(cl_autoNudge && cl_autoNudge->value != 0.0f)) {
+		if (cl_effectiveTimeNudge) {
+			Cvar_Set("cl_effectiveTimeNudge", va("%d", manual));
+		}
+		return manual;
+	}
+	// Interval-based recomputation to avoid per-frame micro adjustments
+	int now = cls.realtime;
+	int interval = (cl_autoNudgeInterval) ? cl_autoNudgeInterval->integer : 0;
+	qboolean recompute = qtrue;
+	if (interval > 0) {
+		if (now - lastComputeTime < interval) {
+			recompute = qfalse;
+		}
+	}
+	float target;
+	static float lastFactor = 0.0f; // remember factor for adaptive extra computation during non-recompute frames
+	if (recompute) {
+		float avg = CL_AvgPing_AutoNudge();
+		float factor = cl_autoNudge->value;
+		lastFactor = factor;
+		target = -(avg * factor); // negative to push time forward
+		lastComputeTime = now;
+	} else {
+		target = lastRawTarget; // reuse previous computation
+	}
+
+	// Optional high-ping adaptive extension: if enabled and ping in higher range, allow additional lead scaled by jitter
+	if (cl_hpAdaptive && cl_hpAdaptive->integer) {
+		// Determine recent ping stats (reuse snapshot loop but we already have avg median; compute mean & stddev over valid pings)
+		int window = (cl_hpJitterWindow && cl_hpJitterWindow->integer > 2) ? cl_hpJitterWindow->integer : 20;
+		if (window > PACKET_BACKUP) window = PACKET_BACKUP;
+		int pings[PACKET_BACKUP]; int n=0;
+		for (int i=0;i<PACKET_BACKUP && n<window;i++) {
+			int p = cl.snapshots[i].ping;
+			if (p > 0 && p < 999) {
+				pings[n++] = p;
+			}
+		}
+		if (n >= 3) {
+			// compute mean
+			float sum=0.0f; for (int i=0;i<n;i++) sum += (float)pings[i];
+			float mean = sum / (float)n;
+			float var=0.0f; for (int i=0;i<n;i++){ float d = pings[i]-mean; var += d*d; }
+			var /= (float)(n-1);
+			float stddev = (var>0.0f)? sqrtf(var):0.0f;
+			// high ping band detection
+			if (mean >= 80.0f) {
+				// Additional adaptive lead tries to cover up to half the remaining latency beyond what auto timenudge (based on median) already covers.
+				// Base extra lead proposal: (mean * 0.5f * factor) but scaled down by jitter ratio.
+				float jitterRatio = 0.0f;
+				if (mean > 1.0f) jitterRatio = stddev / mean; // normalized jitter (0.. ~1)
+				float damp = 1.0f;
+				if (cl_hpJitterDampen) {
+					float jd = cl_hpJitterDampen->value; if (jd < 0.0f) jd = 0.0f; if (jd > 1.0f) jd = 1.0f;
+					// damping curve: damp = 1 / (1 + jitterRatio * jd * 4)
+					damp = 1.0f / (1.0f + jitterRatio * jd * 4.0f);
+				}
+				float baseExtra = mean * 0.5f * lastFactor * damp; // ms to try to additionally lead (use lastFactor)
+				if (baseExtra < 0.f) baseExtra = 0.f;
+				// Convert to negative timenudge direction
+				float desired = target - baseExtra; // target already negative; subtract extra to increase magnitude
+				// Respect max lead cap
+				if (cl_hpMaxLead && cl_hpMaxLead->value > 0.0f) {
+					float cap = -cl_hpMaxLead->value; // negative number (e.g., -45)
+					if (desired < cap) desired = cap; // cap is negative so more negative beyond cap is not allowed
+				}
+				// Only apply if it extends further than current target by at least 1ms to avoid oscillation
+				if (desired < target - 0.9f) {
+					target = desired;
+				}
+			}
+		}
+	}
+	// cap magnitude
+	if (cl_autoNudgeMax && cl_autoNudgeMax->value > 0.0f) {
+		float cap = cl_autoNudgeMax->value;
+		if (target < -cap) target = -cap;
+		else if (target > cap) target = cap;
+	}
+
+	// Deadband: if change from last raw target is very small, stick to previous to prevent oscillation
+	if (recompute) {
+		float delta = target - lastRawTarget;
+		if (cl_autoNudgeDeadband && cl_autoNudgeDeadband->value > 0.0f) {
+			float db = cl_autoNudgeDeadband->value;
+			if (delta > -db && delta < db) {
+				// ignore small change
+				target = lastRawTarget;
+				recompute = qfalse; // treat as no new meaningful target
+			}
+		}
+	}
+
+	// smoothing via exponential moving average on previous effective value
+	float smoothed = target;
+	if (cl_autoNudgeSmoothing && cl_autoNudgeSmoothing->value > 0.0f && cl_effectiveTimeNudge) {
+		float alpha = cl_autoNudgeSmoothing->value;
+		float prev = (float)cl_effectiveTimeNudge->integer;
+		if (alpha < 0.0f) alpha = 0.0f; else if (alpha > 1.0f) alpha = 1.0f;
+		smoothed = prev + alpha * (target - prev);
+	}
+
+	// Limit max per-update step after smoothing to avoid sudden jumps producing view/player shake
+	if (cl_autoNudgeMaxStep && cl_autoNudgeMaxStep->value > 0.0f && cl_effectiveTimeNudge) {
+		float maxStep = cl_autoNudgeMaxStep->value;
+		float prevApplied = (float)cl_effectiveTimeNudge->integer;
+		float step = smoothed - prevApplied;
+		if (step > maxStep) smoothed = prevApplied + maxStep;
+		else if (step < -maxStep) smoothed = prevApplied - maxStep;
+	}
+
+	if (recompute) {
+		lastRawTarget = target; // store only when a true recomputation occurred (post deadband)
+	}
+	int applied = (int)(smoothed >= 0 ? smoothed + 0.5f : smoothed - 0.5f);
+	if (cl_effectiveTimeNudge) {
+		Cvar_Set("cl_effectiveTimeNudge", va("%d", applied));
+	}
+	return applied;
+}
+
 /*
 Ghoul2 Insert End
 */
@@ -1827,9 +1987,7 @@ void CL_SetCGameTime( void ) {
 		// cl_timeNudge is a user adjustable cvar that allows more
 		// or less latency to be added in the interest of better
 		// smoothness or better responsiveness.
-		int tn;
-
-		tn = cl_timeNudge->integer;
+		int tn = CL_EffectiveTimeNudge();
 
 		if (tn < 0 && (cl.snap.ps.pm_type == PM_SPECTATOR || cl.snap.ps.pm_flags & PMF_FOLLOW || clc.demoplaying))
 			tn = 0; // JAPRO ENGINE - disable negative timenudge when spectating

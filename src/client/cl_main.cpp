@@ -33,6 +33,20 @@ cvar_t	*cl_timeout;
 cvar_t	*cl_maxpackets;
 cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
+cvar_t *cl_autoNudge; // auto nudge factor (0 = disabled)
+cvar_t *cl_autoNudgeSmoothing; // EMA smoothing factor
+cvar_t *cl_autoNudgeMax; // cap on magnitude
+cvar_t *cl_effectiveTimeNudge; // current applied timenudge (informational)
+cvar_t *cl_hpAdaptive;
+cvar_t *cl_hpMaxLead;
+cvar_t *cl_hpJitterWindow;
+cvar_t *cl_hpJitterDampen;
+cvar_t *cl_autoNudgeInterval; // ms between target recomputations
+cvar_t *cl_autoNudgeDeadband; // ms threshold under which changes are ignored
+cvar_t *cl_autoNudgeMaxStep; // max ms change per update (post smoothing)
+cvar_t	*cl_timeNudgeAntiLagHack;
+cvar_t	*cl_timeNudgeSafeServerTime;
+cvar_t	*cl_smoothenSnapLag;
 cvar_t	*cl_showTimeDelta;
 cvar_t	*cl_freezeDemo;
 
@@ -3109,6 +3123,18 @@ void CL_Init( void ) {
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
+	cl_autoNudge = Cvar_Get("cl_autoNudge", "0", CVAR_ARCHIVE); // factor multiplied by median ping, result negated as timenudge (e.g. 0.5 => -0.5*ping)
+	cl_autoNudgeSmoothing = Cvar_Get("cl_autoNudgeSmoothing", "0.5", CVAR_ARCHIVE); // 0..1 exponential moving average weight for new sample
+	cl_autoNudgeMax = Cvar_Get("cl_autoNudgeMax", "30", CVAR_ARCHIVE); // safety cap (abs value) for auto timenudge
+	cl_effectiveTimeNudge = Cvar_Get("cl_effectiveTimeNudge", "0", CVAR_ROM | CVAR_INTERNAL | CVAR_VM_NOWRITE); // updated each frame
+	cl_autoNudgeInterval = Cvar_Get("cl_autoNudgeInterval", "125", CVAR_ARCHIVE); // only recalc target every N ms (default 8Hz) to prevent thrash
+	cl_autoNudgeDeadband = Cvar_Get("cl_autoNudgeDeadband", "2", CVAR_ARCHIVE); // ignore tiny changes (<2ms)
+	cl_autoNudgeMaxStep = Cvar_Get("cl_autoNudgeMaxStep", "4", CVAR_ARCHIVE); // limit per-update change to 4ms to avoid jitter pulses
+	// High-ping adaptive prediction cvars
+	cl_hpAdaptive = Cvar_Get("cl_hpAdaptive", "0", CVAR_ARCHIVE); // master enable for adaptive high-ping compensation
+	cl_hpMaxLead = Cvar_Get("cl_hpMaxLead", "45", CVAR_ARCHIVE); // absolute cap (ms) for additional lead beyond base timenudge
+	cl_hpJitterWindow = Cvar_Get("cl_hpJitterWindow", "20", CVAR_ARCHIVE); // number of recent pings retained for jitter stats
+	cl_hpJitterDampen = Cvar_Get("cl_hpJitterDampen", "0.5", CVAR_ARCHIVE); // scale (0..1) controlling how strongly jitter reduces adaptive lead
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
 	cl_showTimeDelta = Cvar_Get ("cl_showTimeDelta", "0", CVAR_TEMP );

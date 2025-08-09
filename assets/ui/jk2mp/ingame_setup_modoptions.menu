@@ -1,0 +1,242 @@
+{
+	menuDef
+	{
+		name                    "ingame_setup_modoptions"
+		fullscreen              0
+		rect                    245 81 300 250
+		focusColor              1 1 1 1
+		style                   1
+		border                  1
+		descX                   305
+		descY                   335
+		descScale               0.7
+		descColor               .235 .882 .847 1
+		descAlignment           ITEM_ALIGN_CENTER
+		onClose 
+		{
+			close					ingame_setup ;
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		// HIGHLIGHT BARS
+		//
+		//----------------------------------------------------------------------------------------------
+		itemDef
+		{
+			name                    highlight1
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 0 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight2
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 20 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight3
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 40 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight4
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 60 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight5
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 80 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight6
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 100 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight7
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 120 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight8
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 140 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight9
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 160 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight10
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 180 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight11
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 200 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight12
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    20 220 300 20
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		itemDef
+		{
+			name                    highlight13
+			group                   highlights
+			style                   WINDOW_STYLE_SHADER
+			rect                    165 220 120 32
+			background              "gfx/menus/menu_blendbox"
+			forecolor               1 1 1 1
+			visible                 0
+			decoration
+		}
+
+		//----------------------------------------------------------------------------------------------
+		//
+		// MOD OPTIONS FIELDS
+		//
+		//----------------------------------------------------------------------------------------------
+
+		// Latency & Prediction Enhancements
+		itemDef { name mod_title type ITEM_TYPE_TEXT text "Latency / Prediction" rect 20 4 260 20 font 4 textscale .8 forecolor .8 .9 1 1 visible 1 }
+
+		// Auto Nudge Factor
+		itemDef { name an_factor type ITEM_TYPE_SLIDER text "AutoNudge" cvarfloat "cl_autoNudge" 0 0 1 rect 20 24 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name an_factor_field type ITEM_TYPE_NUMERICFIELD cvar "cl_autoNudge" rect 180 24 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 action { play "sound/interface/button1.wav" ; } }
+
+		// Smoothing
+		itemDef { name an_smooth type ITEM_TYPE_SLIDER text "Smoothing" cvarfloat "cl_autoNudgeSmoothing" 0 0 1 rect 20 44 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name an_smooth_field type ITEM_TYPE_NUMERICFIELD cvar "cl_autoNudgeSmoothing" rect 180 44 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+
+		// Interval (ms)
+		itemDef { name an_interval type ITEM_TYPE_SLIDER text "Interval" cvarfloat "cl_autoNudgeInterval" 0 0 500 rect 20 64 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name an_interval_field type ITEM_TYPE_NUMERICFIELD cvar "cl_autoNudgeInterval" rect 180 64 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+
+		// Deadband (ms)
+		itemDef { name an_deadband type ITEM_TYPE_SLIDER text "Deadband" cvarfloat "cl_autoNudgeDeadband" 0 0 10 rect 20 84 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name an_deadband_field type ITEM_TYPE_NUMERICFIELD cvar "cl_autoNudgeDeadband" rect 180 84 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+
+		// Max Step (ms)
+		itemDef { name an_maxstep type ITEM_TYPE_SLIDER text "MaxStep" cvarfloat "cl_autoNudgeMaxStep" 0 0 10 rect 20 104 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+		itemDef { name an_maxstep_field type ITEM_TYPE_NUMERICFIELD cvar "cl_autoNudgeMaxStep" rect 180 104 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+
+		// High Ping Adaptive Toggle
+		itemDef { name hp_enable type ITEM_TYPE_MULTI text "HP Adaptive" cvar cl_hpAdaptive cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 124 156 20 textalign ITEM_ALIGN_LEFT textalignx 0 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 }
+
+		// Max Lead (ms)
+		itemDef { name hp_maxlead type ITEM_TYPE_SLIDER text "MaxLead" cvarfloat "cl_hpMaxLead" 0 0 60 rect 20 144 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+		itemDef { name hp_maxlead_field type ITEM_TYPE_NUMERICFIELD cvar "cl_hpMaxLead" rect 180 144 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+
+		// Jitter Window
+		itemDef { name hp_jwin type ITEM_TYPE_SLIDER text "JitWin" cvarfloat "cl_hpJitterWindow" 0 5 64 rect 20 164 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+		itemDef { name hp_jwin_field type ITEM_TYPE_NUMERICFIELD cvar "cl_hpJitterWindow" rect 180 164 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+
+		// Jitter Dampen
+		itemDef { name hp_jdamp type ITEM_TYPE_SLIDER text "JitDamp" cvarfloat "cl_hpJitterDampen" 0 0 1 rect 20 184 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+		itemDef { name hp_jdamp_field type ITEM_TYPE_NUMERICFIELD cvar "cl_hpJitterDampen" rect 180 184 40 20 textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 enable { cvarTest cl_hpAdaptive 1 } }
+
+		// Effective (read-only shown via numeric field - editing allowed but engine will overwrite)
+		itemDef { name eff_tn_label type ITEM_TYPE_TEXT text "EffectiveTN" rect 20 204 156 20 textalign ITEM_ALIGN_LEFT textalignx 0 textaligny 12 font 4 textscale 1 forecolor .5 .8 1 1 visible 1 }
+		itemDef { name eff_tn_field type ITEM_TYPE_NUMERICFIELD cvar "cl_effectiveTimeNudge" rect 180 204 40 20 textaligny 12 font 4 textscale 1 forecolor .5 .8 1 1 visible 1 }
+
+		// Open Advanced V24 Features Menu
+		itemDef {
+			name v24_open
+			type ITEM_TYPE_BUTTON
+			text "Advanced (V24) >>>"
+			rect 20 228 200 20
+			font 4
+			textscale .8
+			forecolor .8 .9 1 1
+			visible 1
+			action { play "sound/interface/button1.wav" ; close ingame_setup_modoptions ; open ingame_setup_v24 ; }
+		}
+	}
+}

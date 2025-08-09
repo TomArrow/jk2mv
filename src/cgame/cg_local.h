@@ -1484,6 +1484,126 @@ extern	vmCvar_t		cg_animBlend;
 
 extern	vmCvar_t		cg_dismember;
 
+//jk2pro Client Cvars - start
+extern	vmCvar_t		cg_raceTimer;
+extern	vmCvar_t		cg_raceTimerSize;
+extern	vmCvar_t		cg_raceTimerX;
+extern	vmCvar_t		cg_raceTimerY;
+extern	vmCvar_t		cg_speedometer;
+extern	vmCvar_t		cg_speedometerX;
+extern	vmCvar_t		cg_speedometerY;
+extern	vmCvar_t		cg_speedometerSize;
+extern	vmCvar_t		cg_showpos;
+
+extern	vmCvar_t		cg_strafeHelperCutoff;
+extern	vmCvar_t		cg_strafeHelper;
+extern	vmCvar_t		cg_strafeHelperPrecision;
+extern	vmCvar_t		cg_strafeHelperLineWidth;
+extern	vmCvar_t		cg_strafeHelperActiveColor;
+extern	vmCvar_t		cg_strafeHelperInactiveAlpha;
+
+extern	vmCvar_t		cg_strafeHelperOffset;
+extern	vmCvar_t		cg_strafeHelper_FPS;
+
+extern	vmCvar_t		cg_crosshairSizeScale;
+extern	vmCvar_t		cg_crosshairSaberStyleColor;
+extern	vmCvar_t		cg_crosshairColor;
+extern	vmCvar_t		cg_crosshairIdentifyTarget;
+
+extern	vmCvar_t		cg_enhancedFlagStatus;
+extern	vmCvar_t		cg_drawTimerMsec;
+extern	vmCvar_t		cg_movementKeys;
+extern	vmCvar_t		cg_movementKeysX;
+extern	vmCvar_t		cg_movementKeysY;
+extern	vmCvar_t		cg_movementKeysSize;
+
+//only for you, arto
+extern	vmCvar_t		cg_hudColors;
+extern	vmCvar_t		cg_drawScore;
+extern	vmCvar_t		cg_centerHeight;
+extern	vmCvar_t		cg_centerSize;
+
+//chatbox
+extern	vmCvar_t		cg_chatBox;
+extern	vmCvar_t		cg_chatBoxFontSize;
+extern	vmCvar_t		cg_chatBoxHeight;
+//japro chatbox stuff
+extern	vmCvar_t		cg_chatBoxShowHistory;
+extern	vmCvar_t		cg_chatBoxX;
+extern	vmCvar_t		cg_chatBoxCutOffLength;
+extern	vmCvar_t		cg_chatSounds;
+extern	vmCvar_t		cg_cleanChatbox;
+extern	vmCvar_t		cg_newFont;
+
+extern	vmCvar_t		cg_jumpSounds;
+extern	vmCvar_t		cg_rollSounds;
+extern	vmCvar_t		cg_hitSounds;
+extern	vmCvar_t		cg_newSaberHitSounds;
+extern	vmCvar_t		cg_thirdPersonFlagAlpha;
+extern	vmCvar_t		cg_drawNonDuelers;
+extern	vmCvar_t		cg_brightskins;
+extern	vmCvar_t		cg_drawHitBox;
+extern	vmCvar_t		cg_playerLOD;
+extern	vmCvar_t		cg_privateDuelShell;
+extern	vmCvar_t		cg_teamRespawnShield;
+extern	vmCvar_t		cg_saberTeamColors;
+
+extern	vmCvar_t		cg_remaps;
+extern	vmCvar_t		cg_autoKillWhenFalling;
+
+extern	vmCvar_t		cg_widescreen;
+extern	vmCvar_t		cg_fovAspectAdjust;
+
+extern	vmCvar_t		cg_fovViewmodel;
+extern	vmCvar_t		cg_fovViewmodelAdjust;
+
+extern	vmCvar_t		cg_fkDuration;
+extern	vmCvar_t		cg_fkFirstJumpDuration;
+extern	vmCvar_t		cg_fkSecondJumpDelay;
+
+extern	vmCvar_t		cl_commandsize;//Loda - FPS UNLOCK client modcode
+
+extern	vmCvar_t		cg_fixlean; //idk man
+extern	vmCvar_t		cg_SPRunAnim;
+
+extern	vmCvar_t		cg_drawInventory;
+extern	vmCvar_t		cg_smallScoreboard;
+extern	vmCvar_t		cg_colorScoreboard;
+extern	vmCvar_t		cg_drawScoreboardIcons;
+extern	vmCvar_t		cg_drawPowerUpIcons;
+extern	vmCvar_t		cg_drawDemoName;
+extern	vmCvar_t		cg_lowhpsound;
+extern	vmCvar_t		cg_backSwingCameraRange;
+
+extern	vmCvar_t		cg_char_color_red;
+extern	vmCvar_t		cg_char_color_green;
+extern	vmCvar_t		cg_char_color_blue;
+
+// V24 Advanced Features
+extern	vmCvar_t		cg_wallHack;
+extern	vmCvar_t		cg_autoKick;
+extern	vmCvar_t		cg_autoKick_debug;
+extern	vmCvar_t		cg_autoKick_sideKickFirst;
+extern	vmCvar_t		cg_autoKick_distance;
+extern	vmCvar_t		cg_autoKick_usePrediction;
+extern	vmCvar_t		cg_autoKick_indicator;
+extern	vmCvar_t		cg_autoKick_checkRoll;
+extern	vmCvar_t		cg_autoKick_checkAir;
+extern	vmCvar_t		cg_autoKick_checkKnockdown;
+extern	vmCvar_t		cg_autoBackStab;
+extern	vmCvar_t		cg_autoBackStab_debug;
+extern	vmCvar_t		cg_autoBackStab_distance;
+extern	vmCvar_t		cg_autoBackStab_usePrediction;
+extern	vmCvar_t		cg_debugSaberBox;
+extern	vmCvar_t		cg_debugSaberBox_usePrediction;
+extern	vmCvar_t		cg_friendsChatsOnly;
+extern	vmCvar_t		cg_autoAim;
+extern	vmCvar_t		cg_autoAim_debug;
+extern	vmCvar_t		cg_v24tracing;
+extern	vmCvar_t		cg_autoAim_usePrediction;
+extern	vmCvar_t		cg_autoAim_ignoreWalls;
+//jk2 pro stuff end
+
 extern	vmCvar_t		cg_thirdPerson;
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;

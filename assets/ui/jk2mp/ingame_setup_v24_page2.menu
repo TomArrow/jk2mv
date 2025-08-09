@@ -1,0 +1,55 @@
+// V24 Advanced Features Menu (Page 2)
+{
+	menuDef
+	{
+		name                "ingame_setup_v24_page2"
+		fullscreen          0
+		visible             0
+		rect                180 40 430 425
+		focusColor          1 1 1 1
+		style               1
+		border              1
+		descX               320
+		descY               450
+		descScale           0.7
+		descColor           .235 .882 .847 1
+		descAlignment       ITEM_ALIGN_CENTER
+
+		itemDef { name background style WINDOW_STYLE_SHADER rect 0 0 430 425 background "gfx/menus/menu_box_ingame" forecolor 1 1 1 1 visible 1 decoration }
+		itemDef { name title style WINDOW_STYLE_SHADER background "gfx/menus/menu_blendbox" text "V24 Advanced (2)" rect 35 5 360 28 textalign ITEM_ALIGN_CENTER textalignx 180 textaligny 2 font 3 textscale 0.9 forecolor .549 .854 1 1 visible 1 descText "Detailed helper settings (page 2)" }
+
+		// Section separators to mirror page 1 styling
+		itemDef { name sep_left2 style WINDOW_STYLE_SHADER rect 10 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+		itemDef { name sep_right2 style WINDOW_STYLE_SHADER rect 210 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+
+		// AutoKick detailed options
+		itemDef { name ak_sidefirst type ITEM_TYPE_MULTI text "KickSideFirst" cvar cg_autoKick_sideKickFirst cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 50 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 textscale 1 forecolor .615 .615 .956 1 visible 1 descText "Prefer side kick if both types are valid" }
+		itemDef { name ak_predict type ITEM_TYPE_MULTI text "KickPredict" cvar cg_autoKick_usePrediction cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 70 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Use movement prediction for kick timing" }
+		itemDef { name ak_indicator type ITEM_TYPE_MULTI text "KickIndicator" cvar cg_autoKick_indicator cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 90 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Show on‑screen kick timing icon" }
+		itemDef { name ak_checkroll type ITEM_TYPE_MULTI text "KickChkRoll" cvar cg_autoKick_checkRoll cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 110 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Allow logic during enemy roll" }
+		itemDef { name ak_checkair type ITEM_TYPE_MULTI text "KickChkAir" cvar cg_autoKick_checkAir cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 130 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Enable air kick targeting" }
+		itemDef { name ak_checkkd type ITEM_TYPE_MULTI text "KickChkKD" cvar cg_autoKick_checkKnockdown cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 150 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Allow when target is knocked down" }
+		itemDef { name ak_debug type ITEM_TYPE_MULTI text "KickDebug" cvar cg_autoKick_debug cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 170 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Verbose console debug info" }
+		itemDef { name ak_distance type ITEM_TYPE_SLIDER text "KickDist" cvarfloat "cg_autoKick_distance" 0 0 64 rect 20 190 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Max distance to attempt auto kick" }
+		itemDef { name ak_distance_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoKick_distance" rect 185 190 40 20 textaligny 12 font 4 descText "Exact kick distance value" }
+
+		// AutoBackStab details
+		itemDef { name abs_predict type ITEM_TYPE_MULTI text "BackPredict" cvar cg_autoBackStab_usePrediction cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 50 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Predict enemy movement for backstab" }
+		itemDef { name abs_debug type ITEM_TYPE_MULTI text "BackDebug" cvar cg_autoBackStab_debug cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 70 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Verbose backstab debug" }
+		itemDef { name abs_distance type ITEM_TYPE_SLIDER text "BackDist" cvarfloat "cg_autoBackStab_distance" 0 0 128 rect 220 90 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Max distance to attempt backstab" }
+		itemDef { name abs_distance_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoBackStab_distance" rect 385 90 40 20 textaligny 12 font 4 descText "Exact backstab distance" }
+
+		// AutoAim details
+		itemDef { name aa_predict type ITEM_TYPE_MULTI text "AimPredict" cvar cg_autoAim_usePrediction cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 120 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Predict future enemy position" }
+		itemDef { name aa_ignorewalls type ITEM_TYPE_MULTI text "AimNoWall" cvar cg_autoAim_ignoreWalls cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 140 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Ignore walls / LOS checks (debug)" }
+		itemDef { name aa_debug type ITEM_TYPE_MULTI text "AimDebug" cvar cg_autoAim_debug cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 160 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Verbose auto aim debug" }
+
+		// Saber Box prediction
+		itemDef { name sb_predict type ITEM_TYPE_MULTI text "SaberPredict" cvar cg_debugSaberBox_usePrediction cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 180 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Predict saber collision box" }
+
+		// Navigation
+		itemDef { name backbtn type ITEM_TYPE_BUTTON text "<<< Prev" rect 25 390 110 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24_page2 ; open ingame_setup_v24 ; } descText "Return to page 1" }
+		itemDef { name nextbtn type ITEM_TYPE_BUTTON text "More >>>" rect 160 390 110 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24_page2 ; open ingame_setup_v24_page3 ; } descText "Page 3 (timers & assist)" }
+		itemDef { name closebtn type ITEM_TYPE_BUTTON text "Close" rect 295 390 110 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24_page2 ; open ingame_setup_modoptions ; } descText "Exit advanced menus" }
+	}
+}

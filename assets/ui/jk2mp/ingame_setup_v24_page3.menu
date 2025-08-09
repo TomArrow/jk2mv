@@ -1,0 +1,61 @@
+// V24 Advanced Features Menu (Page 3)
+{
+	menuDef
+	{
+		name                "ingame_setup_v24_page3"
+		fullscreen          0
+		visible             0
+		rect                180 40 430 425
+		focusColor          1 1 1 1
+		style               1
+		border              1
+		descX               320
+		descY               450
+		descScale           0.7
+		descColor           .235 .882 .847 1
+		descAlignment       ITEM_ALIGN_CENTER
+
+		itemDef { name background style WINDOW_STYLE_SHADER rect 0 0 430 425 background "gfx/menus/menu_box_ingame" forecolor 1 1 1 1 visible 1 decoration }
+		itemDef { name title style WINDOW_STYLE_SHADER background "gfx/menus/menu_blendbox" text "V24 Advanced (3)" rect 35 5 360 28 textalign ITEM_ALIGN_CENTER textalignx 180 textaligny 2 font 3 textscale 0.9 forecolor .549 .854 1 1 visible 1 descText "Timing & assist tuning (page 3)" }
+
+		// Separators
+		itemDef { name sep_a style WINDOW_STYLE_SHADER rect 10 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+		itemDef { name sep_b style WINDOW_STYLE_SHADER rect 210 42 200 1 background "gfx/menus/menu_divider" forecolor 1 1 1 .35 visible 1 decoration }
+
+		// Column Left (AutoKick / BackStab timing)
+		itemDef { name ak_cooldown type ITEM_TYPE_SLIDER text "KickCD" cvarfloat "cg_autoKick_cooldown" 0 0 1500 rect 20 50 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Auto kick cooldown ms" }
+		itemDef { name ak_cooldown_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoKick_cooldown" rect 185 50 40 20 textaligny 12 font 4 descText "Exact kick cooldown" }
+		itemDef { name ak_wallnormal type ITEM_TYPE_SLIDER text "KickWallDot" cvarfloat "cg_autoKick_minWallNormal" 0 0 1 rect 20 70 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Required wall normal dot" }
+		itemDef { name ak_wallnormal_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoKick_minWallNormal" rect 185 70 40 20 textaligny 12 font 4 descText "Exact wall dot" }
+		itemDef { name ak_minvel type ITEM_TYPE_SLIDER text "KickVelZ" cvarfloat "cg_autoKick_minVelocityZ" 0 0 600 rect 20 90 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Min upward velocity" }
+		itemDef { name ak_minvel_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoKick_minVelocityZ" rect 185 90 40 20 textaligny 12 font 4 descText "Exact velocity" }
+
+		itemDef { name abs_maxangle type ITEM_TYPE_SLIDER text "BackAng" cvarfloat "cg_autoBackStab_maxAngle" 0 0 180 rect 20 120 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Allowed yaw span" }
+		itemDef { name abs_maxangle_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoBackStab_maxAngle" rect 185 120 40 20 textaligny 12 font 4 descText "Exact yaw span" }
+		itemDef { name abs_cooldown type ITEM_TYPE_SLIDER text "BackCD" cvarfloat "cg_autoBackStab_cooldown" 0 0 2000 rect 20 140 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Backstab cooldown ms" }
+		itemDef { name abs_cooldown_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoBackStab_cooldown" rect 185 140 40 20 textaligny 12 font 4 descText "Exact backstab cooldown" }
+		itemDef { name abs_crouch type ITEM_TYPE_MULTI text "BackCrouch" cvar cg_autoBackStab_crouch cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 160 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Use crouched variant" }
+		itemDef { name abs_track type ITEM_TYPE_MULTI text "BackTrack" cvar cg_autoBackStab_track cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 20 180 180 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Track target during stab" }
+		itemDef { name abs_trackTime type ITEM_TYPE_SLIDER text "TrackTime" cvarfloat "cg_autoBackStab_trackTime" 0 0 1500 rect 20 200 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Tracking duration ms" }
+		itemDef { name abs_trackTime_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoBackStab_trackTime" rect 185 200 40 20 textaligny 12 font 4 descText "Exact track time" }
+
+		// Column Right (AutoAim & Passive Assist)
+		itemDef { name aa_fov type ITEM_TYPE_SLIDER text "AimFOV" cvarfloat "cg_autoAim_fov" 0 0 180 rect 220 50 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Acquisition FOV" }
+		itemDef { name aa_fov_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoAim_fov" rect 385 50 40 20 textaligny 12 font 4 descText "Exact FOV" }
+		itemDef { name aa_switch type ITEM_TYPE_SLIDER text "AimSwitch" cvarfloat "cg_autoAim_switchDelay" 0 0 1000 rect 220 70 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Target switch delay ms" }
+		itemDef { name aa_switch_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoAim_switchDelay" rect 385 70 40 20 textaligny 12 font 4 descText "Exact switch delay" }
+		itemDef { name aa_smooth type ITEM_TYPE_MULTI text "AimSmooth" cvar cg_autoAim_smooth cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 90 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Angle smoothing" }
+		itemDef { name aa_smoothfac type ITEM_TYPE_SLIDER text "SmoothFac" cvarfloat "cg_autoAim_smoothFactor" 0 0 1 rect 220 110 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Smoothing factor (0-1)" }
+		itemDef { name aa_smoothfac_field type ITEM_TYPE_NUMERICFIELD cvar "cg_autoAim_smoothFactor" rect 385 110 40 20 textaligny 12 font 4 descText "Exact smooth factor" }
+
+		itemDef { name pa_enable type ITEM_TYPE_MULTI text "PassiveAim" cvar cg_passiveAimAssist cvarFloatList { @MENUS0_OFF 0 @MENUS0_ON 1 } rect 220 140 170 20 textalign ITEM_ALIGN_LEFT textaligny 12 font 4 descText "Passive saber tip assist" }
+		itemDef { name pa_range type ITEM_TYPE_SLIDER text "AssistRange" cvarfloat "cg_passiveAimAssist_range" 0 0 256 rect 220 160 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Assist trace range" }
+		itemDef { name pa_range_field type ITEM_TYPE_NUMERICFIELD cvar "cg_passiveAimAssist_range" rect 385 160 40 20 textaligny 12 font 4 descText "Exact range" }
+		itemDef { name pa_width type ITEM_TYPE_SLIDER text "AssistWidth" cvarfloat "cg_passiveAimAssist_width" 0 0 30 rect 220 180 156 20 textalign ITEM_ALIGN_RIGHT textalignx 70 textaligny 12 font 4 descText "Assist cone width deg" }
+		itemDef { name pa_width_field type ITEM_TYPE_NUMERICFIELD cvar "cg_passiveAimAssist_width" rect 385 180 40 20 textaligny 12 font 4 descText "Exact width" }
+
+		// Navigation
+		itemDef { name backbtn type ITEM_TYPE_BUTTON text "<<< Prev" rect 25 390 110 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24_page3 ; open ingame_setup_v24_page2 ; } descText "Return to page 2" }
+		itemDef { name closebtn type ITEM_TYPE_BUTTON text "Close" rect 295 390 110 20 font 4 textscale 0.8 forecolor .8 .9 1 1 visible 1 action { play "sound/interface/button1.wav" ; close ingame_setup_v24_page3 ; open ingame_setup_modoptions ; } descText "Exit advanced menus" }
+	}
+}
