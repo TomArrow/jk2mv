@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 4.1)
 
+# Adopt all CMake policies up to 4.1 as NEW for consistent behavior.
+cmake_policy(VERSION 4.1)
+
 # Adopt all policies up to 4.1 so subdirectories share a consistent baseline
 cmake_policy(VERSION 4.1)
 
