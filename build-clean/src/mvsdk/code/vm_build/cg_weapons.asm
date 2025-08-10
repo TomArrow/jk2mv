@@ -1,254 +1,244 @@
-data
-export jk2version
-align 4
-LABELV jk2version
-byte 4 0
-export jk2gameplay
-align 4
-LABELV jk2gameplay
-byte 4 0
-export jk2startversion
-align 4
-LABELV jk2startversion
-byte 4 0
-export MV_BuildAnimationMappingTable
+export CG_SetGhoul2InfoRef
 code
-proc MV_BuildAnimationMappingTable 0 0
-endproc MV_BuildAnimationMappingTable 0 0
-export MV_SetGamePlay
-proc MV_SetGamePlay 0 0
-endproc MV_SetGamePlay 0 0
+proc CG_SetGhoul2InfoRef 0 0
+endproc CG_SetGhoul2InfoRef 0 0
+export CG_RegisterItemVisuals
+proc CG_RegisterItemVisuals 0 0
+endproc CG_RegisterItemVisuals 0 0
 data
 align 4
-LABELV mvKeyconversion
-byte 4 9
-byte 4 9
-byte 4 13
-byte 4 10
-byte 4 27
-byte 4 27
-byte 4 32
-byte 4 32
-byte 4 127
-byte 4 8
-byte 4 129
-byte 4 4
-byte 4 131
-byte 4 7
-byte 4 132
-byte 4 170
-byte 4 133
-byte 4 171
-byte 4 134
-byte 4 172
-byte 4 135
-byte 4 173
-byte 4 136
-byte 4 3
-byte 4 136
-byte 4 131
-byte 4 137
-byte 4 2
-byte 4 138
-byte 4 1
-byte 4 139
-byte 4 143
-byte 4 140
-byte 4 127
-byte 4 141
-byte 4 158
-byte 4 142
-byte 4 145
-byte 4 143
-byte 4 144
-byte 4 144
-byte 4 157
-byte 4 145
-byte 4 28
-byte 4 146
-byte 4 29
-byte 4 147
-byte 4 30
-byte 4 148
-byte 4 31
-byte 4 149
-byte 4 132
-byte 4 150
-byte 4 133
-byte 4 151
-byte 4 134
-byte 4 152
-byte 4 135
-byte 4 153
-byte 4 149
-byte 4 154
-byte 4 150
-byte 4 155
-byte 4 151
-byte 4 156
-byte 4 152
-byte 4 160
-byte 4 23
-byte 4 161
-byte 4 24
-byte 4 162
-byte 4 25
-byte 4 163
-byte 4 20
-byte 4 164
-byte 4 21
-byte 4 165
-byte 4 22
-byte 4 166
-byte 4 17
-byte 4 167
-byte 4 18
-byte 4 168
-byte 4 19
-byte 4 169
-byte 4 13
-byte 4 170
-byte 4 16
-byte 4 171
-byte 4 14
-byte 4 172
-byte 4 247
-byte 4 173
-byte 4 12
-byte 4 174
-byte 4 11
-byte 4 175
-byte 4 5
-byte 4 176
-byte 4 215
-byte 4 178
-byte 4 141
-byte 4 179
-byte 4 142
-byte 4 180
-byte 4 166
-byte 4 181
-byte 4 167
-byte 4 182
-byte 4 168
-byte 4 183
-byte 4 139
-byte 4 184
-byte 4 137
-byte 4 185
-byte 4 257
-byte 4 186
-byte 4 258
-byte 4 187
-byte 4 259
-byte 4 188
-byte 4 260
-byte 4 189
-byte 4 261
-byte 4 190
-byte 4 262
-byte 4 191
-byte 4 263
-byte 4 192
-byte 4 264
-byte 4 193
-byte 4 265
-byte 4 194
-byte 4 266
-byte 4 195
-byte 4 267
-byte 4 196
-byte 4 268
-byte 4 197
-byte 4 269
-byte 4 198
-byte 4 270
-byte 4 199
-byte 4 271
-byte 4 200
-byte 4 272
-byte 4 201
-byte 4 273
-byte 4 202
-byte 4 274
-byte 4 203
-byte 4 275
-byte 4 204
-byte 4 276
-byte 4 205
-byte 4 277
-byte 4 206
-byte 4 278
-byte 4 207
-byte 4 279
-byte 4 208
-byte 4 280
-byte 4 209
-byte 4 281
-byte 4 210
-byte 4 282
-byte 4 211
-byte 4 283
-byte 4 212
-byte 4 284
-byte 4 213
-byte 4 285
-byte 4 214
-byte 4 286
-byte 4 215
-byte 4 287
-byte 4 217
-byte 4 289
-byte 4 218
-byte 4 290
-byte 4 219
-byte 4 291
-byte 4 220
-byte 4 292
-byte 4 221
-byte 4 293
-byte 4 222
-byte 4 294
-byte 4 223
-byte 4 295
-byte 4 224
-byte 4 296
-byte 4 225
-byte 4 297
-byte 4 226
-byte 4 298
-byte 4 227
-byte 4 299
-byte 4 228
-byte 4 300
-byte 4 229
-byte 4 301
-byte 4 230
-byte 4 302
-byte 4 231
-byte 4 303
-byte 4 232
-byte 4 304
-byte 4 233
-byte 4 320
+LABELV cgWeapFrame
+byte 4 0
 align 4
-LABELV mvKeyconversionCount
-byte 4 105
-export Key_GetProtocolKey_New
+LABELV cgWeapFrameTime
+byte 4 0
 code
-proc Key_GetProtocolKey_New 0 0
-endproc Key_GetProtocolKey_New 0 0
-export Key_GetProtocolKey
-proc Key_GetProtocolKey 0 0
-endproc Key_GetProtocolKey 0 0
-export Key_GetProtocolKey15
-proc Key_GetProtocolKey15 0 0
-endproc Key_GetProtocolKey15 0 0
-import forcePowerNeeded
-import forcePowerNeeded_1_04
-import forcePowerNeeded_1_02
-import animTable
-import animTable_1_02
+proc CG_MapTorsoToWeaponFrame 0 0
+endproc CG_MapTorsoToWeaponFrame 0 0
+proc CG_CalculateWeaponPosition 0 0
+endproc CG_CalculateWeaponPosition 0 0
+proc CG_LightningBolt 0 0
+endproc CG_LightningBolt 0 0
+proc CG_AddWeaponWithPowerups 0 0
+endproc CG_AddWeaponWithPowerups 0 0
+export CG_AddPlayerWeapon
+proc CG_AddPlayerWeapon 0 0
+endproc CG_AddPlayerWeapon 0 0
+export CG_AddViewWeapon
+proc CG_AddViewWeapon 0 0
+endproc CG_AddViewWeapon 0 0
+export CG_DrawIconBackground
+proc CG_DrawIconBackground 0 0
+endproc CG_DrawIconBackground 0 0
+export CG_WeaponCheck
+proc CG_WeaponCheck 0 0
+endproc CG_WeaponCheck 0 0
+export CG_WeaponSelectable
+proc CG_WeaponSelectable 0 0
+endproc CG_WeaponSelectable 0 0
+lit
+align 4
+LABELV $869
+byte 4 1063256064
+byte 4 1060622041
+byte 4 1039650521
+byte 4 1065353216
+export CG_DrawWeaponSelect
+code
+proc CG_DrawWeaponSelect 0 0
+endproc CG_DrawWeaponSelect 0 0
+export CG_NextWeapon_f
+proc CG_NextWeapon_f 0 0
+endproc CG_NextWeapon_f 0 0
+export CG_PrevWeapon_f
+proc CG_PrevWeapon_f 0 0
+endproc CG_PrevWeapon_f 0 0
+export CG_Weapon_f
+proc CG_Weapon_f 0 0
+endproc CG_Weapon_f 0 0
+export CG_OutOfAmmoChange
+proc CG_OutOfAmmoChange 0 0
+endproc CG_OutOfAmmoChange 0 0
+export CG_FireATST
+proc CG_FireATST 0 0
+endproc CG_FireATST 0 0
+export CG_GetClientWeaponMuzzleBoltPoint
+proc CG_GetClientWeaponMuzzleBoltPoint 0 0
+endproc CG_GetClientWeaponMuzzleBoltPoint 0 0
+export CG_FireWeapon
+proc CG_FireWeapon 0 0
+endproc CG_FireWeapon 0 0
+lit
+align 4
+LABELV $1093
+byte 4 0
+byte 4 0
+byte 4 1065353216
+export CG_MissileHitWall
+code
+proc CG_MissileHitWall 0 0
+endproc CG_MissileHitWall 0 0
+lit
+align 4
+LABELV $1123
+byte 4 0
+byte 4 0
+byte 4 1065353216
+export CG_MissileHitPlayer
+code
+proc CG_MissileHitPlayer 0 0
+endproc CG_MissileHitPlayer 0 0
+export CG_Tracer
+proc CG_Tracer 0 0
+endproc CG_Tracer 0 0
+export CG_CalcMuzzlePoint
+proc CG_CalcMuzzlePoint 0 0
+endproc CG_CalcMuzzlePoint 0 0
+export CG_InitG2Weapons
+proc CG_InitG2Weapons 0 0
+endproc CG_InitG2Weapons 0 0
+export CG_ShutDownG2Weapons
+proc CG_ShutDownG2Weapons 0 0
+endproc CG_ShutDownG2Weapons 0 0
+export CG_G2WeaponInstance
+proc CG_G2WeaponInstance 0 0
+endproc CG_G2WeaponInstance 0 0
+export CG_CopyG2WeaponInstance
+proc CG_CopyG2WeaponInstance 0 0
+endproc CG_CopyG2WeaponInstance 0 0
+export CG_CheckPlayerG2Weapons
+proc CG_CheckPlayerG2Weapons 0 0
+endproc CG_CheckPlayerG2Weapons 0 0
+bss
+align 4
+LABELV g2WeaponInstances
+skip 64
+import hudTintColor
+import redhudtint
+import bluehudtint
+import Item_IsJKA
+import Menu_IsJKA
+import Menu_SetJKA
+import HolocronIcons
+import menuInJK2MV
+import Item_ListBox_MaxScroll
+import trap_G2API_SetSkin
+import trap_SP_Register
+import trap_SP_RegisterServer
+import trap_AnyLanguage_ReadCharFromString
+import trap_PC_RemoveAllGlobalDefines
+import trap_PC_LoadGlobalDefines
+import trap_PC_SourceFileAndLine
+import trap_PC_ReadToken
+import trap_PC_FreeSource
+import trap_PC_LoadSource
+import trap_PC_AddGlobalDefine
+import Controls_SetConfig
+import Controls_GetConfig
+import UI_OutOfMemory
+import UI_InitMemory
+import UI_Alloc
+import Menu_SetItemBackground
+import Display_CacheAll
+import Menu_SetFeederSelection
+import Menu_Paint
+import Menus_CloseAll
+import LerpColor
+import Display_HandleKey
+import Menus_CloseByName
+import Menus_ShowByName
+import Menus_FindByName
+import Menus_OpenByName
+import Display_KeyBindPending
+import Display_CursorType
+import Display_MouseMove
+import Display_CaptureItem
+import Display_GetContext
+import Menu_FindItemByName
+import Menus_Activate
+import Menus_AnyFullScreenVisible
+import Menu_Reset
+import Menus_ActivateByName
+import Menu_PaintAll
+import Menu_New
+import Menu_Count
+import PC_Script_Parse
+import PC_String_Parse
+import PC_Rect_Parse
+import PC_Int_Parse
+import PC_Color_Parse
+import PC_Float_Parse
+import String_Parse
+import Rect_Parse
+import Int_Parse
+import Color_Parse
+import Float_Parse
+import Menu_ScrollFeeder
+import Menu_HandleMouseMove
+import Menu_HandleKey
+import Menu_GetFocused
+import Menu_PostParse
+import Item_Init
+import Menu_Init
+import Display_ExpandMacros
+import Init_Display
+import String_Report
+import String_Init
+import String_Alloc
+export multiDef_t
+align 4
+LABELV multiDef_t
+skip 4
+export strDef
+align 4
+LABELV strDef
+skip 4
+export count
+align 4
+LABELV count
+skip 4
+export cvarValue
+align 4
+LABELV cvarValue
+skip 128
+export cvarStr
+align 4
+LABELV cvarStr
+skip 128
+export cvarList
+align 4
+LABELV cvarList
+skip 128
+import FX_RocketHitPlayer
+import FX_RocketHitWall
+import FX_RocketAltProjectileThink
+import FX_RocketProjectileThink
+import FX_FlechetteAltProjectileThink
+import FX_FlechetteWeaponHitPlayer
+import FX_FlechetteWeaponHitWall
+import FX_FlechetteProjectileThink
+import FX_DEMP2_AltDetonate
+import FX_DEMP2_HitPlayer
+import FX_DEMP2_HitWall
+import FX_DEMP2_ProjectileThink
+import FX_RepeaterAltHitPlayer
+import FX_RepeaterHitPlayer
+import FX_RepeaterAltHitWall
+import FX_RepeaterHitWall
+import FX_RepeaterAltProjectileThink
+import FX_RepeaterProjectileThink
+import FX_BowcasterHitPlayer
+import FX_BowcasterHitWall
+import FX_BowcasterAltProjectileThink
+import FX_BowcasterProjectileThink
+import FX_DisruptorHitPlayer
+import FX_DisruptorHitWall
+import FX_DisruptorAltHit
+import FX_DisruptorAltMiss
+import FX_DisruptorAltShot
+import FX_DisruptorMainShot
+import FX_BryarAltProjectileThink
+import FX_BryarProjectileThink
 import trap_AnyLanguage_ReadCharFromString_1_02
 import trap_AnyLanguage_ReadCharFromString_1_04
 import trap_G2API_SetBoneAnim
@@ -515,20 +505,7 @@ import CG_InitLocalEntities
 import CG_ImpactMark
 import CG_AddMarks
 import CG_InitMarkPolys
-import CG_OutOfAmmoChange
-import CG_DrawIconBackground
-import CG_DrawWeaponSelect
-import CG_AddPlayerWeapon
-import CG_AddViewWeapon
-import CG_MissileHitPlayer
-import CG_MissileHitWall
-import CG_FireWeapon
-import CG_RegisterItemVisuals
 import CG_RegisterWeapon
-import CG_Weapon_f
-import CG_PrevWeapon_f
-import CG_NextWeapon_f
-import CG_GetClientWeaponMuzzleBoltPoint
 import TurretClientRun
 import ScaleModelAxis
 import CG_PositionRotatedEntityOnTag
@@ -1027,6 +1004,15 @@ import BG_Cmd_ArgsFrom
 import BG_Cmd_Args
 import BG_Cmd_Argv
 import BG_Cmd_Argc
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
+import MV_SetGamePlay
+import MV_BuildAnimationMappingTable
+import animMappingTable_1_02_to_1_04
+import animMappingTable_1_04_to_1_02
+import jk2startversion
+import jk2gameplay
+import jk2version
 import BG_DB_VerifyPassword
 import g_arenaInfosHashed
 import g_numArenas
@@ -1149,8 +1135,6 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import animMappingTable_1_02_to_1_04
-import animMappingTable_1_04_to_1_02
 import clampedIntAdd
 import clampedIntMult
 import parseHex
@@ -1343,3 +1327,570 @@ import strlen
 import rand
 import srand
 import qsort
+lit
+align 1
+LABELV $1473
+byte 1 115
+byte 1 111
+byte 1 117
+byte 1 110
+byte 1 100
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 47
+byte 1 115
+byte 1 97
+byte 1 98
+byte 1 101
+byte 1 114
+byte 1 47
+byte 1 115
+byte 1 97
+byte 1 98
+byte 1 101
+byte 1 114
+byte 1 111
+byte 1 110
+byte 1 46
+byte 1 119
+byte 1 97
+byte 1 118
+byte 1 0
+align 1
+LABELV $1470
+byte 1 115
+byte 1 111
+byte 1 117
+byte 1 110
+byte 1 100
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 47
+byte 1 115
+byte 1 97
+byte 1 98
+byte 1 101
+byte 1 114
+byte 1 47
+byte 1 115
+byte 1 97
+byte 1 98
+byte 1 101
+byte 1 114
+byte 1 111
+byte 1 102
+byte 1 102
+byte 1 113
+byte 1 117
+byte 1 105
+byte 1 99
+byte 1 107
+byte 1 46
+byte 1 119
+byte 1 97
+byte 1 118
+byte 1 0
+align 1
+LABELV $1403
+byte 1 42
+byte 1 102
+byte 1 108
+byte 1 97
+byte 1 115
+byte 1 104
+byte 1 0
+align 1
+LABELV $1109
+byte 1 100
+byte 1 101
+byte 1 109
+byte 1 112
+byte 1 50
+byte 1 47
+byte 1 97
+byte 1 108
+byte 1 116
+byte 1 68
+byte 1 101
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 97
+byte 1 116
+byte 1 101
+byte 1 46
+byte 1 101
+byte 1 102
+byte 1 120
+byte 1 0
+align 1
+LABELV $1034
+byte 1 67
+byte 1 71
+byte 1 95
+byte 1 70
+byte 1 105
+byte 1 114
+byte 1 101
+byte 1 87
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 58
+byte 1 32
+byte 1 101
+byte 1 110
+byte 1 116
+byte 1 45
+byte 1 62
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 32
+byte 1 62
+byte 1 61
+byte 1 32
+byte 1 87
+byte 1 80
+byte 1 95
+byte 1 78
+byte 1 85
+byte 1 77
+byte 1 95
+byte 1 87
+byte 1 69
+byte 1 65
+byte 1 80
+byte 1 79
+byte 1 78
+byte 1 83
+byte 1 0
+align 1
+LABELV $1015
+byte 1 115
+byte 1 111
+byte 1 117
+byte 1 110
+byte 1 100
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 47
+byte 1 97
+byte 1 116
+byte 1 115
+byte 1 116
+byte 1 47
+byte 1 65
+byte 1 84
+byte 1 83
+byte 1 84
+byte 1 102
+byte 1 105
+byte 1 114
+byte 1 101
+byte 1 49
+byte 1 46
+byte 1 119
+byte 1 97
+byte 1 118
+byte 1 0
+align 1
+LABELV $958
+byte 1 115
+byte 1 118
+byte 1 95
+byte 1 115
+byte 1 97
+byte 1 98
+byte 1 101
+byte 1 114
+byte 1 115
+byte 1 119
+byte 1 105
+byte 1 116
+byte 1 99
+byte 1 104
+byte 1 10
+byte 1 0
+align 1
+LABELV $872
+byte 1 73
+byte 1 78
+byte 1 71
+byte 1 65
+byte 1 77
+byte 1 69
+byte 1 95
+byte 1 37
+byte 1 115
+byte 1 0
+align 1
+LABELV $648
+byte 1 114
+byte 1 105
+byte 1 103
+byte 1 104
+byte 1 116
+byte 1 104
+byte 1 117
+byte 1 100
+byte 1 0
+align 1
+LABELV $645
+byte 1 108
+byte 1 101
+byte 1 102
+byte 1 116
+byte 1 104
+byte 1 117
+byte 1 100
+byte 1 0
+align 1
+LABELV $642
+byte 1 102
+byte 1 111
+byte 1 114
+byte 1 99
+byte 1 101
+byte 1 115
+byte 1 101
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 104
+byte 1 117
+byte 1 100
+byte 1 0
+align 1
+LABELV $633
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 101
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 104
+byte 1 117
+byte 1 100
+byte 1 0
+align 1
+LABELV $626
+byte 1 105
+byte 1 110
+byte 1 118
+byte 1 101
+byte 1 110
+byte 1 116
+byte 1 111
+byte 1 114
+byte 1 121
+byte 1 115
+byte 1 101
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 104
+byte 1 117
+byte 1 100
+byte 1 0
+align 1
+LABELV $330
+byte 1 116
+byte 1 97
+byte 1 103
+byte 1 95
+byte 1 102
+byte 1 108
+byte 1 97
+byte 1 115
+byte 1 104
+byte 1 0
+align 1
+LABELV $319
+byte 1 116
+byte 1 97
+byte 1 103
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 51
+byte 1 0
+align 1
+LABELV $318
+byte 1 116
+byte 1 97
+byte 1 103
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 50
+byte 1 0
+align 1
+LABELV $315
+byte 1 116
+byte 1 97
+byte 1 103
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 0
+align 1
+LABELV $309
+byte 1 109
+byte 1 111
+byte 1 100
+byte 1 101
+byte 1 108
+byte 1 115
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 50
+byte 1 47
+byte 1 115
+byte 1 116
+byte 1 117
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 47
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 51
+byte 1 46
+byte 1 109
+byte 1 100
+byte 1 51
+byte 1 0
+align 1
+LABELV $307
+byte 1 109
+byte 1 111
+byte 1 100
+byte 1 101
+byte 1 108
+byte 1 115
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 50
+byte 1 47
+byte 1 115
+byte 1 116
+byte 1 117
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 47
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 50
+byte 1 46
+byte 1 109
+byte 1 100
+byte 1 51
+byte 1 0
+align 1
+LABELV $303
+byte 1 109
+byte 1 111
+byte 1 100
+byte 1 101
+byte 1 108
+byte 1 115
+byte 1 47
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 115
+byte 1 50
+byte 1 47
+byte 1 115
+byte 1 116
+byte 1 117
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 47
+byte 1 98
+byte 1 97
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 95
+byte 1 98
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 101
+byte 1 108
+byte 1 46
+byte 1 109
+byte 1 100
+byte 1 51
+byte 1 0
+align 1
+LABELV $288
+byte 1 116
+byte 1 97
+byte 1 103
+byte 1 95
+byte 1 119
+byte 1 101
+byte 1 97
+byte 1 112
+byte 1 111
+byte 1 110
+byte 1 0
+align 1
+LABELV $186
+byte 1 46
+byte 1 103
+byte 1 108
+byte 1 109
+byte 1 0
+align 1
+LABELV $173
+byte 1 67
+byte 1 71
+byte 1 95
+byte 1 82
+byte 1 101
+byte 1 103
+byte 1 105
+byte 1 115
+byte 1 116
+byte 1 101
+byte 1 114
+byte 1 73
+byte 1 116
+byte 1 101
+byte 1 109
+byte 1 86
+byte 1 105
+byte 1 115
+byte 1 117
+byte 1 97
+byte 1 108
+byte 1 115
+byte 1 58
+byte 1 32
+byte 1 105
+byte 1 116
+byte 1 101
+byte 1 109
+byte 1 78
+byte 1 117
+byte 1 109
+byte 1 32
+byte 1 37
+byte 1 100
+byte 1 32
+byte 1 111
+byte 1 117
+byte 1 116
+byte 1 32
+byte 1 111
+byte 1 102
+byte 1 32
+byte 1 114
+byte 1 97
+byte 1 110
+byte 1 103
+byte 1 101
+byte 1 32
+byte 1 91
+byte 1 48
+byte 1 45
+byte 1 37
+byte 1 100
+byte 1 93
+byte 1 0

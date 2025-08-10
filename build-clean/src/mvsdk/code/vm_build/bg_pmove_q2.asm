@@ -137,7 +137,7 @@ INDIRP4
 ARGP4
 ADDRGP4 pm
 INDIRP4
-CNSTI4 540
+CNSTI4 544
 ADDP4
 ARGP4
 ADDRGP4 pmlq2+12
@@ -194,7 +194,7 @@ line 86
 ;86:	VectorCopy(pmlq2.velocity, pm->lastAntiLoopVelocity);
 ADDRGP4 pm
 INDIRP4
-CNSTI4 540
+CNSTI4 544
 ADDP4
 ADDRGP4 pmlq2+12
 INDIRB
@@ -8666,6 +8666,8 @@ align 4
 LABELV pmq2
 skip 4
 import c_pmove
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
 import MV_SetGamePlay
 import MV_BuildAnimationMappingTable
 import animMappingTable_1_02_to_1_04

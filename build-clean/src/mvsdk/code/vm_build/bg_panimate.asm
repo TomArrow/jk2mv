@@ -4609,3511 +4609,113 @@ byte 4 0
 byte 4 -1
 export BG_InSpecialJump
 code
-proc BG_InSpecialJump 20 4
-file "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c"
-line 22
-;1:// BG_PAnimate.c
-;2:
-;3:#include "q_shared.h"
-;4:#include "bg_public.h"
-;5:#include "bg_local.h"
-;6:#include "anims.h"
-;7:#include "../cgame/animtable.h"
-;8:
-;9:#ifdef JK2_GAME
-;10:#include "g_local.h"
-;11:#elif JK2_CGAME
-;12:#include "../cgame/cg_local.h"
-;13:#endif
-;14:
-;15:/*
-;16:==============================================================================
-;17:BEGIN: Animation utility functions (sequence checking)
-;18:==============================================================================
-;19:*/
-;20://Called regardless of pm validity:
-;21:qboolean BG_InSpecialJump( int anim, int runFlags )
-;22:{
-line 23
-;23:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 905
-LTI4 $2421
-ADDRLP4 0
-INDIRI4
-CNSTI4 922
-GTI4 $2428
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2429-3620
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2429
-address $2425
-address $2425
-address $2421
-address $2421
-address $2421
-address $2424
-address $2424
-address $2424
-address $2424
-address $2424
-address $2424
-address $2424
-address $2421
-address $2424
-address $2424
-address $2421
-address $2424
-address $2424
-code
-LABELV $2428
-ADDRLP4 0
-INDIRI4
-CNSTI4 944
-EQI4 $2424
-ADDRGP4 $2421
-JUMPV
-line 24
-;24:	{
-LABELV $2424
-line 37
-;25:	case BOTH_WALL_RUN_RIGHT:
-;26:	case BOTH_WALL_RUN_RIGHT_FLIP:
-;27:	case BOTH_WALL_RUN_LEFT:
-;28:	case BOTH_WALL_RUN_LEFT_FLIP:
-;29:	case BOTH_WALL_FLIP_RIGHT:
-;30:	case BOTH_WALL_FLIP_LEFT:
-;31:	case BOTH_FLIP_BACK1:
-;32:	case BOTH_FLIP_BACK2:
-;33:	case BOTH_FLIP_BACK3:
-;34:	case BOTH_WALL_FLIP_BACK1:
-;35:	case BOTH_BUTTERFLY_LEFT:
-;36:	case BOTH_BUTTERFLY_RIGHT:
-;37:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2420
-JUMPV
-LABELV $2425
-line 40
-;38:	case BOTH_ARIAL_LEFT: // jka cartwheel
-;39:	case BOTH_ARIAL_RIGHT: // jka cartwheel
-;40:		if (runFlags & RFL_CLIMBTECH) {
-ADDRFP4 4
-INDIRI4
-CNSTI4 256
-BANDI4
-CNSTI4 0
-EQI4 $2426
-line 41
-;41:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2420
-JUMPV
-LABELV $2426
-line 43
-;42:		}
-;43:	}
-LABELV $2421
-line 44
-;44:	if ((runFlags & RFL_CLIMBTECH))
-ADDRFP4 4
-INDIRI4
-CNSTI4 256
-BANDI4
-CNSTI4 0
-EQI4 $2431
-line 45
-;45:	{
-line 46
-;46:		if ( BG_InReboundJump( anim ) )
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 8
-ADDRGP4 BG_InReboundJump
-CALLI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 0
-EQI4 $2433
-line 47
-;47:		{
-line 48
-;48:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2420
-JUMPV
-LABELV $2433
-line 50
-;49:		}
-;50:		if ( BG_InReboundHold( anim ) )
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 12
-ADDRGP4 BG_InReboundHold
-CALLI4
-ASGNI4
-ADDRLP4 12
-INDIRI4
-CNSTI4 0
-EQI4 $2435
-line 51
-;51:		{
-line 52
-;52:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2420
-JUMPV
-LABELV $2435
-line 54
-;53:		}
-;54:		if ( BG_InReboundRelease( anim ) )
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 16
-ADDRGP4 BG_InReboundRelease
-CALLI4
-ASGNI4
-ADDRLP4 16
-INDIRI4
-CNSTI4 0
-EQI4 $2437
-line 55
-;55:		{
-line 56
-;56:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2420
-JUMPV
-LABELV $2437
-line 58
-;57:		}
-;58:	}
-LABELV $2431
-line 59
-;59:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2420
-endproc BG_InSpecialJump 20 4
+proc BG_InSpecialJump 0 0
+endproc BG_InSpecialJump 0 0
 export BG_InSaberStandAnim
-proc BG_InSaberStandAnim 12 0
-line 63
-;60:}
-;61:
-;62:qboolean BG_InSaberStandAnim( int anim )
-;63:{
-line 64
-;64:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 8
-CNSTI4 562
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-EQI4 $2443
-ADDRLP4 0
-INDIRI4
-CNSTI4 563
-EQI4 $2443
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-LTI4 $2440
-LABELV $2444
-ADDRLP4 0
-INDIRI4
-CNSTI4 573
-EQI4 $2443
-ADDRGP4 $2440
-JUMPV
-line 65
-;65:	{
-LABELV $2443
-line 69
-;66:	case BOTH_SABERFAST_STANCE:
-;67:	case BOTH_STAND2:
-;68:	case BOTH_SABERSLOW_STANCE:
-;69:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2439
-JUMPV
-LABELV $2440
-line 71
-;70:	default:
-;71:		return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2439
-endproc BG_InSaberStandAnim 12 0
+proc BG_InSaberStandAnim 0 0
+endproc BG_InSaberStandAnim 0 0
 export BG_InReboundJump
-proc BG_InReboundJump 8 0
-line 77
-;72:	}
-;73:}
-;74:
-;75:// JKA wallgrab
-;76:qboolean BG_InReboundJump(int anim)
-;77:{
-line 78
-;78:	switch (anim & ~ANIM_TOGGLEBIT) // TA: just fix this? (anim_togglebit)
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 618
-LTI4 $2446
-ADDRLP4 0
-INDIRI4
-CNSTI4 624
-GTI4 $2446
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2450-2472
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2450
-address $2449
-address $2449
-address $2449
-address $2446
-address $2446
-address $2446
-address $2449
-code
-line 79
-;79:	{
-LABELV $2449
-line 84
-;80:	case BOTH_FORCEWALLREBOUND_FORWARD:
-;81:	case BOTH_FORCEWALLREBOUND_LEFT:
-;82:	case BOTH_FORCEWALLREBOUND_BACK:
-;83:	case BOTH_FORCEWALLREBOUND_RIGHT:
-;84:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2445
-JUMPV
-line 85
-;85:		break;
-LABELV $2446
-line 87
-;86:	}
-;87:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2445
-endproc BG_InReboundJump 8 0
+proc BG_InReboundJump 0 0
+endproc BG_InReboundJump 0 0
 export BG_InReboundHold
-proc BG_InReboundHold 16 0
-line 91
-;88:}
-;89:// JKA wallgrab
-;90:qboolean BG_InReboundHold(int anim)
-;91:{
-line 92
-;92:	switch (anim & ~ANIM_TOGGLEBIT) // TA: just fix this? (anim_togglebit)
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 8
-CNSTI4 626
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-EQI4 $2456
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-LTI4 $2453
-LABELV $2457
-ADDRLP4 0
-INDIRI4
-CNSTI4 674
-EQI4 $2456
-ADDRLP4 0
-INDIRI4
-CNSTI4 675
-EQI4 $2456
-ADDRLP4 0
-INDIRI4
-CNSTI4 676
-EQI4 $2456
-ADDRGP4 $2453
-JUMPV
-line 93
-;93:	{
-LABELV $2456
-line 98
-;94:	case BOTH_FORCEWALLHOLD_FORWARD:
-;95:	case BOTH_FORCEWALLHOLD_LEFT:
-;96:	case BOTH_FORCEWALLHOLD_BACK:
-;97:	case BOTH_FORCEWALLHOLD_RIGHT:
-;98:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2452
-JUMPV
-line 99
-;99:		break;
-LABELV $2453
-line 101
-;100:	}
-;101:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2452
-endproc BG_InReboundHold 16 0
+proc BG_InReboundHold 0 0
+endproc BG_InReboundHold 0 0
 export BG_InReboundRelease
-proc BG_InReboundRelease 8 0
-line 105
-;102:}
-;103:// JKA wallgrab
-;104:qboolean BG_InReboundRelease(int anim)
-;105:{
-line 106
-;106:	switch (anim & ~ANIM_TOGGLEBIT) // TA: just fix this? (anim_togglebit)
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 677
-LTI4 $2459
-ADDRLP4 0
-INDIRI4
-CNSTI4 680
-GTI4 $2459
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2463-2708
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2463
-address $2462
-address $2462
-address $2462
-address $2462
-code
-line 107
-;107:	{
-LABELV $2462
-line 112
-;108:	case BOTH_FORCEWALLRELEASE_FORWARD:
-;109:	case BOTH_FORCEWALLRELEASE_LEFT:
-;110:	case BOTH_FORCEWALLRELEASE_BACK:
-;111:	case BOTH_FORCEWALLRELEASE_RIGHT:
-;112:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2458
-JUMPV
-line 113
-;113:		break;
-LABELV $2459
-line 115
-;114:	}
-;115:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2458
-endproc BG_InReboundRelease 8 0
+proc BG_InReboundRelease 0 0
+endproc BG_InReboundRelease 0 0
 export BG_InBackFlip
-proc BG_InBackFlip 4 0
-line 119
-;116:}
-;117:
-;118:qboolean BG_InBackFlip(int anim)
-;119:{
-line 120
-;120:	switch (anim)
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 910
-EQI4 $2468
-ADDRLP4 0
-INDIRI4
-CNSTI4 911
-EQI4 $2468
-ADDRLP4 0
-INDIRI4
-CNSTI4 912
-EQI4 $2468
-ADDRGP4 $2466
-JUMPV
-line 121
-;121:	{
-LABELV $2468
-line 125
-;122:	case BOTH_FLIP_BACK1:
-;123:	case BOTH_FLIP_BACK2:
-;124:	case BOTH_FLIP_BACK3:
-;125:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2465
-JUMPV
-line 126
-;126:		break;
-LABELV $2466
-line 128
-;127:	}
-;128:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2465
-endproc BG_InBackFlip 4 0
+proc BG_InBackFlip 0 0
+endproc BG_InBackFlip 0 0
 export BG_DirectFlippingAnim
-proc BG_DirectFlippingAnim 8 0
-line 132
-;129:}
-;130:
-;131:qboolean BG_DirectFlippingAnim( int anim )
-;132:{
-line 133
-;133:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 881
-LTI4 $2470
-ADDRLP4 0
-INDIRI4
-CNSTI4 884
-GTI4 $2470
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2474-3524
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2474
-address $2473
-address $2473
-address $2473
-address $2473
-code
-line 134
-;134:	{
-LABELV $2473
-line 139
-;135:	case BOTH_FLIP_F:			//# Flip forward
-;136:	case BOTH_FLIP_B:			//# Flip backwards
-;137:	case BOTH_FLIP_L:			//# Flip left
-;138:	case BOTH_FLIP_R:			//# Flip right
-;139:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2469
-JUMPV
-line 140
-;140:		break;
-LABELV $2470
-line 143
-;141:	}
-;142:
-;143:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2469
-endproc BG_DirectFlippingAnim 8 0
+proc BG_DirectFlippingAnim 0 0
+endproc BG_DirectFlippingAnim 0 0
 export BG_SaberInAttack
-proc BG_SaberInAttack 12 0
-line 147
-;144:}
-;145:
-;146:qboolean BG_SaberInAttack( int move )
-;147:{
-line 148
-;148:	if ( move >= LS_A_TL2BR && move <= LS_A_T2B )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 4
-LTI4 $2477
-ADDRLP4 0
-INDIRI4
-CNSTI4 10
-GTI4 $2477
-line 149
-;149:	{
-line 150
-;150:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2476
-JUMPV
-LABELV $2477
-line 152
-;151:	}
-;152:	switch ( move )
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 4
-INDIRI4
-CNSTI4 11
-LTI4 $2479
-ADDRLP4 4
-INDIRI4
-CNSTI4 17
-GTI4 $2482
-ADDRLP4 4
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2483-44
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2483
-address $2481
-address $2481
-address $2481
-address $2481
-address $2481
-address $2481
-address $2481
-code
-LABELV $2482
-ADDRLP4 8
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 118
-EQI4 $2481
-ADDRLP4 8
-INDIRI4
-CNSTI4 119
-EQI4 $2481
-ADDRGP4 $2479
-JUMPV
-line 153
-;153:	{
-LABELV $2481
-line 163
-;154:	case LS_A_BACK:
-;155:	case LS_A_BACK_CR:
-;156:	case LS_A_BACKSTAB:
-;157:	case LS_A_LUNGE:
-;158:	case LS_A_JUMP_T__B_:
-;159:	case LS_A_FLIP_STAB:
-;160:	case LS_A_FLIP_SLASH:
-;161:	case LS_JUMPATTACK_ARIAL_LEFT: // jka cartwheel
-;162:	case LS_JUMPATTACK_ARIAL_RIGHT: // jka cartwheel
-;163:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2476
-JUMPV
-line 164
-;164:		break;
-LABELV $2479
-line 166
-;165:	}
-;166:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2476
-endproc BG_SaberInAttack 12 0
+proc BG_SaberInAttack 0 0
+endproc BG_SaberInAttack 0 0
 export BG_SaberInSpecial
-proc BG_SaberInSpecial 8 0
-line 170
-;167:}
-;168:
-;169:qboolean BG_SaberInSpecial( int move )
-;170:{
-line 171
-;171:	switch( move )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 11
-LTI4 $2486
-ADDRLP4 0
-INDIRI4
-CNSTI4 17
-GTI4 $2489
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2490-44
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2490
-address $2488
-address $2488
-address $2488
-address $2488
-address $2488
-address $2488
-address $2488
-code
-LABELV $2489
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 4
-INDIRI4
-CNSTI4 118
-EQI4 $2488
-ADDRLP4 4
-INDIRI4
-CNSTI4 119
-EQI4 $2488
-ADDRGP4 $2486
-JUMPV
-line 172
-;172:	{
-LABELV $2488
-line 182
-;173:	case LS_A_BACK:
-;174:	case LS_A_BACK_CR:
-;175:	case LS_A_BACKSTAB:
-;176:	case LS_A_LUNGE:
-;177:	case LS_A_JUMP_T__B_:
-;178:	case LS_A_FLIP_STAB:
-;179:	case LS_A_FLIP_SLASH:
-;180:	case LS_JUMPATTACK_ARIAL_LEFT: // jka cartwheel
-;181:	case LS_JUMPATTACK_ARIAL_RIGHT: // jka cartwheel
-;182:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2485
-JUMPV
-LABELV $2486
-line 184
-;183:	}
-;184:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2485
-endproc BG_SaberInSpecial 8 0
+proc BG_SaberInSpecial 0 0
+endproc BG_SaberInSpecial 0 0
 export BG_SaberInIdle
-proc BG_SaberInIdle 4 0
-line 188
-;185:}
-;186:
-;187:qboolean BG_SaberInIdle( int move )
-;188:{
-line 189
-;189:	switch ( move )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 0
-LTI4 $2493
-ADDRLP4 0
-INDIRI4
-CNSTI4 3
-GTI4 $2493
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2496
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2496
-address $2495
-address $2495
-address $2495
-address $2495
-code
-line 190
-;190:	{
-LABELV $2495
-line 195
-;191:	case LS_NONE:
-;192:	case LS_READY:
-;193:	case LS_DRAW:
-;194:	case LS_PUTAWAY:
-;195:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2492
-JUMPV
-line 196
-;196:		break;
-LABELV $2493
-line 198
-;197:	}
-;198:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2492
-endproc BG_SaberInIdle 4 0
+proc BG_SaberInIdle 0 0
+endproc BG_SaberInIdle 0 0
 export BG_FlippingAnim
-proc BG_FlippingAnim 24 0
-line 202
-;199:}
-;200:
-;201:qboolean BG_FlippingAnim( int anim )
-;202:{
-line 203
-;203:	switch ( (jk2gameplay == VERSION_1_02 ? anim : anim&~ANIM_TOGGLEBIT) )
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2502
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRGP4 $2503
-JUMPV
-LABELV $2502
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-LABELV $2503
-ADDRLP4 0
-ADDRLP4 4
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 881
-LTI4 $2505
-ADDRLP4 0
-INDIRI4
-CNSTI4 922
-GTI4 $2506
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2507-3524
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2507
-address $2504
-address $2504
-address $2504
-address $2504
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2498
-address $2504
-address $2504
-address $2504
-address $2504
-address $2498
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-address $2504
-code
-LABELV $2505
-ADDRLP4 0
-INDIRI4
-CNSTI4 566
-EQI4 $2504
-ADDRLP4 0
-INDIRI4
-CNSTI4 567
-EQI4 $2504
-ADDRGP4 $2498
-JUMPV
-LABELV $2506
-ADDRLP4 20
-CNSTI4 944
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-EQI4 $2504
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-LTI4 $2498
-LABELV $2509
-ADDRLP4 0
-INDIRI4
-CNSTI4 955
-EQI4 $2504
-ADDRGP4 $2498
-JUMPV
-line 204
-;204:	{
-LABELV $2504
-line 232
-;205:	case BOTH_FLIP_F:			//# Flip forward
-;206:	case BOTH_FLIP_B:			//# Flip backwards
-;207:	case BOTH_FLIP_L:			//# Flip left
-;208:	case BOTH_FLIP_R:			//# Flip right
-;209:	case BOTH_WALL_RUN_RIGHT_FLIP:
-;210:	case BOTH_WALL_RUN_LEFT_FLIP:
-;211:	case BOTH_WALL_FLIP_RIGHT:
-;212:	case BOTH_WALL_FLIP_LEFT:
-;213:	case BOTH_FLIP_BACK1:
-;214:	case BOTH_FLIP_BACK2:
-;215:	case BOTH_FLIP_BACK3:
-;216:	case BOTH_WALL_FLIP_BACK1:
-;217:	//Not really flips, but...
-;218:	case BOTH_WALL_RUN_RIGHT:
-;219:	case BOTH_WALL_RUN_LEFT:
-;220:	case BOTH_WALL_RUN_RIGHT_STOP:
-;221:	case BOTH_WALL_RUN_LEFT_STOP:
-;222:	case BOTH_BUTTERFLY_LEFT:
-;223:	case BOTH_BUTTERFLY_RIGHT:
-;224:	//
-;225:	case BOTH_ARIAL_LEFT:
-;226:	case BOTH_ARIAL_RIGHT:
-;227:	case BOTH_ARIAL_F1:
-;228:	case BOTH_CARTWHEEL_LEFT:
-;229:	case BOTH_CARTWHEEL_RIGHT:
-;230:	case BOTH_JUMPFLIPSLASHDOWN1:
-;231:	case BOTH_JUMPFLIPSTABDOWN:
-;232:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2497
-JUMPV
-line 233
-;233:		break;
-LABELV $2498
-line 235
-;234:	}
-;235:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2497
-endproc BG_FlippingAnim 24 0
+proc BG_FlippingAnim 0 0
+endproc BG_FlippingAnim 0 0
 export BG_SpinningSaberAnim
-proc BG_SpinningSaberAnim 80 0
-line 239
-;236:}
-;237:
-;238:qboolean BG_SpinningSaberAnim( int anim )
-;239:{
-line 240
-;240:	switch ( (jk2gameplay == VERSION_1_02 ? anim : anim&~ANIM_TOGGLEBIT) )
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2515
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRGP4 $2516
-JUMPV
-LABELV $2515
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-LABELV $2516
-ADDRLP4 0
-ADDRLP4 4
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 378
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 379
-EQI4 $2517
-ADDRLP4 12
-CNSTI4 383
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 12
-INDIRI4
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-ADDRLP4 12
-INDIRI4
-GTI4 $2519
-LABELV $2518
-ADDRLP4 0
-INDIRI4
-CNSTI4 224
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 225
-EQI4 $2517
-ADDRLP4 20
-CNSTI4 229
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-GTI4 $2521
-LABELV $2520
-ADDRLP4 0
-INDIRI4
-CNSTI4 146
-LTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 156
-GTI4 $2522
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2523-584
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2523
-address $2517
-address $2517
-address $2517
-address $2511
-address $2511
-address $2517
-address $2517
-address $2511
-address $2511
-address $2511
-address $2517
-code
-LABELV $2522
-ADDRLP4 0
-INDIRI4
-CNSTI4 163
-LTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 170
-GTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2525-652
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2525
-address $2517
-address $2511
-address $2517
-address $2517
-address $2511
-address $2517
-address $2517
-address $2517
-code
-LABELV $2521
-ADDRLP4 0
-INDIRI4
-CNSTI4 301
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 302
-EQI4 $2517
-ADDRLP4 36
-CNSTI4 306
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 36
-INDIRI4
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-ADDRLP4 36
-INDIRI4
-GTI4 $2528
-LABELV $2527
-ADDRLP4 0
-INDIRI4
-CNSTI4 242
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 245
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 246
-EQI4 $2517
-ADDRGP4 $2511
-JUMPV
-LABELV $2528
-ADDRLP4 0
-INDIRI4
-CNSTI4 319
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 322
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 323
-EQI4 $2517
-ADDRGP4 $2511
-JUMPV
-LABELV $2519
-ADDRLP4 0
-INDIRI4
-CNSTI4 471
-LTI4 $2529
-ADDRLP4 0
-INDIRI4
-CNSTI4 478
-GTI4 $2530
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2531-1884
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2531
-address $2517
-address $2511
-address $2517
-address $2517
-address $2511
-address $2517
-address $2517
-address $2517
-code
-LABELV $2529
-ADDRLP4 56
-CNSTI4 396
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 56
-INDIRI4
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 399
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 400
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-ADDRLP4 56
-INDIRI4
-LTI4 $2511
-LABELV $2533
-ADDRLP4 0
-INDIRI4
-CNSTI4 454
-LTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 464
-GTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2534-1816
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2534
-address $2517
-address $2517
-address $2517
-address $2511
-address $2511
-address $2517
-address $2517
-address $2511
-address $2511
-address $2511
-address $2517
-code
-LABELV $2530
-ADDRLP4 0
-INDIRI4
-CNSTI4 913
-EQI4 $2517
-ADDRLP4 68
-CNSTI4 914
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 68
-INDIRI4
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-ADDRLP4 68
-INDIRI4
-GTI4 $2537
-LABELV $2536
-ADDRLP4 0
-INDIRI4
-CNSTI4 565
-LTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 570
-GTI4 $2511
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2538-2260
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2538
-address $2517
-address $2517
-address $2517
-address $2511
-address $2511
-address $2517
-code
-LABELV $2537
-ADDRLP4 0
-INDIRI4
-CNSTI4 949
-EQI4 $2517
-ADDRLP4 0
-INDIRI4
-CNSTI4 950
-EQI4 $2517
-ADDRGP4 $2511
-JUMPV
-line 241
-;241:	{
-LABELV $2517
-line 299
-;242:	//level 1 - FIXME: level 1 will have *no* spins
-;243:	case BOTH_T1_BR_BL:
-;244:	case BOTH_T1__R__L:
-;245:	case BOTH_T1__R_BL:
-;246:	case BOTH_T1_TR_BL:
-;247:	case BOTH_T1_BR_TL:
-;248:	case BOTH_T1_BR__L:
-;249:	case BOTH_T1_TL_BR:
-;250:	case BOTH_T1__L_BR:
-;251:	case BOTH_T1__L__R:
-;252:	case BOTH_T1_BL_BR:
-;253:	case BOTH_T1_BL__R:
-;254:	case BOTH_T1_BL_TR:
-;255:	//level 2
-;256:	case BOTH_T2_BR__L:
-;257:	case BOTH_T2_BR_BL:
-;258:	case BOTH_T2__R_BL:
-;259:	case BOTH_T2__L_BR:
-;260:	case BOTH_T2_BL_BR:
-;261:	case BOTH_T2_BL__R:
-;262:	//level 3
-;263:	case BOTH_T3_BR__L:
-;264:	case BOTH_T3_BR_BL:
-;265:	case BOTH_T3__R_BL:
-;266:	case BOTH_T3__L_BR:
-;267:	case BOTH_T3_BL_BR:
-;268:	case BOTH_T3_BL__R:
-;269:	//level 4
-;270:	case BOTH_T4_BR__L:
-;271:	case BOTH_T4_BR_BL:
-;272:	case BOTH_T4__R_BL:
-;273:	case BOTH_T4__L_BR:
-;274:	case BOTH_T4_BL_BR:
-;275:	case BOTH_T4_BL__R:
-;276:	//level 5
-;277:	case BOTH_T5_BR_BL:
-;278:	case BOTH_T5__R__L:
-;279:	case BOTH_T5__R_BL:
-;280:	case BOTH_T5_TR_BL:
-;281:	case BOTH_T5_BR_TL:
-;282:	case BOTH_T5_BR__L:
-;283:	case BOTH_T5_TL_BR:
-;284:	case BOTH_T5__L_BR:
-;285:	case BOTH_T5__L__R:
-;286:	case BOTH_T5_BL_BR:
-;287:	case BOTH_T5_BL__R:
-;288:	case BOTH_T5_BL_TR:
-;289:	//special
-;290:	//case BOTH_A2_STABBACK1:
-;291:	case BOTH_ATTACK_BACK:
-;292:	case BOTH_CROUCHATTACKBACK1:
-;293:	case BOTH_BUTTERFLY_LEFT:
-;294:	case BOTH_BUTTERFLY_RIGHT:
-;295:	case BOTH_FJSS_TR_BL:
-;296:	case BOTH_FJSS_TL_BR:
-;297:	case BOTH_JUMPFLIPSLASHDOWN1:
-;298:	case BOTH_JUMPFLIPSTABDOWN:
-;299:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2510
-JUMPV
-line 300
-;300:		break;
-LABELV $2511
-line 302
-;301:	}
-;302:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2510
-endproc BG_SpinningSaberAnim 80 0
+proc BG_SpinningSaberAnim 0 0
+endproc BG_SpinningSaberAnim 0 0
 export BG_SaberInSpecialAttack
-proc BG_SaberInSpecialAttack 20 0
-line 306
-;303:}
-;304:
-;305:qboolean BG_SaberInSpecialAttack( int anim )
-;306:{
-line 307
-;307:	switch ( anim&~ANIM_TOGGLEBIT )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 913
-EQI4 $2544
-ADDRLP4 8
-CNSTI4 914
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-EQI4 $2544
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-GTI4 $2546
-LABELV $2545
-ADDRLP4 0
-INDIRI4
-CNSTI4 564
-LTI4 $2541
-ADDRLP4 0
-INDIRI4
-CNSTI4 570
-GTI4 $2541
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2547-2256
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2547
-address $2544
-address $2544
-address $2544
-address $2544
-address $2544
-address $2544
-address $2544
-code
-LABELV $2546
-ADDRLP4 0
-INDIRI4
-CNSTI4 949
-EQI4 $2544
-ADDRLP4 0
-INDIRI4
-CNSTI4 950
-EQI4 $2544
-ADDRGP4 $2541
-JUMPV
-line 308
-;308:	{
-LABELV $2544
-line 320
-;309:	case BOTH_A2_STABBACK1:
-;310:	case BOTH_ATTACK_BACK:
-;311:	case BOTH_CROUCHATTACKBACK1:
-;312:	case BOTH_BUTTERFLY_LEFT:
-;313:	case BOTH_BUTTERFLY_RIGHT:
-;314:	case BOTH_FJSS_TR_BL:
-;315:	case BOTH_FJSS_TL_BR:
-;316:	case BOTH_LUNGE2_B__T_:
-;317:	case BOTH_FORCELEAP2_T__B_:
-;318:	case BOTH_JUMPFLIPSLASHDOWN1://#
-;319:	case BOTH_JUMPFLIPSTABDOWN://#
-;320:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2540
-JUMPV
-LABELV $2541
-line 322
-;321:	}
-;322:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2540
-endproc BG_SaberInSpecialAttack 20 0
+proc BG_SaberInSpecialAttack 0 0
+endproc BG_SaberInSpecialAttack 0 0
 export BG_BrokenParryForAttack
-proc BG_BrokenParryForAttack 8 0
-line 326
-;323:}
-;324:
-;325:int BG_BrokenParryForAttack( int move )
-;326:{
-line 330
-;327:	//Our attack was knocked away by a knockaway parry
-;328:	//FIXME: need actual anims for this
-;329:	//FIXME: need to know which side of the saber was hit!  For now, we presume the saber gets knocked away from the center
-;330:	switch ( saberMoveData[move].startQuad )
-ADDRLP4 0
-CNSTI4 40
-ADDRFP4 0
-INDIRI4
-MULI4
-ADDRGP4 saberMoveData+8
-ADDP4
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 0
-LTI4 $2550
-ADDRLP4 0
-INDIRI4
-CNSTI4 7
-GTI4 $2550
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2562
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2562
-address $2555
-address $2556
-address $2557
-address $2558
-address $2559
-address $2560
-address $2561
-address $2554
-code
-line 331
-;331:	{
-LABELV $2554
-line 333
-;332:	case Q_B:
-;333:		return LS_V1_B_;
-CNSTI4 96
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 334
-;334:		break;
-LABELV $2555
-line 336
-;335:	case Q_BR:
-;336:		return LS_V1_BR;
-CNSTI4 89
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 337
-;337:		break;
-LABELV $2556
-line 339
-;338:	case Q_R:
-;339:		return LS_V1__R;
-CNSTI4 90
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 340
-;340:		break;
-LABELV $2557
-line 342
-;341:	case Q_TR:
-;342:		return LS_V1_TR;
-CNSTI4 91
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 343
-;343:		break;
-LABELV $2558
-line 345
-;344:	case Q_T:
-;345:		return LS_V1_T_;
-CNSTI4 92
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 346
-;346:		break;
-LABELV $2559
-line 348
-;347:	case Q_TL:
-;348:		return LS_V1_TL;
-CNSTI4 93
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 349
-;349:		break;
-LABELV $2560
-line 351
-;350:	case Q_L:
-;351:		return LS_V1__L;
-CNSTI4 94
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 352
-;352:		break;
-LABELV $2561
-line 354
-;353:	case Q_BL:
-;354:		return LS_V1_BL;
-CNSTI4 95
-RETI4
-ADDRGP4 $2549
-JUMPV
-line 355
-;355:		break;
-LABELV $2550
-line 357
-;356:	}
-;357:	return LS_NONE;
-CNSTI4 0
-RETI4
-LABELV $2549
-endproc BG_BrokenParryForAttack 8 0
+proc BG_BrokenParryForAttack 0 0
+endproc BG_BrokenParryForAttack 0 0
 export BG_BrokenParryForParry
-proc BG_BrokenParryForParry 20 16
-line 361
-;358:}
-;359:
-;360:int BG_BrokenParryForParry( int move, qboolean raceMode )
-;361:{
-line 364
-;362:	//FIXME: need actual anims for this
-;363:	//FIXME: need to know which side of the saber was hit!  For now, we presume the saber gets knocked away from the center
-;364:	switch ( move )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 4
-CNSTI4 1
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 4
-INDIRI4
-EQI4 $2574
-ADDRLP4 0
-INDIRI4
-ADDRLP4 4
-INDIRI4
-LTI4 $2564
-LABELV $2575
-ADDRLP4 8
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 108
-LTI4 $2564
-ADDRLP4 8
-INDIRI4
-CNSTI4 112
-GTI4 $2564
-ADDRLP4 8
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2576-432
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2576
-address $2566
-address $2570
-address $2571
-address $2572
-address $2573
-code
-line 365
-;365:	{
-LABELV $2566
-line 368
-;366:	case LS_PARRY_UP:
-;367:		//Hmm... since we don't know what dir the hit came from, randomly pick knock down or knock back
-;368:		if ( Q_irand( 0, 1 + pml.randomAdd, raceMode, 0 ) )
-ADDRLP4 12
-CNSTI4 0
-ASGNI4
-ADDRLP4 12
-INDIRI4
-ARGI4
-ADDRGP4 pml+1168
-INDIRI4
-CNSTI4 1
-ADDI4
-ARGI4
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRLP4 12
-INDIRI4
-ARGI4
-ADDRLP4 16
-ADDRGP4 Q_irand
-CALLI4
-ASGNI4
-ADDRLP4 16
-INDIRI4
-CNSTI4 0
-EQI4 $2567
-line 369
-;369:		{
-line 370
-;370:			return LS_H1_B_;
-CNSTI4 101
-RETI4
-ADDRGP4 $2563
-JUMPV
-LABELV $2567
-line 373
-;371:		}
-;372:		else
-;373:		{
-line 374
-;374:			return LS_H1_T_;
-CNSTI4 97
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 376
-;375:		}
-;376:		break;
-LABELV $2570
-line 378
-;377:	case LS_PARRY_UR:
-;378:		return LS_H1_TR;
-CNSTI4 98
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 379
-;379:		break;
-LABELV $2571
-line 381
-;380:	case LS_PARRY_UL:
-;381:		return LS_H1_TL;
-CNSTI4 99
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 382
-;382:		break;
-LABELV $2572
-line 384
-;383:	case LS_PARRY_LR:
-;384:		return LS_H1_BR;
-CNSTI4 100
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 385
-;385:		break;
-LABELV $2573
-line 387
-;386:	case LS_PARRY_LL:
-;387:		return LS_H1_BL;
-CNSTI4 102
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 388
-;388:		break;
-LABELV $2574
-line 390
-;389:	case LS_READY:
-;390:		return LS_H1_B_;//???
-CNSTI4 101
-RETI4
-ADDRGP4 $2563
-JUMPV
-line 391
-;391:		break;
-LABELV $2564
-line 393
-;392:	}
-;393:	return LS_NONE;
-CNSTI4 0
-RETI4
-LABELV $2563
-endproc BG_BrokenParryForParry 20 16
+proc BG_BrokenParryForParry 0 0
+endproc BG_BrokenParryForParry 0 0
 export BG_KnockawayForParry
-proc BG_KnockawayForParry 4 0
-line 397
-;394:}
-;395:
-;396:int BG_KnockawayForParry( int move )
-;397:{
-line 400
-;398:	//FIXME: need actual anims for this
-;399:	//FIXME: need to know which side of the saber was hit!  For now, we presume the saber gets knocked away from the center
-;400:	switch ( move )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 4
-LTI4 $2579
-ADDRLP4 0
-INDIRI4
-CNSTI4 8
-GTI4 $2579
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2586-16
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2586
-address $2582
-address $2583
-address $2584
-address $2585
-address $2581
-code
-line 401
-;401:	{
-LABELV $2581
-line 403
-;402:	case BLOCKED_TOP://LS_PARRY_UP:
-;403:		return LS_K1_T_;//push up
-CNSTI4 103
-RETI4
-ADDRGP4 $2578
-JUMPV
-line 404
-;404:		break;
-LABELV $2582
-LABELV $2579
-line 407
-;405:	case BLOCKED_UPPER_RIGHT://LS_PARRY_UR:
-;406:	default://case LS_READY:
-;407:		return LS_K1_TR;//push up, slightly to right
-CNSTI4 104
-RETI4
-ADDRGP4 $2578
-JUMPV
-line 408
-;408:		break;
-LABELV $2583
-line 410
-;409:	case BLOCKED_UPPER_LEFT://LS_PARRY_UL:
-;410:		return LS_K1_TL;//push up and to left
-CNSTI4 105
-RETI4
-ADDRGP4 $2578
-JUMPV
-line 411
-;411:		break;
-LABELV $2584
-line 413
-;412:	case BLOCKED_LOWER_RIGHT://LS_PARRY_LR:
-;413:		return LS_K1_BR;//push down and to left
-CNSTI4 106
-RETI4
-ADDRGP4 $2578
-JUMPV
-line 414
-;414:		break;
-LABELV $2585
-line 416
-;415:	case BLOCKED_LOWER_LEFT://LS_PARRY_LL:
-;416:		return LS_K1_BL;//push down and to right
-CNSTI4 107
-RETI4
-line 417
-;417:		break;
-LABELV $2578
-endproc BG_KnockawayForParry 4 0
+proc BG_KnockawayForParry 0 0
+endproc BG_KnockawayForParry 0 0
 export BG_InRoll
-proc BG_InRoll 8 0
-line 423
-;418:	}
-;419:	//return LS_NONE;
-;420:}
-;421:
-;422:qboolean BG_InRoll( playerState_t *ps, int anim )
-;423:{
-line 424
-;424:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 885
-LTI4 $2589
-ADDRLP4 0
-INDIRI4
-CNSTI4 888
-GTI4 $2589
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2595-3540
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2595
-address $2592
-address $2592
-address $2592
-address $2592
-code
-line 425
-;425:	{
-LABELV $2592
-line 430
-;426:	case BOTH_ROLL_F:
-;427:	case BOTH_ROLL_B:
-;428:	case BOTH_ROLL_R:
-;429:	case BOTH_ROLL_L:
-;430:		if ( ps->legsTimer > 0 )
-ADDRFP4 0
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 0
-LEI4 $2590
-line 431
-;431:		{
-line 432
-;432:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2588
-JUMPV
-line 434
-;433:		}
-;434:		break;
-LABELV $2589
-LABELV $2590
-line 436
-;435:	}
-;436:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2588
-endproc BG_InRoll 8 0
+proc BG_InRoll 0 0
+endproc BG_InRoll 0 0
 export BG_InDeathAnim
-proc BG_InDeathAnim 12 0
-line 440
-;437:}
-;438:
-;439:qboolean BG_InDeathAnim( int anim )
-;440:{
-line 441
-;441:	switch((anim&~ANIM_TOGGLEBIT))
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 26
-LTI4 $2602
-ADDRLP4 0
-INDIRI4
-CNSTI4 36
-GTI4 $2603
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2604-104
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2604
-address $2601
-address $2601
-address $2598
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-code
-LABELV $2602
-ADDRLP4 0
-INDIRI4
-CNSTI4 1
-LTI4 $2598
-ADDRLP4 0
-INDIRI4
-CNSTI4 7
-GTI4 $2598
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2606-4
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2606
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-address $2601
-code
-LABELV $2603
-ADDRLP4 0
-INDIRI4
-CNSTI4 903
-EQI4 $2601
-ADDRGP4 $2598
-JUMPV
-line 442
-;442:	{
-LABELV $2601
-line 462
-;443:	case BOTH_DIVE1:
-;444:	case BOTH_DEATHBACKWARD1:
-;445:	case BOTH_DEATHBACKWARD2:
-;446:	case BOTH_DEATHFORWARD1:
-;447:	case BOTH_DEATHFORWARD2:
-;448:	case BOTH_DEATH1:
-;449:	case BOTH_DEATH2:
-;450:	case BOTH_DEATH3:
-;451:	case BOTH_DEATH4:
-;452:	case BOTH_DEATH5:
-;453:	case BOTH_DEATH6:
-;454:	case BOTH_DEATH7:
-;455:
-;456:	case BOTH_DEATH1IDLE:
-;457:	case BOTH_LYINGDEATH1:
-;458:	case BOTH_STUMBLEDEATH1:
-;459:	case BOTH_FALLDEATH1:
-;460:	case BOTH_FALLDEATH1INAIR:
-;461:	case BOTH_FALLDEATH1LAND:
-;462:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2597
-JUMPV
-line 463
-;463:		break;
-LABELV $2598
-line 465
-;464:	default:
-;465:		return qfalse;
-CNSTI4 0
-RETI4
-line 466
-;466:		break;
-LABELV $2597
-endproc BG_InDeathAnim 12 0
+proc BG_InDeathAnim 0 0
+endproc BG_InDeathAnim 0 0
 export PM_SaberBounceForAttack
-proc PM_SaberBounceForAttack 8 0
-line 472
-;467:	}
-;468:}
-;469:
-;470://Called only where pm is valid (not all require pm, but some do):
-;471:int PM_SaberBounceForAttack( int move )
-;472:{
-line 473
-;473:	switch ( saberMoveData[move].startQuad )
-ADDRLP4 0
-CNSTI4 40
-ADDRFP4 0
-INDIRI4
-MULI4
-ADDRGP4 saberMoveData+8
-ADDP4
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 0
-LTI4 $2609
-ADDRLP4 0
-INDIRI4
-CNSTI4 7
-GTI4 $2609
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2620
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2620
-address $2613
-address $2614
-address $2615
-address $2616
-address $2617
-address $2618
-address $2619
-address $2613
-code
-line 474
-;474:	{
-LABELV $2613
-line 477
-;475:	case Q_B:
-;476:	case Q_BR:
-;477:		return LS_B1_BR;
-CNSTI4 74
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 478
-;478:		break;
-LABELV $2614
-line 480
-;479:	case Q_R:
-;480:		return LS_B1__R;
-CNSTI4 75
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 481
-;481:		break;
-LABELV $2615
-line 483
-;482:	case Q_TR:
-;483:		return LS_B1_TR;
-CNSTI4 76
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 484
-;484:		break;
-LABELV $2616
-line 486
-;485:	case Q_T:
-;486:		return LS_B1_T_;
-CNSTI4 77
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 487
-;487:		break;
-LABELV $2617
-line 489
-;488:	case Q_TL:
-;489:		return LS_B1_TL;
-CNSTI4 78
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 490
-;490:		break;
-LABELV $2618
-line 492
-;491:	case Q_L:
-;492:		return LS_B1__L;
-CNSTI4 79
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 493
-;493:		break;
-LABELV $2619
-line 495
-;494:	case Q_BL:
-;495:		return LS_B1_BL;
-CNSTI4 80
-RETI4
-ADDRGP4 $2608
-JUMPV
-line 496
-;496:		break;
-LABELV $2609
-line 498
-;497:	}
-;498:	return LS_NONE;
-CNSTI4 0
-RETI4
-LABELV $2608
-endproc PM_SaberBounceForAttack 8 0
+proc PM_SaberBounceForAttack 0 0
+endproc PM_SaberBounceForAttack 0 0
 export PM_SaberDeflectionForQuad
-proc PM_SaberDeflectionForQuad 4 0
-line 502
-;499:}
-;500:
-;501:int PM_SaberDeflectionForQuad( int quad )
-;502:{
-line 503
-;503:	switch ( quad )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 0
-LTI4 $2622
-ADDRLP4 0
-INDIRI4
-CNSTI4 7
-GTI4 $2622
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2632
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2632
-address $2625
-address $2626
-address $2627
-address $2628
-address $2629
-address $2630
-address $2631
-address $2624
-code
-line 504
-;504:	{
-LABELV $2624
-line 506
-;505:	case Q_B:
-;506:		return LS_D1_B_;
-CNSTI4 88
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 507
-;507:		break;
-LABELV $2625
-line 509
-;508:	case Q_BR:
-;509:		return LS_D1_BR;
-CNSTI4 81
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 510
-;510:		break;
-LABELV $2626
-line 512
-;511:	case Q_R:
-;512:		return LS_D1__R;
-CNSTI4 82
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 513
-;513:		break;
-LABELV $2627
-line 515
-;514:	case Q_TR:
-;515:		return LS_D1_TR;
-CNSTI4 83
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 516
-;516:		break;
-LABELV $2628
-line 518
-;517:	case Q_T:
-;518:		return LS_D1_T_;
-CNSTI4 84
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 519
-;519:		break;
-LABELV $2629
-line 521
-;520:	case Q_TL:
-;521:		return LS_D1_TL;
-CNSTI4 85
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 522
-;522:		break;
-LABELV $2630
-line 524
-;523:	case Q_L:
-;524:		return LS_D1__L;
-CNSTI4 86
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 525
-;525:		break;
-LABELV $2631
-line 527
-;526:	case Q_BL:
-;527:		return LS_D1_BL;
-CNSTI4 87
-RETI4
-ADDRGP4 $2621
-JUMPV
-line 528
-;528:		break;
-LABELV $2622
-line 530
-;529:	}
-;530:	return LS_NONE;
-CNSTI4 0
-RETI4
-LABELV $2621
-endproc PM_SaberDeflectionForQuad 4 0
+proc PM_SaberDeflectionForQuad 0 0
+endproc PM_SaberDeflectionForQuad 0 0
 export PM_SaberInDeflect
-proc PM_SaberInDeflect 4 0
-line 534
-;531:}
-;532:
-;533:qboolean PM_SaberInDeflect( int move )
-;534:{
-line 535
-;535:	if ( move >= LS_D1_BR && move <= LS_D1_B_ )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 81
-LTI4 $2634
-ADDRLP4 0
-INDIRI4
-CNSTI4 88
-GTI4 $2634
-line 536
-;536:	{
-line 537
-;537:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2633
-JUMPV
-LABELV $2634
-line 539
-;538:	}
-;539:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2633
-endproc PM_SaberInDeflect 4 0
+proc PM_SaberInDeflect 0 0
+endproc PM_SaberInDeflect 0 0
 export PM_SaberInParry
-proc PM_SaberInParry 4 0
-line 543
-;540:}
-;541:
-;542:qboolean PM_SaberInParry( int move )
-;543:{
-line 544
-;544:	if ( move >= LS_PARRY_UP && move <= LS_PARRY_LL )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 108
-LTI4 $2637
-ADDRLP4 0
-INDIRI4
-CNSTI4 112
-GTI4 $2637
-line 545
-;545:	{
-line 546
-;546:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2636
-JUMPV
-LABELV $2637
-line 548
-;547:	}
-;548:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2636
-endproc PM_SaberInParry 4 0
+proc PM_SaberInParry 0 0
+endproc PM_SaberInParry 0 0
 export PM_SaberInKnockaway
-proc PM_SaberInKnockaway 4 0
-line 552
-;549:}
-;550:
-;551:qboolean PM_SaberInKnockaway( int move )
-;552:{
-line 553
-;553:	if ( move >= LS_K1_T_ && move <= LS_K1_BL )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 103
-LTI4 $2640
-ADDRLP4 0
-INDIRI4
-CNSTI4 107
-GTI4 $2640
-line 554
-;554:	{
-line 555
-;555:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2639
-JUMPV
-LABELV $2640
-line 557
-;556:	}
-;557:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2639
-endproc PM_SaberInKnockaway 4 0
+proc PM_SaberInKnockaway 0 0
+endproc PM_SaberInKnockaway 0 0
 export PM_SaberInReflect
-proc PM_SaberInReflect 4 0
-line 561
-;558:}
-;559:
-;560:qboolean PM_SaberInReflect( int move )
-;561:{
-line 562
-;562:	if ( move >= LS_REFLECT_UP && move <= LS_REFLECT_LL )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 113
-LTI4 $2643
-ADDRLP4 0
-INDIRI4
-CNSTI4 117
-GTI4 $2643
-line 563
-;563:	{
-line 564
-;564:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2642
-JUMPV
-LABELV $2643
-line 566
-;565:	}
-;566:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2642
-endproc PM_SaberInReflect 4 0
+proc PM_SaberInReflect 0 0
+endproc PM_SaberInReflect 0 0
 export PM_SaberInStart
-proc PM_SaberInStart 4 0
-line 570
-;567:}
-;568:
-;569:qboolean PM_SaberInStart( int move )
-;570:{
-line 571
-;571:	if ( move >= LS_S_TL2BR && move <= LS_S_T2B )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 18
-LTI4 $2646
-ADDRLP4 0
-INDIRI4
-CNSTI4 24
-GTI4 $2646
-line 572
-;572:	{
-line 573
-;573:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2645
-JUMPV
-LABELV $2646
-line 575
-;574:	}
-;575:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2645
-endproc PM_SaberInStart 4 0
+proc PM_SaberInStart 0 0
+endproc PM_SaberInStart 0 0
 export PM_SaberInReturn
-proc PM_SaberInReturn 8 0
-line 579
-;576:}
-;577:
-;578:qboolean PM_SaberInReturn( int move )
-;579:{
-line 580
-;580:	if ( move >= LS_R_TL2BR && move <= LS_R_TL2BR )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-ASGNI4
-ADDRLP4 4
-CNSTI4 25
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 4
-INDIRI4
-LTI4 $2649
-ADDRLP4 0
-INDIRI4
-ADDRLP4 4
-INDIRI4
-GTI4 $2649
-line 581
-;581:	{
-line 582
-;582:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2648
-JUMPV
-LABELV $2649
-line 584
-;583:	}
-;584:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2648
-endproc PM_SaberInReturn 8 0
+proc PM_SaberInReturn 0 0
+endproc PM_SaberInReturn 0 0
 export PM_InSaberAnim
-proc PM_InSaberAnim 4 0
-line 588
-;585:}
-;586:
-;587:qboolean PM_InSaberAnim( int anim )
-;588:{
-line 589
-;589:	if ( (anim&~ANIM_TOGGLEBIT) >= BOTH_A1_T__B_ && (anim&~ANIM_TOGGLEBIT) <= BOTH_H1_S1_BR )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 138
-LTI4 $2652
-ADDRLP4 0
-INDIRI4
-CNSTI4 547
-GTI4 $2652
-line 590
-;590:	{
-line 591
-;591:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2651
-JUMPV
-LABELV $2652
-line 593
-;592:	}
-;593:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2651
-endproc PM_InSaberAnim 4 0
+proc PM_InSaberAnim 0 0
+endproc PM_InSaberAnim 0 0
 export PM_InKnockDown
-proc PM_InKnockDown 8 0
-line 597
-;594:}
-;595:
-;596:qboolean PM_InKnockDown( playerState_t *ps )
-;597:{
-line 598
-;598:	switch ( (ps->legsAnim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 924
-LTI4 $2655
-ADDRLP4 0
-INDIRI4
-CNSTI4 942
-GTI4 $2655
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2662-3696
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2662
-address $2658
-address $2658
-address $2658
-address $2658
-address $2658
-address $2659
-address $2659
-address $2659
-address $2659
-address $2659
-address $2655
-address $2655
-address $2659
-address $2659
-address $2659
-address $2659
-address $2659
-address $2659
-address $2659
-code
-line 599
-;599:	{
-LABELV $2658
-line 605
-;600:	case BOTH_KNOCKDOWN1:
-;601:	case BOTH_KNOCKDOWN2:
-;602:	case BOTH_KNOCKDOWN3:
-;603:	case BOTH_KNOCKDOWN4:
-;604:	case BOTH_KNOCKDOWN5:
-;605:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2654
-JUMPV
-line 606
-;606:		break;
-LABELV $2659
-line 619
-;607:	case BOTH_GETUP1:
-;608:	case BOTH_GETUP2:
-;609:	case BOTH_GETUP3:
-;610:	case BOTH_GETUP4:
-;611:	case BOTH_GETUP5:
-;612:	case BOTH_FORCE_GETUP_F1:
-;613:	case BOTH_FORCE_GETUP_F2:
-;614:	case BOTH_FORCE_GETUP_B1:
-;615:	case BOTH_FORCE_GETUP_B2:
-;616:	case BOTH_FORCE_GETUP_B3:
-;617:	case BOTH_FORCE_GETUP_B4:
-;618:	case BOTH_FORCE_GETUP_B5:
-;619:		if ( ps->legsTimer )
-ADDRFP4 0
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 0
-EQI4 $2656
-line 620
-;620:		{
-line 621
-;621:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2654
-JUMPV
-line 623
-;622:		}
-;623:		break;
-LABELV $2655
-LABELV $2656
-line 625
-;624:	}
-;625:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2654
-endproc PM_InKnockDown 8 0
+proc PM_InKnockDown 0 0
+endproc PM_InKnockDown 0 0
 export PM_PainAnim
-proc PM_PainAnim 8 0
-line 645
-;626:}
-;627:
-;628://Called only where pm is valid (not all require pm, but some do):
-;629:/*qboolean PM_InCartwheel(int anim)
-;630:{
-;631:	switch (anim)
-;632:	{
-;633:	case BOTH_ARIAL_LEFT:
-;634:	case BOTH_ARIAL_RIGHT:
-;635:	case BOTH_ARIAL_F1:
-;636:	case BOTH_CARTWHEEL_LEFT:
-;637:	case BOTH_CARTWHEEL_RIGHT:
-;638:		return qtrue;
-;639:		break;
-;640:	}
-;641:	return qfalse;
-;642:}*/
-;643:
-;644:qboolean PM_PainAnim( int anim )
-;645:{
-line 646
-;646:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 97
-LTI4 $2665
-ADDRLP4 0
-INDIRI4
-CNSTI4 115
-GTI4 $2665
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2669-388
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2669
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-address $2668
-code
-line 647
-;647:	{
-LABELV $2668
-line 667
-;648:		case BOTH_PAIN1:				//# First take pain anim
-;649:		case BOTH_PAIN2:				//# Second take pain anim
-;650:		case BOTH_PAIN3:				//# Third take pain anim
-;651:		case BOTH_PAIN4:				//# Fourth take pain anim
-;652:		case BOTH_PAIN5:				//# Fifth take pain anim - from behind
-;653:		case BOTH_PAIN6:				//# Sixth take pain anim - from behind
-;654:		case BOTH_PAIN7:				//# Seventh take pain anim - from behind
-;655:		case BOTH_PAIN8:				//# Eigth take pain anim - from behind
-;656:		case BOTH_PAIN9:				//# 
-;657:		case BOTH_PAIN10:			//# 
-;658:		case BOTH_PAIN11:			//# 
-;659:		case BOTH_PAIN12:			//# 
-;660:		case BOTH_PAIN13:			//# 
-;661:		case BOTH_PAIN14:			//# 
-;662:		case BOTH_PAIN15:			//# 
-;663:		case BOTH_PAIN16:			//# 
-;664:		case BOTH_PAIN17:			//# 
-;665:		case BOTH_PAIN18:			//# 
-;666:		case BOTH_PAIN19:			//# 
-;667:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2664
-JUMPV
-line 668
-;668:		break;
-LABELV $2665
-line 670
-;669:	}
-;670:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2664
-endproc PM_PainAnim 8 0
+proc PM_PainAnim 0 0
+endproc PM_PainAnim 0 0
 export PM_JumpingAnim
-proc PM_JumpingAnim 8 0
-line 674
-;671:}
-;672:
-;673:qboolean PM_JumpingAnim( int anim )
-;674:{
-line 675
-;675:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 856
-LTI4 $2672
-ADDRLP4 0
-INDIRI4
-CNSTI4 880
-GTI4 $2672
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2676-3424
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2676
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-address $2675
-code
-line 676
-;676:	{
-LABELV $2675
-line 702
-;677:		case BOTH_JUMP1:				//# Jump - wind-up and leave ground
-;678:		case BOTH_INAIR1:			//# In air loop (from jump)
-;679:		case BOTH_LAND1:				//# Landing (from in air loop)
-;680:		case BOTH_LAND2:				//# Landing Hard (from a great height)
-;681:		case BOTH_JUMPBACK1:			//# Jump backwards - wind-up and leave ground
-;682:		case BOTH_INAIRBACK1:		//# In air loop (from jump back)
-;683:		case BOTH_LANDBACK1:			//# Landing backwards(from in air loop)
-;684:		case BOTH_JUMPLEFT1:			//# Jump left - wind-up and leave ground
-;685:		case BOTH_INAIRLEFT1:		//# In air loop (from jump left)
-;686:		case BOTH_LANDLEFT1:			//# Landing left(from in air loop)
-;687:		case BOTH_JUMPRIGHT1:		//# Jump right - wind-up and leave ground
-;688:		case BOTH_INAIRRIGHT1:		//# In air loop (from jump right)
-;689:		case BOTH_LANDRIGHT1:		//# Landing right(from in air loop)
-;690:		case BOTH_FORCEJUMP1:				//# Jump - wind-up and leave ground
-;691:		case BOTH_FORCEINAIR1:			//# In air loop (from jump)
-;692:		case BOTH_FORCELAND1:				//# Landing (from in air loop)
-;693:		case BOTH_FORCEJUMPBACK1:			//# Jump backwards - wind-up and leave ground
-;694:		case BOTH_FORCEINAIRBACK1:		//# In air loop (from jump back)
-;695:		case BOTH_FORCELANDBACK1:			//# Landing backwards(from in air loop)
-;696:		case BOTH_FORCEJUMPLEFT1:			//# Jump left - wind-up and leave ground
-;697:		case BOTH_FORCEINAIRLEFT1:		//# In air loop (from jump left)
-;698:		case BOTH_FORCELANDLEFT1:			//# Landing left(from in air loop)
-;699:		case BOTH_FORCEJUMPRIGHT1:		//# Jump right - wind-up and leave ground
-;700:		case BOTH_FORCEINAIRRIGHT1:		//# In air loop (from jump right)
-;701:		case BOTH_FORCELANDRIGHT1:		//# Landing right(from in air loop)
-;702:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2671
-JUMPV
-line 703
-;703:		break;
-LABELV $2672
-line 705
-;704:	}
-;705:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2671
-endproc PM_JumpingAnim 8 0
+proc PM_JumpingAnim 0 0
+endproc PM_JumpingAnim 0 0
 export PM_LandingAnim
-proc PM_LandingAnim 24 0
-line 709
-;706:}
-;707:
-;708:qboolean PM_LandingAnim( int anim )
-;709:{
-line 710
-;710:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 868
-EQI4 $2682
-ADDRLP4 8
-CNSTI4 871
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-EQI4 $2682
-ADDRLP4 0
-INDIRI4
-ADDRLP4 8
-INDIRI4
-GTI4 $2684
-LABELV $2683
-ADDRLP4 0
-INDIRI4
-CNSTI4 858
-LTI4 $2679
-ADDRLP4 0
-INDIRI4
-CNSTI4 865
-GTI4 $2679
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2685-3432
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2685
-address $2682
-address $2682
-address $2679
-address $2679
-address $2682
-address $2679
-address $2679
-address $2682
-code
-LABELV $2684
-ADDRLP4 20
-CNSTI4 874
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-EQI4 $2682
-ADDRLP4 0
-INDIRI4
-CNSTI4 877
-EQI4 $2682
-ADDRLP4 0
-INDIRI4
-ADDRLP4 20
-INDIRI4
-LTI4 $2679
-LABELV $2687
-ADDRLP4 0
-INDIRI4
-CNSTI4 880
-EQI4 $2682
-ADDRGP4 $2679
-JUMPV
-line 711
-;711:	{
-LABELV $2682
-line 721
-;712:		case BOTH_LAND1:				//# Landing (from in air loop)
-;713:		case BOTH_LAND2:				//# Landing Hard (from a great height)
-;714:		case BOTH_LANDBACK1:			//# Landing backwards(from in air loop)
-;715:		case BOTH_LANDLEFT1:			//# Landing left(from in air loop)
-;716:		case BOTH_LANDRIGHT1:		//# Landing right(from in air loop)
-;717:		case BOTH_FORCELAND1:		//# Landing (from in air loop)
-;718:		case BOTH_FORCELANDBACK1:	//# Landing backwards(from in air loop)
-;719:		case BOTH_FORCELANDLEFT1:	//# Landing left(from in air loop)
-;720:		case BOTH_FORCELANDRIGHT1:	//# Landing right(from in air loop)
-;721:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2678
-JUMPV
-line 722
-;722:		break;
-LABELV $2679
-line 724
-;723:	}
-;724:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2678
-endproc PM_LandingAnim 24 0
+proc PM_LandingAnim 0 0
+endproc PM_LandingAnim 0 0
 export PM_SpinningAnim
-proc PM_SpinningAnim 4 4
-line 728
-;725:}
-;726:
-;727:qboolean PM_SpinningAnim( int anim )
-;728:{
-line 737
-;729:	/*
-;730:	switch ( anim )
-;731:	{
-;732:	//FIXME: list any other spinning anims
-;733:	default:
-;734:		break;
-;735:	}
-;736:	*/
-;737:	return BG_SpinningSaberAnim( anim );
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 0
-ADDRGP4 BG_SpinningSaberAnim
-CALLI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-RETI4
-LABELV $2688
-endproc PM_SpinningAnim 4 4
+proc PM_SpinningAnim 0 0
+endproc PM_SpinningAnim 0 0
 export PM_InOnGroundAnim
-proc PM_InOnGroundAnim 32 0
-line 741
-;738:}
-;739:
-;740:qboolean PM_InOnGroundAnim ( int anim )
-;741:{
-line 742
-;742:	switch( anim&~ANIM_TOGGLEBIT )
-ADDRLP4 0
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 72
-LTI4 $2694
-ADDRLP4 0
-INDIRI4
-CNSTI4 76
-GTI4 $2695
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2696-288
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2696
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-code
-LABELV $2694
-ADDRLP4 12
-CNSTI4 32
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 12
-INDIRI4
-EQI4 $2693
-ADDRLP4 0
-INDIRI4
-ADDRLP4 12
-INDIRI4
-LTI4 $2690
-LABELV $2698
-ADDRLP4 0
-INDIRI4
-CNSTI4 47
-LTI4 $2690
-ADDRLP4 0
-INDIRI4
-CNSTI4 51
-GTI4 $2690
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2699-188
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2699
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-code
-LABELV $2695
-ADDRLP4 24
-CNSTI4 924
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 24
-INDIRI4
-EQI4 $2693
-ADDRLP4 0
-INDIRI4
-CNSTI4 925
-EQI4 $2693
-ADDRLP4 0
-INDIRI4
-ADDRLP4 24
-INDIRI4
-LTI4 $2690
-LABELV $2701
-ADDRLP4 0
-INDIRI4
-CNSTI4 985
-LTI4 $2690
-ADDRLP4 0
-INDIRI4
-CNSTI4 1002
-GTI4 $2690
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2702-3940
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2702
-address $2693
-address $2690
-address $2690
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2693
-address $2690
-address $2690
-address $2693
-code
-line 743
-;743:	{
-LABELV $2693
-line 771
-;744:	case BOTH_DEAD1:
-;745:	case BOTH_DEAD2:
-;746:	case BOTH_DEAD3:
-;747:	case BOTH_DEAD4:
-;748:	case BOTH_DEAD5:
-;749:	case BOTH_DEADFORWARD1:
-;750:	case BOTH_DEADBACKWARD1:
-;751:	case BOTH_DEADFORWARD2:
-;752:	case BOTH_DEADBACKWARD2:
-;753:	case BOTH_LYINGDEATH1:
-;754:	case BOTH_LYINGDEAD1:
-;755:	case BOTH_PAIN2WRITHE1:		//# Transition from upright position to writhing on ground anim
-;756:	case BOTH_WRITHING1:			//# Lying on ground writhing in pain
-;757:	case BOTH_WRITHING1RLEG:		//# Lying on ground writhing in pain: holding right leg
-;758:	case BOTH_WRITHING1LLEG:		//# Lying on ground writhing in pain: holding left leg
-;759:	case BOTH_WRITHING2:			//# Lying on stomache writhing in pain
-;760:	case BOTH_INJURED1:			//# Lying down: against wall - can also be sleeping
-;761:	case BOTH_CRAWLBACK1:			//# Lying on back: crawling backwards with elbows
-;762:	case BOTH_INJURED2:			//# Injured pose 2
-;763:	case BOTH_INJURED3:			//# Injured pose 3
-;764:	case BOTH_INJURED6:			//# Injured pose 6
-;765:	case BOTH_INJURED6ATTACKSTART:	//# Start attack while in injured 6 pose 
-;766:	case BOTH_INJURED6ATTACKSTOP:	//# End attack while in injured 6 pose
-;767:	case BOTH_INJURED6COMBADGE:	//# Hit combadge while in injured 6 pose
-;768:	case BOTH_INJURED6POINT:		//# Chang points to door while in injured state
-;769:	case BOTH_KNOCKDOWN1:		//# 
-;770:	case BOTH_KNOCKDOWN2:		//# 
-;771:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2689
-JUMPV
-line 772
-;772:		break;
-LABELV $2690
-line 775
-;773:	}
-;774:
-;775:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2689
-endproc PM_InOnGroundAnim 32 0
+proc PM_InOnGroundAnim 0 0
+endproc PM_InOnGroundAnim 0 0
 export PM_InRollComplete
-proc PM_InRollComplete 8 0
-line 779
-;776:}
-;777:
-;778:qboolean PM_InRollComplete( playerState_t *ps, int anim )
-;779:{
-line 780
-;780:	switch ( (anim&~ANIM_TOGGLEBIT) )
-ADDRLP4 0
-ADDRFP4 4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 885
-LTI4 $2705
-ADDRLP4 0
-INDIRI4
-CNSTI4 888
-GTI4 $2705
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2711-3540
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2711
-address $2708
-address $2708
-address $2708
-address $2708
-code
-line 781
-;781:	{
-LABELV $2708
-line 786
-;782:	case BOTH_ROLL_F:
-;783:	case BOTH_ROLL_B:
-;784:	case BOTH_ROLL_R:
-;785:	case BOTH_ROLL_L:
-;786:		if ( ps->legsTimer < 1 )
-ADDRFP4 0
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 1
-GEI4 $2706
-line 787
-;787:		{
-line 788
-;788:			return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2704
-JUMPV
-line 790
-;789:		}
-;790:		break;
-LABELV $2705
-LABELV $2706
-line 792
-;791:	}
-;792:	return qfalse;
-CNSTI4 0
-RETI4
-LABELV $2704
-endproc PM_InRollComplete 8 0
+proc PM_InRollComplete 0 0
+endproc PM_InRollComplete 0 0
 export PM_AnimLength
-proc PM_AnimLength 8 4
-line 796
-;793:}
-;794:
-;795:int PM_AnimLength( int index, animNumber_t anim )
-;796:{
-line 797
-;797:	if (anim >= MAX_ANIMATIONS)
-ADDRFP4 4
-INDIRI4
-CNSTI4 1210
-LTI4 $2714
-line 798
-;798:	{
-line 799
-;799:		return -1;
-CNSTI4 -1
-RETI4
-ADDRGP4 $2713
-JUMPV
-LABELV $2714
-line 801
-;800:	}
-;801:	return pm->animations[anim].numFrames * abs(pm->animations[anim].frameLerp);
-ADDRLP4 0
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRGP4 pm
-INDIRP4
-CNSTI4 260
-ADDP4
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 0
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 4
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 0
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-ADDRLP4 4
-INDIRI4
-MULI4
-RETI4
-LABELV $2713
-endproc PM_AnimLength 8 4
+proc PM_AnimLength 0 0
+endproc PM_AnimLength 0 0
 export PM_DebugLegsAnim
-proc PM_DebugLegsAnim 24 8
-line 805
-;802:}
-;803:
-;804:void PM_DebugLegsAnim(int anim)
-;805:{
-line 806
-;806:	int oldAnim = (pm->ps->legsAnim & ~ANIM_TOGGLEBIT);
-ADDRLP4 0
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-line 807
-;807:	int newAnim = (anim & ~ANIM_TOGGLEBIT);
-ADDRLP4 4
-ADDRFP4 0
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-line 809
-;808:
-;809:	if (oldAnim < MAX_TOTALANIMATIONS && oldAnim >= BOTH_DEATH1 &&
-ADDRLP4 12
-CNSTI4 1211
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 12
-INDIRI4
-GEI4 $2717
-ADDRLP4 16
-CNSTI4 1
-ASGNI4
-ADDRLP4 0
-INDIRI4
-ADDRLP4 16
-INDIRI4
-LTI4 $2717
-ADDRLP4 4
-INDIRI4
-ADDRLP4 12
-INDIRI4
-GEI4 $2717
-ADDRLP4 4
-INDIRI4
-ADDRLP4 16
-INDIRI4
-LTI4 $2717
-line 811
-;810:		newAnim < MAX_TOTALANIMATIONS && newAnim >= BOTH_DEATH1)
-;811:	{
-line 812
-;812:		Com_Printf("OLD: %s\n", animTable[oldAnim].name);
-ADDRGP4 $2719
-ARGP4
-ADDRLP4 0
-INDIRI4
-CNSTI4 3
-LSHI4
-ADDRGP4 animTable
-ADDP4
-INDIRP4
-ARGP4
-ADDRGP4 Com_Printf
-CALLV
-pop
-line 813
-;813:		Com_Printf("NEW: %s\n", animTable[newAnim].name);
-ADDRGP4 $2720
-ARGP4
-ADDRLP4 4
-INDIRI4
-CNSTI4 3
-LSHI4
-ADDRGP4 animTable
-ADDP4
-INDIRP4
-ARGP4
-ADDRGP4 Com_Printf
-CALLV
-pop
-line 814
-;814:	}
-LABELV $2717
-line 815
-;815:}
-LABELV $2716
-endproc PM_DebugLegsAnim 24 8
+proc PM_DebugLegsAnim 0 0
+endproc PM_DebugLegsAnim 0 0
 data
 export BGPAFtextLoaded
 align 4
@@ -8140,3105 +4742,44 @@ LABELV animOverrideCount
 byte 4 12
 export BG_AnimationOverrides
 code
-proc BG_AnimationOverrides 28 4
-line 882
-;816:/*
-;817:==============================================================================
-;818:END: Animation utility functions (sequence checking)
-;819:==============================================================================
-;820:*/
-;821:
-;822:/*
-;823:======================
-;824:BG_ParseAnimationFile
-;825:
-;826:Read a configuration file containing animation coutns and rates
-;827:models/players/visor/animation.cfg, etc
-;828:
-;829:======================
-;830:*/
-;831:char		BGPAFtext[40000];
-;832:qboolean	BGPAFtextLoaded = qfalse;
-;833:animation_t	bgGlobalAnimations[MAX_TOTALANIMATIONS];
-;834:
-;835://#define CONVENIENT_ANIMATION_FILE_DEBUG_THING
-;836:
-;837:#ifdef CONVENIENT_ANIMATION_FILE_DEBUG_THING
-;838:void SpewDebugStuffToFile()
-;839:{
-;840:	fileHandle_t f;
-;841:	int i = 0;
-;842:
-;843:	trap_FS_FOpenFile("file_of_debug_stuff_MP.txt", &f, FS_WRITE);
-;844:
-;845:	if (!f)
-;846:	{
-;847:		return;
-;848:	}
-;849:
-;850:	BGPAFtext[0] = 0;
-;851:
-;852:	while (i < MAX_ANIMATIONS)
-;853:	{
-;854:		strcat(BGPAFtext, va("%i %i\n", i, bgGlobalAnimations[i].frameLerp));
-;855:		i++;
-;856:	}
-;857:
-;858:	trap_FS_Write(BGPAFtext, strlen(BGPAFtext), f);
-;859:	trap_FS_FCloseFile(f);
-;860:}
-;861:#endif
-;862:
-;863:const int animOverrideNums[] = {
-;864:	BOTH_FORCEWALLREBOUND_BACK,
-;865:	BOTH_FORCEWALLREBOUND_FORWARD,
-;866:	BOTH_FORCEWALLREBOUND_LEFT,
-;867:	BOTH_FORCEWALLREBOUND_RIGHT,
-;868:
-;869:	BOTH_FORCEWALLHOLD_BACK,
-;870:	BOTH_FORCEWALLHOLD_FORWARD,
-;871:	BOTH_FORCEWALLHOLD_LEFT,
-;872:	BOTH_FORCEWALLHOLD_RIGHT,
-;873:
-;874:	BOTH_FORCEWALLRELEASE_BACK,
-;875:	BOTH_FORCEWALLRELEASE_FORWARD,
-;876:	BOTH_FORCEWALLRELEASE_LEFT,
-;877:	BOTH_FORCEWALLRELEASE_RIGHT,
-;878:};
-;879:
-;880:const int animOverrideCount = sizeof(animOverrideNums) / sizeof(animOverrideNums[0]);
-;881:
-;882:void BG_AnimationOverrides() {
-line 886
-;883:	int i, animNum;
-;884:	float fps;
-;885:
-;886:	for(i=0;i< animOverrideCount;i++)
-ADDRLP4 8
-CNSTI4 0
-ASGNI4
-ADDRGP4 $2725
-JUMPV
-LABELV $2722
-line 887
-;887:	{
-line 888
-;888:		animNum = animOverrideNums[i];
-ADDRLP4 0
-ADDRLP4 8
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 animOverrideNums
-ADDP4
-INDIRI4
-ASGNI4
-line 894
-;889:		// Dirty JKA wallgrab hack
-;890:		// TODO Only do this if:
-;891:		// cgame: tommyternal server && g_defrag
-;892:		// game: g_defrag
-;893:		// TODO Wallrun too somehow
-;894:		switch (animNum) {
-ADDRLP4 0
-INDIRI4
-CNSTI4 618
-LTI4 $2726
-ADDRLP4 0
-INDIRI4
-CNSTI4 626
-GTI4 $2737
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2738-2472
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2738
-address $2728
-address $2728
-address $2728
-address $2726
-address $2726
-address $2726
-address $2728
-address $2726
-address $2731
-code
-LABELV $2737
-ADDRLP4 0
-INDIRI4
-CNSTI4 674
-LTI4 $2726
-ADDRLP4 0
-INDIRI4
-CNSTI4 680
-GTI4 $2726
-ADDRLP4 0
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2740-2696
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2740
-address $2731
-address $2731
-address $2731
-address $2734
-address $2734
-address $2734
-address $2734
-code
-LABELV $2728
-line 899
-;895:			case BOTH_FORCEWALLREBOUND_BACK:
-;896:			case BOTH_FORCEWALLREBOUND_FORWARD:
-;897:			case BOTH_FORCEWALLREBOUND_LEFT:
-;898:			case BOTH_FORCEWALLREBOUND_RIGHT: // use slowed down BOTH_UNCROUCH1 anim instead (ditch last frame to make the total length correct with the 1/4 fps)
-;899:				bgGlobalAnimations[animNum].firstFrame = 3384;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3384
-ASGNI4
-line 900
-;900:				bgGlobalAnimations[animNum].numFrames = 3;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 3
-ASGNI4
-line 901
-;901:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 902
-;902:				fps = -5;
-ADDRLP4 4
-CNSTF4 3231711232
-ASGNF4
-line 903
-;903:				break;
-ADDRGP4 $2727
-JUMPV
-LABELV $2731
-line 908
-;904:			case BOTH_FORCEWALLHOLD_BACK:
-;905:			case BOTH_FORCEWALLHOLD_FORWARD:
-;906:			case BOTH_FORCEWALLHOLD_LEFT:
-;907:			case BOTH_FORCEWALLHOLD_RIGHT: // use first frame of BOTH_CROUCH1IDLE
-;908:				bgGlobalAnimations[animNum].firstFrame = 3388;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3388
-ASGNI4
-line 909
-;909:				bgGlobalAnimations[animNum].numFrames = 1;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 1
-ASGNI4
-line 910
-;910:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 911
-;911:				fps = 20;
-ADDRLP4 4
-CNSTF4 1101004800
-ASGNF4
-line 912
-;912:				break;
-ADDRGP4 $2727
-JUMPV
-LABELV $2734
-line 917
-;913:			case BOTH_FORCEWALLRELEASE_BACK:
-;914:			case BOTH_FORCEWALLRELEASE_FORWARD:
-;915:			case BOTH_FORCEWALLRELEASE_LEFT:
-;916:			case BOTH_FORCEWALLRELEASE_RIGHT: // use slowed down BOTH_UNCROUCH1 anim instead (ditch last frame to make the total length correct with the 1/2 fps)
-;917:				bgGlobalAnimations[animNum].firstFrame = 3384;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3384
-ASGNI4
-line 918
-;918:				bgGlobalAnimations[animNum].numFrames = 3;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 3
-ASGNI4
-line 919
-;919:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 920
-;920:				fps = -10;
-ADDRLP4 4
-CNSTF4 3240099840
-ASGNF4
-line 921
-;921:				break;
-LABELV $2726
-LABELV $2727
-line 924
-;922:		}
-;923:
-;924:		if (fps < 0)
-ADDRLP4 4
-INDIRF4
-CNSTF4 0
-GEF4 $2742
-line 925
-;925:		{//backwards
-line 926
-;926:			bgGlobalAnimations[animNum].frameLerp = floor(1000.0f / fps);
-CNSTF4 1148846080
-ADDRLP4 4
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 20
-ADDRGP4 floor
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+12
-ADDP4
-ADDRLP4 20
-INDIRF4
-CVFI4 4
-ASGNI4
-line 927
-;927:		}
-ADDRGP4 $2743
-JUMPV
-LABELV $2742
-line 929
-;928:		else
-;929:		{
-line 930
-;930:			bgGlobalAnimations[animNum].frameLerp = ceil(1000.0f / fps);
-CNSTF4 1148846080
-ADDRLP4 4
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 20
-ADDRGP4 ceil
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+12
-ADDP4
-ADDRLP4 20
-INDIRF4
-CVFI4 4
-ASGNI4
-line 931
-;931:		}
-LABELV $2743
-line 933
-;932:
-;933:		bgGlobalAnimations[animNum].initialLerp = ceil(1000.0f / fabs(fps));
-ADDRLP4 4
-INDIRF4
-ARGF4
-ADDRLP4 20
-ADDRGP4 fabs
-CALLF4
-ASGNF4
-CNSTF4 1148846080
-ADDRLP4 20
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 24
-ADDRGP4 ceil
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 0
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+16
-ADDP4
-ADDRLP4 24
-INDIRF4
-CVFI4 4
-ASGNI4
-line 934
-;934:	}
-LABELV $2723
-line 886
-ADDRLP4 8
-ADDRLP4 8
-INDIRI4
-CNSTI4 1
-ADDI4
-ASGNI4
-LABELV $2725
-ADDRLP4 8
-INDIRI4
-ADDRGP4 animOverrideCount
-INDIRI4
-LTI4 $2722
-line 935
-;935:}
-LABELV $2721
-endproc BG_AnimationOverrides 28 4
+proc BG_AnimationOverrides 0 0
+endproc BG_AnimationOverrides 0 0
 export BG_ParseAnimationFile
-proc BG_ParseAnimationFile 80 12
-line 938
-;936:
-;937:qboolean BG_ParseAnimationFile(const char *filename) 
-;938:{
-line 950
-;939:	char		*text_p;
-;940:	int			len;
-;941:	int			i;
-;942:	char		*token;
-;943:	float		fps;
-;944:
-;945:	fileHandle_t	f;
-;946:	int				animNum;
-;947:
-;948:
-;949:	// load the file
-;950:	if (!BGPAFtextLoaded)
-ADDRGP4 BGPAFtextLoaded
-INDIRI4
-CNSTI4 0
-NEI4 $2748
-line 951
-;951:	{ //rww - We are always using the same animation config now. So only load it once.
-line 952
-;952:		len = trap_FS_FOpenFile( filename, &f, FS_READ );
-ADDRFP4 0
-INDIRP4
-ARGP4
-ADDRLP4 24
-ARGP4
-CNSTI4 0
-ARGI4
-ADDRLP4 28
-ADDRGP4 trap_FS_FOpenFile
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 28
-INDIRI4
-ASGNI4
-line 953
-;953:		if ( len <= 0 ) 
-ADDRLP4 20
-INDIRI4
-CNSTI4 0
-GTI4 $2750
-line 954
-;954:		{
-line 955
-;955:			return qfalse;
-CNSTI4 0
-RETI4
-ADDRGP4 $2747
-JUMPV
-LABELV $2750
-line 957
-;956:		}
-;957:		if ( len >= (int)sizeof( BGPAFtext ) - 1 ) 
-ADDRLP4 20
-INDIRI4
-CNSTI4 39999
-LTI4 $2752
-line 958
-;958:		{
-line 960
-;959:			//Com_Printf( "File %s too long\n", filename );
-;960:			return qfalse;
-CNSTI4 0
-RETI4
-ADDRGP4 $2747
-JUMPV
-LABELV $2752
-line 963
-;961:		}
-;962:
-;963:		trap_FS_Read( BGPAFtext, len, f );
-ADDRGP4 BGPAFtext
-ARGP4
-ADDRLP4 20
-INDIRI4
-ARGI4
-ADDRLP4 24
-INDIRI4
-ARGI4
-ADDRGP4 trap_FS_Read
-CALLV
-pop
-line 964
-;964:		BGPAFtext[len] = 0;
-ADDRLP4 20
-INDIRI4
-ADDRGP4 BGPAFtext
-ADDP4
-CNSTI1 0
-ASGNI1
-line 965
-;965:		trap_FS_FCloseFile( f );
-ADDRLP4 24
-INDIRI4
-ARGI4
-ADDRGP4 trap_FS_FCloseFile
-CALLV
-pop
-line 966
-;966:	}
-ADDRGP4 $2749
-JUMPV
-LABELV $2748
-line 968
-;967:	else
-;968:	{
-line 969
-;969:		return qtrue;
-CNSTI4 1
-RETI4
-ADDRGP4 $2747
-JUMPV
-LABELV $2749
-line 973
-;970:	}
-;971:
-;972:	// parse the text
-;973:	text_p = BGPAFtext;
-ADDRLP4 16
-ADDRGP4 BGPAFtext
-ASGNP4
-line 978
-;974:
-;975:	//FIXME: have some way of playing anims backwards... negative numFrames?
-;976:
-;977:	//initialize anim array so that from 0 to MAX_ANIMATIONS, set default values of 0 1 0 100
-;978:	for(i = 0; i < MAX_ANIMATIONS; i++)
-ADDRLP4 8
-CNSTI4 0
-ASGNI4
-LABELV $2754
-line 979
-;979:	{
-line 980
-;980:		bgGlobalAnimations[i].firstFrame = 0;
-CNSTI4 28
-ADDRLP4 8
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 0
-ASGNI4
-line 981
-;981:		bgGlobalAnimations[i].numFrames = 0;
-CNSTI4 28
-ADDRLP4 8
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 0
-ASGNI4
-line 982
-;982:		bgGlobalAnimations[i].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 8
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 983
-;983:		bgGlobalAnimations[i].frameLerp = 100;
-CNSTI4 28
-ADDRLP4 8
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+12
-ADDP4
-CNSTI4 100
-ASGNI4
-line 984
-;984:		bgGlobalAnimations[i].initialLerp = 100;
-CNSTI4 28
-ADDRLP4 8
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+16
-ADDP4
-CNSTI4 100
-ASGNI4
-line 985
-;985:	}
-LABELV $2755
-line 978
-ADDRLP4 8
-ADDRLP4 8
-INDIRI4
-CNSTI4 1
-ADDI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 1210
-LTI4 $2754
-ADDRGP4 $2763
-JUMPV
-LABELV $2762
-line 989
-;986:
-;987:	// read information for each frame
-;988:	while(1) 
-;989:	{
-line 990
-;990:		token = COM_Parse( (const char **)(&text_p) );
-ADDRLP4 16
-ARGP4
-ADDRLP4 28
-ADDRGP4 COM_Parse
-CALLP4
-ASGNP4
-ADDRLP4 0
-ADDRLP4 28
-INDIRP4
-ASGNP4
-line 992
-;991:
-;992:		if ( !token || !token[0]) 
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-EQU4 $2767
-ADDRLP4 0
-INDIRP4
-INDIRI1
-CVII4 1
-CNSTI4 0
-NEI4 $2765
-LABELV $2767
-line 993
-;993:		{
-line 994
-;994:			break;
-ADDRGP4 $2764
-JUMPV
-LABELV $2765
-line 997
-;995:		}
-;996:
-;997:		animNum = GetIDForString(animTable, token);
-ADDRGP4 animTable
-ARGP4
-ADDRLP4 0
-INDIRP4
-ARGP4
-ADDRLP4 36
-ADDRGP4 GetIDForString
-CALLI4
-ASGNI4
-ADDRLP4 4
-ADDRLP4 36
-INDIRI4
-ASGNI4
-line 998
-;998:		if(animNum == -1)
-ADDRLP4 4
-INDIRI4
-CNSTI4 -1
-NEI4 $2768
-line 999
-;999:		{
-line 1010
-;1000://#ifndef FINAL_BUILD
-;1001:#ifdef _DEBUG
-;1002:#if JK2_GAME
-;1003:		if(g_developer.integer){
-;1004:#elif JK2_CGAME
-;1005:		if (cg_developer.integer) {
-;1006:#endif
-;1007:			Com_Printf(S_COLOR_RED"WARNING: Unknown token %s in %s\n", token, filename);
-;1008:		}
-;1009:#endif
-;1010:			continue;
-ADDRGP4 $2763
-JUMPV
-LABELV $2768
-line 1013
-;1011:		}
-;1012:
-;1013:		token = COM_Parse( (const char **)(&text_p) );
-ADDRLP4 16
-ARGP4
-ADDRLP4 40
-ADDRGP4 COM_Parse
-CALLP4
-ASGNP4
-ADDRLP4 0
-ADDRLP4 40
-INDIRP4
-ASGNP4
-line 1014
-;1014:		if ( !token ) 
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-NEU4 $2770
-line 1015
-;1015:		{
-line 1016
-;1016:			break;
-ADDRGP4 $2764
-JUMPV
-LABELV $2770
-line 1018
-;1017:		}
-;1018:		bgGlobalAnimations[animNum].firstFrame = atoi( token );
-ADDRLP4 0
-INDIRP4
-ARGP4
-ADDRLP4 44
-ADDRGP4 atoi
-CALLI4
-ASGNI4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-ADDRLP4 44
-INDIRI4
-ASGNI4
-line 1020
-;1019:
-;1020:		token = COM_Parse( (const char **)(&text_p) );
-ADDRLP4 16
-ARGP4
-ADDRLP4 48
-ADDRGP4 COM_Parse
-CALLP4
-ASGNP4
-ADDRLP4 0
-ADDRLP4 48
-INDIRP4
-ASGNP4
-line 1021
-;1021:		if ( !token ) 
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-NEU4 $2772
-line 1022
-;1022:		{
-line 1023
-;1023:			break;
-ADDRGP4 $2764
-JUMPV
-LABELV $2772
-line 1025
-;1024:		}
-;1025:		bgGlobalAnimations[animNum].numFrames = atoi( token );
-ADDRLP4 0
-INDIRP4
-ARGP4
-ADDRLP4 52
-ADDRGP4 atoi
-CALLI4
-ASGNI4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-ADDRLP4 52
-INDIRI4
-ASGNI4
-line 1027
-;1026:
-;1027:		token = COM_Parse( (const char **)(&text_p) );
-ADDRLP4 16
-ARGP4
-ADDRLP4 56
-ADDRGP4 COM_Parse
-CALLP4
-ASGNP4
-ADDRLP4 0
-ADDRLP4 56
-INDIRP4
-ASGNP4
-line 1028
-;1028:		if ( !token ) 
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-NEU4 $2775
-line 1029
-;1029:		{
-line 1030
-;1030:			break;
-ADDRGP4 $2764
-JUMPV
-LABELV $2775
-line 1032
-;1031:		}
-;1032:		bgGlobalAnimations[animNum].loopFrames = atoi( token );
-ADDRLP4 0
-INDIRP4
-ARGP4
-ADDRLP4 60
-ADDRGP4 atoi
-CALLI4
-ASGNI4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-ADDRLP4 60
-INDIRI4
-ASGNI4
-line 1034
-;1033:
-;1034:		token = COM_Parse( (const char **)(&text_p) );
-ADDRLP4 16
-ARGP4
-ADDRLP4 64
-ADDRGP4 COM_Parse
-CALLP4
-ASGNP4
-ADDRLP4 0
-ADDRLP4 64
-INDIRP4
-ASGNP4
-line 1035
-;1035:		if ( !token ) 
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-NEU4 $2778
-line 1036
-;1036:		{
-line 1037
-;1037:			break;
-ADDRGP4 $2764
-JUMPV
-LABELV $2778
-line 1039
-;1038:		}
-;1039:		fps = atof( token );
-ADDRLP4 0
-INDIRP4
-ARGP4
-ADDRLP4 68
-ADDRGP4 atof
-CALLF4
-ASGNF4
-ADDRLP4 12
-ADDRLP4 68
-INDIRF4
-ASGNF4
-line 1040
-;1040:		if ( fps == 0 ) 
-ADDRLP4 12
-INDIRF4
-CNSTF4 0
-NEF4 $2780
-line 1041
-;1041:		{
-line 1042
-;1042:			fps = 1;//Don't allow divide by zero error
-ADDRLP4 12
-CNSTF4 1065353216
-ASGNF4
-line 1043
-;1043:		}
-LABELV $2780
-line 1053
-;1044:
-;1045:// TODO... cant do it as simply as this because it only gets loaded once?
-;1046://		if (
-;1047://#ifdef JK2_GAME
-;1048://			g_defrag.integer
-;1049://#elif JK2_CGAME
-;1050://			
-;1051://#endif
-;1052://			) 
-;1053:		{
-line 1054
-;1054:			switch (animNum) {
-ADDRLP4 4
-INDIRI4
-CNSTI4 618
-LTI4 $2782
-ADDRLP4 4
-INDIRI4
-CNSTI4 626
-GTI4 $2793
-ADDRLP4 4
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2794-2472
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2794
-address $2784
-address $2784
-address $2784
-address $2782
-address $2782
-address $2782
-address $2784
-address $2782
-address $2787
-code
-LABELV $2793
-ADDRLP4 4
-INDIRI4
-CNSTI4 674
-LTI4 $2782
-ADDRLP4 4
-INDIRI4
-CNSTI4 680
-GTI4 $2782
-ADDRLP4 4
-INDIRI4
-CNSTI4 2
-LSHI4
-ADDRGP4 $2796-2696
-ADDP4
-INDIRP4
-JUMPV
-lit
-align 4
-LABELV $2796
-address $2787
-address $2787
-address $2787
-address $2790
-address $2790
-address $2790
-address $2790
-code
-LABELV $2784
-line 1059
-;1055:			case BOTH_FORCEWALLREBOUND_BACK:
-;1056:			case BOTH_FORCEWALLREBOUND_FORWARD:
-;1057:			case BOTH_FORCEWALLREBOUND_LEFT:
-;1058:			case BOTH_FORCEWALLREBOUND_RIGHT: // use slowed down BOTH_UNCROUCH1 anim instead (ditch last frame to make the total length correct with the 1/4 fps)
-;1059:				bgGlobalAnimations[animNum].firstFrame = 3384;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3384
-ASGNI4
-line 1060
-;1060:				bgGlobalAnimations[animNum].numFrames = 3;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 3
-ASGNI4
-line 1061
-;1061:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 1062
-;1062:				fps = -5;
-ADDRLP4 12
-CNSTF4 3231711232
-ASGNF4
-line 1063
-;1063:				break;
-ADDRGP4 $2783
-JUMPV
-LABELV $2787
-line 1068
-;1064:			case BOTH_FORCEWALLHOLD_BACK:
-;1065:			case BOTH_FORCEWALLHOLD_FORWARD:
-;1066:			case BOTH_FORCEWALLHOLD_LEFT:
-;1067:			case BOTH_FORCEWALLHOLD_RIGHT: // use first frame of BOTH_CROUCH1IDLE
-;1068:				bgGlobalAnimations[animNum].firstFrame = 3388;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3388
-ASGNI4
-line 1069
-;1069:				bgGlobalAnimations[animNum].numFrames = 1;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 1
-ASGNI4
-line 1070
-;1070:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 1071
-;1071:				fps = 20;
-ADDRLP4 12
-CNSTF4 1101004800
-ASGNF4
-line 1072
-;1072:				break;
-ADDRGP4 $2783
-JUMPV
-LABELV $2790
-line 1077
-;1073:			case BOTH_FORCEWALLRELEASE_BACK:
-;1074:			case BOTH_FORCEWALLRELEASE_FORWARD:
-;1075:			case BOTH_FORCEWALLRELEASE_LEFT:
-;1076:			case BOTH_FORCEWALLRELEASE_RIGHT: // use slowed down BOTH_UNCROUCH1 anim instead (ditch last frame to make the total length correct with the 1/2 fps)
-;1077:				bgGlobalAnimations[animNum].firstFrame = 3384;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations
-ADDP4
-CNSTI4 3384
-ASGNI4
-line 1078
-;1078:				bgGlobalAnimations[animNum].numFrames = 3;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+4
-ADDP4
-CNSTI4 3
-ASGNI4
-line 1079
-;1079:				bgGlobalAnimations[animNum].loopFrames = -1;
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+8
-ADDP4
-CNSTI4 -1
-ASGNI4
-line 1080
-;1080:				fps = -10;
-ADDRLP4 12
-CNSTF4 3240099840
-ASGNF4
-line 1081
-;1081:				break;
-LABELV $2782
-LABELV $2783
-line 1083
-;1082:			}
-;1083:		}
-line 1086
-;1084:		
-;1085:
-;1086:		if ( fps < 0 )
-ADDRLP4 12
-INDIRF4
-CNSTF4 0
-GEF4 $2798
-line 1087
-;1087:		{//backwards
-line 1088
-;1088:			bgGlobalAnimations[animNum].frameLerp = floor(1000.0f / fps);
-CNSTF4 1148846080
-ADDRLP4 12
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 72
-ADDRGP4 floor
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+12
-ADDP4
-ADDRLP4 72
-INDIRF4
-CVFI4 4
-ASGNI4
-line 1089
-;1089:		}
-ADDRGP4 $2799
-JUMPV
-LABELV $2798
-line 1091
-;1090:		else
-;1091:		{
-line 1092
-;1092:			bgGlobalAnimations[animNum].frameLerp = ceil(1000.0f / fps);
-CNSTF4 1148846080
-ADDRLP4 12
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 72
-ADDRGP4 ceil
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+12
-ADDP4
-ADDRLP4 72
-INDIRF4
-CVFI4 4
-ASGNI4
-line 1093
-;1093:		}
-LABELV $2799
-line 1095
-;1094:
-;1095:		bgGlobalAnimations[animNum].initialLerp = ceil(1000.0f / fabs(fps));
-ADDRLP4 12
-INDIRF4
-ARGF4
-ADDRLP4 72
-ADDRGP4 fabs
-CALLF4
-ASGNF4
-CNSTF4 1148846080
-ADDRLP4 72
-INDIRF4
-DIVF4
-ARGF4
-ADDRLP4 76
-ADDRGP4 ceil
-CALLF4
-ASGNF4
-CNSTI4 28
-ADDRLP4 4
-INDIRI4
-MULI4
-ADDRGP4 bgGlobalAnimations+16
-ADDP4
-ADDRLP4 76
-INDIRF4
-CVFI4 4
-ASGNI4
-line 1096
-;1096:	}
-LABELV $2763
-line 988
-ADDRGP4 $2762
-JUMPV
-LABELV $2764
-line 1123
-;1097:
-;1098:	//BG_AnimationOverrides(); // just to be safe but we should already be using only available anims (ones in animation.cfg). others cant be used because the array will never loop over them and thus we get assertion error on debug build
-;1099:
-;1100:#ifdef _DEBUG
-;1101:#if JK2_GAME
-;1102:	if (g_developer.integer) {
-;1103:#elif JK2_CGAME
-;1104:	if (cg_developer.integer) {
-;1105:#endif
-;1106:	//Check the array, and print the ones that have nothing in them.
-;1107:	for (i = 0; i < MAX_ANIMATIONS; i++)
-;1108:	{
-;1109:		if (animTable[i].name != NULL)		// This animation reference exists.
-;1110:		{
-;1111:			if (bgGlobalAnimations[i].firstFrame <= 0 && bgGlobalAnimations[i].numFrames <= 0)
-;1112:			{	// This is an empty animation reference.
-;1113:				Com_Printf("***ANIMTABLE reference #%d (%s) is empty!\n", i, animTable[i].name);
-;1114:			}
-;1115:		}
-;1116:	}
-;1117:	}
-;1118:#endif // _DEBUG
-;1119:
-;1120:#ifdef CONVENIENT_ANIMATION_FILE_DEBUG_THING
-;1121:	SpewDebugStuffToFile();
-;1122:#endif
-;1123:	BGPAFtextLoaded = qtrue;
-ADDRGP4 BGPAFtextLoaded
-CNSTI4 1
-ASGNI4
-line 1124
-;1124:	return qtrue;
-CNSTI4 1
-RETI4
-LABELV $2747
-endproc BG_ParseAnimationFile 80 12
-proc PM_StartLegsAnim 16 16
-line 1135
-;1125:}
-;1126:
-;1127:
-;1128:
-;1129:/*
-;1130:===================
-;1131:LEGS Animations
-;1132:Base animation for overall body
-;1133:===================
-;1134:*/
-;1135:static void PM_StartLegsAnim( int anim ) {
-line 1136
-;1136:	if ( pm->ps->pm_type >= PM_DEAD ) {
-ADDRLP4 0
-CNSTI4 4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-ADDRLP4 0
-INDIRI4
-ADDP4
-INDIRI4
-ADDRLP4 0
-INDIRI4
-LTI4 $2804
-line 1137
-;1137:		return;
-ADDRGP4 $2803
-JUMPV
-LABELV $2804
-line 1139
-;1138:	}
-;1139:	if ( pm->ps->legsTimer > 0 ) {
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 0
-LEI4 $2806
-line 1140
-;1140:		return;		// a high priority animation is running
-ADDRGP4 $2803
-JUMPV
-LABELV $2806
-line 1143
-;1141:	}
-;1142:
-;1143:	if (pm->ps->usingATST)
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 1316
-ADDP4
-INDIRI4
-CNSTI4 0
-EQI4 $2808
-line 1144
-;1144:	{ //animation is handled mostly client-side with only a few exceptions
-line 1145
-;1145:		return;
-ADDRGP4 $2803
-JUMPV
-LABELV $2808
-line 1155
-;1146:	}
-;1147:
-;1148:	/*
-;1149:	if (BG_InSaberStandAnim(anim) && pm->ps->weapon == WP_SABER && pm->ps->dualBlade)
-;1150:	{ //a bit of a hack, but dualblade is cheat-only anyway
-;1151:		anim = BOTH_STAND1;
-;1152:	}
-;1153:	*/
-;1154:
-;1155:	pm->ps->legsAnim = ( ( pm->ps->legsAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT )
-ADDRLP4 4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-ASGNP4
-ADDRLP4 8
-CNSTI4 2048
-ASGNI4
-ADDRLP4 4
-INDIRP4
-ADDRLP4 4
-INDIRP4
-INDIRI4
-ADDRLP4 8
-INDIRI4
-BANDI4
-ADDRLP4 8
-INDIRI4
-BXORI4
-ADDRFP4 0
-INDIRI4
-BORI4
-ASGNI4
-line 1158
-;1156:		| anim;
-;1157:
-;1158:	if ( pm->debugLevel ) {
-ADDRGP4 pm
-INDIRP4
-CNSTI4 68
-ADDP4
-INDIRI4
-CNSTI4 0
-EQI4 $2810
-line 1159
-;1159:		Com_Printf("%d:  StartLegsAnim %d, on client#%d\n", pm->cmd.serverTime, anim, pm->ps->clientNum);
-ADDRGP4 $2812
-ARGP4
-ADDRLP4 12
-ADDRGP4 pm
-INDIRP4
-ASGNP4
-ADDRLP4 12
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-ARGI4
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 12
-INDIRP4
-INDIRP4
-CNSTI4 144
-ADDP4
-INDIRI4
-ARGI4
-ADDRGP4 Com_Printf
-CALLV
-pop
-line 1160
-;1160:	}
-LABELV $2810
-line 1161
-;1161:}
-LABELV $2803
-endproc PM_StartLegsAnim 16 16
+proc BG_ParseAnimationFile 0 0
+endproc BG_ParseAnimationFile 0 0
+proc PM_StartLegsAnim 0 0
+endproc PM_StartLegsAnim 0 0
 export PM_ContinueLegsAnim
-proc PM_ContinueLegsAnim 0 4
-line 1163
-;1162:
-;1163:void PM_ContinueLegsAnim( int anim ) {
-line 1164
-;1164:	if ( ( pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) == anim ) {
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ADDRFP4 0
-INDIRI4
-NEI4 $2814
-line 1165
-;1165:		return;
-ADDRGP4 $2813
-JUMPV
-LABELV $2814
-line 1167
-;1166:	}
-;1167:	if ( pm->ps->legsTimer > 0 ) {
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 0
-LEI4 $2816
-line 1168
-;1168:		return;		// a high priority animation is running
-ADDRGP4 $2813
-JUMPV
-LABELV $2816
-line 1171
-;1169:	}
-;1170:
-;1171:	PM_StartLegsAnim( anim );
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRGP4 PM_StartLegsAnim
-CALLV
-pop
-line 1172
-;1172:}
-LABELV $2813
-endproc PM_ContinueLegsAnim 0 4
+proc PM_ContinueLegsAnim 0 0
+endproc PM_ContinueLegsAnim 0 0
 export PM_ForceLegsAnim
-proc PM_ForceLegsAnim 40 8
-line 1174
-;1173:
-;1174:void PM_ForceLegsAnim( int anim) {
-line 1175
-;1175:	if (BG_InSpecialJump(pm->ps->legsAnim, pm->modParms.runFlags) &&
-ADDRLP4 0
-ADDRGP4 pm
-INDIRP4
-ASGNP4
-ADDRLP4 0
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 0
-INDIRP4
-CNSTI4 288
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 4
-ADDRGP4 BG_InSpecialJump
-CALLI4
-ASGNI4
-ADDRLP4 8
-CNSTI4 0
-ASGNI4
-ADDRLP4 4
-INDIRI4
-ADDRLP4 8
-INDIRI4
-EQI4 $2819
-ADDRLP4 12
-ADDRGP4 pm
-INDIRP4
-ASGNP4
-ADDRLP4 12
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-ADDRLP4 8
-INDIRI4
-LEI4 $2819
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 12
-INDIRP4
-CNSTI4 288
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 16
-ADDRGP4 BG_InSpecialJump
-CALLI4
-ASGNI4
-ADDRLP4 16
-INDIRI4
-CNSTI4 0
-NEI4 $2819
-line 1178
-;1176:		pm->ps->legsTimer > 0 &&
-;1177:		!BG_InSpecialJump(anim, pm->modParms.runFlags))
-;1178:	{
-line 1179
-;1179:		return;
-ADDRGP4 $2818
-JUMPV
-LABELV $2819
-line 1182
-;1180:	}
-;1181:
-;1182:	if (BG_InRoll(pm->ps, pm->ps->legsAnim) &&
-ADDRLP4 20
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-ARGP4
-ADDRLP4 20
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 24
-ADDRGP4 BG_InRoll
-CALLI4
-ASGNI4
-ADDRLP4 28
-CNSTI4 0
-ASGNI4
-ADDRLP4 24
-INDIRI4
-ADDRLP4 28
-INDIRI4
-EQI4 $2821
-ADDRLP4 32
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-ASGNP4
-ADDRLP4 32
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-ADDRLP4 28
-INDIRI4
-LEI4 $2821
-ADDRLP4 32
-INDIRP4
-ARGP4
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRLP4 36
-ADDRGP4 BG_InRoll
-CALLI4
-ASGNI4
-ADDRLP4 36
-INDIRI4
-CNSTI4 0
-NEI4 $2821
-line 1185
-;1183:		pm->ps->legsTimer > 0 &&
-;1184:		!BG_InRoll(pm->ps, anim))
-;1185:	{
-line 1186
-;1186:		return;
-ADDRGP4 $2818
-JUMPV
-LABELV $2821
-line 1189
-;1187:	}
-;1188:
-;1189:	pm->ps->legsTimer = 0;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-CNSTI4 0
-ASGNI4
-line 1190
-;1190:	PM_StartLegsAnim( anim );
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRGP4 PM_StartLegsAnim
-CALLV
-pop
-line 1191
-;1191:}
-LABELV $2818
-endproc PM_ForceLegsAnim 40 8
+proc PM_ForceLegsAnim 0 0
+endproc PM_ForceLegsAnim 0 0
 export PM_StartTorsoAnim
-proc PM_StartTorsoAnim 12 0
-line 1201
-;1192:
-;1193:
-;1194:
-;1195:/*
-;1196:===================
-;1197:TORSO Animations
-;1198:Override animations for upper body
-;1199:===================
-;1200:*/
-;1201:void PM_StartTorsoAnim( int anim ) {
-line 1202
-;1202:	if ( pm->ps->pm_type >= PM_DEAD ) {
-ADDRLP4 0
-CNSTI4 4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-ADDRLP4 0
-INDIRI4
-ADDP4
-INDIRI4
-ADDRLP4 0
-INDIRI4
-LTI4 $2824
-line 1203
-;1203:		return;
-ADDRGP4 $2823
-JUMPV
-LABELV $2824
-line 1206
-;1204:	}
-;1205:
-;1206:	if (pm->ps->usingATST)
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 1316
-ADDP4
-INDIRI4
-CNSTI4 0
-EQI4 $2826
-line 1207
-;1207:	{ //animation is handled mostly client-side with only a few exceptions
-line 1208
-;1208:		return;
-ADDRGP4 $2823
-JUMPV
-LABELV $2826
-line 1218
-;1209:	}
-;1210:
-;1211:	/*
-;1212:	if (BG_InSaberStandAnim(anim) && pm->ps->weapon == WP_SABER && pm->ps->dualBlade)
-;1213:	{ //a bit of a hack, but dualblade is cheat-only anyway
-;1214:		anim = BOTH_STAND1;
-;1215:	}
-;1216:	*/
-;1217:
-;1218:	pm->ps->torsoAnim = ( ( pm->ps->torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT )
-ADDRLP4 4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 100
-ADDP4
-ASGNP4
-ADDRLP4 8
-CNSTI4 2048
-ASGNI4
-ADDRLP4 4
-INDIRP4
-ADDRLP4 4
-INDIRP4
-INDIRI4
-ADDRLP4 8
-INDIRI4
-BANDI4
-ADDRLP4 8
-INDIRI4
-BXORI4
-ADDRFP4 0
-INDIRI4
-BORI4
-ASGNI4
-line 1220
-;1219:		| anim;
-;1220:}
-LABELV $2823
-endproc PM_StartTorsoAnim 12 0
+proc PM_StartTorsoAnim 0 0
+endproc PM_StartTorsoAnim 0 0
 export PM_SetLegsAnimTimer
 proc PM_SetLegsAnimTimer 0 0
-line 1230
-;1221:
-;1222:
-;1223:/*
-;1224:-------------------------
-;1225:PM_SetLegsAnimTimer
-;1226:-------------------------
-;1227:*/
-;1228:
-;1229:void PM_SetLegsAnimTimer(int time )
-;1230:{
-line 1231
-;1231:	pm->ps->legsTimer = time;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-line 1233
-;1232:
-;1233:	if (pm->ps->legsTimer < 0 && time != -1 )
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-CNSTI4 0
-GEI4 $2829
-ADDRFP4 0
-INDIRI4
-CNSTI4 -1
-EQI4 $2829
-line 1234
-;1234:	{//Cap timer to 0 if was counting down, but let it be -1 if that was intentional.  NOTENOTE Yeah this seems dumb, but it mirrors SP.
-line 1235
-;1235:		pm->ps->legsTimer = 0;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-CNSTI4 0
-ASGNI4
-line 1236
-;1236:	}
-LABELV $2829
-line 1237
-;1237:}
-LABELV $2828
 endproc PM_SetLegsAnimTimer 0 0
 export PM_SetTorsoAnimTimer
 proc PM_SetTorsoAnimTimer 0 0
-line 1246
-;1238:
-;1239:/*
-;1240:-------------------------
-;1241:PM_SetTorsoAnimTimer
-;1242:-------------------------
-;1243:*/
-;1244:
-;1245:void PM_SetTorsoAnimTimer(int time )
-;1246:{
-line 1247
-;1247:	pm->ps->torsoTimer = time;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ADDRFP4 0
-INDIRI4
-ASGNI4
-line 1249
-;1248:
-;1249:	if (pm->ps->torsoTimer < 0 && time != -1 )
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-INDIRI4
-CNSTI4 0
-GEI4 $2832
-ADDRFP4 0
-INDIRI4
-CNSTI4 -1
-EQI4 $2832
-line 1250
-;1250:	{//Cap timer to 0 if was counting down, but let it be -1 if that was intentional.  NOTENOTE Yeah this seems dumb, but it mirrors SP.
-line 1251
-;1251:		pm->ps->torsoTimer = 0;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-CNSTI4 0
-ASGNI4
-line 1252
-;1252:	}
-LABELV $2832
-line 1253
-;1253:}
-LABELV $2831
 endproc PM_SetTorsoAnimTimer 0 0
 export BG_SaberStartTransAnim
-proc BG_SaberStartTransAnim 16 0
-line 1256
-;1254:
-;1255:void BG_SaberStartTransAnim( int saberAnimLevel, int anim, float *animSpeed )
-;1256:{
-line 1257
-;1257:	if ( ( (anim&~ANIM_TOGGLEBIT) >= BOTH_T1_BR__R && 
-ADDRLP4 0
-ADDRFP4 4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 145
-LTI4 $2838
-ADDRLP4 0
-INDIRI4
-CNSTI4 186
-LEI4 $2839
-LABELV $2838
-ADDRLP4 4
-ADDRFP4 4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 4
-INDIRI4
-CNSTI4 222
-LTI4 $2840
-ADDRLP4 4
-INDIRI4
-CNSTI4 263
-LEI4 $2839
-LABELV $2840
-ADDRLP4 8
-ADDRFP4 4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 299
-LTI4 $2835
-ADDRLP4 8
-INDIRI4
-CNSTI4 340
-GTI4 $2835
-LABELV $2839
-line 1263
-;1258:		(anim&~ANIM_TOGGLEBIT) <= BOTH_T1_BL_TL ) ||
-;1259:		( (anim&~ANIM_TOGGLEBIT) >= BOTH_T2_BR__R && 
-;1260:		(anim&~ANIM_TOGGLEBIT) <= BOTH_T2_BL_TL ) ||
-;1261:		( (anim&~ANIM_TOGGLEBIT) >= BOTH_T3_BR__R && 
-;1262:		(anim&~ANIM_TOGGLEBIT) <= BOTH_T3_BL_TL ) )
-;1263:	{
-line 1264
-;1264:		if ( saberAnimLevel == FORCE_LEVEL_1 )
-ADDRFP4 0
-INDIRI4
-CNSTI4 1
-NEI4 $2841
-line 1265
-;1265:		{
-line 1266
-;1266:			*animSpeed *= 1.5;
-ADDRLP4 12
-ADDRFP4 8
-INDIRP4
-ASGNP4
-ADDRLP4 12
-INDIRP4
-CNSTF4 1069547520
-ADDRLP4 12
-INDIRP4
-INDIRF4
-MULF4
-ASGNF4
-line 1267
-;1267:		}
-ADDRGP4 $2842
-JUMPV
-LABELV $2841
-line 1268
-;1268:		else if ( saberAnimLevel == FORCE_LEVEL_3 )
-ADDRFP4 0
-INDIRI4
-CNSTI4 3
-NEI4 $2843
-line 1269
-;1269:		{
-line 1270
-;1270:			*animSpeed *= 0.75;
-ADDRLP4 12
-ADDRFP4 8
-INDIRP4
-ASGNP4
-ADDRLP4 12
-INDIRP4
-CNSTF4 1061158912
-ADDRLP4 12
-INDIRP4
-INDIRF4
-MULF4
-ASGNF4
-line 1271
-;1271:		}
-LABELV $2843
-LABELV $2842
-line 1272
-;1272:	}
-LABELV $2835
-line 1273
-;1273:}
-LABELV $2834
-endproc BG_SaberStartTransAnim 16 0
+proc BG_SaberStartTransAnim 0 0
+endproc BG_SaberStartTransAnim 0 0
 export PM_SetAnimFinal
-proc PM_SetAnimFinal 40 12
-line 1282
-;1274:
-;1275:/*
-;1276:-------------------------
-;1277:PM_SetAnimFinal
-;1278:-------------------------
-;1279:*/
-;1280:void PM_SetAnimFinal(int setAnimParts,int anim,int setAnimFlags,
-;1281:					 int blendTime)		// default blendTime=350
-;1282:{
-line 1283
-;1283:	animation_t *animations = pm->animations;
-ADDRLP4 0
-ADDRGP4 pm
-INDIRP4
-CNSTI4 260
-ADDP4
-INDIRP4
-ASGNP4
-line 1285
-;1284:
-;1285:	float editAnimSpeed = (jk2gameplay == VERSION_1_02 ? 0 : 1);
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2847
-ADDRLP4 8
-CNSTI4 0
-ASGNI4
-ADDRGP4 $2848
-JUMPV
-LABELV $2847
-ADDRLP4 8
-CNSTI4 1
-ASGNI4
-LABELV $2848
-ADDRLP4 4
-ADDRLP4 8
-INDIRI4
-CVIF4 4
-ASGNF4
-line 1287
-;1286:
-;1287:	if (!animations)
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-CNSTU4 0
-NEU4 $2849
-line 1288
-;1288:	{
-line 1289
-;1289:		return;
-ADDRGP4 $2845
-JUMPV
-LABELV $2849
-line 1293
-;1290:	}
-;1291:
-;1292:	//NOTE: Setting blendTime here breaks actual blending..
-;1293:	blendTime = 0;
-ADDRFP4 12
-CNSTI4 0
-ASGNI4
-line 1295
-;1294:
-;1295:	BG_SaberStartTransAnim(pm->ps->fd.saberAnimLevel, anim, &editAnimSpeed);
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 1228
-ADDP4
-INDIRI4
-ARGI4
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRLP4 4
-ARGP4
-ADDRGP4 BG_SaberStartTransAnim
-CALLV
-pop
-line 1298
-;1296:
-;1297:	// Set torso anim
-;1298:	if (setAnimParts & SETANIM_TORSO)
-ADDRFP4 0
-INDIRI4
-CNSTI4 1
-BANDI4
-CNSTI4 0
-EQI4 $2851
-line 1299
-;1299:	{
-line 1301
-;1300:		// Don't reset if it's already running the anim
-;1301:		if( !(setAnimFlags & SETANIM_FLAG_RESTART) && (pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) == anim )
-ADDRFP4 8
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-NEI4 $2853
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 100
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ADDRFP4 4
-INDIRI4
-NEI4 $2853
-line 1302
-;1302:		{
-line 1303
-;1303:			goto setAnimLegs;
-ADDRGP4 $2855
-JUMPV
-LABELV $2853
-line 1306
-;1304:		}
-;1305:		// or if a more important anim is running
-;1306:		if( !(setAnimFlags & SETANIM_FLAG_OVERRIDE) && ((pm->ps->torsoTimer > 0)||(pm->ps->torsoTimer == -1)) )
-ADDRLP4 12
-CNSTI4 0
-ASGNI4
-ADDRFP4 8
-INDIRI4
-CNSTI4 1
-BANDI4
-ADDRLP4 12
-INDIRI4
-NEI4 $2856
-ADDRLP4 16
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-INDIRI4
-ASGNI4
-ADDRLP4 16
-INDIRI4
-ADDRLP4 12
-INDIRI4
-GTI4 $2858
-ADDRLP4 16
-INDIRI4
-CNSTI4 -1
-NEI4 $2856
-LABELV $2858
-line 1307
-;1307:		{	
-line 1308
-;1308:			goto setAnimLegs;
-ADDRGP4 $2855
-JUMPV
-LABELV $2856
-line 1311
-;1309:		}
-;1310:
-;1311:		PM_StartTorsoAnim( anim );
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRGP4 PM_StartTorsoAnim
-CALLV
-pop
-line 1313
-;1312:
-;1313:		if (setAnimFlags & SETANIM_FLAG_HOLD)
-ADDRFP4 8
-INDIRI4
-CNSTI4 2
-BANDI4
-CNSTI4 0
-EQI4 $2859
-line 1314
-;1314:		{
-line 1315
-;1315:			if (setAnimFlags & SETANIM_FLAG_HOLDLESS)
-ADDRFP4 8
-INDIRI4
-CNSTI4 8
-BANDI4
-CNSTI4 0
-EQI4 $2861
-line 1316
-;1316:			{	// Make sure to only wait in full 1/20 sec server frame intervals.
-line 1320
-;1317:				int dur;
-;1318:				int speedDif;
-;1319:				
-;1320:				if ( jk2gameplay == VERSION_1_02 )
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2863
-line 1321
-;1321:				{
-line 1322
-;1322:					dur = (animations[anim].numFrames ) * abs(animations[anim].frameLerp);
-ADDRLP4 28
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 28
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 32
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 28
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-ADDRLP4 32
-INDIRI4
-MULI4
-ASGNI4
-line 1324
-;1323:					//dur = ((int)(dur/50.0)) * 50 / timeScaleMod;
-;1324:					dur -= blendTime+abs(animations[anim].frameLerp)*2;
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 36
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 20
-INDIRI4
-ADDRFP4 12
-INDIRI4
-ADDRLP4 36
-INDIRI4
-CNSTI4 1
-LSHI4
-ADDI4
-SUBI4
-ASGNI4
-line 1325
-;1325:				}
-ADDRGP4 $2864
-JUMPV
-LABELV $2863
-line 1327
-;1326:				else
-;1327:				{
-line 1328
-;1328:					dur = (animations[anim].numFrames-1) * abs(animations[anim].frameLerp);
-ADDRLP4 28
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 28
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 32
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 28
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-CNSTI4 1
-SUBI4
-ADDRLP4 32
-INDIRI4
-MULI4
-ASGNI4
-line 1329
-;1329:					speedDif = dur - (dur * editAnimSpeed);
-ADDRLP4 36
-ADDRLP4 20
-INDIRI4
-CVIF4 4
-ASGNF4
-ADDRLP4 24
-ADDRLP4 36
-INDIRF4
-ADDRLP4 36
-INDIRF4
-ADDRLP4 4
-INDIRF4
-MULF4
-SUBF4
-CVFI4 4
-ASGNI4
-line 1330
-;1330:					dur += speedDif;
-ADDRLP4 20
-ADDRLP4 20
-INDIRI4
-ADDRLP4 24
-INDIRI4
-ADDI4
-ASGNI4
-line 1331
-;1331:				}
-LABELV $2864
-line 1332
-;1332:				if (dur > 1)
-ADDRLP4 20
-INDIRI4
-CNSTI4 1
-LEI4 $2865
-line 1333
-;1333:				{
-line 1334
-;1334:					pm->ps->torsoTimer = dur-1;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ADDRLP4 20
-INDIRI4
-CNSTI4 1
-SUBI4
-ASGNI4
-line 1335
-;1335:				}
-ADDRGP4 $2862
-JUMPV
-LABELV $2865
-line 1337
-;1336:				else
-;1337:				{
-line 1338
-;1338:					pm->ps->torsoTimer = abs(animations[anim].frameLerp);
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 28
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ADDRLP4 28
-INDIRI4
-ASGNI4
-line 1339
-;1339:				}
-line 1340
-;1340:			}
-ADDRGP4 $2862
-JUMPV
-LABELV $2861
-line 1342
-;1341:			else
-;1342:			{
-line 1343
-;1343:				pm->ps->torsoTimer = ((animations[anim].numFrames ) * abs(animations[anim].frameLerp));
-ADDRLP4 20
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 24
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ADDRLP4 20
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-ADDRLP4 24
-INDIRI4
-MULI4
-ASGNI4
-line 1344
-;1344:			}
-LABELV $2862
-line 1346
-;1345:
-;1346:			if (pm->ps->fd.forcePowersActive & (1 << FP_RAGE))
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 848
-ADDP4
-INDIRI4
-CNSTI4 256
-BANDI4
-CNSTI4 0
-EQI4 $2867
-line 1347
-;1347:			{
-line 1348
-;1348:				pm->ps->torsoTimer /= 1.7;
-ADDRLP4 20
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-ADDRLP4 20
-INDIRP4
-INDIRI4
-CVIF4 4
-CNSTF4 1071225242
-DIVF4
-CVFI4 4
-ASGNI4
-line 1349
-;1349:			}
-LABELV $2867
-line 1351
-;1350:
-;1351:			if (editAnimSpeed && jk2gameplay == VERSION_1_02)
-ADDRLP4 4
-INDIRF4
-CNSTF4 0
-EQF4 $2869
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2869
-line 1352
-;1352:			{
-line 1353
-;1353:				pm->ps->torsoTimer /= editAnimSpeed;
-ADDRLP4 20
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 96
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-ADDRLP4 20
-INDIRP4
-INDIRI4
-CVIF4 4
-ADDRLP4 4
-INDIRF4
-DIVF4
-CVFI4 4
-ASGNI4
-line 1354
-;1354:			}
-LABELV $2869
-line 1355
-;1355:		}
-LABELV $2859
-line 1356
-;1356:	}
-LABELV $2851
-LABELV $2855
-line 1360
-;1357:
-;1358:setAnimLegs:
-;1359:	// Set legs anim
-;1360:	if (setAnimParts & SETANIM_LEGS)
-ADDRFP4 0
-INDIRI4
-CNSTI4 2
-BANDI4
-CNSTI4 0
-EQI4 $2845
-line 1361
-;1361:	{
-line 1363
-;1362:		// Don't reset if it's already running the anim
-;1363:		if( !(setAnimFlags & SETANIM_FLAG_RESTART) && (pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) == anim )
-ADDRFP4 8
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-NEI4 $2873
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ADDRFP4 4
-INDIRI4
-NEI4 $2873
-line 1364
-;1364:		{
-line 1365
-;1365:			goto setAnimDone;
-ADDRGP4 $2845
-JUMPV
-LABELV $2873
-line 1368
-;1366:		}
-;1367:		// or if a more important anim is running
-;1368:		if( !(setAnimFlags & SETANIM_FLAG_OVERRIDE) && ((pm->ps->legsTimer > 0)||(pm->ps->legsTimer == -1)) )
-ADDRLP4 12
-CNSTI4 0
-ASGNI4
-ADDRFP4 8
-INDIRI4
-CNSTI4 1
-BANDI4
-ADDRLP4 12
-INDIRI4
-NEI4 $2876
-ADDRLP4 16
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-INDIRI4
-ASGNI4
-ADDRLP4 16
-INDIRI4
-ADDRLP4 12
-INDIRI4
-GTI4 $2878
-ADDRLP4 16
-INDIRI4
-CNSTI4 -1
-NEI4 $2876
-LABELV $2878
-line 1369
-;1369:		{	
-line 1370
-;1370:			goto setAnimDone;
-ADDRGP4 $2845
-JUMPV
-LABELV $2876
-line 1373
-;1371:		}
-;1372:
-;1373:		PM_StartLegsAnim(anim);
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRGP4 PM_StartLegsAnim
-CALLV
-pop
-line 1375
-;1374:
-;1375:		if (setAnimFlags & SETANIM_FLAG_HOLD)
-ADDRFP4 8
-INDIRI4
-CNSTI4 2
-BANDI4
-CNSTI4 0
-EQI4 $2845
-line 1376
-;1376:		{
-line 1377
-;1377:			if (setAnimFlags & SETANIM_FLAG_HOLDLESS)
-ADDRFP4 8
-INDIRI4
-CNSTI4 8
-BANDI4
-CNSTI4 0
-EQI4 $2881
-line 1378
-;1378:			{	// Make sure to only wait in full 1/20 sec server frame intervals.
-line 1382
-;1379:				int dur;
-;1380:				int speedDif;
-;1381:				
-;1382:				if ( jk2gameplay == VERSION_1_02 )
-ADDRGP4 jk2gameplay
-INDIRI4
-CNSTI4 2
-NEI4 $2883
-line 1383
-;1383:				{
-line 1384
-;1384:					dur = (animations[anim].numFrames -1) * abs(animations[anim].frameLerp);
-ADDRLP4 28
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 28
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 32
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 28
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-CNSTI4 1
-SUBI4
-ADDRLP4 32
-INDIRI4
-MULI4
-ASGNI4
-line 1386
-;1385:					//dur = ((int)(dur/50.0)) * 50 / timeScaleMod;
-;1386:					dur -= blendTime+abs(animations[anim].frameLerp)*2;
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 36
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 20
-INDIRI4
-ADDRFP4 12
-INDIRI4
-ADDRLP4 36
-INDIRI4
-CNSTI4 1
-LSHI4
-ADDI4
-SUBI4
-ASGNI4
-line 1387
-;1387:				}
-ADDRGP4 $2884
-JUMPV
-LABELV $2883
-line 1389
-;1388:				else
-;1389:				{
-line 1390
-;1390:					dur = (animations[anim].numFrames-1) * abs(animations[anim].frameLerp);
-ADDRLP4 28
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 28
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 32
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRLP4 20
-ADDRLP4 28
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-CNSTI4 1
-SUBI4
-ADDRLP4 32
-INDIRI4
-MULI4
-ASGNI4
-line 1391
-;1391:					speedDif = dur - (dur * editAnimSpeed);
-ADDRLP4 36
-ADDRLP4 20
-INDIRI4
-CVIF4 4
-ASGNF4
-ADDRLP4 24
-ADDRLP4 36
-INDIRF4
-ADDRLP4 36
-INDIRF4
-ADDRLP4 4
-INDIRF4
-MULF4
-SUBF4
-CVFI4 4
-ASGNI4
-line 1392
-;1392:					dur += speedDif;
-ADDRLP4 20
-ADDRLP4 20
-INDIRI4
-ADDRLP4 24
-INDIRI4
-ADDI4
-ASGNI4
-line 1393
-;1393:				}
-LABELV $2884
-line 1394
-;1394:				if (dur > 1)
-ADDRLP4 20
-INDIRI4
-CNSTI4 1
-LEI4 $2885
-line 1395
-;1395:				{
-line 1396
-;1396:					pm->ps->legsTimer = dur-1;
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ADDRLP4 20
-INDIRI4
-CNSTI4 1
-SUBI4
-ASGNI4
-line 1397
-;1397:				}
-ADDRGP4 $2882
-JUMPV
-LABELV $2885
-line 1399
-;1398:				else
-;1399:				{
-line 1400
-;1400:					pm->ps->legsTimer = abs(animations[anim].frameLerp);
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 28
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ADDRLP4 28
-INDIRI4
-ASGNI4
-line 1401
-;1401:				}
-line 1402
-;1402:			}
-ADDRGP4 $2882
-JUMPV
-LABELV $2881
-line 1404
-;1403:			else
-;1404:			{
-line 1405
-;1405:				pm->ps->legsTimer = ((animations[anim].numFrames ) * abs(animations[anim].frameLerp));
-ADDRLP4 20
-CNSTI4 28
-ADDRFP4 4
-INDIRI4
-MULI4
-ADDRLP4 0
-INDIRP4
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-CNSTI4 12
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 24
-ADDRGP4 abs
-CALLI4
-ASGNI4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ADDRLP4 20
-INDIRP4
-CNSTI4 4
-ADDP4
-INDIRI4
-ADDRLP4 24
-INDIRI4
-MULI4
-ASGNI4
-line 1406
-;1406:			}
-LABELV $2882
-line 1408
-;1407:
-;1408:			if (pm->ps->fd.forcePowersActive & (1 << FP_RAGE))
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 848
-ADDP4
-INDIRI4
-CNSTI4 256
-BANDI4
-CNSTI4 0
-EQI4 $2887
-line 1409
-;1409:			{
-line 1410
-;1410:				pm->ps->legsTimer /= 1.3;
-ADDRLP4 20
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-ADDRLP4 20
-INDIRP4
-INDIRI4
-CVIF4 4
-CNSTF4 1067869798
-DIVF4
-CVFI4 4
-ASGNI4
-line 1411
-;1411:			}
-ADDRGP4 $2845
-JUMPV
-LABELV $2887
-line 1412
-;1412:			else if (pm->ps->fd.forcePowersActive & (1 << FP_SPEED))
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 848
-ADDP4
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-EQI4 $2845
-line 1413
-;1413:			{
-line 1414
-;1414:				pm->ps->legsTimer /= 1.7;
-ADDRLP4 20
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 88
-ADDP4
-ASGNP4
-ADDRLP4 20
-INDIRP4
-ADDRLP4 20
-INDIRP4
-INDIRI4
-CVIF4 4
-CNSTF4 1071225242
-DIVF4
-CVFI4 4
-ASGNI4
-line 1415
-;1415:			}
-line 1416
-;1416:		}
-line 1417
-;1417:	}
-line 1420
-;1418:
-;1419:setAnimDone:
-;1420:	return;
-LABELV $2845
-endproc PM_SetAnimFinal 40 12
+proc PM_SetAnimFinal 0 0
+endproc PM_SetAnimFinal 0 0
 export PM_SetAnim
-proc PM_SetAnim 12 16
-line 1427
-;1421:}
-;1422:
-;1423:
-;1424:
-;1425:// Imported from single-player, this function is mainly intended to make porting from SP easier.
-;1426:void PM_SetAnim(int setAnimParts,int anim,int setAnimFlags, int blendTime)
-;1427:{	
-line 1429
-;1428:#if JK2_GAME // server might use stuff we don't have in cgame, that's ok.
-;1429:	assert(	bgGlobalAnimations[anim].firstFrame != 0 || 
-line 1433
-;1430:			bgGlobalAnimations[anim].numFrames != 0);
-;1431:#endif
-;1432:
-;1433:	if (BG_InSpecialJump(anim, pm->modParms.runFlags))
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRGP4 pm
-INDIRP4
-CNSTI4 288
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 0
-ADDRGP4 BG_InSpecialJump
-CALLI4
-ASGNI4
-ADDRLP4 0
-INDIRI4
-CNSTI4 0
-EQI4 $2892
-line 1434
-;1434:	{
-line 1435
-;1435:		setAnimFlags |= SETANIM_FLAG_RESTART;
-ADDRFP4 8
-ADDRFP4 8
-INDIRI4
-CNSTI4 4
-BORI4
-ASGNI4
-line 1436
-;1436:	}
-LABELV $2892
-line 1438
-;1437:
-;1438:	if (BG_InRoll(pm->ps, pm->ps->legsAnim))
-ADDRLP4 4
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-ASGNP4
-ADDRLP4 4
-INDIRP4
-ARGP4
-ADDRLP4 4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-ARGI4
-ADDRLP4 8
-ADDRGP4 BG_InRoll
-CALLI4
-ASGNI4
-ADDRLP4 8
-INDIRI4
-CNSTI4 0
-EQI4 $2894
-line 1439
-;1439:	{ //never interrupt a roll
-line 1440
-;1440:		return;
-ADDRGP4 $2891
-JUMPV
-LABELV $2894
-line 1443
-;1441:	}
-;1442:
-;1443:	if (setAnimFlags&SETANIM_FLAG_OVERRIDE)
-ADDRFP4 8
-INDIRI4
-CNSTI4 1
-BANDI4
-CNSTI4 0
-EQI4 $2896
-line 1444
-;1444:	{
-line 1445
-;1445:		if (setAnimParts & SETANIM_TORSO)
-ADDRFP4 0
-INDIRI4
-CNSTI4 1
-BANDI4
-CNSTI4 0
-EQI4 $2898
-line 1446
-;1446:		{
-line 1447
-;1447:			if( (setAnimFlags & SETANIM_FLAG_RESTART) || (pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) != anim )
-ADDRFP4 8
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-NEI4 $2902
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 100
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ADDRFP4 4
-INDIRI4
-EQI4 $2900
-LABELV $2902
-line 1448
-;1448:			{
-line 1449
-;1449:				PM_SetTorsoAnimTimer(0);
-CNSTI4 0
-ARGI4
-ADDRGP4 PM_SetTorsoAnimTimer
-CALLV
-pop
-line 1450
-;1450:			}
-LABELV $2900
-line 1451
-;1451:		}
-LABELV $2898
-line 1452
-;1452:		if (setAnimParts & SETANIM_LEGS)
-ADDRFP4 0
-INDIRI4
-CNSTI4 2
-BANDI4
-CNSTI4 0
-EQI4 $2903
-line 1453
-;1453:		{
-line 1454
-;1454:			if( (setAnimFlags & SETANIM_FLAG_RESTART) || (pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) != anim )
-ADDRFP4 8
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-NEI4 $2907
-ADDRGP4 pm
-INDIRP4
-INDIRP4
-CNSTI4 92
-ADDP4
-INDIRI4
-CNSTI4 -2049
-BANDI4
-ADDRFP4 4
-INDIRI4
-EQI4 $2905
-LABELV $2907
-line 1455
-;1455:			{
-line 1456
-;1456:				PM_SetLegsAnimTimer(0);
-CNSTI4 0
-ARGI4
-ADDRGP4 PM_SetLegsAnimTimer
-CALLV
-pop
-line 1457
-;1457:			}
-LABELV $2905
-line 1458
-;1458:		}
-LABELV $2903
-line 1459
-;1459:	}
-LABELV $2896
-line 1461
-;1460:
-;1461:	PM_SetAnimFinal(setAnimParts, anim, setAnimFlags, blendTime);
-ADDRFP4 0
-INDIRI4
-ARGI4
-ADDRFP4 4
-INDIRI4
-ARGI4
-ADDRFP4 8
-INDIRI4
-ARGI4
-ADDRFP4 12
-INDIRI4
-ARGI4
-ADDRGP4 PM_SetAnimFinal
-CALLV
-pop
-line 1462
-;1462:}
-LABELV $2891
-endproc PM_SetAnim 12 16
+proc PM_SetAnim 0 0
+endproc PM_SetAnim 0 0
 bss
 export BGPAFtext
 align 1
 LABELV BGPAFtext
 skip 40000
-import ClientInactivitySpecTimerReset
-import G_ResetClientVote
-import generateHashValue
-import DF_UpdateRanksMainRequest
-import G_BufferedSendOrPrintFlushIfNeeded
-import G_BufferedSendOrPrintFlush
-import G_BufferedSendOrPrint
-import G_SendOrPrint
-import DF_KeepClientZombie
-import DF_RequestSubContestLeaderboard
-import DF_SetPlayerSubContestValue
-import DF_ClientInSegmentedRunMode
-import DF_PostDeltaAngleChange
-import DF_PreDeltaAngleChange
-import helpTipCount
-import helpTips
+import trap_AnyLanguage_ReadCharFromString_1_02
+import trap_AnyLanguage_ReadCharFromString_1_04
 import trap_G2API_SetBoneAnim
 import trap_G2API_GetGLAName
 import trap_G2API_SetBoneAngles
@@ -11253,18 +4794,17 @@ import trap_G2API_SetBoltInfo
 import trap_G2API_AddBolt
 import trap_G2API_InitGhoul2Model
 import trap_G2API_GetBoltMatrix_NoRecNoRot
-import MV_PlayerStateToEngine
-import MV_PlayerStateFromEngine
-import MV_VersionMagic
+import trap_CG_RegisterSharedMemory
+import trap_G2API_SetNewOrigin
+import trap_G2API_SetSurfaceOnOff
+import trap_G2API_SetRootSurface
+import trap_Language_UsesSpaces
+import trap_Language_IsAsian
 import MV_SetGameVersion
-import g_ps
 import trap_MVAPI_EnableSubmodelBypass
-import trap_MVAPI_EnablePlayerSnapshots
-import trap_MVAPI_ResetServerTime
-import trap_MVAPI_DisableStructConversion
-import trap_MVAPI_LocateGameData
-import trap_MVAPI_GetConnectionlessPacket
-import trap_MVAPI_SendConnectionlessPacket
+import CG_Cvar_Get_int
+import trap_MVAPI_SetVirtualScreen
+import trap_R_AddRefEntityToScene2
 import trap_MVAPI_Print
 import trap_MVAPI_SetVersion
 import trap_FS_FLock
@@ -11272,684 +4812,737 @@ import trap_MVAPI_GetVersion
 import trap_MVAPI_ControlFixes
 import MVAPI_AfterInit
 import MVAPI_Init
-import mvStructConversionDisabled
-import mvapi
-import gRandomUnlockAdd
-import coolApi_userCmdVersion
 import coolApi_jkaVersion
 import coolApi_dbVersion
 import coolApi
-import trap_ROFF_Purge_Ent
-import trap_ROFF_Play
-import trap_ROFF_Cache
-import trap_ROFF_UpdateEntities
-import trap_ROFF_Clean
-import trap_SP_GetStringTextString
-import trap_SP_Register
-import trap_SP_RegisterServer
-import trap_RealTime
-import trap_SnapVector
-import trap_GeneticParentsAndChildSelection
-import trap_BotResetWeaponState
-import trap_BotFreeWeaponState
-import trap_BotAllocWeaponState
-import trap_BotLoadWeaponWeights
-import trap_BotGetWeaponInfo
-import trap_BotChooseBestFightWeapon
-import trap_BotAddAvoidSpot
-import trap_BotInitMoveState
-import trap_BotFreeMoveState
-import trap_BotAllocMoveState
-import trap_BotPredictVisiblePosition
-import trap_BotMovementViewTarget
-import trap_BotReachabilityArea
-import trap_BotResetLastAvoidReach
-import trap_BotResetAvoidReach
-import trap_BotMoveInDirection
-import trap_BotMoveToGoal
-import trap_BotResetMoveState
-import trap_BotFreeGoalState
-import trap_BotAllocGoalState
-import trap_BotMutateGoalFuzzyLogic
-import trap_BotSaveGoalFuzzyLogic
-import trap_BotInterbreedGoalFuzzyLogic
-import trap_BotFreeItemWeights
-import trap_BotLoadItemWeights
-import trap_BotUpdateEntityItems
-import trap_BotInitLevelItems
-import trap_BotSetAvoidGoalTime
-import trap_BotAvoidGoalTime
-import trap_BotGetLevelItemGoal
-import trap_BotGetMapLocationGoal
-import trap_BotGetNextCampSpotGoal
-import trap_BotItemGoalInVisButNotVisible
-import trap_BotTouchingGoal
-import trap_BotChooseNBGItem
-import trap_BotChooseLTGItem
-import trap_BotGetSecondGoal
-import trap_BotGetTopGoal
-import trap_BotGoalName
-import trap_BotDumpGoalStack
-import trap_BotDumpAvoidGoals
-import trap_BotEmptyGoalStack
-import trap_BotPopGoal
-import trap_BotPushGoal
-import trap_BotResetAvoidGoals
-import trap_BotRemoveFromAvoidGoals
-import trap_BotResetGoalState
-import trap_BotSetChatName
-import trap_BotSetChatGender
-import trap_BotLoadChatFile
-import trap_BotReplaceSynonyms
-import trap_UnifyWhiteSpaces
-import trap_BotMatchVariable
-import trap_BotFindMatch
-import trap_StringContains
-import trap_BotGetChatMessage
-import trap_BotEnterChat
-import trap_BotChatLength
-import trap_BotReplyChat
-import trap_BotNumInitialChats
-import trap_BotInitialChat
-import trap_BotNumConsoleMessages
-import trap_BotNextConsoleMessage
-import trap_BotRemoveConsoleMessage
-import trap_BotQueueConsoleMessage
-import trap_BotFreeChatState
-import trap_BotAllocChatState
-import trap_Characteristic_String
-import trap_Characteristic_BInteger
-import trap_Characteristic_Integer
-import trap_Characteristic_BFloat
-import trap_Characteristic_Float
-import trap_BotFreeCharacter
-import trap_BotLoadCharacter
-import trap_EA_ResetInput
-import trap_EA_GetInput
-import trap_EA_EndRegular
-import trap_EA_ForcePower
-import trap_EA_Alt_Attack
-import trap_EA_View
-import trap_EA_Move
-import trap_EA_DelayedJump
-import trap_EA_Jump
-import trap_EA_SelectWeapon
-import trap_EA_MoveRight
-import trap_EA_MoveLeft
-import trap_EA_MoveBack
-import trap_EA_MoveForward
-import trap_EA_MoveDown
-import trap_EA_MoveUp
-import trap_EA_Crouch
-import trap_EA_Respawn
-import trap_EA_Use
-import trap_EA_Attack
-import trap_EA_Talk
-import trap_EA_Gesture
-import trap_EA_Action
-import trap_EA_Command
-import trap_EA_SayTeam
-import trap_EA_Say
-import trap_AAS_PredictClientMovement
-import trap_AAS_Swimming
-import trap_AAS_AlternativeRouteGoals
-import trap_AAS_PredictRoute
-import trap_AAS_EnableRoutingArea
-import trap_AAS_AreaTravelTimeToGoalArea
-import trap_AAS_AreaReachability
-import trap_AAS_IntForBSPEpairKey
-import trap_AAS_FloatForBSPEpairKey
-import trap_AAS_VectorForBSPEpairKey
-import trap_AAS_ValueForBSPEpairKey
-import trap_AAS_NextBSPEntity
-import trap_AAS_PointContents
-import trap_AAS_TraceAreas
-import trap_AAS_PointReachabilityAreaIndex
-import trap_AAS_PointAreaNum
-import trap_AAS_Time
-import trap_AAS_PresenceTypeBoundingBox
-import trap_AAS_Initialized
-import trap_AAS_EntityInfo
-import trap_AAS_AreaInfo
-import trap_AAS_BBoxAreas
-import trap_BotUserCommand
-import trap_BotGetServerCommand
-import trap_BotGetSnapshotEntity
-import trap_BotLibTest
-import trap_BotLibUpdateEntity
-import trap_BotLibLoadMap
-import trap_BotLibStartFrame
-import trap_BotLibDefine
-import trap_BotLibVarGet
-import trap_BotLibVarSet
-import trap_BotLibShutdown
-import trap_BotLibSetup
-import trap_DebugPolygonDelete
-import trap_DebugPolygonCreate
-import trap_GetEntityToken
-import trap_GetUsercmd
-import trap_BotFreeClient
-import trap_BotAllocateClient
-import trap_EntityContact
-import trap_EntitiesInBox
-import trap_UnlinkEntity
-import trap_LinkEntity
-import trap_AreasConnected
-import trap_AdjustAreaPortalState
-import trap_InPVSIgnorePortals
-import trap_InPVS
-import trap_PointContents
-import JP_TraceCustomEpsilonQ2Lite
-import JP_TraceCustomEpsilonQ2
-import JP_TracePrecise
-import JP_Trace
-import trap_Trace
-import trap_SetBrushModel
-import trap_GetServerinfo
-import trap_SetUserinfo
-import trap_GetUserinfo
-import trap_GetConfigstring
-import trap_SetConfigstring
-import trap_SendServerCommand
-import trap_DropClient
-import trap_LocateGameData
-import trap_Cvar_VariableStringBuffer
-import trap_Cvar_VariableValue
-import trap_Cvar_VariableIntegerValue
-import trap_Cvar_Set
-import trap_Cvar_Update
-import trap_Cvar_Register
-import trap_SendConsoleCommand
-import trap_FS_GetFileList
-import trap_Args
-import trap_Argv
-import trap_Argc
-import trap_Milliseconds
-import trap_Error
-import trap_Printf
-import g_crossServerDefragTimes
-import g_crossServerChat
-import g_mineSwitchFix
-import g_unlockRandom
-import g_randomTipInterval
-import g_blockIdenticalUserSnapsMinFps
-import g_blockIdenticalUserSnaps
-import g_userCmdBufferSmoothen
-import g_userCmdBuffer
-import g_botTeamAutoBalance
-import g_submodelWorkaround
-import g_mv_forcePowerDisableMode
-import g_connectinglimit
-import g_connectionlimit
-import g_mv_fixturretcrash
-import g_mv_blockspeedhack
-import g_mv_blockchargejump
-import g_mv_fixbrokenmodels
-import g_mv_fixgalaking
-import g_debugMelee
-import g_austrian
-import g_saberDebugPrint
-import g_saberDmgDelay_Wound
-import g_saberDmgDelay_Idle
-import g_saberDmgVelocityScale
-import g_allowNameDupes
-import g_fpsToggleDelay
-import g_sv_fps
-import g_timeouttospec
-import g_forceDodge
-import g_dismember
-import g_singlePlayer
-import g_enableBreath
-import g_enableDust
-import g_rankings
-import g_entHUDFields
-import g_fixHighFPSAbuse
-import g_ttFlags
-import g_pmove_float
-import g_pmove_msec
-import g_pmove_fixed
-import g_smoothClients
-import g_blueteam
-import g_redteam
-import g_debugUp
-import g_debugRight
-import g_debugForward
-import g_filterBan
-import g_banIPs
-import g_teamForceBalance
-import g_teamAutoJoin
-import g_slowVoteAFKThreshold
-import g_slowVote
-import g_allowVote
-import g_blood
-import g_doWarmup
-import g_warmup
-import g_motd
-import g_synchronousClients
-import g_autoScoresInterval
-import g_strafebotSlopeHandling
-import g_q2Skims
-import g_q2trace
-import g_mapDefaultRunFlags
-import g_mapDefaultJump
-import g_mapDefaultMsec
-import g_adaptRespawn
-import g_weaponTeamRespawn
-import g_weaponRespawn
-import g_debugDamage
-import g_debugAlloc
-import g_debugMove
-import g_developer
-import g_inactivityToSpecRacers
-import g_inactivityToSpec
-import g_inactivity
-import g_afkCmdMinSecs
-import g_startWeaponAlwaysSaber
-import g_forcerespawn
-import g_quadfactor
-import g_knockback
-import g_speed
-import g_gravity
-import g_needpass
-import g_password
-import g_friendlySaber
-import g_friendlyFire
-import g_saberInterpolate
-import g_capturelimit
-import g_timelimit
-import g_duel_fraglimit
-import g_fraglimit
-import g_duelWeaponDisable
-import g_fraglimitVoteCorrection
-import g_allowDuelSuicide
-import g_weaponDisable
-import g_forcePowerDisable
-import g_spawnInvulnerability
-import g_forceRegenTime
-import g_alwaysAllowTeamChat
-import g_useWhileThrowing
-import g_saberDamageScale
-import g_slowmoDuelEnd
-import g_logClientInfo
-import g_saberBoxTraceSize
-import g_saberAlwaysBoxTrace
-import g_saberGhoul2Collision
-import g_arenaAutoGen
-import g_defragArenaAutoGen
-import g_defragForceRegenFps
-import g_bubbleSpawn
-import g_triggersRobust
-import g_defragSimpleResetSpawn
-import g_defragKillSafetyMinSecs
-import g_defragAutoDemo
-import g_defragLastDemoId
-import g_defragLastRunId
-import g_defrag
-import g_modesDefault
-import g_modes
-import g_saberTraceSaberFirst
-import g_saberLockFactor
-import g_saberLocking
-import g_privateDuel
-import g_forceBasedTeams
-import g_maxForceRank
-import g_dmflags
-import g_autoMapCycle
-import g_trueJedi
-import g_restarted
-import g_maxGameClients
-import g_maxclients
-import g_cheats
-import g_dedicated
-import g_gametype
-import g_dfv
-import g_logicalents
-import g_entitiesHashTableCount
-import g_entitiesHashTable
-import g_entities
-import level
-import Pickup_Team
-import CheckTeamStatus
-import TeamplayInfoMessage
-import Team_GetLocationMsg
-import Team_GetLocation
-import SelectSagaSpawnPoint
-import SelectCTFSpawnPoint
-import Team_FreeEntity
-import Team_ReturnFlag
-import Team_InitGame
-import Team_CheckHurtCarrier
-import Team_FragBonuses
-import Team_DroppedFlagThink
-import AddTeamScore
-import TeamColorString
-import OtherTeamName
-import TeamName
-import OtherTeam
-import BotAIStartFrame
-import BotAIShutdownClient
-import BotAISetupClient
-import BotAILoadMap
-import BotAIShutdown
-import BotAISetup
-import B_CleanupAlloc
-import B_InitAlloc
-import InFieldOfVision
-import BotOrder
-import OrgVisible
-import InitSagaMode
-import G_ClearClientLog
-import G_LogExit
-import G_LogWeaponOutput
-import G_LogWeaponInit
-import G_LogWeaponItem
-import G_LogWeaponPowerup
-import G_LogWeaponFrag
-import G_LogWeaponDeath
-import G_LogWeaponKill
-import G_LogWeaponDamage
-import G_LogWeaponFire
-import G_LogWeaponPickup
-import Jedi_DodgeEvasion
-import ForceTelepathy
-import ForceThrow
-import ForceSeeing
-import ForceTeamForceReplenish
-import ForceTeamHeal
-import ForceAbsorb
-import ForceProtect
-import ForceGrip
-import ForceRage
-import ForceSpeed
-import ForceHeal
-import ForcePowerUsableOn
-import WP_ForcePowersUpdate
-import WP_SpawnInitForcePowers
-import WP_InitForcePowers
-import WP_SaberInitBladeData
-import WP_SaberCanBlock
-import WP_SaberPositionUpdate
-import WP_ForcePowerStop
-import MakeDeadSaber
-import thrownSaberTouch
-import SaberGotHit
-import SaberUpdateSelf
-import HasSetSaberOnly
-import G_PreDefSound
-import G_RefreshNextMap
-import G_DoesMapHaveArena
-import G_DoesMapSupportGametype
-import BotInterbreedEndMatch
-import Svcmd_BotList_f
-import Svcmd_AddBot_f
-import G_BotConnect
-import G_RemoveQueuedBotBegin
-import G_CheckBotSpawn
-import G_IsMapBlacklisted
-import G_GetArenaInfoByMap
-import G_GetBotInfoByName
-import G_GetBotInfoByNumber
-import G_InitBots
-import UpdateTournamentInfo
-import G_WriteSessionData
-import G_InitWorldSession
-import MV_ReadSessionData
-import G_InitSessionData
-import G_ReadSessionData
-import Svcmd_GameMem_f
-import G_InitMemory
-import G_Alloc
-import Team_CheckDroppedItem
-import OnSameTeam
-import G_ResetUserCmdStore
-import G_GetUserCmd
-import G_RunClient
-import SpectatorClientEndFrame
-import ClientEndFrameInClientThink
-import ClientEndFrame
-import ClientThink
-import G_CheckClientTimeouts
-import G_SendCrossServerCommand
-import G_CrossServerCommand
-import ClientCommand
-import ClientBegin
-import ClientDisconnect
-import ClientPhysicsFpsChanged
-import ClientUserinfoChanged
-import ClientConnect
-import MV_ModelindexToTime2
-import MV_BBoxToTime2
-import myrand
-import mysrand
-import G_StringAppendSubstring
-import MV_UpdateSvFlags
-import MV_UpdateMvsdkConfigstring
-import G_GetStripEdString
-import G_Error
-import G_Printf
-import SendScoreboardMessageToAllClients
-import G_LogPrintf
-import G_RunThink
-import CheckTeamLeader
-import SetLeader
-import FindIntermissionPoint
-import mv_clientSessions
-import mv_entities
-import g_clients
-import gSlowMoDuelTime
-import gDoSlowMoDuel
-import g_ff_objectives
-import DeathmatchScoreboardMessage
-import G_SetStats
-import MoveClientToIntermission
-import BlowDetpacks
-import FireWeapon
-import G_FilterPacket
-import G_ProcessIPBans
-import ConsoleCommand
-import gJMSaberEnt
-import G_SendServerCommand
-import G_CenterPrint
-import SelectNearestDeathmatchSpawnPoint
-import WiggleSpotTelefrag
-import SpotWouldTelefrag
-import CalculateRanks
-import AddScore
-import player_die
-import G_Kill
-import ClientSpawn
-import InitPlayerStats
-import InitBodyQue
-import BeginIntermission
-import respawn
-import CopyToBodyQue
-import SelectSpawnPoint
-import SetClientViewAngle
-import PickTeam
-import TeamLeader
-import TeamCount
-import CheckGauntletAttack
-import SnapVectorTowards
-import CalcMuzzlePoint
-import LogAccuracyHit
-import WP_FireGenericBlasterMissile
-import WP_FireTurretMissile
-import G_CreateExampleAnimEnt
-import G_PlayerBecomeATST
-import ATST_ManageDamageBoxes
-import TeleportPlayer
-import trigger_teleporter_touch
-import G_ResetActivatorTimeDelta
-import G_SetActivator
-import G_ClearActivatedEntities
-import G_ClearEntityActivator
-import Touch_DoorTrigger
-import G_RunMover
-import WP_FireBlasterMissile
-import G_ExplodeMissile
-import G_BounceProjectile
-import CreateMissile
-import G_RunMissile
-import G_ReflectMissile
-import gGAvoidDismember
-import G_CheckForDismemberment
-import ExplodeDeath
-import TossClientCubes
-import TossClientItems
-import TossClientWeapon
-import body_die
-import G_RadiusDamage
-import G_Damage
-import CanDamage
-import G_InsertRun
-import trap_G_COOL_API_GetFileVersion
-import trap_G_COOL_API_AttachG2Model
-import trap_G_COOL_API_GetSurfaceRenderStatus
-import trap_G_COOL_API_SkinlessModel
-import trap_G_COOL_API_SetSkin
-import trap_G_COOL_API_GiveMeVectorFromMatrix
-import trap_G_COOL_API_GetLanguageName
-import trap_G_COOL_API_GetNumLanguages
-import G_COOL_API_DB_GetMoreResults
-import G_COOL_API_DB_PreparedBindNull
-import G_COOL_API_DB_GetBinary
-import G_COOL_API_DB_FinishAndSendPreparedStatement
-import G_COOL_API_DB_PreparedBindBinary
-import G_COOL_API_DB_PreparedBindInt
-import G_COOL_API_DB_PreparedBindFloat
-import G_COOL_API_DB_PreparedBindString
-import G_COOL_API_DB_AddPreparedStatement
-import G_COOL_API_DB_GetString
-import G_COOL_API_DB_GetFloat
-import G_COOL_API_DB_GetInt
-import G_COOL_API_DB_NextRow
-import G_COOL_API_DB_GetReference
-import G_COOL_API_DB_NextResponse
-import G_COOL_API_DB_AddRequestTyped
-import G_COOL_API_DB_AddRequest
-import G_COOL_API_DB_EscapeString
-import trap_G_COOL_API_CrossServerCommand
-import trap_G_COOL_API_CustomEpsilonTraceCapsule
-import trap_G_COOL_API_CustomEpsilonTrace
-import trap_G_COOL_API_SendBackUCMD_GameGenerated
-import trap_G_COOL_API_NonEpsilonTraceCapsule
-import trap_G_COOL_API_NonEpsilonTrace
-import trap_G_COOL_API_PlayerUserCmdGetCount
-import trap_G_COOL_API_PlayerUserCmdGet
-import trap_G_COOL_API_PlayerUserCmdClear
-import trap_G_COOL_API_PlayerUserCmdRemove
-import trap_G_COOL_API_PlayerUserCmdAdd
-import trap_G_COOL_API_SetBrushModelContentFlags
+import mvapi
+import trap_GetTemporaryUserCommand
+import trap_G2API_GiveMeVectorFromMatrix
 import trap_G2API_GetBoltMatrix_NoReconstruct
 import trap_G2API_GetBoltMatrix
 import trap_G2_HaveWeGhoul2Models
 import trap_G2_SetGhoul2ModelIndexes
 import trap_G2_ListModelBones
 import trap_G2_ListModelSurfaces
-import G_SkinIndex
-import BuildShaderStateConfig
-import AddRemap
-import G_SetOrigin
-import G_AddEvent
-import G_AddPredictableEvent
-import vtos
-import tv
-import G_RunObject
-import G_TouchSolids
-import G_TouchTriggers
-import G_EntitiesFree
-import G_FreeEntity
-import G_KillG2Queue
-import G_SendG2KillQueue
-import TryUse
-import G_EntitySound
-import G_SoundAtLoc
-import G_Sound
-import G_MuteSound
-import G_ScreenShake
-import G_PlayEffect
-import G_TempEntity
-import G_SpawnLogical
-import G_SpawnAfter
-import G_Spawn
-import G_SetClassName
-import G_UnlistFromHashTable
-import G_InitGentity
-import G_SetAngles
-import G_SetMovedir
-import G_UseTargets
-import G_PickTarget
-import G_RadiusList
-import G_FindByClassNameFast
-import G_FindByClassName
-import G_Find
-import G_KillBox
-import G_TeamCommand
-import G_EffectIndex
-import G_SoundIndex
-import G_ModelIndex
-import SaveRegisteredItems
-import RegisterItem
-import ClearRegisteredItems
-import Touch_Item
-import Add_Ammo
-import ArmorIndex
-import Think_Weapon
-import FinishSpawningItem
-import G_SpawnItem
-import SetRespawn
-import LaunchItem
-import Drop_Item
-import PrecacheItem
-import UseHoldableItem
-import RespawnItem
-import G_RunItem
-import G_CheckTeamItems
-import ItemUse_MedPack
-import ItemUse_Seeker
-import ItemUse_Sentry
-import ItemUse_Shield
-import ItemUse_Binoculars
-import G_GetDuelWinner
-import ConcatArgsQuoted
-import G_SayTo
-import Cmd_EngageDuel_f
-import Cmd_ToggleSaber_f
-import G_ItemUsable
-import Cmd_SaberAttackCycle_f
-import Cmd_FollowCycle_f
-import SetTeam
-import BroadcastTeamChange
-import StopFollowing
-import Cmd_Score_f
-import G_NewString
-import G_SpawnEntitiesFromString
-import G_SpawnVector
-import G_SpawnInt
-import G_SpawnFloat
-import G_SpawnString
-import gEscapeTime
-import gEscaping
-import g2SaberInstance
-import precachedKyle
-import G_DB_Init
-import G_DB_VerifyUsername
-import G_DB_CheckResponses
-import DF_GetCourseName
-import DF_CheckRaceCvarChanges
-import DF_FormatFpsString
-import DF_HandleUnfinishedDemos
-import DF_SetMapDefaults
-import DF_LoadMapDefaults
-import MovementStyleDisabledRunFlags
-import PlayerSnapshotRestoreValues
-import PlayerSnapshotHackValues
-import MovementStyleAllowsWeapons
-import G_ConvertDefragTriggerTypes
-import subContestParams
-import nameTagTypeNames
-import userCmdBuffer
-import semiBreakingChangeVersionDefrag
+import FX_ForceDrained
+import FX_BlasterWeaponHitPlayer
+import FX_BlasterWeaponHitWall
+import FX_BlasterAltFireThink
+import FX_BlasterProjectileThink
+import FX_BryarAltHitPlayer
+import FX_BryarHitPlayer
+import FX_BryarAltHitWall
+import FX_BryarHitWall
+import CG_Spark
+import FX_TurretHitPlayer
+import FX_TurretHitWall
+import FX_TurretProjectileThink
+import CG_NewParticleArea
+import initparticles
+import CG_GetStripEdString
+import CG_ParticleExplosion
+import CG_ParticleMisc
+import CG_ParticleDust
+import CG_ParticleSparks
+import CG_ParticleBulletDebris
+import CG_ParticleSnowFlurry
+import CG_AddParticleShrapnel
+import CG_ParticleSmoke
+import CG_ParticleSnow
+import CG_AddParticles
+import CG_ClearParticles
+import trap_ROFF_Purge_Ent
+import trap_ROFF_Play
+import trap_ROFF_Cache
+import trap_ROFF_UpdateEntities
+import trap_ROFF_Clean
+import trap_SP_GetStringTextString
+import trap_SP_Print
+import trap_FX_AddSprite
+import trap_FX_AddPrimitive
+import trap_FX_AddBezier
+import trap_FX_AddPoly
+import trap_FX_AdjustTime
+import trap_FX_FreeSystem
+import trap_FX_InitSystem
+import trap_FX_AddScheduledEffects
+import trap_FX_PlayBoltedEffectID
+import trap_FX_PlayEntityEffectID
+import trap_FX_PlayEffectID
+import trap_FX_PlaySimpleEffectID
+import trap_FX_PlayEntityEffect
+import trap_FX_PlayEffect
+import trap_FX_PlaySimpleEffect
+import trap_FX_RegisterEffect
+import trap_R_inPVS
+import trap_GetEntityToken
+import trap_getCameraInfo
+import trap_startCamera
+import trap_loadCamera
+import trap_SnapVector
+import trap_CIN_SetExtents
+import trap_CIN_DrawCinematic
+import trap_CIN_RunCinematic
+import trap_CIN_StopCinematic
+import trap_CIN_PlayCinematic
+import BG_CycleForce
+import BG_ProperForceIndex
+import trap_Key_GetKey
+import trap_Key_SetCatcher
+import trap_Key_GetCatcher
+import trap_Key_IsDown
+import trap_MemoryRemaining
+import testPrintFloat
+import testPrintInt
+import trap_OpenUIMenu
+import trap_SetClientTurnExtent
+import trap_SetClientForceAngle
+import trap_SetUserCmdValueExtended
+import trap_SetUserCmdValue
+import trap_GetUserCmd
+import trap_GetCurrentCmdNumber
+import trap_GetServerCommand
+import trap_GetSnapshot
+import trap_GetCurrentSnapshotNumber
+import trap_GetGameState
+import trap_GetGlconfig
+import trap_FX_AddLine
+import trap_R_GetBModelVerts
+import trap_R_SetLightStyle
+import trap_R_GetLightStyle
+import trap_R_RemapShader
+import trap_R_DrawRotatePic2
+import trap_R_DrawRotatePic
+import trap_R_LerpTag
+import trap_R_ModelBounds
+import trap_R_DrawStretchPic
+import trap_R_SetColor
+import trap_R_RenderScene
+import trap_R_LightForPoint
+import trap_R_AddLightToScene
+import trap_R_AddPolysToScene
+import trap_R_AddPolyToScene
+import trap_R_AddRefEntityToScene
+import trap_R_ClearScene
+import trap_CG_COOL_API_GetFileList
+import trap_CG_COOL_API_GetFileVersion
+import trap_CG_COOL_API_AttachG2Model
+import trap_CG_COOL_API_GetSurfaceRenderStatus
+import trap_CG_COOL_API_SkinlessModel
+import trap_CG_COOL_API_SetSkin
+import trap_CG_COOL_API_GetLanguageName
+import trap_CG_COOL_API_GetNumLanguages
+import CG_COOL_API_DB_GetMoreResults
+import CG_COOL_API_DB_PreparedBindNull
+import CG_COOL_API_DB_GetBinary
+import CG_COOL_API_DB_FinishAndSendPreparedStatement
+import CG_COOL_API_DB_PreparedBindBinary
+import CG_COOL_API_DB_PreparedBindInt
+import CG_COOL_API_DB_PreparedBindFloat
+import CG_COOL_API_DB_PreparedBindString
+import CG_COOL_API_DB_AddPreparedStatement
+import CG_COOL_API_DB_GetString
+import CG_COOL_API_DB_GetFloat
+import CG_COOL_API_DB_GetInt
+import CG_COOL_API_DB_NextRow
+import CG_COOL_API_DB_GetReference
+import CG_COOL_API_DB_NextResponse
+import CG_COOL_API_DB_AddRequestTyped
+import CG_COOL_API_DB_AddRequest
+import CG_COOL_API_DB_EscapeString
+import trap_CG_COOL_API_SetUserAngles
+import trap_CG_COOL_API_GlResolutionChanged
+import trap_CG_COOL_API_GetTimeSinceSnapReceived
+import trap_CG_COOL_API_SetEzDemoBuffer
+import trap_CG_COOL_API_SetPredictedMovement
+import trap_R_Font_DrawString
+import trap_R_Font_HeightPixels
+import trap_R_Font_StrLenChars
+import trap_R_Font_StrLenPixels
+import trap_R_RegisterFont
+import trap_R_RegisterShaderNoMip
+import trap_R_RegisterShader
+import trap_R_RegisterSkin
+import trap_R_RegisterModel
+import trap_R_LoadWorldMap
+import trap_RealTime
+import trap_S_StopBackgroundTrack
+import trap_S_StartBackgroundTrack
+import trap_S_RegisterSound
+import trap_S_Respatialize
+import trap_S_UpdateEntityPosition
+import trap_S_AddRealLoopingSound
+import trap_S_AddLoopingSound
+import trap_S_ClearLoopingSounds
+import trap_S_StartLocalSound
+import trap_S_StopLoopingSound
+import trap_S_StartSound
+import trap_S_MuteSound
+import trap_CM_MarkFragments
+import trap_CM_TransformedBoxTrace
+import trap_CM_BoxTrace
+import trap_CM_TransformedPointContents
+import trap_CM_PointContents
+import trap_CM_TempBoxModel
+import trap_CM_InlineModel
+import trap_CM_NumInlineModels
+import trap_CM_LoadMap
+import trap_UpdateScreen
+import trap_SendClientCommand
+import trap_CG_COOL_API_AddMemeCommand
+import trap_AddCommand
+import trap_SendConsoleCommand
+import trap_Args
+import trap_Argv
+import trap_Argc
+import trap_Cvar_VariableStringBuffer
+import trap_Cvar_Set
+import trap_Cvar_Update
+import trap_Cvar_Register
+import trap_Milliseconds
+import trap_Error
+import trap_Print
+import CG_SagaObjectiveCompleted
+import CG_SagaRoundOver
+import CG_InitSagaMode
+import CG_CheckChangedPredictableEvents
+import CG_TransitionPlayerState
+import CG_Respawn
+import CG_IsMindTricked
+import CG_UpdateConfigString
+import CG_PlayBufferedVoiceChats
+import CG_VoiceChatLocal
+import CG_LoadVoiceChats
+import CG_ExecuteNewServerCommands
+import CG_InitConsoleCommands
+import CG_ConsoleCommand
+import CG_DrawOldTourneyScoreboard
+import CG_DrawOldScoreboard
+import CG_DrawInformation
+import CG_LoadingClient
+import CG_LoadingItem
+import CG_LoadingString
+import CG_ProcessSnapshots
+import CG_InitGlass
+import CG_TestLine
+import CG_SurfaceExplosion
+import CG_MakeExplosion
+import CG_Bleed
+import CG_ScorePlum
+import CG_CreateDebris
+import CG_GlassShatter
+import CG_BubbleTrail
+import CG_SmokePuff
+import CG_AddLocalEntities
+import CG_AllocLocalEntity
+import CG_InitLocalEntities
+import CG_ImpactMark
+import CG_AddMarks
+import CG_InitMarkPolys
+import CG_OutOfAmmoChange
+import CG_DrawIconBackground
+import CG_DrawWeaponSelect
+import CG_AddPlayerWeapon
+import CG_AddViewWeapon
+import CG_MissileHitPlayer
+import CG_MissileHitWall
+import CG_FireWeapon
+import CG_RegisterItemVisuals
+import CG_RegisterWeapon
+import CG_Weapon_f
+import CG_PrevWeapon_f
+import CG_NextWeapon_f
+import CG_GetClientWeaponMuzzleBoltPoint
+import TurretClientRun
+import ScaleModelAxis
+import CG_PositionRotatedEntityOnTag
+import CG_PositionEntityOnTag
+import CG_AdjustPositionForMover
+import CG_Beam
+import CG_ManualEntityRender
+import CG_AddPacketEntities
+import CG_SetEntitySoundPosition
+import CG_ReattachLimb
+import CG_UpdateForceActivationPredict
+import CG_RegisterDirectHit
+import CG_PainEvent_UpdatePredict
+import CG_PainEvent
+import CG_EntityEvent
+import CG_PlaceString
+import CG_CheckEvents
+import CG_LoadDeferredPlayers
+import CG_PredictPlayerState
+import CG_RawTraceQ2Style
+import CG_RawTrace
+import CG_TraceQ2StyleLite
+import CG_TraceQ2Style
+import CG_Trace
+import CG_PointContents
+import CG_BuildSolidList
+import CG_GetRootSurfNameWithVariant
+import CG_PlayerShieldHit
+import CG_CustomSound
+import CG_NewClientInfo
+import CG_AddRefEntityWithPowerups
+import CG_ResetPlayerEntity
+import CG_Player
+import CG_StatusHandle
+import CG_GetFlagCarrier
+import CG_OtherTeamHasFlag
+import CG_YourTeamHasFlag
+import CG_GameTypeString
+import CG_CheckOrderPending
+import CG_Draw3DModel
+import CG_GetKillerText
+import CG_GetGameStatusText
+import CG_GetTeamColor
+import CG_InitTeamChat
+import CG_SetPrintString
+import CG_ShowResponseHead
+import CG_DeferMenuScript
+import CG_RunMenuScript
+import CG_OwnerDrawVisible
+import CG_GetValue
+import CG_SelectNextPlayer
+import CG_SelectPrevPlayer
+import CG_Text_Height
+import CG_Text_Width
+import CG_Text_Paint
+import CG_OwnerDraw
+import CG_DrawTeamBackground
+import CG_DrawFlagModel
+import CG_DrawActive
+import CG_DrawHead
+import CG_CenterPrintMultiKill
+import CG_CenterPrint
+import CG_AddSpeed
+import CG_AddLagometerSnapshotInfo
+import CG_AddLagometerFrameInfo
+import teamChat2
+import teamChat1
+import systemChat
+import drawTeamOverlayModificationCount
+import numSortedTeamPlayers
+import sortedTeamPlayers
+import CG_DrawPlayerInfoIcons
+import CG_DrawPlayerName
+import CG_DrawPlayerInfo
+import CG_DrawTopBottom
+import CG_DrawSides
+import CG_DrawRect
+import UI_DrawScaledProportionalString
+import UI_DrawProportionalString
+import CG_GetColorForHealth
+import CG_ColorForHealth
+import CG_TileClear
+import CG_TeamColor
+import CG_FadeColor
+import CG_DrawStrlen
+import CG_DrawSmallStringColor
+import CG_DrawSmallString
+import CG_DrawBigStringColor
+import CG_DrawBigString
+import CG_DrawStringExt
+import CG_DrawNumField
+import CG_DrawRotatePic2
+import CG_DrawRotatePic
+import CG_DrawPic
+import CG_FillRect
+import CG_DrawActiveFrame
+import CG_AddBufferedSound
+import CG_ZoomUp_f
+import CG_ZoomDown_f
+import CG_TestModelPrevSkin_f
+import CG_TestModelNextSkin_f
+import CG_TestModelPrevFrame_f
+import CG_TestModelNextFrame_f
+import CG_TestGun_f
+import CG_TestModel_f
+import CG_ForceModelChange
+import CG_UpdateHud
+import CG_WideScreenMode
+import MV_UpdateCgFlags
+import MV_LoadSettings
+import CG_PrevForcePower_f
+import CG_NextForcePower_f
+import CG_PrevInventory_f
+import CG_NextInventory_f
+import CG_BuildSpectatorString
+import CG_SetScoreSelection
+import CG_RankRunFrame
+import CG_EventHandling
+import CG_MouseEvent
+import CG_KeyEvent
+import CG_LoadMenus
+import CG_LastAttacker
+import CG_CrosshairPlayer
+import CG_ClearUnsetSystemInfoCvars
+import CG_UpdateCvars
+import CG_StartMusic
+import CG_SendConsoleCommand
+import CG_Error
+import CG_DPrintf
+import CG_Printf
+import CG_Argv
+import CG_ConfigString
+import cg_randomTaunts
+import cg_teleportEvents
+import cg_cropLevelShot
+import cg_drawLocalTimeSeconds
+import cg_drawLocalTime12h
+import cg_drawLocalTimeScale
+import cg_drawLocalTimeY
+import cg_drawLocalTimeX
+import cg_drawLocalTime
+import cg_char_color_blue
+import cg_char_color_green
+import cg_char_color_red
+import cg_debugBB
+import cg_snapHudFps
+import cg_snapHudSpeed
+import cg_snapHudDef
+import cg_snapHudAuto
+import cg_snapHudHeight
+import cg_snapHudY
+import cg_snapHudRgba2
+import cg_snapHudRgba1
+import cg_snapHud
+import cg_smoothCameraFPS
+import cg_smoothCamera
+import cg_developer
+import cg_drawPlayerSprites
+import cg_mv_fixbrokenmodelsclient
+import cg_com_physicsFps
+import cg_com_maxfps
+import cg_ui_myteam
+import cg_recordSPDemoName
+import cg_recordSPDemo
+import cg_singlePlayerActive
+import cg_enableBreath
+import cg_enableDust
+import cg_singlePlayer
+import cg_currentSelectedPlayerName
+import cg_currentSelectedPlayer
+import cg_blueTeamName
+import cg_redTeamName
+import cg_trueLightning
+import cg_noProjectileTrail
+import cg_noTaunt
+import cg_bigFont
+import cg_smallFont
+import cg_cameraMode
+import cg_timescale
+import cg_timescaleFadeSpeed
+import cg_timescaleFadeEnd
+import cg_cameraOrbitDelay
+import cg_cameraOrbit
+import cg_pmove_float
+import cg_pmove_msec
+import cg_pmove_fixed
+import cg_smoothClients
+import cg_consoleHudOffsetY
+import cg_consoleHudOffsetX
+import cg_hudFiles
+import cg_scorePlum
+import cg_noVoiceText
+import cg_noVoiceChats
+import cg_teamChatsOnly
+import cg_drawFriend
+import cg_deferPlayersDebug
+import cg_deferPlayers
+import cg_predictItems
+import cg_blood
+import cg_paused
+import cg_buildScript
+import cg_forceMySaber
+import cg_forceMyModel
+import cg_forceModel
+import cg_stats
+import cg_teamChatHeight
+import cg_teamChatTime
+import cg_debugMove
+import cg_synchronousClients
+import cg_strafebotSlopeHandling
+import cg_cl_timeNudgeSafeServerTime
+import cg_cl_timeNudgeAntiLagHack
+import cg_g_unlockRandom
+import cg_q2Skims
+import cg_q2trace
+import cg_mapDefaultRunFlags
+import cg_mapDefaultJump
+import cg_mapDefaultMsec
+import cg_leadSoundsRace
+import cg_leadSounds
+import cg_strafebotFactor
+import cg_drawEnemyInfo
+import cg_lagometer
+import cg_stereoSeparation
+import cg_thirdPersonHorzOffset
+import cg_thirdPersonAlpha
+import cg_thirdPersonTargetDamp
+import cg_thirdPersonCameraDamp
+import cg_thirdPersonVertOffset
+import cg_thirdPersonPitchOffset
+import cg_thirdPersonAngle
+import cg_thirdPersonRange
+import cg_thirdPerson
+import cg_backSwingCameraRange
+import cg_lowhpsound
+import cg_drawDemoName
+import cg_drawPowerUpIcons
+import cg_drawScoreboardIcons
+import cg_colorScoreboard
+import cg_smallScoreboard
+import cg_drawInventory
+import cg_SPRunAnim
+import cg_fixlean
+import cl_commandsize
+import cg_fkSecondJumpDelay
+import cg_fkFirstJumpDuration
+import cg_fkDuration
+import cg_fovViewmodelAdjust
+import cg_fovViewmodel
+import cg_fovAspectAdjust
+import cg_widescreen
+import cg_autoKillWhenFalling
+import cg_remaps
+import cg_saberTeamColors
+import cg_teamRespawnShield
+import cg_privateDuelShell
+import cg_playerLOD
+import cg_drawHitBox
+import cg_brightskins
+import cg_drawNonDuelers
+import cg_thirdPersonFlagAlpha
+import cg_newSaberHitSounds
+import cg_hitSounds
+import cg_rollSounds
+import cg_jumpSounds
+import cg_newFont
+import cg_cleanChatbox
+import cg_chatSounds
+import cg_chatBoxCutOffLength
+import cg_chatBoxX
+import cg_chatBoxShowHistory
+import cg_chatBoxHeight
+import cg_chatBoxFontSize
+import cg_chatBox
+import cg_centerSize
+import cg_centerHeight
+import cg_drawScoreDefrag
+import cg_drawScore
+import cg_hudColors
+import cg_movementKeysOnlySpec
+import cg_movementKeysSize
+import cg_movementKeysY
+import cg_movementKeysX
+import cg_movementKeys
+import cg_drawTimerMsec
+import cg_enhancedFlagStatus
+import cg_crosshairIdentifyTarget
+import cg_crosshairColor
+import cg_crosshairSaberStyleColor
+import cg_crosshairSizeScale
+import cg_strafeHelper_RealPhysicsLines
+import cg_strafeHelper_FPS
+import cg_strafeHelperOffset
+import cg_realAccelPreFriction
+import cg_realAccelSlopes
+import cg_realAccelDynScale
+import cg_realAccelScale
+import cg_realAccelNegativeColor
+import cg_realAccelPositiveColor
+import cg_strafeHelperInactiveAlpha
+import cg_strafeHelperActiveColor
+import cg_strafeHelperLineWidth
+import cg_strafeHelperPrecision
+import cg_strafeHelper
+import cg_strafeHelperCutoff
+import cg_customizeRace
+import cg_forceFieldOpacityRace
+import cg_forceFieldOpacity
+import cg_forceMeterJumpCharge
+import cg_forcemeterY
+import cg_forcemeterX
+import cg_forcemeter
+import cg_showpos
+import cg_speedometerSize
+import cg_speedometerY
+import cg_speedometerX
+import cg_speedometer
+import cg_raceTimerY
+import cg_raceTimerX
+import cg_raceTimerNoSpeeds
+import cg_raceTimerSize
+import cg_raceTimer
+import cg_dismember
+import cg_animBlend
+import cg_auraShell
+import cg_speedTrailSP
+import cg_speedTrail
+import cg_duelHeadAngles
+import cg_saberEndsGlow
+import cg_saberTrail
+import cg_saberContact
+import cg_saberDynamicMarkTime
+import cg_saberDynamicMarks
+import cg_fpls
+import cg_saberModelTraceEffect
+import cg_oldPainSounds
+import cg_swingAngles
+import cg_zoomFov
+import cg_fov
+import cg_simpleItems
+import cg_ignore
+import cg_autoswitch
+import cg_tracerLength
+import cg_tracerWidth
+import cg_tracerChance
+import cg_viewsize
+import cg_drawGun
+import cg_gun_z
+import cg_gun_y
+import cg_gun_x
+import cg_gun_frame
+import cg_addMarks
+import cg_footsteps
+import cg_showmiss
+import cg_noPlayerAnims
+import cg_specialPredictPhysicsFpsAngleCmdTime
+import cg_specialPredictPhysicsFps
+import cg_nopredict
+import cg_errorDecay
+import cg_debugRank
+import cg_debugSaber
+import cg_debugEvents
+import cg_debugPosition
+import cg_debugAnim
+import cg_animSpeed
+import cg_drawStrafeHelperSpeedometerAlways
+import cg_drawCenterAlways
+import cg_draw2D
+import cg_antiLoopIndicatorY
+import cg_antiLoopIndicatorX
+import cg_drawAntiLoopIndicator
+import cg_drawStatus
+import cg_crosshairHealth
+import cg_crosshairSize
+import cg_crosshairY
+import cg_crosshairX
+import cg_teamOverlayUserinfo
+import cg_drawTeamOverlay
+import cg_drawRewards
+import cg_dynamicCrosshair
+import cg_drawScores
+import cg_drawCrosshairNamesDetails
+import cg_drawCrosshairNames
+import cg_drawCrosshair
+import cg_drawAmmoWarning
+import cg_drawIcons
+import cg_draw3dIcons
+import cg_drawSnapshot
+import cg_drawStrafeBotFactor
+import cg_drawFPSLowest
+import cg_drawFPSPhysical
+import cg_drawFPSSamples
+import cg_drawFPSMisses
+import cg_drawFPSShorterCheckSim
+import cg_drawFPS
+import cg_drawRamps
+import cg_drawTimer
+import cg_shadows
+import cg_bobroll
+import cg_bobpitch
+import cg_bobup
+import cg_runroll
+import cg_runpitch
+import cg_centertime
+import cg_autoKick_leadFactor
+import cg_advancedPrediction
+import cg_autoBackStab_leadAdjust
+import cg_autoAim_retargetInterval
+import cg_autoAim_maxLeadMs
+import cg_autoAim_leadFactor
+import cg_passiveAimAssist_width
+import cg_passiveAimAssist_range
+import cg_passiveAimAssist
+import cg_autoAim_smoothFactor
+import cg_autoAim_smooth
+import cg_autoAim_switchDelay
+import cg_autoAim_fov
+import cg_autoAim_ignoreWalls
+import cg_autoAim_usePrediction
+import cg_v24tracing
+import cg_autoAim_debug
+import cg_autoAim
+import cg_friendsChatsOnly
+import cg_showKills
+import cg_drawKillMessage
+import cg_debugSaberBox_usePrediction
+import cg_debugSaberBox
+import cg_autoBackStab_trackTime
+import cg_autoBackStab_track
+import cg_autoBackStab_crouch
+import cg_autoBackStab_cooldown
+import cg_autoBackStab_maxAngle
+import cg_autoBackStab_usePrediction
+import cg_autoBackStab_distance
+import cg_autoBackStab_debug
+import cg_autoBackStab
+import cg_autoKick_minVelocityZ
+import cg_autoKick_minWallNormal
+import cg_autoKick_cooldown
+import cg_autoKick_checkKnockdown
+import cg_autoKick_checkAir
+import cg_autoKick_checkRoll
+import cg_autoKick_indicator
+import cg_autoKick_usePrediction
+import cg_autoKick_distance
+import cg_autoKick_sideKickFirst
+import cg_autoKick_debug
+import cg_autoKick
+import cg_playerInfo
+import cg_wallHack_iconOffsetZ
+import cg_wallHack_iconScale
+import cg_wallHack_showIcons
+import cg_wallHack_showInfo
+import cg_wallHack_showBoxes
+import cg_wallHack_showNames
+import cg_espShowStance
+import cg_espItems
+import cg_espEnemyColor
+import cg_espFriendColor
+import cg_espShowPowerups
+import cg_espShowForce
+import cg_espShowDistance
+import cg_espShowBar
+import cg_espShowHealth
+import cg_espScale
+import cg_espMaxDist
+import cg_esp
+import cg_friendPersistMaxPing
+import cg_friendPersistStrictModel
+import cg_friendPersist
+import cg_enemyMarker
+import cg_friendMarker
+import cg_enemyList
+import cg_friendList
+import cg_wallHack
+import cg_teleportDisable
+import cg_markPolys
+import cg_items
+import cg_weapons
+import cg_entities
+import cg
+import cgs
+import CGCam_SetMusicMult
+import CGCam_Shake
+import cgScreenEffects
+import ammoTicPos
+import forceTicPos
+import cg_statsEntities
+import dueltypes
+import angleVectors
 import BG_Cmd_TokenizeString
 import BG_Cmd_DropArg
 import BG_Cmd_ArgsBuffer
@@ -11995,6 +5588,8 @@ import pm_swimScale
 import pm_duckScale
 import pm_stopspeed
 import pml
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
 import MV_SetGamePlay
 import MV_BuildAnimationMappingTable
 import animMappingTable_1_02_to_1_04
@@ -12300,7 +5895,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $2812
+LABELV $2850
 byte 1 37
 byte 1 100
 byte 1 58
@@ -12339,7 +5934,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $2720
+LABELV $2758
 byte 1 78
 byte 1 69
 byte 1 87
@@ -12350,7 +5945,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $2719
+LABELV $2757
 byte 1 79
 byte 1 76
 byte 1 68

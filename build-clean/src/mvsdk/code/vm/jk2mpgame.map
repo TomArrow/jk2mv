@@ -1957,11 +1957,11 @@
 0    6b77a sscanf
 0    6b7f4 roundf
 0    6b80e fpclassify
-0    6b85b copysignf
-0    6b88d logf
-0    6b909 expf
-0    6b97a memcmp
-0        0 fabs
+0    6b85b fabs
+0    6b870 copysignf
+0    6b8a2 logf
+0    6b91e expf
+0    6b98f memcmp
 0   fddde4 _stackStart
 0   fedde4 _stackEnd
 1        4 g_entitiesHashTableCount

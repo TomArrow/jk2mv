@@ -3877,6 +3877,8 @@ import pm_swimScale
 import pm_duckScale
 import pm_stopspeed
 import pml
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
 import MV_SetGamePlay
 import MV_BuildAnimationMappingTable
 import animMappingTable_1_02_to_1_04

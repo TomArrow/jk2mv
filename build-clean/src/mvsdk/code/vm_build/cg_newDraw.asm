@@ -1,254 +1,212 @@
 data
-export jk2version
+export drawTeamOverlayModificationCount
 align 4
-LABELV jk2version
-byte 4 0
-export jk2gameplay
-align 4
-LABELV jk2gameplay
-byte 4 0
-export jk2startversion
-align 4
-LABELV jk2startversion
-byte 4 0
-export MV_BuildAnimationMappingTable
+LABELV drawTeamOverlayModificationCount
+byte 4 -1
+export CG_InitTeamChat
 code
-proc MV_BuildAnimationMappingTable 0 0
-endproc MV_BuildAnimationMappingTable 0 0
-export MV_SetGamePlay
-proc MV_SetGamePlay 0 0
-endproc MV_SetGamePlay 0 0
+proc CG_InitTeamChat 0 0
+endproc CG_InitTeamChat 0 0
+export CG_SetPrintString
+proc CG_SetPrintString 0 0
+endproc CG_SetPrintString 0 0
+export CG_CheckOrderPending
+proc CG_CheckOrderPending 0 0
+endproc CG_CheckOrderPending 0 0
+proc CG_SetSelectedPlayerName 0 0
+endproc CG_SetSelectedPlayerName 0 0
+export CG_GetSelectedPlayer
+proc CG_GetSelectedPlayer 0 0
+endproc CG_GetSelectedPlayer 0 0
+export CG_SelectNextPlayer
+proc CG_SelectNextPlayer 0 0
+endproc CG_SelectNextPlayer 0 0
+export CG_SelectPrevPlayer
+proc CG_SelectPrevPlayer 0 0
+endproc CG_SelectPrevPlayer 0 0
+export CG_StatusHandle
+proc CG_StatusHandle 0 0
+endproc CG_StatusHandle 0 0
+export CG_GetValue
+proc CG_GetValue 0 0
+endproc CG_GetValue 0 0
+export CG_OtherTeamHasFlag
+proc CG_OtherTeamHasFlag 0 0
+endproc CG_OtherTeamHasFlag 0 0
+export CG_YourTeamHasFlag
+proc CG_YourTeamHasFlag 0 0
+endproc CG_YourTeamHasFlag 0 0
+export CG_GetFlagCarrier
+proc CG_GetFlagCarrier 0 0
+endproc CG_GetFlagCarrier 0 0
+export CG_OwnerDrawVisible
+proc CG_OwnerDrawVisible 0 0
+endproc CG_OwnerDrawVisible 0 0
 data
 align 4
-LABELV mvKeyconversion
-byte 4 9
-byte 4 9
-byte 4 13
-byte 4 10
-byte 4 27
-byte 4 27
-byte 4 32
-byte 4 32
-byte 4 127
-byte 4 8
-byte 4 129
-byte 4 4
-byte 4 131
-byte 4 7
-byte 4 132
-byte 4 170
-byte 4 133
-byte 4 171
-byte 4 134
-byte 4 172
-byte 4 135
-byte 4 173
-byte 4 136
-byte 4 3
-byte 4 136
-byte 4 131
-byte 4 137
-byte 4 2
-byte 4 138
-byte 4 1
-byte 4 139
-byte 4 143
-byte 4 140
-byte 4 127
-byte 4 141
-byte 4 158
-byte 4 142
-byte 4 145
-byte 4 143
-byte 4 144
-byte 4 144
-byte 4 157
-byte 4 145
-byte 4 28
-byte 4 146
-byte 4 29
-byte 4 147
-byte 4 30
-byte 4 148
-byte 4 31
-byte 4 149
-byte 4 132
-byte 4 150
-byte 4 133
-byte 4 151
-byte 4 134
-byte 4 152
-byte 4 135
-byte 4 153
-byte 4 149
-byte 4 154
-byte 4 150
-byte 4 155
-byte 4 151
-byte 4 156
-byte 4 152
-byte 4 160
-byte 4 23
-byte 4 161
-byte 4 24
-byte 4 162
-byte 4 25
-byte 4 163
-byte 4 20
-byte 4 164
-byte 4 21
-byte 4 165
-byte 4 22
-byte 4 166
-byte 4 17
-byte 4 167
-byte 4 18
-byte 4 168
-byte 4 19
-byte 4 169
-byte 4 13
-byte 4 170
-byte 4 16
-byte 4 171
-byte 4 14
-byte 4 172
-byte 4 247
-byte 4 173
-byte 4 12
-byte 4 174
-byte 4 11
-byte 4 175
-byte 4 5
-byte 4 176
-byte 4 215
-byte 4 178
-byte 4 141
-byte 4 179
-byte 4 142
-byte 4 180
-byte 4 166
-byte 4 181
-byte 4 167
-byte 4 182
-byte 4 168
-byte 4 183
-byte 4 139
-byte 4 184
-byte 4 137
-byte 4 185
-byte 4 257
-byte 4 186
-byte 4 258
-byte 4 187
-byte 4 259
-byte 4 188
-byte 4 260
-byte 4 189
-byte 4 261
-byte 4 190
-byte 4 262
-byte 4 191
-byte 4 263
-byte 4 192
-byte 4 264
-byte 4 193
-byte 4 265
-byte 4 194
-byte 4 266
-byte 4 195
-byte 4 267
-byte 4 196
-byte 4 268
-byte 4 197
-byte 4 269
-byte 4 198
-byte 4 270
-byte 4 199
-byte 4 271
-byte 4 200
-byte 4 272
-byte 4 201
-byte 4 273
-byte 4 202
-byte 4 274
-byte 4 203
-byte 4 275
-byte 4 204
-byte 4 276
-byte 4 205
-byte 4 277
-byte 4 206
-byte 4 278
-byte 4 207
-byte 4 279
-byte 4 208
-byte 4 280
-byte 4 209
-byte 4 281
-byte 4 210
-byte 4 282
-byte 4 211
-byte 4 283
-byte 4 212
-byte 4 284
-byte 4 213
-byte 4 285
-byte 4 214
-byte 4 286
-byte 4 215
-byte 4 287
-byte 4 217
-byte 4 289
-byte 4 218
-byte 4 290
-byte 4 219
-byte 4 291
-byte 4 220
-byte 4 292
-byte 4 221
-byte 4 293
-byte 4 222
-byte 4 294
-byte 4 223
-byte 4 295
-byte 4 224
-byte 4 296
-byte 4 225
-byte 4 297
-byte 4 226
-byte 4 298
-byte 4 227
-byte 4 299
-byte 4 228
-byte 4 300
-byte 4 229
-byte 4 301
-byte 4 230
-byte 4 302
-byte 4 231
-byte 4 303
-byte 4 232
-byte 4 304
-byte 4 233
-byte 4 320
-align 4
-LABELV mvKeyconversionCount
-byte 4 105
-export Key_GetProtocolKey_New
+LABELV $453
+address $454
+export CG_GetKillerText
 code
-proc Key_GetProtocolKey_New 0 0
-endproc Key_GetProtocolKey_New 0 0
-export Key_GetProtocolKey
-proc Key_GetProtocolKey 0 0
-endproc Key_GetProtocolKey 0 0
-export Key_GetProtocolKey15
-proc Key_GetProtocolKey15 0 0
-endproc Key_GetProtocolKey15 0 0
-import forcePowerNeeded
-import forcePowerNeeded_1_04
-import forcePowerNeeded_1_02
-import animTable
-import animTable_1_02
+proc CG_GetKillerText 0 0
+endproc CG_GetKillerText 0 0
+data
+align 4
+LABELV $463
+address $454
+export CG_GetGameStatusText
+code
+proc CG_GetGameStatusText 0 0
+endproc CG_GetGameStatusText 0 0
+export CG_GameTypeString
+proc CG_GameTypeString 0 0
+endproc CG_GameTypeString 0 0
+lit
+align 1
+LABELV $526
+byte 1 0
+skip 4095
+code
+proc CG_Text_Paint_Limit 0 0
+endproc CG_Text_Paint_Limit 0 0
+export CG_DrawNewTeamInfo
+proc CG_DrawNewTeamInfo 0 0
+endproc CG_DrawNewTeamInfo 0 0
+export CG_DrawTeamSpectators
+proc CG_DrawTeamSpectators 0 0
+endproc CG_DrawTeamSpectators 0 0
+export CG_DrawMedal
+proc CG_DrawMedal 0 0
+endproc CG_DrawMedal 0 0
+export CG_OwnerDraw
+proc CG_OwnerDraw 0 0
+endproc CG_OwnerDraw 0 0
+export CG_MouseEvent
+proc CG_MouseEvent 0 0
+endproc CG_MouseEvent 0 0
+export CG_HideTeamMenu
+proc CG_HideTeamMenu 0 0
+endproc CG_HideTeamMenu 0 0
+export CG_ShowTeamMenu
+proc CG_ShowTeamMenu 0 0
+endproc CG_ShowTeamMenu 0 0
+export CG_EventHandling
+proc CG_EventHandling 0 0
+endproc CG_EventHandling 0 0
+export CG_KeyEvent
+proc CG_KeyEvent 0 0
+endproc CG_KeyEvent 0 0
+export CG_ClientNumFromName
+proc CG_ClientNumFromName 0 0
+endproc CG_ClientNumFromName 0 0
+export CG_ShowResponseHead
+proc CG_ShowResponseHead 0 0
+endproc CG_ShowResponseHead 0 0
+export CG_RunMenuScript
+proc CG_RunMenuScript 0 0
+endproc CG_RunMenuScript 0 0
+export CG_DeferMenuScript
+proc CG_DeferMenuScript 0 0
+endproc CG_DeferMenuScript 0 0
+export CG_GetTeamColor
+proc CG_GetTeamColor 0 0
+endproc CG_GetTeamColor 0 0
+import MenuFontToHandle
+import cgDC
+import Item_IsJKA
+import Menu_IsJKA
+import Menu_SetJKA
+import HolocronIcons
+import menuInJK2MV
+import Item_ListBox_MaxScroll
+import trap_G2API_SetSkin
+import trap_SP_Register
+import trap_SP_RegisterServer
+import trap_AnyLanguage_ReadCharFromString
+import trap_PC_RemoveAllGlobalDefines
+import trap_PC_LoadGlobalDefines
+import trap_PC_SourceFileAndLine
+import trap_PC_ReadToken
+import trap_PC_FreeSource
+import trap_PC_LoadSource
+import trap_PC_AddGlobalDefine
+import Controls_SetConfig
+import Controls_GetConfig
+import UI_OutOfMemory
+import UI_InitMemory
+import UI_Alloc
+import Menu_SetItemBackground
+import Display_CacheAll
+import Menu_SetFeederSelection
+import Menu_Paint
+import Menus_CloseAll
+import LerpColor
+import Display_HandleKey
+import Menus_CloseByName
+import Menus_ShowByName
+import Menus_FindByName
+import Menus_OpenByName
+import Display_KeyBindPending
+import Display_CursorType
+import Display_MouseMove
+import Display_CaptureItem
+import Display_GetContext
+import Menu_FindItemByName
+import Menus_Activate
+import Menus_AnyFullScreenVisible
+import Menu_Reset
+import Menus_ActivateByName
+import Menu_PaintAll
+import Menu_New
+import Menu_Count
+import PC_Script_Parse
+import PC_String_Parse
+import PC_Rect_Parse
+import PC_Int_Parse
+import PC_Color_Parse
+import PC_Float_Parse
+import String_Parse
+import Rect_Parse
+import Int_Parse
+import Color_Parse
+import Float_Parse
+import Menu_ScrollFeeder
+import Menu_HandleMouseMove
+import Menu_HandleKey
+import Menu_GetFocused
+import Menu_PostParse
+import Item_Init
+import Menu_Init
+import Display_ExpandMacros
+import Init_Display
+import String_Report
+import String_Init
+import String_Alloc
+bss
+export multiDef_t
+align 4
+LABELV multiDef_t
+skip 4
+export strDef
+align 4
+LABELV strDef
+skip 4
+export count
+align 4
+LABELV count
+skip 4
+export cvarValue
+align 4
+LABELV cvarValue
+skip 128
+export cvarStr
+align 4
+LABELV cvarStr
+skip 128
+export cvarList
+align 4
+LABELV cvarList
+skip 128
 import trap_AnyLanguage_ReadCharFromString_1_02
 import trap_AnyLanguage_ReadCharFromString_1_04
 import trap_G2API_SetBoneAnim
@@ -562,29 +520,10 @@ import CG_NewClientInfo
 import CG_AddRefEntityWithPowerups
 import CG_ResetPlayerEntity
 import CG_Player
-import CG_StatusHandle
-import CG_GetFlagCarrier
-import CG_OtherTeamHasFlag
-import CG_YourTeamHasFlag
-import CG_GameTypeString
-import CG_CheckOrderPending
 import CG_Draw3DModel
-import CG_GetKillerText
-import CG_GetGameStatusText
-import CG_GetTeamColor
-import CG_InitTeamChat
-import CG_SetPrintString
-import CG_ShowResponseHead
-import CG_DeferMenuScript
-import CG_RunMenuScript
-import CG_OwnerDrawVisible
-import CG_GetValue
-import CG_SelectNextPlayer
-import CG_SelectPrevPlayer
 import CG_Text_Height
 import CG_Text_Width
 import CG_Text_Paint
-import CG_OwnerDraw
 import CG_DrawTeamBackground
 import CG_DrawFlagModel
 import CG_DrawActive
@@ -597,7 +536,6 @@ import CG_AddLagometerFrameInfo
 import teamChat2
 import teamChat1
 import systemChat
-import drawTeamOverlayModificationCount
 import numSortedTeamPlayers
 import sortedTeamPlayers
 import CG_DrawPlayerInfoIcons
@@ -646,9 +584,6 @@ import CG_NextInventory_f
 import CG_BuildSpectatorString
 import CG_SetScoreSelection
 import CG_RankRunFrame
-import CG_EventHandling
-import CG_MouseEvent
-import CG_KeyEvent
 import CG_LoadMenus
 import CG_LastAttacker
 import CG_CrosshairPlayer
@@ -1027,6 +962,15 @@ import BG_Cmd_ArgsFrom
 import BG_Cmd_Args
 import BG_Cmd_Argv
 import BG_Cmd_Argc
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
+import MV_SetGamePlay
+import MV_BuildAnimationMappingTable
+import animMappingTable_1_02_to_1_04
+import animMappingTable_1_04_to_1_02
+import jk2startversion
+import jk2gameplay
+import jk2version
 import BG_DB_VerifyPassword
 import g_arenaInfosHashed
 import g_numArenas
@@ -1149,8 +1093,6 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import animMappingTable_1_02_to_1_04
-import animMappingTable_1_04_to_1_02
 import clampedIntAdd
 import clampedIntMult
 import parseHex
@@ -1343,3 +1285,729 @@ import strlen
 import rand
 import srand
 import qsort
+lit
+align 1
+LABELV $790
+byte 1 55
+byte 1 50
+byte 1 0
+align 1
+LABELV $789
+byte 1 99
+byte 1 108
+byte 1 95
+byte 1 99
+byte 1 111
+byte 1 110
+byte 1 88
+byte 1 79
+byte 1 102
+byte 1 102
+byte 1 115
+byte 1 101
+byte 1 116
+byte 1 0
+align 1
+LABELV $788
+byte 1 118
+byte 1 111
+byte 1 105
+byte 1 99
+byte 1 101
+byte 1 77
+byte 1 101
+byte 1 110
+byte 1 117
+byte 1 0
+align 1
+LABELV $741
+byte 1 103
+byte 1 101
+byte 1 116
+byte 1 77
+byte 1 101
+byte 1 110
+byte 1 117
+byte 1 0
+align 1
+LABELV $740
+byte 1 116
+byte 1 101
+byte 1 97
+byte 1 109
+byte 1 77
+byte 1 101
+byte 1 110
+byte 1 117
+byte 1 0
+align 1
+LABELV $686
+byte 1 87
+byte 1 111
+byte 1 119
+byte 1 0
+align 1
+LABELV $683
+byte 1 37
+byte 1 105
+byte 1 0
+align 1
+LABELV $680
+byte 1 37
+byte 1 105
+byte 1 37
+byte 1 37
+byte 1 0
+align 1
+LABELV $591
+byte 1 117
+byte 1 110
+byte 1 107
+byte 1 110
+byte 1 111
+byte 1 119
+byte 1 110
+byte 1 0
+align 1
+LABELV $522
+byte 1 67
+byte 1 97
+byte 1 112
+byte 1 116
+byte 1 117
+byte 1 114
+byte 1 101
+byte 1 32
+byte 1 116
+byte 1 104
+byte 1 101
+byte 1 32
+byte 1 89
+byte 1 115
+byte 1 97
+byte 1 108
+byte 1 97
+byte 1 109
+byte 1 105
+byte 1 114
+byte 1 105
+byte 1 0
+align 1
+LABELV $518
+byte 1 67
+byte 1 97
+byte 1 112
+byte 1 116
+byte 1 117
+byte 1 114
+byte 1 101
+byte 1 32
+byte 1 116
+byte 1 104
+byte 1 101
+byte 1 32
+byte 1 70
+byte 1 108
+byte 1 97
+byte 1 103
+byte 1 0
+align 1
+LABELV $514
+byte 1 78
+byte 1 47
+byte 1 65
+byte 1 0
+align 1
+LABELV $510
+byte 1 84
+byte 1 101
+byte 1 97
+byte 1 109
+byte 1 32
+byte 1 70
+byte 1 70
+byte 1 65
+byte 1 0
+align 1
+LABELV $506
+byte 1 74
+byte 1 101
+byte 1 100
+byte 1 105
+byte 1 32
+byte 1 77
+byte 1 97
+byte 1 115
+byte 1 116
+byte 1 101
+byte 1 114
+byte 1 0
+align 1
+LABELV $502
+byte 1 72
+byte 1 111
+byte 1 108
+byte 1 111
+byte 1 99
+byte 1 114
+byte 1 111
+byte 1 110
+byte 1 32
+byte 1 70
+byte 1 70
+byte 1 65
+byte 1 0
+align 1
+LABELV $498
+byte 1 70
+byte 1 114
+byte 1 101
+byte 1 101
+byte 1 32
+byte 1 70
+byte 1 111
+byte 1 114
+byte 1 32
+byte 1 65
+byte 1 108
+byte 1 108
+byte 1 0
+align 1
+LABELV $490
+byte 1 66
+byte 1 108
+byte 1 117
+byte 1 101
+byte 1 32
+byte 1 108
+byte 1 101
+byte 1 97
+byte 1 100
+byte 1 115
+byte 1 32
+byte 1 82
+byte 1 101
+byte 1 100
+byte 1 44
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 32
+byte 1 116
+byte 1 111
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 0
+align 1
+LABELV $486
+byte 1 82
+byte 1 101
+byte 1 100
+byte 1 32
+byte 1 108
+byte 1 101
+byte 1 97
+byte 1 100
+byte 1 115
+byte 1 32
+byte 1 66
+byte 1 108
+byte 1 117
+byte 1 101
+byte 1 44
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 32
+byte 1 116
+byte 1 111
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 0
+align 1
+LABELV $479
+byte 1 84
+byte 1 101
+byte 1 97
+byte 1 109
+byte 1 115
+byte 1 32
+byte 1 97
+byte 1 114
+byte 1 101
+byte 1 32
+byte 1 116
+byte 1 105
+byte 1 101
+byte 1 100
+byte 1 32
+byte 1 97
+byte 1 116
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 0
+align 1
+LABELV $471
+byte 1 37
+byte 1 115
+byte 1 32
+byte 1 37
+byte 1 115
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 0
+align 1
+LABELV $470
+byte 1 73
+byte 1 78
+byte 1 71
+byte 1 65
+byte 1 77
+byte 1 69
+byte 1 84
+byte 1 69
+byte 1 88
+byte 1 84
+byte 1 95
+byte 1 80
+byte 1 76
+byte 1 65
+byte 1 67
+byte 1 69
+byte 1 95
+byte 1 87
+byte 1 73
+byte 1 84
+byte 1 72
+byte 1 0
+align 1
+LABELV $460
+byte 1 75
+byte 1 73
+byte 1 76
+byte 1 76
+byte 1 69
+byte 1 68
+byte 1 66
+byte 1 89
+byte 1 0
+align 1
+LABELV $459
+byte 1 73
+byte 1 78
+byte 1 71
+byte 1 65
+byte 1 77
+byte 1 69
+byte 1 84
+byte 1 69
+byte 1 88
+byte 1 84
+byte 1 0
+align 1
+LABELV $458
+byte 1 37
+byte 1 115
+byte 1 32
+byte 1 37
+byte 1 115
+byte 1 0
+align 1
+LABELV $454
+byte 1 0
+align 1
+LABELV $242
+byte 1 69
+byte 1 118
+byte 1 101
+byte 1 114
+byte 1 121
+byte 1 111
+byte 1 110
+byte 1 101
+byte 1 0
+align 1
+LABELV $239
+byte 1 37
+byte 1 100
+byte 1 0
+align 1
+LABELV $238
+byte 1 99
+byte 1 103
+byte 1 95
+byte 1 115
+byte 1 101
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 101
+byte 1 100
+byte 1 80
+byte 1 108
+byte 1 97
+byte 1 121
+byte 1 101
+byte 1 114
+byte 1 0
+align 1
+LABELV $237
+byte 1 99
+byte 1 103
+byte 1 95
+byte 1 115
+byte 1 101
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 101
+byte 1 100
+byte 1 80
+byte 1 108
+byte 1 97
+byte 1 121
+byte 1 101
+byte 1 114
+byte 1 78
+byte 1 97
+byte 1 109
+byte 1 101
+byte 1 0
+align 1
+LABELV $223
+byte 1 99
+byte 1 109
+byte 1 100
+byte 1 32
+byte 1 118
+byte 1 116
+byte 1 101
+byte 1 108
+byte 1 108
+byte 1 32
+byte 1 37
+byte 1 100
+byte 1 32
+byte 1 37
+byte 1 115
+byte 1 10
+byte 1 0
+align 1
+LABELV $219
+byte 1 116
+byte 1 101
+byte 1 97
+byte 1 109
+byte 1 116
+byte 1 97
+byte 1 115
+byte 1 107
+byte 1 32
+byte 1 37
+byte 1 105
+byte 1 10
+byte 1 0
+align 1
+LABELV $214
+byte 1 99
+byte 1 109
+byte 1 100
+byte 1 32
+byte 1 118
+byte 1 115
+byte 1 97
+byte 1 121
+byte 1 95
+byte 1 116
+byte 1 101
+byte 1 97
+byte 1 109
+byte 1 32
+byte 1 37
+byte 1 115
+byte 1 10
+byte 1 0
+align 1
+LABELV $206
+byte 1 102
+byte 1 111
+byte 1 108
+byte 1 108
+byte 1 111
+byte 1 119
+byte 1 102
+byte 1 108
+byte 1 97
+byte 1 103
+byte 1 99
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 105
+byte 1 101
+byte 1 114
+byte 1 0
+align 1
+LABELV $205
+byte 1 111
+byte 1 110
+byte 1 102
+byte 1 111
+byte 1 108
+byte 1 108
+byte 1 111
+byte 1 119
+byte 1 99
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 105
+byte 1 101
+byte 1 114
+byte 1 0
+align 1
+LABELV $203
+byte 1 114
+byte 1 101
+byte 1 116
+byte 1 117
+byte 1 114
+byte 1 110
+byte 1 102
+byte 1 108
+byte 1 97
+byte 1 103
+byte 1 0
+align 1
+LABELV $202
+byte 1 111
+byte 1 110
+byte 1 103
+byte 1 101
+byte 1 116
+byte 1 102
+byte 1 108
+byte 1 97
+byte 1 103
+byte 1 0
+align 1
+LABELV $200
+byte 1 99
+byte 1 97
+byte 1 109
+byte 1 112
+byte 1 0
+align 1
+LABELV $199
+byte 1 111
+byte 1 110
+byte 1 99
+byte 1 97
+byte 1 109
+byte 1 112
+byte 1 0
+align 1
+LABELV $197
+byte 1 43
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 49
+byte 1 48
+byte 1 59
+byte 1 32
+byte 1 119
+byte 1 97
+byte 1 105
+byte 1 116
+byte 1 59
+byte 1 32
+byte 1 45
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 49
+byte 1 48
+byte 1 10
+byte 1 0
+align 1
+LABELV $196
+byte 1 102
+byte 1 111
+byte 1 108
+byte 1 108
+byte 1 111
+byte 1 119
+byte 1 109
+byte 1 101
+byte 1 0
+align 1
+LABELV $195
+byte 1 111
+byte 1 110
+byte 1 102
+byte 1 111
+byte 1 108
+byte 1 108
+byte 1 111
+byte 1 119
+byte 1 0
+align 1
+LABELV $193
+byte 1 43
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 57
+byte 1 59
+byte 1 32
+byte 1 119
+byte 1 97
+byte 1 105
+byte 1 116
+byte 1 59
+byte 1 32
+byte 1 45
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 57
+byte 1 10
+byte 1 0
+align 1
+LABELV $192
+byte 1 112
+byte 1 97
+byte 1 116
+byte 1 114
+byte 1 111
+byte 1 108
+byte 1 0
+align 1
+LABELV $191
+byte 1 111
+byte 1 110
+byte 1 112
+byte 1 97
+byte 1 116
+byte 1 114
+byte 1 111
+byte 1 108
+byte 1 0
+align 1
+LABELV $189
+byte 1 43
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 56
+byte 1 59
+byte 1 32
+byte 1 119
+byte 1 97
+byte 1 105
+byte 1 116
+byte 1 59
+byte 1 32
+byte 1 45
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 56
+byte 1 10
+byte 1 0
+align 1
+LABELV $188
+byte 1 100
+byte 1 101
+byte 1 102
+byte 1 101
+byte 1 110
+byte 1 100
+byte 1 0
+align 1
+LABELV $187
+byte 1 111
+byte 1 110
+byte 1 100
+byte 1 101
+byte 1 102
+byte 1 101
+byte 1 110
+byte 1 115
+byte 1 101
+byte 1 0
+align 1
+LABELV $185
+byte 1 43
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 55
+byte 1 59
+byte 1 32
+byte 1 119
+byte 1 97
+byte 1 105
+byte 1 116
+byte 1 59
+byte 1 32
+byte 1 45
+byte 1 98
+byte 1 117
+byte 1 116
+byte 1 116
+byte 1 111
+byte 1 110
+byte 1 55
+byte 1 10
+byte 1 0
+align 1
+LABELV $184
+byte 1 111
+byte 1 102
+byte 1 102
+byte 1 101
+byte 1 110
+byte 1 115
+byte 1 101
+byte 1 0
+align 1
+LABELV $183
+byte 1 111
+byte 1 110
+byte 1 111
+byte 1 102
+byte 1 102
+byte 1 101
+byte 1 110
+byte 1 115
+byte 1 101
+byte 1 0

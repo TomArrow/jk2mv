@@ -1,254 +1,16 @@
-data
-export jk2version
-align 4
-LABELV jk2version
-byte 4 0
-export jk2gameplay
-align 4
-LABELV jk2gameplay
-byte 4 0
-export jk2startversion
-align 4
-LABELV jk2startversion
-byte 4 0
-export MV_BuildAnimationMappingTable
+export FX_BowcasterProjectileThink
 code
-proc MV_BuildAnimationMappingTable 0 0
-endproc MV_BuildAnimationMappingTable 0 0
-export MV_SetGamePlay
-proc MV_SetGamePlay 0 0
-endproc MV_SetGamePlay 0 0
-data
-align 4
-LABELV mvKeyconversion
-byte 4 9
-byte 4 9
-byte 4 13
-byte 4 10
-byte 4 27
-byte 4 27
-byte 4 32
-byte 4 32
-byte 4 127
-byte 4 8
-byte 4 129
-byte 4 4
-byte 4 131
-byte 4 7
-byte 4 132
-byte 4 170
-byte 4 133
-byte 4 171
-byte 4 134
-byte 4 172
-byte 4 135
-byte 4 173
-byte 4 136
-byte 4 3
-byte 4 136
-byte 4 131
-byte 4 137
-byte 4 2
-byte 4 138
-byte 4 1
-byte 4 139
-byte 4 143
-byte 4 140
-byte 4 127
-byte 4 141
-byte 4 158
-byte 4 142
-byte 4 145
-byte 4 143
-byte 4 144
-byte 4 144
-byte 4 157
-byte 4 145
-byte 4 28
-byte 4 146
-byte 4 29
-byte 4 147
-byte 4 30
-byte 4 148
-byte 4 31
-byte 4 149
-byte 4 132
-byte 4 150
-byte 4 133
-byte 4 151
-byte 4 134
-byte 4 152
-byte 4 135
-byte 4 153
-byte 4 149
-byte 4 154
-byte 4 150
-byte 4 155
-byte 4 151
-byte 4 156
-byte 4 152
-byte 4 160
-byte 4 23
-byte 4 161
-byte 4 24
-byte 4 162
-byte 4 25
-byte 4 163
-byte 4 20
-byte 4 164
-byte 4 21
-byte 4 165
-byte 4 22
-byte 4 166
-byte 4 17
-byte 4 167
-byte 4 18
-byte 4 168
-byte 4 19
-byte 4 169
-byte 4 13
-byte 4 170
-byte 4 16
-byte 4 171
-byte 4 14
-byte 4 172
-byte 4 247
-byte 4 173
-byte 4 12
-byte 4 174
-byte 4 11
-byte 4 175
-byte 4 5
-byte 4 176
-byte 4 215
-byte 4 178
-byte 4 141
-byte 4 179
-byte 4 142
-byte 4 180
-byte 4 166
-byte 4 181
-byte 4 167
-byte 4 182
-byte 4 168
-byte 4 183
-byte 4 139
-byte 4 184
-byte 4 137
-byte 4 185
-byte 4 257
-byte 4 186
-byte 4 258
-byte 4 187
-byte 4 259
-byte 4 188
-byte 4 260
-byte 4 189
-byte 4 261
-byte 4 190
-byte 4 262
-byte 4 191
-byte 4 263
-byte 4 192
-byte 4 264
-byte 4 193
-byte 4 265
-byte 4 194
-byte 4 266
-byte 4 195
-byte 4 267
-byte 4 196
-byte 4 268
-byte 4 197
-byte 4 269
-byte 4 198
-byte 4 270
-byte 4 199
-byte 4 271
-byte 4 200
-byte 4 272
-byte 4 201
-byte 4 273
-byte 4 202
-byte 4 274
-byte 4 203
-byte 4 275
-byte 4 204
-byte 4 276
-byte 4 205
-byte 4 277
-byte 4 206
-byte 4 278
-byte 4 207
-byte 4 279
-byte 4 208
-byte 4 280
-byte 4 209
-byte 4 281
-byte 4 210
-byte 4 282
-byte 4 211
-byte 4 283
-byte 4 212
-byte 4 284
-byte 4 213
-byte 4 285
-byte 4 214
-byte 4 286
-byte 4 215
-byte 4 287
-byte 4 217
-byte 4 289
-byte 4 218
-byte 4 290
-byte 4 219
-byte 4 291
-byte 4 220
-byte 4 292
-byte 4 221
-byte 4 293
-byte 4 222
-byte 4 294
-byte 4 223
-byte 4 295
-byte 4 224
-byte 4 296
-byte 4 225
-byte 4 297
-byte 4 226
-byte 4 298
-byte 4 227
-byte 4 299
-byte 4 228
-byte 4 300
-byte 4 229
-byte 4 301
-byte 4 230
-byte 4 302
-byte 4 231
-byte 4 303
-byte 4 232
-byte 4 304
-byte 4 233
-byte 4 320
-align 4
-LABELV mvKeyconversionCount
-byte 4 105
-export Key_GetProtocolKey_New
-code
-proc Key_GetProtocolKey_New 0 0
-endproc Key_GetProtocolKey_New 0 0
-export Key_GetProtocolKey
-proc Key_GetProtocolKey 0 0
-endproc Key_GetProtocolKey 0 0
-export Key_GetProtocolKey15
-proc Key_GetProtocolKey15 0 0
-endproc Key_GetProtocolKey15 0 0
-import forcePowerNeeded
-import forcePowerNeeded_1_04
-import forcePowerNeeded_1_02
-import animTable
-import animTable_1_02
+proc FX_BowcasterProjectileThink 0 0
+endproc FX_BowcasterProjectileThink 0 0
+export FX_BowcasterHitWall
+proc FX_BowcasterHitWall 0 0
+endproc FX_BowcasterHitWall 0 0
+export FX_BowcasterHitPlayer
+proc FX_BowcasterHitPlayer 0 0
+endproc FX_BowcasterHitPlayer 0 0
+export FX_BowcasterAltProjectileThink
+proc FX_BowcasterAltProjectileThink 0 0
+endproc FX_BowcasterAltProjectileThink 0 0
 import trap_AnyLanguage_ReadCharFromString_1_02
 import trap_AnyLanguage_ReadCharFromString_1_04
 import trap_G2API_SetBoneAnim
@@ -1027,6 +789,15 @@ import BG_Cmd_ArgsFrom
 import BG_Cmd_Args
 import BG_Cmd_Argv
 import BG_Cmd_Argc
+import Key_GetProtocolKey15
+import Key_GetProtocolKey
+import MV_SetGamePlay
+import MV_BuildAnimationMappingTable
+import animMappingTable_1_02_to_1_04
+import animMappingTable_1_04_to_1_02
+import jk2startversion
+import jk2gameplay
+import jk2version
 import BG_DB_VerifyPassword
 import g_arenaInfosHashed
 import g_numArenas
@@ -1149,8 +920,6 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import animMappingTable_1_02_to_1_04
-import animMappingTable_1_04_to_1_02
 import clampedIntAdd
 import clampedIntMult
 import parseHex

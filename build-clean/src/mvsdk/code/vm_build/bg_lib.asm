@@ -6804,8 +6804,8 @@ CNSTI4 0
 RETI4
 LABELV $518
 endproc fpclassify 28 0
-export copysignf
-proc copysignf 12 0
+export fabs
+proc fabs 4 0
 line 1613
 ;1597:}
 ;1598:
@@ -6823,92 +6823,118 @@ line 1613
 ;1610:#ifndef HAVE_VM_FLOAT_MATH_SHIMS
 ;1611:#define HAVE_VM_FLOAT_MATH_SHIMS 1
 ;1612:/* Minimal VM-only helpers. fabs/sqrt already provided via macros -> host doubles. */
-;1613:float copysignf(float x, float y){ return (y < 0) ? ((x < 0) ? x : -x) : ((x < 0) ? -x : x); }
-ADDRFP4 4
-INDIRF4
-CNSTF4 0
-GEF4 $540
+;1613:double fabs(double x){ return (x < 0.0) ? -x : x; }
 ADDRFP4 0
 INDIRF4
 CNSTF4 0
-GEF4 $542
-ADDRLP4 4
-ADDRFP4 0
-INDIRF4
-ASGNF4
-ADDRGP4 $543
-JUMPV
-LABELV $542
-ADDRLP4 4
+GEF4 $538
+ADDRLP4 0
 ADDRFP4 0
 INDIRF4
 NEGF4
 ASGNF4
-LABELV $543
-ADDRLP4 0
-ADDRLP4 4
-INDIRF4
-ASGNF4
-ADDRGP4 $541
+ADDRGP4 $539
 JUMPV
-LABELV $540
-ADDRFP4 0
-INDIRF4
-CNSTF4 0
-GEF4 $544
-ADDRLP4 8
-ADDRFP4 0
-INDIRF4
-NEGF4
-ASGNF4
-ADDRGP4 $545
-JUMPV
-LABELV $544
-ADDRLP4 8
-ADDRFP4 0
-INDIRF4
-ASGNF4
-LABELV $545
+LABELV $538
 ADDRLP4 0
-ADDRLP4 8
+ADDRFP4 0
 INDIRF4
 ASGNF4
-LABELV $541
+LABELV $539
 ADDRLP4 0
 INDIRF4
 RETF4
 LABELV $536
-endproc copysignf 12 0
-export logf
-proc logf 28 0
+endproc fabs 4 0
+export copysignf
+proc copysignf 12 0
 line 1614
-;1614:float logf(float x){
-line 1615
-;1615:	int k; float y, term, sum; int n; const float LN2 = 0.69314718056f;
-ADDRLP4 20
-CNSTF4 1060205080
-ASGNF4
-line 1616
-;1616:	if(x <= 0) return 0; /* crude */
+;1614:float copysignf(float x, float y){ return (y < 0) ? ((x < 0) ? x : -x) : ((x < 0) ? -x : x); }
+ADDRFP4 4
+INDIRF4
+CNSTF4 0
+GEF4 $544
 ADDRFP4 0
 INDIRF4
 CNSTF4 0
-GTF4 $547
+GEF4 $546
+ADDRLP4 4
+ADDRFP4 0
+INDIRF4
+ASGNF4
+ADDRGP4 $547
+JUMPV
+LABELV $546
+ADDRLP4 4
+ADDRFP4 0
+INDIRF4
+NEGF4
+ASGNF4
+LABELV $547
+ADDRLP4 0
+ADDRLP4 4
+INDIRF4
+ASGNF4
+ADDRGP4 $545
+JUMPV
+LABELV $544
+ADDRFP4 0
+INDIRF4
+CNSTF4 0
+GEF4 $548
+ADDRLP4 8
+ADDRFP4 0
+INDIRF4
+NEGF4
+ASGNF4
+ADDRGP4 $549
+JUMPV
+LABELV $548
+ADDRLP4 8
+ADDRFP4 0
+INDIRF4
+ASGNF4
+LABELV $549
+ADDRLP4 0
+ADDRLP4 8
+INDIRF4
+ASGNF4
+LABELV $545
+ADDRLP4 0
+INDIRF4
+RETF4
+LABELV $540
+endproc copysignf 12 0
+export logf
+proc logf 28 0
+line 1615
+;1615:float logf(float x){
+line 1616
+;1616:	int k; float y, term, sum; int n; const float LN2 = 0.69314718056f;
+ADDRLP4 20
+CNSTF4 1060205080
+ASGNF4
+line 1617
+;1617:	if(x <= 0) return 0; /* crude */
+ADDRFP4 0
+INDIRF4
+CNSTF4 0
+GTF4 $551
 CNSTF4 0
 RETF4
-ADDRGP4 $546
+ADDRGP4 $550
 JUMPV
-LABELV $547
-line 1617
-;1617:	k = 0; 
+LABELV $551
+line 1618
+;1618:	k = 0; 
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $550
+ADDRGP4 $554
 JUMPV
-LABELV $549
-line 1618
-;1618:	while(x > 2.0f){ x *= 0.5f; k++; }
+LABELV $553
+line 1619
+;1619:	while(x > 2.0f){ x *= 0.5f; k++; }
 ADDRFP4 0
 CNSTF4 1056964608
 ADDRFP4 0
@@ -6921,16 +6947,16 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $550
+LABELV $554
 ADDRFP4 0
 INDIRF4
 CNSTF4 1073741824
-GTF4 $549
-ADDRGP4 $553
+GTF4 $553
+ADDRGP4 $557
 JUMPV
-LABELV $552
-line 1619
-;1619:	while(x < 1.0f){ x *= 2.0f; k--; }
+LABELV $556
+line 1620
+;1620:	while(x < 1.0f){ x *= 2.0f; k--; }
 ADDRFP4 0
 CNSTF4 1073741824
 ADDRFP4 0
@@ -6943,21 +6969,21 @@ INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-LABELV $553
+LABELV $557
 ADDRFP4 0
 INDIRF4
 CNSTF4 1065353216
-LTF4 $552
-line 1620
-;1620:	y = x - 1.0f; /* x in [1,2) */
+LTF4 $556
+line 1621
+;1621:	y = x - 1.0f; /* x in [1,2) */
 ADDRLP4 12
 ADDRFP4 0
 INDIRF4
 CNSTF4 1065353216
 SUBF4
 ASGNF4
-line 1621
-;1621:	term = y; sum = 0.0f;
+line 1622
+;1622:	term = y; sum = 0.0f;
 ADDRLP4 8
 ADDRLP4 12
 INDIRF4
@@ -6965,25 +6991,25 @@ ASGNF4
 ADDRLP4 16
 CNSTF4 0
 ASGNF4
-line 1622
-;1622:	for(n=1;n<=6;n++){ /* truncated alternating series */
+line 1623
+;1623:	for(n=1;n<=6;n++){ /* truncated alternating series */
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-LABELV $555
-line 1623
-;1623:		if(n==1) term = y; else term *= -y*(n-1)/n; 
+LABELV $559
+line 1624
+;1624:		if(n==1) term = y; else term *= -y*(n-1)/n; 
 ADDRLP4 0
 INDIRI4
 CNSTI4 1
-NEI4 $559
+NEI4 $563
 ADDRLP4 8
 ADDRLP4 12
 INDIRF4
 ASGNF4
-ADDRGP4 $560
+ADDRGP4 $564
 JUMPV
-LABELV $559
+LABELV $563
 ADDRLP4 8
 ADDRLP4 8
 INDIRF4
@@ -7002,9 +7028,9 @@ CVIF4 4
 DIVF4
 MULF4
 ASGNF4
-LABELV $560
-line 1624
-;1624:		sum += term; 
+LABELV $564
+line 1625
+;1625:		sum += term; 
 ADDRLP4 16
 ADDRLP4 16
 INDIRF4
@@ -7012,10 +7038,10 @@ ADDRLP4 8
 INDIRF4
 ADDF4
 ASGNF4
-line 1625
-;1625:	}
-LABELV $556
-line 1622
+line 1626
+;1626:	}
+LABELV $560
+line 1623
 ADDRLP4 0
 ADDRLP4 0
 INDIRI4
@@ -7025,9 +7051,9 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 6
-LEI4 $555
-line 1626
-;1626:	return sum + k * LN2;
+LEI4 $559
+line 1627
+;1627:	return sum + k * LN2;
 ADDRLP4 16
 INDIRF4
 ADDRLP4 4
@@ -7038,20 +7064,20 @@ INDIRF4
 MULF4
 ADDF4
 RETF4
-LABELV $546
+LABELV $550
 endproc logf 28 0
 export expf
 proc expf 28 0
-line 1628
-;1627:}
-;1628:float expf(float x){
 line 1629
-;1629:	int k; float r, term, sum; int n; const float LN2 = 0.69314718056f;
+;1628:}
+;1629:float expf(float x){
+line 1630
+;1630:	int k; float r, term, sum; int n; const float LN2 = 0.69314718056f;
 ADDRLP4 20
 CNSTF4 1060205080
 ASGNF4
-line 1630
-;1630:	k = (int)(x / LN2); /* scale by ln2 */
+line 1631
+;1631:	k = (int)(x / LN2); /* scale by ln2 */
 ADDRLP4 12
 ADDRFP4 0
 INDIRF4
@@ -7060,8 +7086,8 @@ INDIRF4
 DIVF4
 CVFI4 4
 ASGNI4
-line 1631
-;1631:	r = x - k * LN2;
+line 1632
+;1632:	r = x - k * LN2;
 ADDRLP4 16
 ADDRFP4 0
 INDIRF4
@@ -7073,20 +7099,20 @@ INDIRF4
 MULF4
 SUBF4
 ASGNF4
-line 1632
-;1632:	term = 1.0f; sum = 1.0f;
+line 1633
+;1633:	term = 1.0f; sum = 1.0f;
 ADDRLP4 8
 CNSTF4 1065353216
 ASGNF4
 ADDRLP4 4
 CNSTF4 1065353216
 ASGNF4
-line 1633
-;1633:	for(n=1;n<=6;n++){ term *= r / n; sum += term; }
+line 1634
+;1634:	for(n=1;n<=6;n++){ term *= r / n; sum += term; }
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-LABELV $562
+LABELV $566
 ADDRLP4 8
 ADDRLP4 8
 INDIRF4
@@ -7105,7 +7131,7 @@ ADDRLP4 8
 INDIRF4
 ADDF4
 ASGNF4
-LABELV $563
+LABELV $567
 ADDRLP4 0
 ADDRLP4 0
 INDIRI4
@@ -7115,23 +7141,23 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 6
-LEI4 $562
-line 1634
-;1634:	if(k>0){ while(k--) sum *= 2.0f; } else { while(k++) sum *= 0.5f; }
+LEI4 $566
+line 1635
+;1635:	if(k>0){ while(k--) sum *= 2.0f; } else { while(k++) sum *= 0.5f; }
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-LEI4 $572
-ADDRGP4 $569
+LEI4 $576
+ADDRGP4 $573
 JUMPV
-LABELV $568
+LABELV $572
 ADDRLP4 4
 CNSTF4 1073741824
 ADDRLP4 4
 INDIRF4
 MULF4
 ASGNF4
-LABELV $569
+LABELV $573
 ADDRLP4 24
 ADDRLP4 12
 INDIRI4
@@ -7145,17 +7171,17 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-NEI4 $568
-ADDRGP4 $567
+NEI4 $572
+ADDRGP4 $571
 JUMPV
-LABELV $571
+LABELV $575
 ADDRLP4 4
 CNSTF4 1056964608
 ADDRLP4 4
 INDIRF4
 MULF4
 ASGNF4
-LABELV $572
+LABELV $576
 ADDRLP4 24
 ADDRLP4 12
 INDIRI4
@@ -7169,52 +7195,52 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-NEI4 $571
-LABELV $567
-line 1635
-;1635:	return sum;
+NEI4 $575
+LABELV $571
+line 1636
+;1636:	return sum;
 ADDRLP4 4
 INDIRF4
 RETF4
-LABELV $561
+LABELV $565
 endproc expf 28 0
 export memcmp
 proc memcmp 12 0
-line 1650
-;1636:}
-;1637:#endif /* HAVE_VM_FLOAT_MATH_SHIMS */
-;1638:#endif /* Q3_VM */
-;1639:
-;1640:/* UINT32_C / INT32_C are needed by fp16.c when compiling for the VM */
-;1641:#ifndef UINT32_C
-;1642:#define UINT32_C(val) val##U
-;1643:#endif
-;1644:#ifndef INT32_C
-;1645:#define INT32_C(val) val
-;1646:#endif
-;1647:
-;1648:#ifndef HAVE_VM_MEMCMP_SHIM
-;1649:#define HAVE_VM_MEMCMP_SHIM 1
-;1650:int memcmp(const void *s1, const void *s2, size_t n) {
 line 1651
-;1651:	const unsigned char *a = (const unsigned char*)s1;
+;1637:}
+;1638:#endif /* HAVE_VM_FLOAT_MATH_SHIMS */
+;1639:#endif /* Q3_VM */
+;1640:
+;1641:/* UINT32_C / INT32_C are needed by fp16.c when compiling for the VM */
+;1642:#ifndef UINT32_C
+;1643:#define UINT32_C(val) val##U
+;1644:#endif
+;1645:#ifndef INT32_C
+;1646:#define INT32_C(val) val
+;1647:#endif
+;1648:
+;1649:#ifndef HAVE_VM_MEMCMP_SHIM
+;1650:#define HAVE_VM_MEMCMP_SHIM 1
+;1651:int memcmp(const void *s1, const void *s2, size_t n) {
+line 1652
+;1652:	const unsigned char *a = (const unsigned char*)s1;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 ASGNP4
-line 1652
-;1652:	const unsigned char *b = (const unsigned char*)s2;
+line 1653
+;1653:	const unsigned char *b = (const unsigned char*)s2;
 ADDRLP4 4
 ADDRFP4 4
 INDIRP4
 ASGNP4
-ADDRGP4 $576
+ADDRGP4 $580
 JUMPV
-LABELV $575
-line 1653
-;1653:	while(n--) {
+LABELV $579
 line 1654
-;1654:		if(*a != *b) return *a - *b;
+;1654:	while(n--) {
+line 1655
+;1655:		if(*a != *b) return *a - *b;
 ADDRLP4 0
 INDIRP4
 INDIRU1
@@ -7223,7 +7249,7 @@ ADDRLP4 4
 INDIRP4
 INDIRU1
 CVUI4 1
-EQI4 $578
+EQI4 $582
 ADDRLP4 0
 INDIRP4
 INDIRU1
@@ -7234,27 +7260,27 @@ INDIRU1
 CVUI4 1
 SUBI4
 RETI4
-ADDRGP4 $574
+ADDRGP4 $578
 JUMPV
-LABELV $578
-line 1655
-;1655:		++a; ++b;
-ADDRLP4 0
-ADDRLP4 0
-INDIRP4
-CNSTI4 1
-ADDP4
-ASGNP4
-ADDRLP4 4
-ADDRLP4 4
-INDIRP4
-CNSTI4 1
-ADDP4
-ASGNP4
+LABELV $582
 line 1656
-;1656:	}
-LABELV $576
-line 1653
+;1656:		++a; ++b;
+ADDRLP4 0
+ADDRLP4 0
+INDIRP4
+CNSTI4 1
+ADDP4
+ASGNP4
+ADDRLP4 4
+ADDRLP4 4
+INDIRP4
+CNSTI4 1
+ADDP4
+ASGNP4
+line 1657
+;1657:	}
+LABELV $580
+line 1654
 ADDRLP4 8
 ADDRFP4 8
 INDIRU4
@@ -7268,12 +7294,12 @@ ASGNU4
 ADDRLP4 8
 INDIRU4
 CNSTU4 0
-NEU4 $575
-line 1657
-;1657:	return 0;
+NEU4 $579
+line 1658
+;1658:	return 0;
 CNSTI4 0
 RETI4
-LABELV $574
+LABELV $578
 endproc memcmp 12 0
 import clampedIntAdd
 import clampedIntMult
@@ -7431,7 +7457,6 @@ import bsearch
 import frexpf
 import asin
 import acos
-import fabs
 import atan2
 import cos
 import sin
