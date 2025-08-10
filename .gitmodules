@@ -1,6 +1,6 @@
 [submodule "src/mvsdk"]
 	path = src/mvsdk
-	url = https://github.com/TomArrow/mvsdk.git
+	url = https://github.com/soothad/mvsdk-tom.git
 [submodule "libs/mariadb-connector-cpp"]
 	path = libs/mariadb-connector-cpp
 	url = https://github.com/TomArrow/mariadb-connector-cpp
