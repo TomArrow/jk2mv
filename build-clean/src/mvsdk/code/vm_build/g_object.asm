@@ -1,6 +1,6 @@
 lit
 align 4
-LABELV $123
+LABELV $121
 byte 4 0
 byte 4 0
 byte 4 0
@@ -35,7 +35,7 @@ line 24
 ;23:	vec3_t	slope;
 ;24:	vec3_t	nvf, ovf, ovr, startspot, endspot, new_angles = { 0, 0, 0 };
 ADDRLP4 12
-ADDRGP4 $123
+ADDRGP4 $121
 INDIRB
 ASGNB 12
 line 29
@@ -52,7 +52,7 @@ ADDRLP4 100
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $126
+EQU4 $124
 ADDRGP4 vec3_origin
 ARGP4
 ADDRLP4 100
@@ -65,8 +65,8 @@ ASGNI4
 ADDRLP4 104
 INDIRI4
 CNSTI4 0
-EQI4 $124
-LABELV $126
+EQI4 $122
+LABELV $124
 line 30
 ;30:	{
 line 33
@@ -149,24 +149,24 @@ line 41
 ADDRLP4 108+8
 INDIRF4
 CNSTF4 1065353216
-LTF4 $129
+LTF4 $127
 line 42
 ;42:			return;
-ADDRGP4 $122
+ADDRGP4 $120
 JUMPV
-LABELV $129
+LABELV $127
 line 44
 ;43:
 ;44:		if( trace.allsolid )
 ADDRLP4 108
 INDIRI4
 CNSTI4 0
-EQI4 $132
+EQI4 $130
 line 45
 ;45:			return;
-ADDRGP4 $122
+ADDRGP4 $120
 JUMPV
-LABELV $132
+LABELV $130
 line 47
 ;46:
 ;47:		VectorCopy( trace.plane.normal, slope );
@@ -176,9 +176,9 @@ INDIRB
 ASGNB 12
 line 48
 ;48:	}
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $124
+LABELV $122
 line 50
 ;49:	else
 ;50:	{
@@ -191,7 +191,7 @@ INDIRB
 ASGNB 12
 line 52
 ;52:	}
-LABELV $125
+LABELV $123
 line 55
 ;53:
 ;54:
@@ -288,22 +288,22 @@ line 65
 ADDRLP4 48
 INDIRF4
 CNSTF4 0
-GEF4 $140
+GEF4 $138
 line 66
 ;66:		mod = -1;
 ADDRLP4 48
 CNSTF4 3212836864
 ASGNF4
-ADDRGP4 $141
+ADDRGP4 $139
 JUMPV
-LABELV $140
+LABELV $138
 line 68
 ;67:	else
 ;68:		mod = 1;
 ADDRLP4 48
 CNSTF4 1065353216
 ASGNF4
-LABELV $141
+LABELV $139
 line 70
 ;69:
 ;70:	dot = DotProduct( nvf, ovf );
@@ -336,7 +336,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $146
+EQU4 $144
 line 73
 ;73:	{
 line 74
@@ -432,7 +432,7 @@ INDIRP4
 CNSTI4 324
 ADDP4
 INDIRF4
-LEF4 $147
+LEF4 $145
 line 80
 ;80:		{//our mins is now lower, need to move up
 line 82
@@ -497,9 +497,9 @@ line 85
 ;85:		}
 line 86
 ;86:	}
-ADDRGP4 $147
+ADDRGP4 $145
 JUMPV
-LABELV $146
+LABELV $144
 line 88
 ;87:	else
 ;88:	{
@@ -541,10 +541,10 @@ MULF4
 ASGNF4
 line 91
 ;91:	}
-LABELV $147
+LABELV $145
 line 92
 ;92:}
-LABELV $122
+LABELV $120
 endproc pitch_roll_for_slope 1196 28
 export G_BounceObject
 proc G_BounceObject 44 12
@@ -644,7 +644,7 @@ line 112
 ADDRLP4 12
 INDIRF4
 CNSTF4 1065353216
-LEF4 $156
+LEF4 $154
 line 113
 ;113:	{
 line 114
@@ -654,7 +654,7 @@ CNSTF4 1065353216
 ASGNF4
 line 115
 ;115:	}
-LABELV $156
+LABELV $154
 line 116
 ;116:	VectorMA( velocity, -2*dot*bounceFactor, trace->plane.normal, ent->s.pos.trDelta );
 ADDRFP4 0
@@ -732,7 +732,7 @@ INDIRI4
 CNSTI4 32
 BANDI4
 CNSTI4 0
-EQI4 $160
+EQI4 $158
 line 120
 ;120:	{
 line 121
@@ -789,48 +789,48 @@ CNSTI4 32
 ADDP4
 INDIRF4
 CNSTF4 1060320051
-LEF4 $169
+LEF4 $167
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-GTF4 $168
-LABELV $169
+GTF4 $166
+LABELV $167
 ADDRFP4 4
 INDIRP4
 CNSTI4 32
 ADDP4
 INDIRF4
 CNSTF4 3207803699
-GEF4 $162
+GEF4 $160
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-GEF4 $162
-LABELV $168
+GEF4 $160
+LABELV $166
 ADDRFP4 0
 INDIRP4
 CNSTI4 44
 ADDP4
 INDIRF4
 CNSTF4 1109393408
-GEF4 $171
+GEF4 $169
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-GTF4 $170
-LABELV $171
+GTF4 $168
+LABELV $169
 ADDRFP4 0
 INDIRP4
 CNSTI4 44
 ADDP4
 INDIRF4
 CNSTF4 3256877056
-LEF4 $162
+LEF4 $160
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-GEF4 $162
-LABELV $170
+GEF4 $160
+LABELV $168
 line 125
 ;125:		{
 line 128
@@ -894,13 +894,13 @@ INDIRI4
 ASGNI4
 line 133
 ;133:			return;
-ADDRGP4 $150
+ADDRGP4 $148
 JUMPV
-LABELV $162
+LABELV $160
 line 135
 ;134:		}
 ;135:	}
-LABELV $160
+LABELV $158
 line 140
 ;136:
 ;137:	// NEW--It would seem that we want to set our trBase to the trace endpos
@@ -957,7 +957,7 @@ INDIRB
 ASGNB 12
 line 145
 ;145:}
-LABELV $150
+LABELV $148
 endproc G_BounceObject 44 12
 export G_RunObject
 proc G_RunObject 1192 28
@@ -993,7 +993,7 @@ CNSTI4 12
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $174
+NEI4 $172
 line 166
 ;166:	{
 line 167
@@ -1034,7 +1034,7 @@ line 170
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-NEF4 $177
+NEF4 $175
 line 171
 ;171:		{
 line 172
@@ -1055,10 +1055,10 @@ ADDF4
 ASGNF4
 line 173
 ;173:		}
-LABELV $177
+LABELV $175
 line 174
 ;174:	}
-LABELV $174
+LABELV $172
 line 176
 ;175:
 ;176:	ent->nextthink = level.time + FRAMETIME;
@@ -1137,14 +1137,14 @@ ASGNI4
 ADDRLP4 1112
 INDIRI4
 CNSTI4 0
-EQI4 $183
+EQI4 $181
 line 185
 ;185:	{//error - didn't move at all!
 line 186
 ;186:		return;
-ADDRGP4 $173
+ADDRGP4 $171
 JUMPV
-LABELV $183
+LABELV $181
 line 190
 ;187:	}
 ;188:	// trace a line from the previous position to the current position,
@@ -1180,7 +1180,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $186
+EQU4 $184
 ADDRLP4 1116
 ADDRFP4 0
 INDIRP4
@@ -1189,15 +1189,15 @@ ADDP4
 INDIRP4
 INDIRI4
 ASGNI4
-ADDRGP4 $187
+ADDRGP4 $185
 JUMPV
-LABELV $186
+LABELV $184
 ADDRLP4 1116
 ADDRFP4 0
 INDIRP4
 INDIRI4
 ASGNI4
-LABELV $187
+LABELV $185
 ADDRLP4 1116
 INDIRI4
 ARGI4
@@ -1221,16 +1221,16 @@ ADDRLP4 0+4
 INDIRI4
 ADDRLP4 1124
 INDIRI4
-NEI4 $188
+NEI4 $186
 ADDRLP4 0
 INDIRI4
 ADDRLP4 1124
 INDIRI4
-NEI4 $188
+NEI4 $186
 ADDRLP4 0+8
 INDIRF4
 CNSTF4 0
-EQF4 $188
+EQF4 $186
 line 194
 ;194:	{
 line 195
@@ -1252,9 +1252,9 @@ CALLV
 pop
 line 197
 ;197:	}
-ADDRGP4 $189
+ADDRGP4 $187
 JUMPV
-LABELV $188
+LABELV $186
 line 200
 ;198:	else
 ;199:	//if ( tr.startsolid ) 
@@ -1266,7 +1266,7 @@ CNSTF4 0
 ASGNF4
 line 202
 ;202:	}
-LABELV $189
+LABELV $187
 line 204
 ;203:
 ;204:	G_MoverTouchPushTriggers( ent, oldOrg );
@@ -1298,7 +1298,7 @@ line 220
 ADDRLP4 0+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $194
+NEF4 $192
 line 221
 ;221:	{
 line 222
@@ -1306,7 +1306,7 @@ line 222
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-GTF4 $197
+GTF4 $195
 line 223
 ;223:		{
 line 224
@@ -1317,7 +1317,7 @@ CNSTI4 48
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $200
+NEI4 $198
 line 225
 ;225:			{
 line 226
@@ -1365,7 +1365,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1140
 INDIRU4
-EQU4 $203
+EQU4 $201
 ADDRLP4 1144
 ADDRLP4 1136
 INDIRP4
@@ -1378,24 +1378,24 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1140
 INDIRU4
-EQU4 $203
+EQU4 $201
 ADDRLP4 1144
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $203
+EQI4 $201
 ADDRLP4 1132
 CNSTI4 1
 ASGNI4
-ADDRGP4 $204
+ADDRGP4 $202
 JUMPV
-LABELV $203
+LABELV $201
 ADDRLP4 1132
 CNSTI4 0
 ASGNI4
-LABELV $204
+LABELV $202
 ADDRLP4 1132
 INDIRI4
 ARGI4
@@ -1433,7 +1433,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1160
 INDIRU4
-EQU4 $206
+EQU4 $204
 ADDRLP4 1164
 ADDRLP4 1156
 INDIRP4
@@ -1446,24 +1446,24 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1160
 INDIRU4
-EQU4 $206
+EQU4 $204
 ADDRLP4 1164
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $206
+EQI4 $204
 ADDRLP4 1152
 CNSTI4 1
 ASGNI4
-ADDRGP4 $207
+ADDRGP4 $205
 JUMPV
-LABELV $206
+LABELV $204
 ADDRLP4 1152
 CNSTI4 0
 ASGNI4
-LABELV $207
+LABELV $205
 ADDRLP4 1152
 INDIRI4
 ARGI4
@@ -1501,7 +1501,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1180
 INDIRU4
-EQU4 $209
+EQU4 $207
 ADDRLP4 1184
 ADDRLP4 1176
 INDIRP4
@@ -1514,24 +1514,24 @@ INDIRP4
 CVPU4 4
 ADDRLP4 1180
 INDIRU4
-EQU4 $209
+EQU4 $207
 ADDRLP4 1184
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $209
+EQI4 $207
 ADDRLP4 1172
 CNSTI4 1
 ASGNI4
-ADDRGP4 $210
+ADDRGP4 $208
 JUMPV
-LABELV $209
+LABELV $207
 ADDRLP4 1172
 CNSTI4 0
 ASGNI4
-LABELV $210
+LABELV $208
 ADDRLP4 1172
 INDIRI4
 ARGI4
@@ -1559,17 +1559,17 @@ INDIRI4
 ASGNI4
 line 232
 ;232:			}
-LABELV $200
+LABELV $198
 line 233
 ;233:		}
-LABELV $197
+LABELV $195
 line 235
 ;234:		//friction in zero-G
 ;235:		if ( !g_gravity.value )
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-NEF4 $173
+NEF4 $171
 line 236
 ;236:		{
 line 237
@@ -1583,7 +1583,7 @@ line 239
 ADDRLP4 1128
 INDIRF4
 CNSTF4 1036831949
-GEF4 $215
+GEF4 $213
 line 240
 ;240:			{
 line 241
@@ -1593,7 +1593,7 @@ CNSTF4 1036831949
 ASGNF4
 line 242
 ;242:			}
-LABELV $215
+LABELV $213
 line 244
 ;243:
 ;244:			VectorScale( ent->s.pos.trDelta, friction, ent->s.pos.trDelta );
@@ -1671,9 +1671,9 @@ line 247
 ;247:		}
 line 248
 ;248:		return;
-ADDRGP4 $173
+ADDRGP4 $171
 JUMPV
-LABELV $194
+LABELV $192
 line 254
 ;249:	}
 ;250:
@@ -1694,20 +1694,20 @@ line 255
 ADDRLP4 0+8
 INDIRF4
 CNSTF4 0
-NEF4 $222
+NEF4 $220
 ADDRLP4 1080
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $219
+EQU4 $217
 ADDRLP4 1080
 INDIRP4
 CNSTI4 692
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $219
-LABELV $222
+EQI4 $217
+LABELV $220
 line 256
 ;256:	{
 line 257
@@ -1726,7 +1726,7 @@ ASGNI4
 ADDRLP4 1132
 INDIRI4
 CNSTI4 0
-NEI4 $223
+NEI4 $221
 line 258
 ;258:		{//moved and impacted
 line 259
@@ -1735,24 +1735,24 @@ ADDRLP4 1080
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $225
+EQU4 $223
 ADDRLP4 1080
 INDIRP4
 CNSTI4 692
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $225
+EQI4 $223
 line 260
 ;260:			{//hurt someone
 line 262
 ;261://				G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHurt.wav" ) );
 ;262:			}
-LABELV $225
+LABELV $223
 line 264
 ;263://			G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHit.wav" ) );
 ;264:		}
-LABELV $223
+LABELV $221
 line 266
 ;265:
 ;266:		if (ent->s.weapon != WP_SABER || jk2gameplay == VERSION_1_02)
@@ -1766,13 +1766,13 @@ ADDP4
 INDIRI4
 ADDRLP4 1136
 INDIRI4
-NEI4 $229
+NEI4 $227
 ADDRGP4 jk2gameplay
 INDIRI4
 ADDRLP4 1136
 INDIRI4
-NEI4 $227
-LABELV $229
+NEI4 $225
+LABELV $227
 line 267
 ;267:		{
 line 268
@@ -1790,10 +1790,10 @@ CALLV
 pop
 line 269
 ;269:		}
-LABELV $227
+LABELV $225
 line 270
 ;270:	}
-LABELV $219
+LABELV $217
 line 272
 ;271:
 ;272:	if ( !ent || (ent->takedamage&&ent->health <= 0) )
@@ -1805,7 +1805,7 @@ ADDRLP4 1132
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $232
+EQU4 $230
 ADDRLP4 1136
 CNSTI4 0
 ASGNI4
@@ -1816,7 +1816,7 @@ ADDP4
 INDIRI4
 ADDRLP4 1136
 INDIRI4
-EQI4 $230
+EQI4 $228
 ADDRLP4 1132
 INDIRP4
 CNSTI4 688
@@ -1824,17 +1824,17 @@ ADDP4
 INDIRI4
 ADDRLP4 1136
 INDIRI4
-GTI4 $230
-LABELV $232
+GTI4 $228
+LABELV $230
 line 273
 ;273:	{//been destroyed by impact
 line 276
 ;274:		//chunks?
 ;275://		G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectBreak.wav" ) );
 ;276:		return;
-ADDRGP4 $173
+ADDRGP4 $171
 JUMPV
-LABELV $230
+LABELV $228
 line 280
 ;277:	}
 ;278:
@@ -1846,7 +1846,7 @@ CNSTI4 12
 ADDP4
 INDIRI4
 CNSTI4 5
-NEI4 $233
+NEI4 $231
 line 281
 ;281:	{//FIXME: only do this if no trDelta
 line 282
@@ -1854,12 +1854,12 @@ line 282
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-LEF4 $240
+LEF4 $238
 ADDRLP4 0+24+8
 INDIRF4
 CNSTF4 1060320051
-GEF4 $235
-LABELV $240
+GEF4 $233
+LABELV $238
 line 283
 ;283:		{
 line 284
@@ -1872,7 +1872,7 @@ INDIRI4
 CNSTI4 48
 BANDI4
 CNSTI4 0
-EQI4 $234
+EQI4 $232
 line 285
 ;285:			{
 line 286
@@ -1880,7 +1880,7 @@ line 286
 ADDRLP4 0+8
 INDIRF4
 CNSTF4 0
-GTF4 $243
+GTF4 $241
 line 287
 ;287:				{
 line 288
@@ -1942,9 +1942,9 @@ INDIRI4
 ASGNI4
 line 292
 ;292:				}
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $243
+LABELV $241
 line 294
 ;293:				else
 ;294:				{
@@ -1970,9 +1970,9 @@ line 301
 ;301:			}
 line 302
 ;302:		}
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $235
+LABELV $233
 line 304
 ;303:		else
 ;304:		{
@@ -2027,9 +2027,9 @@ line 314
 ;314:		}
 line 315
 ;315:	}
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $233
+LABELV $231
 line 316
 ;316:	else if (ent->s.weapon != WP_SABER)
 ADDRFP4 0
@@ -2038,7 +2038,7 @@ CNSTI4 276
 ADDP4
 INDIRI4
 CNSTI4 2
-EQI4 $250
+EQI4 $248
 line 317
 ;317:	{
 line 318
@@ -2079,8 +2079,8 @@ INDIRB
 ASGNB 12
 line 323
 ;323:	}
-LABELV $250
-LABELV $234
+LABELV $248
+LABELV $232
 line 326
 ;324:
 ;325:	//call touch func
@@ -2110,7 +2110,7 @@ CALLV
 pop
 line 327
 ;327:}
-LABELV $173
+LABELV $171
 endproc G_RunObject 1192 28
 export G_StopObjectMoving
 proc G_StopObjectMoving 16 0
@@ -2199,7 +2199,7 @@ line 344
 ;342:	VectorCopy(self->s.angles, self->s.apos.trBase);
 ;343:	*/
 ;344:}
-LABELV $254
+LABELV $252
 endproc G_StopObjectMoving 16 0
 export G_StartObjectMoving
 proc G_StartObjectMoving 4 4
@@ -2309,7 +2309,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $257
+NEU4 $255
 line 366
 ;366:	{
 line 367
@@ -2333,16 +2333,16 @@ ADDRGP4 G_RunObject
 ASGNP4
 line 369
 ;369:	}
-LABELV $257
+LABELV $255
 line 371
 ;370:	else
 ;371:	{//You're responsible for calling RunObject
 line 372
 ;372:	}
-LABELV $258
+LABELV $256
 line 373
 ;373:}
-LABELV $255
+LABELV $253
 endproc G_StartObjectMoving 4 4
 import DoImpact
 import G_MoverTouchPushTriggers
@@ -3213,14 +3213,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -3367,6 +3365,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf

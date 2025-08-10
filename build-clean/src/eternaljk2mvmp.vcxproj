@@ -52,7 +52,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -89,7 +88,8 @@
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4244;4996;4267</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
@@ -98,25 +98,19 @@
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
-      <RuntimeLibrary></RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;DEBUG;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;DEBUG;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <MASM>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;DEBUG;CMAKE_INTDIR="Debug";</PreprocessorDefinitions>
-      <IncludePaths>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(IncludePaths)</IncludePaths>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-    </MASM>
     <Midl>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
@@ -149,6 +143,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <Link>
       <AdditionalDependencies>..\out\Debug\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;D:\Workspace\jk2mv-tom\libs\OpenAL\lib\x64\OpenAL32.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2main.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2.lib;..\out\Debug\jpeg-static.lib;..\out\Debug\libpng.lib;..\out\Debug\minizip.lib;..\out\Debug\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -182,7 +177,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
@@ -196,11 +192,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <MASM>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="Release";</PreprocessorDefinitions>
-      <IncludePaths>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(IncludePaths)</IncludePaths>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-    </MASM>
     <Midl>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
@@ -233,6 +224,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <Link>
       <AdditionalDependencies>..\out\Release\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;D:\Workspace\jk2mv-tom\libs\OpenAL\lib\x64\OpenAL32.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2main.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2.lib;..\out\Release\jpeg-static.lib;..\out\Release\libpng.lib;..\out\Release\minizip.lib;..\out\Release\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -263,7 +255,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Optimization>MinSpace</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
-      <RuntimeLibrary></RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
@@ -277,11 +270,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <MASM>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;CMAKE_INTDIR="MinSizeRel";</PreprocessorDefinitions>
-      <IncludePaths>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(IncludePaths)</IncludePaths>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-    </MASM>
     <Midl>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
@@ -314,6 +302,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <Link>
       <AdditionalDependencies>..\out\MinSizeRel\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;D:\Workspace\jk2mv-tom\libs\OpenAL\lib\x64\OpenAL32.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2main.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2.lib;..\out\MinSizeRel\jpeg-static.lib;..\out\MinSizeRel\libpng.lib;..\out\MinSizeRel\minizip.lib;..\out\MinSizeRel\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -348,7 +337,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
@@ -360,11 +350,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-    <MASM>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";</PreprocessorDefinitions>
-      <IncludePaths>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(IncludePaths)</IncludePaths>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-    </MASM>
     <Midl>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom\build-clean;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\build-clean\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
@@ -397,6 +382,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <Link>
       <AdditionalDependencies>..\out\RelWithDebInfo\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;D:\Workspace\jk2mv-tom\libs\OpenAL\lib\x64\OpenAL32.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2main.lib;D:\Workspace\jk2mv-tom\libs\SDL2\lib\x64\SDL2.lib;..\out\RelWithDebInfo\jpeg-static.lib;..\out\RelWithDebInfo\libpng.lib;..\out\RelWithDebInfo\minizip.lib;..\out\RelWithDebInfo\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -600,9 +586,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_mesh.cpp" />
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_model.cpp" />
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_shader.cpp" />
-    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\StackWalker\include\StackWalker.h" />
     <ClCompile Include="D:\Workspace\jk2mv-tom\libs\StackWalker\StackWalker.cpp" />
-    <MASM Include="D:\Workspace\jk2mv-tom\src\win32\q3asm.asm" />
+    <None Include="D:\Workspace\jk2mv-tom\src\win32\q3asm.asm">
+    </None>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\StackWalker\include\StackWalker.h" />
     <ClInclude Include="D:\Workspace\jk2mv-tom\src\sys\sys_public.h" />
     <ClInclude Include="D:\Workspace\jk2mv-tom\src\sys\sys_local.h" />
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\con_win32.cpp" />
@@ -743,6 +730,5 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

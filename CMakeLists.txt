@@ -8,6 +8,7 @@ endif()
 
 # Paths
 set(RESDir "${CMAKE_SOURCE_DIR}/res")
+set(LIBDir "${CMAKE_SOURCE_DIR}/libs")
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/tools")
 list(INSERT CMAKE_MODULE_PATH 0 "${RESDir}")
 

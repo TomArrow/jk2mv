@@ -1434,7 +1434,7 @@ ADDRFP4 0
 INDIRP4
 INDIRI4
 RETI4
-LABELV $50
+LABELV $48
 endproc Q_rand 4 0
 export Q_random
 proc Q_random 4 4
@@ -1459,7 +1459,7 @@ CVIF4 4
 CNSTF4 1199570944
 DIVF4
 RETF4
-LABELV $51
+LABELV $49
 endproc Q_random 4 4
 export Q_crandom
 proc Q_crandom 4 4
@@ -1483,7 +1483,7 @@ CNSTF4 1056964608
 SUBF4
 MULF4
 RETF4
-LABELV $52
+LABELV $50
 endproc Q_crandom 4 4
 export VectorCompare
 proc VectorCompare 16 0
@@ -1509,7 +1509,7 @@ INDIRF4
 ADDRLP4 4
 INDIRP4
 INDIRF4
-NEF4 $57
+NEF4 $55
 ADDRLP4 8
 CNSTI4 4
 ASGNI4
@@ -1525,7 +1525,7 @@ ADDRLP4 8
 INDIRI4
 ADDP4
 INDIRF4
-NEF4 $57
+NEF4 $55
 ADDRLP4 12
 CNSTI4 8
 ASGNI4
@@ -1541,21 +1541,21 @@ ADDRLP4 12
 INDIRI4
 ADDP4
 INDIRF4
-EQF4 $54
-LABELV $57
+EQF4 $52
+LABELV $55
 line 277
 ;277:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $53
+ADDRGP4 $51
 JUMPV
-LABELV $54
+LABELV $52
 line 279
 ;278:	}			
 ;279:	return 1;
 CNSTI4 1
 RETI4
-LABELV $53
+LABELV $51
 endproc VectorCompare 16 0
 export VectorLength
 proc VectorLength 20 4
@@ -1613,7 +1613,7 @@ ASGNF4
 ADDRLP4 16
 INDIRF4
 RETF4
-LABELV $58
+LABELV $56
 endproc VectorLength 20 4
 export VectorLengthSquared
 proc VectorLengthSquared 16 0
@@ -1664,7 +1664,7 @@ INDIRF4
 MULF4
 ADDF4
 RETF4
-LABELV $59
+LABELV $57
 endproc VectorLengthSquared 16 0
 export Distance
 proc Distance 32 4
@@ -1740,7 +1740,7 @@ ASGNF4
 ADDRLP4 28
 INDIRF4
 RETF4
-LABELV $60
+LABELV $58
 endproc Distance 32 4
 export DistanceSquared
 proc DistanceSquared 32 0
@@ -1829,7 +1829,7 @@ INDIRF4
 MULF4
 ADDF4
 RETF4
-LABELV $63
+LABELV $61
 endproc DistanceSquared 32 0
 export VectorNormalizeFast
 proc VectorNormalizeFast 36 4
@@ -1945,7 +1945,7 @@ MULF4
 ASGNF4
 line 315
 ;315:}
-LABELV $70
+LABELV $68
 endproc VectorNormalizeFast 36 4
 export VectorInverse
 proc VectorInverse 12 0
@@ -1997,7 +1997,7 @@ NEGF4
 ASGNF4
 line 321
 ;321:}
-LABELV $71
+LABELV $69
 endproc VectorInverse 12 0
 export CrossProduct
 proc CrossProduct 40 0
@@ -2130,7 +2130,7 @@ SUBF4
 ASGNF4
 line 327
 ;327:}
-LABELV $72
+LABELV $70
 endproc CrossProduct 40 0
 export ClampChar
 proc ClampChar 0 0
@@ -2145,28 +2145,28 @@ line 333
 ADDRFP4 0
 INDIRI4
 CNSTI4 -128
-GEI4 $74
+GEI4 $72
 line 334
 ;334:		return -128;
 CNSTI4 -128
 RETI4
-ADDRGP4 $73
+ADDRGP4 $71
 JUMPV
-LABELV $74
+LABELV $72
 line 336
 ;335:	}
 ;336:	if ( i > 127 ) {
 ADDRFP4 0
 INDIRI4
 CNSTI4 127
-LEI4 $76
+LEI4 $74
 line 337
 ;337:		return 127;
 CNSTI4 127
 RETI4
-ADDRGP4 $73
+ADDRGP4 $71
 JUMPV
-LABELV $76
+LABELV $74
 line 339
 ;338:	}
 ;339:	return i;
@@ -2175,7 +2175,7 @@ INDIRI4
 CVII1 4
 CVII4 1
 RETI4
-LABELV $73
+LABELV $71
 endproc ClampChar 0 0
 export ClampShort
 proc ClampShort 0 0
@@ -2188,28 +2188,28 @@ line 343
 ADDRFP4 0
 INDIRI4
 CNSTI4 -32768
-GEI4 $79
+GEI4 $77
 line 344
 ;344:		return -32768;
 CNSTI4 -32768
 RETI4
-ADDRGP4 $78
+ADDRGP4 $76
 JUMPV
-LABELV $79
+LABELV $77
 line 346
 ;345:	}
 ;346:	if ( i > 0x7fff ) {
 ADDRFP4 0
 INDIRI4
 CNSTI4 32767
-LEI4 $81
+LEI4 $79
 line 347
 ;347:		return 0x7fff;
 CNSTI4 32767
 RETI4
-ADDRGP4 $78
+ADDRGP4 $76
 JUMPV
-LABELV $81
+LABELV $79
 line 349
 ;348:	}
 ;349:	return i;
@@ -2218,7 +2218,7 @@ INDIRI4
 CVII2 4
 CVII4 2
 RETI4
-LABELV $78
+LABELV $76
 endproc ClampShort 0 0
 export DirToByte
 proc DirToByte 24 0
@@ -2237,14 +2237,14 @@ ADDRFP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $84
+NEU4 $82
 line 359
 ;359:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $83
+ADDRGP4 $81
 JUMPV
-LABELV $84
+LABELV $82
 line 362
 ;360:	}
 ;361:
@@ -2262,7 +2262,7 @@ line 364
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $86
+LABELV $84
 line 365
 ;365:	{
 line 366
@@ -2318,7 +2318,7 @@ ADDRLP4 4
 INDIRF4
 ADDRLP4 8
 INDIRF4
-LEF4 $92
+LEF4 $90
 line 368
 ;368:		{
 line 369
@@ -2335,10 +2335,10 @@ INDIRI4
 ASGNI4
 line 371
 ;371:		}
-LABELV $92
+LABELV $90
 line 372
 ;372:	}
-LABELV $87
+LABELV $85
 line 364
 ADDRLP4 0
 ADDRLP4 0
@@ -2349,14 +2349,14 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 162
-LTI4 $86
+LTI4 $84
 line 374
 ;373:
 ;374:	return best;
 ADDRLP4 12
 INDIRI4
 RETI4
-LABELV $83
+LABELV $81
 endproc DirToByte 24 0
 export ByteToDir
 proc ByteToDir 4 0
@@ -2373,12 +2373,12 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-LTI4 $97
+LTI4 $95
 ADDRLP4 0
 INDIRI4
 CNSTI4 162
-LTI4 $95
-LABELV $97
+LTI4 $93
+LABELV $95
 line 379
 ;379:		VectorCopy( vec3_origin, dir );
 ADDRFP4 4
@@ -2388,9 +2388,9 @@ INDIRB
 ASGNB 12
 line 380
 ;380:		return;
-ADDRGP4 $94
+ADDRGP4 $92
 JUMPV
-LABELV $95
+LABELV $93
 line 382
 ;381:	}
 ;382:	VectorCopy (bytedirs[b], dir);
@@ -2406,7 +2406,7 @@ INDIRB
 ASGNB 12
 line 383
 ;383:}
-LABELV $94
+LABELV $92
 endproc ByteToDir 4 0
 export ColorBytes3
 proc ColorBytes3 40 0
@@ -2431,7 +2431,7 @@ ADDRLP4 8
 INDIRF4
 ADDRLP4 12
 INDIRF4
-LTF4 $100
+LTF4 $98
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
@@ -2443,16 +2443,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $101
+ADDRGP4 $99
 JUMPV
-LABELV $100
+LABELV $98
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $101
+LABELV $99
 ADDRLP4 0
 ADDRLP4 4
 INDIRU4
@@ -2473,7 +2473,7 @@ ADDRLP4 20
 INDIRF4
 ADDRLP4 24
 INDIRF4
-LTF4 $104
+LTF4 $102
 ADDRLP4 16
 ADDRLP4 20
 INDIRF4
@@ -2485,16 +2485,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $105
+ADDRGP4 $103
 JUMPV
-LABELV $104
+LABELV $102
 ADDRLP4 16
 ADDRLP4 20
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $105
+LABELV $103
 ADDRLP4 0+1
 ADDRLP4 16
 INDIRU4
@@ -2515,7 +2515,7 @@ ADDRLP4 32
 INDIRF4
 ADDRLP4 36
 INDIRF4
-LTF4 $108
+LTF4 $106
 ADDRLP4 28
 ADDRLP4 32
 INDIRF4
@@ -2527,16 +2527,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $109
+ADDRGP4 $107
 JUMPV
-LABELV $108
+LABELV $106
 ADDRLP4 28
 ADDRLP4 32
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $109
+LABELV $107
 ADDRLP4 0+2
 ADDRLP4 28
 INDIRU4
@@ -2548,7 +2548,7 @@ line 393
 ADDRLP4 0
 INDIRU4
 RETU4
-LABELV $98
+LABELV $96
 endproc ColorBytes3 40 0
 export ColorBytes4
 proc ColorBytes4 52 0
@@ -2573,7 +2573,7 @@ ADDRLP4 8
 INDIRF4
 ADDRLP4 12
 INDIRF4
-LTF4 $112
+LTF4 $110
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
@@ -2585,16 +2585,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $113
+ADDRGP4 $111
 JUMPV
-LABELV $112
+LABELV $110
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $113
+LABELV $111
 ADDRLP4 0
 ADDRLP4 4
 INDIRU4
@@ -2615,7 +2615,7 @@ ADDRLP4 20
 INDIRF4
 ADDRLP4 24
 INDIRF4
-LTF4 $116
+LTF4 $114
 ADDRLP4 16
 ADDRLP4 20
 INDIRF4
@@ -2627,16 +2627,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $117
+ADDRGP4 $115
 JUMPV
-LABELV $116
+LABELV $114
 ADDRLP4 16
 ADDRLP4 20
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $117
+LABELV $115
 ADDRLP4 0+1
 ADDRLP4 16
 INDIRU4
@@ -2657,7 +2657,7 @@ ADDRLP4 32
 INDIRF4
 ADDRLP4 36
 INDIRF4
-LTF4 $120
+LTF4 $118
 ADDRLP4 28
 ADDRLP4 32
 INDIRF4
@@ -2669,16 +2669,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $121
+ADDRGP4 $119
 JUMPV
-LABELV $120
+LABELV $118
 ADDRLP4 28
 ADDRLP4 32
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $121
+LABELV $119
 ADDRLP4 0+2
 ADDRLP4 28
 INDIRU4
@@ -2699,7 +2699,7 @@ ADDRLP4 44
 INDIRF4
 ADDRLP4 48
 INDIRF4
-LTF4 $124
+LTF4 $122
 ADDRLP4 40
 ADDRLP4 44
 INDIRF4
@@ -2711,16 +2711,16 @@ CVIU4 4
 CNSTU4 2147483648
 ADDU4
 ASGNU4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $124
+LABELV $122
 ADDRLP4 40
 ADDRLP4 44
 INDIRF4
 CVFI4 4
 CVIU4 4
 ASGNU4
-LABELV $125
+LABELV $123
 ADDRLP4 0+3
 ADDRLP4 40
 INDIRU4
@@ -2732,7 +2732,7 @@ line 404
 ADDRLP4 0
 INDIRU4
 RETU4
-LABELV $110
+LABELV $108
 endproc ColorBytes4 52 0
 export NormalizeColor
 proc NormalizeColor 12 0
@@ -2758,7 +2758,7 @@ ADDP4
 INDIRF4
 ADDRLP4 0
 INDIRF4
-LEF4 $127
+LEF4 $125
 line 412
 ;412:		max = in[1];
 ADDRLP4 0
@@ -2770,7 +2770,7 @@ INDIRF4
 ASGNF4
 line 413
 ;413:	}
-LABELV $127
+LABELV $125
 line 414
 ;414:	if ( in[2] > max ) {
 ADDRFP4 0
@@ -2780,7 +2780,7 @@ ADDP4
 INDIRF4
 ADDRLP4 0
 INDIRF4
-LEF4 $129
+LEF4 $127
 line 415
 ;415:		max = in[2];
 ADDRLP4 0
@@ -2792,14 +2792,14 @@ INDIRF4
 ASGNF4
 line 416
 ;416:	}
-LABELV $129
+LABELV $127
 line 418
 ;417:
 ;418:	if ( !max ) {
 ADDRLP4 0
 INDIRF4
 CNSTF4 0
-NEF4 $131
+NEF4 $129
 line 419
 ;419:		VectorClear( out );
 ADDRLP4 4
@@ -2830,9 +2830,9 @@ INDIRF4
 ASGNF4
 line 420
 ;420:	} else {
-ADDRGP4 $132
+ADDRGP4 $130
 JUMPV
-LABELV $131
+LABELV $129
 line 421
 ;421:		out[0] = in[0] / max;
 ADDRFP4 4
@@ -2886,13 +2886,13 @@ DIVF4
 ASGNF4
 line 424
 ;424:	}
-LABELV $132
+LABELV $130
 line 425
 ;425:	return max;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $126
+LABELV $124
 endproc NormalizeColor 12 0
 export PlaneFromPoints
 proc PlaneFromPoints 76 12
@@ -3045,14 +3045,14 @@ ASGNF4
 ADDRLP4 56
 INDIRF4
 CNSTF4 0
-NEF4 $138
+NEF4 $136
 line 444
 ;444:		return qfalse;
 CNSTI4 0
 RETI4
-ADDRGP4 $133
+ADDRGP4 $131
 JUMPV
-LABELV $138
+LABELV $136
 line 447
 ;445:	}
 ;446:
@@ -3115,7 +3115,7 @@ line 448
 ;448:	return qtrue;
 CNSTI4 1
 RETI4
-LABELV $133
+LABELV $131
 endproc PlaneFromPoints 76 12
 export RotatePointAroundVector
 proc RotatePointAroundVector 256 12
@@ -3415,7 +3415,7 @@ line 509
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $185
+LABELV $183
 line 510
 ;510:		dst[i] = rot[i][0] * point[0] + rot[i][1] * point[1] + rot[i][2] * point[2];
 ADDRLP4 248
@@ -3471,7 +3471,7 @@ ADDF4
 ASGNF4
 line 511
 ;511:	}
-LABELV $186
+LABELV $184
 line 509
 ADDRLP4 0
 ADDRLP4 0
@@ -3482,10 +3482,10 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $185
+LTI4 $183
 line 512
 ;512:}
-LABELV $140
+LABELV $138
 endproc RotatePointAroundVector 256 12
 export RotateAroundDirection
 proc RotateAroundDirection 20 16
@@ -3523,7 +3523,7 @@ line 525
 ADDRFP4 4
 INDIRF4
 CNSTF4 0
-EQF4 $192
+EQF4 $190
 line 528
 ;526:		vec3_t	temp;
 ;527:
@@ -3559,7 +3559,7 @@ CALLV
 pop
 line 530
 ;530:	}
-LABELV $192
+LABELV $190
 line 533
 ;531:
 ;532:	// cross to get axis[2]
@@ -3586,7 +3586,7 @@ CALLV
 pop
 line 534
 ;534:}
-LABELV $191
+LABELV $189
 endproc RotateAroundDirection 20 16
 export vectoangles
 proc vectoangles 40 8
@@ -3614,13 +3614,13 @@ ADDP4
 INDIRF4
 ADDRLP4 16
 INDIRF4
-NEF4 $195
+NEF4 $193
 ADDRLP4 12
 INDIRP4
 INDIRF4
 ADDRLP4 16
 INDIRF4
-NEF4 $195
+NEF4 $193
 line 543
 ;543:		yaw = 0;
 ADDRLP4 0
@@ -3634,7 +3634,7 @@ CNSTI4 8
 ADDP4
 INDIRF4
 CNSTF4 0
-LEF4 $197
+LEF4 $195
 line 545
 ;545:			pitch = 90;
 ADDRLP4 4
@@ -3642,9 +3642,9 @@ CNSTF4 1119092736
 ASGNF4
 line 546
 ;546:		}
-ADDRGP4 $196
+ADDRGP4 $194
 JUMPV
-LABELV $197
+LABELV $195
 line 547
 ;547:		else {
 line 548
@@ -3656,9 +3656,9 @@ line 549
 ;549:		}
 line 550
 ;550:	}
-ADDRGP4 $196
+ADDRGP4 $194
 JUMPV
-LABELV $195
+LABELV $193
 line 551
 ;551:	else {
 line 552
@@ -3667,7 +3667,7 @@ ADDRFP4 0
 INDIRP4
 INDIRF4
 CNSTF4 0
-EQF4 $199
+EQF4 $197
 line 553
 ;553:			yaw = ( atan2 ( value1[1], value1[0] ) * 180 / M_PI );
 ADDRLP4 20
@@ -3698,9 +3698,9 @@ DIVF4
 ASGNF4
 line 554
 ;554:		}
-ADDRGP4 $200
+ADDRGP4 $198
 JUMPV
-LABELV $199
+LABELV $197
 line 555
 ;555:		else if ( value1[1] > 0 ) {
 ADDRFP4 0
@@ -3709,7 +3709,7 @@ CNSTI4 4
 ADDP4
 INDIRF4
 CNSTF4 0
-LEF4 $201
+LEF4 $199
 line 556
 ;556:			yaw = 90;
 ADDRLP4 0
@@ -3717,9 +3717,9 @@ CNSTF4 1119092736
 ASGNF4
 line 557
 ;557:		}
-ADDRGP4 $202
+ADDRGP4 $200
 JUMPV
-LABELV $201
+LABELV $199
 line 558
 ;558:		else {
 line 559
@@ -3729,14 +3729,14 @@ CNSTF4 1132920832
 ASGNF4
 line 560
 ;560:		}
-LABELV $202
 LABELV $200
+LABELV $198
 line 561
 ;561:		if ( yaw < 0 ) {
 ADDRLP4 0
 INDIRF4
 CNSTF4 0
-GEF4 $203
+GEF4 $201
 line 562
 ;562:			yaw += 360;
 ADDRLP4 0
@@ -3747,7 +3747,7 @@ ADDF4
 ASGNF4
 line 563
 ;563:		}
-LABELV $203
+LABELV $201
 line 565
 ;564:
 ;565:		forward = sqrt ( value1[0]*value1[0] + value1[1]*value1[1] );
@@ -3815,7 +3815,7 @@ line 567
 ADDRLP4 4
 INDIRF4
 CNSTF4 0
-GEF4 $205
+GEF4 $203
 line 568
 ;568:			pitch += 360;
 ADDRLP4 4
@@ -3826,10 +3826,10 @@ ADDF4
 ASGNF4
 line 569
 ;569:		}
-LABELV $205
+LABELV $203
 line 570
 ;570:	}
-LABELV $196
+LABELV $194
 line 572
 ;571:
 ;572:	angles[PITCH] = -pitch;
@@ -3858,7 +3858,7 @@ CNSTF4 0
 ASGNF4
 line 575
 ;575:}
-LABELV $194
+LABELV $192
 endproc vectoangles 40 8
 export AnglesToAxis
 proc AnglesToAxis 16 16
@@ -3930,7 +3930,7 @@ SUBF4
 ASGNF4
 line 589
 ;589:}
-LABELV $207
+LABELV $205
 endproc AnglesToAxis 16 16
 export AxisClear
 proc AxisClear 0 0
@@ -4009,7 +4009,7 @@ CNSTF4 1065353216
 ASGNF4
 line 601
 ;601:}
-LABELV $212
+LABELV $210
 endproc AxisClear 0 0
 export AxisCopy
 proc AxisCopy 8 0
@@ -4060,7 +4060,7 @@ INDIRB
 ASGNB 12
 line 607
 ;607:}
-LABELV $213
+LABELV $211
 endproc AxisCopy 8 0
 export ProjectPointOnPlane
 proc ProjectPointOnPlane 60 0
@@ -4282,7 +4282,7 @@ SUBF4
 ASGNF4
 line 630
 ;630:}
-LABELV $214
+LABELV $212
 endproc ProjectPointOnPlane 60 0
 export MakeNormalVectors
 proc MakeNormalVectors 40 12
@@ -4486,7 +4486,7 @@ CALLV
 pop
 line 653
 ;653:}
-LABELV $219
+LABELV $217
 endproc MakeNormalVectors 40 12
 export VectorRotate
 proc VectorRotate 40 0
@@ -4657,7 +4657,7 @@ ADDF4
 ASGNF4
 line 661
 ;661:}
-LABELV $220
+LABELV $218
 endproc VectorRotate 40 0
 export Q_rsqrt
 proc Q_rsqrt 20 0
@@ -4739,7 +4739,7 @@ line 682
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $221
+LABELV $219
 endproc Q_rsqrt 20 0
 export ET_asin
 proc ET_asin 12 8
@@ -4752,7 +4752,7 @@ line 686
 ADDRFP4 0
 INDIRF4
 CNSTF4 3212836864
-GEF4 $223
+GEF4 $221
 line 687
 ;687:		c = -1.0;
 ADDRFP4 0
@@ -4760,13 +4760,13 @@ CNSTF4 3212836864
 ASGNF4
 line 688
 ;688:	} else if (c > 1.0) {
-ADDRGP4 $224
+ADDRGP4 $222
 JUMPV
-LABELV $223
+LABELV $221
 ADDRFP4 0
 INDIRF4
 CNSTF4 1065353216
-LEF4 $225
+LEF4 $223
 line 689
 ;689:		c = 1.0;
 ADDRFP4 0
@@ -4774,8 +4774,8 @@ CNSTF4 1065353216
 ASGNF4
 line 690
 ;690:	}
-LABELV $225
-LABELV $224
+LABELV $223
+LABELV $222
 line 691
 ;691:	return atan2(c, sqrt(1 - c*c));
 ADDRLP4 0
@@ -4807,7 +4807,7 @@ ASGNF4
 ADDRLP4 8
 INDIRF4
 RETF4
-LABELV $222
+LABELV $220
 endproc ET_asin 12 8
 export Q_fabs
 proc Q_fabs 4 0
@@ -4835,7 +4835,7 @@ line 698
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $227
+LABELV $225
 endproc Q_fabs 4 0
 export intfloat
 proc intfloat 4 0
@@ -4856,7 +4856,7 @@ line 705
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $228
+LABELV $226
 endproc intfloat 4 0
 export floatint
 proc floatint 4 0
@@ -4876,7 +4876,7 @@ line 711
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $229
+LABELV $227
 endproc floatint 4 0
 export LerpAngle
 proc LerpAngle 8 0
@@ -4902,7 +4902,7 @@ ADDRFP4 0
 INDIRF4
 SUBF4
 CNSTF4 1127481344
-LEF4 $231
+LEF4 $229
 line 726
 ;726:		to -= 360;
 ADDRFP4 4
@@ -4913,7 +4913,7 @@ SUBF4
 ASGNF4
 line 727
 ;727:	}
-LABELV $231
+LABELV $229
 line 728
 ;728:	if ( to - from < -180 ) {
 ADDRFP4 4
@@ -4922,7 +4922,7 @@ ADDRFP4 0
 INDIRF4
 SUBF4
 CNSTF4 3274964992
-GEF4 $233
+GEF4 $231
 line 729
 ;729:		to += 360;
 ADDRFP4 4
@@ -4933,7 +4933,7 @@ ADDF4
 ASGNF4
 line 730
 ;730:	}
-LABELV $233
+LABELV $231
 line 731
 ;731:	a = from + frac * (to - from);
 ADDRLP4 4
@@ -4959,7 +4959,7 @@ line 733
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $230
+LABELV $228
 endproc LerpAngle 8 0
 export AngleSubtract
 proc AngleSubtract 4 0
@@ -4988,9 +4988,9 @@ SUBF4
 ASGNF4
 line 748
 ;748:	assert(fabs(a) < 3600);
-ADDRGP4 $237
+ADDRGP4 $235
 JUMPV
-LABELV $236
+LABELV $234
 line 749
 ;749:	while ( a > 180 ) {
 line 750
@@ -5003,15 +5003,15 @@ SUBF4
 ASGNF4
 line 751
 ;751:	}
-LABELV $237
+LABELV $235
 line 749
 ADDRLP4 0
 INDIRF4
 CNSTF4 1127481344
-GTF4 $236
-ADDRGP4 $240
+GTF4 $234
+ADDRGP4 $238
 JUMPV
-LABELV $239
+LABELV $237
 line 752
 ;752:	while ( a < -180 ) {
 line 753
@@ -5024,18 +5024,18 @@ ADDF4
 ASGNF4
 line 754
 ;754:	}
-LABELV $240
+LABELV $238
 line 752
 ADDRLP4 0
 INDIRF4
 CNSTF4 3274964992
-LTF4 $239
+LTF4 $237
 line 755
 ;755:	return a;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $235
+LABELV $233
 endproc AngleSubtract 4 0
 export AnglesSubtract
 proc AnglesSubtract 20 8
@@ -5127,7 +5127,7 @@ INDIRF4
 ASGNF4
 line 763
 ;763:}
-LABELV $242
+LABELV $240
 endproc AnglesSubtract 20 8
 export AngleMod
 proc AngleMod 0 0
@@ -5154,7 +5154,7 @@ line 768
 ADDRFP4 0
 INDIRF4
 RETF4
-LABELV $243
+LABELV $241
 endproc AngleMod 0 0
 export AngleNormalize360
 proc AngleNormalize360 0 0
@@ -5183,7 +5183,7 @@ BANDI4
 CVIF4 4
 MULF4
 RETF4
-LABELV $244
+LABELV $242
 endproc AngleNormalize360 0 0
 export AngleNormalize180
 proc AngleNormalize180 4 4
@@ -5217,7 +5217,7 @@ line 793
 ADDRFP4 0
 INDIRF4
 CNSTF4 1127481344
-LEF4 $246
+LEF4 $244
 line 794
 ;794:		angle -= 360.0;
 ADDRFP4 0
@@ -5228,13 +5228,13 @@ SUBF4
 ASGNF4
 line 795
 ;795:	}
-LABELV $246
+LABELV $244
 line 796
 ;796:	return angle;
 ADDRFP4 0
 INDIRF4
 RETF4
-LABELV $245
+LABELV $243
 endproc AngleNormalize180 4 4
 export AngleDelta
 proc AngleDelta 4 4
@@ -5265,7 +5265,7 @@ ASGNF4
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $248
+LABELV $246
 endproc AngleDelta 4 4
 export SetPlaneSignbits
 proc SetPlaneSignbits 8 0
@@ -5295,7 +5295,7 @@ line 825
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $250
+LABELV $248
 line 826
 ;826:		if (out->normal[j] < 0) {
 ADDRLP4 0
@@ -5307,7 +5307,7 @@ INDIRP4
 ADDP4
 INDIRF4
 CNSTF4 0
-GEF4 $254
+GEF4 $252
 line 827
 ;827:			bits |= 1<<j;
 ADDRLP4 4
@@ -5321,10 +5321,10 @@ BORI4
 ASGNI4
 line 828
 ;828:		}
-LABELV $254
+LABELV $252
 line 829
 ;829:	}
-LABELV $251
+LABELV $249
 line 825
 ADDRLP4 0
 ADDRLP4 0
@@ -5335,7 +5335,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $250
+LTI4 $248
 line 830
 ;830:	out->signbits = bits;
 ADDRFP4 0
@@ -5349,7 +5349,7 @@ CVUU1 4
 ASGNU1
 line 831
 ;831:}
-LABELV $249
+LABELV $247
 endproc SetPlaneSignbits 8 0
 export BoxOnPlaneSide
 proc BoxOnPlaneSide 280 0
@@ -5412,7 +5412,7 @@ ADDP4
 INDIRU1
 CVUI4 1
 CNSTI4 3
-GEI4 $257
+GEI4 $255
 line 882
 ;882:	{
 line 883
@@ -5438,14 +5438,14 @@ ADDRFP4 0
 INDIRP4
 ADDP4
 INDIRF4
-GTF4 $259
+GTF4 $257
 line 884
 ;884:			return 1;
 CNSTI4 1
 RETI4
-ADDRGP4 $256
+ADDRGP4 $254
 JUMPV
-LABELV $259
+LABELV $257
 line 885
 ;885:		if (p->dist >= emaxs[p->type])
 ADDRLP4 16
@@ -5469,21 +5469,21 @@ ADDRFP4 4
 INDIRP4
 ADDP4
 INDIRF4
-LTF4 $261
+LTF4 $259
 line 886
 ;886:			return 2;
 CNSTI4 2
 RETI4
-ADDRGP4 $256
+ADDRGP4 $254
 JUMPV
-LABELV $261
+LABELV $259
 line 887
 ;887:		return 3;
 CNSTI4 3
 RETI4
-ADDRGP4 $256
+ADDRGP4 $254
 JUMPV
-LABELV $257
+LABELV $255
 line 891
 ;888:	}
 ;889:
@@ -5500,34 +5500,34 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-LTI4 $263
+LTI4 $261
 ADDRLP4 12
 INDIRI4
 CNSTI4 7
-GTI4 $263
+GTI4 $261
 ADDRLP4 12
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $274
+ADDRGP4 $272
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $274
+LABELV $272
+address $264
+address $265
 address $266
 address $267
 address $268
 address $269
 address $270
 address $271
-address $272
-address $273
 code
 line 892
 ;892:	{
-LABELV $266
+LABELV $264
 line 894
 ;893:	case 0:
 ;894:		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
@@ -5637,9 +5637,9 @@ ADDF4
 ASGNF4
 line 896
 ;896:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $267
+LABELV $265
 line 898
 ;897:	case 1:
 ;898:		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
@@ -5749,9 +5749,9 @@ ADDF4
 ASGNF4
 line 900
 ;900:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $268
+LABELV $266
 line 902
 ;901:	case 2:
 ;902:		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
@@ -5861,9 +5861,9 @@ ADDF4
 ASGNF4
 line 904
 ;904:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $269
+LABELV $267
 line 906
 ;905:	case 3:
 ;906:		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
@@ -5973,9 +5973,9 @@ ADDF4
 ASGNF4
 line 908
 ;908:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $270
+LABELV $268
 line 910
 ;909:	case 4:
 ;910:		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
@@ -6085,9 +6085,9 @@ ADDF4
 ASGNF4
 line 912
 ;912:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $271
+LABELV $269
 line 914
 ;913:	case 5:
 ;914:		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
@@ -6197,9 +6197,9 @@ ADDF4
 ASGNF4
 line 916
 ;916:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $272
+LABELV $270
 line 918
 ;917:	case 6:
 ;918:		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
@@ -6309,9 +6309,9 @@ ADDF4
 ASGNF4
 line 920
 ;920:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $273
+LABELV $271
 line 922
 ;921:	case 7:
 ;922:		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
@@ -6421,9 +6421,9 @@ ADDF4
 ASGNF4
 line 924
 ;924:		break;
-ADDRGP4 $264
+ADDRGP4 $262
 JUMPV
-LABELV $263
+LABELV $261
 line 926
 ;925:	default:
 ;926:		dist1 = dist2 = 0;		// shut up compiler
@@ -6440,7 +6440,7 @@ INDIRF4
 ASGNF4
 line 927
 ;927:		break;
-LABELV $264
+LABELV $262
 line 930
 ;928:	}
 ;929:
@@ -6457,13 +6457,13 @@ INDIRP4
 CNSTI4 12
 ADDP4
 INDIRF4
-LTF4 $275
+LTF4 $273
 line 932
 ;932:		sides = 1;
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-LABELV $275
+LABELV $273
 line 933
 ;933:	if (dist2 < p->dist)
 ADDRLP4 8
@@ -6473,7 +6473,7 @@ INDIRP4
 CNSTI4 12
 ADDP4
 INDIRF4
-GEF4 $277
+GEF4 $275
 line 934
 ;934:		sides |= 2;
 ADDRLP4 0
@@ -6482,14 +6482,14 @@ INDIRI4
 CNSTI4 2
 BORI4
 ASGNI4
-LABELV $277
+LABELV $275
 line 936
 ;935:
 ;936:	return sides;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $256
+LABELV $254
 endproc BoxOnPlaneSide 280 0
 export RadiusFromBounds
 proc RadiusFromBounds 36 4
@@ -6511,7 +6511,7 @@ line 949
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $280
+LABELV $278
 line 950
 ;950:		a = fabs( mins[i] );
 ADDRLP4 0
@@ -6556,19 +6556,19 @@ ADDRLP4 4
 INDIRF4
 ADDRLP4 8
 INDIRF4
-LEF4 $285
+LEF4 $283
 ADDRLP4 32
 ADDRLP4 4
 INDIRF4
 ASGNF4
-ADDRGP4 $286
+ADDRGP4 $284
 JUMPV
-LABELV $285
+LABELV $283
 ADDRLP4 32
 ADDRLP4 8
 INDIRF4
 ASGNF4
-LABELV $286
+LABELV $284
 ADDRLP4 0
 INDIRI4
 CNSTI4 2
@@ -6580,7 +6580,7 @@ INDIRF4
 ASGNF4
 line 953
 ;953:	}
-LABELV $281
+LABELV $279
 line 949
 ADDRLP4 0
 ADDRLP4 0
@@ -6591,7 +6591,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $280
+LTI4 $278
 line 955
 ;954:
 ;955:	return VectorLength (corner);
@@ -6604,7 +6604,7 @@ ASGNF4
 ADDRLP4 24
 INDIRF4
 RETF4
-LABELV $279
+LABELV $277
 endproc RadiusFromBounds 36 4
 export ClearBounds
 proc ClearBounds 16 0
@@ -6671,7 +6671,7 @@ INDIRF4
 ASGNF4
 line 962
 ;962:}
-LABELV $287
+LABELV $285
 endproc ClearBounds 16 0
 export AddPointToBounds
 proc AddPointToBounds 20 0
@@ -6686,7 +6686,7 @@ INDIRF4
 ADDRFP4 4
 INDIRP4
 INDIRF4
-GEF4 $289
+GEF4 $287
 line 966
 ;966:		mins[0] = v[0];
 ADDRFP4 4
@@ -6697,7 +6697,7 @@ INDIRF4
 ASGNF4
 line 967
 ;967:	}
-LABELV $289
+LABELV $287
 line 968
 ;968:	if ( v[0] > maxs[0]) {
 ADDRFP4 0
@@ -6706,7 +6706,7 @@ INDIRF4
 ADDRFP4 8
 INDIRP4
 INDIRF4
-LEF4 $291
+LEF4 $289
 line 969
 ;969:		maxs[0] = v[0];
 ADDRFP4 8
@@ -6717,7 +6717,7 @@ INDIRF4
 ASGNF4
 line 970
 ;970:	}
-LABELV $291
+LABELV $289
 line 972
 ;971:
 ;972:	if ( v[1] < mins[1] ) {
@@ -6736,7 +6736,7 @@ ADDRLP4 0
 INDIRI4
 ADDP4
 INDIRF4
-GEF4 $293
+GEF4 $291
 line 973
 ;973:		mins[1] = v[1];
 ADDRLP4 4
@@ -6756,7 +6756,7 @@ INDIRF4
 ASGNF4
 line 974
 ;974:	}
-LABELV $293
+LABELV $291
 line 975
 ;975:	if ( v[1] > maxs[1]) {
 ADDRLP4 4
@@ -6774,7 +6774,7 @@ ADDRLP4 4
 INDIRI4
 ADDP4
 INDIRF4
-LEF4 $295
+LEF4 $293
 line 976
 ;976:		maxs[1] = v[1];
 ADDRLP4 8
@@ -6794,7 +6794,7 @@ INDIRF4
 ASGNF4
 line 977
 ;977:	}
-LABELV $295
+LABELV $293
 line 979
 ;978:
 ;979:	if ( v[2] < mins[2] ) {
@@ -6813,7 +6813,7 @@ ADDRLP4 8
 INDIRI4
 ADDP4
 INDIRF4
-GEF4 $297
+GEF4 $295
 line 980
 ;980:		mins[2] = v[2];
 ADDRLP4 12
@@ -6833,7 +6833,7 @@ INDIRF4
 ASGNF4
 line 981
 ;981:	}
-LABELV $297
+LABELV $295
 line 982
 ;982:	if ( v[2] > maxs[2]) {
 ADDRLP4 12
@@ -6851,7 +6851,7 @@ ADDRLP4 12
 INDIRI4
 ADDP4
 INDIRF4
-LEF4 $299
+LEF4 $297
 line 983
 ;983:		maxs[2] = v[2];
 ADDRLP4 16
@@ -6871,10 +6871,10 @@ INDIRF4
 ASGNF4
 line 984
 ;984:	}
-LABELV $299
+LABELV $297
 line 985
 ;985:}
-LABELV $288
+LABELV $286
 endproc AddPointToBounds 20 0
 export VectorNormalize
 proc VectorNormalize 40 4
@@ -6947,7 +6947,7 @@ line 994
 ADDRLP4 0
 INDIRF4
 CNSTF4 0
-EQF4 $302
+EQF4 $300
 line 995
 ;995:		ilength = 1/length;
 ADDRLP4 4
@@ -7007,14 +7007,14 @@ MULF4
 ASGNF4
 line 999
 ;999:	}
-LABELV $302
+LABELV $300
 line 1001
 ;1000:		
 ;1001:	return length;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $301
+LABELV $299
 endproc VectorNormalize 40 4
 export VectorNormalize2
 proc VectorNormalize2 36 4
@@ -7087,7 +7087,7 @@ line 1010
 ADDRLP4 0
 INDIRF4
 CNSTF4 0
-EQF4 $305
+EQF4 $303
 line 1011
 ;1011:	{
 line 1015
@@ -7154,9 +7154,9 @@ MULF4
 ASGNF4
 line 1019
 ;1019:	} else {
-ADDRGP4 $306
+ADDRGP4 $304
 JUMPV
-LABELV $305
+LABELV $303
 line 1023
 ;1020:#ifndef Q3_VM // bk0101022 - FPE related
 ;1021://	  assert( ((Q_fabs(v[0])==0.0f) && (Q_fabs(v[1])==0.0f) && (Q_fabs(v[2])==0.0f)) );
@@ -7190,14 +7190,14 @@ INDIRF4
 ASGNF4
 line 1024
 ;1024:	}
-LABELV $306
+LABELV $304
 line 1026
 ;1025:		
 ;1026:	return length;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $304
+LABELV $302
 endproc VectorNormalize2 36 4
 export _VectorMA
 proc _VectorMA 8 0
@@ -7277,7 +7277,7 @@ ADDF4
 ASGNF4
 line 1034
 ;1034:}
-LABELV $307
+LABELV $305
 endproc _VectorMA 8 0
 export _DotProduct
 proc _DotProduct 16 0
@@ -7337,7 +7337,7 @@ INDIRF4
 MULF4
 ADDF4
 RETF4
-LABELV $308
+LABELV $306
 endproc _DotProduct 16 0
 export _VectorSubtract
 proc _VectorSubtract 8 0
@@ -7407,7 +7407,7 @@ SUBF4
 ASGNF4
 line 1045
 ;1045:}
-LABELV $309
+LABELV $307
 endproc _VectorSubtract 8 0
 export _VectorAdd
 proc _VectorAdd 8 0
@@ -7476,7 +7476,7 @@ ADDF4
 ASGNF4
 line 1051
 ;1051:}
-LABELV $310
+LABELV $308
 endproc _VectorAdd 8 0
 export _VectorCopy
 proc _VectorCopy 8 0
@@ -7527,7 +7527,7 @@ INDIRF4
 ASGNF4
 line 1057
 ;1057:}
-LABELV $311
+LABELV $309
 endproc _VectorCopy 8 0
 export _VectorScale
 proc _VectorScale 8 0
@@ -7587,7 +7587,7 @@ MULF4
 ASGNF4
 line 1063
 ;1063:}
-LABELV $312
+LABELV $310
 endproc _VectorScale 8 0
 export Vector4Scale
 proc Vector4Scale 12 0
@@ -7667,7 +7667,7 @@ MULF4
 ASGNF4
 line 1070
 ;1070:}
-LABELV $313
+LABELV $311
 endproc Vector4Scale 12 0
 export Q_log2
 proc Q_log2 8 0
@@ -7682,9 +7682,9 @@ line 1076
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $316
+ADDRGP4 $314
 JUMPV
-LABELV $315
+LABELV $313
 line 1077
 ;1077:	while ( ( val>>=1 ) != 0 ) {
 line 1078
@@ -7697,7 +7697,7 @@ ADDI4
 ASGNI4
 line 1079
 ;1079:	}
-LABELV $316
+LABELV $314
 line 1077
 ADDRLP4 4
 ADDRFP4 0
@@ -7712,13 +7712,13 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $315
+NEI4 $313
 line 1080
 ;1080:	return answer;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $314
+LABELV $312
 endproc Q_log2 8 0
 export MatrixMultiply
 proc MatrixMultiply 104 0
@@ -8247,9 +8247,15 @@ ASGNF4
 line 1128
 ;1127:				in1[2][2] * in2[2][2];
 ;1128:}
-LABELV $318
+LABELV $316
 endproc MatrixMultiply 104 0
 bss
+align 4
+LABELV $318
+skip 4
+align 4
+LABELV $319
+skip 4
 align 4
 LABELV $320
 skip 4
@@ -8261,12 +8267,6 @@ LABELV $322
 skip 4
 align 4
 LABELV $323
-skip 4
-align 4
-LABELV $324
-skip 4
-align 4
-LABELV $325
 skip 4
 export AngleVectors
 code
@@ -8299,7 +8299,7 @@ ADDRLP4 4
 ADDRGP4 sin
 CALLF4
 ASGNF4
-ADDRGP4 $322
+ADDRGP4 $320
 ADDRLP4 4
 INDIRF4
 ASGNF4
@@ -8312,7 +8312,7 @@ ADDRLP4 8
 ADDRGP4 cos
 CALLF4
 ASGNF4
-ADDRGP4 $325
+ADDRGP4 $323
 ADDRLP4 8
 INDIRF4
 ASGNF4
@@ -8334,7 +8334,7 @@ ADDRLP4 12
 ADDRGP4 sin
 CALLF4
 ASGNF4
-ADDRGP4 $321
+ADDRGP4 $319
 ADDRLP4 12
 INDIRF4
 ASGNF4
@@ -8347,7 +8347,7 @@ ADDRLP4 16
 ADDRGP4 cos
 CALLF4
 ASGNF4
-ADDRGP4 $324
+ADDRGP4 $322
 ADDRLP4 16
 INDIRF4
 ASGNF4
@@ -8371,7 +8371,7 @@ ADDRLP4 20
 ADDRGP4 sin
 CALLF4
 ASGNF4
-ADDRGP4 $320
+ADDRGP4 $318
 ADDRLP4 20
 INDIRF4
 ASGNF4
@@ -8384,7 +8384,7 @@ ADDRLP4 24
 ADDRGP4 cos
 CALLF4
 ASGNF4
-ADDRGP4 $323
+ADDRGP4 $321
 ADDRLP4 24
 INDIRF4
 ASGNF4
@@ -8395,16 +8395,16 @@ ADDRFP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $326
+EQU4 $324
 line 1147
 ;1147:	{
 line 1148
 ;1148:		forward[0] = cp*cy;
 ADDRFP4 4
 INDIRP4
-ADDRGP4 $324
+ADDRGP4 $322
 INDIRF4
-ADDRGP4 $325
+ADDRGP4 $323
 INDIRF4
 MULF4
 ASGNF4
@@ -8414,9 +8414,9 @@ ADDRFP4 4
 INDIRP4
 CNSTI4 4
 ADDP4
-ADDRGP4 $324
-INDIRF4
 ADDRGP4 $322
+INDIRF4
+ADDRGP4 $320
 INDIRF4
 MULF4
 ASGNF4
@@ -8426,20 +8426,20 @@ ADDRFP4 4
 INDIRP4
 CNSTI4 8
 ADDP4
-ADDRGP4 $321
+ADDRGP4 $319
 INDIRF4
 NEGF4
 ASGNF4
 line 1151
 ;1151:	}
-LABELV $326
+LABELV $324
 line 1152
 ;1152:	if (right)
 ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $328
+EQU4 $326
 line 1153
 ;1153:	{
 line 1154
@@ -8451,21 +8451,21 @@ ADDRFP4 8
 INDIRP4
 ADDRLP4 28
 INDIRF4
-ADDRGP4 $320
+ADDRGP4 $318
 INDIRF4
 MULF4
-ADDRGP4 $321
+ADDRGP4 $319
 INDIRF4
 MULF4
-ADDRGP4 $325
+ADDRGP4 $323
 INDIRF4
 MULF4
 ADDRLP4 28
 INDIRF4
-ADDRGP4 $323
+ADDRGP4 $321
 INDIRF4
 MULF4
-ADDRGP4 $322
+ADDRGP4 $320
 INDIRF4
 NEGF4
 MULF4
@@ -8482,21 +8482,21 @@ CNSTI4 4
 ADDP4
 ADDRLP4 32
 INDIRF4
+ADDRGP4 $318
+INDIRF4
+MULF4
+ADDRGP4 $319
+INDIRF4
+MULF4
 ADDRGP4 $320
-INDIRF4
-MULF4
-ADDRGP4 $321
-INDIRF4
-MULF4
-ADDRGP4 $322
 INDIRF4
 MULF4
 ADDRLP4 32
 INDIRF4
-ADDRGP4 $323
+ADDRGP4 $321
 INDIRF4
 MULF4
-ADDRGP4 $325
+ADDRGP4 $323
 INDIRF4
 MULF4
 ADDF4
@@ -8508,41 +8508,41 @@ INDIRP4
 CNSTI4 8
 ADDP4
 CNSTF4 3212836864
-ADDRGP4 $320
+ADDRGP4 $318
 INDIRF4
 MULF4
-ADDRGP4 $324
+ADDRGP4 $322
 INDIRF4
 MULF4
 ASGNF4
 line 1157
 ;1157:	}
-LABELV $328
+LABELV $326
 line 1158
 ;1158:	if (up)
 ADDRFP4 12
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $330
+EQU4 $328
 line 1159
 ;1159:	{
 line 1160
 ;1160:		up[0] = (cr*sp*cy+-sr*-sy);
 ADDRFP4 12
 INDIRP4
-ADDRGP4 $323
-INDIRF4
 ADDRGP4 $321
 INDIRF4
-MULF4
-ADDRGP4 $325
+ADDRGP4 $319
 INDIRF4
 MULF4
-ADDRGP4 $320
+ADDRGP4 $323
+INDIRF4
+MULF4
+ADDRGP4 $318
 INDIRF4
 NEGF4
-ADDRGP4 $322
+ADDRGP4 $320
 INDIRF4
 NEGF4
 MULF4
@@ -8554,18 +8554,18 @@ ADDRFP4 12
 INDIRP4
 CNSTI4 4
 ADDP4
-ADDRGP4 $323
-INDIRF4
 ADDRGP4 $321
 INDIRF4
-MULF4
-ADDRGP4 $322
+ADDRGP4 $319
 INDIRF4
 MULF4
 ADDRGP4 $320
 INDIRF4
+MULF4
+ADDRGP4 $318
+INDIRF4
 NEGF4
-ADDRGP4 $325
+ADDRGP4 $323
 INDIRF4
 MULF4
 ADDF4
@@ -8576,18 +8576,18 @@ ADDRFP4 12
 INDIRP4
 CNSTI4 8
 ADDP4
-ADDRGP4 $323
+ADDRGP4 $321
 INDIRF4
-ADDRGP4 $324
+ADDRGP4 $322
 INDIRF4
 MULF4
 ASGNF4
 line 1163
 ;1163:	}
-LABELV $330
+LABELV $328
 line 1164
 ;1164:}
-LABELV $319
+LABELV $317
 endproc AngleVectors 36 4
 export PerpendicularVector
 proc PerpendicularVector 36 12
@@ -8623,9 +8623,9 @@ ADDRLP4 0
 ADDRLP4 24
 INDIRI4
 ASGNI4
-ADDRGP4 $336
+ADDRGP4 $334
 JUMPV
-LABELV $333
+LABELV $331
 line 1180
 ;1180:	{
 line 1181
@@ -8647,7 +8647,7 @@ ADDRLP4 28
 INDIRF4
 ADDRLP4 4
 INDIRF4
-GEF4 $337
+GEF4 $335
 line 1182
 ;1182:		{
 line 1183
@@ -8677,10 +8677,10 @@ INDIRF4
 ASGNF4
 line 1185
 ;1185:		}
-LABELV $337
+LABELV $335
 line 1186
 ;1186:	}
-LABELV $334
+LABELV $332
 line 1179
 ADDRLP4 0
 ADDRLP4 0
@@ -8688,11 +8688,11 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $336
+LABELV $334
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $333
+LTI4 $331
 line 1187
 ;1187:	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;
 ADDRLP4 28
@@ -8751,7 +8751,7 @@ CALLF4
 pop
 line 1199
 ;1199:}
-LABELV $332
+LABELV $330
 endproc PerpendicularVector 36 12
 data
 align 4
@@ -8782,7 +8782,7 @@ CVIU4 4
 ASGNU4
 line 1213
 ;1213:}
-LABELV $341
+LABELV $339
 endproc Rand_Init 0 0
 export flrand
 proc flrand 16 0
@@ -8805,15 +8805,15 @@ line 1227
 ADDRFP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $343
+EQI4 $341
 line 1228
 ;1228:		return defaultValue;
 ADDRFP4 12
 INDIRF4
 RETF4
-ADDRGP4 $342
+ADDRGP4 $340
 JUMPV
-LABELV $343
+LABELV $341
 line 1231
 ;1229:	}
 ;1230:
@@ -8886,7 +8886,7 @@ line 1237
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $342
+LABELV $340
 endproc flrand 16 0
 export irand
 proc irand 12 0
@@ -8910,15 +8910,15 @@ line 1252
 ADDRFP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $346
+EQI4 $344
 line 1253
 ;1253:		return defaultValue;
 ADDRFP4 12
 INDIRI4
 RETI4
-ADDRGP4 $345
+ADDRGP4 $343
 JUMPV
-LABELV $346
+LABELV $344
 line 1256
 ;1254:	}
 ;1255:
@@ -8982,7 +8982,7 @@ line 1262
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $345
+LABELV $343
 endproc irand 12 0
 export JK2_powf
 proc JK2_powf 8 0
@@ -9005,9 +9005,9 @@ INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-ADDRGP4 $352
+ADDRGP4 $350
 JUMPV
-LABELV $349
+LABELV $347
 line 1269
 ;1269:		r = r * r;
 ADDRLP4 0
@@ -9017,7 +9017,7 @@ ADDRLP4 0
 INDIRF4
 MULF4
 ASGNF4
-LABELV $350
+LABELV $348
 line 1268
 ADDRFP4 4
 ADDRFP4 4
@@ -9025,73 +9025,84 @@ INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-LABELV $352
+LABELV $350
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-GTI4 $349
+GTI4 $347
 line 1270
 ;1270:	return r;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $348
+LABELV $346
 endproc JK2_powf 8 0
 export Q_pown
 proc Q_pown 12 0
-line 1275
+line 1286
 ;1271:}
 ;1272:
-;1273:// Returns `base` raised to the power of `exp`
-;1274:float Q_pown(float base, int exp)
-;1275:{
-line 1276
-;1276:	float		result = 1.0f;
+;1273:/*
+;1274:=================
+;1275:powf
+;1276:
+;1277:Lightweight powf implementation for QVM. Handles integer exponents with a fast
+;1278:exponentiation loop and falls back to expf/logf for other cases. Negative base
+;1279:with non-integer exponent returns 0.0f (no proper NaN handling in minimal VM).
+;1280:=================
+;1281:*/
+;1282:/* Removed duplicate powf implementation (conflicted with MSVC intrinsic). */
+;1283:
+;1284:// Returns `base` raised to the power of `exp`
+;1285:float Q_pown(float base, int exp)
+;1286:{
+line 1287
+;1287:	float		result = 1.0f;
 ADDRLP4 0
 CNSTF4 1065353216
 ASGNF4
-line 1277
-;1277:	qboolean	invert = qfalse;
+line 1288
+;1288:	qboolean	invert = qfalse;
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-line 1279
-;1278:
-;1279:	if (exp < 0) {
+line 1290
+;1289:
+;1290:	if (exp < 0) {
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-GEI4 $357
-line 1280
-;1280:		invert = qtrue;
+GEI4 $355
+line 1291
+;1291:		invert = qtrue;
 ADDRLP4 4
 CNSTI4 1
 ASGNI4
-line 1281
-;1281:		exp = -exp;
+line 1292
+;1292:		exp = -exp;
 ADDRFP4 4
 ADDRFP4 4
 INDIRI4
 NEGI4
 ASGNI4
-line 1282
-;1282:	}
-ADDRGP4 $357
+line 1293
+;1293:	}
+ADDRGP4 $355
 JUMPV
-LABELV $356
-line 1284
-;1283:
-;1284:	while (exp > 0) {
-line 1285
-;1285:		if (exp & 1) {
+LABELV $354
+line 1295
+;1294:
+;1295:	while (exp > 0) {
+line 1296
+;1296:		if (exp & 1) {
 ADDRFP4 4
 INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $359
-line 1286
-;1286:			result *= base;
+EQI4 $357
+line 1297
+;1297:			result *= base;
 ADDRLP4 0
 ADDRLP4 0
 INDIRF4
@@ -9099,12 +9110,12 @@ ADDRFP4 0
 INDIRF4
 MULF4
 ASGNF4
-line 1287
-;1287:		}
-LABELV $359
-line 1289
-;1288:
-;1289:		base *= base;
+line 1298
+;1298:		}
+LABELV $357
+line 1300
+;1299:
+;1300:		base *= base;
 ADDRLP4 8
 ADDRFP4 0
 INDIRF4
@@ -9116,55 +9127,55 @@ ADDRLP4 8
 INDIRF4
 MULF4
 ASGNF4
-line 1290
-;1290:		exp >>= 1;
+line 1301
+;1301:		exp >>= 1;
 ADDRFP4 4
 ADDRFP4 4
 INDIRI4
 CNSTI4 1
 RSHI4
 ASGNI4
-line 1291
-;1291:	}
-LABELV $357
-line 1284
+line 1302
+;1302:	}
+LABELV $355
+line 1295
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-GTI4 $356
-line 1293
-;1292:
-;1293:	if (invert)
+GTI4 $354
+line 1304
+;1303:
+;1304:	if (invert)
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $361
-line 1294
-;1294:		result = 1.0f / result;
+EQI4 $359
+line 1305
+;1305:		result = 1.0f / result;
 ADDRLP4 0
 CNSTF4 1065353216
 ADDRLP4 0
 INDIRF4
 DIVF4
 ASGNF4
-LABELV $361
-line 1296
-;1295:
-;1296:	return result;
+LABELV $359
+line 1307
+;1306:
+;1307:	return result;
 ADDRLP4 0
 INDIRF4
 RETF4
-LABELV $353
+LABELV $351
 endproc Q_pown 12 0
 export clampedIntMult
 proc clampedIntMult 16 0
-line 1300
-;1297:}
-;1298:
-;1299:// clamps to INT_MIN and INT_MAX
-;1300:int clampedIntMult(int a, int b) {
-line 1301
-;1301:	int res = a * b;
+line 1311
+;1308:}
+;1309:
+;1310:// clamps to INT_MIN and INT_MAX
+;1311:int clampedIntMult(int a, int b) {
+line 1312
+;1312:	int res = a * b;
 ADDRLP4 0
 ADDRFP4 0
 INDIRI4
@@ -9172,8 +9183,8 @@ ADDRFP4 4
 INDIRI4
 MULI4
 ASGNI4
-line 1302
-;1302:	if (b != 0 && res / b != a) {
+line 1313
+;1313:	if (b != 0 && res / b != a) {
 ADDRLP4 4
 ADDRFP4 4
 INDIRI4
@@ -9181,7 +9192,7 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $364
+EQI4 $362
 ADDRLP4 0
 INDIRI4
 ADDRLP4 4
@@ -9189,77 +9200,77 @@ INDIRI4
 DIVI4
 ADDRFP4 0
 INDIRI4
-EQI4 $364
-line 1304
-;1303:		// overflowed
-;1304:		if ((a >= 0) != (b >= 0)) {
+EQI4 $362
+line 1315
+;1314:		// overflowed
+;1315:		if ((a >= 0) != (b >= 0)) {
 ADDRFP4 0
 INDIRI4
 CNSTI4 0
-LTI4 $370
+LTI4 $368
 ADDRLP4 8
+CNSTI4 1
+ASGNI4
+ADDRGP4 $369
+JUMPV
+LABELV $368
+ADDRLP4 8
+CNSTI4 0
+ASGNI4
+LABELV $369
+ADDRFP4 4
+INDIRI4
+CNSTI4 0
+LTI4 $370
+ADDRLP4 12
 CNSTI4 1
 ASGNI4
 ADDRGP4 $371
 JUMPV
 LABELV $370
-ADDRLP4 8
+ADDRLP4 12
 CNSTI4 0
 ASGNI4
 LABELV $371
-ADDRFP4 4
-INDIRI4
-CNSTI4 0
-LTI4 $372
-ADDRLP4 12
-CNSTI4 1
-ASGNI4
-ADDRGP4 $373
-JUMPV
-LABELV $372
-ADDRLP4 12
-CNSTI4 0
-ASGNI4
-LABELV $373
 ADDRLP4 8
 INDIRI4
 ADDRLP4 12
 INDIRI4
-EQI4 $366
-line 1305
-;1305:			return INT_MIN;
+EQI4 $364
+line 1316
+;1316:			return INT_MIN;
 CNSTI4 -2147483648
 RETI4
-ADDRGP4 $363
-JUMPV
-LABELV $366
-line 1307
-;1306:		}
-;1307:		else {
-line 1308
-;1308:			return INT_MAX;
-CNSTI4 2147483647
-RETI4
-ADDRGP4 $363
+ADDRGP4 $361
 JUMPV
 LABELV $364
-line 1311
-;1309:		}
-;1310:	}
-;1311:	return res;
+line 1318
+;1317:		}
+;1318:		else {
+line 1319
+;1319:			return INT_MAX;
+CNSTI4 2147483647
+RETI4
+ADDRGP4 $361
+JUMPV
+LABELV $362
+line 1322
+;1320:		}
+;1321:	}
+;1322:	return res;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $363
+LABELV $361
 endproc clampedIntMult 16 0
 export clampedIntAdd
 proc clampedIntAdd 8 0
-line 1314
-;1312:}
-;1313:
-;1314:int clampedIntAdd(int a, int b) {
-line 1315
-;1315:	if (b > 0 && INT_MAX - b < a) {
+line 1325
+;1323:}
+;1324:
+;1325:int clampedIntAdd(int a, int b) {
+line 1326
+;1326:	if (b > 0 && INT_MAX - b < a) {
 ADDRLP4 0
 ADDRFP4 4
 INDIRI4
@@ -9267,64 +9278,62 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-LEI4 $375
+LEI4 $373
 CNSTI4 2147483647
 ADDRLP4 0
 INDIRI4
 SUBI4
 ADDRFP4 0
 INDIRI4
-GEI4 $375
-line 1316
-;1316:		return INT_MAX;
+GEI4 $373
+line 1327
+;1327:		return INT_MAX;
 CNSTI4 2147483647
 RETI4
-ADDRGP4 $374
+ADDRGP4 $372
+JUMPV
+LABELV $373
+line 1329
+;1328:	}
+;1329:	else if (b < 0 && INT_MIN - b > a) {
+ADDRLP4 4
+ADDRFP4 4
+INDIRI4
+ASGNI4
+ADDRLP4 4
+INDIRI4
+CNSTI4 0
+GEI4 $375
+CNSTI4 -2147483648
+ADDRLP4 4
+INDIRI4
+SUBI4
+ADDRFP4 0
+INDIRI4
+LEI4 $375
+line 1330
+;1330:		return INT_MIN;
+CNSTI4 -2147483648
+RETI4
+ADDRGP4 $372
 JUMPV
 LABELV $375
-line 1318
-;1317:	}
-;1318:	else if (b < 0 && INT_MIN - b > a) {
-ADDRLP4 4
-ADDRFP4 4
-INDIRI4
-ASGNI4
-ADDRLP4 4
-INDIRI4
-CNSTI4 0
-GEI4 $377
-CNSTI4 -2147483648
-ADDRLP4 4
-INDIRI4
-SUBI4
-ADDRFP4 0
-INDIRI4
-LEI4 $377
-line 1319
-;1319:		return INT_MIN;
-CNSTI4 -2147483648
-RETI4
-ADDRGP4 $374
-JUMPV
-LABELV $377
-line 1322
-;1320:	}
-;1321:
-;1322:	return a + b;
+line 1333
+;1331:	}
+;1332:
+;1333:	return a + b;
 ADDRFP4 0
 INDIRI4
 ADDRFP4 4
 INDIRI4
 ADDI4
 RETI4
-LABELV $374
+LABELV $372
 endproc clampedIntAdd 8 0
-import fpclassify
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -9390,6 +9399,8 @@ import Q_acos
 import colorTable
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf

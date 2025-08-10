@@ -27,7 +27,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $123
+EQU4 $121
 line 17
 ;17:	{
 line 18
@@ -43,7 +43,7 @@ CALLV
 pop
 line 19
 ;19:	}
-LABELV $123
+LABELV $121
 line 22
 ;20:
 ;21:	//remove my script_targetname
@@ -56,7 +56,7 @@ CALLV
 pop
 line 23
 ;23:}
-LABELV $122
+LABELV $120
 endproc ObjectDie 0 8
 export G_GetHitLocation
 proc G_GetHitLocation 152 16
@@ -209,7 +209,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $126
+EQU4 $124
 line 164
 ;164:	{
 line 166
@@ -230,7 +230,7 @@ CNSTF4 0
 ASGNF4
 line 167
 ;167:	}
-LABELV $126
+LABELV $124
 line 169
 ;168:
 ;169:	AngleVectors(tangles, forward, right, up);
@@ -333,7 +333,7 @@ ADDRLP4 124
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $136
+EQU4 $134
 ADDRLP4 124
 INDIRP4
 ARGP4
@@ -346,7 +346,7 @@ ASGNI4
 ADDRLP4 128
 INDIRI4
 CNSTI4 0
-NEI4 $136
+NEI4 $134
 line 177
 ;177:	{
 line 178
@@ -358,9 +358,9 @@ INDIRB
 ASGNB 12
 line 179
 ;179:	}
-ADDRGP4 $137
+ADDRGP4 $135
 JUMPV
-LABELV $136
+LABELV $134
 line 181
 ;180:	else
 ;181:	{
@@ -368,9 +368,9 @@ line 182
 ;182:		return HL_NONE;
 CNSTI4 0
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $137
+LABELV $135
 line 207
 ;183:	}
 ;184:
@@ -453,7 +453,7 @@ line 212
 ADDRLP4 80
 INDIRF4
 CNSTF4 1061997773
-LEF4 $148
+LEF4 $146
 line 213
 ;213:	{
 line 214
@@ -463,15 +463,15 @@ CNSTI4 4
 ASGNI4
 line 215
 ;215:	}
-ADDRGP4 $149
+ADDRGP4 $147
 JUMPV
-LABELV $148
+LABELV $146
 line 216
 ;216:	else if(udot>.400)
 ADDRLP4 80
 INDIRF4
 CNSTF4 1053609165
-LEF4 $150
+LEF4 $148
 line 217
 ;217:	{
 line 218
@@ -481,15 +481,15 @@ CNSTI4 3
 ASGNI4
 line 219
 ;219:	}
-ADDRGP4 $151
+ADDRGP4 $149
 JUMPV
-LABELV $150
+LABELV $148
 line 220
 ;220:	else if(udot>-.333)
 ADDRLP4 80
 INDIRF4
 CNSTF4 3198844666
-LEF4 $152
+LEF4 $150
 line 221
 ;221:	{
 line 222
@@ -499,15 +499,15 @@ CNSTI4 2
 ASGNI4
 line 223
 ;223:	}
-ADDRGP4 $153
+ADDRGP4 $151
 JUMPV
-LABELV $152
+LABELV $150
 line 224
 ;224:	else if(udot>-.666)
 ADDRLP4 80
 INDIRF4
 CNSTF4 3207233274
-LEF4 $154
+LEF4 $152
 line 225
 ;225:	{
 line 226
@@ -517,9 +517,9 @@ CNSTI4 1
 ASGNI4
 line 227
 ;227:	}
-ADDRGP4 $155
+ADDRGP4 $153
 JUMPV
-LABELV $154
+LABELV $152
 line 229
 ;228:	else
 ;229:	{
@@ -530,10 +530,10 @@ CNSTI4 0
 ASGNI4
 line 231
 ;231:	}
-LABELV $155
 LABELV $153
 LABELV $151
 LABELV $149
+LABELV $147
 line 234
 ;232:
 ;233:	// Get back to front (forward) position index.
@@ -562,7 +562,7 @@ line 235
 ADDRLP4 84
 INDIRF4
 CNSTF4 1059749626
-LEF4 $160
+LEF4 $158
 line 236
 ;236:	{
 line 237
@@ -572,15 +572,15 @@ CNSTI4 4
 ASGNI4
 line 238
 ;238:	}
-ADDRGP4 $161
+ADDRGP4 $159
 JUMPV
-LABELV $160
+LABELV $158
 line 239
 ;239:	else if(fdot>.333)
 ADDRLP4 84
 INDIRF4
 CNSTF4 1051361018
-LEF4 $162
+LEF4 $160
 line 240
 ;240:	{
 line 241
@@ -590,15 +590,15 @@ CNSTI4 3
 ASGNI4
 line 242
 ;242:	}
-ADDRGP4 $163
+ADDRGP4 $161
 JUMPV
-LABELV $162
+LABELV $160
 line 243
 ;243:	else if(fdot>-.333)
 ADDRLP4 84
 INDIRF4
 CNSTF4 3198844666
-LEF4 $164
+LEF4 $162
 line 244
 ;244:	{
 line 245
@@ -608,15 +608,15 @@ CNSTI4 2
 ASGNI4
 line 246
 ;246:	}
-ADDRGP4 $165
+ADDRGP4 $163
 JUMPV
-LABELV $164
+LABELV $162
 line 247
 ;247:	else if(fdot>-.666)
 ADDRLP4 84
 INDIRF4
 CNSTF4 3207233274
-LEF4 $166
+LEF4 $164
 line 248
 ;248:	{
 line 249
@@ -626,9 +626,9 @@ CNSTI4 1
 ASGNI4
 line 250
 ;250:	}
-ADDRGP4 $167
+ADDRGP4 $165
 JUMPV
-LABELV $166
+LABELV $164
 line 252
 ;251:	else
 ;252:	{
@@ -639,10 +639,10 @@ CNSTI4 0
 ASGNI4
 line 254
 ;254:	}
-LABELV $167
 LABELV $165
 LABELV $163
 LABELV $161
+LABELV $159
 line 257
 ;255:
 ;256:	// Get left to right (lateral) position index.
@@ -671,7 +671,7 @@ line 258
 ADDRLP4 64
 INDIRF4
 CNSTF4 1059749626
-LEF4 $172
+LEF4 $170
 line 259
 ;259:	{
 line 260
@@ -681,15 +681,15 @@ CNSTI4 4
 ASGNI4
 line 261
 ;261:	}
-ADDRGP4 $173
+ADDRGP4 $171
 JUMPV
-LABELV $172
+LABELV $170
 line 262
 ;262:	else if(rdot>.333)
 ADDRLP4 64
 INDIRF4
 CNSTF4 1051361018
-LEF4 $174
+LEF4 $172
 line 263
 ;263:	{
 line 264
@@ -699,15 +699,15 @@ CNSTI4 3
 ASGNI4
 line 265
 ;265:	}
-ADDRGP4 $175
+ADDRGP4 $173
 JUMPV
-LABELV $174
+LABELV $172
 line 266
 ;266:	else if(rdot>-.333)
 ADDRLP4 64
 INDIRF4
 CNSTF4 3198844666
-LEF4 $176
+LEF4 $174
 line 267
 ;267:	{
 line 268
@@ -717,15 +717,15 @@ CNSTI4 2
 ASGNI4
 line 269
 ;269:	}
-ADDRGP4 $177
+ADDRGP4 $175
 JUMPV
-LABELV $176
+LABELV $174
 line 270
 ;270:	else if(rdot>-.666)
 ADDRLP4 64
 INDIRF4
 CNSTF4 3207233274
-LEF4 $178
+LEF4 $176
 line 271
 ;271:	{
 line 272
@@ -735,9 +735,9 @@ CNSTI4 1
 ASGNI4
 line 273
 ;273:	}
-ADDRGP4 $179
+ADDRGP4 $177
 JUMPV
-LABELV $178
+LABELV $176
 line 275
 ;274:	else
 ;275:	{
@@ -748,10 +748,10 @@ CNSTI4 0
 ASGNI4
 line 277
 ;277:	}
-LABELV $179
 LABELV $177
 LABELV $175
 LABELV $173
+LABELV $171
 line 279
 ;278:
 ;279:	HitLoc = Vertical * 25 + Forward * 5 + Lateral;
@@ -775,7 +775,7 @@ line 281
 ADDRLP4 24
 INDIRI4
 CNSTI4 10
-GTI4 $180
+GTI4 $178
 line 282
 ;282:	{
 line 284
@@ -784,16 +784,16 @@ line 284
 ADDRLP4 64
 INDIRF4
 CNSTF4 0
-LEF4 $182
+LEF4 $180
 line 285
 ;285:		{
 line 286
 ;286:			return HL_FOOT_RT;
 CNSTI4 1
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $182
+LABELV $180
 line 289
 ;287:		}
 ;288:		else
@@ -802,9 +802,9 @@ line 290
 ;290:			return HL_FOOT_LT;
 CNSTI4 2
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $180
+LABELV $178
 line 293
 ;291:		}
 ;292:	}
@@ -812,7 +812,7 @@ line 293
 ADDRLP4 24
 INDIRI4
 CNSTI4 50
-GTI4 $184
+GTI4 $182
 line 294
 ;294:	{
 line 296
@@ -821,16 +821,16 @@ line 296
 ADDRLP4 64
 INDIRF4
 CNSTF4 0
-LEF4 $186
+LEF4 $184
 line 297
 ;297:		{
 line 298
 ;298:			return HL_LEG_RT;
 CNSTI4 3
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $186
+LABELV $184
 line 301
 ;299:		}
 ;300:		else
@@ -839,9 +839,9 @@ line 302
 ;302:			return HL_LEG_LT;
 CNSTI4 4
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $184
+LABELV $182
 line 305
 ;303:		}
 ;304:	}
@@ -849,28 +849,28 @@ line 305
 ADDRLP4 24
 INDIRI4
 CNSTI4 56
-EQI4 $194
+EQI4 $192
 ADDRLP4 24
 INDIRI4
 CNSTI4 60
-EQI4 $194
+EQI4 $192
 ADDRLP4 24
 INDIRI4
 CNSTI4 61
-EQI4 $194
+EQI4 $192
 ADDRLP4 24
 INDIRI4
 CNSTI4 65
-EQI4 $194
+EQI4 $192
 ADDRLP4 24
 INDIRI4
 CNSTI4 66
-EQI4 $194
+EQI4 $192
 ADDRLP4 24
 INDIRI4
 CNSTI4 70
-NEI4 $188
-LABELV $194
+NEI4 $186
+LABELV $192
 line 306
 ;306:	{
 line 308
@@ -879,16 +879,16 @@ line 308
 ADDRLP4 64
 INDIRF4
 CNSTF4 0
-LEF4 $195
+LEF4 $193
 line 309
 ;309:		{
 line 310
 ;310:			return HL_HAND_RT;
 CNSTI4 14
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $195
+LABELV $193
 line 313
 ;311:		}
 ;312:		else
@@ -897,9 +897,9 @@ line 314
 ;314:			return HL_HAND_LT;
 CNSTI4 15
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $188
+LABELV $186
 line 317
 ;315:		}
 ;316:	}
@@ -907,28 +907,28 @@ line 317
 ADDRLP4 24
 INDIRI4
 CNSTI4 83
-EQI4 $203
+EQI4 $201
 ADDRLP4 24
 INDIRI4
 CNSTI4 87
-EQI4 $203
+EQI4 $201
 ADDRLP4 24
 INDIRI4
 CNSTI4 88
-EQI4 $203
+EQI4 $201
 ADDRLP4 24
 INDIRI4
 CNSTI4 92
-EQI4 $203
+EQI4 $201
 ADDRLP4 24
 INDIRI4
 CNSTI4 93
-EQI4 $203
+EQI4 $201
 ADDRLP4 24
 INDIRI4
 CNSTI4 97
-NEI4 $197
-LABELV $203
+NEI4 $195
+LABELV $201
 line 318
 ;318:	{
 line 320
@@ -937,16 +937,16 @@ line 320
 ADDRLP4 64
 INDIRF4
 CNSTF4 0
-LEF4 $204
+LEF4 $202
 line 321
 ;321:		{
 line 322
 ;322:			return HL_ARM_RT;
 CNSTI4 12
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $204
+LABELV $202
 line 325
 ;323:		}
 ;324:		else
@@ -955,9 +955,9 @@ line 326
 ;326:			return HL_ARM_LT;
 CNSTI4 13
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $197
+LABELV $195
 line 329
 ;327:		}
 ;328:	}
@@ -965,30 +965,30 @@ line 329
 ADDRLP4 24
 INDIRI4
 CNSTI4 107
-LTI4 $209
+LTI4 $207
 ADDRLP4 24
 INDIRI4
 CNSTI4 109
-LEI4 $210
-LABELV $209
+LEI4 $208
+LABELV $207
 ADDRLP4 24
 INDIRI4
 CNSTI4 112
-LTI4 $211
+LTI4 $209
 ADDRLP4 24
 INDIRI4
 CNSTI4 114
-LEI4 $210
-LABELV $211
+LEI4 $208
+LABELV $209
 ADDRLP4 24
 INDIRI4
 CNSTI4 117
-LTI4 $206
+LTI4 $204
 ADDRLP4 24
 INDIRI4
 CNSTI4 119
-GTI4 $206
-LABELV $210
+GTI4 $204
+LABELV $208
 line 330
 ;330:	{
 line 332
@@ -996,9 +996,9 @@ line 332
 ;332:		return HL_HEAD;
 CNSTI4 16
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $206
+LABELV $204
 line 335
 ;333:	}
 ;334:	else
@@ -1008,23 +1008,23 @@ line 336
 ADDRLP4 80
 INDIRF4
 CNSTF4 1050253722
-GEF4 $212
+GEF4 $210
 line 337
 ;337:		{
 line 338
 ;338:			return HL_WAIST;
 CNSTI4 5
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $212
+LABELV $210
 line 340
 ;339:		}
 ;340:		else if(fdot < 0)
 ADDRLP4 84
 INDIRF4
 CNSTF4 0
-GEF4 $214
+GEF4 $212
 line 341
 ;341:		{
 line 342
@@ -1032,51 +1032,51 @@ line 342
 ADDRLP4 64
 INDIRF4
 CNSTF4 1053609165
-LEF4 $216
+LEF4 $214
 line 343
 ;343:			{
 line 344
 ;344:				return HL_BACK_RT;
 CNSTI4 6
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $216
+LABELV $214
 line 346
 ;345:			}
 ;346:			else if(rdot < -0.4)
 ADDRLP4 64
 INDIRF4
 CNSTF4 3201092813
-GEF4 $218
+GEF4 $216
 line 347
 ;347:			{
 line 348
 ;348:				return HL_BACK_LT;
 CNSTI4 7
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $218
+LABELV $216
 line 350
 ;349:			}
 ;350:			else if(fdot < 0)
 ADDRLP4 84
 INDIRF4
 CNSTF4 0
-GEF4 $215
+GEF4 $213
 line 351
 ;351:			{
 line 352
 ;352:				return HL_BACK;
 CNSTI4 8
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
 line 354
 ;353:			}
 ;354:		}
-LABELV $214
+LABELV $212
 line 356
 ;355:		else
 ;356:		{
@@ -1085,59 +1085,59 @@ line 357
 ADDRLP4 64
 INDIRF4
 CNSTF4 1050253722
-LEF4 $222
+LEF4 $220
 line 358
 ;358:			{
 line 359
 ;359:				return HL_CHEST_RT;
 CNSTI4 9
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $222
+LABELV $220
 line 361
 ;360:			}
 ;361:			else if(rdot < -0.3)
 ADDRLP4 64
 INDIRF4
 CNSTF4 3197737370
-GEF4 $224
+GEF4 $222
 line 362
 ;362:			{
 line 363
 ;363:				return HL_CHEST_LT;
 CNSTI4 10
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $224
+LABELV $222
 line 365
 ;364:			}
 ;365:			else if(fdot < 0)
 ADDRLP4 84
 INDIRF4
 CNSTF4 0
-GEF4 $226
+GEF4 $224
 line 366
 ;366:			{
 line 367
 ;367:				return HL_CHEST;
 CNSTI4 11
 RETI4
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $226
+LABELV $224
 line 369
 ;368:			}
 ;369:		}
-LABELV $215
+LABELV $213
 line 370
 ;370:	}
 line 371
 ;371:	return HL_NONE;
 CNSTI4 0
 RETI4
-LABELV $125
+LABELV $123
 endproc G_GetHitLocation 152 16
 export ExplodeDeath
 proc ExplodeDeath 40 24
@@ -1339,7 +1339,7 @@ ADDP4
 INDIRI4
 ADDRLP4 24
 INDIRI4
-LEI4 $229
+LEI4 $227
 ADDRLP4 20
 INDIRP4
 CNSTI4 716
@@ -1347,7 +1347,7 @@ ADDP4
 INDIRI4
 ADDRLP4 24
 INDIRI4
-LEI4 $229
+LEI4 $227
 line 503
 ;503:	{
 line 504
@@ -1365,7 +1365,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $231
+EQU4 $229
 line 506
 ;506:		{
 line 507
@@ -1379,7 +1379,7 @@ INDIRP4
 ASGNP4
 line 508
 ;508:		}
-LABELV $231
+LABELV $229
 line 509
 ;509:		G_RadiusDamage( self->r.currentOrigin, attacker, self->splashDamage, self->splashRadius, 
 ADDRLP4 32
@@ -1423,7 +1423,7 @@ pop
 line 511
 ;510:				attacker, MOD_UNKNOWN );
 ;511:	}
-LABELV $229
+LABELV $227
 line 513
 ;512:
 ;513:	ObjectDie( self, self, self, 20, 0 );
@@ -1449,7 +1449,7 @@ CALLV
 pop
 line 514
 ;514:}
-LABELV $228
+LABELV $226
 endproc ExplodeDeath 40 24
 export ScorePlum
 proc ScorePlum 12 8
@@ -1528,7 +1528,7 @@ INDIRI4
 ASGNI4
 line 532
 ;532:}
-LABELV $233
+LABELV $231
 endproc ScorePlum 12 8
 export AddScore
 proc AddScore 8 0
@@ -1551,12 +1551,12 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $235
+NEU4 $233
 line 543
 ;543:		return;
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $235
+LABELV $233
 line 545
 ;544:	}
 ;545:	if ( ent->client->sess.raceMode ) { // dont affect points by dying or such. racemode has current racetimer as score
@@ -1569,12 +1569,12 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $237
+EQI4 $235
 line 546
 ;546:		return;
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $237
+LABELV $235
 line 549
 ;547:	}
 ;548:	// no scoring during pre-match warmup
@@ -1582,12 +1582,12 @@ line 549
 ADDRGP4 level+20
 INDIRI4
 CNSTI4 0
-EQI4 $239
+EQI4 $237
 line 550
 ;550:		return;
-ADDRGP4 $234
+ADDRGP4 $232
 JUMPV
-LABELV $239
+LABELV $237
 line 555
 ;551:	}
 ;552:	// show score plum
@@ -1617,7 +1617,7 @@ line 556
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 5
-NEI4 $242
+NEI4 $240
 line 557
 ;557:		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
 ADDRLP4 4
@@ -1643,7 +1643,7 @@ ADDRFP4 8
 INDIRI4
 ADDI4
 ASGNI4
-LABELV $242
+LABELV $240
 line 558
 ;558:	CalculateRanks();
 ADDRGP4 CalculateRanks
@@ -1651,7 +1651,7 @@ CALLV
 pop
 line 559
 ;559:}
-LABELV $234
+LABELV $232
 endproc AddScore 8 0
 export TossClientWeapon
 proc TossClientWeapon 96 16
@@ -1685,14 +1685,14 @@ line 576
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-GTI4 $247
+GTI4 $245
 line 577
 ;577:	{ //can't have this
 line 578
 ;578:		return;
-ADDRGP4 $246
+ADDRGP4 $244
 JUMPV
-LABELV $247
+LABELV $245
 line 581
 ;579:	}
 ;580:
@@ -1700,20 +1700,20 @@ line 581
 ADDRLP4 0
 INDIRI4
 CNSTI4 14
-EQI4 $251
+EQI4 $249
 ADDRLP4 0
 INDIRI4
 CNSTI4 15
-NEI4 $249
-LABELV $251
+NEI4 $247
+LABELV $249
 line 583
 ;582:		weapon == WP_TURRET)
 ;583:	{
 line 584
 ;584:		return;
-ADDRGP4 $246
+ADDRGP4 $244
 JUMPV
-LABELV $249
+LABELV $247
 line 588
 ;585:	}
 ;586:
@@ -1782,7 +1782,7 @@ line 592
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-GEI4 $253
+GEI4 $251
 line 593
 ;593:	{
 line 594
@@ -1810,18 +1810,18 @@ line 597
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-GTI4 $255
+GTI4 $253
 line 598
 ;598:		{ //no ammo
 line 599
 ;599:			return;
-ADDRGP4 $246
+ADDRGP4 $244
 JUMPV
-LABELV $255
+LABELV $253
 line 601
 ;600:		}
 ;601:	}
-LABELV $253
+LABELV $251
 line 603
 ;602:
 ;603:	vel[0] = direction[0]*speed;
@@ -2013,7 +2013,7 @@ ADDP4
 ADDP4
 INDIRI4
 CNSTI4 0
-GEI4 $262
+GEI4 $260
 line 617
 ;617:	{
 line 618
@@ -2085,7 +2085,7 @@ CNSTI4 0
 ASGNI4
 line 620
 ;620:	}
-LABELV $262
+LABELV $260
 line 622
 ;621:
 ;622:	if ((self->client->ps.ammo[weaponData[weapon].ammoIndex] < 1 && weapon != WP_DET_PACK) ||
@@ -2114,25 +2114,25 @@ ADDP4
 ADDP4
 INDIRI4
 CNSTI4 1
-GEI4 $267
+GEI4 $265
 ADDRLP4 0
 INDIRI4
 CNSTI4 13
-NEI4 $266
-LABELV $267
+NEI4 $264
+LABELV $265
 ADDRLP4 0
 INDIRI4
 CNSTI4 11
-EQI4 $264
+EQI4 $262
 ADDRLP4 0
 INDIRI4
 CNSTI4 13
-EQI4 $264
+EQI4 $262
 ADDRLP4 0
 INDIRI4
 CNSTI4 12
-EQI4 $264
-LABELV $266
+EQI4 $262
+LABELV $264
 line 624
 ;623:		(weapon != WP_THERMAL && weapon != WP_DET_PACK && weapon != WP_TRIP_MINE))
 ;624:	{
@@ -2195,10 +2195,10 @@ CALLV
 pop
 line 631
 ;631:	}
-LABELV $264
+LABELV $262
 line 632
 ;632:}
-LABELV $246
+LABELV $244
 endproc TossClientWeapon 96 16
 export TossClientItems
 proc TossClientItems 60 12
@@ -2230,14 +2230,14 @@ ADDRLP4 32
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $273
+EQU4 $271
 ADDRLP4 32
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $273
+EQI4 $271
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -2247,7 +2247,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $275
+LEI4 $273
 ADDRLP4 28
 ADDRFP4 0
 INDIRP4
@@ -2258,26 +2258,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $276
-JUMPV
-LABELV $275
-ADDRLP4 28
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $276
-ADDRLP4 24
-ADDRLP4 28
-INDIRI4
-ASGNI4
 ADDRGP4 $274
 JUMPV
 LABELV $273
-ADDRLP4 24
+ADDRLP4 28
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $274
+ADDRLP4 24
+ADDRLP4 28
+INDIRI4
+ASGNI4
+ADDRGP4 $272
+JUMPV
+LABELV $271
+ADDRLP4 24
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $272
 ADDRLP4 16
 ADDRLP4 24
 INDIRI4
@@ -2294,12 +2294,12 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $277
+EQI4 $275
 line 650
 ;650:		return;
-ADDRGP4 $268
+ADDRGP4 $266
 JUMPV
-LABELV $277
+LABELV $275
 line 653
 ;651:
 ;652:	// drop the weapon if not a gauntlet or machinegun
@@ -2321,7 +2321,7 @@ line 659
 ADDRLP4 12
 INDIRI4
 CNSTI4 3
-NEI4 $279
+NEI4 $277
 line 660
 ;660:		if ( self->client->ps.weaponstate == WEAPON_DROPPING ) {
 ADDRFP4 0
@@ -2333,7 +2333,7 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $281
+NEI4 $279
 line 661
 ;661:			weapon = self->client->pers.cmd.weapon;
 ADDRLP4 12
@@ -2349,7 +2349,7 @@ CVUI4 1
 ASGNI4
 line 662
 ;662:		}
-LABELV $281
+LABELV $279
 line 663
 ;663:		if ( !( self->client->ps.stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 ADDRFP4 0
@@ -2366,7 +2366,7 @@ INDIRI4
 LSHI4
 BANDI4
 CNSTI4 0
-NEI4 $283
+NEI4 $281
 line 664
 ;664:			weapon = WP_NONE;
 ADDRLP4 12
@@ -2374,10 +2374,10 @@ CNSTI4 0
 ASGNI4
 line 665
 ;665:		}
-LABELV $283
+LABELV $281
 line 666
 ;666:	}
-LABELV $279
+LABELV $277
 line 668
 ;667:
 ;668:	self->s.bolt2 = weapon;
@@ -2394,15 +2394,15 @@ line 670
 ADDRLP4 12
 INDIRI4
 CNSTI4 3
-LEI4 $285
+LEI4 $283
 ADDRLP4 12
 INDIRI4
 CNSTI4 14
-EQI4 $285
+EQI4 $283
 ADDRLP4 12
 INDIRI4
 CNSTI4 15
-EQI4 $285
+EQI4 $283
 ADDRLP4 40
 CNSTI4 408
 ASGNI4
@@ -2428,7 +2428,7 @@ ADDP4
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $285
+EQI4 $283
 line 673
 ;671:		weapon != WP_EMPLACED_GUN &&
 ;672:		weapon != WP_TURRET &&
@@ -2508,7 +2508,7 @@ CALLP4
 pop
 line 686
 ;686:	}
-LABELV $285
+LABELV $283
 line 689
 ;687:
 ;688:	// drop all the powerups if not in teamplay
@@ -2516,7 +2516,7 @@ line 689
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 5
-EQI4 $287
+EQI4 $285
 line 690
 ;690:		angle = 45;
 ADDRLP4 20
@@ -2527,7 +2527,7 @@ line 691
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-LABELV $290
+LABELV $288
 line 692
 ;692:			if ( self->client->ps.powerups[ i ] > nowTime ) {
 ADDRLP4 0
@@ -2545,7 +2545,7 @@ ADDP4
 INDIRI4
 ADDRLP4 16
 INDIRI4
-LEI4 $294
+LEI4 $292
 line 693
 ;693:				item = BG_FindItemForPowerup( i );
 ADDRLP4 0
@@ -2565,12 +2565,12 @@ ADDRLP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $296
+NEU4 $294
 line 695
 ;695:					continue;
-ADDRGP4 $291
+ADDRGP4 $289
 JUMPV
-LABELV $296
+LABELV $294
 line 697
 ;696:				}
 ;697:				drop = Drop_Item( self, item, angle );
@@ -2625,7 +2625,7 @@ CNSTI4 728
 ADDP4
 INDIRI4
 CNSTI4 1
-GEI4 $298
+GEI4 $296
 line 701
 ;701:					drop->count = 1;
 ADDRLP4 4
@@ -2636,7 +2636,7 @@ CNSTI4 1
 ASGNI4
 line 702
 ;702:				}
-LABELV $298
+LABELV $296
 line 703
 ;703:				angle += 45;
 ADDRLP4 20
@@ -2647,10 +2647,10 @@ ADDF4
 ASGNF4
 line 704
 ;704:			}
-LABELV $294
+LABELV $292
 line 705
 ;705:		}
-LABELV $291
+LABELV $289
 line 691
 ADDRLP4 0
 ADDRLP4 0
@@ -2661,13 +2661,13 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 16
-LTI4 $290
+LTI4 $288
 line 706
 ;706:	}
-LABELV $287
+LABELV $285
 line 707
 ;707:}
-LABELV $268
+LABELV $266
 endproc TossClientItems 60 12
 export LookAtKiller
 proc LookAtKiller 40 4
@@ -2692,13 +2692,13 @@ ASGNU4
 ADDRLP4 12
 INDIRU4
 CNSTU4 0
-EQU4 $301
+EQU4 $299
 ADDRLP4 12
 INDIRU4
 ADDRFP4 0
 INDIRP4
 CVPU4 4
-EQU4 $301
+EQU4 $299
 line 719
 ;719:		VectorSubtract (attacker->s.pos.trBase, self->s.pos.trBase, dir);
 ADDRLP4 16
@@ -2765,9 +2765,9 @@ SUBF4
 ASGNF4
 line 720
 ;720:	} else if ( inflictor && inflictor != self ) {
-ADDRGP4 $302
+ADDRGP4 $300
 JUMPV
-LABELV $301
+LABELV $299
 ADDRLP4 16
 ADDRFP4 4
 INDIRP4
@@ -2776,13 +2776,13 @@ ASGNU4
 ADDRLP4 16
 INDIRU4
 CNSTU4 0
-EQU4 $305
+EQU4 $303
 ADDRLP4 16
 INDIRU4
 ADDRFP4 0
 INDIRP4
 CVPU4 4
-EQU4 $305
+EQU4 $303
 line 721
 ;721:		VectorSubtract (inflictor->s.pos.trBase, self->s.pos.trBase, dir);
 ADDRLP4 20
@@ -2849,9 +2849,9 @@ SUBF4
 ASGNF4
 line 722
 ;722:	} else {
-ADDRGP4 $306
+ADDRGP4 $304
 JUMPV
-LABELV $305
+LABELV $303
 line 723
 ;723:		self->client->ps.stats[STAT_DEAD_YAW] = self->s.angles[YAW];
 ADDRLP4 20
@@ -2874,10 +2874,10 @@ CVFI4 4
 ASGNI4
 line 724
 ;724:		return;
-ADDRGP4 $300
+ADDRGP4 $298
 JUMPV
-LABELV $306
-LABELV $302
+LABELV $304
+LABELV $300
 line 727
 ;725:	}
 ;726:
@@ -2901,7 +2901,7 @@ CVFI4 4
 ASGNI4
 line 728
 ;728:}
-LABELV $300
+LABELV $298
 endproc LookAtKiller 40 4
 export GibEntity
 proc GibEntity 0 12
@@ -2952,7 +2952,7 @@ CNSTI4 0
 ASGNI4
 line 740
 ;740:}
-LABELV $309
+LABELV $307
 endproc GibEntity 0 12
 export BodyRid
 proc BodyRid 0 4
@@ -2978,7 +2978,7 @@ CNSTI4 0
 ASGNI4
 line 746
 ;746:}
-LABELV $310
+LABELV $308
 endproc BodyRid 0 4
 export body_die
 proc body_die 24 0
@@ -3005,7 +3005,7 @@ CNSTI4 688
 ADDP4
 INDIRI4
 CNSTI4 -39
-GEI4 $312
+GEI4 $310
 line 758
 ;758:	{
 line 759
@@ -3038,19 +3038,19 @@ ADDRLP4 16
 INDIRU4
 ADDRLP4 20
 INDIRU4
-EQU4 $314
+EQU4 $312
 ADDRLP4 16
 INDIRU4
 ADDRLP4 20
 INDIRU4
-EQU4 $320
+EQU4 $318
 ADDRLP4 12
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $320
+EQI4 $318
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -3060,7 +3060,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $322
+LEI4 $320
 ADDRLP4 8
 ADDRFP4 0
 INDIRP4
@@ -3071,26 +3071,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $323
-JUMPV
-LABELV $322
-ADDRLP4 8
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $323
-ADDRLP4 4
-ADDRLP4 8
-INDIRI4
-ASGNI4
 ADDRGP4 $321
 JUMPV
 LABELV $320
-ADDRLP4 4
+ADDRLP4 8
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $321
+ADDRLP4 4
+ADDRLP4 8
+INDIRI4
+ASGNI4
+ADDRGP4 $319
+JUMPV
+LABELV $318
+ADDRLP4 4
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $319
 ADDRLP4 4
 INDIRI4
 ADDRFP4 0
@@ -3103,7 +3103,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 2000
-GEI4 $314
+GEI4 $312
 line 762
 ;762:		{
 line 763
@@ -3113,9 +3113,9 @@ CNSTI4 0
 ASGNI4
 line 764
 ;764:		}
-ADDRGP4 $315
+ADDRGP4 $313
 JUMPV
-LABELV $314
+LABELV $312
 line 766
 ;765:		else
 ;766:		{
@@ -3126,10 +3126,10 @@ CNSTI4 1
 ASGNI4
 line 768
 ;768:		}
-LABELV $315
+LABELV $313
 line 769
 ;769:	}
-LABELV $312
+LABELV $310
 line 771
 ;770:
 ;771:	if (self->client && (self->client->ps.eFlags & EF_DISINTEGRATION))
@@ -3144,7 +3144,7 @@ ADDRLP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $324
+EQU4 $322
 ADDRLP4 4
 INDIRP4
 CNSTI4 108
@@ -3153,14 +3153,14 @@ INDIRI4
 CNSTI4 33554432
 BANDI4
 CNSTI4 0
-EQI4 $324
+EQI4 $322
 line 772
 ;772:	{
 line 773
 ;773:		return;
-ADDRGP4 $311
+ADDRGP4 $309
 JUMPV
-LABELV $324
+LABELV $322
 line 775
 ;774:	}
 ;775:	else if (self->s.eFlags & EF_DISINTEGRATION)
@@ -3172,14 +3172,14 @@ INDIRI4
 CNSTI4 33554432
 BANDI4
 CNSTI4 0
-EQI4 $326
+EQI4 $324
 line 776
 ;776:	{
 line 777
 ;777:		return;
-ADDRGP4 $311
+ADDRGP4 $309
 JUMPV
-LABELV $326
+LABELV $324
 line 780
 ;778:	}
 ;779:
@@ -3187,7 +3187,7 @@ line 780
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-EQI4 $328
+EQI4 $326
 line 781
 ;781:	{
 line 782
@@ -3199,7 +3199,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $330
+EQU4 $328
 line 783
 ;783:		{
 line 784
@@ -3242,9 +3242,9 @@ INDIRB
 ASGNB 12
 line 786
 ;786:		}
-ADDRGP4 $311
+ADDRGP4 $309
 JUMPV
-LABELV $330
+LABELV $328
 line 788
 ;787:		else
 ;788:		{
@@ -3305,16 +3305,18 @@ line 795
 ;795:		}
 line 796
 ;796:		return;
-LABELV $328
+LABELV $326
 line 798
 ;797:	}
 ;798:}
-LABELV $311
+LABELV $309
 endproc body_die 24 0
 data
 export modNames
 align 4
 LABELV modNames
+address $331
+address $332
 address $333
 address $334
 address $335
@@ -3351,8 +3353,6 @@ address $365
 address $366
 address $367
 address $368
-address $369
-address $370
 export CheckAlmostCapture
 code
 proc CheckAlmostCapture 0 0
@@ -3454,7 +3454,7 @@ line 894
 ;892:	}
 ;893:#endif
 ;894:}
-LABELV $371
+LABELV $369
 endproc CheckAlmostCapture 0 0
 export G_InKnockDown
 proc G_InKnockDown 8 0
@@ -3476,45 +3476,45 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 924
-LTI4 $373
+LTI4 $371
 ADDRLP4 0
 INDIRI4
 CNSTI4 942
-GTI4 $373
+GTI4 $371
 ADDRLP4 0
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $378-3696
+ADDRGP4 $376-3696
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $378
-address $376
-address $376
-address $376
-address $376
-address $376
-address $377
-address $377
-address $377
-address $377
-address $377
-address $373
-address $373
-address $377
-address $377
-address $377
-address $377
-address $377
-address $377
-address $377
+LABELV $376
+address $374
+address $374
+address $374
+address $374
+address $374
+address $375
+address $375
+address $375
+address $375
+address $375
+address $371
+address $371
+address $375
+address $375
+address $375
+address $375
+address $375
+address $375
+address $375
 code
 line 899
 ;899:	{
-LABELV $376
+LABELV $374
 line 905
 ;900:	case BOTH_KNOCKDOWN1:
 ;901:	case BOTH_KNOCKDOWN2:
@@ -3524,11 +3524,11 @@ line 905
 ;905:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $372
+ADDRGP4 $370
 JUMPV
 line 906
 ;906:		break;
-LABELV $377
+LABELV $375
 line 919
 ;907:	case BOTH_GETUP1:
 ;908:	case BOTH_GETUP2:
@@ -3545,17 +3545,17 @@ line 919
 ;919:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $372
+ADDRGP4 $370
 JUMPV
 line 920
 ;920:		break;
-LABELV $373
+LABELV $371
 line 922
 ;921:	}
 ;922:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $372
+LABELV $370
 endproc G_InKnockDown 8 0
 proc G_CheckSpecialDeathAnim 64 16
 line 926
@@ -3594,7 +3594,7 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $381
+EQI4 $379
 line 930
 ;930:	{
 line 931
@@ -3604,9 +3604,9 @@ CNSTI4 37
 ASGNI4
 line 932
 ;932:	}
-ADDRGP4 $382
+ADDRGP4 $380
 JUMPV
-LABELV $381
+LABELV $379
 line 933
 ;933:	else if ( BG_FlippingAnim( self->client->ps.legsAnim ) )
 ADDRFP4 0
@@ -3625,7 +3625,7 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-EQI4 $383
+EQI4 $381
 line 934
 ;934:	{
 line 935
@@ -3635,9 +3635,9 @@ CNSTI4 38
 ASGNI4
 line 936
 ;936:	}
-ADDRGP4 $384
+ADDRGP4 $382
 JUMPV
-LABELV $383
+LABELV $381
 line 937
 ;937:	else if ( G_InKnockDown( &self->client->ps ) )
 ADDRFP4 0
@@ -3653,7 +3653,7 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-EQI4 $385
+EQI4 $383
 line 938
 ;938:	{//since these happen a lot, let's handle them case by case
 line 939
@@ -3709,46 +3709,46 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 924
-LTI4 $389
+LTI4 $387
 ADDRLP4 32
 INDIRI4
 CNSTI4 943
-GTI4 $389
+GTI4 $387
 ADDRLP4 32
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $552-3696
+ADDRGP4 $550-3696
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $552
-address $392
-address $397
-address $402
-address $407
-address $416
-address $419
-address $430
-address $441
-address $452
-address $463
-address $477
-address $468
-address $540
-address $547
-address $486
-address $499
-address $510
-address $515
-address $520
-address $527
+LABELV $550
+address $390
+address $395
+address $400
+address $405
+address $414
+address $417
+address $428
+address $439
+address $450
+address $461
+address $475
+address $466
+address $538
+address $545
+address $484
+address $497
+address $508
+address $513
+address $518
+address $525
 code
 line 941
 ;941:		{
-LABELV $392
+LABELV $390
 line 943
 ;942:		case BOTH_KNOCKDOWN1:
 ;943:			if ( animLength - self->client->ps.legsTimer > 100 )
@@ -3764,7 +3764,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 100
-LEI4 $390
+LEI4 $388
 line 944
 ;944:			{//on our way down
 line 945
@@ -3778,7 +3778,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 600
-LEI4 $395
+LEI4 $393
 line 946
 ;946:				{//still partially up
 line 947
@@ -3788,9 +3788,9 @@ CNSTI4 45
 ASGNI4
 line 948
 ;948:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $395
+LABELV $393
 line 950
 ;949:				else
 ;950:				{//down
@@ -3805,9 +3805,9 @@ line 953
 ;953:			}
 line 954
 ;954:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $397
+LABELV $395
 line 956
 ;955:		case BOTH_KNOCKDOWN2:
 ;956:			if ( animLength - self->client->ps.legsTimer > 700 )
@@ -3823,7 +3823,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 700
-LEI4 $390
+LEI4 $388
 line 957
 ;957:			{//on our way down
 line 958
@@ -3837,7 +3837,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 600
-LEI4 $400
+LEI4 $398
 line 959
 ;959:				{//still partially up
 line 960
@@ -3847,9 +3847,9 @@ CNSTI4 45
 ASGNI4
 line 961
 ;961:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $400
+LABELV $398
 line 963
 ;962:				else
 ;963:				{//down
@@ -3864,9 +3864,9 @@ line 966
 ;966:			}
 line 967
 ;967:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $402
+LABELV $400
 line 969
 ;968:		case BOTH_KNOCKDOWN3:
 ;969:			if ( animLength - self->client->ps.legsTimer > 100 )
@@ -3882,7 +3882,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 100
-LEI4 $390
+LEI4 $388
 line 970
 ;970:			{//on our way down
 line 971
@@ -3896,7 +3896,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 1300
-LEI4 $405
+LEI4 $403
 line 972
 ;972:				{//still partially up
 line 973
@@ -3906,9 +3906,9 @@ CNSTI4 44
 ASGNI4
 line 974
 ;974:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $405
+LABELV $403
 line 976
 ;975:				else
 ;976:				{//down
@@ -3923,9 +3923,9 @@ line 979
 ;979:			}
 line 980
 ;980:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $407
+LABELV $405
 line 982
 ;981:		case BOTH_KNOCKDOWN4:
 ;982:			if ( animLength - self->client->ps.legsTimer > 300 )
@@ -3941,7 +3941,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 300
-LEI4 $408
+LEI4 $406
 line 983
 ;983:			{//on our way down
 line 984
@@ -3955,7 +3955,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 350
-LEI4 $410
+LEI4 $408
 line 985
 ;985:				{//still partially up
 line 986
@@ -3965,9 +3965,9 @@ CNSTI4 45
 ASGNI4
 line 987
 ;987:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $410
+LABELV $408
 line 989
 ;988:				else
 ;989:				{//down
@@ -3980,9 +3980,9 @@ line 991
 ;991:				}
 line 992
 ;992:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $408
+LABELV $406
 line 994
 ;993:			else
 ;994:			{//crouch death
@@ -4060,7 +4060,7 @@ line 1001
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $414
+GEF4 $412
 line 1002
 ;1002:				{
 line 1003
@@ -4070,9 +4070,9 @@ CNSTI4 29
 ASGNI4
 line 1004
 ;1004:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $414
+LABELV $412
 line 1006
 ;1005:				else
 ;1006:				{
@@ -4087,9 +4087,9 @@ line 1009
 ;1009:			}
 line 1010
 ;1010:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $416
+LABELV $414
 line 1012
 ;1011:		case BOTH_KNOCKDOWN5:
 ;1012:			if ( self->client->ps.legsTimer < 750 )
@@ -4102,7 +4102,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 750
-GEI4 $390
+GEI4 $388
 line 1013
 ;1013:			{//flat
 line 1014
@@ -4114,9 +4114,9 @@ line 1015
 ;1015:			}
 line 1016
 ;1016:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $419
+LABELV $417
 line 1018
 ;1017:		case BOTH_GETUP1:
 ;1018:			if ( self->client->ps.legsTimer < 350 )
@@ -4129,14 +4129,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 350
-GEI4 $420
+GEI4 $418
 line 1019
 ;1019:			{//standing up
 line 1020
 ;1020:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $420
+LABELV $418
 line 1021
 ;1021:			else if ( self->client->ps.legsTimer < 800 )
 ADDRFP4 0
@@ -4148,7 +4148,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 800
-GEI4 $422
+GEI4 $420
 line 1022
 ;1022:			{//crouching
 line 1024
@@ -4224,7 +4224,7 @@ line 1028
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $426
+GEF4 $424
 line 1029
 ;1029:				{
 line 1030
@@ -4234,9 +4234,9 @@ CNSTI4 29
 ASGNI4
 line 1031
 ;1031:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $426
+LABELV $424
 line 1033
 ;1032:				else
 ;1033:				{
@@ -4249,9 +4249,9 @@ line 1035
 ;1035:				}
 line 1036
 ;1036:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $422
+LABELV $420
 line 1038
 ;1037:			else
 ;1038:			{//lying down
@@ -4269,7 +4269,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 450
-LEI4 $428
+LEI4 $426
 line 1040
 ;1040:				{//partially up
 line 1041
@@ -4279,9 +4279,9 @@ CNSTI4 45
 ASGNI4
 line 1042
 ;1042:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $428
+LABELV $426
 line 1044
 ;1043:				else
 ;1044:				{//down
@@ -4296,9 +4296,9 @@ line 1047
 ;1047:			}
 line 1048
 ;1048:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $430
+LABELV $428
 line 1050
 ;1049:		case BOTH_GETUP2:
 ;1050:			if ( self->client->ps.legsTimer < 150 )
@@ -4311,14 +4311,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 150
-GEI4 $431
+GEI4 $429
 line 1051
 ;1051:			{//standing up
 line 1052
 ;1052:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $431
+LABELV $429
 line 1053
 ;1053:			else if ( self->client->ps.legsTimer < 850 )
 ADDRFP4 0
@@ -4330,7 +4330,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 850
-GEI4 $433
+GEI4 $431
 line 1054
 ;1054:			{//crouching
 line 1056
@@ -4407,7 +4407,7 @@ line 1061
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $437
+GEF4 $435
 line 1062
 ;1062:				{
 line 1063
@@ -4417,9 +4417,9 @@ CNSTI4 29
 ASGNI4
 line 1064
 ;1064:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $437
+LABELV $435
 line 1066
 ;1065:				else
 ;1066:				{
@@ -4432,9 +4432,9 @@ line 1068
 ;1068:				}
 line 1069
 ;1069:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $433
+LABELV $431
 line 1071
 ;1070:			else
 ;1071:			{//lying down
@@ -4452,7 +4452,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 500
-LEI4 $439
+LEI4 $437
 line 1073
 ;1073:				{//partially up
 line 1074
@@ -4462,9 +4462,9 @@ CNSTI4 45
 ASGNI4
 line 1075
 ;1075:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $439
+LABELV $437
 line 1077
 ;1076:				else
 ;1077:				{//down
@@ -4479,9 +4479,9 @@ line 1080
 ;1080:			}
 line 1081
 ;1081:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $441
+LABELV $439
 line 1083
 ;1082:		case BOTH_GETUP3:
 ;1083:			if ( self->client->ps.legsTimer < 250 )
@@ -4494,14 +4494,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 250
-GEI4 $442
+GEI4 $440
 line 1084
 ;1084:			{//standing up
 line 1085
 ;1085:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $442
+LABELV $440
 line 1086
 ;1086:			else if ( self->client->ps.legsTimer < 600 )
 ADDRFP4 0
@@ -4513,7 +4513,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 600
-GEI4 $444
+GEI4 $442
 line 1087
 ;1087:			{//crouching
 line 1089
@@ -4589,7 +4589,7 @@ line 1093
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $448
+GEF4 $446
 line 1094
 ;1094:				{
 line 1095
@@ -4599,9 +4599,9 @@ CNSTI4 29
 ASGNI4
 line 1096
 ;1096:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $448
+LABELV $446
 line 1098
 ;1097:				else
 ;1098:				{
@@ -4614,9 +4614,9 @@ line 1100
 ;1100:				}
 line 1101
 ;1101:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $444
+LABELV $442
 line 1103
 ;1102:			else
 ;1103:			{//lying down
@@ -4634,7 +4634,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 150
-LEI4 $450
+LEI4 $448
 line 1105
 ;1105:				{//partially up
 line 1106
@@ -4644,9 +4644,9 @@ CNSTI4 44
 ASGNI4
 line 1107
 ;1107:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $450
+LABELV $448
 line 1109
 ;1108:				else
 ;1109:				{//down
@@ -4661,9 +4661,9 @@ line 1112
 ;1112:			}
 line 1113
 ;1113:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $452
+LABELV $450
 line 1115
 ;1114:		case BOTH_GETUP4:
 ;1115:			if ( self->client->ps.legsTimer < 250 )
@@ -4676,14 +4676,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 250
-GEI4 $453
+GEI4 $451
 line 1116
 ;1116:			{//standing up
 line 1117
 ;1117:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $453
+LABELV $451
 line 1118
 ;1118:			else if ( self->client->ps.legsTimer < 600 )
 ADDRFP4 0
@@ -4695,7 +4695,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 600
-GEI4 $455
+GEI4 $453
 line 1119
 ;1119:			{//crouching
 line 1121
@@ -4772,7 +4772,7 @@ line 1126
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $459
+GEF4 $457
 line 1127
 ;1127:				{
 line 1128
@@ -4782,9 +4782,9 @@ CNSTI4 29
 ASGNI4
 line 1129
 ;1129:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $459
+LABELV $457
 line 1131
 ;1130:				else
 ;1131:				{
@@ -4797,9 +4797,9 @@ line 1133
 ;1133:				}
 line 1134
 ;1134:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $455
+LABELV $453
 line 1136
 ;1135:			else
 ;1136:			{//lying down
@@ -4817,7 +4817,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 850
-LEI4 $461
+LEI4 $459
 line 1138
 ;1138:				{//partially up
 line 1139
@@ -4827,9 +4827,9 @@ CNSTI4 44
 ASGNI4
 line 1140
 ;1140:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $461
+LABELV $459
 line 1142
 ;1141:				else
 ;1142:				{//down
@@ -4844,9 +4844,9 @@ line 1145
 ;1145:			}
 line 1146
 ;1146:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $463
+LABELV $461
 line 1148
 ;1147:		case BOTH_GETUP5:
 ;1148:			if ( self->client->ps.legsTimer > 850 )
@@ -4859,7 +4859,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 850
-LEI4 $390
+LEI4 $388
 line 1149
 ;1149:			{//lying down
 line 1150
@@ -4876,7 +4876,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 1500
-LEI4 $466
+LEI4 $464
 line 1151
 ;1151:				{//partially up
 line 1152
@@ -4886,9 +4886,9 @@ CNSTI4 44
 ASGNI4
 line 1153
 ;1153:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $466
+LABELV $464
 line 1155
 ;1154:				else
 ;1155:				{//down
@@ -4903,9 +4903,9 @@ line 1158
 ;1158:			}
 line 1159
 ;1159:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $468
+LABELV $466
 line 1161
 ;1160:		case BOTH_GETUP_CROUCH_B1:
 ;1161:			if ( self->client->ps.legsTimer < 800 )
@@ -4918,7 +4918,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 800
-GEI4 $469
+GEI4 $467
 line 1162
 ;1162:			{//crouching
 line 1164
@@ -4995,7 +4995,7 @@ line 1169
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $473
+GEF4 $471
 line 1170
 ;1170:				{
 line 1171
@@ -5005,9 +5005,9 @@ CNSTI4 29
 ASGNI4
 line 1172
 ;1172:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $473
+LABELV $471
 line 1174
 ;1173:				else
 ;1174:				{
@@ -5020,9 +5020,9 @@ line 1176
 ;1176:				}
 line 1177
 ;1177:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $469
+LABELV $467
 line 1179
 ;1178:			else
 ;1179:			{//lying down
@@ -5040,7 +5040,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 400
-LEI4 $475
+LEI4 $473
 line 1181
 ;1181:				{//partially up
 line 1182
@@ -5050,9 +5050,9 @@ CNSTI4 45
 ASGNI4
 line 1183
 ;1183:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $475
+LABELV $473
 line 1185
 ;1184:				else
 ;1185:				{//down
@@ -5067,9 +5067,9 @@ line 1188
 ;1188:			}
 line 1189
 ;1189:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $477
+LABELV $475
 line 1191
 ;1190:		case BOTH_GETUP_CROUCH_F1:
 ;1191:			if ( self->client->ps.legsTimer < 800 )
@@ -5082,7 +5082,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 800
-GEI4 $478
+GEI4 $476
 line 1192
 ;1192:			{//crouching
 line 1194
@@ -5159,7 +5159,7 @@ line 1199
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $482
+GEF4 $480
 line 1200
 ;1200:				{
 line 1201
@@ -5169,9 +5169,9 @@ CNSTI4 29
 ASGNI4
 line 1202
 ;1202:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $482
+LABELV $480
 line 1204
 ;1203:				else
 ;1204:				{
@@ -5184,9 +5184,9 @@ line 1206
 ;1206:				}
 line 1207
 ;1207:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $478
+LABELV $476
 line 1209
 ;1208:			else
 ;1209:			{//lying down
@@ -5204,7 +5204,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 150
-LEI4 $484
+LEI4 $482
 line 1211
 ;1211:				{//partially up
 line 1212
@@ -5214,9 +5214,9 @@ CNSTI4 44
 ASGNI4
 line 1213
 ;1213:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $484
+LABELV $482
 line 1215
 ;1214:				else
 ;1215:				{//down
@@ -5231,9 +5231,9 @@ line 1218
 ;1218:			}
 line 1219
 ;1219:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $486
+LABELV $484
 line 1221
 ;1220:		case BOTH_FORCE_GETUP_B1:
 ;1221:			if ( self->client->ps.legsTimer < 325 )
@@ -5246,14 +5246,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 325
-GEI4 $487
+GEI4 $485
 line 1222
 ;1222:			{//standing up
 line 1223
 ;1223:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $487
+LABELV $485
 line 1224
 ;1224:			else if ( self->client->ps.legsTimer < 725 )
 ADDRFP4 0
@@ -5265,7 +5265,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 725
-GEI4 $489
+GEI4 $487
 line 1225
 ;1225:			{//spinning up
 line 1226
@@ -5275,9 +5275,9 @@ CNSTI4 41
 ASGNI4
 line 1227
 ;1227:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $489
+LABELV $487
 line 1228
 ;1228:			else if ( self->client->ps.legsTimer < 900 )
 ADDRFP4 0
@@ -5289,7 +5289,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 900
-GEI4 $491
+GEI4 $489
 line 1229
 ;1229:			{//crouching
 line 1231
@@ -5366,7 +5366,7 @@ line 1236
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $495
+GEF4 $493
 line 1237
 ;1237:				{
 line 1238
@@ -5376,9 +5376,9 @@ CNSTI4 29
 ASGNI4
 line 1239
 ;1239:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $495
+LABELV $493
 line 1241
 ;1240:				else
 ;1241:				{
@@ -5391,9 +5391,9 @@ line 1243
 ;1243:				}
 line 1244
 ;1244:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $491
+LABELV $489
 line 1246
 ;1245:			else
 ;1246:			{//lying down
@@ -5411,7 +5411,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 50
-LEI4 $497
+LEI4 $495
 line 1248
 ;1248:				{//partially up
 line 1249
@@ -5421,9 +5421,9 @@ CNSTI4 45
 ASGNI4
 line 1250
 ;1250:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $497
+LABELV $495
 line 1252
 ;1251:				else
 ;1252:				{//down
@@ -5438,9 +5438,9 @@ line 1255
 ;1255:			}
 line 1256
 ;1256:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $499
+LABELV $497
 line 1258
 ;1257:		case BOTH_FORCE_GETUP_B2:
 ;1258:			if ( self->client->ps.legsTimer < 575 )
@@ -5453,14 +5453,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 575
-GEI4 $500
+GEI4 $498
 line 1259
 ;1259:			{//standing up
 line 1260
 ;1260:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $500
+LABELV $498
 line 1261
 ;1261:			else if ( self->client->ps.legsTimer < 875 )
 ADDRFP4 0
@@ -5472,7 +5472,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 875
-GEI4 $502
+GEI4 $500
 line 1262
 ;1262:			{//spinning up
 line 1263
@@ -5482,9 +5482,9 @@ CNSTI4 41
 ASGNI4
 line 1264
 ;1264:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $502
+LABELV $500
 line 1265
 ;1265:			else if ( self->client->ps.legsTimer < 900 )
 ADDRFP4 0
@@ -5496,7 +5496,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 900
-GEI4 $504
+GEI4 $502
 line 1266
 ;1266:			{//crouching
 line 1268
@@ -5573,7 +5573,7 @@ line 1273
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $508
+GEF4 $506
 line 1274
 ;1274:				{
 line 1275
@@ -5583,9 +5583,9 @@ CNSTI4 29
 ASGNI4
 line 1276
 ;1276:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $508
+LABELV $506
 line 1278
 ;1277:				else
 ;1278:				{
@@ -5598,9 +5598,9 @@ line 1280
 ;1280:				}
 line 1281
 ;1281:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $504
+LABELV $502
 line 1283
 ;1282:			else
 ;1283:			{//lying down
@@ -5614,9 +5614,9 @@ line 1286
 ;1286:			}
 line 1287
 ;1287:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $510
+LABELV $508
 line 1289
 ;1288:		case BOTH_FORCE_GETUP_B3:
 ;1289:			if ( self->client->ps.legsTimer < 150 )
@@ -5629,14 +5629,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 150
-GEI4 $511
+GEI4 $509
 line 1290
 ;1290:			{//standing up
 line 1291
 ;1291:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $511
+LABELV $509
 line 1292
 ;1292:			else if ( self->client->ps.legsTimer < 775 )
 ADDRFP4 0
@@ -5648,7 +5648,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 775
-GEI4 $513
+GEI4 $511
 line 1293
 ;1293:			{//flipping
 line 1294
@@ -5658,9 +5658,9 @@ CNSTI4 30
 ASGNI4
 line 1295
 ;1295:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $513
+LABELV $511
 line 1297
 ;1296:			else
 ;1297:			{//lying down
@@ -5674,9 +5674,9 @@ line 1300
 ;1300:			}
 line 1301
 ;1301:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $515
+LABELV $513
 line 1303
 ;1302:		case BOTH_FORCE_GETUP_B4:
 ;1303:			if ( self->client->ps.legsTimer < 325 )
@@ -5689,14 +5689,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 325
-GEI4 $516
+GEI4 $514
 line 1304
 ;1304:			{//standing up
 line 1305
 ;1305:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $516
+LABELV $514
 line 1307
 ;1306:			else
 ;1307:			{//lying down
@@ -5714,7 +5714,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 150
-LEI4 $518
+LEI4 $516
 line 1309
 ;1309:				{//partially up
 line 1310
@@ -5724,9 +5724,9 @@ CNSTI4 45
 ASGNI4
 line 1311
 ;1311:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $518
+LABELV $516
 line 1313
 ;1312:				else
 ;1313:				{//down
@@ -5741,9 +5741,9 @@ line 1316
 ;1316:			}
 line 1317
 ;1317:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $520
+LABELV $518
 line 1319
 ;1318:		case BOTH_FORCE_GETUP_B5:
 ;1319:			if ( self->client->ps.legsTimer < 550 )
@@ -5756,14 +5756,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 550
-GEI4 $521
+GEI4 $519
 line 1320
 ;1320:			{//standing up
 line 1321
 ;1321:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $521
+LABELV $519
 line 1322
 ;1322:			else if ( self->client->ps.legsTimer < 1025 )
 ADDRFP4 0
@@ -5775,7 +5775,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 1025
-GEI4 $523
+GEI4 $521
 line 1323
 ;1323:			{//kicking up
 line 1324
@@ -5785,9 +5785,9 @@ CNSTI4 30
 ASGNI4
 line 1325
 ;1325:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $523
+LABELV $521
 line 1327
 ;1326:			else
 ;1327:			{//lying down
@@ -5805,7 +5805,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 50
-LEI4 $525
+LEI4 $523
 line 1329
 ;1329:				{//partially up
 line 1330
@@ -5815,9 +5815,9 @@ CNSTI4 45
 ASGNI4
 line 1331
 ;1331:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $525
+LABELV $523
 line 1333
 ;1332:				else
 ;1333:				{//down
@@ -5832,9 +5832,9 @@ line 1336
 ;1336:			}
 line 1337
 ;1337:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $527
+LABELV $525
 line 1339
 ;1338:		case BOTH_FORCE_GETUP_B6:
 ;1339:			if ( self->client->ps.legsTimer < 225 )
@@ -5847,14 +5847,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 225
-GEI4 $528
+GEI4 $526
 line 1340
 ;1340:			{//standing up
 line 1341
 ;1341:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $528
+LABELV $526
 line 1342
 ;1342:			else if ( self->client->ps.legsTimer < 425 )
 ADDRFP4 0
@@ -5866,7 +5866,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 425
-GEI4 $530
+GEI4 $528
 line 1343
 ;1343:			{//crouching up
 line 1345
@@ -5943,7 +5943,7 @@ line 1350
 ADDRLP4 40
 INDIRF4
 CNSTF4 3272998912
-GEF4 $534
+GEF4 $532
 line 1351
 ;1351:				{
 line 1352
@@ -5953,9 +5953,9 @@ CNSTI4 29
 ASGNI4
 line 1353
 ;1353:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $534
+LABELV $532
 line 1355
 ;1354:				else
 ;1355:				{
@@ -5968,9 +5968,9 @@ line 1357
 ;1357:				}
 line 1358
 ;1358:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $530
+LABELV $528
 line 1359
 ;1359:			else if ( self->client->ps.legsTimer < 825 )
 ADDRFP4 0
@@ -5982,7 +5982,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 825
-GEI4 $536
+GEI4 $534
 line 1360
 ;1360:			{//flipping up
 line 1361
@@ -5992,9 +5992,9 @@ CNSTI4 28
 ASGNI4
 line 1362
 ;1362:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $536
+LABELV $534
 line 1364
 ;1363:			else
 ;1364:			{//lying down
@@ -6012,7 +6012,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 225
-LEI4 $538
+LEI4 $536
 line 1366
 ;1366:				{//partially up
 line 1367
@@ -6022,9 +6022,9 @@ CNSTI4 45
 ASGNI4
 line 1368
 ;1368:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $538
+LABELV $536
 line 1370
 ;1369:				else
 ;1370:				{//down
@@ -6039,9 +6039,9 @@ line 1373
 ;1373:			}
 line 1374
 ;1374:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $540
+LABELV $538
 line 1376
 ;1375:		case BOTH_FORCE_GETUP_F1:
 ;1376:			if ( self->client->ps.legsTimer < 275 )
@@ -6054,14 +6054,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 275
-GEI4 $541
+GEI4 $539
 line 1377
 ;1377:			{//standing up
 line 1378
 ;1378:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $541
+LABELV $539
 line 1379
 ;1379:			else if ( self->client->ps.legsTimer < 750 )
 ADDRFP4 0
@@ -6073,7 +6073,7 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 750
-GEI4 $543
+GEI4 $541
 line 1380
 ;1380:			{//flipping
 line 1381
@@ -6083,9 +6083,9 @@ CNSTI4 14
 ASGNI4
 line 1382
 ;1382:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $543
+LABELV $541
 line 1384
 ;1383:			else
 ;1384:			{//lying down
@@ -6103,7 +6103,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 100
-LEI4 $545
+LEI4 $543
 line 1386
 ;1386:				{//partially up
 line 1387
@@ -6113,9 +6113,9 @@ CNSTI4 44
 ASGNI4
 line 1388
 ;1388:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $545
+LABELV $543
 line 1390
 ;1389:				else
 ;1390:				{//down
@@ -6130,9 +6130,9 @@ line 1393
 ;1393:			}
 line 1394
 ;1394:			break;
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $547
+LABELV $545
 line 1396
 ;1395:		case BOTH_FORCE_GETUP_F2:
 ;1396:			if ( self->client->ps.legsTimer < 1200 )
@@ -6145,14 +6145,14 @@ CNSTI4 88
 ADDP4
 INDIRI4
 CNSTI4 1200
-GEI4 $548
+GEI4 $546
 line 1397
 ;1397:			{//standing
 line 1398
 ;1398:			}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $548
+LABELV $546
 line 1400
 ;1399:			else
 ;1400:			{//lying down
@@ -6170,7 +6170,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 225
-LEI4 $550
+LEI4 $548
 line 1402
 ;1402:				{//partially up
 line 1403
@@ -6180,9 +6180,9 @@ CNSTI4 44
 ASGNI4
 line 1404
 ;1404:				}
-ADDRGP4 $390
+ADDRGP4 $388
 JUMPV
-LABELV $550
+LABELV $548
 line 1406
 ;1405:				else
 ;1406:				{//down
@@ -6197,21 +6197,21 @@ line 1409
 ;1409:			}
 line 1410
 ;1410:			break;
-LABELV $389
-LABELV $390
+LABELV $387
+LABELV $388
 line 1412
 ;1411:		}
 ;1412:	}
-LABELV $385
-LABELV $384
+LABELV $383
 LABELV $382
+LABELV $380
 line 1414
 ;1413:
 ;1414:	return deathAnim;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $380
+LABELV $378
 endproc G_CheckSpecialDeathAnim 64 16
 export G_PickDeathAnim
 proc G_PickDeathAnim 128 20
@@ -6247,7 +6247,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 28
 INDIRU4
-EQU4 $557
+EQU4 $555
 ADDRLP4 24
 INDIRP4
 CNSTI4 408
@@ -6256,8 +6256,8 @@ INDIRP4
 CVPU4 4
 ADDRLP4 28
 INDIRU4
-NEU4 $555
-LABELV $557
+NEU4 $553
+LABELV $555
 line 1425
 ;1425:	{
 line 1426
@@ -6270,28 +6270,28 @@ ADDRLP4 32
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $560
+EQU4 $558
 ADDRLP4 32
 INDIRP4
 CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 13
-EQI4 $558
-LABELV $560
+EQI4 $556
+LABELV $558
 line 1427
 ;1427:		{ //g2animent
 line 1428
 ;1428:			return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $554
+ADDRGP4 $552
 JUMPV
-LABELV $558
+LABELV $556
 line 1430
 ;1429:		}
 ;1430:	}
-LABELV $555
+LABELV $553
 line 1432
 ;1431:
 ;1432:	if (self->client)
@@ -6302,7 +6302,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $561
+EQU4 $559
 line 1433
 ;1433:	{
 line 1434
@@ -6319,9 +6319,9 @@ INDIRI4
 ASGNI4
 line 1435
 ;1435:	}
-ADDRGP4 $562
+ADDRGP4 $560
 JUMPV
-LABELV $561
+LABELV $559
 line 1437
 ;1436:	else
 ;1437:	{
@@ -6332,7 +6332,7 @@ CNSTI4 60
 ASGNI4
 line 1439
 ;1439:	}
-LABELV $562
+LABELV $560
 line 1441
 ;1440:
 ;1441:	if (self->client)
@@ -6343,7 +6343,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $563
+EQU4 $561
 line 1442
 ;1442:	{
 line 1443
@@ -6360,9 +6360,9 @@ INDIRB
 ASGNB 12
 line 1444
 ;1444:	}
-ADDRGP4 $564
+ADDRGP4 $562
 JUMPV
-LABELV $563
+LABELV $561
 line 1446
 ;1445:	else
 ;1446:	{
@@ -6377,14 +6377,14 @@ INDIRB
 ASGNB 12
 line 1448
 ;1448:	}
-LABELV $564
+LABELV $562
 line 1450
 ;1449:
 ;1450:	if ( hitLoc == HL_NONE )
 ADDRFP4 16
 INDIRI4
 CNSTI4 0
-NEI4 $565
+NEI4 $563
 line 1451
 ;1451:	{
 line 1452
@@ -6405,7 +6405,7 @@ INDIRI4
 ASGNI4
 line 1453
 ;1453:	}
-LABELV $565
+LABELV $563
 line 1455
 ;1454:
 ;1455:	if (self->client)
@@ -6416,7 +6416,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $567
+EQU4 $565
 line 1456
 ;1456:	{
 line 1457
@@ -6433,9 +6433,9 @@ INDIRI4
 ASGNI4
 line 1458
 ;1458:	}
-ADDRGP4 $568
+ADDRGP4 $566
 JUMPV
-LABELV $567
+LABELV $565
 line 1460
 ;1459:	else
 ;1460:	{
@@ -6450,23 +6450,23 @@ INDIRI4
 ASGNI4
 line 1462
 ;1462:	}
-LABELV $568
+LABELV $566
 line 1464
 ;1463:
 ;1464:	if (gGAvoidDismember)
 ADDRGP4 gGAvoidDismember
 INDIRI4
 CNSTI4 0
-EQI4 $569
+EQI4 $567
 line 1465
 ;1465:	{
 line 1466
 ;1466:		return BOTH_RIGHTHANDCHOPPEDOFF;
 CNSTI4 952
 RETI4
-ADDRGP4 $554
+ADDRGP4 $552
 JUMPV
-LABELV $569
+LABELV $567
 line 1470
 ;1467:	}
 ;1468:
@@ -6481,105 +6481,105 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 1
-LTI4 $571
+LTI4 $569
 ADDRLP4 32
 INDIRI4
 CNSTI4 79
-GTI4 $571
+GTI4 $569
 ADDRLP4 32
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $578-4
+ADDRGP4 $576-4
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $578
-address $574
-address $574
-address $577
-address $577
-address $577
-address $577
-address $577
-address $574
-address $577
-address $575
-address $577
-address $577
-address $574
-address $574
-address $575
-address $574
-address $577
-address $577
-address $577
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $577
-address $577
-address $571
-address $577
-address $577
-address $577
-address $577
-address $577
-address $577
-address $577
-address $577
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
-address $574
-address $574
-address $577
-address $577
-address $577
-address $577
-address $577
-address $574
-address $577
-address $575
-address $577
-address $577
-address $574
-address $574
-address $575
-address $574
-address $577
-address $577
-address $577
-address $571
-address $571
-address $571
-address $571
-address $571
-address $571
+LABELV $576
+address $572
+address $572
 address $575
 address $575
+address $575
+address $575
+address $575
+address $572
+address $575
+address $573
+address $575
+address $575
+address $572
+address $572
+address $573
+address $572
+address $575
+address $575
+address $575
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $575
+address $575
+address $569
+address $575
+address $575
+address $575
+address $575
+address $575
+address $575
+address $575
+address $575
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $572
+address $572
+address $575
+address $575
+address $575
+address $575
+address $575
+address $572
+address $575
+address $573
+address $575
+address $575
+address $572
+address $572
+address $573
+address $572
+address $575
+address $575
+address $575
+address $569
+address $569
+address $569
+address $569
+address $569
+address $569
+address $573
+address $573
+address $572
+address $572
+address $575
+address $575
+address $575
 address $574
-address $574
-address $577
-address $577
-address $577
-address $576
 code
 line 1471
 ;1471:	{
-LABELV $574
+LABELV $572
 line 1486
 ;1472:	case BOTH_DEATH1:		//# First Death anim
 ;1473:	case BOTH_DEAD1:
@@ -6599,7 +6599,7 @@ line 1486
 ADDRLP4 0
 CNSTI4 -2
 ASGNI4
-LABELV $575
+LABELV $573
 line 1507
 ;1487:		/*
 ;1488:		if ( PM_FinishedCurrentLegsAnim( self ) )
@@ -6625,7 +6625,7 @@ line 1507
 ADDRLP4 0
 CNSTI4 -2
 ASGNI4
-LABELV $576
+LABELV $574
 line 1520
 ;1508:		/*
 ;1509:		if ( PM_FinishedCurrentLegsAnim( self ) )
@@ -6646,9 +6646,9 @@ ASGNI4
 line 1522
 ;1521:		//deathAnim = BOTH_DEADFLOP1;
 ;1522:		break;
-ADDRGP4 $572
+ADDRGP4 $570
 JUMPV
-LABELV $577
+LABELV $575
 line 1558
 ;1523:	case BOTH_DEAD3:				//# Third Death finished pose
 ;1524:	case BOTH_DEAD4:				//# Fourth Death finished pose
@@ -6691,15 +6691,15 @@ CNSTI4 -2
 ASGNI4
 line 1559
 ;1559:		break;
-LABELV $571
-LABELV $572
+LABELV $569
+LABELV $570
 line 1561
 ;1560:	}
 ;1561:	if ( deathAnim == -1 )
 ADDRLP4 0
 INDIRI4
 CNSTI4 -1
-NEI4 $580
+NEI4 $578
 line 1562
 ;1562:	{
 line 1563
@@ -6711,11 +6711,11 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $582
+EQU4 $580
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-NEI4 $582
+NEI4 $580
 line 1564
 ;1564:		{
 line 1565
@@ -6745,14 +6745,14 @@ INDIRI4
 ASGNI4
 line 1566
 ;1566:		}
-LABELV $582
+LABELV $580
 line 1568
 ;1567:
 ;1568:		if (deathAnim == -1)
 ADDRLP4 0
 INDIRI4
 CNSTI4 -1
-NEI4 $584
+NEI4 $582
 line 1569
 ;1569:		{
 line 1571
@@ -6765,42 +6765,42 @@ ASGNI4
 ADDRLP4 40
 INDIRI4
 CNSTI4 1
-LTI4 $587
+LTI4 $585
 ADDRLP4 40
 INDIRI4
 CNSTI4 16
-GTI4 $587
+GTI4 $585
 ADDRLP4 40
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $657-4
+ADDRGP4 $655-4
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $657
-address $588
-address $588
-address $595
-address $600
-address $642
-address $612
-address $627
-address $605
-address $612
-address $627
-address $642
-address $612
-address $627
-address $612
-address $627
-address $654
+LABELV $655
+address $586
+address $586
+address $593
+address $598
+address $640
+address $610
+address $625
+address $603
+address $610
+address $625
+address $640
+address $610
+address $625
+address $610
+address $625
+address $652
 code
 line 1572
 ;1572:			{
-LABELV $588
+LABELV $586
 line 1575
 ;1573:			case HL_FOOT_RT:
 ;1574:			case HL_FOOT_LT:
@@ -6808,7 +6808,7 @@ line 1575
 ADDRFP4 12
 INDIRI4
 CNSTI4 3
-NEI4 $589
+NEI4 $587
 ADDRLP4 44
 CNSTI4 0
 ASGNI4
@@ -6832,16 +6832,16 @@ ASGNI4
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-NEI4 $589
+NEI4 $587
 line 1576
 ;1576:				{
 line 1577
 ;1577:					return BOTH_DEATH10;//chest: back flip
 CNSTI4 10
 RETI4
-ADDRGP4 $554
+ADDRGP4 $552
 JUMPV
-LABELV $589
+LABELV $587
 line 1579
 ;1578:				}
 ;1579:				else if ( !Q_irand( 0, 2 + gRandomUnlockAdd,qfalse,1 ) )
@@ -6868,7 +6868,7 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 0
-NEI4 $591
+NEI4 $589
 line 1580
 ;1580:				{
 line 1581
@@ -6878,9 +6878,9 @@ CNSTI4 4
 ASGNI4
 line 1582
 ;1582:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $591
+LABELV $589
 line 1583
 ;1583:				else if ( !Q_irand( 0, 1 + gRandomUnlockAdd, qfalse, 0 ) )
 ADDRLP4 60
@@ -6907,7 +6907,7 @@ ASGNI4
 ADDRLP4 64
 INDIRI4
 CNSTI4 0
-NEI4 $593
+NEI4 $591
 line 1584
 ;1584:				{
 line 1585
@@ -6917,9 +6917,9 @@ CNSTI4 5
 ASGNI4
 line 1586
 ;1586:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $593
+LABELV $591
 line 1588
 ;1587:				else
 ;1588:				{
@@ -6932,9 +6932,9 @@ line 1590
 ;1590:				}
 line 1591
 ;1591:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $595
+LABELV $593
 line 1593
 ;1592:			case HL_LEG_RT:
 ;1593:				if ( !Q_irand( 0, 2 + gRandomUnlockAdd,qfalse,1 ) )
@@ -6961,7 +6961,7 @@ ASGNI4
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-NEI4 $596
+NEI4 $594
 line 1594
 ;1594:				{
 line 1595
@@ -6971,9 +6971,9 @@ CNSTI4 4
 ASGNI4
 line 1596
 ;1596:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $596
+LABELV $594
 line 1597
 ;1597:				else if ( !Q_irand( 0, 1 + gRandomUnlockAdd, qfalse, 0 ) ) // doesnt this q_irand always return 0?
 ADDRLP4 76
@@ -7000,7 +7000,7 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 0
-NEI4 $598
+NEI4 $596
 line 1598
 ;1598:				{
 line 1599
@@ -7010,9 +7010,9 @@ CNSTI4 5
 ASGNI4
 line 1600
 ;1600:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $598
+LABELV $596
 line 1602
 ;1601:				else
 ;1602:				{
@@ -7025,9 +7025,9 @@ line 1604
 ;1604:				}
 line 1605
 ;1605:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $600
+LABELV $598
 line 1607
 ;1606:			case HL_LEG_LT:
 ;1607:				if ( !Q_irand( 0, 2 + gRandomUnlockAdd, qfalse, 1) )
@@ -7054,7 +7054,7 @@ ASGNI4
 ADDRLP4 88
 INDIRI4
 CNSTI4 0
-NEI4 $601
+NEI4 $599
 line 1608
 ;1608:				{
 line 1609
@@ -7064,9 +7064,9 @@ CNSTI4 4
 ASGNI4
 line 1610
 ;1610:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $601
+LABELV $599
 line 1611
 ;1611:				else if ( !Q_irand( 0, 1 + gRandomUnlockAdd, qfalse, 0) )
 ADDRLP4 92
@@ -7093,7 +7093,7 @@ ASGNI4
 ADDRLP4 96
 INDIRI4
 CNSTI4 0
-NEI4 $603
+NEI4 $601
 line 1612
 ;1612:				{
 line 1613
@@ -7103,9 +7103,9 @@ CNSTI4 5
 ASGNI4
 line 1614
 ;1614:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $603
+LABELV $601
 line 1616
 ;1615:				else
 ;1616:				{
@@ -7118,9 +7118,9 @@ line 1618
 ;1618:				}
 line 1619
 ;1619:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $605
+LABELV $603
 line 1621
 ;1620:			case HL_BACK:
 ;1621:				if ( !VectorLengthSquared( objVelocity ) )
@@ -7133,7 +7133,7 @@ ASGNF4
 ADDRLP4 100
 INDIRF4
 CNSTF4 0
-NEF4 $606
+NEF4 $604
 line 1622
 ;1622:				{
 line 1623
@@ -7143,9 +7143,9 @@ CNSTI4 17
 ASGNI4
 line 1624
 ;1624:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $606
+LABELV $604
 line 1626
 ;1625:				else
 ;1626:				{
@@ -7174,7 +7174,7 @@ ASGNI4
 ADDRLP4 108
 INDIRI4
 CNSTI4 0
-NEI4 $608
+NEI4 $606
 line 1628
 ;1628:					{
 line 1629
@@ -7184,9 +7184,9 @@ CNSTI4 4
 ASGNI4
 line 1630
 ;1630:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $608
+LABELV $606
 line 1631
 ;1631:					else if ( !Q_irand( 0, 1 + gRandomUnlockAdd, qfalse, 0) )
 ADDRLP4 112
@@ -7213,7 +7213,7 @@ ASGNI4
 ADDRLP4 116
 INDIRI4
 CNSTI4 0
-NEI4 $610
+NEI4 $608
 line 1632
 ;1632:					{
 line 1633
@@ -7223,9 +7223,9 @@ CNSTI4 5
 ASGNI4
 line 1634
 ;1634:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $610
+LABELV $608
 line 1636
 ;1635:					else
 ;1636:					{
@@ -7240,9 +7240,9 @@ line 1639
 ;1639:				}
 line 1640
 ;1640:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $612
+LABELV $610
 line 1645
 ;1641:			case HL_CHEST_RT:
 ;1642:			case HL_ARM_RT:
@@ -7257,7 +7257,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $613
+GTF4 $611
 line 1646
 ;1646:				{
 line 1647
@@ -7267,9 +7267,9 @@ CNSTI4 9
 ASGNI4
 line 1648
 ;1648:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $613
+LABELV $611
 line 1649
 ;1649:				else if ( damage <= max_health*0.5 )
 ADDRFP4 8
@@ -7280,7 +7280,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $615
+GTF4 $613
 line 1650
 ;1650:				{
 line 1651
@@ -7290,9 +7290,9 @@ CNSTI4 3
 ASGNI4
 line 1652
 ;1652:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $615
+LABELV $613
 line 1653
 ;1653:				else if ( damage <= max_health*0.75 )
 ADDRFP4 8
@@ -7303,7 +7303,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $617
+GTF4 $615
 line 1654
 ;1654:				{
 line 1655
@@ -7313,9 +7313,9 @@ CNSTI4 6
 ASGNI4
 line 1656
 ;1656:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $617
+LABELV $615
 line 1658
 ;1657:				else 
 ;1658:				{
@@ -7346,7 +7346,7 @@ ASGNI4
 ADDRLP4 108
 INDIRI4
 CNSTI4 0
-EQI4 $619
+EQI4 $617
 line 1661
 ;1661:					{
 line 1662
@@ -7356,9 +7356,9 @@ CNSTI4 8
 ASGNI4
 line 1663
 ;1663:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $619
+LABELV $617
 line 1665
 ;1664:					else
 ;1665:					{
@@ -7391,21 +7391,21 @@ ASGNI4
 ADDRLP4 112
 INDIRI4
 CNSTI4 0
-EQI4 $624
+EQI4 $622
 ADDRLP4 112
 INDIRI4
 CNSTI4 1
-EQI4 $625
+EQI4 $623
 ADDRLP4 112
 INDIRI4
 CNSTI4 2
-EQI4 $626
-ADDRGP4 $621
+EQI4 $624
+ADDRGP4 $619
 JUMPV
 line 1667
 ;1667:						{
-LABELV $621
-LABELV $624
+LABELV $619
+LABELV $622
 line 1670
 ;1668:						default:
 ;1669:						case 0:
@@ -7415,9 +7415,9 @@ CNSTI4 9
 ASGNI4
 line 1671
 ;1671:							break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $625
+LABELV $623
 line 1673
 ;1672:						case 1:
 ;1673:							deathAnim = BOTH_DEATH3;//chest right: back
@@ -7426,9 +7426,9 @@ CNSTI4 3
 ASGNI4
 line 1674
 ;1674:							break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $626
+LABELV $624
 line 1676
 ;1675:						case 2:
 ;1676:							deathAnim = BOTH_DEATH6;//chest right: spin
@@ -7444,9 +7444,9 @@ line 1680
 ;1680:				}
 line 1681
 ;1681:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $627
+LABELV $625
 line 1686
 ;1682:			case HL_CHEST_LT:
 ;1683:			case HL_ARM_LT:
@@ -7461,7 +7461,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $628
+GTF4 $626
 line 1687
 ;1687:				{
 line 1688
@@ -7471,9 +7471,9 @@ CNSTI4 11
 ASGNI4
 line 1689
 ;1689:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $628
+LABELV $626
 line 1690
 ;1690:				else if ( damage <= max_health*0.5 )
 ADDRFP4 8
@@ -7484,7 +7484,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $630
+GTF4 $628
 line 1691
 ;1691:				{
 line 1692
@@ -7494,9 +7494,9 @@ CNSTI4 7
 ASGNI4
 line 1693
 ;1693:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $630
+LABELV $628
 line 1694
 ;1694:				else if ( damage <= max_health*0.75 )
 ADDRFP4 8
@@ -7507,7 +7507,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $632
+GTF4 $630
 line 1695
 ;1695:				{
 line 1696
@@ -7517,9 +7517,9 @@ CNSTI4 12
 ASGNI4
 line 1697
 ;1697:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $632
+LABELV $630
 line 1699
 ;1698:				else
 ;1699:				{
@@ -7550,7 +7550,7 @@ ASGNI4
 ADDRLP4 108
 INDIRI4
 CNSTI4 0
-EQI4 $634
+EQI4 $632
 line 1702
 ;1702:					{
 line 1703
@@ -7560,9 +7560,9 @@ CNSTI4 14
 ASGNI4
 line 1704
 ;1704:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $634
+LABELV $632
 line 1706
 ;1705:					else
 ;1706:					{
@@ -7595,21 +7595,21 @@ ASGNI4
 ADDRLP4 112
 INDIRI4
 CNSTI4 0
-EQI4 $639
+EQI4 $637
 ADDRLP4 112
 INDIRI4
 CNSTI4 1
-EQI4 $640
+EQI4 $638
 ADDRLP4 112
 INDIRI4
 CNSTI4 2
-EQI4 $641
-ADDRGP4 $636
+EQI4 $639
+ADDRGP4 $634
 JUMPV
 line 1708
 ;1708:						{
-LABELV $636
-LABELV $639
+LABELV $634
+LABELV $637
 line 1711
 ;1709:						default:
 ;1710:						case 0:
@@ -7619,9 +7619,9 @@ CNSTI4 11
 ASGNI4
 line 1712
 ;1712:							break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $640
+LABELV $638
 line 1714
 ;1713:						case 1:
 ;1714:							deathAnim = BOTH_DEATH7;//chest left: back
@@ -7630,9 +7630,9 @@ CNSTI4 7
 ASGNI4
 line 1715
 ;1715:							break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $641
+LABELV $639
 line 1717
 ;1716:						case 2:
 ;1717:							deathAnim = BOTH_DEATH12;//chest left: spin
@@ -7648,9 +7648,9 @@ line 1721
 ;1721:				}
 line 1722
 ;1722:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $642
+LABELV $640
 line 1725
 ;1723:			case HL_CHEST:
 ;1724:			case HL_WAIST:
@@ -7663,7 +7663,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-LEF4 $645
+LEF4 $643
 ADDRLP4 12
 ARGP4
 ADDRLP4 104
@@ -7673,8 +7673,8 @@ ASGNF4
 ADDRLP4 104
 INDIRF4
 CNSTF4 0
-NEF4 $643
-LABELV $645
+NEF4 $641
+LABELV $643
 line 1726
 ;1726:				{
 line 1727
@@ -7703,7 +7703,7 @@ ASGNI4
 ADDRLP4 112
 INDIRI4
 CNSTI4 0
-NEI4 $646
+NEI4 $644
 line 1728
 ;1728:					{
 line 1729
@@ -7713,9 +7713,9 @@ CNSTI4 18
 ASGNI4
 line 1730
 ;1730:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $646
+LABELV $644
 line 1732
 ;1731:					else
 ;1732:					{
@@ -7728,9 +7728,9 @@ line 1734
 ;1734:					}
 line 1735
 ;1735:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $643
+LABELV $641
 line 1736
 ;1736:				else if ( damage <= max_health*0.5 )
 ADDRFP4 8
@@ -7741,7 +7741,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $648
+GTF4 $646
 line 1737
 ;1737:				{
 line 1738
@@ -7751,9 +7751,9 @@ CNSTI4 2
 ASGNI4
 line 1739
 ;1739:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $648
+LABELV $646
 line 1740
 ;1740:				else if ( damage <= max_health*0.75 )
 ADDRFP4 8
@@ -7764,7 +7764,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $650
+GTF4 $648
 line 1741
 ;1741:				{
 line 1742
@@ -7793,7 +7793,7 @@ ASGNI4
 ADDRLP4 112
 INDIRI4
 CNSTI4 0
-NEI4 $652
+NEI4 $650
 line 1743
 ;1743:					{
 line 1744
@@ -7803,9 +7803,9 @@ CNSTI4 1
 ASGNI4
 line 1745
 ;1745:					}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $652
+LABELV $650
 line 1747
 ;1746:					else
 ;1747:					{
@@ -7818,9 +7818,9 @@ line 1749
 ;1749:					}
 line 1750
 ;1750:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $650
+LABELV $648
 line 1752
 ;1751:				else
 ;1752:				{
@@ -7833,9 +7833,9 @@ line 1754
 ;1754:				}
 line 1755
 ;1755:				break;
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $654
+LABELV $652
 line 1757
 ;1756:			case HL_HEAD:
 ;1757:				if ( damage <= max_health*0.5 )
@@ -7847,7 +7847,7 @@ ADDRLP4 8
 INDIRI4
 CVIF4 4
 MULF4
-GTF4 $655
+GTF4 $653
 line 1758
 ;1758:				{
 line 1759
@@ -7857,9 +7857,9 @@ CNSTI4 17
 ASGNI4
 line 1760
 ;1760:				}
-ADDRGP4 $587
+ADDRGP4 $585
 JUMPV
-LABELV $655
+LABELV $653
 line 1762
 ;1761:				else
 ;1762:				{
@@ -7875,20 +7875,20 @@ line 1765
 line 1767
 ;1766:			default:
 ;1767:				break;
-LABELV $587
+LABELV $585
 line 1769
 ;1768:			}
 ;1769:		}
-LABELV $584
+LABELV $582
 line 1770
 ;1770:	}
-LABELV $580
+LABELV $578
 line 1771
 ;1771:	return deathAnim;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $554
+LABELV $552
 endproc G_PickDeathAnim 128 20
 export G_GetJediMaster
 proc G_GetJediMaster 24 0
@@ -7902,9 +7902,9 @@ line 1776
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $661
+ADDRGP4 $659
 JUMPV
-LABELV $660
+LABELV $658
 line 1780
 ;1777:	gentity_t *ent;
 ;1778:
@@ -7931,7 +7931,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $663
+EQU4 $661
 ADDRLP4 16
 CNSTI4 0
 ASGNI4
@@ -7942,7 +7942,7 @@ ADDP4
 INDIRI4
 ADDRLP4 16
 INDIRI4
-EQI4 $663
+EQI4 $661
 ADDRLP4 20
 ADDRLP4 0
 INDIRP4
@@ -7955,7 +7955,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $663
+EQU4 $661
 ADDRLP4 20
 INDIRP4
 CNSTI4 604
@@ -7963,7 +7963,7 @@ ADDP4
 INDIRI4
 ADDRLP4 16
 INDIRI4
-EQI4 $663
+EQI4 $661
 line 1784
 ;1784:		{
 line 1785
@@ -7971,9 +7971,9 @@ line 1785
 ADDRLP4 0
 INDIRP4
 RETP4
-ADDRGP4 $659
+ADDRGP4 $657
 JUMPV
-LABELV $663
+LABELV $661
 line 1788
 ;1786:		}
 ;1787:
@@ -7986,22 +7986,22 @@ ADDI4
 ASGNI4
 line 1789
 ;1789:	}
-LABELV $661
+LABELV $659
 line 1779
 ADDRLP4 4
 INDIRI4
 CNSTI4 32
-LTI4 $660
+LTI4 $658
 line 1791
 ;1790:
 ;1791:	return NULL;
 CNSTP4 0
 RETP4
-LABELV $659
+LABELV $657
 endproc G_GetJediMaster 24 0
 bss
 align 4
-LABELV $906
+LABELV $904
 skip 4
 export player_die
 code
@@ -8043,14 +8043,14 @@ ADDRLP4 44
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $670
+EQU4 $668
 ADDRLP4 44
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $670
+EQI4 $668
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -8060,7 +8060,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $672
+LEI4 $670
 ADDRLP4 40
 ADDRFP4 0
 INDIRP4
@@ -8071,26 +8071,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $673
-JUMPV
-LABELV $672
-ADDRLP4 40
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $673
-ADDRLP4 36
-ADDRLP4 40
-INDIRI4
-ASGNI4
 ADDRGP4 $671
 JUMPV
 LABELV $670
-ADDRLP4 36
+ADDRLP4 40
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $671
+ADDRLP4 36
+ADDRLP4 40
+INDIRI4
+ASGNI4
+ADDRGP4 $669
+JUMPV
+LABELV $668
+ADDRLP4 36
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $669
 ADDRLP4 12
 ADDRLP4 36
 INDIRI4
@@ -8110,7 +8110,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 52
 INDIRU4
-EQU4 $676
+EQU4 $674
 ADDRLP4 48
 INDIRP4
 CNSTI4 408
@@ -8119,11 +8119,11 @@ INDIRP4
 CVPU4 4
 ADDRLP4 52
 INDIRU4
-NEU4 $674
-LABELV $676
-ADDRGP4 $665
-JUMPV
+NEU4 $672
 LABELV $674
+ADDRGP4 $663
+JUMPV
+LABELV $672
 line 1815
 ;1814:
 ;1815:	if ( self->client->ps.pm_type == PM_DEAD ) {
@@ -8141,12 +8141,12 @@ ADDP4
 INDIRI4
 ADDRLP4 56
 INDIRI4
-NEI4 $677
+NEI4 $675
 line 1816
 ;1816:		return;
-ADDRGP4 $665
+ADDRGP4 $663
 JUMPV
-LABELV $677
+LABELV $675
 line 1819
 ;1817:	}
 ;1818:
@@ -8154,12 +8154,12 @@ line 1819
 ADDRGP4 level+9028
 INDIRI4
 CNSTI4 0
-EQI4 $679
+EQI4 $677
 line 1820
 ;1820:		return;
-ADDRGP4 $665
+ADDRGP4 $663
 JUMPV
-LABELV $679
+LABELV $677
 line 1823
 ;1821:	}
 ;1822:
@@ -8177,7 +8177,7 @@ ASGNI4
 ADDRLP4 60
 INDIRI4
 CNSTI4 0
-EQI4 $682
+EQI4 $680
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -8187,11 +8187,11 @@ CNSTI4 22084
 ADDP4
 INDIRI4
 CNSTI4 2
-LTI4 $682
+LTI4 $680
 ADDRFP4 16
 INDIRI4
 CNSTI4 35
-EQI4 $682
+EQI4 $680
 line 1824
 ;1824:		DF_SegmentedRunStatusInvalidated(self);
 ADDRFP4 0
@@ -8202,9 +8202,9 @@ CALLV
 pop
 line 1825
 ;1825:	}
-ADDRGP4 $683
+ADDRGP4 $681
 JUMPV
-LABELV $682
+LABELV $680
 line 1826
 ;1826:	else {
 line 1827
@@ -8219,7 +8219,7 @@ CALLV
 pop
 line 1828
 ;1828:	}
-LABELV $683
+LABELV $681
 line 1830
 ;1829:
 ;1830:	if (g_slowmoDuelEnd.integer && g_gametype.integer == GT_TOURNAMENT && attacker && attacker->inuse && attacker->client)
@@ -8230,11 +8230,11 @@ ADDRGP4 g_slowmoDuelEnd+12
 INDIRI4
 ADDRLP4 64
 INDIRI4
-EQI4 $684
+EQI4 $682
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 3
-NEI4 $684
+NEI4 $682
 ADDRLP4 68
 ADDRFP4 8
 INDIRP4
@@ -8247,7 +8247,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 72
 INDIRU4
-EQU4 $684
+EQU4 $682
 ADDRLP4 68
 INDIRP4
 CNSTI4 412
@@ -8255,7 +8255,7 @@ ADDP4
 INDIRI4
 ADDRLP4 64
 INDIRI4
-EQI4 $684
+EQI4 $682
 ADDRLP4 68
 INDIRP4
 CNSTI4 408
@@ -8264,7 +8264,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 72
 INDIRU4
-EQU4 $684
+EQU4 $682
 line 1831
 ;1831:	{
 line 1832
@@ -8272,7 +8272,7 @@ line 1832
 ADDRGP4 gDoSlowMoDuel
 INDIRI4
 CNSTI4 0
-NEI4 $688
+NEI4 $686
 line 1833
 ;1833:		{
 line 1834
@@ -8288,10 +8288,10 @@ INDIRI4
 ASGNI4
 line 1836
 ;1836:		}
-LABELV $688
+LABELV $686
 line 1837
 ;1837:	}
-LABELV $684
+LABELV $682
 line 1839
 ;1838:
 ;1839:	if (inflictor && inflictor->activator && !inflictor->client && !attacker->client &&
@@ -8307,7 +8307,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-EQU4 $691
+EQU4 $689
 ADDRLP4 84
 ADDRLP4 76
 INDIRP4
@@ -8320,7 +8320,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-EQU4 $691
+EQU4 $689
 ADDRLP4 88
 CNSTI4 408
 ASGNI4
@@ -8333,7 +8333,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-NEU4 $691
+NEU4 $689
 ADDRFP4 8
 INDIRP4
 ADDRLP4 88
@@ -8343,7 +8343,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-NEU4 $691
+NEU4 $689
 ADDRLP4 84
 INDIRP4
 ADDRLP4 88
@@ -8353,21 +8353,21 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-EQU4 $691
+EQU4 $689
 ADDRLP4 84
 INDIRP4
 CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $691
+EQI4 $689
 ADDRLP4 76
 INDIRP4
 CNSTI4 276
 ADDP4
 INDIRI4
 CNSTI4 15
-NEI4 $691
+NEI4 $689
 line 1842
 ;1840:		inflictor->activator->client && inflictor->activator->inuse &&
 ;1841:		inflictor->s.weapon == WP_TURRET)
@@ -8383,7 +8383,7 @@ INDIRP4
 ASGNP4
 line 1844
 ;1844:	}
-LABELV $691
+LABELV $689
 line 1846
 ;1845:
 ;1846:	if (self->client && self->client->ps.isJediMaster)
@@ -8398,14 +8398,14 @@ ADDRLP4 92
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $693
+EQU4 $691
 ADDRLP4 92
 INDIRP4
 CNSTI4 604
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $693
+EQI4 $691
 line 1847
 ;1847:	{
 line 1848
@@ -8415,7 +8415,7 @@ CNSTI4 1
 ASGNI4
 line 1849
 ;1849:	}
-LABELV $693
+LABELV $691
 line 1852
 ;1850:
 ;1851:	//if he was charging or anything else, kill the sound
@@ -8463,7 +8463,7 @@ CVPU4 4
 ADDRLP4 96
 INDIRP4
 CVPU4 4
-EQU4 $697
+EQU4 $695
 ADDRLP4 96
 INDIRP4
 CNSTI4 408
@@ -8471,8 +8471,8 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $695
-LABELV $697
+NEU4 $693
+LABELV $695
 ADDRLP4 100
 ADDRFP4 16
 INDIRI4
@@ -8480,28 +8480,28 @@ ASGNI4
 ADDRLP4 100
 INDIRI4
 CNSTI4 32
-EQI4 $702
+EQI4 $700
 ADDRLP4 100
 INDIRI4
 CNSTI4 34
-EQI4 $702
+EQI4 $700
 ADDRLP4 100
 INDIRI4
 CNSTI4 37
-EQI4 $702
+EQI4 $700
 ADDRLP4 100
 INDIRI4
 CNSTI4 0
-EQI4 $702
+EQI4 $700
 ADDRLP4 100
 INDIRI4
 CNSTI4 31
-EQI4 $702
+EQI4 $700
 ADDRLP4 100
 INDIRI4
 CNSTI4 30
-NEI4 $695
-LABELV $702
+NEI4 $693
+LABELV $700
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -8512,7 +8512,7 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-LEI4 $695
+LEI4 $693
 line 1861
 ;1859:		(meansOfDeath == MOD_CRUSH || meansOfDeath == MOD_FALLING || meansOfDeath == MOD_TRIGGER_HURT || meansOfDeath == MOD_UNKNOWN || meansOfDeath == MOD_LAVA || meansOfDeath == MOD_SLIME) && // TA: Give credit for lava/slime kills too :)
 ;1860:		self->client->ps.otherKillerTime > nowTime)
@@ -8535,7 +8535,7 @@ ADDP4
 ASGNP4
 line 1863
 ;1863:	}
-LABELV $695
+LABELV $693
 line 1866
 ;1864:
 ;1865:	// check for an almost capture
@@ -8585,7 +8585,7 @@ ADDP4
 INDIRI4
 ADDRLP4 112
 INDIRI4
-EQI4 $703
+EQI4 $701
 ADDRLP4 108
 INDIRP4
 CNSTI4 43500
@@ -8596,7 +8596,7 @@ CNSTI4 256
 BANDI4
 ADDRLP4 112
 INDIRI4
-EQI4 $703
+EQI4 $701
 line 1870
 ;1870:		self->client->ps.pm_flags &= ~PMF_STUCK_TO_WALL;
 ADDRLP4 116
@@ -8618,7 +8618,7 @@ BANDI4
 ASGNI4
 line 1871
 ;1871:	}
-LABELV $703
+LABELV $701
 line 1873
 ;1872:
 ;1873:	if ( attacker ) {
@@ -8626,7 +8626,7 @@ ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $705
+EQU4 $703
 line 1874
 ;1874:		killer = attacker->s.number;
 ADDRLP4 4
@@ -8643,7 +8643,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $707
+EQU4 $705
 line 1876
 ;1876:			killerName = attacker->client->pers.netname;
 ADDRLP4 28
@@ -8657,21 +8657,21 @@ ADDP4
 ASGNP4
 line 1877
 ;1877:		} else {
-ADDRGP4 $706
+ADDRGP4 $704
 JUMPV
-LABELV $707
+LABELV $705
 line 1878
 ;1878:			killerName = "<non-client>";
 ADDRLP4 28
-ADDRGP4 $709
+ADDRGP4 $707
 ASGNP4
 line 1879
 ;1879:		}
 line 1880
 ;1880:	} else {
-ADDRGP4 $706
+ADDRGP4 $704
 JUMPV
-LABELV $705
+LABELV $703
 line 1881
 ;1881:		killer = ENTITYNUM_WORLD;
 ADDRLP4 4
@@ -8680,23 +8680,23 @@ ASGNI4
 line 1882
 ;1882:		killerName = "<world>";
 ADDRLP4 28
-ADDRGP4 $710
+ADDRGP4 $708
 ASGNP4
 line 1883
 ;1883:	}
-LABELV $706
+LABELV $704
 line 1885
 ;1884:
 ;1885:	if ( killer < 0 || killer >= MAX_CLIENTS ) {
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-LTI4 $713
+LTI4 $711
 ADDRLP4 4
 INDIRI4
 CNSTI4 32
-LTI4 $711
-LABELV $713
+LTI4 $709
+LABELV $711
 line 1886
 ;1886:		killer = ENTITYNUM_WORLD;
 ADDRLP4 4
@@ -8705,11 +8705,11 @@ ASGNI4
 line 1887
 ;1887:		killerName = "<world>";
 ADDRLP4 28
-ADDRGP4 $710
+ADDRGP4 $708
 ASGNP4
 line 1888
 ;1888:	}
-LABELV $711
+LABELV $709
 line 1890
 ;1889:
 ;1890:	if ( meansOfDeath < 0 || meansOfDeath >= (int)ARRAY_LEN( modNames ) ) {
@@ -8720,22 +8720,22 @@ ASGNI4
 ADDRLP4 120
 INDIRI4
 CNSTI4 0
-LTI4 $716
+LTI4 $714
 ADDRLP4 120
 INDIRI4
 CNSTI4 38
-LTI4 $714
-LABELV $716
+LTI4 $712
+LABELV $714
 line 1891
 ;1891:		obit = "<bad obituary>";
 ADDRLP4 32
-ADDRGP4 $717
+ADDRGP4 $715
 ASGNP4
 line 1892
 ;1892:	} else {
-ADDRGP4 $715
+ADDRGP4 $713
 JUMPV
-LABELV $714
+LABELV $712
 line 1893
 ;1893:		obit = modNames[ meansOfDeath ];
 ADDRLP4 32
@@ -8749,7 +8749,7 @@ INDIRP4
 ASGNP4
 line 1894
 ;1894:	}
-LABELV $715
+LABELV $713
 line 1896
 ;1895:
 ;1896:	if (!self->client->sess.raceMode || (self != attacker && attacker && (attacker - g_entities) < MAX_CLIENTS || g_developer.integer)/* || meansOfDeath != MOD_SUICIDE*/) {
@@ -8766,7 +8766,7 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $722
+EQI4 $720
 ADDRLP4 128
 ADDRFP4 8
 INDIRP4
@@ -8777,11 +8777,11 @@ INDIRP4
 CVPU4 4
 ADDRLP4 128
 INDIRU4
-EQU4 $724
+EQU4 $722
 ADDRLP4 128
 INDIRU4
 CNSTU4 0
-EQU4 $724
+EQU4 $722
 ADDRLP4 128
 INDIRU4
 ADDRGP4 g_entities
@@ -8791,16 +8791,16 @@ CVUI4 4
 CNSTI4 2352
 DIVI4
 CNSTI4 32
-LTI4 $722
-LABELV $724
+LTI4 $720
+LABELV $722
 ADDRGP4 g_developer+12
 INDIRI4
 CNSTI4 0
-EQI4 $718
-LABELV $722
+EQI4 $716
+LABELV $720
 line 1897
 ;1897:		G_LogPrintf("Kill: %i %i %i: %s killed %s by %s\n",
-ADDRGP4 $725
+ADDRGP4 $723
 ARGP4
 ADDRLP4 4
 INDIRI4
@@ -8837,22 +8837,22 @@ line 1900
 ;1898:			killer, self->s.number, meansOfDeath, killerName,
 ;1899:			self->client->pers.netname, obit);
 ;1900:	}
-LABELV $718
+LABELV $716
 line 1902
 ;1901:
 ;1902:	if ( g_austrian.integer 
 ADDRGP4 g_austrian+12
 INDIRI4
 CNSTI4 0
-EQI4 $726
+EQI4 $724
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 3
-NEI4 $726
+NEI4 $724
 ADDRGP4 level+92
 INDIRI4
 CNSTI4 2
-LTI4 $726
+LTI4 $724
 line 1905
 ;1903:		&& g_gametype.integer == GT_TOURNAMENT 
 ;1904:		&& level.numPlayingClients >= 2 )
@@ -8893,7 +8893,7 @@ ADDRLP4 148
 INDIRI4
 ADDP4
 INDIRI4
-LEI4 $738
+LEI4 $736
 ADDRLP4 136
 CNSTI4 53196
 ADDRGP4 level+96
@@ -8906,9 +8906,9 @@ CNSTI4 43684
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $739
+ADDRGP4 $737
 JUMPV
-LABELV $738
+LABELV $736
 ADDRLP4 136
 CNSTI4 53196
 ADDRGP4 level+96+4
@@ -8921,21 +8921,21 @@ CNSTI4 43684
 ADDP4
 INDIRI4
 ASGNI4
-LABELV $739
+LABELV $737
 ADDRLP4 132
 ADDRLP4 136
 INDIRI4
 ASGNI4
 line 1907
 ;1907:		G_LogPrintf("Duel Kill Details:\n");
-ADDRGP4 $740
+ADDRGP4 $738
 ARGP4
 ADDRGP4 G_LogPrintf
 CALLV
 pop
 line 1908
 ;1908:		G_LogPrintf("Kill Time: %d\n", level.time-spawnTime );
-ADDRGP4 $741
+ADDRGP4 $739
 ARGP4
 ADDRGP4 level+36
 INDIRI4
@@ -8948,7 +8948,7 @@ CALLV
 pop
 line 1909
 ;1909:		G_LogPrintf("victim: %s, hits on enemy %d\n", self->client->pers.netname, self->client->ps.persistant[PERS_HITS] );
-ADDRGP4 $743
+ADDRGP4 $741
 ARGP4
 ADDRLP4 152
 ADDRFP4 0
@@ -8985,7 +8985,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 160
 INDIRU4
-EQU4 $744
+EQU4 $742
 ADDRLP4 156
 INDIRP4
 CNSTI4 408
@@ -8994,12 +8994,12 @@ INDIRP4
 CVPU4 4
 ADDRLP4 160
 INDIRU4
-EQU4 $744
+EQU4 $742
 line 1911
 ;1911:		{
 line 1912
 ;1912:			G_LogPrintf("killer: %s, hits on enemy %d, health: %d\n", attacker->client->pers.netname, attacker->client->ps.persistant[PERS_HITS], attacker->health );
-ADDRGP4 $746
+ADDRGP4 $744
 ARGP4
 ADDRLP4 164
 ADDRFP4 8
@@ -9038,12 +9038,12 @@ line 1914
 ADDRFP4 16
 INDIRI4
 CNSTI4 3
-NEI4 $747
+NEI4 $745
 line 1915
 ;1915:			{
 line 1916
 ;1916:				G_LogPrintf("killer saber style: %d, killer saber anim %s\n", attacker->client->ps.fd.saberAnimLevel, animTable[(attacker->client->ps.torsoAnim&~ANIM_TOGGLEBIT)].name );
-ADDRGP4 $749
+ADDRGP4 $747
 ARGP4
 ADDRLP4 172
 ADDRFP4 8
@@ -9076,13 +9076,13 @@ CALLV
 pop
 line 1917
 ;1917:			}
-LABELV $747
+LABELV $745
 line 1918
 ;1918:		}
-LABELV $744
+LABELV $742
 line 1919
 ;1919:	}
-LABELV $726
+LABELV $724
 line 1921
 ;1920:
 ;1921:	G_LogWeaponKill(killer, meansOfDeath);
@@ -9128,7 +9128,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 140
 INDIRU4
-EQU4 $750
+EQU4 $748
 ADDRLP4 136
 INDIRP4
 CNSTI4 408
@@ -9137,14 +9137,14 @@ INDIRP4
 CVPU4 4
 ADDRLP4 140
 INDIRU4
-EQU4 $750
+EQU4 $748
 ADDRLP4 136
 INDIRP4
 CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $750
+EQI4 $748
 line 1924
 ;1924:	{
 line 1925
@@ -9161,7 +9161,7 @@ CALLV
 pop
 line 1926
 ;1926:	}
-LABELV $750
+LABELV $748
 line 1929
 ;1927:
 ;1928:	// broadcast the death event to everyone
@@ -9179,7 +9179,7 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $754
+EQI4 $752
 ADDRLP4 148
 ADDRFP4 8
 INDIRP4
@@ -9190,11 +9190,11 @@ INDIRP4
 CVPU4 4
 ADDRLP4 148
 INDIRU4
-EQU4 $752
+EQU4 $750
 ADDRLP4 148
 INDIRU4
 CNSTU4 0
-EQU4 $752
+EQU4 $750
 ADDRLP4 148
 INDIRU4
 ADDRGP4 g_entities
@@ -9204,8 +9204,8 @@ CVUI4 4
 CNSTI4 2352
 DIVI4
 CNSTI4 32
-GEI4 $752
-LABELV $754
+GEI4 $750
+LABELV $752
 line 1930
 ;1930:		ent = G_TempEntity(self->r.currentOrigin, EV_OBITUARY);
 ADDRFP4 0
@@ -9270,7 +9270,7 @@ INDIRI4
 ASGNI4
 line 1936
 ;1936:	}
-LABELV $752
+LABELV $750
 line 1937
 ;1937:	self->enemy = attacker;
 ADDRFP4 0
@@ -9309,7 +9309,7 @@ CVPU4 4
 ADDRFP4 8
 INDIRP4
 CVPU4 4
-NEU4 $755
+NEU4 $753
 line 1942
 ;1942:	{
 line 1943
@@ -9333,7 +9333,7 @@ ADDI4
 ASGNI4
 line 1944
 ;1944:	}
-LABELV $755
+LABELV $753
 line 1946
 ;1945:
 ;1946:	if (attacker && attacker->client) {
@@ -9349,7 +9349,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 160
 INDIRU4
-EQU4 $757
+EQU4 $755
 ADDRLP4 156
 INDIRP4
 CNSTI4 408
@@ -9358,7 +9358,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 160
 INDIRU4
-EQU4 $757
+EQU4 $755
 line 1947
 ;1947:		attacker->client->lastkilled_client = self->s.number;
 ADDRFP4 8
@@ -9389,7 +9389,7 @@ CVPU4 4
 ADDRLP4 168
 INDIRP4
 CVPU4 4
-EQU4 $761
+EQU4 $759
 ADDRLP4 168
 INDIRP4
 ARGP4
@@ -9403,14 +9403,14 @@ ASGNI4
 ADDRLP4 172
 INDIRI4
 CNSTI4 0
-EQI4 $759
-LABELV $761
+EQI4 $757
+LABELV $759
 line 1950
 ;1950:			if (g_gametype.integer == GT_TOURNAMENT)
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 3
-NEI4 $762
+NEI4 $760
 line 1951
 ;1951:			{ //in duel, if you kill yourself, the person you are dueling against gets a kill for it
 line 1952
@@ -9425,7 +9425,7 @@ INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $765
+NEI4 $763
 line 1954
 ;1954:				{
 line 1955
@@ -9436,9 +9436,9 @@ INDIRI4
 ASGNI4
 line 1956
 ;1956:				}
-ADDRGP4 $766
+ADDRGP4 $764
 JUMPV
-LABELV $765
+LABELV $763
 line 1957
 ;1957:				else if (level.sortedClients[1] == self->s.number)
 ADDRGP4 level+96+4
@@ -9446,7 +9446,7 @@ INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $770
+NEI4 $768
 line 1958
 ;1958:				{
 line 1959
@@ -9457,8 +9457,8 @@ INDIRI4
 ASGNI4
 line 1960
 ;1960:				}
-LABELV $770
-LABELV $766
+LABELV $768
+LABELV $764
 line 1962
 ;1961:
 ;1962:				if (otherClNum >= 0 && otherClNum < MAX_CLIENTS &&
@@ -9473,11 +9473,11 @@ ADDRLP4 180
 INDIRI4
 ADDRLP4 184
 INDIRI4
-LTI4 $775
+LTI4 $773
 ADDRLP4 180
 INDIRI4
 CNSTI4 32
-GEI4 $775
+GEI4 $773
 ADDRLP4 188
 CNSTI4 2352
 ADDRLP4 180
@@ -9491,7 +9491,7 @@ ADDP4
 INDIRI4
 ADDRLP4 184
 INDIRI4
-EQI4 $775
+EQI4 $773
 ADDRLP4 188
 INDIRI4
 ADDRGP4 g_entities+408
@@ -9499,13 +9499,13 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $775
+EQU4 $773
 ADDRLP4 180
 INDIRI4
 ADDRFP4 8
 INDIRP4
 INDIRI4
-EQI4 $775
+EQI4 $773
 line 1965
 ;1963:					g_entities[otherClNum].inuse && g_entities[otherClNum].client &&
 ;1964:					otherClNum != attacker->s.number)
@@ -9531,9 +9531,9 @@ CALLV
 pop
 line 1967
 ;1967:				}
-ADDRGP4 $763
+ADDRGP4 $761
 JUMPV
-LABELV $775
+LABELV $773
 line 1969
 ;1968:				else
 ;1969:				{
@@ -9548,7 +9548,7 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $763
+NEI4 $761
 line 1971
 ;1971:						AddScore(attacker, self->r.currentOrigin, -1);
 ADDRFP4 8
@@ -9568,9 +9568,9 @@ line 1972
 ;1972:				}
 line 1973
 ;1973:			}
-ADDRGP4 $763
+ADDRGP4 $761
 JUMPV
-LABELV $762
+LABELV $760
 line 1975
 ;1974:			else
 ;1975:			{
@@ -9597,7 +9597,7 @@ CVPU4 4
 ADDRFP4 0
 INDIRP4
 CVPU4 4
-EQU4 $781
+EQU4 $779
 line 1978
 ;1978:					if (!attacker->client->sess.raceMode) {
 ADDRFP4 8
@@ -9609,7 +9609,7 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $782
+NEI4 $780
 line 1979
 ;1979:						AddScore(attacker, self->r.currentOrigin, -1);
 ADDRFP4 8
@@ -9631,19 +9631,19 @@ line 1982
 ;1982:					}
 line 1983
 ;1983:				}
-ADDRGP4 $782
+ADDRGP4 $780
 JUMPV
-LABELV $781
+LABELV $779
 line 1984
 ;1984:				else if (g_gametype.integer != GT_FFA && (g_gametype.integer != GT_CTF)){// || !g_fixCTFScores.integer)) {//we selfkilled
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 0
-EQI4 $785
+EQI4 $783
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 7
-EQI4 $785
+EQI4 $783
 line 1985
 ;1985:					if (!attacker->client->sess.raceMode)
 ADDRFP4 8
@@ -9655,7 +9655,7 @@ CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $789
+NEI4 $787
 line 1986
 ;1986:						AddScore(attacker, self->r.currentOrigin, -1); //Only take away a point if its not FFA or CTF i guess, sure
 ADDRFP4 8
@@ -9671,20 +9671,20 @@ ARGI4
 ADDRGP4 AddScore
 CALLV
 pop
-LABELV $789
+LABELV $787
 line 1987
 ;1987:				}
-LABELV $785
-LABELV $782
+LABELV $783
+LABELV $780
 line 1988
 ;1988:			}
-LABELV $763
+LABELV $761
 line 1989
 ;1989:			if (g_gametype.integer == GT_JEDIMASTER)
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 2
-NEI4 $758
+NEI4 $756
 line 1990
 ;1990:			{
 line 1991
@@ -9700,14 +9700,14 @@ ADDRLP4 176
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $758
+EQU4 $756
 ADDRLP4 176
 INDIRP4
 CNSTI4 604
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $758
+EQI4 $756
 line 1992
 ;1992:				{ //killed ourself so return the saber to the original position
 line 1995
@@ -9739,15 +9739,15 @@ line 1998
 ;1998:			}
 line 1999
 ;1999:		} else {
-ADDRGP4 $758
+ADDRGP4 $756
 JUMPV
-LABELV $759
+LABELV $757
 line 2000
 ;2000:			if (g_gametype.integer == GT_JEDIMASTER)
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 2
-NEI4 $796
+NEI4 $794
 line 2001
 ;2001:			{
 line 2002
@@ -9773,7 +9773,7 @@ ADDP4
 INDIRI4
 ADDRLP4 184
 INDIRI4
-NEI4 $801
+NEI4 $799
 ADDRLP4 188
 ADDRFP4 0
 INDIRP4
@@ -9786,7 +9786,7 @@ ADDRLP4 188
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $799
+EQU4 $797
 ADDRLP4 188
 INDIRP4
 ADDRLP4 180
@@ -9795,8 +9795,8 @@ ADDP4
 INDIRI4
 ADDRLP4 184
 INDIRI4
-EQI4 $799
-LABELV $801
+EQI4 $797
+LABELV $799
 line 2004
 ;2003:					(self->client && self->client->ps.isJediMaster))
 ;2004:				{
@@ -9829,14 +9829,14 @@ ADDRLP4 192
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $797
+EQU4 $795
 ADDRLP4 192
 INDIRP4
 CNSTI4 604
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $797
+EQI4 $795
 line 2008
 ;2008:					{
 line 2009
@@ -9865,9 +9865,9 @@ line 2011
 ;2011:					}
 line 2012
 ;2012:				}
-ADDRGP4 $797
+ADDRGP4 $795
 JUMPV
-LABELV $799
+LABELV $797
 line 2014
 ;2013:				else
 ;2014:				{
@@ -9896,7 +9896,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 204
 INDIRU4
-EQU4 $797
+EQU4 $795
 ADDRLP4 200
 INDIRP4
 CNSTI4 408
@@ -9905,7 +9905,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 204
 INDIRU4
-EQU4 $797
+EQU4 $795
 line 2018
 ;2018:					{
 line 2019
@@ -9929,9 +9929,9 @@ line 2021
 ;2021:				}
 line 2022
 ;2022:			}
-ADDRGP4 $797
+ADDRGP4 $795
 JUMPV
-LABELV $796
+LABELV $794
 line 2024
 ;2023:			else
 ;2024:			{
@@ -9952,14 +9952,14 @@ CALLV
 pop
 line 2026
 ;2026:			}
-LABELV $797
+LABELV $795
 line 2028
 ;2027:
 ;2028:			if( meansOfDeath == MOD_STUN_BATON ) {
 ADDRFP4 16
 INDIRI4
 CNSTI4 1
-NEI4 $806
+NEI4 $804
 line 2031
 ;2029:				
 ;2030:				// play humiliation on player
@@ -10034,14 +10034,14 @@ ADDRLP4 196
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $812
+EQU4 $810
 ADDRLP4 196
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $812
+EQI4 $810
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10051,7 +10051,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $814
+LEI4 $812
 ADDRLP4 192
 ADDRFP4 8
 INDIRP4
@@ -10062,26 +10062,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $815
-JUMPV
-LABELV $814
-ADDRLP4 192
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $815
-ADDRLP4 188
-ADDRLP4 192
-INDIRI4
-ASGNI4
 ADDRGP4 $813
 JUMPV
 LABELV $812
-ADDRLP4 188
+ADDRLP4 192
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $813
+ADDRLP4 188
+ADDRLP4 192
+INDIRI4
+ASGNI4
+ADDRGP4 $811
+JUMPV
+LABELV $810
+ADDRLP4 188
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $811
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10117,7 +10117,7 @@ BXORI4
 ASGNI4
 line 2040
 ;2040:			}
-LABELV $806
+LABELV $804
 line 2044
 ;2041:
 ;2042:			// check for two kills in a short amount of time
@@ -10134,14 +10134,14 @@ ADDRLP4 184
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $822
+EQU4 $820
 ADDRLP4 184
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $822
+EQI4 $820
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10151,7 +10151,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $824
+LEI4 $822
 ADDRLP4 180
 ADDRFP4 8
 INDIRP4
@@ -10162,26 +10162,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $825
-JUMPV
-LABELV $824
-ADDRLP4 180
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $825
-ADDRLP4 176
-ADDRLP4 180
-INDIRI4
-ASGNI4
 ADDRGP4 $823
 JUMPV
 LABELV $822
-ADDRLP4 176
+ADDRLP4 180
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $823
+ADDRLP4 176
+ADDRLP4 180
+INDIRI4
+ASGNI4
+ADDRGP4 $821
+JUMPV
+LABELV $820
+ADDRLP4 176
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $821
 ADDRLP4 176
 INDIRI4
 ADDRFP4 8
@@ -10194,7 +10194,7 @@ ADDP4
 INDIRI4
 SUBI4
 CNSTI4 3000
-GEI4 $816
+GEI4 $814
 line 2046
 ;2045:				// play excellent on player
 ;2046:				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
@@ -10268,14 +10268,14 @@ ADDRLP4 208
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $830
+EQU4 $828
 ADDRLP4 208
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $830
+EQI4 $828
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10285,7 +10285,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $832
+LEI4 $830
 ADDRLP4 204
 ADDRFP4 8
 INDIRP4
@@ -10296,26 +10296,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $833
-JUMPV
-LABELV $832
-ADDRLP4 204
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $833
-ADDRLP4 200
-ADDRLP4 204
-INDIRI4
-ASGNI4
 ADDRGP4 $831
 JUMPV
 LABELV $830
-ADDRLP4 200
+ADDRLP4 204
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $831
+ADDRLP4 200
+ADDRLP4 204
+INDIRI4
+ASGNI4
+ADDRGP4 $829
+JUMPV
+LABELV $828
+ADDRLP4 200
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $829
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10330,7 +10330,7 @@ ADDI4
 ASGNI4
 line 2052
 ;2052:			}
-LABELV $816
+LABELV $814
 line 2053
 ;2053:			attacker->client->lastKillTime = LEVELTIME(attacker->client);
 ADDRLP4 196
@@ -10344,14 +10344,14 @@ ADDRLP4 196
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $838
+EQU4 $836
 ADDRLP4 196
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $838
+EQI4 $836
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10361,7 +10361,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $840
+LEI4 $838
 ADDRLP4 192
 ADDRFP4 8
 INDIRP4
@@ -10372,26 +10372,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $841
-JUMPV
-LABELV $840
-ADDRLP4 192
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $841
-ADDRLP4 188
-ADDRLP4 192
-INDIRI4
-ASGNI4
 ADDRGP4 $839
 JUMPV
 LABELV $838
-ADDRLP4 188
+ADDRLP4 192
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $839
+ADDRLP4 188
+ADDRLP4 192
+INDIRI4
+ASGNI4
+ADDRGP4 $837
+JUMPV
+LABELV $836
+ADDRLP4 188
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $837
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -10407,9 +10407,9 @@ line 2055
 ;2055:		}
 line 2056
 ;2056:	} else {
-ADDRGP4 $758
+ADDRGP4 $756
 JUMPV
-LABELV $757
+LABELV $755
 line 2057
 ;2057:		if (self->client && self->client->ps.isJediMaster)
 ADDRLP4 164
@@ -10423,14 +10423,14 @@ ADDRLP4 164
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $842
+EQU4 $840
 ADDRLP4 164
 INDIRP4
 CNSTI4 604
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $842
+EQI4 $840
 line 2058
 ;2058:		{ //killed ourself so return the saber to the original position
 line 2061
@@ -10458,14 +10458,14 @@ CNSTI4 0
 ASGNI4
 line 2063
 ;2063:		}
-LABELV $842
+LABELV $840
 line 2065
 ;2064:
 ;2065:		if (g_gametype.integer == GT_TOURNAMENT)
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 3
-NEI4 $844
+NEI4 $842
 line 2066
 ;2066:		{ //in duel, if you kill yourself, the person you are dueling against gets a kill for it
 line 2067
@@ -10480,7 +10480,7 @@ INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $847
+NEI4 $845
 line 2069
 ;2069:			{
 line 2070
@@ -10491,9 +10491,9 @@ INDIRI4
 ASGNI4
 line 2071
 ;2071:			}
-ADDRGP4 $848
+ADDRGP4 $846
 JUMPV
-LABELV $847
+LABELV $845
 line 2072
 ;2072:			else if (level.sortedClients[1] == self->s.number)
 ADDRGP4 level+96+4
@@ -10501,7 +10501,7 @@ INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $852
+NEI4 $850
 line 2073
 ;2073:			{
 line 2074
@@ -10512,8 +10512,8 @@ INDIRI4
 ASGNI4
 line 2075
 ;2075:			}
-LABELV $852
-LABELV $848
+LABELV $850
+LABELV $846
 line 2077
 ;2076:
 ;2077:			if (otherClNum >= 0 && otherClNum < MAX_CLIENTS &&
@@ -10528,11 +10528,11 @@ ADDRLP4 172
 INDIRI4
 ADDRLP4 176
 INDIRI4
-LTI4 $857
+LTI4 $855
 ADDRLP4 172
 INDIRI4
 CNSTI4 32
-GEI4 $857
+GEI4 $855
 ADDRLP4 180
 CNSTI4 2352
 ADDRLP4 172
@@ -10546,7 +10546,7 @@ ADDP4
 INDIRI4
 ADDRLP4 176
 INDIRI4
-EQI4 $857
+EQI4 $855
 ADDRLP4 180
 INDIRI4
 ADDRGP4 g_entities+408
@@ -10554,13 +10554,13 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $857
+EQU4 $855
 ADDRLP4 172
 INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-EQI4 $857
+EQI4 $855
 line 2080
 ;2078:				g_entities[otherClNum].inuse && g_entities[otherClNum].client &&
 ;2079:				otherClNum != self->s.number)
@@ -10586,9 +10586,9 @@ CALLV
 pop
 line 2082
 ;2082:			}
-ADDRGP4 $845
+ADDRGP4 $843
 JUMPV
-LABELV $857
+LABELV $855
 line 2084
 ;2083:			else
 ;2084:			{
@@ -10615,9 +10615,9 @@ line 2086
 ;2086:			}
 line 2087
 ;2087:		}
-ADDRGP4 $845
+ADDRGP4 $843
 JUMPV
-LABELV $844
+LABELV $842
 line 2089
 ;2088:		else
 ;2089:		{
@@ -10642,10 +10642,10 @@ CALLV
 pop
 line 2091
 ;2091:		}
-LABELV $845
+LABELV $843
 line 2092
 ;2092:	}
-LABELV $758
+LABELV $756
 line 2094
 ;2093:
 ;2094:	if ((self->client->ps.powerups[PW_REDFLAG] || self->client->ps.powerups[PW_BLUEFLAG] || self->client->ps.powerups[PW_NEUTRALFLAG]) && self->client->sess.mode == MODE_IRONMAN && self != attacker) {	// only happens in standard CTF
@@ -10666,7 +10666,7 @@ ADDP4
 INDIRI4
 ADDRLP4 168
 INDIRI4
-NEI4 $864
+NEI4 $862
 ADDRLP4 164
 INDIRP4
 CNSTI4 364
@@ -10674,7 +10674,7 @@ ADDP4
 INDIRI4
 ADDRLP4 168
 INDIRI4
-NEI4 $864
+NEI4 $862
 ADDRLP4 164
 INDIRP4
 CNSTI4 368
@@ -10682,8 +10682,8 @@ ADDP4
 INDIRI4
 ADDRLP4 168
 INDIRI4
-EQI4 $861
-LABELV $864
+EQI4 $859
+LABELV $862
 ADDRLP4 172
 ADDRFP4 0
 INDIRP4
@@ -10697,14 +10697,14 @@ CNSTI4 43484
 ADDP4
 INDIRI4
 CNSTI4 5
-NEI4 $861
+NEI4 $859
 ADDRLP4 172
 INDIRP4
 CVPU4 4
 ADDRFP4 8
 INDIRP4
 CVPU4 4
-EQU4 $861
+EQU4 $859
 line 2095
 ;2095:		if (attacker->client) {
 ADDRFP4 8
@@ -10714,7 +10714,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $865
+EQU4 $863
 line 2096
 ;2096:			if (self->client->ps.powerups[PW_REDFLAG]) {
 ADDRFP4 0
@@ -10726,7 +10726,7 @@ CNSTI4 360
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $867
+EQI4 $865
 line 2097
 ;2097:				PrintCTFMessage(attacker->s.number, TEAM_BLUE, CTFMESSAGE_FRAGGED_FLAG_CARRIER);
 ADDRFP4 8
@@ -10742,9 +10742,9 @@ CALLP4
 pop
 line 2098
 ;2098:			}
-ADDRGP4 $868
+ADDRGP4 $866
 JUMPV
-LABELV $867
+LABELV $865
 line 2099
 ;2099:			else if (self->client->ps.powerups[PW_BLUEFLAG]) {
 ADDRFP4 0
@@ -10756,7 +10756,7 @@ CNSTI4 364
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $869
+EQI4 $867
 line 2100
 ;2100:				PrintCTFMessage(attacker->s.number, TEAM_RED, CTFMESSAGE_FRAGGED_FLAG_CARRIER);
 ADDRFP4 8
@@ -10772,8 +10772,8 @@ CALLP4
 pop
 line 2101
 ;2101:			}
-LABELV $869
-LABELV $868
+LABELV $867
+LABELV $866
 line 2102
 ;2102:			AddScore(attacker, self->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 ADDRFP4 8
@@ -10791,7 +10791,7 @@ CALLV
 pop
 line 2103
 ;2103:		}
-LABELV $865
+LABELV $863
 line 2104
 ;2104:		level.lastIronManKilled = level.time;
 ADDRGP4 level+30576
@@ -10800,9 +10800,9 @@ INDIRI4
 ASGNI4
 line 2105
 ;2105:	}
-ADDRGP4 $862
+ADDRGP4 $860
 JUMPV
-LABELV $861
+LABELV $859
 line 2106
 ;2106:	else if (self->client->sess.mode == MODE_IRONMAN && attacker && attacker->client && attacker->client->sess.mode == MODE_IRONMAN && attacker->client->isIronMan && attacker != self) {
 ADDRLP4 176
@@ -10830,7 +10830,7 @@ ADDP4
 INDIRI4
 ADDRLP4 188
 INDIRI4
-NEI4 $873
+NEI4 $871
 ADDRLP4 192
 ADDRFP4 8
 INDIRP4
@@ -10847,7 +10847,7 @@ ADDRLP4 196
 INDIRU4
 ADDRLP4 200
 INDIRU4
-EQU4 $873
+EQU4 $871
 ADDRLP4 204
 ADDRLP4 192
 INDIRP4
@@ -10861,7 +10861,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 200
 INDIRU4
-EQU4 $873
+EQU4 $871
 ADDRLP4 204
 INDIRP4
 ADDRLP4 184
@@ -10870,20 +10870,20 @@ ADDP4
 INDIRI4
 ADDRLP4 188
 INDIRI4
-NEI4 $873
+NEI4 $871
 ADDRLP4 204
 INDIRP4
 CNSTI4 53188
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $873
+EQI4 $871
 ADDRLP4 196
 INDIRU4
 ADDRLP4 176
 INDIRP4
 CVPU4 4
-EQU4 $873
+EQU4 $871
 line 2108
 ;2107:		// give shield bonus to iron man if he kills someone
 ;2108:		if (attacker->client->ps.stats[STAT_ARMOR] < 100) {
@@ -10896,7 +10896,7 @@ CNSTI4 236
 ADDP4
 INDIRI4
 CNSTI4 100
-GEI4 $874
+GEI4 $872
 line 2109
 ;2109:			attacker->client->ps.stats[STAT_ARMOR] += 20;
 ADDRLP4 208
@@ -10927,7 +10927,7 @@ CNSTI4 236
 ADDP4
 INDIRI4
 CNSTI4 100
-LEI4 $874
+LEI4 $872
 line 2111
 ;2111:				attacker->client->ps.stats[STAT_ARMOR] = 100;
 ADDRFP4 8
@@ -10945,9 +10945,9 @@ line 2113
 ;2113:		}
 line 2114
 ;2114:	}
-ADDRGP4 $874
+ADDRGP4 $872
 JUMPV
-LABELV $873
+LABELV $871
 line 2115
 ;2115:	else {
 line 2117
@@ -10967,8 +10967,8 @@ CALLV
 pop
 line 2118
 ;2118:	}
-LABELV $874
-LABELV $862
+LABELV $872
+LABELV $860
 line 2122
 ;2119:
 ;2120:
@@ -10977,7 +10977,7 @@ line 2122
 ADDRFP4 16
 INDIRI4
 CNSTI4 35
-NEI4 $879
+NEI4 $877
 line 2123
 ;2123:		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
 ADDRFP4 0
@@ -10989,7 +10989,7 @@ CNSTI4 368
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $881
+EQI4 $879
 line 2124
 ;2124:			Team_ReturnFlag( TEAM_FREE );
 CNSTI4 0
@@ -11010,9 +11010,9 @@ CNSTI4 0
 ASGNI4
 line 2126
 ;2126:		}
-ADDRGP4 $882
+ADDRGP4 $880
 JUMPV
-LABELV $881
+LABELV $879
 line 2127
 ;2127:		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
 ADDRFP4 0
@@ -11024,7 +11024,7 @@ CNSTI4 360
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $883
+EQI4 $881
 line 2128
 ;2128:			Team_ReturnFlag( TEAM_RED );
 CNSTI4 1
@@ -11045,9 +11045,9 @@ CNSTI4 0
 ASGNI4
 line 2130
 ;2130:		}
-ADDRGP4 $884
+ADDRGP4 $882
 JUMPV
-LABELV $883
+LABELV $881
 line 2131
 ;2131:		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
 ADDRFP4 0
@@ -11059,7 +11059,7 @@ CNSTI4 364
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $885
+EQI4 $883
 line 2132
 ;2132:			Team_ReturnFlag( TEAM_BLUE );
 CNSTI4 2
@@ -11080,12 +11080,12 @@ CNSTI4 0
 ASGNI4
 line 2134
 ;2134:		}
-LABELV $885
-LABELV $884
+LABELV $883
 LABELV $882
+LABELV $880
 line 2135
 ;2135:	}
-LABELV $879
+LABELV $877
 line 2138
 ;2136:
 ;2137:	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
@@ -11116,7 +11116,7 @@ CNSTI4 2048
 BANDI4
 ADDRLP4 212
 INDIRI4
-NEI4 $887
+NEI4 $885
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -11127,7 +11127,7 @@ ADDP4
 INDIRI4
 ADDRLP4 212
 INDIRI4
-NEI4 $887
+NEI4 $885
 line 2140
 ;2140:		TossClientItems( self );
 ADDRFP4 0
@@ -11138,9 +11138,9 @@ CALLV
 pop
 line 2141
 ;2141:	}
-ADDRGP4 $888
+ADDRGP4 $886
 JUMPV
-LABELV $887
+LABELV $885
 line 2142
 ;2142:	else {
 line 2143
@@ -11154,7 +11154,7 @@ CNSTI4 368
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $889
+EQI4 $887
 line 2144
 ;2144:			Team_ReturnFlag( TEAM_FREE );
 CNSTI4 0
@@ -11164,9 +11164,9 @@ CALLV
 pop
 line 2145
 ;2145:		}
-ADDRGP4 $890
+ADDRGP4 $888
 JUMPV
-LABELV $889
+LABELV $887
 line 2146
 ;2146:		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
 ADDRFP4 0
@@ -11178,7 +11178,7 @@ CNSTI4 360
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $891
+EQI4 $889
 line 2147
 ;2147:			Team_ReturnFlag( TEAM_RED );
 CNSTI4 1
@@ -11188,9 +11188,9 @@ CALLV
 pop
 line 2148
 ;2148:		}
-ADDRGP4 $892
+ADDRGP4 $890
 JUMPV
-LABELV $891
+LABELV $889
 line 2149
 ;2149:		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
 ADDRFP4 0
@@ -11202,7 +11202,7 @@ CNSTI4 364
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $893
+EQI4 $891
 line 2150
 ;2150:			Team_ReturnFlag( TEAM_BLUE );
 CNSTI4 2
@@ -11212,12 +11212,12 @@ CALLV
 pop
 line 2151
 ;2151:		}
-LABELV $893
-LABELV $892
+LABELV $891
 LABELV $890
+LABELV $888
 line 2152
 ;2152:	}
-LABELV $888
+LABELV $886
 line 2154
 ;2153:
 ;2154:	Cmd_Score_f( self );		// show scores
@@ -11234,9 +11234,9 @@ line 2157
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $898
+ADDRGP4 $896
 JUMPV
-LABELV $895
+LABELV $893
 line 2160
 ;2158:		gclient_t	*client;
 ;2159:
@@ -11258,12 +11258,12 @@ CNSTI4 1380
 ADDP4
 INDIRI4
 CNSTI4 2
-EQI4 $900
+EQI4 $898
 line 2162
 ;2162:			continue;
-ADDRGP4 $896
+ADDRGP4 $894
 JUMPV
-LABELV $900
+LABELV $898
 line 2164
 ;2163:		}
 ;2164:		if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
@@ -11273,12 +11273,12 @@ CNSTI4 43440
 ADDP4
 INDIRI4
 CNSTI4 3
-EQI4 $902
+EQI4 $900
 line 2165
 ;2165:			continue;
-ADDRGP4 $896
+ADDRGP4 $894
 JUMPV
-LABELV $902
+LABELV $900
 line 2167
 ;2166:		}
 ;2167:		if ( client->sess.spectatorClient == self->s.number ) {
@@ -11290,7 +11290,7 @@ INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $904
+NEI4 $902
 line 2168
 ;2168:			Cmd_Score_f( g_entities + i );
 CNSTI4 2352
@@ -11305,10 +11305,10 @@ CALLV
 pop
 line 2169
 ;2169:		}
-LABELV $904
+LABELV $902
 line 2170
 ;2170:	}
-LABELV $896
+LABELV $894
 line 2157
 ADDRLP4 0
 ADDRLP4 0
@@ -11316,12 +11316,12 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $898
+LABELV $896
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-LTI4 $895
+LTI4 $893
 line 2172
 ;2171:
 ;2172:	self->takedamage = qtrue;	// can still be gibbed
@@ -11492,24 +11492,24 @@ line 2211
 ;2210:
 ;2211:		switch ( i ) {
 ADDRLP4 220
-ADDRGP4 $906
+ADDRGP4 $904
 INDIRI4
 ASGNI4
 ADDRLP4 220
 INDIRI4
 CNSTI4 0
-EQI4 $909
+EQI4 $907
 ADDRLP4 220
 INDIRI4
 CNSTI4 1
-EQI4 $910
+EQI4 $908
 ADDRLP4 220
 INDIRI4
 CNSTI4 2
-EQI4 $911
-ADDRGP4 $907
+EQI4 $909
+ADDRGP4 $905
 JUMPV
-LABELV $909
+LABELV $907
 line 2213
 ;2212:		case 0:
 ;2213:			anim = BOTH_DEATH1;
@@ -11518,9 +11518,9 @@ CNSTI4 1
 ASGNI4
 line 2214
 ;2214:			break;
-ADDRGP4 $908
+ADDRGP4 $906
 JUMPV
-LABELV $910
+LABELV $908
 line 2216
 ;2215:		case 1:
 ;2216:			anim = BOTH_DEATH2;
@@ -11529,10 +11529,10 @@ CNSTI4 2
 ASGNI4
 line 2217
 ;2217:			break;
-ADDRGP4 $908
+ADDRGP4 $906
 JUMPV
-LABELV $911
-LABELV $907
+LABELV $909
+LABELV $905
 line 2220
 ;2218:		case 2:
 ;2219:		default:
@@ -11542,7 +11542,7 @@ CNSTI4 3
 ASGNI4
 line 2221
 ;2221:			break;
-LABELV $908
+LABELV $906
 line 2224
 ;2222:		}
 ;2223:		
@@ -11581,7 +11581,7 @@ line 2226
 ADDRLP4 8
 INDIRI4
 CNSTI4 1
-GEI4 $912
+GEI4 $910
 line 2227
 ;2227:		{
 line 2228
@@ -11591,14 +11591,14 @@ CNSTI4 1
 ASGNI4
 line 2229
 ;2229:		}
-LABELV $912
+LABELV $910
 line 2231
 ;2230:
 ;2231:		if (meansOfDeath == MOD_SABER)
 ADDRFP4 16
 INDIRI4
 CNSTI4 3
-NEI4 $914
+NEI4 $912
 line 2232
 ;2232:		{
 line 2233
@@ -11626,7 +11626,7 @@ CALLV
 pop
 line 2234
 ;2234:		}
-LABELV $914
+LABELV $912
 line 2238
 ;2235:
 ;2236:		// for the no-blood option, we need to prevent the health
@@ -11638,7 +11638,7 @@ CNSTI4 688
 ADDP4
 INDIRI4
 CNSTI4 -40
-GTI4 $916
+GTI4 $914
 line 2239
 ;2239:			self->health = GIB_HEALTH+1;
 ADDRFP4 0
@@ -11649,7 +11649,7 @@ CNSTI4 -39
 ASGNI4
 line 2240
 ;2240:		}
-LABELV $916
+LABELV $914
 line 2242
 ;2241:
 ;2242:		self->client->respawnTime = nowTime + 1000;//((self->client->animations[anim].numFrames*40)/(50.0f / self->client->animations[anim].frameLerp))+300;
@@ -11737,7 +11737,7 @@ line 2254
 ADDRLP4 20
 INDIRI4
 CNSTI4 0
-EQI4 $918
+EQI4 $916
 line 2255
 ;2255:		{
 line 2256
@@ -11745,7 +11745,7 @@ line 2256
 ADDRFP4 0
 INDIRP4
 ARGP4
-ADDRGP4 $906
+ADDRGP4 $904
 INDIRI4
 CNSTI4 78
 ADDI4
@@ -11757,9 +11757,9 @@ CALLV
 pop
 line 2257
 ;2257:		}
-ADDRGP4 $919
+ADDRGP4 $917
 JUMPV
-LABELV $918
+LABELV $916
 line 2259
 ;2258:		else
 ;2259:		{
@@ -11768,7 +11768,7 @@ line 2260
 ADDRFP4 0
 INDIRP4
 ARGP4
-ADDRGP4 $906
+ADDRGP4 $904
 INDIRI4
 CNSTI4 78
 ADDI4
@@ -11780,7 +11780,7 @@ CALLV
 pop
 line 2261
 ;2261:		}
-LABELV $919
+LABELV $917
 line 2264
 ;2262:
 ;2263:		// the body can still be gibbed
@@ -11806,7 +11806,7 @@ line 2270
 ;2269:		// globally cycle through the different death animations
 ;2270:		i = ( i + 1 ) % 3;
 ADDRLP4 248
-ADDRGP4 $906
+ADDRGP4 $904
 ASGNP4
 ADDRLP4 248
 INDIRP4
@@ -11854,7 +11854,7 @@ pop
 line 2277
 ;2276:
 ;2277:}
-LABELV $665
+LABELV $663
 endproc player_die 252 28
 export CheckArmor
 proc CheckArmor 20 4
@@ -11877,14 +11877,14 @@ line 2291
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 line 2292
 ;2292:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $920
+ADDRGP4 $918
 JUMPV
-LABELV $921
+LABELV $919
 line 2294
 ;2293:
 ;2294:	client = ent->client;
@@ -11902,14 +11902,14 @@ ADDRLP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $923
+NEU4 $921
 line 2297
 ;2297:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $920
+ADDRGP4 $918
 JUMPV
-LABELV $923
+LABELV $921
 line 2299
 ;2298:
 ;2299:	if (dflags & DAMAGE_NO_ARMOR)
@@ -11918,14 +11918,14 @@ INDIRI4
 CNSTI4 2
 BANDI4
 CNSTI4 0
-EQI4 $925
+EQI4 $923
 line 2300
 ;2300:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $920
+ADDRGP4 $918
 JUMPV
-LABELV $925
+LABELV $923
 line 2303
 ;2301:
 ;2302:	// armor
@@ -11945,7 +11945,7 @@ INDIRI4
 CNSTI4 1024
 BANDI4
 CNSTI4 0
-EQI4 $927
+EQI4 $925
 line 2306
 ;2306:	{	// Half the damage gets absorbed by the shields, rather than 100%
 line 2307
@@ -11967,9 +11967,9 @@ CVFI4 4
 ASGNI4
 line 2308
 ;2308:	}
-ADDRGP4 $928
+ADDRGP4 $926
 JUMPV
-LABELV $927
+LABELV $925
 line 2310
 ;2309:	else
 ;2310:	{	// All the damage gets absorbed by the shields.
@@ -11981,7 +11981,7 @@ INDIRI4
 ASGNI4
 line 2312
 ;2312:	}
-LABELV $928
+LABELV $926
 line 2315
 ;2313:
 ;2314:	// save is the most damage that the armor is elibigle to protect, of course, but it's limited by the total armor.
@@ -11990,28 +11990,28 @@ ADDRLP4 0
 INDIRI4
 ADDRLP4 8
 INDIRI4
-LTI4 $929
+LTI4 $927
 line 2316
 ;2316:		save = count;
 ADDRLP4 0
 ADDRLP4 8
 INDIRI4
 ASGNI4
-LABELV $929
+LABELV $927
 line 2318
 ;2317:
 ;2318:	if (!save)
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $931
+NEI4 $929
 line 2319
 ;2319:		return 0;
 CNSTI4 0
 RETI4
-ADDRGP4 $920
+ADDRGP4 $918
 JUMPV
-LABELV $931
+LABELV $929
 line 2321
 ;2320:
 ;2321:	if(!client->sess.raceMode || !(dflags & FAKE_DAMAGE_IN_RACEMODE)){
@@ -12025,15 +12025,15 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-EQI4 $935
+EQI4 $933
 ADDRFP4 8
 INDIRI4
 CNSTI4 8192
 BANDI4
 ADDRLP4 12
 INDIRI4
-NEI4 $933
-LABELV $935
+NEI4 $931
+LABELV $933
 line 2322
 ;2322:		if (dflags & DAMAGE_HALF_ARMOR_REDUCTION)		// Armor isn't whittled so easily by sniper shots.
 ADDRFP4 8
@@ -12041,7 +12041,7 @@ INDIRI4
 CNSTI4 2048
 BANDI4
 CNSTI4 0
-EQI4 $936
+EQI4 $934
 line 2323
 ;2323:		{
 line 2324
@@ -12067,9 +12067,9 @@ SUBI4
 ASGNI4
 line 2325
 ;2325:		}
-ADDRGP4 $937
+ADDRGP4 $935
 JUMPV
-LABELV $936
+LABELV $934
 line 2327
 ;2326:		else
 ;2327:		{
@@ -12092,17 +12092,17 @@ SUBI4
 ASGNI4
 line 2329
 ;2329:		}
-LABELV $937
+LABELV $935
 line 2330
 ;2330:	}
-LABELV $933
+LABELV $931
 line 2332
 ;2331:
 ;2332:	return save;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $920
+LABELV $918
 endproc CheckArmor 20 4
 export G_ApplyKnockback
 proc G_ApplyKnockback 48 0
@@ -12121,10 +12121,10 @@ ADDRFP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $939
-ADDRGP4 $938
+NEU4 $937
+ADDRGP4 $936
 JUMPV
-LABELV $939
+LABELV $937
 line 2342
 ;2342:	if (targ && targ->client && targ->client->ps.usingATST)
 ADDRLP4 16
@@ -12139,7 +12139,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 20
 INDIRU4
-EQU4 $941
+EQU4 $939
 ADDRLP4 24
 ADDRLP4 16
 INDIRP4
@@ -12152,21 +12152,21 @@ INDIRP4
 CVPU4 4
 ADDRLP4 20
 INDIRU4
-EQU4 $941
+EQU4 $939
 ADDRLP4 24
 INDIRP4
 CNSTI4 1316
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $941
+EQI4 $939
 line 2343
 ;2343:	{
 line 2344
 ;2344:		return;
-ADDRGP4 $938
+ADDRGP4 $936
 JUMPV
-LABELV $941
+LABELV $939
 line 2347
 ;2345:	}
 ;2346:
@@ -12177,7 +12177,7 @@ CNSTI4 508
 ADDP4
 INDIRF4
 CNSTF4 0
-LEF4 $943
+LEF4 $941
 line 2348
 ;2348:		mass = targ->physicsBounce;
 ADDRLP4 12
@@ -12187,23 +12187,23 @@ CNSTI4 508
 ADDP4
 INDIRF4
 ASGNF4
-ADDRGP4 $944
+ADDRGP4 $942
 JUMPV
-LABELV $943
+LABELV $941
 line 2350
 ;2349:	else
 ;2350:		mass = 200;
 ADDRLP4 12
 CNSTF4 1128792064
 ASGNF4
-LABELV $944
+LABELV $942
 line 2352
 ;2351:
 ;2352:	if ( g_gravity.value > 0 )
 ADDRGP4 g_gravity+8
 INDIRF4
 CNSTF4 0
-LEF4 $945
+LEF4 $943
 line 2353
 ;2353:	{
 line 2354
@@ -12295,9 +12295,9 @@ MULF4
 ASGNF4
 line 2356
 ;2356:	}
-ADDRGP4 $946
+ADDRGP4 $944
 JUMPV
-LABELV $945
+LABELV $943
 line 2358
 ;2357:	else
 ;2358:	{
@@ -12359,7 +12359,7 @@ MULF4
 ASGNF4
 line 2360
 ;2360:	}
-LABELV $946
+LABELV $944
 line 2362
 ;2361:
 ;2362:	if ( targ->client )
@@ -12370,7 +12370,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $960
+EQU4 $958
 line 2363
 ;2363:	{
 line 2364
@@ -12431,9 +12431,9 @@ ADDF4
 ASGNF4
 line 2365
 ;2365:	}
-ADDRGP4 $961
+ADDRGP4 $959
 JUMPV
-LABELV $960
+LABELV $958
 line 2366
 ;2366:	else if ( targ->s.pos.trType != TR_STATIONARY && targ->s.pos.trType != TR_LINEAR_STOP )
 ADDRLP4 28
@@ -12446,11 +12446,11 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-EQI4 $964
+EQI4 $962
 ADDRLP4 28
 INDIRI4
 CNSTI4 3
-EQI4 $964
+EQI4 $962
 line 2367
 ;2367:	{
 line 2368
@@ -12527,8 +12527,8 @@ INDIRI4
 ASGNI4
 line 2371
 ;2371:	}
-LABELV $964
-LABELV $961
+LABELV $962
+LABELV $959
 line 2375
 ;2372:
 ;2373:	// set the timer so that the other client can't cancel
@@ -12545,14 +12545,14 @@ ADDRLP4 32
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $969
+EQU4 $967
 ADDRLP4 32
 INDIRP4
 CNSTI4 16
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $969
+NEI4 $967
 line 2376
 ;2376:	{
 line 2379
@@ -12571,7 +12571,7 @@ line 2380
 ADDRLP4 36
 INDIRI4
 CNSTI4 50
-GEI4 $971
+GEI4 $969
 line 2381
 ;2381:			t = 50;
 ADDRLP4 36
@@ -12579,13 +12579,13 @@ CNSTI4 50
 ASGNI4
 line 2382
 ;2382:		}
-LABELV $971
+LABELV $969
 line 2383
 ;2383:		if ( t > 200 ) {
 ADDRLP4 36
 INDIRI4
 CNSTI4 200
-LEI4 $973
+LEI4 $971
 line 2384
 ;2384:			t = 200;
 ADDRLP4 36
@@ -12593,7 +12593,7 @@ CNSTI4 200
 ASGNI4
 line 2385
 ;2385:		}
-LABELV $973
+LABELV $971
 line 2386
 ;2386:		targ->client->ps.pm_time = t;
 ADDRFP4 0
@@ -12627,10 +12627,10 @@ BORI4
 ASGNI4
 line 2388
 ;2388:	}
-LABELV $969
+LABELV $967
 line 2389
 ;2389:}
-LABELV $938
+LABELV $936
 endproc G_ApplyKnockback 48 0
 export RaySphereIntersections
 proc RaySphereIntersections 96 4
@@ -12842,7 +12842,7 @@ line 2413
 ADDRLP4 8
 INDIRF4
 CNSTF4 0
-LEF4 $976
+LEF4 $974
 line 2414
 ;2414:		t = (- b + sqrt(d)) / 2;
 ADDRLP4 8
@@ -13015,16 +13015,16 @@ line 2418
 ;2418:		return 2;
 CNSTI4 2
 RETI4
-ADDRGP4 $975
+ADDRGP4 $973
 JUMPV
-LABELV $976
+LABELV $974
 line 2420
 ;2419:	}
 ;2420:	else if (d == 0) {
 ADDRLP4 8
 INDIRF4
 CNSTF4 0
-NEF4 $978
+NEF4 $976
 line 2421
 ;2421:		t = (- b ) / 2;
 ADDRLP4 0
@@ -13103,15 +13103,15 @@ line 2423
 ;2423:		return 1;
 CNSTI4 1
 RETI4
-ADDRGP4 $975
+ADDRGP4 $973
 JUMPV
-LABELV $978
+LABELV $976
 line 2425
 ;2424:	}
 ;2425:	return 0;
 CNSTI4 0
 RETI4
-LABELV $975
+LABELV $973
 endproc RaySphereIntersections 96 4
 export LimbTouch
 proc LimbTouch 0 0
@@ -13122,7 +13122,7 @@ line 2429
 ;2429:{
 line 2430
 ;2430:}
-LABELV $980
+LABELV $978
 endproc LimbTouch 0 0
 export LimbThink
 proc LimbThink 12 4
@@ -13140,7 +13140,7 @@ INDIRF4
 ADDRGP4 level+36
 INDIRI4
 CVIF4 4
-GEF4 $982
+GEF4 $980
 line 2435
 ;2435:	{
 line 2436
@@ -13162,9 +13162,9 @@ INDIRI4
 ASGNI4
 line 2438
 ;2438:		return;
-ADDRGP4 $981
+ADDRGP4 $979
 JUMPV
-LABELV $982
+LABELV $980
 line 2441
 ;2439:	}
 ;2440:
@@ -13175,7 +13175,7 @@ CNSTI4 12
 ADDP4
 INDIRI4
 CNSTI4 5
-EQI4 $986
+EQI4 $984
 line 2442
 ;2442:	{
 line 2443
@@ -13198,7 +13198,7 @@ line 2445
 ADDRLP4 0
 INDIRI4
 CNSTI4 5000
-LEI4 $989
+LEI4 $987
 line 2446
 ;2446:		{
 line 2447
@@ -13208,13 +13208,13 @@ CNSTI4 5000
 ASGNI4
 line 2448
 ;2448:		}
-LABELV $989
+LABELV $987
 line 2449
 ;2449:		if (addamt < 0)
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-GEI4 $991
+GEI4 $989
 line 2450
 ;2450:		{
 line 2451
@@ -13224,7 +13224,7 @@ CNSTI4 0
 ASGNI4
 line 2452
 ;2452:		}
-LABELV $991
+LABELV $989
 line 2454
 ;2453:
 ;2454:		VectorClear(ent->s.pos.trDelta);
@@ -13278,9 +13278,9 @@ ADDI4
 ASGNI4
 line 2457
 ;2457:		return;
-ADDRGP4 $981
+ADDRGP4 $979
 JUMPV
-LABELV $986
+LABELV $984
 line 2460
 ;2458:	}
 ;2459:
@@ -13302,12 +13302,14 @@ CALLV
 pop
 line 2463
 ;2463:}
-LABELV $981
+LABELV $979
 endproc LimbThink 12 4
 data
 export hitLocName
 align 4
 LABELV hitLocName
+address $992
+address $993
 address $994
 address $995
 address $996
@@ -13329,8 +13331,6 @@ address $1011
 address $1012
 address $1013
 address $1014
-address $1015
-address $1016
 export G_GetDismemberLoc
 code
 proc G_GetDismemberLoc 184 16
@@ -13407,33 +13407,33 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 10
-LTI4 $1017
+LTI4 $1015
 ADDRLP4 36
 INDIRI4
 CNSTI4 16
-GTI4 $1017
+GTI4 $1015
 ADDRLP4 36
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $1051-40
+ADDRGP4 $1049-40
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $1051
-address $1020
-address $1023
-address $1026
-address $1031
-address $1036
-address $1041
-address $1046
+LABELV $1049
+address $1018
+address $1021
+address $1024
+address $1029
+address $1034
+address $1039
+address $1044
 code
 line 2504
 ;2504:	{
-LABELV $1020
+LABELV $1018
 line 2506
 ;2505:	case G2_MODELPART_HEAD:
 ;2506:		boltPoint[0] += up[0]*24;
@@ -13492,9 +13492,9 @@ ADDF4
 ASGNF4
 line 2509
 ;2509:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1023
+LABELV $1021
 line 2511
 ;2510:	case G2_MODELPART_WAIST:
 ;2511:		boltPoint[0] += up[0]*4;
@@ -13553,9 +13553,9 @@ ADDF4
 ASGNF4
 line 2514
 ;2514:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1026
+LABELV $1024
 line 2516
 ;2515:	case G2_MODELPART_LARM:
 ;2516:		boltPoint[0] += up[0]*18;
@@ -13670,9 +13670,9 @@ SUBF4
 ASGNF4
 line 2523
 ;2523:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1031
+LABELV $1029
 line 2525
 ;2524:	case G2_MODELPART_RARM:
 ;2525:		boltPoint[0] += up[0]*18;
@@ -13787,9 +13787,9 @@ ADDF4
 ASGNF4
 line 2532
 ;2532:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1036
+LABELV $1034
 line 2534
 ;2533:	case G2_MODELPART_RHAND:
 ;2534:		boltPoint[0] += up[0]*8;
@@ -13904,9 +13904,9 @@ ADDF4
 ASGNF4
 line 2541
 ;2541:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1041
+LABELV $1039
 line 2543
 ;2542:	case G2_MODELPART_LLEG:
 ;2543:		boltPoint[0] -= up[0]*4;
@@ -14021,9 +14021,9 @@ SUBF4
 ASGNF4
 line 2550
 ;2550:		break;
-ADDRGP4 $1017
+ADDRGP4 $1015
 JUMPV
-LABELV $1046
+LABELV $1044
 line 2552
 ;2551:	case G2_MODELPART_RLEG:
 ;2552:		boltPoint[0] -= up[0]*4;
@@ -14145,7 +14145,7 @@ line 2564
 ;2562:	}
 ;2563:
 ;2564:	return;
-LABELV $1017
+LABELV $1015
 endproc G_GetDismemberLoc 184 16
 export G_GetDismemberBolt
 proc G_GetDismemberBolt 176 36
@@ -14184,14 +14184,14 @@ ADDRLP4 140
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1058
+EQU4 $1056
 ADDRLP4 140
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1058
+EQI4 $1056
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -14201,7 +14201,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $1060
+LEI4 $1058
 ADDRLP4 136
 ADDRFP4 0
 INDIRP4
@@ -14212,26 +14212,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $1061
-JUMPV
-LABELV $1060
-ADDRLP4 136
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $1061
-ADDRLP4 132
-ADDRLP4 136
-INDIRI4
-ASGNI4
 ADDRGP4 $1059
 JUMPV
 LABELV $1058
-ADDRLP4 132
+ADDRLP4 136
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $1059
+ADDRLP4 132
+ADDRLP4 136
+INDIRI4
+ASGNI4
+ADDRGP4 $1057
+JUMPV
+LABELV $1056
+ADDRLP4 132
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $1057
 ADDRLP4 128
 ADDRLP4 132
 INDIRI4
@@ -14246,33 +14246,33 @@ ASGNI4
 ADDRLP4 144
 INDIRI4
 CNSTI4 10
-LTI4 $1062
+LTI4 $1060
 ADDRLP4 144
 INDIRI4
 CNSTI4 16
-GTI4 $1062
+GTI4 $1060
 ADDRLP4 144
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $1072-40
+ADDRGP4 $1070-40
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $1072
+LABELV $1070
+address $1062
+address $1063
 address $1064
 address $1065
 address $1066
-address $1067
 address $1068
-address $1070
-address $1071
+address $1069
 code
 line 2577
 ;2577:	{
-LABELV $1064
+LABELV $1062
 line 2579
 ;2578:	case G2_MODELPART_HEAD:
 ;2579:		useBolt = self->bolt_Head;
@@ -14285,9 +14285,9 @@ INDIRI4
 ASGNI4
 line 2580
 ;2580:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1065
+LABELV $1063
 line 2582
 ;2581:	case G2_MODELPART_WAIST:
 ;2582:		useBolt = self->bolt_Waist;
@@ -14300,9 +14300,9 @@ INDIRI4
 ASGNI4
 line 2583
 ;2583:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1066
+LABELV $1064
 line 2585
 ;2584:	case G2_MODELPART_LARM:
 ;2585:		useBolt = self->bolt_LArm;
@@ -14315,9 +14315,9 @@ INDIRI4
 ASGNI4
 line 2586
 ;2586:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1067
+LABELV $1065
 line 2588
 ;2587:	case G2_MODELPART_RARM:
 ;2588:		useBolt = self->bolt_RArm;
@@ -14330,9 +14330,9 @@ INDIRI4
 ASGNI4
 line 2589
 ;2589:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1068
+LABELV $1066
 line 2591
 ;2590:	case G2_MODELPART_RHAND:
 ;2591:		useBolt = trap_G2API_AddBolt(self->client->ghoul2, 0, "rhand");
@@ -14347,7 +14347,7 @@ INDIRP4
 ARGP4
 CNSTI4 0
 ARGI4
-ADDRGP4 $1069
+ADDRGP4 $1067
 ARGP4
 ADDRLP4 148
 ADDRGP4 trap_G2API_AddBolt
@@ -14360,9 +14360,9 @@ INDIRI4
 ASGNI4
 line 2592
 ;2592:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1070
+LABELV $1068
 line 2594
 ;2593:	case G2_MODELPART_LLEG:
 ;2594:		useBolt = self->bolt_LLeg;
@@ -14375,9 +14375,9 @@ INDIRI4
 ASGNI4
 line 2595
 ;2595:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1071
+LABELV $1069
 line 2597
 ;2596:	case G2_MODELPART_RLEG:
 ;2597:		useBolt = self->bolt_RLeg;
@@ -14390,9 +14390,9 @@ INDIRI4
 ASGNI4
 line 2598
 ;2598:		break;
-ADDRGP4 $1063
+ADDRGP4 $1061
 JUMPV
-LABELV $1062
+LABELV $1060
 line 2600
 ;2599:	default:
 ;2600:		useBolt = self->bolt_Head;
@@ -14405,7 +14405,7 @@ INDIRI4
 ASGNI4
 line 2601
 ;2601:		break;
-LABELV $1063
+LABELV $1061
 line 2604
 ;2602:	}
 ;2603:
@@ -14465,7 +14465,7 @@ CNSTI4 32
 ADDP4
 INDIRF4
 CNSTF4 0
-GEF4 $1074
+GEF4 $1072
 line 2612
 ;2612:	{
 line 2613
@@ -14486,9 +14486,9 @@ ADDF4
 ASGNF4
 line 2614
 ;2614:	}
-ADDRGP4 $1075
+ADDRGP4 $1073
 JUMPV
-LABELV $1074
+LABELV $1072
 line 2616
 ;2615:	else
 ;2616:	{
@@ -14509,7 +14509,7 @@ ADDF4
 ASGNF4
 line 2618
 ;2618:	}
-LABELV $1075
+LABELV $1073
 line 2619
 ;2619:	if (self->client->ps.velocity[1] < 0)
 ADDRFP4 0
@@ -14521,7 +14521,7 @@ CNSTI4 36
 ADDP4
 INDIRF4
 CNSTF4 0
-GEF4 $1076
+GEF4 $1074
 line 2620
 ;2620:	{
 line 2621
@@ -14542,9 +14542,9 @@ ADDF4
 ASGNF4
 line 2622
 ;2622:	}
-ADDRGP4 $1077
+ADDRGP4 $1075
 JUMPV
-LABELV $1076
+LABELV $1074
 line 2624
 ;2623:	else
 ;2624:	{
@@ -14565,7 +14565,7 @@ ADDF4
 ASGNF4
 line 2626
 ;2626:	}
-LABELV $1077
+LABELV $1075
 line 2627
 ;2627:	if (self->client->ps.velocity[2] < 0)
 ADDRFP4 0
@@ -14577,7 +14577,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 0
-GEF4 $1078
+GEF4 $1076
 line 2628
 ;2628:	{
 line 2629
@@ -14598,9 +14598,9 @@ ADDF4
 ASGNF4
 line 2630
 ;2630:	}
-ADDRGP4 $1079
+ADDRGP4 $1077
 JUMPV
-LABELV $1078
+LABELV $1076
 line 2632
 ;2631:	else
 ;2632:	{
@@ -14621,7 +14621,7 @@ ADDF4
 ASGNF4
 line 2634
 ;2634:	}
-LABELV $1079
+LABELV $1077
 line 2636
 ;2635:
 ;2636:	fVSpeed *= 0.08f;
@@ -14778,7 +14778,7 @@ line 2655
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $1092
+EQI4 $1090
 line 2656
 ;2656:	{
 line 2657
@@ -14822,11 +14822,11 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1095
+EQU4 $1093
 ADDRFP4 8
 INDIRI4
 CNSTI4 14
-NEI4 $1095
+NEI4 $1093
 line 2660
 ;2660:		{ //Make some saber hit sparks over the severed wrist area
 line 2664
@@ -14906,7 +14906,7 @@ ADDP4
 INDIRF4
 ADDRLP4 172
 INDIRF4
-NEF4 $1104
+NEF4 $1102
 ADDRLP4 168
 INDIRP4
 CNSTI4 120
@@ -14914,7 +14914,7 @@ ADDP4
 INDIRF4
 ADDRLP4 172
 INDIRF4
-NEF4 $1104
+NEF4 $1102
 ADDRLP4 168
 INDIRP4
 CNSTI4 124
@@ -14922,7 +14922,7 @@ ADDP4
 INDIRF4
 ADDRLP4 172
 INDIRF4
-NEF4 $1104
+NEF4 $1102
 line 2674
 ;2674:			{ //don't let it play with no direction
 line 2675
@@ -14935,7 +14935,7 @@ CNSTF4 1065353216
 ASGNF4
 line 2676
 ;2676:			}
-LABELV $1104
+LABELV $1102
 line 2678
 ;2677:
 ;2678:			te->s.eventParm = 16; //lots of sparks
@@ -14947,13 +14947,13 @@ CNSTI4 16
 ASGNI4
 line 2679
 ;2679:		}
-LABELV $1095
+LABELV $1093
 line 2680
 ;2680:	}
-LABELV $1092
+LABELV $1090
 line 2681
 ;2681:}
-LABELV $1053
+LABELV $1051
 endproc G_GetDismemberBolt 176 36
 export G_Dismember
 proc G_Dismember 128 20
@@ -14986,7 +14986,7 @@ line 2690
 ADDRLP4 0
 INDIRP4
 ARGP4
-ADDRGP4 $1107
+ADDRGP4 $1105
 ARGP4
 ADDRGP4 G_SetClassName
 CALLV
@@ -15096,7 +15096,7 @@ line 2702
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $1110
+EQI4 $1108
 line 2703
 ;2703:	{
 line 2704
@@ -15141,9 +15141,9 @@ CNSTF4 1086324736
 ASGNF4
 line 2706
 ;2706:	}
-ADDRGP4 $1111
+ADDRGP4 $1109
 JUMPV
-LABELV $1110
+LABELV $1108
 line 2708
 ;2707:	else
 ;2708:	{
@@ -15189,7 +15189,7 @@ CNSTF4 1077936128
 ASGNF4
 line 2711
 ;2711:	}
-LABELV $1111
+LABELV $1109
 line 2716
 ;2712://	VectorClear(limb->r.mins);
 ;2713://	VectorClear(limb->r.maxs);
@@ -15216,7 +15216,7 @@ line 2719
 ADDRFP4 8
 INDIRI4
 CNSTI4 10
-NEI4 $1112
+NEI4 $1110
 line 2720
 ;2720:	{
 line 2721
@@ -15229,9 +15229,9 @@ CNSTI4 2
 ASGNI4
 line 2722
 ;2722:	}
-ADDRGP4 $1113
+ADDRGP4 $1111
 JUMPV
-LABELV $1112
+LABELV $1110
 line 2724
 ;2723:	else
 ;2724:	{
@@ -15245,7 +15245,7 @@ CNSTI4 1
 ASGNI4
 line 2726
 ;2726:	}
-LABELV $1113
+LABELV $1111
 line 2727
 ;2727:	limb->s.pos.trType = TR_GRAVITY;
 ADDRLP4 0
@@ -15326,7 +15326,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1117
+EQU4 $1115
 line 2732
 ;2732:	{
 line 2733
@@ -15343,9 +15343,9 @@ INDIRB
 ASGNB 12
 line 2734
 ;2734:	}
-ADDRGP4 $1118
+ADDRGP4 $1116
 JUMPV
-LABELV $1117
+LABELV $1115
 line 2736
 ;2735:	else
 ;2736:	{
@@ -15360,7 +15360,7 @@ INDIRB
 ASGNB 12
 line 2738
 ;2738:	}
-LABELV $1118
+LABELV $1116
 line 2739
 ;2739:	VectorMA( vel, 100, dir, limb->s.pos.trDelta );
 ADDRLP4 0
@@ -15410,16 +15410,16 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 10
-EQI4 $1125
+EQI4 $1123
 ADDRLP4 56
 INDIRI4
 CNSTI4 11
-NEI4 $1123
-LABELV $1125
+NEI4 $1121
+LABELV $1123
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $1123
+EQI4 $1121
 line 2744
 ;2743:		limbType == G2_MODELPART_WAIST) && jk2gameplay != VERSION_1_02)
 ;2744:	{
@@ -15441,7 +15441,7 @@ ADDF4
 ASGNF4
 line 2746
 ;2746:	}
-LABELV $1123
+LABELV $1121
 line 2749
 ;2747:
 ;2748:	//make it bounce some
@@ -15502,7 +15502,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1126
+EQU4 $1124
 line 2759
 ;2759:	{
 line 2760
@@ -15522,9 +15522,9 @@ INDIRF4
 ASGNF4
 line 2761
 ;2761:	}
-ADDRGP4 $1127
+ADDRGP4 $1125
 JUMPV
-LABELV $1126
+LABELV $1124
 line 2763
 ;2762:	else
 ;2763:	{
@@ -15542,7 +15542,7 @@ INDIRF4
 ASGNF4
 line 2765
 ;2765:	}
-LABELV $1127
+LABELV $1125
 line 2767
 ;2766:
 ;2767:	VectorClear( limb->s.apos.trDelta );
@@ -15576,7 +15576,7 @@ line 2769
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $1128
+NEI4 $1126
 line 2770
 ;2770:	{
 line 2771
@@ -15675,7 +15675,7 @@ line 2775
 ADDRFP4 8
 INDIRI4
 CNSTI4 11
-NEI4 $1129
+NEI4 $1127
 line 2776
 ;2776:		{
 line 2777
@@ -15772,9 +15772,9 @@ line 2780
 ;2780:		}
 line 2781
 ;2781:	}
-ADDRGP4 $1129
+ADDRGP4 $1127
 JUMPV
-LABELV $1128
+LABELV $1126
 line 2783
 ;2782:	else
 ;2783:	{
@@ -15806,7 +15806,7 @@ INDIRF4
 ASGNF4
 line 2785
 ;2785:	}
-LABELV $1129
+LABELV $1127
 line 2787
 ;2786:
 ;2787:	limb->s.apos.trTime = level.time;
@@ -15831,37 +15831,37 @@ line 2790
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-EQI4 $1135
+EQI4 $1133
 ADDRLP4 80
 ADDRFP4 8
 INDIRI4
 ASGNI4
-ADDRGP4 $1136
+ADDRGP4 $1134
 JUMPV
-LABELV $1135
+LABELV $1133
 ADDRFP4 8
 INDIRI4
 CNSTI4 14
-LTI4 $1137
+LTI4 $1135
 ADDRLP4 84
 ADDRFP4 8
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-ADDRGP4 $1138
+ADDRGP4 $1136
 JUMPV
-LABELV $1137
+LABELV $1135
 ADDRLP4 84
 ADDRFP4 8
 INDIRI4
 ASGNI4
-LABELV $1138
+LABELV $1136
 ADDRLP4 80
 ADDRLP4 84
 INDIRI4
 ASGNI4
-LABELV $1136
+LABELV $1134
 ADDRLP4 0
 INDIRP4
 CNSTI4 204
@@ -15886,7 +15886,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1139
+EQU4 $1137
 line 2793
 ;2793:	{
 line 2794
@@ -15910,9 +15910,9 @@ INDIRI4
 ASGNI4
 line 2796
 ;2796:	}
-ADDRGP4 $1140
+ADDRGP4 $1138
 JUMPV
-LABELV $1139
+LABELV $1137
 line 2798
 ;2797:	else
 ;2798:	{
@@ -15929,7 +15929,7 @@ line 2800
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 4
-NEI4 $1141
+NEI4 $1139
 ADDRLP4 0
 INDIRP4
 CNSTI4 188
@@ -15938,9 +15938,9 @@ ADDRFP4 0
 INDIRP4
 INDIRI4
 ASGNI4
-ADDRGP4 $1142
+ADDRGP4 $1140
 JUMPV
-LABELV $1141
+LABELV $1139
 line 2801
 ;2801:		else								   limb->s.modelindex2 = ent->s.number;
 ADDRLP4 0
@@ -15951,10 +15951,10 @@ ADDRFP4 0
 INDIRP4
 INDIRI4
 ASGNI4
-LABELV $1142
+LABELV $1140
 line 2802
 ;2802:	}
-LABELV $1140
+LABELV $1138
 line 2804
 ;2803:
 ;2804:	trap_LinkEntity( limb );
@@ -15966,7 +15966,7 @@ CALLV
 pop
 line 2805
 ;2805:}
-LABELV $1106
+LABELV $1104
 endproc G_Dismember 128 20
 export DismembermentTest
 proc DismembermentTest 16 24
@@ -16014,7 +16014,7 @@ CALLV
 pop
 line 2813
 ;2813:}
-LABELV $1143
+LABELV $1141
 endproc DismembermentTest 16 24
 export DismembermentByNum
 proc DismembermentByNum 20 24
@@ -16038,33 +16038,33 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-LTI4 $1146
+LTI4 $1144
 ADDRLP4 16
 INDIRI4
 CNSTI4 6
-GTI4 $1146
+GTI4 $1144
 ADDRLP4 16
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $1154
+ADDRGP4 $1152
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $1154
+LABELV $1152
+address $1145
+address $1146
 address $1147
 address $1148
 address $1149
 address $1150
 address $1151
-address $1152
-address $1153
 code
 line 2821
 ;2821:	{
-LABELV $1147
+LABELV $1145
 line 2823
 ;2822:	case 0:
 ;2823:		sect = G2_MODELPART_HEAD;
@@ -16073,9 +16073,9 @@ CNSTI4 10
 ASGNI4
 line 2824
 ;2824:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1148
+LABELV $1146
 line 2826
 ;2825:	case 1:
 ;2826:		sect = G2_MODELPART_WAIST;
@@ -16084,9 +16084,9 @@ CNSTI4 11
 ASGNI4
 line 2827
 ;2827:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1149
+LABELV $1147
 line 2829
 ;2828:	case 2:
 ;2829:		sect = G2_MODELPART_LARM;
@@ -16095,9 +16095,9 @@ CNSTI4 12
 ASGNI4
 line 2830
 ;2830:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1150
+LABELV $1148
 line 2832
 ;2831:	case 3:
 ;2832:		sect = G2_MODELPART_RARM;
@@ -16106,9 +16106,9 @@ CNSTI4 13
 ASGNI4
 line 2833
 ;2833:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1151
+LABELV $1149
 line 2835
 ;2834:	case 4:
 ;2835:		sect = G2_MODELPART_RHAND;
@@ -16117,9 +16117,9 @@ CNSTI4 14
 ASGNI4
 line 2836
 ;2836:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1152
+LABELV $1150
 line 2838
 ;2837:	case 5:
 ;2838:		sect = G2_MODELPART_LLEG;
@@ -16128,9 +16128,9 @@ CNSTI4 15
 ASGNI4
 line 2839
 ;2839:		break;
-ADDRGP4 $1146
+ADDRGP4 $1144
 JUMPV
-LABELV $1153
+LABELV $1151
 line 2841
 ;2840:	case 6:
 ;2841:		sect = G2_MODELPART_RLEG;
@@ -16142,7 +16142,7 @@ line 2842
 line 2844
 ;2843:	default:
 ;2844:		break;
-LABELV $1146
+LABELV $1144
 line 2847
 ;2845:	}
 ;2846:
@@ -16179,11 +16179,11 @@ CALLV
 pop
 line 2849
 ;2849:}
-LABELV $1144
+LABELV $1142
 endproc DismembermentByNum 20 24
 lit
 align 4
-LABELV $1156
+LABELV $1154
 byte 4 0
 byte 4 0
 byte 4 0
@@ -16197,7 +16197,7 @@ line 2852
 line 2853
 ;2853:	vec3_t diff, fwdangles={0,0,0}, right;
 ADDRLP4 36
-ADDRGP4 $1156
+ADDRGP4 $1154
 INDIRB
 ASGNB 12
 line 2857
@@ -16218,7 +16218,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1157
+EQU4 $1155
 line 2860
 ;2860:	{
 line 2861
@@ -16251,9 +16251,9 @@ ADDF4
 ASGNF4
 line 2863
 ;2863:	}
-ADDRGP4 $1158
+ADDRGP4 $1156
 JUMPV
-LABELV $1157
+LABELV $1155
 line 2865
 ;2864:	else
 ;2865:	{
@@ -16276,7 +16276,7 @@ ADDF4
 ASGNF4
 line 2868
 ;2868:	}
-LABELV $1158
+LABELV $1156
 line 2870
 ;2869:
 ;2870:	VectorSubtract( hitloc, clEye, diff );
@@ -16334,7 +16334,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1166
+EQU4 $1164
 line 2875
 ;2875:	{
 line 2876
@@ -16351,9 +16351,9 @@ INDIRF4
 ASGNF4
 line 2877
 ;2877:	}
-ADDRGP4 $1167
+ADDRGP4 $1165
 JUMPV
-LABELV $1166
+LABELV $1164
 line 2879
 ;2878:	else
 ;2879:	{
@@ -16368,7 +16368,7 @@ INDIRF4
 ASGNF4
 line 2881
 ;2881:	}
-LABELV $1167
+LABELV $1165
 line 2883
 ;2882:	// Ultimately we might care if the shot was ahead or behind, but for now, just quadrant is fine.
 ;2883:	AngleVectors( fwdangles, NULL, right, NULL );
@@ -16428,7 +16428,7 @@ line 2888
 ADDRLP4 52
 INDIRF4
 CNSTF4 0
-LEF4 $1175
+LEF4 $1173
 line 2889
 ;2889:	{
 line 2890
@@ -16436,7 +16436,7 @@ line 2890
 ADDRLP4 56
 INDIRF4
 CNSTF4 1050253722
-LEF4 $1177
+LEF4 $1175
 line 2891
 ;2891:		{
 line 2892
@@ -16446,15 +16446,15 @@ CNSTI4 13
 ASGNI4
 line 2893
 ;2893:		}
-ADDRGP4 $1176
+ADDRGP4 $1174
 JUMPV
-LABELV $1177
+LABELV $1175
 line 2894
 ;2894:		else if ( rightdot < -0.3 )
 ADDRLP4 56
 INDIRF4
 CNSTF4 3197737370
-GEF4 $1179
+GEF4 $1177
 line 2895
 ;2895:		{
 line 2896
@@ -16464,9 +16464,9 @@ CNSTI4 12
 ASGNI4
 line 2897
 ;2897:		}
-ADDRGP4 $1176
+ADDRGP4 $1174
 JUMPV
-LABELV $1179
+LABELV $1177
 line 2899
 ;2898:		else
 ;2899:		{
@@ -16479,15 +16479,15 @@ line 2901
 ;2901:		}
 line 2902
 ;2902:	}
-ADDRGP4 $1176
+ADDRGP4 $1174
 JUMPV
-LABELV $1175
+LABELV $1173
 line 2903
 ;2903:	else if ( zdiff > -20 )
 ADDRLP4 52
 INDIRF4
 CNSTF4 3248488448
-LEF4 $1181
+LEF4 $1179
 line 2904
 ;2904:	{
 line 2905
@@ -16495,7 +16495,7 @@ line 2905
 ADDRLP4 56
 INDIRF4
 CNSTF4 1036831949
-LEF4 $1183
+LEF4 $1181
 line 2906
 ;2906:		{
 line 2907
@@ -16505,15 +16505,15 @@ CNSTI4 13
 ASGNI4
 line 2908
 ;2908:		}
-ADDRGP4 $1182
+ADDRGP4 $1180
 JUMPV
-LABELV $1183
+LABELV $1181
 line 2909
 ;2909:		else if ( rightdot < -0.1 )
 ADDRLP4 56
 INDIRF4
 CNSTF4 3184315597
-GEF4 $1185
+GEF4 $1183
 line 2910
 ;2910:		{
 line 2911
@@ -16523,9 +16523,9 @@ CNSTI4 12
 ASGNI4
 line 2912
 ;2912:		}
-ADDRGP4 $1182
+ADDRGP4 $1180
 JUMPV
-LABELV $1185
+LABELV $1183
 line 2914
 ;2913:		else
 ;2914:		{
@@ -16538,9 +16538,9 @@ line 2916
 ;2916:		}
 line 2917
 ;2917:	}
-ADDRGP4 $1182
+ADDRGP4 $1180
 JUMPV
-LABELV $1181
+LABELV $1179
 line 2919
 ;2918:	else
 ;2919:	{
@@ -16549,7 +16549,7 @@ line 2920
 ADDRLP4 56
 INDIRF4
 CNSTF4 0
-LTF4 $1187
+LTF4 $1185
 line 2921
 ;2921:		{
 line 2922
@@ -16559,9 +16559,9 @@ CNSTI4 16
 ASGNI4
 line 2923
 ;2923:		}
-ADDRGP4 $1188
+ADDRGP4 $1186
 JUMPV
-LABELV $1187
+LABELV $1185
 line 2925
 ;2924:		else
 ;2925:		{
@@ -16572,18 +16572,18 @@ CNSTI4 15
 ASGNI4
 line 2927
 ;2927:		}
-LABELV $1188
+LABELV $1186
 line 2928
 ;2928:	}
-LABELV $1182
-LABELV $1176
+LABELV $1180
+LABELV $1174
 line 2930
 ;2929:
 ;2930:	return hitLoc;
 ADDRLP4 48
 INDIRI4
 RETI4
-LABELV $1155
+LABELV $1153
 endproc G_GetHitQuad 68 16
 data
 export gGAvoidDismember
@@ -16618,14 +16618,14 @@ line 2941
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $1191
+NEI4 $1189
 line 2942
 ;2942:	{
 line 2943
 ;2943:		return;
-ADDRGP4 $1189
+ADDRGP4 $1187
 JUMPV
-LABELV $1191
+LABELV $1189
 line 2946
 ;2944:	}
 ;2945:
@@ -16633,14 +16633,14 @@ line 2946
 ADDRGP4 gGAvoidDismember
 INDIRI4
 CNSTI4 1
-NEI4 $1193
+NEI4 $1191
 line 2947
 ;2947:	{
 line 2948
 ;2948:		return;
-ADDRGP4 $1189
+ADDRGP4 $1187
 JUMPV
-LABELV $1193
+LABELV $1191
 line 2952
 ;2949:	}
 ;2950:
@@ -16672,14 +16672,14 @@ ADDRLP4 28
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LEI4 $1195
+LEI4 $1193
 line 2954
 ;2954:		{
 line 2955
 ;2955:			return;
-ADDRGP4 $1189
+ADDRGP4 $1187
 JUMPV
-LABELV $1195
+LABELV $1193
 line 2958
 ;2956:		}
 ;2957:
@@ -16687,14 +16687,14 @@ line 2958
 ADDRFP4 8
 INDIRI4
 CNSTI4 20
-GEI4 $1197
+GEI4 $1195
 line 2959
 ;2959:		{
 line 2960
 ;2960:			return;
-ADDRGP4 $1189
+ADDRGP4 $1187
 JUMPV
-LABELV $1197
+LABELV $1195
 line 2962
 ;2961:		}
 ;2962:	}
@@ -16704,7 +16704,7 @@ line 2964
 ADDRGP4 gGAvoidDismember
 INDIRI4
 CNSTI4 2
-NEI4 $1199
+NEI4 $1197
 line 2965
 ;2965:	{
 line 2966
@@ -16714,9 +16714,9 @@ CNSTI4 14
 ASGNI4
 line 2967
 ;2967:	}
-ADDRGP4 $1200
+ADDRGP4 $1198
 JUMPV
-LABELV $1199
+LABELV $1197
 line 2969
 ;2968:	else
 ;2969:	{
@@ -16738,7 +16738,7 @@ INDIRI4
 ASGNI4
 line 2971
 ;2971:	}
-LABELV $1200
+LABELV $1198
 line 2973
 ;2972:
 ;2973:	switch(hitLoc)
@@ -16749,42 +16749,42 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 1
-LTI4 $1201
+LTI4 $1199
 ADDRLP4 24
 INDIRI4
 CNSTI4 16
-GTI4 $1201
+GTI4 $1199
 ADDRLP4 24
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $1210-4
+ADDRGP4 $1208-4
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $1210
+LABELV $1208
+address $1201
+address $1202
+address $1201
+address $1202
 address $1203
+address $1199
+address $1199
+address $1199
+address $1199
+address $1199
+address $1199
 address $1204
-address $1203
-address $1204
-address $1205
-address $1201
-address $1201
-address $1201
-address $1201
-address $1201
-address $1201
 address $1206
-address $1208
+address $1205
+address $1206
 address $1207
-address $1208
-address $1209
 code
 line 2974
 ;2974:	{
-LABELV $1203
+LABELV $1201
 line 2977
 ;2975:	case HL_FOOT_RT:
 ;2976:	case HL_LEG_RT:
@@ -16794,9 +16794,9 @@ CNSTI4 16
 ASGNI4
 line 2978
 ;2978:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1204
+LABELV $1202
 line 2981
 ;2979:	case HL_FOOT_LT:
 ;2980:	case HL_LEG_LT:
@@ -16806,9 +16806,9 @@ CNSTI4 15
 ASGNI4
 line 2982
 ;2982:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1205
+LABELV $1203
 line 2985
 ;2983:		
 ;2984:	case HL_WAIST:
@@ -16818,9 +16818,9 @@ CNSTI4 11
 ASGNI4
 line 2986
 ;2986:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1206
+LABELV $1204
 line 2997
 ;2987:		/*
 ;2988:	case HL_BACK_RT:
@@ -16838,9 +16838,9 @@ CNSTI4 13
 ASGNI4
 line 2998
 ;2998:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1207
+LABELV $1205
 line 3000
 ;2999:	case HL_HAND_RT:
 ;3000:		hitLocUse = G2_MODELPART_RHAND;
@@ -16849,9 +16849,9 @@ CNSTI4 14
 ASGNI4
 line 3001
 ;3001:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1208
+LABELV $1206
 line 3004
 ;3002:	case HL_ARM_LT:
 ;3003:	case HL_HAND_LT:
@@ -16861,9 +16861,9 @@ CNSTI4 12
 ASGNI4
 line 3005
 ;3005:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1209
+LABELV $1207
 line 3007
 ;3006:	case HL_HEAD:
 ;3007:		hitLocUse = G2_MODELPART_HEAD;
@@ -16872,9 +16872,9 @@ CNSTI4 10
 ASGNI4
 line 3008
 ;3008:		break;
-ADDRGP4 $1202
+ADDRGP4 $1200
 JUMPV
-LABELV $1201
+LABELV $1199
 line 3010
 ;3009:	default:
 ;3010:		hitLocUse = G_GetHitQuad(ent, point);
@@ -16894,7 +16894,7 @@ INDIRI4
 ASGNI4
 line 3011
 ;3011:		break;
-LABELV $1202
+LABELV $1200
 line 3014
 ;3012:	}
 ;3013:
@@ -16902,14 +16902,14 @@ line 3014
 ADDRLP4 0
 INDIRI4
 CNSTI4 -1
-NEI4 $1212
+NEI4 $1210
 line 3015
 ;3015:	{
 line 3016
 ;3016:		return;
-ADDRGP4 $1189
+ADDRGP4 $1187
 JUMPV
-LABELV $1212
+LABELV $1210
 line 3019
 ;3017:	}
 ;3018:
@@ -16921,7 +16921,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1214
+EQU4 $1212
 line 3020
 ;3020:	{
 line 3021
@@ -16942,17 +16942,17 @@ line 3022
 ADDRGP4 g_austrian+12
 INDIRI4
 CNSTI4 0
-EQI4 $1215
+EQI4 $1213
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 3
-NEI4 $1215
+NEI4 $1213
 line 3024
 ;3023:			&& g_gametype.integer == GT_TOURNAMENT )
 ;3024:		{
 line 3025
 ;3025:			G_LogPrintf( "Duel Dismemberment: %s dismembered at %s\n", ent->client->pers.netname, hitLocName[hitLoc] );
-ADDRGP4 $1220
+ADDRGP4 $1218
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -16977,9 +16977,9 @@ line 3026
 ;3026:		}
 line 3027
 ;3027:	}
-ADDRGP4 $1215
+ADDRGP4 $1213
 JUMPV
-LABELV $1214
+LABELV $1212
 line 3029
 ;3028:	else
 ;3029:	{
@@ -16998,7 +16998,7 @@ CALLV
 pop
 line 3031
 ;3031:	}
-LABELV $1215
+LABELV $1213
 line 3032
 ;3032:	G_Dismember(ent, boltPoint, hitLocUse, 90, 0, deathAnim);
 ADDRFP4 0
@@ -17021,7 +17021,7 @@ CALLV
 pop
 line 3033
 ;3033:}
-LABELV $1189
+LABELV $1187
 endproc G_CheckForDismemberment 32 24
 export G_ThereIsAMaster
 proc G_ThereIsAMaster 20 0
@@ -17034,9 +17034,9 @@ line 3037
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $1223
+ADDRGP4 $1221
 JUMPV
-LABELV $1222
+LABELV $1220
 line 3041
 ;3038:	gentity_t *ent;
 ;3039:
@@ -17063,7 +17063,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $1225
+EQU4 $1223
 ADDRLP4 16
 ADDRLP4 0
 INDIRP4
@@ -17076,23 +17076,23 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $1225
+EQU4 $1223
 ADDRLP4 16
 INDIRP4
 CNSTI4 604
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1225
+EQI4 $1223
 line 3045
 ;3045:		{
 line 3046
 ;3046:			return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1221
+ADDRGP4 $1219
 JUMPV
-LABELV $1225
+LABELV $1223
 line 3049
 ;3047:		}
 ;3048:
@@ -17105,18 +17105,18 @@ ADDI4
 ASGNI4
 line 3050
 ;3050:	}
-LABELV $1223
+LABELV $1221
 line 3040
 ADDRLP4 4
 INDIRI4
 CNSTI4 32
-LTI4 $1222
+LTI4 $1220
 line 3052
 ;3051:
 ;3052:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $1221
+LABELV $1219
 endproc G_ThereIsAMaster 20 0
 export G_Kill
 proc G_Kill 16 20
@@ -17199,7 +17199,7 @@ CALLV
 pop
 line 3068
 ;3068:}
-LABELV $1227
+LABELV $1225
 endproc G_Kill 16 20
 export G_Damage
 proc G_Damage 352 32
@@ -17264,7 +17264,7 @@ ADDRFP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1235
+EQU4 $1233
 ADDRLP4 56
 ADDRFP4 4
 INDIRP4
@@ -17276,14 +17276,14 @@ ADDRLP4 56
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1237
+EQU4 $1235
 ADDRLP4 56
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1237
+EQI4 $1235
 ADDRFP4 4
 INDIRP4
 CNSTI4 408
@@ -17293,7 +17293,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $1239
+LEI4 $1237
 ADDRLP4 52
 ADDRFP4 4
 INDIRP4
@@ -17304,38 +17304,38 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $1240
-JUMPV
-LABELV $1239
-ADDRLP4 52
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $1240
-ADDRLP4 48
-ADDRLP4 52
-INDIRI4
-ASGNI4
 ADDRGP4 $1238
 JUMPV
 LABELV $1237
-ADDRLP4 48
+ADDRLP4 52
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $1238
-ADDRLP4 44
 ADDRLP4 48
+ADDRLP4 52
 INDIRI4
 ASGNI4
 ADDRGP4 $1236
 JUMPV
 LABELV $1235
-ADDRLP4 44
+ADDRLP4 48
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $1236
+ADDRLP4 44
+ADDRLP4 48
+INDIRI4
+ASGNI4
+ADDRGP4 $1234
+JUMPV
+LABELV $1233
+ADDRLP4 44
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $1234
 ADDRLP4 40
 ADDRLP4 44
 INDIRI4
@@ -17353,14 +17353,14 @@ ADDRLP4 68
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1245
+EQU4 $1243
 ADDRLP4 68
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1245
+EQI4 $1243
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -17370,7 +17370,7 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $1247
+LEI4 $1245
 ADDRLP4 64
 ADDRFP4 0
 INDIRP4
@@ -17381,26 +17381,26 @@ CNSTI4 1384
 ADDP4
 INDIRI4
 ASGNI4
-ADDRGP4 $1248
-JUMPV
-LABELV $1247
-ADDRLP4 64
-ADDRGP4 level+36
-INDIRI4
-ASGNI4
-LABELV $1248
-ADDRLP4 60
-ADDRLP4 64
-INDIRI4
-ASGNI4
 ADDRGP4 $1246
 JUMPV
 LABELV $1245
-ADDRLP4 60
+ADDRLP4 64
 ADDRGP4 level+36
 INDIRI4
 ASGNI4
 LABELV $1246
+ADDRLP4 60
+ADDRLP4 64
+INDIRI4
+ASGNI4
+ADDRGP4 $1244
+JUMPV
+LABELV $1243
+ADDRLP4 60
+ADDRGP4 level+36
+INDIRI4
+ASGNI4
+LABELV $1244
 ADDRLP4 20
 ADDRLP4 60
 INDIRI4
@@ -17412,10 +17412,10 @@ ADDRFP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $1249
-ADDRGP4 $1228
+NEU4 $1247
+ADDRGP4 $1226
 JUMPV
-LABELV $1249
+LABELV $1247
 line 3112
 ;3111:
 ;3112:	if (targ && targ->damageRedirect)
@@ -17427,14 +17427,14 @@ ADDRLP4 72
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1251
+EQU4 $1249
 ADDRLP4 72
 INDIRP4
 CNSTI4 860
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1251
+EQI4 $1249
 line 3113
 ;3113:	{
 line 3114
@@ -17475,9 +17475,9 @@ CALLV
 pop
 line 3115
 ;3115:		return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1251
+LABELV $1249
 line 3118
 ;3116:	}
 ;3117:
@@ -17488,12 +17488,12 @@ CNSTI4 692
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $1253
+NEI4 $1251
 line 3119
 ;3119:		return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1253
+LABELV $1251
 line 3122
 ;3120:	}
 ;3121:
@@ -17510,7 +17510,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-EQU4 $1255
+EQU4 $1253
 ADDRLP4 84
 ADDRLP4 76
 INDIRP4
@@ -17523,14 +17523,14 @@ INDIRP4
 CVPU4 4
 ADDRLP4 80
 INDIRU4
-EQU4 $1255
+EQU4 $1253
 ADDRLP4 84
 INDIRP4
 CNSTI4 1304
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1255
+EQI4 $1253
 line 3123
 ;3123:	{
 line 3124
@@ -17547,7 +17547,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 92
 INDIRU4
-EQU4 $1257
+EQU4 $1255
 ADDRLP4 96
 CNSTI4 408
 ASGNI4
@@ -17560,7 +17560,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 92
 INDIRU4
-EQU4 $1257
+EQU4 $1255
 ADDRLP4 88
 INDIRP4
 INDIRI4
@@ -17573,14 +17573,14 @@ INDIRP4
 CNSTI4 1296
 ADDP4
 INDIRI4
-EQI4 $1257
+EQI4 $1255
 line 3125
 ;3125:		{
 line 3126
 ;3126:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1257
+LABELV $1255
 line 3128
 ;3127:		}
 ;3128:		else if (attacker && attacker->client && mod != MOD_SABER)
@@ -17596,7 +17596,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1259
+EQU4 $1257
 ADDRLP4 100
 INDIRP4
 CNSTI4 408
@@ -17605,22 +17605,22 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1259
+EQU4 $1257
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-EQI4 $1259
+EQI4 $1257
 line 3129
 ;3129:		{
 line 3130
 ;3130:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1259
+LABELV $1257
 line 3132
 ;3131:		}
 ;3132:	}
-LABELV $1255
+LABELV $1253
 line 3133
 ;3133:	if (attacker && attacker->client && attacker->client->ps.duelInProgress)
 ADDRLP4 88
@@ -17635,7 +17635,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 92
 INDIRU4
-EQU4 $1261
+EQU4 $1259
 ADDRLP4 96
 ADDRLP4 88
 INDIRP4
@@ -17648,14 +17648,14 @@ INDIRP4
 CVPU4 4
 ADDRLP4 92
 INDIRU4
-EQU4 $1261
+EQU4 $1259
 ADDRLP4 96
 INDIRP4
 CNSTI4 1304
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1261
+EQI4 $1259
 line 3134
 ;3134:	{
 line 3135
@@ -17672,7 +17672,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1263
+EQU4 $1261
 ADDRLP4 108
 CNSTI4 408
 ASGNI4
@@ -17685,7 +17685,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1263
+EQU4 $1261
 ADDRLP4 100
 INDIRP4
 INDIRI4
@@ -17698,14 +17698,14 @@ INDIRP4
 CNSTI4 1296
 ADDP4
 INDIRI4
-EQI4 $1263
+EQI4 $1261
 line 3136
 ;3136:		{
 line 3137
 ;3137:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1263
+LABELV $1261
 line 3139
 ;3138:		}
 ;3139:		else if (targ && targ->client && mod != MOD_SABER)
@@ -17721,7 +17721,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 116
 INDIRU4
-EQU4 $1265
+EQU4 $1263
 ADDRLP4 112
 INDIRP4
 CNSTI4 408
@@ -17730,22 +17730,22 @@ INDIRP4
 CVPU4 4
 ADDRLP4 116
 INDIRU4
-EQU4 $1265
+EQU4 $1263
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-EQI4 $1265
+EQI4 $1263
 line 3140
 ;3140:		{
 line 3141
 ;3141:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1265
+LABELV $1263
 line 3143
 ;3142:		}
 ;3143:	}
-LABELV $1261
+LABELV $1259
 line 3145
 ;3144:
 ;3145:	if (targ && targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)))
@@ -17761,7 +17761,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1267
+EQU4 $1265
 ADDRLP4 108
 ADDRLP4 100
 INDIRP4
@@ -17774,7 +17774,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 104
 INDIRU4
-EQU4 $1267
+EQU4 $1265
 ADDRLP4 108
 INDIRP4
 CNSTI4 848
@@ -17783,7 +17783,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $1267
+EQI4 $1265
 line 3146
 ;3146:	{
 line 3147
@@ -17798,7 +17798,7 @@ CVFI4 4
 ASGNI4
 line 3148
 ;3148:	}
-LABELV $1267
+LABELV $1265
 line 3156
 ;3149:
 ;3150:	// japro: do i need this?
@@ -17820,7 +17820,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 116
 INDIRU4
-EQU4 $1269
+EQU4 $1267
 ADDRLP4 120
 ADDRLP4 112
 INDIRP4
@@ -17833,7 +17833,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 116
 INDIRU4
-EQU4 $1269
+EQU4 $1267
 ADDRLP4 124
 CNSTI4 0
 ASGNI4
@@ -17844,14 +17844,14 @@ ADDP4
 INDIRI4
 ADDRLP4 124
 INDIRI4
-EQI4 $1269
+EQI4 $1267
 ADDRFP4 24
 INDIRI4
 CNSTI4 4096
 BANDI4
 ADDRLP4 124
 INDIRI4
-NEI4 $1269
+NEI4 $1267
 ADDRLP4 128
 ADDRFP4 0
 INDIRP4
@@ -17861,7 +17861,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 116
 INDIRU4
-EQU4 $1271
+EQU4 $1269
 ADDRLP4 128
 INDIRP4
 CNSTI4 696
@@ -17869,8 +17869,8 @@ ADDP4
 INDIRI4
 ADDRLP4 124
 INDIRI4
-NEI4 $1269
-LABELV $1271
+NEI4 $1267
+LABELV $1269
 ADDRFP4 8
 INDIRP4
 CNSTI4 408
@@ -17880,7 +17880,7 @@ CNSTI4 1304
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $1269
+NEI4 $1267
 line 3164
 ;3157:		//if (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] == MV_COOP_JKA) { //I think this is a bug
 ;3158:		//	//if (mod != MOD_BLASTER || (!targ->client || !targ->client->ps.stats[STAT_MOVEMENTSTYLE] != MV_COOP_JKA))
@@ -17890,9 +17890,9 @@ line 3164
 ;3162:		//if ((attacker->client->ps.stats[STAT_MOVEMENTSTYLE] != MV_RJQ3) && (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] != MV_RJCPM) && (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] != MV_JETPACK) && (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] != MV_TRIBES)) //ignore self damage
 ;3163:		//	return; //ignore self damage if attacker is in racemode
 ;3164:		return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1269
+LABELV $1267
 line 3170
 ;3165:		//if (((attacker->client->ps.stats[STAT_MOVEMENTSTYLE] == MV_RJQ3) || (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] == MV_RJCPM) || (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] == MV_JETPACK) || (attacker->client->ps.stats[STAT_MOVEMENTSTYLE] == MV_TRIBES)) && targ->client && (targ != attacker)) {
 ;3166:		//	return; //ignore other damage if attacker is in racemode - why is this not returning for detpacking race->outof race
@@ -17916,7 +17916,7 @@ ADDRLP4 136
 INDIRU4
 ADDRLP4 140
 INDIRU4
-EQU4 $1272
+EQU4 $1270
 ADDRLP4 144
 ADDRLP4 132
 INDIRP4
@@ -17929,7 +17929,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 140
 INDIRU4
-EQU4 $1272
+EQU4 $1270
 ADDRLP4 148
 CNSTI4 0
 ASGNI4
@@ -17940,17 +17940,17 @@ ADDP4
 INDIRI4
 ADDRLP4 148
 INDIRI4
-EQI4 $1272
+EQI4 $1270
 ADDRFP4 8
 INDIRP4
 CVPU4 4
 ADDRLP4 136
 INDIRU4
-EQU4 $1272
+EQU4 $1270
 ADDRFP4 28
 INDIRI4
 CNSTI4 37
-EQI4 $1272
+EQI4 $1270
 ADDRLP4 152
 ADDRFP4 24
 INDIRI4
@@ -17961,11 +17961,11 @@ CNSTI4 8192
 BANDI4
 ADDRLP4 148
 INDIRI4
-NEI4 $1272
+NEI4 $1270
 ADDRFP4 20
 INDIRI4
 CNSTI4 16777216
-EQI4 $1272
+EQI4 $1270
 ADDRLP4 144
 INDIRP4
 CNSTI4 1304
@@ -17973,19 +17973,19 @@ ADDP4
 INDIRI4
 ADDRLP4 148
 INDIRI4
-NEI4 $1272
+NEI4 $1270
 ADDRLP4 152
 INDIRI4
 CNSTI4 4096
 BANDI4
 ADDRLP4 148
 INDIRI4
-NEI4 $1272
+NEI4 $1270
 line 3171
 ;3171:		return; //ignore other damage if target is in racemode
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1272
+LABELV $1270
 line 3175
 ;3172:
 ;3173:	// the intermission has allready been qualified for, so don't
@@ -17994,7 +17994,7 @@ line 3175
 ADDRGP4 level+9024
 INDIRI4
 CNSTI4 0
-EQI4 $1274
+EQI4 $1272
 line 3176
 ;3176:		if (targ->client && targ->client->sess.raceMode) {
 ADDRLP4 156
@@ -18008,32 +18008,32 @@ ADDRLP4 156
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1228
+EQU4 $1226
 ADDRLP4 156
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1228
+EQI4 $1226
 line 3177
 ;3177:		}
 line 3178
 ;3178:		else {
 line 3179
 ;3179:			return;
-LABELV $1278
+LABELV $1276
 line 3181
 ;3180:		}
 ;3181:	}
-LABELV $1274
+LABELV $1272
 line 3182
 ;3182:	if ( !inflictor ) {
 ADDRFP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $1279
+NEU4 $1277
 line 3183
 ;3183:		inflictor = &g_entities[ENTITYNUM_WORLD];
 ADDRFP4 4
@@ -18041,14 +18041,14 @@ ADDRGP4 g_entities+2403744
 ASGNP4
 line 3184
 ;3184:	}
-LABELV $1279
+LABELV $1277
 line 3185
 ;3185:	if ( !attacker ) {
 ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $1282
+NEU4 $1280
 line 3186
 ;3186:		attacker = &g_entities[ENTITYNUM_WORLD];
 ADDRFP4 8
@@ -18056,7 +18056,7 @@ ADDRGP4 g_entities+2403744
 ASGNP4
 line 3187
 ;3187:	}
-LABELV $1282
+LABELV $1280
 line 3192
 ;3188:
 ;3189:	// shootable doors / buttons don't actually have any health
@@ -18073,14 +18073,14 @@ CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 6
-NEI4 $1285
+NEI4 $1283
 ADDRLP4 156
 INDIRP4
 CNSTI4 824
 ADDP4
 INDIRI4
 CNSTI4 1
-EQI4 $1285
+EQI4 $1283
 line 3193
 ;3193:		if ( targ->use && targ->moverState == MOVER_POS1 ) {
 ADDRLP4 160
@@ -18094,14 +18094,14 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1228
+EQU4 $1226
 ADDRLP4 160
 INDIRP4
 CNSTI4 516
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $1228
+NEI4 $1226
 line 3194
 ;3194:			targ->use( targ, inflictor, attacker );
 ADDRLP4 164
@@ -18128,9 +18128,9 @@ line 3195
 ;3195:		}
 line 3196
 ;3196:		return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1285
+LABELV $1283
 line 3200
 ;3197:	}
 ;3198:	// reduce damage by the attacker's handicap value
@@ -18147,14 +18147,14 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1289
+EQU4 $1287
 ADDRLP4 160
 INDIRP4
 CVPU4 4
 ADDRFP4 0
 INDIRP4
 CVPU4 4
-EQU4 $1289
+EQU4 $1287
 line 3201
 ;3201:		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
 ADDRLP4 36
@@ -18180,7 +18180,7 @@ DIVI4
 ASGNI4
 line 3203
 ;3203:	}
-LABELV $1289
+LABELV $1287
 line 3205
 ;3204:
 ;3205:	client = targ->client;
@@ -18198,7 +18198,7 @@ ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1291
+EQU4 $1289
 line 3208
 ;3208:		if ( client->noclip ) {
 ADDRLP4 0
@@ -18207,16 +18207,16 @@ CNSTI4 43600
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1293
+EQI4 $1291
 line 3209
 ;3209:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1293
+LABELV $1291
 line 3211
 ;3210:		}
 ;3211:	}
-LABELV $1291
+LABELV $1289
 line 3213
 ;3212:
 ;3213:	if ( !dir ) {
@@ -18224,7 +18224,7 @@ ADDRFP4 12
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $1295
+NEU4 $1293
 line 3214
 ;3214:		dflags |= DAMAGE_NO_KNOCKBACK;
 ADDRFP4 24
@@ -18235,9 +18235,9 @@ BORI4
 ASGNI4
 line 3215
 ;3215:	} else {
-ADDRGP4 $1296
+ADDRGP4 $1294
 JUMPV
-LABELV $1295
+LABELV $1293
 line 3216
 ;3216:		VectorNormalize(dir);
 ADDRFP4 12
@@ -18248,7 +18248,7 @@ CALLF4
 pop
 line 3217
 ;3217:	}
-LABELV $1296
+LABELV $1294
 line 3219
 ;3218:
 ;3219:	knockback = damage;
@@ -18261,7 +18261,7 @@ line 3220
 ADDRLP4 8
 INDIRI4
 CNSTI4 200
-LEI4 $1297
+LEI4 $1295
 line 3221
 ;3221:		knockback = 200;
 ADDRLP4 8
@@ -18269,7 +18269,7 @@ CNSTI4 200
 ASGNI4
 line 3222
 ;3222:	}
-LABELV $1297
+LABELV $1295
 line 3223
 ;3223:	if ( targ->flags & FL_NO_KNOCKBACK ) {
 ADDRFP4 0
@@ -18280,7 +18280,7 @@ INDIRI4
 CNSTI4 2048
 BANDI4
 CNSTI4 0
-EQI4 $1299
+EQI4 $1297
 line 3224
 ;3224:		knockback = 0;
 ADDRLP4 8
@@ -18288,7 +18288,7 @@ CNSTI4 0
 ASGNI4
 line 3225
 ;3225:	}
-LABELV $1299
+LABELV $1297
 line 3226
 ;3226:	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
 ADDRFP4 24
@@ -18296,7 +18296,7 @@ INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-EQI4 $1301
+EQI4 $1299
 line 3227
 ;3227:		knockback = 0;
 ADDRLP4 8
@@ -18304,7 +18304,7 @@ CNSTI4 0
 ASGNI4
 line 3228
 ;3228:	}
-LABELV $1301
+LABELV $1299
 line 3230
 ;3229:
 ;3230:	if (targ && targ->client && targ->client->ps.usingATST)
@@ -18320,7 +18320,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 168
 INDIRU4
-EQU4 $1303
+EQU4 $1301
 ADDRLP4 172
 ADDRLP4 164
 INDIRP4
@@ -18333,14 +18333,14 @@ INDIRP4
 CVPU4 4
 ADDRLP4 168
 INDIRU4
-EQU4 $1303
+EQU4 $1301
 ADDRLP4 172
 INDIRP4
 CNSTI4 1316
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1303
+EQI4 $1301
 line 3231
 ;3231:	{
 line 3232
@@ -18350,7 +18350,7 @@ CNSTI4 0
 ASGNI4
 line 3233
 ;3233:	}
-LABELV $1303
+LABELV $1301
 line 3236
 ;3234:
 ;3235:	// figure momentum add, even if the damage won't be taken
@@ -18358,7 +18358,7 @@ line 3236
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $1305
+EQI4 $1303
 ADDRFP4 0
 INDIRP4
 CNSTI4 408
@@ -18366,7 +18366,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1305
+EQU4 $1303
 line 3240
 ;3237:		vec3_t	kvel;
 ;3238:		float	mass;
@@ -18381,11 +18381,11 @@ line 3242
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-NEI4 $1307
+NEI4 $1305
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $1307
+EQI4 $1305
 line 3243
 ;3243:		{
 line 3244
@@ -18401,14 +18401,14 @@ ADDRLP4 192
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1309
+EQU4 $1307
 ADDRLP4 192
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1309
+EQI4 $1307
 line 3245
 ;3245:				VectorScale(dir, 1000.0f * (float)knockback / mass, kvel);
 ADDRLP4 196
@@ -18461,9 +18461,9 @@ MULF4
 ASGNF4
 line 3246
 ;3246:			}
-ADDRGP4 $1308
+ADDRGP4 $1306
 JUMPV
-LABELV $1309
+LABELV $1307
 line 3247
 ;3247:			else {
 line 3248
@@ -18544,9 +18544,9 @@ line 3249
 ;3249:			}
 line 3250
 ;3250:		}
-ADDRGP4 $1308
+ADDRGP4 $1306
 JUMPV
-LABELV $1307
+LABELV $1305
 line 3252
 ;3251:		else
 ;3252:		{
@@ -18563,14 +18563,14 @@ ADDRLP4 192
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1321
+EQU4 $1319
 ADDRLP4 192
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1321
+EQI4 $1319
 line 3254
 ;3254:				VectorScale(dir, 1000.0f * (float)knockback / mass, kvel);
 ADDRLP4 196
@@ -18621,9 +18621,9 @@ INDIRF4
 DIVF4
 MULF4
 ASGNF4
-ADDRGP4 $1322
+ADDRGP4 $1320
 JUMPV
-LABELV $1321
+LABELV $1319
 line 3256
 ;3255:			else
 ;3256:				VectorScale(dir, g_knockback.value * (float)knockback / mass, kvel);
@@ -18687,10 +18687,10 @@ INDIRF4
 DIVF4
 MULF4
 ASGNF4
-LABELV $1322
+LABELV $1320
 line 3257
 ;3257:		}
-LABELV $1308
+LABELV $1306
 line 3258
 ;3258:		VectorAdd (targ->client->ps.velocity, kvel, targ->client->ps.velocity);
 ADDRLP4 192
@@ -18766,7 +18766,7 @@ ADDRLP4 208
 INDIRU4
 ADDRLP4 212
 INDIRU4
-EQU4 $1332
+EQU4 $1330
 ADDRLP4 204
 INDIRP4
 CNSTI4 408
@@ -18775,13 +18775,13 @@ INDIRP4
 CVPU4 4
 ADDRLP4 212
 INDIRU4
-EQU4 $1332
+EQU4 $1330
 ADDRLP4 208
 INDIRU4
 ADDRFP4 0
 INDIRP4
 CVPU4 4
-EQU4 $1332
+EQU4 $1330
 line 3261
 ;3261:		{
 line 3262
@@ -18827,7 +18827,7 @@ ADDI4
 ASGNI4
 line 3265
 ;3265:		}
-LABELV $1332
+LABELV $1330
 line 3268
 ;3266:		// set the timer so that the other client can't cancel
 ;3267:		// out the movement immediately
@@ -18845,21 +18845,21 @@ ADDP4
 INDIRI4
 ADDRLP4 216
 INDIRI4
-NEI4 $1334
+NEI4 $1332
 ADDRGP4 g_saberDmgVelocityScale+12
 INDIRI4
 ADDRLP4 216
 INDIRI4
-NEI4 $1338
+NEI4 $1336
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-NEI4 $1338
+NEI4 $1336
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $1334
-LABELV $1338
+NEI4 $1332
+LABELV $1336
 line 3271
 ;3269:			int		t;
 ;3270:
@@ -18875,7 +18875,7 @@ line 3272
 ADDRLP4 220
 INDIRI4
 CNSTI4 50
-GEI4 $1339
+GEI4 $1337
 line 3273
 ;3273:				t = 50;
 ADDRLP4 220
@@ -18883,13 +18883,13 @@ CNSTI4 50
 ASGNI4
 line 3274
 ;3274:			}
-LABELV $1339
+LABELV $1337
 line 3275
 ;3275:			if ( t > 200 ) {
 ADDRLP4 220
 INDIRI4
 CNSTI4 200
-LEI4 $1341
+LEI4 $1339
 line 3276
 ;3276:				t = 200;
 ADDRLP4 220
@@ -18897,7 +18897,7 @@ CNSTI4 200
 ASGNI4
 line 3277
 ;3277:			}
-LABELV $1341
+LABELV $1339
 line 3278
 ;3278:			targ->client->ps.pm_time = t;
 ADDRFP4 0
@@ -18931,10 +18931,10 @@ BORI4
 ASGNI4
 line 3280
 ;3280:		}
-LABELV $1334
+LABELV $1332
 line 3281
 ;3281:	}
-LABELV $1305
+LABELV $1303
 line 3283
 ;3282:
 ;3283:	if (targ->client && targ->client->sess.raceMode && mod == MOD_SABER)
@@ -18949,18 +18949,18 @@ ADDRLP4 176
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1343
+EQU4 $1341
 ADDRLP4 176
 INDIRP4
 CNSTI4 43488
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1343
+EQI4 $1341
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-NEI4 $1343
+NEI4 $1341
 line 3284
 ;3284:	{ //add the shield effect and get out here (stops pain spam)
 line 3285
@@ -19016,9 +19016,9 @@ CNSTI4 100
 ASGNI4
 line 3289
 ;3289:		return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1343
+LABELV $1341
 line 3292
 ;3290:	}
 ;3291:	
@@ -19026,12 +19026,12 @@ line 3292
 ADDRGP4 g_trueJedi+12
 INDIRI4
 CNSTI4 0
-EQI4 $1345
+EQI4 $1343
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1345
+EQU4 $1343
 line 3293
 ;3293:	{//less explosive damage for jedi, more saber damage for non-jedi
 line 3294
@@ -19042,7 +19042,7 @@ CNSTI4 612
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1348
+EQI4 $1346
 line 3295
 ;3295:		{//if the target is a trueJedi, reduce splash and explosive damage to 1/2
 line 3296
@@ -19054,41 +19054,41 @@ ASGNI4
 ADDRLP4 180
 INDIRI4
 CNSTI4 12
-LTI4 $1349
+LTI4 $1347
 ADDRLP4 180
 INDIRI4
 CNSTI4 26
-GTI4 $1349
+GTI4 $1347
 ADDRLP4 180
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $1356-48
+ADDRGP4 $1354-48
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $1356
-address $1352
-address $1352
-address $1349
-address $1352
-address $1349
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
-address $1352
+LABELV $1354
+address $1350
+address $1350
+address $1347
+address $1350
+address $1347
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
+address $1350
 code
 line 3297
 ;3297:			{
-LABELV $1352
+LABELV $1350
 line 3311
 ;3298:			case MOD_REPEATER_ALT:
 ;3299:			case MOD_REPEATER_ALT_SPLASH:
@@ -19107,17 +19107,17 @@ line 3311
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-NEI4 $1354
+NEI4 $1352
 ADDRLP4 184
 CNSTF4 1061158912
 ASGNF4
-ADDRGP4 $1355
+ADDRGP4 $1353
 JUMPV
-LABELV $1354
+LABELV $1352
 ADDRLP4 184
 CNSTF4 1056964608
 ASGNF4
-LABELV $1355
+LABELV $1353
 ADDRFP4 20
 ADDRFP4 20
 INDIRI4
@@ -19132,9 +19132,9 @@ line 3312
 line 3314
 ;3313:			}
 ;3314:		}
-ADDRGP4 $1349
+ADDRGP4 $1347
 JUMPV
-LABELV $1348
+LABELV $1346
 line 3315
 ;3315:		else if ( client->ps.trueNonJedi && mod == MOD_SABER )
 ADDRLP4 0
@@ -19143,11 +19143,11 @@ CNSTI4 616
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1358
+EQI4 $1356
 ADDRFP4 28
 INDIRI4
 CNSTI4 3
-NEI4 $1358
+NEI4 $1356
 line 3316
 ;3316:		{//if the target is a trueNonJedi, take more saber damage... combined with the 1.5 in the w_saber stuff, this is 6 times damage!
 line 3317
@@ -19155,7 +19155,7 @@ line 3317
 ADDRFP4 20
 INDIRI4
 CNSTI4 100
-GEI4 $1360
+GEI4 $1358
 line 3318
 ;3318:			{
 line 3319
@@ -19171,7 +19171,7 @@ line 3320
 ADDRFP4 20
 INDIRI4
 CNSTI4 100
-LEI4 $1362
+LEI4 $1360
 line 3321
 ;3321:				{
 line 3322
@@ -19181,17 +19181,17 @@ CNSTI4 100
 ASGNI4
 line 3323
 ;3323:				}
-LABELV $1362
+LABELV $1360
 line 3324
 ;3324:			}
-LABELV $1360
+LABELV $1358
 line 3325
 ;3325:		}
-LABELV $1358
-LABELV $1349
+LABELV $1356
+LABELV $1347
 line 3326
 ;3326:	}
-LABELV $1345
+LABELV $1343
 line 3329
 ;3327:
 ;3328:	// check for completely getting out of the damage
@@ -19201,7 +19201,7 @@ INDIRI4
 CNSTI4 8
 BANDI4
 CNSTI4 0
-NEI4 $1364
+NEI4 $1362
 line 3333
 ;3330:
 ;3331:		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
@@ -19221,7 +19221,7 @@ CVPU4 4
 ADDRLP4 184
 INDIRP4
 CVPU4 4
-EQU4 $1366
+EQU4 $1364
 ADDRLP4 180
 INDIRP4
 ARGP4
@@ -19235,22 +19235,22 @@ ASGNI4
 ADDRLP4 188
 INDIRI4
 CNSTI4 0
-EQI4 $1366
+EQI4 $1364
 line 3334
 ;3334:			if ( !g_friendlyFire.integer ) {
 ADDRGP4 g_friendlyFire+12
 INDIRI4
 CNSTI4 0
-NEI4 $1368
+NEI4 $1366
 line 3335
 ;3335:				return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1368
+LABELV $1366
 line 3337
 ;3336:			}
 ;3337:		}
-LABELV $1366
+LABELV $1364
 line 3339
 ;3338:
 ;3339:		if (targ->client && attacker->client && targ->client->sess.mode == MODE_IRONMAN && attacker->client->sess.mode == MODE_IRONMAN 
@@ -19277,7 +19277,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 204
 INDIRU4
-EQU4 $1371
+EQU4 $1369
 ADDRLP4 208
 ADDRFP4 8
 INDIRP4
@@ -19295,7 +19295,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 204
 INDIRU4
-EQU4 $1371
+EQU4 $1369
 ADDRLP4 216
 CNSTI4 43484
 ASGNI4
@@ -19310,7 +19310,7 @@ ADDP4
 INDIRI4
 ADDRLP4 220
 INDIRI4
-NEI4 $1371
+NEI4 $1369
 ADDRLP4 212
 INDIRP4
 ADDRLP4 216
@@ -19319,7 +19319,7 @@ ADDP4
 INDIRI4
 ADDRLP4 220
 INDIRI4
-NEI4 $1371
+NEI4 $1369
 ADDRLP4 224
 CNSTI4 53188
 ASGNI4
@@ -19334,7 +19334,7 @@ ADDP4
 INDIRI4
 ADDRLP4 228
 INDIRI4
-NEI4 $1371
+NEI4 $1369
 ADDRLP4 200
 INDIRP4
 ADDRLP4 224
@@ -19343,21 +19343,21 @@ ADDP4
 INDIRI4
 ADDRLP4 228
 INDIRI4
-NEI4 $1371
+NEI4 $1369
 ADDRLP4 208
 INDIRP4
 CVPU4 4
 ADDRLP4 192
 INDIRP4
 CVPU4 4
-EQU4 $1371
+EQU4 $1369
 line 3340
 ;3340:			&& !attacker->client->isIronMan && !targ->client->isIronMan && attacker != targ) {
 line 3341
 ;3341:			return; // don't let "team mates" in iron man damage each other
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1371
+LABELV $1369
 line 3344
 ;3342:		}
 ;3343:
@@ -19365,7 +19365,7 @@ line 3344
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 2
-NEI4 $1373
+NEI4 $1371
 ADDRLP4 232
 CNSTI4 0
 ASGNI4
@@ -19373,7 +19373,7 @@ ADDRGP4 g_friendlyFire+12
 INDIRI4
 ADDRLP4 232
 INDIRI4
-NEI4 $1373
+NEI4 $1371
 ADDRLP4 236
 ADDRFP4 0
 INDIRP4
@@ -19390,7 +19390,7 @@ ADDRLP4 240
 INDIRU4
 ADDRLP4 244
 INDIRU4
-EQU4 $1373
+EQU4 $1371
 ADDRLP4 248
 CNSTI4 408
 ASGNI4
@@ -19407,7 +19407,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1373
+EQU4 $1371
 ADDRLP4 256
 ADDRFP4 8
 INDIRP4
@@ -19421,7 +19421,7 @@ ADDRLP4 260
 INDIRU4
 ADDRLP4 244
 INDIRU4
-EQU4 $1373
+EQU4 $1371
 ADDRLP4 264
 ADDRLP4 256
 INDIRP4
@@ -19435,12 +19435,12 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1373
+EQU4 $1371
 ADDRLP4 240
 INDIRU4
 ADDRLP4 260
 INDIRU4
-EQU4 $1373
+EQU4 $1371
 ADDRLP4 268
 CNSTI4 604
 ASGNI4
@@ -19452,7 +19452,7 @@ ADDP4
 INDIRI4
 ADDRLP4 232
 INDIRI4
-NEI4 $1373
+NEI4 $1371
 ADDRLP4 264
 INDIRP4
 ADDRLP4 268
@@ -19461,7 +19461,7 @@ ADDP4
 INDIRI4
 ADDRLP4 232
 INDIRI4
-NEI4 $1373
+NEI4 $1371
 ADDRLP4 272
 ADDRGP4 G_ThereIsAMaster
 CALLI4
@@ -19469,7 +19469,7 @@ ASGNI4
 ADDRLP4 272
 INDIRI4
 CNSTI4 0
-EQI4 $1373
+EQI4 $1371
 line 3348
 ;3345:			targ && targ->client && attacker && attacker->client &&
 ;3346:			targ != attacker && !targ->client->ps.isJediMaster && !attacker->client->ps.isJediMaster &&
@@ -19477,9 +19477,9 @@ line 3348
 ;3348:		{
 line 3349
 ;3349:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1373
+LABELV $1371
 line 3352
 ;3350:		}
 ;3351:
@@ -19503,7 +19503,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 284
 INDIRU4
-EQU4 $1377
+EQU4 $1375
 ADDRLP4 288
 CNSTI4 0
 ASGNI4
@@ -19514,7 +19514,7 @@ ADDP4
 INDIRI4
 ADDRLP4 288
 INDIRI4
-EQI4 $1377
+EQI4 $1375
 ADDRLP4 276
 INDIRP4
 CNSTI4 264
@@ -19522,7 +19522,7 @@ ADDP4
 INDIRI4
 ADDRLP4 288
 INDIRI4
-EQI4 $1377
+EQI4 $1375
 ADDRLP4 292
 ADDRFP4 8
 INDIRP4
@@ -19532,7 +19532,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 284
 INDIRU4
-EQU4 $1377
+EQU4 $1375
 ADDRLP4 292
 INDIRP4
 CNSTI4 412
@@ -19540,7 +19540,7 @@ ADDP4
 INDIRI4
 ADDRLP4 288
 INDIRI4
-EQI4 $1377
+EQI4 $1375
 ADDRLP4 292
 INDIRP4
 ADDRLP4 280
@@ -19550,7 +19550,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 284
 INDIRU4
-EQU4 $1377
+EQU4 $1375
 ADDRLP4 296
 ADDRLP4 276
 INDIRP4
@@ -19562,11 +19562,11 @@ ADDRLP4 296
 INDIRI4
 ADDRLP4 288
 INDIRI4
-LTI4 $1377
+LTI4 $1375
 ADDRLP4 296
 INDIRI4
 CNSTI4 32
-GEI4 $1377
+GEI4 $1375
 line 3354
 ;3353:			attacker && attacker->inuse && attacker->client && targ->s.owner >= 0 && targ->s.owner < MAX_CLIENTS)
 ;3354:		{
@@ -19598,14 +19598,14 @@ INDIRP4
 CVPU4 4
 ADDRLP4 308
 INDIRU4
-EQU4 $1379
+EQU4 $1377
 ADDRLP4 304
 INDIRP4
 CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1379
+EQI4 $1377
 ADDRLP4 304
 INDIRP4
 CNSTI4 408
@@ -19614,7 +19614,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 308
 INDIRU4
-EQU4 $1379
+EQU4 $1377
 line 3358
 ;3358:			{
 line 3359
@@ -19636,19 +19636,19 @@ ADDRLP4 312
 INDIRI4
 ADDRLP4 316
 INDIRI4
-EQI4 $1381
+EQI4 $1379
 ADDRGP4 g_friendlyFire+12
 INDIRI4
 ADDRLP4 316
 INDIRI4
-NEI4 $1381
+NEI4 $1379
 line 3360
 ;3360:				{
 line 3361
 ;3361:					return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1381
+LABELV $1379
 line 3363
 ;3362:				}
 ;3363:				if (targown->client && attacker->client && targown->client->sess.mode == MODE_IRONMAN && attacker->client->sess.mode == MODE_IRONMAN
@@ -19671,7 +19671,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 328
 INDIRU4
-EQU4 $1384
+EQU4 $1382
 ADDRLP4 332
 ADDRFP4 8
 INDIRP4
@@ -19685,7 +19685,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 328
 INDIRU4
-EQU4 $1384
+EQU4 $1382
 ADDRLP4 336
 CNSTI4 43484
 ASGNI4
@@ -19700,7 +19700,7 @@ ADDP4
 INDIRI4
 ADDRLP4 340
 INDIRI4
-NEI4 $1384
+NEI4 $1382
 ADDRLP4 332
 INDIRP4
 ADDRLP4 336
@@ -19709,7 +19709,7 @@ ADDP4
 INDIRI4
 ADDRLP4 340
 INDIRI4
-NEI4 $1384
+NEI4 $1382
 ADDRLP4 344
 CNSTI4 53188
 ASGNI4
@@ -19724,7 +19724,7 @@ ADDP4
 INDIRI4
 ADDRLP4 348
 INDIRI4
-NEI4 $1384
+NEI4 $1382
 ADDRLP4 324
 INDIRP4
 ADDRLP4 344
@@ -19733,21 +19733,21 @@ ADDP4
 INDIRI4
 ADDRLP4 348
 INDIRI4
-NEI4 $1384
+NEI4 $1382
 line 3364
 ;3364:					&& !attacker->client->isIronMan && !targown->client->isIronMan) {
 line 3365
 ;3365:					return; // don't let "team mates" in iron man damage each other (does it make sense to do this here too? idk)
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1384
+LABELV $1382
 line 3367
 ;3366:				}
 ;3367:			}
-LABELV $1379
+LABELV $1377
 line 3368
 ;3368:		}
-LABELV $1377
+LABELV $1375
 line 3371
 ;3369:
 ;3370:		// check for godmode
@@ -19760,12 +19760,12 @@ INDIRI4
 CNSTI4 16
 BANDI4
 CNSTI4 0
-EQI4 $1386
+EQI4 $1384
 line 3372
 ;3372:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1386
+LABELV $1384
 line 3375
 ;3373:		}
 ;3374:
@@ -19786,7 +19786,7 @@ ADDRLP4 304
 INDIRU4
 ADDRLP4 308
 INDIRU4
-EQU4 $1388
+EQU4 $1386
 ADDRLP4 312
 CNSTI4 408
 ASGNI4
@@ -19803,7 +19803,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 308
 INDIRU4
-EQU4 $1388
+EQU4 $1386
 ADDRLP4 316
 INDIRP4
 CNSTI4 108
@@ -19812,7 +19812,7 @@ INDIRI4
 CNSTI4 67108864
 BANDI4
 CNSTI4 0
-EQI4 $1388
+EQI4 $1386
 ADDRLP4 320
 ADDRFP4 8
 INDIRP4
@@ -19826,7 +19826,7 @@ ADDRLP4 324
 INDIRU4
 ADDRLP4 308
 INDIRU4
-EQU4 $1388
+EQU4 $1386
 ADDRLP4 320
 INDIRP4
 ADDRLP4 312
@@ -19836,12 +19836,12 @@ INDIRP4
 CVPU4 4
 ADDRLP4 308
 INDIRU4
-EQU4 $1388
+EQU4 $1386
 ADDRLP4 304
 INDIRU4
 ADDRLP4 324
 INDIRU4
-EQU4 $1388
+EQU4 $1386
 line 3377
 ;3376:			attacker && attacker->client && targ != attacker)
 ;3377:		{
@@ -19857,7 +19857,7 @@ ADDP4
 INDIRI4
 ADDRLP4 20
 INDIRI4
-GTI4 $1228
+GTI4 $1226
 line 3379
 ;3379:			{
 line 3380
@@ -19886,14 +19886,14 @@ line 3383
 ;3383:			{
 line 3384
 ;3384:				return;
-LABELV $1391
+LABELV $1389
 line 3386
 ;3385:			}
 ;3386:		}
-LABELV $1388
+LABELV $1386
 line 3387
 ;3387:	}
-LABELV $1364
+LABELV $1362
 line 3389
 ;3388:
 ;3389:	if (attacker && attacker->client)
@@ -19909,7 +19909,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 184
 INDIRU4
-EQU4 $1392
+EQU4 $1390
 ADDRLP4 180
 INDIRP4
 CNSTI4 408
@@ -19918,7 +19918,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 184
 INDIRU4
-EQU4 $1392
+EQU4 $1390
 line 3390
 ;3390:	{
 line 3391
@@ -19937,7 +19937,7 @@ ADDRLP4 188
 INDIRI4
 ADDRLP4 192
 INDIRI4
-EQI4 $1394
+EQI4 $1392
 ADDRLP4 188
 INDIRI4
 ADDRFP4 8
@@ -19948,25 +19948,25 @@ INDIRP4
 CNSTI4 43440
 ADDP4
 INDIRI4
-NEI4 $1394
+NEI4 $1392
 ADDRGP4 g_ff_objectives+12
 INDIRI4
 ADDRLP4 192
 INDIRI4
-NEI4 $1394
+NEI4 $1392
 line 3394
 ;3392:			targ->teamnodmg == (int)attacker->client->sess.sessionTeam &&
 ;3393:			!g_ff_objectives.integer)
 ;3394:		{
 line 3395
 ;3395:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1394
+LABELV $1392
 line 3397
 ;3396:		}
 ;3397:	}
-LABELV $1392
+LABELV $1390
 line 3401
 ;3398:
 ;3399:	// battlesuit protects from all radius damage (but takes knockback)
@@ -19976,14 +19976,14 @@ ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1397
+EQU4 $1395
 ADDRLP4 0
 INDIRP4
 CNSTI4 352
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1397
+EQI4 $1395
 line 3402
 ;3402:		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
 ADDRFP4 0
@@ -20003,17 +20003,17 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-NEI4 $1401
+NEI4 $1399
 ADDRFP4 28
 INDIRI4
 CNSTI4 34
-NEI4 $1399
-LABELV $1401
+NEI4 $1397
+LABELV $1399
 line 3404
 ;3404:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1399
+LABELV $1397
 line 3406
 ;3405:		}
 ;3406:		damage *= 0.5;
@@ -20027,7 +20027,7 @@ CVFI4 4
 ASGNI4
 line 3407
 ;3407:	}
-LABELV $1397
+LABELV $1395
 line 3410
 ;3408:
 ;3409:	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
@@ -20047,7 +20047,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 196
 INDIRU4
-EQU4 $1402
+EQU4 $1400
 ADDRLP4 200
 ADDRFP4 0
 INDIRP4
@@ -20058,7 +20058,7 @@ CVPU4 4
 ADDRLP4 192
 INDIRP4
 CVPU4 4
-EQU4 $1402
+EQU4 $1400
 ADDRLP4 204
 CNSTI4 0
 ASGNI4
@@ -20069,7 +20069,7 @@ ADDP4
 INDIRI4
 ADDRLP4 204
 INDIRI4
-LEI4 $1402
+LEI4 $1400
 ADDRLP4 208
 ADDRLP4 200
 INDIRP4
@@ -20080,18 +20080,18 @@ ASGNI4
 ADDRLP4 208
 INDIRI4
 CNSTI4 3
-EQI4 $1402
+EQI4 $1400
 ADDRLP4 208
 INDIRI4
 ADDRLP4 204
 INDIRI4
-EQI4 $1402
+EQI4 $1400
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRLP4 196
 INDIRU4
-EQU4 $1402
+EQU4 $1400
 line 3413
 ;3411:			&& targ->s.eType != ET_MISSILE
 ;3412:			&& targ->s.eType != ET_GENERAL
@@ -20111,7 +20111,7 @@ ASGNI4
 ADDRLP4 212
 INDIRI4
 CNSTI4 0
-EQI4 $1404
+EQI4 $1402
 line 3415
 ;3415:			attacker->client->ps.persistant[PERS_HITS]--;
 ADDRLP4 216
@@ -20133,9 +20133,9 @@ SUBI4
 ASGNI4
 line 3416
 ;3416:		} else {
-ADDRGP4 $1405
+ADDRGP4 $1403
 JUMPV
-LABELV $1404
+LABELV $1402
 line 3417
 ;3417:			attacker->client->ps.persistant[PERS_HITS]++;
 ADDRLP4 216
@@ -20157,7 +20157,7 @@ ADDI4
 ASGNI4
 line 3418
 ;3418:		}
-LABELV $1405
+LABELV $1403
 line 3419
 ;3419:		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 ADDRFP4 8
@@ -20183,7 +20183,7 @@ BORI4
 ASGNI4
 line 3420
 ;3420:	}
-LABELV $1402
+LABELV $1400
 line 3424
 ;3421:
 ;3422:	// always give half damage if hurting self
@@ -20195,7 +20195,7 @@ CVPU4 4
 ADDRFP4 8
 INDIRP4
 CVPU4 4
-NEU4 $1406
+NEU4 $1404
 line 3425
 ;3425:		damage *= 0.5;
 ADDRFP4 20
@@ -20208,14 +20208,14 @@ CVFI4 4
 ASGNI4
 line 3426
 ;3426:	}
-LABELV $1406
+LABELV $1404
 line 3428
 ;3427:
 ;3428:	if ( damage < 1 ) {
 ADDRFP4 20
 INDIRI4
 CNSTI4 1
-GEI4 $1408
+GEI4 $1406
 line 3429
 ;3429:		damage = 1;
 ADDRFP4 20
@@ -20223,7 +20223,7 @@ CNSTI4 1
 ASGNI4
 line 3430
 ;3430:	}
-LABELV $1408
+LABELV $1406
 line 3431
 ;3431:	take = damage;
 ADDRLP4 4
@@ -20257,7 +20257,7 @@ line 3436
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-EQI4 $1410
+EQI4 $1408
 line 3437
 ;3437:	{
 line 3438
@@ -20269,7 +20269,7 @@ CVIF4 4
 ASGNF4
 line 3439
 ;3439:	}
-LABELV $1410
+LABELV $1408
 line 3441
 ;3440:
 ;3441:	take -= asave;
@@ -20290,12 +20290,12 @@ ASGNI4
 ADDRLP4 216
 INDIRI4
 CNSTI4 14
-EQI4 $1414
+EQI4 $1412
 ADDRLP4 216
 INDIRI4
 CNSTI4 15
-NEI4 $1412
-LABELV $1414
+NEI4 $1410
+LABELV $1412
 line 3444
 ;3444:	{ //demp2 does full damage to shields, but only 1/3 normal damage to health
 line 3445
@@ -20303,7 +20303,7 @@ line 3445
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-LEI4 $1415
+LEI4 $1413
 line 3446
 ;3446:		{
 line 3447
@@ -20319,7 +20319,7 @@ line 3448
 ADDRLP4 4
 INDIRI4
 CNSTI4 1
-GEI4 $1417
+GEI4 $1415
 line 3449
 ;3449:			{
 line 3450
@@ -20329,23 +20329,23 @@ CNSTI4 1
 ASGNI4
 line 3451
 ;3451:			}
-LABELV $1417
+LABELV $1415
 line 3452
 ;3452:		}
-LABELV $1415
+LABELV $1413
 line 3453
 ;3453:	}
-LABELV $1412
+LABELV $1410
 line 3455
 ;3454:
 ;3455:	if ( g_debugDamage.integer ) {
 ADDRGP4 g_debugDamage+12
 INDIRI4
 CNSTI4 0
-EQI4 $1419
+EQI4 $1417
 line 3456
 ;3456:		G_Printf( "%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
-ADDRGP4 $1422
+ADDRGP4 $1420
 ARGP4
 ADDRGP4 level+36
 INDIRI4
@@ -20376,7 +20376,7 @@ pop
 line 3458
 ;3457:			targ->health, take, asave );
 ;3458:	}
-LABELV $1419
+LABELV $1417
 line 3463
 ;3459:
 ;3460:	// add to the damage inflicted on a player this frame
@@ -20387,14 +20387,14 @@ ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1424
+EQU4 $1422
 line 3464
 ;3464:		if ( attacker ) {
 ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1426
+EQU4 $1424
 line 3465
 ;3465:			client->ps.persistant[PERS_ATTACKER] = attacker->s.number;
 ADDRLP4 0
@@ -20407,9 +20407,9 @@ INDIRI4
 ASGNI4
 line 3466
 ;3466:		} else {
-ADDRGP4 $1427
+ADDRGP4 $1425
 JUMPV
-LABELV $1426
+LABELV $1424
 line 3467
 ;3467:			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
 ADDRLP4 0
@@ -20420,7 +20420,7 @@ CNSTI4 1022
 ASGNI4
 line 3468
 ;3468:		}
-LABELV $1427
+LABELV $1425
 line 3469
 ;3469:		client->damage_armor += asave;
 ADDRLP4 220
@@ -20478,7 +20478,7 @@ ADDRFP4 12
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1428
+EQU4 $1426
 line 3473
 ;3473:			VectorCopy ( dir, client->damage_from );
 ADDRLP4 0
@@ -20499,9 +20499,9 @@ CNSTI4 0
 ASGNI4
 line 3475
 ;3475:		} else {
-ADDRGP4 $1429
+ADDRGP4 $1427
 JUMPV
-LABELV $1428
+LABELV $1426
 line 3476
 ;3476:			VectorCopy ( targ->r.currentOrigin, client->damage_from );
 ADDRLP4 0
@@ -20524,7 +20524,7 @@ CNSTI4 1
 ASGNI4
 line 3478
 ;3478:		}
-LABELV $1429
+LABELV $1427
 line 3480
 ;3479:
 ;3480:		if (attacker && attacker->client)
@@ -20540,7 +20540,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 236
 INDIRU4
-EQU4 $1430
+EQU4 $1428
 ADDRLP4 232
 INDIRP4
 CNSTI4 408
@@ -20549,7 +20549,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 236
 INDIRU4
-EQU4 $1430
+EQU4 $1428
 line 3481
 ;3481:		{
 line 3482
@@ -20565,9 +20565,9 @@ CALLV
 pop
 line 3483
 ;3483:		}
-ADDRGP4 $1431
+ADDRGP4 $1429
 JUMPV
-LABELV $1430
+LABELV $1428
 line 3484
 ;3484:		else if (inflictor && inflictor->client)
 ADDRLP4 240
@@ -20582,7 +20582,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1432
+EQU4 $1430
 ADDRLP4 240
 INDIRP4
 CNSTI4 408
@@ -20591,7 +20591,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1432
+EQU4 $1430
 line 3485
 ;3485:		{
 line 3486
@@ -20607,11 +20607,11 @@ CALLV
 pop
 line 3487
 ;3487:		}
-LABELV $1432
-LABELV $1431
+LABELV $1430
+LABELV $1429
 line 3488
 ;3488:	}
-LABELV $1424
+LABELV $1422
 line 3491
 ;3489:
 ;3490:	// See if it's the player hurting the emeny flag carrier
@@ -20619,12 +20619,12 @@ line 3491
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 7
-EQI4 $1438
+EQI4 $1436
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 8
-NEI4 $1434
-LABELV $1438
+NEI4 $1432
+LABELV $1436
 line 3492
 ;3492:		Team_CheckHurtCarrier(targ, attacker);
 ADDRFP4 0
@@ -20638,7 +20638,7 @@ CALLV
 pop
 line 3493
 ;3493:	}
-LABELV $1434
+LABELV $1432
 line 3495
 ;3494:
 ;3495:	if (targ->client) {
@@ -20649,7 +20649,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1439
+EQU4 $1437
 line 3497
 ;3496:		// set the last client who damaged the target
 ;3497:		targ->client->lasthurt_client = attacker->s.number;
@@ -20678,7 +20678,7 @@ INDIRI4
 ASGNI4
 line 3499
 ;3499:	}
-LABELV $1439
+LABELV $1437
 line 3501
 ;3500:
 ;3501:	if (take && targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_PROTECT)))
@@ -20689,7 +20689,7 @@ ADDRLP4 4
 INDIRI4
 ADDRLP4 220
 INDIRI4
-EQI4 $1441
+EQI4 $1439
 ADDRLP4 224
 ADDRFP4 0
 INDIRP4
@@ -20701,7 +20701,7 @@ ADDRLP4 224
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1441
+EQU4 $1439
 ADDRLP4 224
 INDIRP4
 CNSTI4 848
@@ -20711,7 +20711,7 @@ CNSTI4 512
 BANDI4
 ADDRLP4 220
 INDIRI4
-EQI4 $1441
+EQI4 $1439
 line 3502
 ;3502:	{
 line 3503
@@ -20725,7 +20725,7 @@ CNSTI4 932
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $1443
+EQI4 $1441
 line 3504
 ;3504:		{
 line 3505
@@ -20748,11 +20748,11 @@ ADDP4
 INDIRI4
 ADDRLP4 20
 INDIRI4
-GEI4 $1445
+GEI4 $1443
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $1445
+EQI4 $1443
 line 3509
 ;3509:			{
 line 3510
@@ -20786,14 +20786,14 @@ ADDI4
 ASGNI4
 line 3512
 ;3512:			}
-LABELV $1445
+LABELV $1443
 line 3514
 ;3513:
 ;3514:			if ( jk2gameplay == VERSION_1_02 )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $1447
+NEI4 $1445
 line 3515
 ;3515:			{
 line 3516
@@ -20813,7 +20813,7 @@ CALLP4
 pop
 line 3517
 ;3517:			}
-LABELV $1447
+LABELV $1445
 line 3519
 ;3518:
 ;3519:			if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_1)
@@ -20826,7 +20826,7 @@ CNSTI4 980
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $1449
+NEI4 $1447
 line 3520
 ;3520:			{
 line 3521
@@ -20845,7 +20845,7 @@ line 3524
 ADDRLP4 228
 INDIRI4
 CNSTI4 100
-LEI4 $1450
+LEI4 $1448
 line 3525
 ;3525:				{
 line 3526
@@ -20857,9 +20857,9 @@ line 3527
 ;3527:				}
 line 3528
 ;3528:			}
-ADDRGP4 $1450
+ADDRGP4 $1448
 JUMPV
-LABELV $1449
+LABELV $1447
 line 3529
 ;3529:			else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_2)
 ADDRFP4 0
@@ -20871,7 +20871,7 @@ CNSTI4 980
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $1453
+NEI4 $1451
 line 3530
 ;3530:			{
 line 3531
@@ -20890,7 +20890,7 @@ line 3534
 ADDRLP4 228
 INDIRI4
 CNSTI4 200
-LEI4 $1454
+LEI4 $1452
 line 3535
 ;3535:				{
 line 3536
@@ -20902,9 +20902,9 @@ line 3537
 ;3537:				}
 line 3538
 ;3538:			}
-ADDRGP4 $1454
+ADDRGP4 $1452
 JUMPV
-LABELV $1453
+LABELV $1451
 line 3539
 ;3539:			else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_3)
 ADDRFP4 0
@@ -20916,7 +20916,7 @@ CNSTI4 980
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $1457
+NEI4 $1455
 line 3540
 ;3540:			{
 line 3541
@@ -20935,7 +20935,7 @@ line 3544
 ADDRLP4 228
 INDIRI4
 CNSTI4 400
-LEI4 $1459
+LEI4 $1457
 line 3545
 ;3545:				{
 line 3546
@@ -20945,12 +20945,12 @@ CNSTI4 400
 ASGNI4
 line 3547
 ;3547:				}
-LABELV $1459
+LABELV $1457
 line 3548
 ;3548:			}
-LABELV $1457
-LABELV $1454
-LABELV $1450
+LABELV $1455
+LABELV $1452
+LABELV $1448
 line 3550
 ;3549:
 ;3550:			if (!targ->client->ps.powerups[PW_FORCE_BOON])
@@ -20963,7 +20963,7 @@ CNSTI4 400
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $1461
+NEI4 $1459
 line 3551
 ;3551:			{
 line 3552
@@ -20994,9 +20994,9 @@ CVFI4 4
 ASGNI4
 line 3553
 ;3553:			}
-ADDRGP4 $1462
+ADDRGP4 $1460
 JUMPV
-LABELV $1461
+LABELV $1459
 line 3555
 ;3554:			else
 ;3555:			{
@@ -21030,7 +21030,7 @@ CVFI4 4
 ASGNI4
 line 3557
 ;3557:			}
-LABELV $1462
+LABELV $1460
 line 3558
 ;3558:			subamt = (maxtake*hamt)+(take-maxtake);
 ADDRLP4 232
@@ -21064,7 +21064,7 @@ CNSTI4 932
 ADDP4
 INDIRI4
 CNSTI4 0
-GEI4 $1463
+GEI4 $1461
 line 3560
 ;3560:			{
 line 3561
@@ -21095,13 +21095,13 @@ CNSTI4 0
 ASGNI4
 line 3563
 ;3563:			}
-LABELV $1463
+LABELV $1461
 line 3564
 ;3564:			if (subamt)
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-EQI4 $1465
+EQI4 $1463
 line 3565
 ;3565:			{
 line 3566
@@ -21119,7 +21119,7 @@ line 3568
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-GEI4 $1467
+GEI4 $1465
 line 3569
 ;3569:				{
 line 3570
@@ -21129,23 +21129,23 @@ CNSTI4 0
 ASGNI4
 line 3571
 ;3571:				}
-LABELV $1467
+LABELV $1465
 line 3572
 ;3572:			}
-LABELV $1465
+LABELV $1463
 line 3573
 ;3573:		}
-LABELV $1443
+LABELV $1441
 line 3574
 ;3574:	}
-LABELV $1441
+LABELV $1439
 line 3576
 ;3575:
 ;3576:	if (shieldAbsorbed)
 ADDRLP4 16
 INDIRF4
 CNSTF4 0
-EQF4 $1469
+EQF4 $1467
 line 3577
 ;3577:	{
 line 3581
@@ -21227,7 +21227,7 @@ line 3606
 ;3604:
 ;3605:*/
 ;3606:	}
-LABELV $1469
+LABELV $1467
 line 3609
 ;3607:
 ;3608:	// do the damage
@@ -21239,7 +21239,7 @@ ADDRLP4 4
 INDIRI4
 ADDRLP4 228
 INDIRI4
-EQI4 $1471
+EQI4 $1469
 ADDRLP4 232
 ADDRFP4 0
 INDIRP4
@@ -21251,7 +21251,7 @@ ADDRLP4 232
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1473
+EQU4 $1471
 ADDRLP4 232
 INDIRP4
 CNSTI4 43488
@@ -21259,15 +21259,15 @@ ADDP4
 INDIRI4
 ADDRLP4 228
 INDIRI4
-EQI4 $1473
+EQI4 $1471
 ADDRFP4 24
 INDIRI4
 CNSTI4 8192
 BANDI4
 ADDRLP4 228
 INDIRI4
-NEI4 $1471
-LABELV $1473
+NEI4 $1469
+LABELV $1471
 line 3610
 ;3610:		if (targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
 ADDRLP4 236
@@ -21289,7 +21289,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1474
+EQU4 $1472
 ADDRLP4 240
 INDIRP4
 CNSTI4 848
@@ -21298,7 +21298,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $1474
+EQI4 $1472
 ADDRFP4 4
 INDIRP4
 ADDRLP4 236
@@ -21308,7 +21308,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-NEU4 $1476
+NEU4 $1474
 ADDRFP4 8
 INDIRP4
 ADDRLP4 236
@@ -21318,8 +21318,8 @@ INDIRP4
 CVPU4 4
 ADDRLP4 244
 INDIRU4
-EQU4 $1474
-LABELV $1476
+EQU4 $1472
+LABELV $1474
 line 3611
 ;3611:		{
 line 3612
@@ -21341,7 +21341,7 @@ DIVI4
 ASGNI4
 line 3613
 ;3613:		}
-LABELV $1474
+LABELV $1472
 line 3615
 ;3614:
 ;3615:		targ->health = targ->health - take;
@@ -21369,7 +21369,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1477
+EQU4 $1475
 line 3617
 ;3617:			targ->client->ps.stats[STAT_HEALTH] = targ->health;
 ADDRLP4 252
@@ -21391,7 +21391,7 @@ INDIRI4
 ASGNI4
 line 3618
 ;3618:		}
-LABELV $1477
+LABELV $1475
 line 3620
 ;3619:
 ;3620:		if (targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
@@ -21414,7 +21414,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 260
 INDIRU4
-EQU4 $1479
+EQU4 $1477
 ADDRLP4 256
 INDIRP4
 CNSTI4 848
@@ -21423,7 +21423,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $1479
+EQI4 $1477
 ADDRFP4 4
 INDIRP4
 ADDRLP4 252
@@ -21433,7 +21433,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 260
 INDIRU4
-NEU4 $1481
+NEU4 $1479
 ADDRFP4 8
 INDIRP4
 ADDRLP4 252
@@ -21443,8 +21443,8 @@ INDIRP4
 CVPU4 4
 ADDRLP4 260
 INDIRU4
-EQU4 $1479
-LABELV $1481
+EQU4 $1477
+LABELV $1479
 line 3621
 ;3621:		{
 line 3622
@@ -21455,7 +21455,7 @@ CNSTI4 688
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $1482
+GTI4 $1480
 line 3623
 ;3623:			{
 line 3624
@@ -21468,7 +21468,7 @@ CNSTI4 1
 ASGNI4
 line 3625
 ;3625:			}
-LABELV $1482
+LABELV $1480
 line 3626
 ;3626:			if (targ->client->ps.stats[STAT_HEALTH] <= 0)
 ADDRFP4 0
@@ -21480,7 +21480,7 @@ CNSTI4 216
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $1484
+GTI4 $1482
 line 3627
 ;3627:			{
 line 3628
@@ -21496,10 +21496,10 @@ CNSTI4 1
 ASGNI4
 line 3629
 ;3629:			}
-LABELV $1484
+LABELV $1482
 line 3630
 ;3630:		}
-LABELV $1479
+LABELV $1477
 line 3632
 ;3631:	
 ;3632:		if ( targ->health <= 0 ) {
@@ -21509,14 +21509,14 @@ CNSTI4 688
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $1486
+GTI4 $1484
 line 3633
 ;3633:			if ( client )
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1488
+EQU4 $1486
 line 3634
 ;3634:			{
 line 3635
@@ -21542,7 +21542,7 @@ ADDRFP4 16
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1490
+EQU4 $1488
 line 3638
 ;3638:				{
 line 3639
@@ -21557,9 +21557,9 @@ INDIRB
 ASGNB 12
 line 3640
 ;3640:				}
-ADDRGP4 $1489
+ADDRGP4 $1487
 JUMPV
-LABELV $1490
+LABELV $1488
 line 3642
 ;3641:				else
 ;3642:				{
@@ -21586,9 +21586,9 @@ line 3644
 ;3644:				}
 line 3645
 ;3645:			}
-ADDRGP4 $1489
+ADDRGP4 $1487
 JUMPV
-LABELV $1488
+LABELV $1486
 line 3646
 ;3646:			else if (targ->s.eType == ET_GRAPPLE)
 ADDRFP4 0
@@ -21597,7 +21597,7 @@ CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 13
-NEI4 $1492
+NEI4 $1490
 line 3647
 ;3647:			{ //g2animent
 line 3648
@@ -21612,8 +21612,8 @@ INDIRB
 ASGNB 12
 line 3649
 ;3649:			}
-LABELV $1492
-LABELV $1489
+LABELV $1490
+LABELV $1487
 line 3651
 ;3650:
 ;3651:			if (targ->health < -999)
@@ -21623,7 +21623,7 @@ CNSTI4 688
 ADDP4
 INDIRI4
 CNSTI4 -999
-GEI4 $1494
+GEI4 $1492
 line 3652
 ;3652:				targ->health = -999;
 ADDRFP4 0
@@ -21632,7 +21632,7 @@ CNSTI4 688
 ADDP4
 CNSTI4 -999
 ASGNI4
-LABELV $1494
+LABELV $1492
 line 3655
 ;3653:
 ;3654:			// If we are a breaking glass brush, store the damage point so we can do cool things with it.
@@ -21645,7 +21645,7 @@ INDIRI4
 CNSTI4 134217728
 BANDI4
 CNSTI4 0
-EQI4 $1496
+EQI4 $1494
 line 3656
 ;3656:			{
 line 3657
@@ -21670,7 +21670,7 @@ INDIRB
 ASGNB 12
 line 3659
 ;3659:			}
-LABELV $1496
+LABELV $1494
 line 3661
 ;3660:
 ;3661:			targ->enemy = attacker;
@@ -21711,9 +21711,9 @@ CALLV
 pop
 line 3663
 ;3663:			return;
-ADDRGP4 $1228
+ADDRGP4 $1226
 JUMPV
-LABELV $1486
+LABELV $1484
 line 3665
 ;3664:		}
 ;3665:		else {
@@ -21726,7 +21726,7 @@ ADDRGP4 g_debugMelee+12
 INDIRI4
 ADDRLP4 264
 INDIRI4
-EQI4 $1498
+EQI4 $1496
 ADDRLP4 268
 ADDRFP4 0
 INDIRP4
@@ -21738,7 +21738,7 @@ ADDRLP4 268
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1498
+EQU4 $1496
 ADDRLP4 268
 INDIRP4
 CNSTI4 43488
@@ -21746,7 +21746,7 @@ ADDP4
 INDIRI4
 ADDRLP4 264
 INDIRI4
-EQI4 $1498
+EQI4 $1496
 ADDRLP4 268
 INDIRP4
 CNSTI4 43500
@@ -21757,7 +21757,7 @@ CNSTI4 256
 BANDI4
 ADDRLP4 264
 INDIRI4
-EQI4 $1498
+EQI4 $1496
 line 3667
 ;3667:			{//getting hurt makes you let go of the wall
 line 3668
@@ -21773,7 +21773,7 @@ ADDRLP4 272
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1501
+EQU4 $1499
 ADDRLP4 272
 INDIRP4
 CNSTI4 12
@@ -21782,7 +21782,7 @@ INDIRI4
 CNSTI4 16384
 BANDI4
 CNSTI4 0
-EQI4 $1501
+EQI4 $1499
 line 3669
 ;3669:				{
 line 3670
@@ -21795,10 +21795,10 @@ CALLV
 pop
 line 3671
 ;3671:				}
-LABELV $1501
+LABELV $1499
 line 3672
 ;3672:			}
-LABELV $1498
+LABELV $1496
 line 3673
 ;3673:			if (targ->pain) {
 ADDRFP4 0
@@ -21808,7 +21808,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $1503
+EQU4 $1501
 line 3674
 ;3674:				targ->pain(targ, attacker, take);
 ADDRLP4 272
@@ -21833,7 +21833,7 @@ CALLV
 pop
 line 3675
 ;3675:			}
-LABELV $1503
+LABELV $1501
 line 3676
 ;3676:		}
 line 3678
@@ -21854,11 +21854,11 @@ CALLV
 pop
 line 3679
 ;3679:	}
-LABELV $1471
+LABELV $1469
 line 3681
 ;3680:
 ;3681:}
-LABELV $1228
+LABELV $1226
 endproc G_Damage 352 32
 export CanDamage
 proc CanDamage 1136 28
@@ -21991,21 +21991,21 @@ line 3704
 ADDRLP4 24+8
 INDIRF4
 CNSTF4 1065353216
-EQF4 $1516
+EQF4 $1514
 ADDRLP4 24+52
 INDIRI4
 ADDRFP4 0
 INDIRP4
 INDIRI4
-NEI4 $1512
-LABELV $1516
+NEI4 $1510
+LABELV $1514
 line 3705
 ;3705:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1505
+ADDRGP4 $1503
 JUMPV
-LABELV $1512
+LABELV $1510
 line 3709
 ;3706:
 ;3707:	// this should probably check in the plane of projection, 
@@ -22061,14 +22061,14 @@ line 3713
 ADDRLP4 24+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $1518
+NEF4 $1516
 line 3714
 ;3714:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1505
+ADDRGP4 $1503
 JUMPV
-LABELV $1518
+LABELV $1516
 line 3716
 ;3715:
 ;3716:	VectorCopy (midpoint, dest);
@@ -22122,14 +22122,14 @@ line 3720
 ADDRLP4 24+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $1522
+NEF4 $1520
 line 3721
 ;3721:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1505
+ADDRGP4 $1503
 JUMPV
-LABELV $1522
+LABELV $1520
 line 3723
 ;3722:
 ;3723:	VectorCopy (midpoint, dest);
@@ -22183,14 +22183,14 @@ line 3727
 ADDRLP4 24+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $1526
+NEF4 $1524
 line 3728
 ;3728:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1505
+ADDRGP4 $1503
 JUMPV
-LABELV $1526
+LABELV $1524
 line 3730
 ;3729:
 ;3730:	VectorCopy (midpoint, dest);
@@ -22244,21 +22244,21 @@ line 3734
 ADDRLP4 24+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $1530
+NEF4 $1528
 line 3735
 ;3735:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $1505
+ADDRGP4 $1503
 JUMPV
-LABELV $1530
+LABELV $1528
 line 3738
 ;3736:
 ;3737:
 ;3738:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $1505
+LABELV $1503
 endproc CanDamage 1136 28
 export G_RadiusDamage
 proc G_RadiusDamage 4196 32
@@ -22292,7 +22292,7 @@ line 3759
 ADDRFP4 12
 INDIRF4
 CNSTF4 1065353216
-GEF4 $1534
+GEF4 $1532
 line 3760
 ;3760:		radius = 1;
 ADDRFP4 12
@@ -22300,14 +22300,14 @@ CNSTF4 1065353216
 ASGNF4
 line 3761
 ;3761:	}
-LABELV $1534
+LABELV $1532
 line 3763
 ;3762:
 ;3763:	for ( i = 0 ; i < 3 ; i++ ) {
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $1536
+LABELV $1534
 line 3764
 ;3764:		mins[i] = origin[i] - radius;
 ADDRLP4 4172
@@ -22354,7 +22354,7 @@ ADDF4
 ASGNF4
 line 3766
 ;3766:	}
-LABELV $1537
+LABELV $1535
 line 3763
 ADDRLP4 0
 ADDRLP4 0
@@ -22365,7 +22365,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $1536
+LTI4 $1534
 line 3768
 ;3767:
 ;3768:	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
@@ -22391,9 +22391,9 @@ line 3770
 ADDRLP4 20
 CNSTI4 0
 ASGNI4
-ADDRGP4 $1543
+ADDRGP4 $1541
 JUMPV
-LABELV $1540
+LABELV $1538
 line 3771
 ;3771:		ent = &g_entities[entityList[ e ]];
 ADDRLP4 4
@@ -22418,12 +22418,12 @@ CVPU4 4
 ADDRFP4 16
 INDIRP4
 CVPU4 4
-NEU4 $1544
+NEU4 $1542
 line 3774
 ;3774:			continue;
-ADDRGP4 $1541
+ADDRGP4 $1539
 JUMPV
-LABELV $1544
+LABELV $1542
 line 3775
 ;3775:		if (!ent->takedamage)
 ADDRLP4 4
@@ -22432,12 +22432,12 @@ CNSTI4 692
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $1546
+NEI4 $1544
 line 3776
 ;3776:			continue;
-ADDRGP4 $1541
+ADDRGP4 $1539
 JUMPV
-LABELV $1546
+LABELV $1544
 line 3779
 ;3777:
 ;3778:		// find the distance from the edge of the bounding box
@@ -22445,7 +22445,7 @@ line 3779
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $1548
+LABELV $1546
 line 3780
 ;3780:			if ( origin[i] < ent->r.absmin[i] ) {
 ADDRLP4 4176
@@ -22468,7 +22468,7 @@ CNSTI4 344
 ADDP4
 ADDP4
 INDIRF4
-GEF4 $1552
+GEF4 $1550
 line 3781
 ;3781:				v[i] = ent->r.absmin[i] - origin[i];
 ADDRLP4 4180
@@ -22499,9 +22499,9 @@ SUBF4
 ASGNF4
 line 3782
 ;3782:			} else if ( origin[i] > ent->r.absmax[i] ) {
-ADDRGP4 $1553
+ADDRGP4 $1551
 JUMPV
-LABELV $1552
+LABELV $1550
 ADDRLP4 4180
 ADDRLP4 0
 INDIRI4
@@ -22522,7 +22522,7 @@ CNSTI4 356
 ADDP4
 ADDP4
 INDIRF4
-LEF4 $1554
+LEF4 $1552
 line 3783
 ;3783:				v[i] = origin[i] - ent->r.absmax[i];
 ADDRLP4 4184
@@ -22553,9 +22553,9 @@ SUBF4
 ASGNF4
 line 3784
 ;3784:			} else {
-ADDRGP4 $1555
+ADDRGP4 $1553
 JUMPV
-LABELV $1554
+LABELV $1552
 line 3785
 ;3785:				v[i] = 0;
 ADDRLP4 0
@@ -22568,11 +22568,11 @@ CNSTF4 0
 ASGNF4
 line 3786
 ;3786:			}
-LABELV $1555
 LABELV $1553
+LABELV $1551
 line 3787
 ;3787:		}
-LABELV $1549
+LABELV $1547
 line 3779
 ADDRLP4 0
 ADDRLP4 0
@@ -22583,7 +22583,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $1548
+LTI4 $1546
 line 3789
 ;3788:
 ;3789:		dist = VectorLength( v );
@@ -22603,12 +22603,12 @@ ADDRLP4 24
 INDIRF4
 ADDRFP4 12
 INDIRF4
-LTF4 $1556
+LTF4 $1554
 line 3791
 ;3791:			continue;
-ADDRGP4 $1541
+ADDRGP4 $1539
 JUMPV
-LABELV $1556
+LABELV $1554
 line 3794
 ;3792:		}
 ;3793:
@@ -22641,7 +22641,7 @@ ASGNI4
 ADDRLP4 4180
 INDIRI4
 CNSTI4 0
-EQI4 $1558
+EQI4 $1556
 line 3797
 ;3797:			if( LogAccuracyHit( ent, attacker ) ) {
 ADDRLP4 4
@@ -22657,7 +22657,7 @@ ASGNI4
 ADDRLP4 4184
 INDIRI4
 CNSTI4 0
-EQI4 $1560
+EQI4 $1558
 line 3798
 ;3798:				hitClient = qtrue;
 ADDRLP4 4168
@@ -22665,7 +22665,7 @@ CNSTI4 1
 ASGNI4
 line 3799
 ;3799:			}
-LABELV $1560
+LABELV $1558
 line 3800
 ;3800:			VectorSubtract (ent->r.currentOrigin, origin, dir);
 ADDRLP4 4192
@@ -22748,10 +22748,10 @@ CALLV
 pop
 line 3805
 ;3805:		}
-LABELV $1558
+LABELV $1556
 line 3806
 ;3806:	}
-LABELV $1541
+LABELV $1539
 line 3770
 ADDRLP4 20
 ADDRLP4 20
@@ -22759,19 +22759,19 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $1543
+LABELV $1541
 ADDRLP4 20
 INDIRI4
 ADDRLP4 4140
 INDIRI4
-LTI4 $1540
+LTI4 $1538
 line 3808
 ;3807:
 ;3808:	return hitClient;
 ADDRLP4 4168
 INDIRI4
 RETI4
-LABELV $1533
+LABELV $1531
 endproc G_RadiusDamage 4196 32
 import G_LetGoOfWall
 import G_G2PlayerAngles
@@ -23637,14 +23637,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -23791,6 +23789,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -23831,7 +23831,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $1422
+LABELV $1420
 byte 1 37
 byte 1 105
 byte 1 58
@@ -23877,7 +23877,7 @@ byte 1 105
 byte 1 10
 byte 1 0
 align 1
-LABELV $1220
+LABELV $1218
 byte 1 68
 byte 1 117
 byte 1 101
@@ -23921,7 +23921,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $1107
+LABELV $1105
 byte 1 112
 byte 1 108
 byte 1 97
@@ -23934,34 +23934,12 @@ byte 1 109
 byte 1 98
 byte 1 0
 align 1
-LABELV $1069
+LABELV $1067
 byte 1 114
 byte 1 104
 byte 1 97
 byte 1 110
 byte 1 100
-byte 1 0
-align 1
-LABELV $1016
-byte 1 103
-byte 1 101
-byte 1 110
-byte 1 101
-byte 1 114
-byte 1 105
-byte 1 99
-byte 1 54
-byte 1 0
-align 1
-LABELV $1015
-byte 1 103
-byte 1 101
-byte 1 110
-byte 1 101
-byte 1 114
-byte 1 105
-byte 1 99
-byte 1 53
 byte 1 0
 align 1
 LABELV $1014
@@ -23972,7 +23950,7 @@ byte 1 101
 byte 1 114
 byte 1 105
 byte 1 99
-byte 1 52
+byte 1 54
 byte 1 0
 align 1
 LABELV $1013
@@ -23983,7 +23961,7 @@ byte 1 101
 byte 1 114
 byte 1 105
 byte 1 99
-byte 1 51
+byte 1 53
 byte 1 0
 align 1
 LABELV $1012
@@ -23994,7 +23972,7 @@ byte 1 101
 byte 1 114
 byte 1 105
 byte 1 99
-byte 1 50
+byte 1 52
 byte 1 0
 align 1
 LABELV $1011
@@ -24005,38 +23983,35 @@ byte 1 101
 byte 1 114
 byte 1 105
 byte 1 99
-byte 1 49
+byte 1 51
 byte 1 0
 align 1
 LABELV $1010
-byte 1 104
+byte 1 103
 byte 1 101
-byte 1 97
-byte 1 100
+byte 1 110
+byte 1 101
+byte 1 114
+byte 1 105
+byte 1 99
+byte 1 50
 byte 1 0
 align 1
 LABELV $1009
-byte 1 108
+byte 1 103
 byte 1 101
-byte 1 102
-byte 1 116
-byte 1 32
-byte 1 104
-byte 1 97
 byte 1 110
-byte 1 100
+byte 1 101
+byte 1 114
+byte 1 105
+byte 1 99
+byte 1 49
 byte 1 0
 align 1
 LABELV $1008
-byte 1 114
-byte 1 105
-byte 1 103
 byte 1 104
-byte 1 116
-byte 1 32
-byte 1 104
+byte 1 101
 byte 1 97
-byte 1 110
 byte 1 100
 byte 1 0
 align 1
@@ -24046,9 +24021,10 @@ byte 1 101
 byte 1 102
 byte 1 116
 byte 1 32
+byte 1 104
 byte 1 97
-byte 1 114
-byte 1 109
+byte 1 110
+byte 1 100
 byte 1 0
 align 1
 LABELV $1006
@@ -24058,12 +24034,36 @@ byte 1 103
 byte 1 104
 byte 1 116
 byte 1 32
+byte 1 104
+byte 1 97
+byte 1 110
+byte 1 100
+byte 1 0
+align 1
+LABELV $1005
+byte 1 108
+byte 1 101
+byte 1 102
+byte 1 116
+byte 1 32
 byte 1 97
 byte 1 114
 byte 1 109
 byte 1 0
 align 1
-LABELV $1005
+LABELV $1004
+byte 1 114
+byte 1 105
+byte 1 103
+byte 1 104
+byte 1 116
+byte 1 32
+byte 1 97
+byte 1 114
+byte 1 109
+byte 1 0
+align 1
+LABELV $1003
 byte 1 99
 byte 1 104
 byte 1 101
@@ -24071,7 +24071,7 @@ byte 1 115
 byte 1 116
 byte 1 0
 align 1
-LABELV $1004
+LABELV $1002
 byte 1 102
 byte 1 114
 byte 1 111
@@ -24093,7 +24093,7 @@ byte 1 101
 byte 1 114
 byte 1 0
 align 1
-LABELV $1003
+LABELV $1001
 byte 1 102
 byte 1 114
 byte 1 111
@@ -24111,34 +24111,6 @@ byte 1 104
 byte 1 111
 byte 1 117
 byte 1 108
-byte 1 101
-byte 1 114
-byte 1 0
-align 1
-LABELV $1002
-byte 1 98
-byte 1 97
-byte 1 99
-byte 1 107
-byte 1 0
-align 1
-LABELV $1001
-byte 1 98
-byte 1 97
-byte 1 99
-byte 1 107
-byte 1 32
-byte 1 108
-byte 1 101
-byte 1 102
-byte 1 116
-byte 1 32
-byte 1 115
-byte 1 104
-byte 1 111
-byte 1 117
-byte 1 108
-byte 1 100
 byte 1 101
 byte 1 114
 byte 1 0
@@ -24148,6 +24120,34 @@ byte 1 98
 byte 1 97
 byte 1 99
 byte 1 107
+byte 1 0
+align 1
+LABELV $999
+byte 1 98
+byte 1 97
+byte 1 99
+byte 1 107
+byte 1 32
+byte 1 108
+byte 1 101
+byte 1 102
+byte 1 116
+byte 1 32
+byte 1 115
+byte 1 104
+byte 1 111
+byte 1 117
+byte 1 108
+byte 1 100
+byte 1 101
+byte 1 114
+byte 1 0
+align 1
+LABELV $998
+byte 1 98
+byte 1 97
+byte 1 99
+byte 1 107
 byte 1 32
 byte 1 114
 byte 1 105
@@ -24165,35 +24165,12 @@ byte 1 101
 byte 1 114
 byte 1 0
 align 1
-LABELV $999
+LABELV $997
 byte 1 119
 byte 1 97
 byte 1 105
 byte 1 115
 byte 1 116
-byte 1 0
-align 1
-LABELV $998
-byte 1 108
-byte 1 101
-byte 1 102
-byte 1 116
-byte 1 32
-byte 1 108
-byte 1 101
-byte 1 103
-byte 1 0
-align 1
-LABELV $997
-byte 1 114
-byte 1 105
-byte 1 103
-byte 1 104
-byte 1 116
-byte 1 32
-byte 1 108
-byte 1 101
-byte 1 103
 byte 1 0
 align 1
 LABELV $996
@@ -24202,10 +24179,9 @@ byte 1 101
 byte 1 102
 byte 1 116
 byte 1 32
-byte 1 102
-byte 1 111
-byte 1 111
-byte 1 116
+byte 1 108
+byte 1 101
+byte 1 103
 byte 1 0
 align 1
 LABELV $995
@@ -24215,20 +24191,44 @@ byte 1 103
 byte 1 104
 byte 1 116
 byte 1 32
+byte 1 108
+byte 1 101
+byte 1 103
+byte 1 0
+align 1
+LABELV $994
+byte 1 108
+byte 1 101
+byte 1 102
+byte 1 116
+byte 1 32
 byte 1 102
 byte 1 111
 byte 1 111
 byte 1 116
 byte 1 0
 align 1
-LABELV $994
+LABELV $993
+byte 1 114
+byte 1 105
+byte 1 103
+byte 1 104
+byte 1 116
+byte 1 32
+byte 1 102
+byte 1 111
+byte 1 111
+byte 1 116
+byte 1 0
+align 1
+LABELV $992
 byte 1 110
 byte 1 111
 byte 1 110
 byte 1 101
 byte 1 0
 align 1
-LABELV $749
+LABELV $747
 byte 1 107
 byte 1 105
 byte 1 108
@@ -24276,7 +24276,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $746
+LABELV $744
 byte 1 107
 byte 1 105
 byte 1 108
@@ -24320,7 +24320,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $743
+LABELV $741
 byte 1 118
 byte 1 105
 byte 1 99
@@ -24352,7 +24352,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $741
+LABELV $739
 byte 1 75
 byte 1 105
 byte 1 108
@@ -24369,7 +24369,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $740
+LABELV $738
 byte 1 68
 byte 1 117
 byte 1 101
@@ -24391,7 +24391,7 @@ byte 1 58
 byte 1 10
 byte 1 0
 align 1
-LABELV $725
+LABELV $723
 byte 1 75
 byte 1 105
 byte 1 108
@@ -24429,7 +24429,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $717
+LABELV $715
 byte 1 60
 byte 1 98
 byte 1 97
@@ -24446,7 +24446,7 @@ byte 1 121
 byte 1 62
 byte 1 0
 align 1
-LABELV $710
+LABELV $708
 byte 1 60
 byte 1 119
 byte 1 111
@@ -24456,7 +24456,7 @@ byte 1 100
 byte 1 62
 byte 1 0
 align 1
-LABELV $709
+LABELV $707
 byte 1 60
 byte 1 110
 byte 1 111
@@ -24471,7 +24471,7 @@ byte 1 116
 byte 1 62
 byte 1 0
 align 1
-LABELV $370
+LABELV $368
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24490,7 +24490,7 @@ byte 1 82
 byte 1 84
 byte 1 0
 align 1
-LABELV $369
+LABELV $367
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24509,7 +24509,7 @@ byte 1 69
 byte 1 82
 byte 1 0
 align 1
-LABELV $368
+LABELV $366
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24523,7 +24523,7 @@ byte 1 68
 byte 1 69
 byte 1 0
 align 1
-LABELV $367
+LABELV $365
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24537,7 +24537,7 @@ byte 1 78
 byte 1 71
 byte 1 0
 align 1
-LABELV $366
+LABELV $364
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24552,7 +24552,7 @@ byte 1 65
 byte 1 71
 byte 1 0
 align 1
-LABELV $365
+LABELV $363
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24564,7 +24564,7 @@ byte 1 83
 byte 1 72
 byte 1 0
 align 1
-LABELV $364
+LABELV $362
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24575,7 +24575,7 @@ byte 1 86
 byte 1 65
 byte 1 0
 align 1
-LABELV $363
+LABELV $361
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24587,7 +24587,7 @@ byte 1 77
 byte 1 69
 byte 1 0
 align 1
-LABELV $362
+LABELV $360
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24599,7 +24599,7 @@ byte 1 69
 byte 1 82
 byte 1 0
 align 1
-LABELV $361
+LABELV $359
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24612,7 +24612,7 @@ byte 1 82
 byte 1 89
 byte 1 0
 align 1
-LABELV $360
+LABELV $358
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24629,7 +24629,7 @@ byte 1 82
 byte 1 75
 byte 1 0
 align 1
-LABELV $359
+LABELV $357
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24642,53 +24642,6 @@ byte 1 80
 byte 1 65
 byte 1 67
 byte 1 75
-byte 1 95
-byte 1 83
-byte 1 80
-byte 1 76
-byte 1 65
-byte 1 83
-byte 1 72
-byte 1 0
-align 1
-LABELV $358
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 84
-byte 1 73
-byte 1 77
-byte 1 69
-byte 1 68
-byte 1 95
-byte 1 77
-byte 1 73
-byte 1 78
-byte 1 69
-byte 1 95
-byte 1 83
-byte 1 80
-byte 1 76
-byte 1 65
-byte 1 83
-byte 1 72
-byte 1 0
-align 1
-LABELV $357
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 84
-byte 1 82
-byte 1 73
-byte 1 80
-byte 1 95
-byte 1 77
-byte 1 73
-byte 1 78
-byte 1 69
 byte 1 95
 byte 1 83
 byte 1 80
@@ -24704,12 +24657,15 @@ byte 1 79
 byte 1 68
 byte 1 95
 byte 1 84
-byte 1 72
-byte 1 69
-byte 1 82
+byte 1 73
 byte 1 77
-byte 1 65
-byte 1 76
+byte 1 69
+byte 1 68
+byte 1 95
+byte 1 77
+byte 1 73
+byte 1 78
+byte 1 69
 byte 1 95
 byte 1 83
 byte 1 80
@@ -24725,12 +24681,21 @@ byte 1 79
 byte 1 68
 byte 1 95
 byte 1 84
-byte 1 72
-byte 1 69
 byte 1 82
+byte 1 73
+byte 1 80
+byte 1 95
 byte 1 77
-byte 1 65
+byte 1 73
+byte 1 78
+byte 1 69
+byte 1 95
+byte 1 83
+byte 1 80
 byte 1 76
+byte 1 65
+byte 1 83
+byte 1 72
 byte 1 0
 align 1
 LABELV $354
@@ -24738,19 +24703,13 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 82
-byte 1 79
-byte 1 67
-byte 1 75
-byte 1 69
 byte 1 84
-byte 1 95
 byte 1 72
-byte 1 79
+byte 1 69
+byte 1 82
 byte 1 77
-byte 1 73
-byte 1 78
-byte 1 71
+byte 1 65
+byte 1 76
 byte 1 95
 byte 1 83
 byte 1 80
@@ -24765,19 +24724,13 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 82
-byte 1 79
-byte 1 67
-byte 1 75
-byte 1 69
 byte 1 84
-byte 1 95
 byte 1 72
-byte 1 79
+byte 1 69
+byte 1 82
 byte 1 77
-byte 1 73
-byte 1 78
-byte 1 71
+byte 1 65
+byte 1 76
 byte 1 0
 align 1
 LABELV $352
@@ -24791,6 +24744,13 @@ byte 1 67
 byte 1 75
 byte 1 69
 byte 1 84
+byte 1 95
+byte 1 72
+byte 1 79
+byte 1 77
+byte 1 73
+byte 1 78
+byte 1 71
 byte 1 95
 byte 1 83
 byte 1 80
@@ -24811,6 +24771,13 @@ byte 1 67
 byte 1 75
 byte 1 69
 byte 1 84
+byte 1 95
+byte 1 72
+byte 1 79
+byte 1 77
+byte 1 73
+byte 1 78
+byte 1 71
 byte 1 0
 align 1
 LABELV $350
@@ -24818,18 +24785,11 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 70
-byte 1 76
-byte 1 69
+byte 1 82
+byte 1 79
 byte 1 67
-byte 1 72
+byte 1 75
 byte 1 69
-byte 1 84
-byte 1 84
-byte 1 69
-byte 1 95
-byte 1 65
-byte 1 76
 byte 1 84
 byte 1 95
 byte 1 83
@@ -24845,6 +24805,46 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
+byte 1 82
+byte 1 79
+byte 1 67
+byte 1 75
+byte 1 69
+byte 1 84
+byte 1 0
+align 1
+LABELV $348
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
+byte 1 70
+byte 1 76
+byte 1 69
+byte 1 67
+byte 1 72
+byte 1 69
+byte 1 84
+byte 1 84
+byte 1 69
+byte 1 95
+byte 1 65
+byte 1 76
+byte 1 84
+byte 1 95
+byte 1 83
+byte 1 80
+byte 1 76
+byte 1 65
+byte 1 83
+byte 1 72
+byte 1 0
+align 1
+LABELV $347
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
 byte 1 70
 byte 1 76
 byte 1 69
@@ -24856,58 +24856,20 @@ byte 1 84
 byte 1 69
 byte 1 0
 align 1
-LABELV $348
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 68
-byte 1 69
-byte 1 77
-byte 1 80
-byte 1 50
-byte 1 95
-byte 1 65
-byte 1 76
-byte 1 84
-byte 1 0
-align 1
-LABELV $347
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 68
-byte 1 69
-byte 1 77
-byte 1 80
-byte 1 50
-byte 1 0
-align 1
 LABELV $346
 byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 82
+byte 1 68
 byte 1 69
+byte 1 77
 byte 1 80
-byte 1 69
-byte 1 65
-byte 1 84
-byte 1 69
-byte 1 82
+byte 1 50
 byte 1 95
 byte 1 65
 byte 1 76
 byte 1 84
-byte 1 95
-byte 1 83
-byte 1 80
-byte 1 76
-byte 1 65
-byte 1 83
-byte 1 72
 byte 1 0
 align 1
 LABELV $345
@@ -24915,18 +24877,11 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 82
+byte 1 68
 byte 1 69
+byte 1 77
 byte 1 80
-byte 1 69
-byte 1 65
-byte 1 84
-byte 1 69
-byte 1 82
-byte 1 95
-byte 1 65
-byte 1 76
-byte 1 84
+byte 1 50
 byte 1 0
 align 1
 LABELV $344
@@ -24942,9 +24897,54 @@ byte 1 65
 byte 1 84
 byte 1 69
 byte 1 82
+byte 1 95
+byte 1 65
+byte 1 76
+byte 1 84
+byte 1 95
+byte 1 83
+byte 1 80
+byte 1 76
+byte 1 65
+byte 1 83
+byte 1 72
 byte 1 0
 align 1
 LABELV $343
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
+byte 1 82
+byte 1 69
+byte 1 80
+byte 1 69
+byte 1 65
+byte 1 84
+byte 1 69
+byte 1 82
+byte 1 95
+byte 1 65
+byte 1 76
+byte 1 84
+byte 1 0
+align 1
+LABELV $342
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
+byte 1 82
+byte 1 69
+byte 1 80
+byte 1 69
+byte 1 65
+byte 1 84
+byte 1 69
+byte 1 82
+byte 1 0
+align 1
+LABELV $341
 byte 1 77
 byte 1 79
 byte 1 68
@@ -24958,52 +24958,6 @@ byte 1 83
 byte 1 84
 byte 1 69
 byte 1 82
-byte 1 0
-align 1
-LABELV $342
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 68
-byte 1 73
-byte 1 83
-byte 1 82
-byte 1 85
-byte 1 80
-byte 1 84
-byte 1 79
-byte 1 82
-byte 1 95
-byte 1 83
-byte 1 78
-byte 1 73
-byte 1 80
-byte 1 69
-byte 1 82
-byte 1 0
-align 1
-LABELV $341
-byte 1 77
-byte 1 79
-byte 1 68
-byte 1 95
-byte 1 68
-byte 1 73
-byte 1 83
-byte 1 82
-byte 1 85
-byte 1 80
-byte 1 84
-byte 1 79
-byte 1 82
-byte 1 95
-byte 1 83
-byte 1 80
-byte 1 76
-byte 1 65
-byte 1 83
-byte 1 72
 byte 1 0
 align 1
 LABELV $340
@@ -25020,6 +24974,13 @@ byte 1 80
 byte 1 84
 byte 1 79
 byte 1 82
+byte 1 95
+byte 1 83
+byte 1 78
+byte 1 73
+byte 1 80
+byte 1 69
+byte 1 82
 byte 1 0
 align 1
 LABELV $339
@@ -25027,13 +24988,22 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 66
+byte 1 68
+byte 1 73
+byte 1 83
+byte 1 82
+byte 1 85
+byte 1 80
+byte 1 84
+byte 1 79
+byte 1 82
+byte 1 95
+byte 1 83
+byte 1 80
 byte 1 76
 byte 1 65
 byte 1 83
-byte 1 84
-byte 1 69
-byte 1 82
+byte 1 72
 byte 1 0
 align 1
 LABELV $338
@@ -25041,22 +25011,15 @@ byte 1 77
 byte 1 79
 byte 1 68
 byte 1 95
-byte 1 66
-byte 1 82
-byte 1 89
-byte 1 65
-byte 1 82
-byte 1 95
-byte 1 80
+byte 1 68
 byte 1 73
 byte 1 83
+byte 1 82
+byte 1 85
+byte 1 80
 byte 1 84
 byte 1 79
-byte 1 76
-byte 1 95
-byte 1 65
-byte 1 76
-byte 1 84
+byte 1 82
 byte 1 0
 align 1
 LABELV $337
@@ -25065,6 +25028,43 @@ byte 1 79
 byte 1 68
 byte 1 95
 byte 1 66
+byte 1 76
+byte 1 65
+byte 1 83
+byte 1 84
+byte 1 69
+byte 1 82
+byte 1 0
+align 1
+LABELV $336
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
+byte 1 66
+byte 1 82
+byte 1 89
+byte 1 65
+byte 1 82
+byte 1 95
+byte 1 80
+byte 1 73
+byte 1 83
+byte 1 84
+byte 1 79
+byte 1 76
+byte 1 95
+byte 1 65
+byte 1 76
+byte 1 84
+byte 1 0
+align 1
+LABELV $335
+byte 1 77
+byte 1 79
+byte 1 68
+byte 1 95
+byte 1 66
 byte 1 82
 byte 1 89
 byte 1 65
@@ -25078,7 +25078,7 @@ byte 1 79
 byte 1 76
 byte 1 0
 align 1
-LABELV $336
+LABELV $334
 byte 1 77
 byte 1 79
 byte 1 68
@@ -25090,7 +25090,7 @@ byte 1 69
 byte 1 82
 byte 1 0
 align 1
-LABELV $335
+LABELV $333
 byte 1 77
 byte 1 79
 byte 1 68
@@ -25102,7 +25102,7 @@ byte 1 69
 byte 1 69
 byte 1 0
 align 1
-LABELV $334
+LABELV $332
 byte 1 77
 byte 1 79
 byte 1 68
@@ -25119,7 +25119,7 @@ byte 1 79
 byte 1 78
 byte 1 0
 align 1
-LABELV $333
+LABELV $331
 byte 1 77
 byte 1 79
 byte 1 68

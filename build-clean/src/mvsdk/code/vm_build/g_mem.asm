@@ -26,10 +26,10 @@ line 19
 ADDRGP4 g_debugAlloc+12
 INDIRI4
 CNSTI4 0
-EQI4 $123
+EQI4 $121
 line 20
 ;20:		G_Printf( "G_Alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ( ( size + 31 ) & ~31 ) );
-ADDRGP4 $126
+ADDRGP4 $124
 ARGP4
 ADDRLP4 4
 ADDRFP4 0
@@ -55,7 +55,7 @@ CALLV
 pop
 line 21
 ;21:	}
-LABELV $123
+LABELV $121
 line 23
 ;22:
 ;23:	if ( allocPoint + size > POOLSIZE ) {
@@ -65,10 +65,10 @@ ADDRFP4 0
 INDIRI4
 ADDI4
 CNSTI4 262144
-LEI4 $127
+LEI4 $125
 line 24
 ;24:	  G_Error( "G_Alloc: failed on allocation of %i bytes", size ); // bk010103 - was %u, but is signed
-ADDRGP4 $129
+ADDRGP4 $127
 ARGP4
 ADDRFP4 0
 INDIRI4
@@ -78,7 +78,7 @@ CALLV
 pop
 line 25
 ;25:	}
-LABELV $127
+LABELV $125
 line 27
 ;26:
 ;27:	p = &memoryPool[allocPoint];
@@ -113,7 +113,7 @@ line 31
 ADDRLP4 0
 INDIRP4
 RETP4
-LABELV $122
+LABELV $120
 endproc G_Alloc 8 12
 export G_InitMemory
 proc G_InitMemory 0 0
@@ -128,7 +128,7 @@ CNSTI4 0
 ASGNI4
 line 36
 ;36:}
-LABELV $130
+LABELV $128
 endproc G_InitMemory 0 0
 export Svcmd_GameMem_f
 proc Svcmd_GameMem_f 0 12
@@ -137,7 +137,7 @@ line 38
 ;38:void Svcmd_GameMem_f( void ) {
 line 39
 ;39:	G_Printf( "Game memory status: %i out of %i bytes allocated\n", allocPoint, POOLSIZE );
-ADDRGP4 $132
+ADDRGP4 $130
 ARGP4
 ADDRGP4 allocPoint
 INDIRI4
@@ -149,7 +149,7 @@ CALLV
 pop
 line 40
 ;40:}
-LABELV $131
+LABELV $129
 endproc Svcmd_GameMem_f 0 12
 bss
 align 4
@@ -1023,14 +1023,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -1177,6 +1175,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -1217,7 +1217,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $132
+LABELV $130
 byte 1 71
 byte 1 97
 byte 1 109
@@ -1269,7 +1269,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $129
+LABELV $127
 byte 1 71
 byte 1 95
 byte 1 65
@@ -1313,7 +1313,7 @@ byte 1 101
 byte 1 115
 byte 1 0
 align 1
-LABELV $126
+LABELV $124
 byte 1 71
 byte 1 95
 byte 1 65

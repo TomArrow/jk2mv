@@ -164,7 +164,7 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-EQI4 $98
+EQI4 $96
 ADDRLP4 8
 INDIRP4
 INDIRP4
@@ -173,17 +173,17 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-EQI4 $98
+EQI4 $96
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-ADDRGP4 $99
+ADDRGP4 $97
 JUMPV
-LABELV $98
+LABELV $96
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $99
+LABELV $97
 ADDRLP4 0
 INDIRI4
 ARGI4
@@ -201,7 +201,7 @@ INDIRB
 ASGNB 12
 line 87
 ;87:}
-LABELV $95
+LABELV $93
 endproc PMQ2_UpdateAntiLoop 16 20
 export PMQ2_ClipVelocity
 proc PMQ2_ClipVelocity 36 0
@@ -286,7 +286,7 @@ line 108
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $102
+LABELV $100
 line 109
 ;109:	{
 line 110
@@ -342,11 +342,11 @@ ASGNF4
 ADDRLP4 32
 INDIRF4
 CNSTF4 3184315597
-LEF4 $106
+LEF4 $104
 ADDRLP4 32
 INDIRF4
 CNSTF4 1036831949
-GEF4 $106
+GEF4 $104
 line 113
 ;113:			out[i] = 0;
 ADDRLP4 0
@@ -358,10 +358,10 @@ INDIRP4
 ADDP4
 CNSTF4 0
 ASGNF4
-LABELV $106
+LABELV $104
 line 114
 ;114:	}
-LABELV $103
+LABELV $101
 line 108
 ADDRLP4 0
 ADDRLP4 0
@@ -372,10 +372,10 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $102
+LTI4 $100
 line 115
 ;115:}
-LABELV $101
+LABELV $99
 endproc PMQ2_ClipVelocity 36 0
 export PMQ2_StepSlideMove_
 proc PMQ2_StepSlideMove_ 1220 28
@@ -443,9 +443,9 @@ line 156
 ADDRLP4 1192
 CNSTI4 0
 ASGNI4
-ADDRGP4 $114
+ADDRGP4 $112
 JUMPV
-LABELV $111
+LABELV $109
 line 157
 ;157:	{
 line 158
@@ -453,7 +453,7 @@ line 158
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-LABELV $115
+LABELV $113
 line 159
 ;159:			end[i] = pmlq2.origin[i] + time_left * pmlq2.velocity[i];
 ADDRLP4 1204
@@ -481,7 +481,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $116
+LABELV $114
 line 158
 ADDRLP4 4
 ADDRLP4 4
@@ -492,7 +492,7 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 3
-LTI4 $115
+LTI4 $113
 line 161
 ;160:
 ;161:		pmq2->trace(&trace,pmlq2.origin, pmq2->mins, pmq2->maxs, end,pmq2->ps->clientNum,pmq2->tracemask);
@@ -542,7 +542,7 @@ line 163
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-EQI4 $120
+EQI4 $118
 line 164
 ;164:		{	// entity is trapped in another solid
 line 165
@@ -552,9 +552,9 @@ CNSTF4 0
 ASGNF4
 line 166
 ;166:			return;
-ADDRGP4 $108
+ADDRGP4 $106
 JUMPV
-LABELV $120
+LABELV $118
 line 169
 ;167:		}
 ;168:
@@ -562,7 +562,7 @@ line 169
 ADDRLP4 72+8
 INDIRF4
 CNSTF4 0
-LEF4 $124
+LEF4 $122
 line 170
 ;170:		{	// actually covered some distance
 line 171
@@ -578,19 +578,19 @@ CNSTI4 0
 ASGNI4
 line 173
 ;173:		}
-LABELV $124
+LABELV $122
 line 175
 ;174:
 ;175:		if (trace.fraction == 1)
 ADDRLP4 72+8
 INDIRF4
 CNSTF4 1065353216
-NEF4 $128
+NEF4 $126
 line 176
 ;176:			break;		// moved the entire distance
-ADDRGP4 $113
+ADDRGP4 $111
 JUMPV
-LABELV $128
+LABELV $126
 line 179
 ;177:
 ;178:	   // save entity for contact
@@ -601,11 +601,11 @@ CNSTI4 36
 ADDP4
 INDIRI4
 CNSTI4 32
-GEI4 $131
+GEI4 $129
 ADDRLP4 72+52
 INDIRI4
 CNSTI4 1023
-EQI4 $131
+EQI4 $129
 line 180
 ;180:		{
 line 181
@@ -647,7 +647,7 @@ ADDI4
 ASGNI4
 line 183
 ;183:		}
-LABELV $131
+LABELV $129
 line 185
 ;184:
 ;185:		time_left -= time_left * trace.fraction;
@@ -668,7 +668,7 @@ line 188
 ADDRLP4 68
 INDIRI4
 CNSTI4 5
-LTI4 $136
+LTI4 $134
 line 189
 ;189:		{	// this shouldn't really happen
 line 190
@@ -682,9 +682,9 @@ line 194
 ;192:			Com_Printf("numplanes >= MAX_CLIP_PLANES, nulling\n");
 ;193:#endif
 ;194:			break;
-ADDRGP4 $113
+ADDRGP4 $111
 JUMPV
-LABELV $136
+LABELV $134
 line 197
 ;195:		}
 ;196:
@@ -695,7 +695,7 @@ CNSTI4 212
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $139
+NEI4 $137
 line 205
 ;198:			//
 ;199:			// if this is the same plane we hit before, nudge velocity
@@ -708,9 +708,9 @@ line 205
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $144
+ADDRGP4 $142
 JUMPV
-LABELV $141
+LABELV $139
 line 206
 ;206:				if (DotProduct(trace.plane.normal, planes[i]) > 0.99) {
 ADDRLP4 1216
@@ -746,7 +746,7 @@ INDIRF4
 MULF4
 ADDF4
 CNSTF4 1065185444
-LEF4 $145
+LEF4 $143
 line 207
 ;207:					VectorAdd(trace.plane.normal, pmlq2.velocity, pmlq2.velocity);
 ADDRGP4 pmlq2+12
@@ -772,13 +772,13 @@ ADDF4
 ASGNF4
 line 208
 ;208:					break;
-ADDRGP4 $143
+ADDRGP4 $141
 JUMPV
-LABELV $145
+LABELV $143
 line 210
 ;209:				}
 ;210:			}
-LABELV $142
+LABELV $140
 line 205
 ADDRLP4 4
 ADDRLP4 4
@@ -786,19 +786,19 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $144
+LABELV $142
 ADDRLP4 4
 INDIRI4
 ADDRLP4 68
 INDIRI4
-LTI4 $141
-LABELV $143
+LTI4 $139
+LABELV $141
 line 214
 ;211:			//if (i < numplanes) {
 ;212:			//	continue;
 ;213:			//}
 ;214:		}
-LABELV $139
+LABELV $137
 line 216
 ;215:
 ;216:		VectorCopy(trace.plane.normal, planes[numplanes]);
@@ -875,9 +875,9 @@ line 269
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $173
+ADDRGP4 $171
 JUMPV
-LABELV $170
+LABELV $168
 line 270
 ;270:		{
 line 271
@@ -921,7 +921,7 @@ ADDRLP4 8+8
 ADDP4
 INDIRF4
 CNSTF4 1060320051
-LTF4 $176
+LTF4 $174
 line 286
 ;286:				pmlq2.clipped = qtrue; // uh am i putting this the right place? idk
 ADDRGP4 pmlq2+1180
@@ -929,22 +929,22 @@ CNSTI4 1
 ASGNI4
 line 287
 ;287:			}
-LABELV $176
+LABELV $174
 line 288
 ;288:			for (j = 0; j < numplanes; j++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $183
+ADDRGP4 $181
 JUMPV
-LABELV $180
+LABELV $178
 line 289
 ;289:				if (j != i)
 ADDRLP4 0
 INDIRI4
 ADDRLP4 4
 INDIRI4
-EQI4 $184
+EQI4 $182
 line 290
 ;290:				{
 line 291
@@ -982,16 +982,16 @@ INDIRF4
 MULF4
 ADDF4
 CNSTF4 0
-GEF4 $186
+GEF4 $184
 line 292
 ;292:						break;	// not ok
-ADDRGP4 $182
+ADDRGP4 $180
 JUMPV
-LABELV $186
+LABELV $184
 line 293
 ;293:				}
-LABELV $184
-LABELV $181
+LABELV $182
+LABELV $179
 line 288
 ADDRLP4 0
 ADDRLP4 0
@@ -999,28 +999,28 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $183
+LABELV $181
 ADDRLP4 0
 INDIRI4
 ADDRLP4 68
 INDIRI4
-LTI4 $180
-LABELV $182
+LTI4 $178
+LABELV $180
 line 294
 ;294:			if (j == numplanes)
 ADDRLP4 0
 INDIRI4
 ADDRLP4 68
 INDIRI4
-NEI4 $195
+NEI4 $193
 line 295
 ;295:				break;
-ADDRGP4 $172
+ADDRGP4 $170
 JUMPV
-LABELV $195
+LABELV $193
 line 296
 ;296:		}
-LABELV $171
+LABELV $169
 line 269
 ADDRLP4 4
 ADDRLP4 4
@@ -1028,13 +1028,13 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $173
+LABELV $171
 ADDRLP4 4
 INDIRI4
 ADDRLP4 68
 INDIRI4
-LTI4 $170
-LABELV $172
+LTI4 $168
+LABELV $170
 line 298
 ;297:
 ;298:		if (i != numplanes)
@@ -1042,14 +1042,14 @@ ADDRLP4 4
 INDIRI4
 ADDRLP4 68
 INDIRI4
-EQI4 $197
+EQI4 $195
 line 299
 ;299:		{	// go along this plane
 line 300
 ;300:		}
-ADDRGP4 $198
+ADDRGP4 $196
 JUMPV
-LABELV $197
+LABELV $195
 line 302
 ;301:		else
 ;302:		{	// go along the crease
@@ -1058,7 +1058,7 @@ line 303
 ADDRLP4 68
 INDIRI4
 CNSTI4 2
-EQI4 $199
+EQI4 $197
 line 304
 ;304:			{
 line 306
@@ -1073,9 +1073,9 @@ line 310
 ;308:				Com_Printf("i == numplanes && numplanes != 2, nulling\n");
 ;309:#endif
 ;310:				break;
-ADDRGP4 $113
+ADDRGP4 $111
 JUMPV
-LABELV $199
+LABELV $197
 line 312
 ;311:			}
 ;312:			CrossProduct(planes[0], planes[1], dir);
@@ -1150,7 +1150,7 @@ MULF4
 ASGNF4
 line 331
 ;331:		}
-LABELV $198
+LABELV $196
 line 337
 ;332:#endif
 ;333:		//
@@ -1176,7 +1176,7 @@ INDIRF4
 MULF4
 ADDF4
 CNSTF4 0
-GTF4 $217
+GTF4 $215
 line 338
 ;338:		{
 line 342
@@ -1190,13 +1190,13 @@ INDIRB
 ASGNB 12
 line 343
 ;343:			break;
-ADDRGP4 $113
+ADDRGP4 $111
 JUMPV
-LABELV $217
+LABELV $215
 line 345
 ;344:		}
 ;345:	}
-LABELV $112
+LABELV $110
 line 156
 ADDRLP4 1192
 ADDRLP4 1192
@@ -1204,13 +1204,13 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $114
+LABELV $112
 ADDRLP4 1192
 INDIRI4
 ADDRLP4 1200
 INDIRI4
-LTI4 $111
-LABELV $113
+LTI4 $109
+LABELV $111
 line 347
 ;346:
 ;347:	if (pmq2->ps->pm_time)
@@ -1221,7 +1221,7 @@ CNSTI4 16
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $227
+EQI4 $225
 line 348
 ;348:	{
 line 349
@@ -1232,10 +1232,10 @@ INDIRB
 ASGNB 12
 line 350
 ;350:	}
-LABELV $227
+LABELV $225
 line 351
 ;351:}
-LABELV $108
+LABELV $106
 endproc PMQ2_StepSlideMove_ 1220 28
 export PMQ2_StepSlideMove
 proc PMQ2_StepSlideMove 1176 28
@@ -1351,12 +1351,12 @@ line 381
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-EQI4 $234
+EQI4 $232
 line 382
 ;382:		return;		// can't step up
-ADDRGP4 $230
+ADDRGP4 $228
 JUMPV
-LABELV $234
+LABELV $232
 line 385
 ;383:
 ;384:	// try sliding above
@@ -1440,7 +1440,7 @@ line 394
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-NEI4 $238
+NEI4 $236
 line 395
 ;395:	{
 line 396
@@ -1451,7 +1451,7 @@ INDIRB
 ASGNB 12
 line 397
 ;397:	}
-LABELV $238
+LABELV $236
 line 406
 ;398:
 ;399:#if 0
@@ -1534,12 +1534,12 @@ ADDRLP4 1152
 INDIRF4
 ADDRLP4 1156
 INDIRF4
-GTF4 $253
+GTF4 $251
 ADDRLP4 36+24+8
 INDIRF4
 CNSTF4 1060320051
-GEF4 $249
-LABELV $253
+GEF4 $247
+LABELV $251
 line 416
 ;416:	{
 line 417
@@ -1556,9 +1556,9 @@ INDIRB
 ASGNB 12
 line 419
 ;419:		return;
-ADDRGP4 $230
+ADDRGP4 $228
 JUMPV
-LABELV $249
+LABELV $247
 line 421
 ;420:	}
 ;421:	else {
@@ -1577,7 +1577,7 @@ INDIRF4
 ASGNF4
 line 429
 ;429:}
-LABELV $230
+LABELV $228
 endproc PMQ2_StepSlideMove 1176 28
 export PMQ2_Friction
 proc PMQ2_Friction 64 4
@@ -1656,7 +1656,7 @@ line 449
 ADDRLP4 8
 INDIRF4
 CNSTF4 1065353216
-GEF4 $260
+GEF4 $258
 line 450
 ;450:	{
 line 451
@@ -1675,9 +1675,9 @@ CNSTF4 0
 ASGNF4
 line 453
 ;453:		return;
-ADDRGP4 $258
+ADDRGP4 $256
 JUMPV
-LABELV $260
+LABELV $258
 line 456
 ;454:	}
 ;455:
@@ -1696,7 +1696,7 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-EQI4 $269
+EQI4 $267
 ADDRLP4 44
 CNSTI4 0
 ASGNI4
@@ -1704,20 +1704,20 @@ ADDRGP4 pmlq2+1176
 INDIRI4
 ADDRLP4 44
 INDIRI4
-EQI4 $269
+EQI4 $267
 ADDRGP4 pmlq2+92
 INDIRI4
 CNSTI4 16384
 BANDI4
 ADDRLP4 44
 INDIRI4
-EQI4 $267
-LABELV $269
+EQI4 $265
+LABELV $267
 ADDRGP4 pmlq2+1220
 INDIRI4
 CNSTI4 0
-EQI4 $262
-LABELV $267
+EQI4 $260
+LABELV $265
 line 460
 ;460:	{
 line 461
@@ -1732,19 +1732,19 @@ ADDRLP4 8
 INDIRF4
 ADDRGP4 pmq2_stopspeed
 INDIRF4
-GEF4 $271
+GEF4 $269
 ADDRLP4 48
 ADDRGP4 pmq2_stopspeed
 INDIRF4
 ASGNF4
-ADDRGP4 $272
+ADDRGP4 $270
 JUMPV
-LABELV $271
+LABELV $269
 ADDRLP4 48
 ADDRLP4 8
 INDIRF4
 ASGNF4
-LABELV $272
+LABELV $270
 ADDRLP4 16
 ADDRLP4 48
 INDIRF4
@@ -1766,7 +1766,7 @@ ADDF4
 ASGNF4
 line 464
 ;464:	}
-LABELV $262
+LABELV $260
 line 467
 ;465:
 ;466:	// apply water friction
@@ -1781,12 +1781,12 @@ ADDP4
 INDIRI4
 ADDRLP4 48
 INDIRI4
-EQI4 $274
+EQI4 $272
 ADDRGP4 pmlq2+1220
 INDIRI4
 ADDRLP4 48
 INDIRI4
-NEI4 $274
+NEI4 $272
 line 468
 ;468:		drop += speed * pmq2_waterfriction * pmq2->waterlevel * pmlq2.frametime;
 ADDRLP4 12
@@ -1809,7 +1809,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $274
+LABELV $272
 line 471
 ;469:
 ;470:	// scale the velocity
@@ -1826,7 +1826,7 @@ line 472
 ADDRLP4 4
 INDIRF4
 CNSTF4 0
-GEF4 $278
+GEF4 $276
 line 473
 ;473:	{
 line 474
@@ -1836,7 +1836,7 @@ CNSTF4 0
 ASGNF4
 line 475
 ;475:	}
-LABELV $278
+LABELV $276
 line 476
 ;476:	newspeed /= speed;
 ADDRLP4 4
@@ -1894,7 +1894,7 @@ MULF4
 ASGNF4
 line 481
 ;481:}
-LABELV $258
+LABELV $256
 endproc PMQ2_Friction 64 4
 export PMQ2_Accelerate
 proc PMQ2_Accelerate 28 0
@@ -1959,12 +1959,12 @@ line 498
 ADDRLP4 8
 INDIRF4
 CNSTF4 0
-GTF4 $286
+GTF4 $284
 line 499
 ;499:		return;
-ADDRGP4 $280
+ADDRGP4 $278
 JUMPV
-LABELV $286
+LABELV $284
 line 500
 ;500:	accelspeed = accel * pmlq2.frametime * wishspeed;
 ADDRLP4 4
@@ -1983,21 +1983,21 @@ ADDRLP4 4
 INDIRF4
 ADDRLP4 8
 INDIRF4
-LEF4 $289
+LEF4 $287
 line 502
 ;502:		accelspeed = addspeed;
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
 ASGNF4
-LABELV $289
+LABELV $287
 line 504
 ;503:
 ;504:	for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $291
+LABELV $289
 line 505
 ;505:		pmlq2.velocity[i] += accelspeed * wishdir[i];
 ADDRLP4 20
@@ -2028,7 +2028,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $292
+LABELV $290
 line 504
 ADDRLP4 0
 ADDRLP4 0
@@ -2039,10 +2039,10 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $291
+LTI4 $289
 line 506
 ;506:}
-LABELV $280
+LABELV $278
 endproc PMQ2_Accelerate 28 0
 export PMQ2_AirAccelerate
 proc PMQ2_AirAccelerate 32 0
@@ -2063,13 +2063,13 @@ line 513
 ADDRLP4 12
 INDIRF4
 CNSTF4 1106247680
-LEF4 $297
+LEF4 $295
 line 514
 ;514:		wishspd = 30;
 ADDRLP4 12
 CNSTF4 1106247680
 ASGNF4
-LABELV $297
+LABELV $295
 line 515
 ;515:	currentspeed = DotProduct(pmlq2.velocity, wishdir);
 ADDRLP4 20
@@ -2116,12 +2116,12 @@ line 517
 ADDRLP4 8
 INDIRF4
 CNSTF4 0
-GTF4 $304
+GTF4 $302
 line 518
 ;518:		return;
-ADDRGP4 $296
+ADDRGP4 $294
 JUMPV
-LABELV $304
+LABELV $302
 line 519
 ;519:	accelspeed = accel * wishspeed * pmlq2.frametime;
 ADDRLP4 4
@@ -2140,21 +2140,21 @@ ADDRLP4 4
 INDIRF4
 ADDRLP4 8
 INDIRF4
-LEF4 $307
+LEF4 $305
 line 521
 ;521:		accelspeed = addspeed;
 ADDRLP4 4
 ADDRLP4 8
 INDIRF4
 ASGNF4
-LABELV $307
+LABELV $305
 line 523
 ;522:
 ;523:	for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $309
+LABELV $307
 line 524
 ;524:		pmlq2.velocity[i] += accelspeed * wishdir[i];
 ADDRLP4 24
@@ -2185,7 +2185,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $310
+LABELV $308
 line 523
 ADDRLP4 0
 ADDRLP4 0
@@ -2196,10 +2196,10 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $309
+LTI4 $307
 line 525
 ;525:}
-LABELV $296
+LABELV $294
 endproc PMQ2_AirAccelerate 32 0
 export PMQ2_AddCurrents
 proc PMQ2_AddCurrents 20 4
@@ -2224,7 +2224,7 @@ line 541
 ADDRGP4 pmlq2+1220
 INDIRI4
 CNSTI4 0
-EQI4 $315
+EQI4 $313
 ADDRGP4 pmlq2+12+8
 INDIRF4
 ARGF4
@@ -2235,7 +2235,7 @@ ASGNF4
 ADDRLP4 16
 INDIRF4
 CNSTF4 1128792064
-GTF4 $315
+GTF4 $313
 line 542
 ;542:	{
 line 543
@@ -2247,11 +2247,11 @@ CNSTI4 156
 ADDP4
 INDIRF4
 CNSTF4 3245342720
-GTF4 $320
+GTF4 $318
 ADDRGP4 pmlq2+1184
 INDIRI4
 CNSTI4 0
-LEI4 $320
+LEI4 $318
 line 544
 ;544:			wishvel[2] = 200;
 ADDRFP4 0
@@ -2260,9 +2260,9 @@ CNSTI4 8
 ADDP4
 CNSTF4 1128792064
 ASGNF4
-ADDRGP4 $321
+ADDRGP4 $319
 JUMPV
-LABELV $320
+LABELV $318
 line 545
 ;545:		else if ((pmq2->ps->viewangles[PITCH] >= 15) && (pmlq2.forwardmove > 0))
 ADDRGP4 pmq2
@@ -2272,11 +2272,11 @@ CNSTI4 156
 ADDP4
 INDIRF4
 CNSTF4 1097859072
-LTF4 $323
+LTF4 $321
 ADDRGP4 pmlq2+1184
 INDIRI4
 CNSTI4 0
-LEI4 $323
+LEI4 $321
 line 546
 ;546:			wishvel[2] = -200;
 ADDRFP4 0
@@ -2285,15 +2285,15 @@ CNSTI4 8
 ADDP4
 CNSTF4 3276275712
 ASGNF4
-ADDRGP4 $324
+ADDRGP4 $322
 JUMPV
-LABELV $323
+LABELV $321
 line 547
 ;547:		else if (pmlq2.upmove > 0)
 ADDRGP4 pmlq2+1192
 INDIRI4
 CNSTI4 0
-LEI4 $326
+LEI4 $324
 line 548
 ;548:			wishvel[2] = 200;
 ADDRFP4 0
@@ -2302,15 +2302,15 @@ CNSTI4 8
 ADDP4
 CNSTF4 1128792064
 ASGNF4
-ADDRGP4 $327
+ADDRGP4 $325
 JUMPV
-LABELV $326
+LABELV $324
 line 549
 ;549:		else if (pmlq2.upmove < 0)
 ADDRGP4 pmlq2+1192
 INDIRI4
 CNSTI4 0
-GEI4 $329
+GEI4 $327
 line 550
 ;550:			wishvel[2] = -200;
 ADDRFP4 0
@@ -2319,9 +2319,9 @@ CNSTI4 8
 ADDP4
 CNSTF4 3276275712
 ASGNF4
-ADDRGP4 $330
+ADDRGP4 $328
 JUMPV
-LABELV $329
+LABELV $327
 line 552
 ;551:		else
 ;552:			wishvel[2] = 0;
@@ -2331,10 +2331,10 @@ CNSTI4 8
 ADDP4
 CNSTF4 0
 ASGNF4
-LABELV $330
-LABELV $327
-LABELV $324
-LABELV $321
+LABELV $328
+LABELV $325
+LABELV $322
+LABELV $319
 line 555
 ;553:
 ;554:		// limit horizontal speed when on a ladder
@@ -2343,31 +2343,31 @@ ADDRFP4 0
 INDIRP4
 INDIRF4
 CNSTF4 3251109888
-GEF4 $332
+GEF4 $330
 line 556
 ;556:			wishvel[0] = -25;
 ADDRFP4 0
 INDIRP4
 CNSTF4 3251109888
 ASGNF4
-ADDRGP4 $333
+ADDRGP4 $331
 JUMPV
-LABELV $332
+LABELV $330
 line 557
 ;557:		else if (wishvel[0] > 25)
 ADDRFP4 0
 INDIRP4
 INDIRF4
 CNSTF4 1103626240
-LEF4 $334
+LEF4 $332
 line 558
 ;558:			wishvel[0] = 25;
 ADDRFP4 0
 INDIRP4
 CNSTF4 1103626240
 ASGNF4
-LABELV $334
-LABELV $333
+LABELV $332
+LABELV $331
 line 560
 ;559:
 ;560:		if (wishvel[1] < -25)
@@ -2377,7 +2377,7 @@ CNSTI4 4
 ADDP4
 INDIRF4
 CNSTF4 3251109888
-GEF4 $336
+GEF4 $334
 line 561
 ;561:			wishvel[1] = -25;
 ADDRFP4 0
@@ -2386,9 +2386,9 @@ CNSTI4 4
 ADDP4
 CNSTF4 3251109888
 ASGNF4
-ADDRGP4 $337
+ADDRGP4 $335
 JUMPV
-LABELV $336
+LABELV $334
 line 562
 ;562:		else if (wishvel[1] > 25)
 ADDRFP4 0
@@ -2397,7 +2397,7 @@ CNSTI4 4
 ADDP4
 INDIRF4
 CNSTF4 1103626240
-LEF4 $338
+LEF4 $336
 line 563
 ;563:			wishvel[1] = 25;
 ADDRFP4 0
@@ -2406,11 +2406,11 @@ CNSTI4 4
 ADDP4
 CNSTF4 1103626240
 ASGNF4
-LABELV $338
-LABELV $337
+LABELV $336
+LABELV $335
 line 564
 ;564:	}
-LABELV $315
+LABELV $313
 line 618
 ;565:
 ;566:
@@ -2466,7 +2466,7 @@ line 618
 ;616:	//	VectorMA(wishvel, 100 /* pmq2->groundentity->speed */, v, wishvel);
 ;617:	//}
 ;618:}
-LABELV $314
+LABELV $312
 endproc PMQ2_AddCurrents 20 4
 export PMQ2_WaterMove
 proc PMQ2_WaterMove 48 12
@@ -2494,7 +2494,7 @@ line 637
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $341
+LABELV $339
 line 638
 ;638:		wishvel[i] = pmlq2.forward[i] * pmlq2.forwardmove + pmlq2.right[i] * pmlq2.rightmove;
 ADDRLP4 32
@@ -2527,7 +2527,7 @@ CVIF4 4
 MULF4
 ADDF4
 ASGNF4
-LABELV $342
+LABELV $340
 line 637
 ADDRLP4 0
 ADDRLP4 0
@@ -2538,7 +2538,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $341
+LTI4 $339
 line 640
 ;639:
 ;640:	if (!pmlq2.forwardmove && !pmlq2.rightmove && !pmlq2.upmove)
@@ -2549,17 +2549,17 @@ ADDRGP4 pmlq2+1184
 INDIRI4
 ADDRLP4 36
 INDIRI4
-NEI4 $349
+NEI4 $347
 ADDRGP4 pmlq2+1188
 INDIRI4
 ADDRLP4 36
 INDIRI4
-NEI4 $349
+NEI4 $347
 ADDRGP4 pmlq2+1192
 INDIRI4
 ADDRLP4 36
 INDIRI4
-NEI4 $349
+NEI4 $347
 line 641
 ;641:		wishvel[2] -= 60;		// drift towards bottom
 ADDRLP4 4+8
@@ -2568,9 +2568,9 @@ INDIRF4
 CNSTF4 1114636288
 SUBF4
 ASGNF4
-ADDRGP4 $350
+ADDRGP4 $348
 JUMPV
-LABELV $349
+LABELV $347
 line 643
 ;642:	else
 ;643:		wishvel[2] += pmlq2.upmove;
@@ -2582,7 +2582,7 @@ INDIRI4
 CVIF4 4
 ADDF4
 ASGNF4
-LABELV $350
+LABELV $348
 line 645
 ;644:
 ;645:	PMQ2_AddCurrents(wishvel);
@@ -2629,7 +2629,7 @@ ADDRLP4 16
 INDIRF4
 ADDRGP4 pmq2_maxspeed
 INDIRF4
-LEF4 $357
+LEF4 $355
 line 653
 ;653:	{
 line 654
@@ -2673,7 +2673,7 @@ INDIRF4
 ASGNF4
 line 656
 ;656:	}
-LABELV $357
+LABELV $355
 line 657
 ;657:	wishspeed *= 0.5;
 ADDRLP4 16
@@ -2714,7 +2714,7 @@ CALLV
 pop
 line 664
 ;664:}
-LABELV $340
+LABELV $338
 endproc PMQ2_WaterMove 48 12
 export PMQ2_AirMove
 proc PMQ2_AirMove 64 12
@@ -2764,7 +2764,7 @@ line 693
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $366
+LABELV $364
 line 694
 ;694:		wishvel[i] = pmlq2.forward[i] * fmove + pmlq2.right[i] * smove;
 ADDRLP4 44
@@ -2795,7 +2795,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $367
+LABELV $365
 line 693
 ADDRLP4 0
 ADDRLP4 0
@@ -2806,7 +2806,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 2
-LTI4 $366
+LTI4 $364
 line 695
 ;695:	wishvel[2] = 0;
 ADDRLP4 4+8
@@ -2854,19 +2854,19 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $374
+EQI4 $372
 ADDRLP4 52
 ADDRGP4 pmq2_duckspeed
 INDIRF4
 ASGNF4
-ADDRGP4 $375
+ADDRGP4 $373
 JUMPV
-LABELV $374
+LABELV $372
 ADDRLP4 52
 ADDRGP4 pmq2_maxspeed
 INDIRF4
 ASGNF4
-LABELV $375
+LABELV $373
 ADDRLP4 28
 ADDRLP4 52
 INDIRF4
@@ -2890,7 +2890,7 @@ ADDRLP4 24
 INDIRF4
 ADDRLP4 28
 INDIRF4
-LEF4 $376
+LEF4 $374
 line 710
 ;710:	{
 line 711
@@ -2934,14 +2934,14 @@ INDIRF4
 ASGNF4
 line 713
 ;713:	}
-LABELV $376
+LABELV $374
 line 715
 ;714:
 ;715:	if (pmlq2.ladder)
 ADDRGP4 pmlq2+1220
 INDIRI4
 CNSTI4 0
-EQI4 $382
+EQI4 $380
 line 716
 ;716:	{
 line 717
@@ -2967,7 +2967,7 @@ line 719
 ADDRLP4 4+8
 INDIRF4
 CNSTF4 0
-NEF4 $385
+NEF4 $383
 line 720
 ;720:		{
 line 721
@@ -2975,7 +2975,7 @@ line 721
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 0
-LEF4 $388
+LEF4 $386
 line 722
 ;722:			{
 line 723
@@ -3005,7 +3005,7 @@ line 724
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 0
-GEF4 $389
+GEF4 $387
 line 725
 ;725:					pmlq2.velocity[2] = 0;
 ADDRGP4 pmlq2+12+8
@@ -3013,9 +3013,9 @@ CNSTF4 0
 ASGNF4
 line 726
 ;726:			}
-ADDRGP4 $389
+ADDRGP4 $387
 JUMPV
-LABELV $388
+LABELV $386
 line 728
 ;727:			else
 ;728:			{
@@ -3046,19 +3046,19 @@ line 730
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 0
-LEF4 $404
+LEF4 $402
 line 731
 ;731:					pmlq2.velocity[2] = 0;
 ADDRGP4 pmlq2+12+8
 CNSTF4 0
 ASGNF4
-LABELV $404
+LABELV $402
 line 732
 ;732:			}
-LABELV $389
+LABELV $387
 line 733
 ;733:		}
-LABELV $385
+LABELV $383
 line 734
 ;734:		PMQ2_StepSlideMove();
 ADDRGP4 PMQ2_StepSlideMove
@@ -3071,9 +3071,9 @@ CALLV
 pop
 line 736
 ;736:	}
-ADDRGP4 $383
+ADDRGP4 $381
 JUMPV
-LABELV $382
+LABELV $380
 line 737
 ;737:	else if (pmq2->ps->groundEntityNum != ENTITYNUM_NONE)
 ADDRGP4 pmq2
@@ -3083,7 +3083,7 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-EQI4 $410
+EQI4 $408
 line 738
 ;738:	{	// walking on ground
 line 739
@@ -3121,15 +3121,15 @@ CNSTI4 56
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $414
+LEI4 $412
 line 746
 ;746:			pmlq2.velocity[2] = 0;
 ADDRGP4 pmlq2+12+8
 CNSTF4 0
 ASGNF4
-ADDRGP4 $415
+ADDRGP4 $413
 JUMPV
-LABELV $414
+LABELV $412
 line 748
 ;747:		else
 ;748:			pmlq2.velocity[2] -= pmq2->ps->gravity * pmlq2.frametime;
@@ -3153,7 +3153,7 @@ INDIRF4
 MULF4
 SUBF4
 ASGNF4
-LABELV $415
+LABELV $413
 line 751
 ;749:		// PGM
 ;750:
@@ -3165,17 +3165,17 @@ ADDRGP4 pmlq2+12
 INDIRF4
 ADDRLP4 60
 INDIRF4
-NEF4 $421
+NEF4 $419
 ADDRGP4 pmlq2+12+4
 INDIRF4
 ADDRLP4 60
 INDIRF4
-NEF4 $421
+NEF4 $419
 line 752
 ;752:			return;
-ADDRGP4 $363
+ADDRGP4 $361
 JUMPV
-LABELV $421
+LABELV $419
 line 753
 ;753:		PMQ2_StepSlideMove();
 ADDRGP4 PMQ2_StepSlideMove
@@ -3188,9 +3188,9 @@ CALLV
 pop
 line 755
 ;755:	}
-ADDRGP4 $411
+ADDRGP4 $409
 JUMPV
-LABELV $410
+LABELV $408
 line 757
 ;756:	else
 ;757:	{	// not on ground, so little effect on velocity
@@ -3199,7 +3199,7 @@ line 758
 ADDRGP4 pmq2_airaccelerate
 INDIRF4
 CNSTF4 0
-EQF4 $426
+EQF4 $424
 line 759
 ;759:			PMQ2_AirAccelerate(wishdir, wishspeed, pmq2_accelerate);
 ADDRLP4 32
@@ -3213,9 +3213,9 @@ ARGF4
 ADDRGP4 PMQ2_AirAccelerate
 CALLV
 pop
-ADDRGP4 $427
+ADDRGP4 $425
 JUMPV
-LABELV $426
+LABELV $424
 line 761
 ;760:		else
 ;761:			PMQ2_Accelerate(wishdir, wishspeed, 1);
@@ -3229,7 +3229,7 @@ ARGF4
 ADDRGP4 PMQ2_Accelerate
 CALLV
 pop
-LABELV $427
+LABELV $425
 line 763
 ;762:
 ;763:		PMQ2_UpdateAntiLoop();
@@ -3272,11 +3272,11 @@ CALLV
 pop
 line 769
 ;769:	}
-LABELV $411
-LABELV $383
+LABELV $409
+LABELV $381
 line 770
 ;770:}
-LABELV $363
+LABELV $361
 endproc PMQ2_AirMove 64 12
 export PMQ2_CatagorizePosition
 proc PMQ2_CatagorizePosition 1132 28
@@ -3326,7 +3326,7 @@ line 794
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 1127481344
-LEF4 $436
+LEF4 $434
 line 795
 ;795:	{
 line 797
@@ -3341,9 +3341,9 @@ CNSTI4 1023
 ASGNI4
 line 798
 ;798:	}
-ADDRGP4 $437
+ADDRGP4 $435
 JUMPV
-LABELV $436
+LABELV $434
 line 800
 ;799:	else
 ;800:	{
@@ -3413,17 +3413,17 @@ line 806
 ADDRLP4 12+52
 INDIRI4
 CNSTI4 1023
-EQI4 $449
+EQI4 $447
 ADDRLP4 1108
 CNSTI4 1
 ASGNI4
-ADDRGP4 $450
+ADDRGP4 $448
 JUMPV
-LABELV $449
+LABELV $447
 ADDRLP4 1108
 CNSTI4 0
 ASGNI4
-LABELV $450
+LABELV $448
 ADDRGP4 pmlq2+1176
 ADDRLP4 1108
 INDIRI4
@@ -3441,16 +3441,16 @@ line 815
 ADDRLP4 12+52
 INDIRI4
 CNSTI4 1023
-EQI4 $457
+EQI4 $455
 ADDRLP4 12+24+8
 INDIRF4
 CNSTF4 1060320051
-GEF4 $451
+GEF4 $449
 ADDRLP4 12+4
 INDIRI4
 CNSTI4 0
-NEI4 $451
-LABELV $457
+NEI4 $449
+LABELV $455
 line 816
 ;816:		{
 line 817
@@ -3465,9 +3465,9 @@ ASGNI4
 line 819
 ;818:			//pmq2->ps->pm_flags &= ~PMF_ON_GROUND;
 ;819:		}
-ADDRGP4 $452
+ADDRGP4 $450
 JUMPV
-LABELV $451
+LABELV $449
 line 821
 ;820:		else
 ;821:		{
@@ -3506,7 +3506,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $459
+EQI4 $457
 line 829
 ;829:			{
 line 830
@@ -3537,7 +3537,7 @@ CNSTI4 0
 ASGNI4
 line 832
 ;832:			}
-LABELV $459
+LABELV $457
 line 835
 ;833:
 ;834:			//if (!(pmq2->ps->pm_flags & PMF_ON_GROUND))
@@ -3545,7 +3545,7 @@ line 835
 ADDRLP4 1112
 INDIRI4
 CNSTI4 1023
-NEI4 $461
+NEI4 $459
 line 836
 ;836:			{	// just hit the ground
 line 839
@@ -3558,10 +3558,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $463
+EQI4 $461
 line 840
 ;840:					Com_Printf("%i:landed, pmlq2.velocity[2] %f (call %d)\n", c_pmove, pmlq2.velocity[2],type);
-ADDRGP4 $465
+ADDRGP4 $463
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -3577,7 +3577,7 @@ CALLV
 pop
 line 841
 ;841:				}
-LABELV $463
+LABELV $461
 line 844
 ;842:
 ;843:				// Thanks to Loda for making this fix and Daggo for pointing me to it.
@@ -3589,17 +3589,17 @@ ADDRLP4 12+24
 INDIRF4
 ADDRLP4 1116
 INDIRF4
-NEF4 $476
+NEF4 $474
 ADDRLP4 12+24+4
 INDIRF4
 ADDRLP4 1116
 INDIRF4
-NEF4 $476
+NEF4 $474
 ADDRLP4 12+24+8
 INDIRF4
 CNSTF4 1065353216
-EQF4 $468
-LABELV $476
+EQF4 $466
+LABELV $474
 line 845
 ;845:				{ // It's a ramp!
 line 846
@@ -3607,7 +3607,7 @@ line 846
 ADDRGP4 pmlq2+1180
 INDIRI4
 CNSTI4 0
-NEI4 $477
+NEI4 $475
 line 847
 ;847:					{
 line 852
@@ -3624,7 +3624,7 @@ INDIRI4
 CNSTI4 2
 BANDI4
 CNSTI4 0
-EQI4 $480
+EQI4 $478
 line 854
 ;853:
 ;854:							PMQ2_ClipVelocity(pmlq2.velocity, trace.plane.normal, pmlq2.velocity, 1.01);
@@ -3653,10 +3653,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $478
+EQI4 $476
 line 858
 ;858:								Com_Printf("%i:Dead ramp fixed\n", c_pmove);
-ADDRGP4 $487
+ADDRGP4 $485
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -3668,9 +3668,9 @@ line 859
 ;859:							}
 line 860
 ;860:						}
-ADDRGP4 $478
+ADDRGP4 $476
 JUMPV
-LABELV $480
+LABELV $478
 line 861
 ;861:						else {
 line 862
@@ -3681,10 +3681,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $478
+EQI4 $476
 line 863
 ;863:								Com_Printf("%i:Dead ramp\n", c_pmove);
-ADDRGP4 $490
+ADDRGP4 $488
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -3698,9 +3698,9 @@ line 865
 ;865:						}
 line 866
 ;866:					}
-ADDRGP4 $478
+ADDRGP4 $476
 JUMPV
-LABELV $477
+LABELV $475
 line 867
 ;867:					else {
 line 868
@@ -3711,10 +3711,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $491
+EQI4 $489
 line 869
 ;869:							Com_Printf("%i:Good ramp\n", c_pmove);
-ADDRGP4 $493
+ADDRGP4 $491
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -3724,13 +3724,13 @@ CALLV
 pop
 line 870
 ;870:						}
-LABELV $491
+LABELV $489
 line 871
 ;871:					}
-LABELV $478
+LABELV $476
 line 872
 ;872:				}
-LABELV $468
+LABELV $466
 line 875
 ;873:
 ;874:
@@ -3741,7 +3741,7 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 5
-LTI4 $494
+LTI4 $492
 line 889
 ;876:					// this is NONSTANDARD q2 behavior, but in some situations it may happen as you can see below.
 ;877:					// the idea of the standard heavior is that you get more pm_time the faster you fall, but obviously
@@ -3784,17 +3784,17 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 6
-NEI4 $497
+NEI4 $495
 ADDRLP4 1124
 CNSTI4 25
 ASGNI4
-ADDRGP4 $498
+ADDRGP4 $496
 JUMPV
-LABELV $497
+LABELV $495
 ADDRLP4 1124
 CNSTI4 18
 ASGNI4
-LABELV $498
+LABELV $496
 ADDRLP4 1128
 INDIRP4
 INDIRP4
@@ -3811,10 +3811,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $495
+EQI4 $493
 line 892
 ;892:						Com_Printf("%i:PMF_TIME_LAND, cornerSkims %d, pmlq2.previous_velocity[2] %f, pmlq2.velocity[2] %f (call %d)\n", c_pmove, pmq2->cornerSkims,pmlq2.previous_velocity[2],pmlq2.velocity[2], type);
-ADDRGP4 $501
+ADDRGP4 $499
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -3841,9 +3841,9 @@ line 893
 ;893:					}
 line 894
 ;894:				}
-ADDRGP4 $495
+ADDRGP4 $493
 JUMPV
-LABELV $494
+LABELV $492
 line 895
 ;895:				else if (pmq2->cornerSkims >= 1) {
 ADDRGP4 pmq2
@@ -3852,7 +3852,7 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 1
-LTI4 $506
+LTI4 $504
 line 900
 ;896:					// this restores originally intended behavior (sorta) of q2 (using previous_velocity instead of velocity 
 ;897:					// which will usually already have killed downward speed through slidemove
@@ -3862,7 +3862,7 @@ line 900
 ADDRGP4 pmlq2+1208+8
 INDIRF4
 CNSTF4 3276275712
-GEF4 $507
+GEF4 $505
 line 901
 ;901:						pmq2->ps->pm_flags |= PMF_TIME_LAND;
 ADDRLP4 1120
@@ -3889,7 +3889,7 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 2
-GTI4 $512
+GTI4 $510
 line 908
 ;904:							// value 1 and 2 of cornerSkims restores "intended" q2 behavior based on previous_velocity
 ;905:							// value 1 is truly vanilla because it wont let us jump afterwards as q2 devs intended.
@@ -3899,7 +3899,7 @@ line 908
 ADDRGP4 pmlq2+1208+8
 INDIRF4
 CNSTF4 3284664320
-GEF4 $514
+GEF4 $512
 line 909
 ;909:								pmq2->ps->pm_time = 25;
 ADDRGP4 pmq2
@@ -3909,9 +3909,9 @@ CNSTI4 16
 ADDP4
 CNSTI4 25
 ASGNI4
-ADDRGP4 $513
+ADDRGP4 $511
 JUMPV
-LABELV $514
+LABELV $512
 line 911
 ;910:							else
 ;911:								pmq2->ps->pm_time = 18;
@@ -3924,9 +3924,9 @@ CNSTI4 18
 ASGNI4
 line 912
 ;912:						}
-ADDRGP4 $513
+ADDRGP4 $511
 JUMPV
-LABELV $512
+LABELV $510
 line 913
 ;913:						else {//if (pmq2->cornerSkims > 2) {
 line 915
@@ -3942,17 +3942,17 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 4
-NEI4 $519
+NEI4 $517
 ADDRLP4 1124
 CNSTI4 25
 ASGNI4
-ADDRGP4 $520
+ADDRGP4 $518
 JUMPV
-LABELV $519
+LABELV $517
 ADDRLP4 1124
 CNSTI4 18
 ASGNI4
-LABELV $520
+LABELV $518
 ADDRLP4 1128
 INDIRP4
 INDIRP4
@@ -3963,7 +3963,7 @@ INDIRI4
 ASGNI4
 line 916
 ;916:						}
-LABELV $513
+LABELV $511
 line 917
 ;917:						if (pm->debugLevel) {
 ADDRGP4 pm
@@ -3972,10 +3972,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $507
+EQI4 $505
 line 918
 ;918:							Com_Printf("%i:PMF_TIME_LAND, pm_time %d, cornerSkims %d, pmlq2.previous_velocity[2] %f (call %d)\n", c_pmove, pmq2->ps->pm_time, pmq2->cornerSkims, pmlq2.previous_velocity[2], type);
-ADDRGP4 $523
+ADDRGP4 $521
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -4013,9 +4013,9 @@ line 920
 line 922
 ;921:
 ;922:				}
-ADDRGP4 $507
+ADDRGP4 $505
 JUMPV
-LABELV $506
+LABELV $504
 line 925
 ;923:				//pmq2->ps->pm_flags |= PMF_ON_GROUND;
 ;924:				// don't do landing time if we were just going down a slope
@@ -4023,7 +4023,7 @@ line 925
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 3276275712
-GEF4 $526
+GEF4 $524
 ADDRGP4 pm
 INDIRP4
 CNSTI4 288
@@ -4032,7 +4032,7 @@ INDIRI4
 CNSTI4 2
 BANDI4
 CNSTI4 0
-NEI4 $526
+NEI4 $524
 line 926
 ;926:				{
 line 939
@@ -4070,7 +4070,7 @@ line 941
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 3284664320
-GEF4 $530
+GEF4 $528
 line 942
 ;942:						pmq2->ps->pm_time = 25;
 ADDRGP4 pmq2
@@ -4080,9 +4080,9 @@ CNSTI4 16
 ADDP4
 CNSTI4 25
 ASGNI4
-ADDRGP4 $531
+ADDRGP4 $529
 JUMPV
-LABELV $530
+LABELV $528
 line 944
 ;943:					else
 ;944:						pmq2->ps->pm_time = 18;
@@ -4093,7 +4093,7 @@ CNSTI4 16
 ADDP4
 CNSTI4 18
 ASGNI4
-LABELV $531
+LABELV $529
 line 946
 ;945:
 ;946:					if (pm->debugLevel) {
@@ -4103,10 +4103,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $534
+EQI4 $532
 line 947
 ;947:						Com_Printf("%i:PMF_TIME_LAND, pmlq2.velocity[2] %f (call %d)\n", c_pmove, pmlq2.velocity[2],type);
-ADDRGP4 $536
+ADDRGP4 $534
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -4122,18 +4122,18 @@ CALLV
 pop
 line 948
 ;948:					}
-LABELV $534
+LABELV $532
 line 949
 ;949:				}
-LABELV $526
-LABELV $507
-LABELV $495
+LABELV $524
+LABELV $505
+LABELV $493
 line 950
 ;950:			}
-LABELV $461
+LABELV $459
 line 951
 ;951:		}
-LABELV $452
+LABELV $450
 line 958
 ;952:
 ;953:#if 0
@@ -4148,11 +4148,11 @@ CNSTI4 36
 ADDP4
 INDIRI4
 CNSTI4 32
-GEI4 $539
+GEI4 $537
 ADDRLP4 12+52
 INDIRI4
 CNSTI4 1023
-EQI4 $539
+EQI4 $537
 line 959
 ;959:		{
 line 960
@@ -4194,10 +4194,10 @@ ADDI4
 ASGNI4
 line 962
 ;962:		}
-LABELV $539
+LABELV $537
 line 963
 ;963:	}
-LABELV $437
+LABELV $435
 line 968
 ;964:
 ;965:	//
@@ -4299,7 +4299,7 @@ INDIRI4
 CNSTI4 131078
 BANDI4
 CNSTI4 0
-EQI4 $545
+EQI4 $543
 line 978
 ;978:	{
 line 979
@@ -4369,7 +4369,7 @@ INDIRI4
 CNSTI4 131078
 BANDI4
 CNSTI4 0
-EQI4 $549
+EQI4 $547
 line 984
 ;984:		{
 line 985
@@ -4430,7 +4430,7 @@ INDIRI4
 CNSTI4 131078
 BANDI4
 CNSTI4 0
-EQI4 $553
+EQI4 $551
 line 989
 ;989:				pmq2->waterlevel = 3;
 ADDRGP4 pmq2
@@ -4439,17 +4439,17 @@ CNSTI4 196
 ADDP4
 CNSTI4 3
 ASGNI4
-LABELV $553
+LABELV $551
 line 990
 ;990:		}
-LABELV $549
+LABELV $547
 line 991
 ;991:	}
-LABELV $545
+LABELV $543
 line 993
 ;992:
 ;993:}
-LABELV $431
+LABELV $429
 endproc PMQ2_CatagorizePosition 1132 28
 export PMQ2_CheckJump
 proc PMQ2_CheckJump 12 8
@@ -4474,7 +4474,7 @@ INDIRI4
 CNSTI4 32
 BANDI4
 CNSTI4 0
-EQI4 $556
+EQI4 $554
 line 1004
 ;1004:	{	// hasn't been long enough since landing to jump again
 line 1006
@@ -4486,7 +4486,7 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $558
+EQI4 $556
 line 1007
 ;1007:			if (pmq2->cornerSkims == 1) {
 ADDRGP4 pmq2
@@ -4495,10 +4495,10 @@ CNSTI4 220
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $559
+NEI4 $557
 line 1008
 ;1008:				return; // cornerSkims 1 == originally intended vanilla q2 behavior (feels bad, wont be able to bunnyhop)
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
 line 1010
 ;1009:			}
@@ -4508,7 +4508,7 @@ line 1012
 ;1012:			}
 line 1013
 ;1013:		}
-LABELV $558
+LABELV $556
 line 1014
 ;1014:		else if (pm->modParms.runFlags & RFL_NODEADRAMPS) {
 ADDRGP4 pm
@@ -4519,7 +4519,7 @@ INDIRI4
 CNSTI4 2
 BANDI4
 CNSTI4 0
-EQI4 $555
+EQI4 $553
 line 1021
 ;1015:			// kinda in the same spirit tbh. this behaves like an RNG that sometimes wont let us hop and keep speed.
 ;1016:			// different fps makes it behave differently as well. it feels really bad.
@@ -4532,19 +4532,19 @@ line 1022
 ;1022:		else {
 line 1023
 ;1023:			return;
-LABELV $563
-LABELV $559
+LABELV $561
+LABELV $557
 line 1025
 ;1024:		}
 ;1025:	}
-LABELV $556
+LABELV $554
 line 1027
 ;1026:
 ;1027:	if (pmlq2.upmove < 10)
 ADDRGP4 pmlq2+1192
 INDIRI4
 CNSTI4 10
-GEI4 $564
+GEI4 $562
 line 1028
 ;1028:	{	// not holding jump
 line 1029
@@ -4566,9 +4566,9 @@ BANDI4
 ASGNI4
 line 1030
 ;1030:		return;
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $564
+LABELV $562
 line 1034
 ;1031:	}
 ;1032:
@@ -4583,12 +4583,12 @@ INDIRI4
 CNSTI4 2
 BANDI4
 CNSTI4 0
-EQI4 $567
+EQI4 $565
 line 1035
 ;1035:		return;
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $567
+LABELV $565
 line 1037
 ;1036:
 ;1037:	if (pmq2->ps->pm_type == PM_DEAD)
@@ -4604,12 +4604,12 @@ ADDP4
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $569
+NEI4 $567
 line 1038
 ;1038:		return;
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $569
+LABELV $567
 line 1040
 ;1039:
 ;1040:	if (pmq2->waterlevel >= 2)
@@ -4619,7 +4619,7 @@ CNSTI4 196
 ADDP4
 INDIRI4
 CNSTI4 2
-LTI4 $571
+LTI4 $569
 line 1041
 ;1041:	{	// swimming, not jumping
 line 1042
@@ -4637,12 +4637,12 @@ line 1044
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 3281387520
-GTF4 $573
+GTF4 $571
 line 1045
 ;1045:			return;
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $573
+LABELV $571
 line 1047
 ;1046:
 ;1047:		if (pmq2->watertype == CONTENTS_WATER)
@@ -4652,15 +4652,15 @@ CNSTI4 192
 ADDP4
 INDIRI4
 CNSTI4 4
-NEI4 $577
+NEI4 $575
 line 1048
 ;1048:			pmlq2.velocity[2] = 100;
 ADDRGP4 pmlq2+12+8
 CNSTF4 1120403456
 ASGNF4
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $577
+LABELV $575
 line 1049
 ;1049:		else if (pmq2->watertype == CONTENTS_SLIME)
 ADDRGP4 pmq2
@@ -4669,15 +4669,15 @@ CNSTI4 192
 ADDP4
 INDIRI4
 CNSTI4 131072
-NEI4 $581
+NEI4 $579
 line 1050
 ;1050:			pmlq2.velocity[2] = 80;
 ADDRGP4 pmlq2+12+8
 CNSTF4 1117782016
 ASGNF4
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $581
+LABELV $579
 line 1052
 ;1051:		else
 ;1052:			pmlq2.velocity[2] = 50;
@@ -4686,9 +4686,9 @@ CNSTF4 1112014848
 ASGNF4
 line 1053
 ;1053:		return;
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $571
+LABELV $569
 line 1056
 ;1054:	}
 ;1055:
@@ -4700,12 +4700,12 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-NEI4 $587
+NEI4 $585
 line 1057
 ;1057:		return;		// in air, so no effect
-ADDRGP4 $555
+ADDRGP4 $553
 JUMPV
-LABELV $587
+LABELV $585
 line 1059
 ;1058:
 ;1059:	pmq2->ps->pm_flags |= PMF_JUMP_HELD;
@@ -4752,13 +4752,13 @@ line 1063
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 1132920832
-GEF4 $591
+GEF4 $589
 line 1064
 ;1064:		pmlq2.velocity[2] = 270;
 ADDRGP4 pmlq2+12+8
 CNSTF4 1132920832
 ASGNF4
-LABELV $591
+LABELV $589
 line 1066
 ;1065:
 ;1066:	if (pm->debugLevel) {
@@ -4768,10 +4768,10 @@ CNSTI4 68
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $597
+EQI4 $595
 line 1067
 ;1067:		Com_Printf("%i:jump\n", c_pmove);
-ADDRGP4 $599
+ADDRGP4 $597
 ARGP4
 ADDRGP4 c_pmove
 INDIRI4
@@ -4781,10 +4781,10 @@ CALLV
 pop
 line 1068
 ;1068:	}
-LABELV $597
+LABELV $595
 line 1069
 ;1069:}
-LABELV $555
+LABELV $553
 endproc PMQ2_CheckJump 12 8
 export PMQ2_CheckSpecialMovement
 proc PMQ2_CheckSpecialMovement 1140 28
@@ -4812,12 +4812,12 @@ CNSTI4 16
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $601
+EQI4 $599
 line 1085
 ;1085:		return;
-ADDRGP4 $600
+ADDRGP4 $598
 JUMPV
-LABELV $601
+LABELV $599
 line 1087
 ;1086:
 ;1087:	pmlq2.ladder = qfalse;
@@ -4932,19 +4932,19 @@ line 1097
 ADDRLP4 28+8
 INDIRF4
 CNSTF4 1065353216
-GEF4 $615
+GEF4 $613
 ADDRLP4 28+48
 INDIRI4
 CNSTI4 8192
 BANDI4
 CNSTI4 0
-EQI4 $615
+EQI4 $613
 line 1098
 ;1098:		pmlq2.ladder = qtrue;
 ADDRGP4 pmlq2+1220
 CNSTI4 1
 ASGNI4
-LABELV $615
+LABELV $613
 line 1101
 ;1099:
 ;1100:	// check for water jump
@@ -4955,12 +4955,12 @@ CNSTI4 196
 ADDP4
 INDIRI4
 CNSTI4 2
-EQI4 $620
+EQI4 $618
 line 1102
 ;1102:		return;
-ADDRGP4 $600
+ADDRGP4 $598
 JUMPV
-LABELV $620
+LABELV $618
 line 1104
 ;1103:
 ;1104:	VectorMA(pmlq2.origin, 30, flatforward, spot);
@@ -5038,12 +5038,12 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-NEI4 $629
+NEI4 $627
 line 1108
 ;1108:		return;
-ADDRGP4 $600
+ADDRGP4 $598
 JUMPV
-LABELV $629
+LABELV $627
 line 1110
 ;1109:
 ;1110:	spot[2] += 16;
@@ -5085,12 +5085,12 @@ line 1112
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-EQI4 $632
+EQI4 $630
 line 1113
 ;1113:		return;
-ADDRGP4 $600
+ADDRGP4 $598
 JUMPV
-LABELV $632
+LABELV $630
 line 1115
 ;1114:	// jump out of water
 ;1115:	VectorScale(flatforward, 50, pmlq2.velocity);
@@ -5146,7 +5146,7 @@ CNSTI4 255
 ASGNI4
 line 1120
 ;1120:}
-LABELV $600
+LABELV $598
 endproc PMQ2_CheckSpecialMovement 1140 28
 export PMQ2_FlyMove
 proc PMQ2_FlyMove 1192 28
@@ -5199,7 +5199,7 @@ line 1145
 ADDRLP4 56
 INDIRF4
 CNSTF4 1065353216
-GEF4 $645
+GEF4 $643
 line 1146
 ;1146:	{
 line 1147
@@ -5210,9 +5210,9 @@ INDIRB
 ASGNB 12
 line 1148
 ;1148:	}
-ADDRGP4 $646
+ADDRGP4 $644
 JUMPV
-LABELV $645
+LABELV $643
 line 1150
 ;1149:	else
 ;1150:	{
@@ -5236,19 +5236,19 @@ ADDRLP4 56
 INDIRF4
 ADDRGP4 pmq2_stopspeed
 INDIRF4
-GEF4 $649
+GEF4 $647
 ADDRLP4 1168
 ADDRGP4 pmq2_stopspeed
 INDIRF4
 ASGNF4
-ADDRGP4 $650
+ADDRGP4 $648
 JUMPV
-LABELV $649
+LABELV $647
 ADDRLP4 1168
 ADDRLP4 56
 INDIRF4
 ASGNF4
-LABELV $650
+LABELV $648
 ADDRLP4 80
 ADDRLP4 1168
 INDIRF4
@@ -5284,13 +5284,13 @@ line 1159
 ADDRLP4 64
 INDIRF4
 CNSTF4 0
-GEF4 $652
+GEF4 $650
 line 1160
 ;1160:			newspeed = 0;
 ADDRLP4 64
 CNSTF4 0
 ASGNF4
-LABELV $652
+LABELV $650
 line 1161
 ;1161:		newspeed /= speed;
 ADDRLP4 64
@@ -5326,7 +5326,7 @@ MULF4
 ASGNF4
 line 1164
 ;1164:	}
-LABELV $646
+LABELV $644
 line 1167
 ;1165:
 ;1166:	// accelerate
@@ -5364,7 +5364,7 @@ line 1173
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $668
+LABELV $666
 line 1174
 ;1174:		wishvel[i] = pmlq2.forward[i] * fmove + pmlq2.right[i] * smove;
 ADDRLP4 1168
@@ -5395,7 +5395,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $669
+LABELV $667
 line 1173
 ADDRLP4 0
 ADDRLP4 0
@@ -5406,7 +5406,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $668
+LTI4 $666
 line 1175
 ;1175:	wishvel[2] += pmlq2.upmove;
 ADDRLP4 4+8
@@ -5446,7 +5446,7 @@ ADDRLP4 40
 INDIRF4
 ADDRGP4 pmq2_maxspeed
 INDIRF4
-LEF4 $676
+LEF4 $674
 line 1184
 ;1184:	{
 line 1185
@@ -5490,7 +5490,7 @@ INDIRF4
 ASGNF4
 line 1187
 ;1187:	}
-LABELV $676
+LABELV $674
 line 1189
 ;1188:
 ;1189:	pmq2->ps->speed = pmq2_maxspeed;
@@ -5539,12 +5539,12 @@ line 1193
 ADDRLP4 60
 INDIRF4
 CNSTF4 0
-GTF4 $689
+GTF4 $687
 line 1194
 ;1194:		return;
-ADDRGP4 $643
+ADDRGP4 $641
 JUMPV
-LABELV $689
+LABELV $687
 line 1195
 ;1195:	accelspeed = pmq2_accelerate * pmlq2.frametime * wishspeed;
 ADDRLP4 28
@@ -5563,21 +5563,21 @@ ADDRLP4 28
 INDIRF4
 ADDRLP4 60
 INDIRF4
-LEF4 $692
+LEF4 $690
 line 1197
 ;1197:		accelspeed = addspeed;
 ADDRLP4 28
 ADDRLP4 60
 INDIRF4
 ASGNF4
-LABELV $692
+LABELV $690
 line 1199
 ;1198:
 ;1199:	for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $694
+LABELV $692
 line 1200
 ;1200:		pmlq2.velocity[i] += accelspeed * wishdir[i];
 ADDRLP4 1176
@@ -5607,7 +5607,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $695
+LABELV $693
 line 1199
 ADDRLP4 0
 ADDRLP4 0
@@ -5618,20 +5618,20 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $694
+LTI4 $692
 line 1202
 ;1201:
 ;1202:	if (doclip) {
 ADDRFP4 0
 INDIRI4
 CNSTI4 0
-EQI4 $699
+EQI4 $697
 line 1203
 ;1203:		for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $701
+LABELV $699
 line 1204
 ;1204:			end[i] = pmlq2.origin[i] + pmlq2.frametime * pmlq2.velocity[i];
 ADDRLP4 1184
@@ -5659,7 +5659,7 @@ INDIRF4
 MULF4
 ADDF4
 ASGNF4
-LABELV $702
+LABELV $700
 line 1203
 ADDRLP4 0
 ADDRLP4 0
@@ -5670,7 +5670,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $701
+LTI4 $699
 line 1206
 ;1205:
 ;1206:		pmq2->trace(&trace, pmlq2.origin, pmq2->mins, pmq2->maxs, end, pmq2->ps->clientNum, pmq2->tracemask);
@@ -5723,9 +5723,9 @@ INDIRB
 ASGNB 12
 line 1209
 ;1209:	}
-ADDRGP4 $700
+ADDRGP4 $698
 JUMPV
-LABELV $699
+LABELV $697
 line 1210
 ;1210:	else {
 line 1212
@@ -5768,10 +5768,10 @@ ADDF4
 ASGNF4
 line 1213
 ;1213:	}
-LABELV $700
+LABELV $698
 line 1214
 ;1214:}
-LABELV $643
+LABELV $641
 endproc PMQ2_FlyMove 1192 28
 export PMQ2_CheckDuck
 proc PMQ2_CheckDuck 1096 28
@@ -5855,7 +5855,7 @@ ADDP4
 INDIRI4
 ADDRLP4 1080
 INDIRI4
-NEI4 $721
+NEI4 $719
 line 1246
 ;1246:	{
 line 1247
@@ -5877,16 +5877,16 @@ BORI4
 ASGNI4
 line 1248
 ;1248:	}
-ADDRGP4 $722
+ADDRGP4 $720
 JUMPV
-LABELV $721
+LABELV $719
 line 1250
 ;1249:	//else if (pmlq2.upmove < 0 && (pmq2->ps->pm_flags & PMF_ON_GROUND))
 ;1250:	else if (pmlq2.upmove < 0 && (pmq2->ps->groundEntityNum != ENTITYNUM_NONE))
 ADDRGP4 pmlq2+1192
 INDIRI4
 CNSTI4 0
-GEI4 $723
+GEI4 $721
 ADDRGP4 pmq2
 INDIRP4
 INDIRP4
@@ -5894,7 +5894,7 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-EQI4 $723
+EQI4 $721
 line 1251
 ;1251:	{	// duck
 line 1252
@@ -5916,9 +5916,9 @@ BORI4
 ASGNI4
 line 1253
 ;1253:	}
-ADDRGP4 $724
+ADDRGP4 $722
 JUMPV
-LABELV $723
+LABELV $721
 line 1255
 ;1254:	else
 ;1255:	{	// stand up if possible
@@ -5933,7 +5933,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $726
+EQI4 $724
 line 1257
 ;1257:		{
 line 1259
@@ -5997,7 +5997,7 @@ line 1261
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $728
+NEI4 $726
 line 1262
 ;1262:				pmq2->ps->pm_flags &= ~PMF_DUCKED;
 ADDRLP4 1092
@@ -6015,14 +6015,14 @@ INDIRI4
 CNSTI4 -2
 BANDI4
 ASGNI4
-LABELV $728
+LABELV $726
 line 1263
 ;1263:		}
-LABELV $726
+LABELV $724
 line 1264
 ;1264:	}
-LABELV $724
 LABELV $722
+LABELV $720
 line 1266
 ;1265:
 ;1266:	if (pmq2->ps->pm_flags & PMF_DUCKED)
@@ -6035,7 +6035,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $730
+EQI4 $728
 line 1267
 ;1267:	{
 line 1268
@@ -6057,9 +6057,9 @@ CNSTI4 -2
 ASGNI4
 line 1270
 ;1270:	}
-ADDRGP4 $731
+ADDRGP4 $729
 JUMPV
-LABELV $730
+LABELV $728
 line 1272
 ;1271:	else
 ;1272:	{
@@ -6082,10 +6082,10 @@ CNSTI4 22
 ASGNI4
 line 1275
 ;1275:	}
-LABELV $731
+LABELV $729
 line 1276
 ;1276:}
-LABELV $720
+LABELV $718
 endproc PMQ2_CheckDuck 1096 28
 export PMQ2_DeadMove
 proc PMQ2_DeadMove 12 4
@@ -6110,12 +6110,12 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-NEI4 $733
+NEI4 $731
 line 1289
 ;1289:		return;
-ADDRGP4 $732
+ADDRGP4 $730
 JUMPV
-LABELV $733
+LABELV $731
 line 1293
 ;1290:
 ;1291:	// extra friction
@@ -6144,7 +6144,7 @@ line 1295
 ADDRLP4 0
 INDIRF4
 CNSTF4 0
-GTF4 $736
+GTF4 $734
 line 1296
 ;1296:	{
 line 1297
@@ -6166,9 +6166,9 @@ INDIRF4
 ASGNF4
 line 1298
 ;1298:	}
-ADDRGP4 $737
+ADDRGP4 $735
 JUMPV
-LABELV $736
+LABELV $734
 line 1300
 ;1299:	else
 ;1300:	{
@@ -6204,10 +6204,10 @@ MULF4
 ASGNF4
 line 1303
 ;1303:	}
-LABELV $737
+LABELV $735
 line 1304
 ;1304:}
-LABELV $732
+LABELV $730
 endproc PMQ2_DeadMove 12 4
 export PMQ2_GoodPosition
 proc PMQ2_GoodPosition 1124 28
@@ -6229,21 +6229,21 @@ CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $755
+NEI4 $753
 line 1314
 ;1314:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $754
+ADDRGP4 $752
 JUMPV
-LABELV $755
+LABELV $753
 line 1316
 ;1315:
 ;1316:	for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $757
+LABELV $755
 line 1318
 ;1317:#ifdef AUTHENTIC_Q2SNAP
 ;1318:		origin[i] = end[i] = pmq2->ps->origin[i] *0.125;
@@ -6280,7 +6280,7 @@ ADDP4
 ADDRLP4 1112
 INDIRF4
 ASGNF4
-LABELV $758
+LABELV $756
 line 1316
 ADDRLP4 0
 ADDRLP4 0
@@ -6291,7 +6291,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $757
+LTI4 $755
 line 1323
 ;1319:#else
 ;1320:		origin[i] = end[i] = pmq2->ps->origin[i];
@@ -6355,25 +6355,25 @@ line 1329
 ADDRLP4 28+4
 INDIRI4
 CNSTI4 0
-NEI4 $764
+NEI4 $762
 ADDRLP4 1120
 CNSTI4 1
 ASGNI4
-ADDRGP4 $765
+ADDRGP4 $763
 JUMPV
-LABELV $764
+LABELV $762
 ADDRLP4 1120
 CNSTI4 0
 ASGNI4
-LABELV $765
+LABELV $763
 ADDRLP4 1120
 INDIRI4
 RETI4
-LABELV $754
+LABELV $752
 endproc PMQ2_GoodPosition 1124 28
 data
 align 4
-LABELV $767
+LABELV $765
 byte 4 0
 byte 4 4
 byte 4 1
@@ -6420,13 +6420,13 @@ CNSTI4 292
 ADDP4
 INDIRI4
 CNSTI4 -2
-NEI4 $768
+NEI4 $766
 line 1357
 ;1357:		for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $770
+LABELV $768
 line 1358
 ;1358:			pmq2->ps->velocity[i] = pmlq2.velocity[i] * 8;
 ADDRLP4 36
@@ -6451,7 +6451,7 @@ ADDP4
 INDIRF4
 MULF4
 ASGNF4
-LABELV $771
+LABELV $769
 line 1357
 ADDRLP4 0
 ADDRLP4 0
@@ -6462,12 +6462,12 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $770
+LTI4 $768
 line 1359
 ;1359:	}
-ADDRGP4 $769
+ADDRGP4 $767
 JUMPV
-LABELV $768
+LABELV $766
 line 1360
 ;1360:	else {
 line 1361
@@ -6475,7 +6475,7 @@ line 1361
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $775
+LABELV $773
 line 1362
 ;1362:			pmq2->ps->velocity[i] = (int)(pmlq2.velocity[i] * 8);
 ADDRLP4 36
@@ -6502,7 +6502,7 @@ MULF4
 CVFI4 4
 CVIF4 4
 ASGNF4
-LABELV $776
+LABELV $774
 line 1361
 ADDRLP4 0
 ADDRLP4 0
@@ -6513,17 +6513,17 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $775
+LTI4 $773
 line 1363
 ;1363:	}
-LABELV $769
+LABELV $767
 line 1365
 ;1364:
 ;1365:	for (i = 0; i < 3; i++)
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $780
+LABELV $778
 line 1366
 ;1366:	{
 line 1367
@@ -6536,7 +6536,7 @@ ADDRGP4 pmlq2
 ADDP4
 INDIRF4
 CNSTF4 0
-LTF4 $784
+LTF4 $782
 line 1368
 ;1368:			sign[i] = 1;
 ADDRLP4 0
@@ -6547,9 +6547,9 @@ ADDRLP4 8
 ADDP4
 CNSTI4 1
 ASGNI4
-ADDRGP4 $785
+ADDRGP4 $783
 JUMPV
-LABELV $784
+LABELV $782
 line 1370
 ;1369:		else
 ;1370:			sign[i] = -1;
@@ -6561,7 +6561,7 @@ ADDRLP4 8
 ADDP4
 CNSTI4 -1
 ASGNI4
-LABELV $785
+LABELV $783
 line 1371
 ;1371:		if (pm->modParms.msecRestrict == -2) {
 ADDRGP4 pm
@@ -6570,7 +6570,7 @@ CNSTI4 292
 ADDP4
 INDIRI4
 CNSTI4 -2
-NEI4 $786
+NEI4 $784
 line 1372
 ;1372:			pmq2->ps->origin[i] = pmlq2.origin[i] * 8; // in float physics mode no snap
 ADDRLP4 36
@@ -6597,9 +6597,9 @@ MULF4
 ASGNF4
 line 1373
 ;1373:		}
-ADDRGP4 $787
+ADDRGP4 $785
 JUMPV
-LABELV $786
+LABELV $784
 line 1374
 ;1374:		else {
 line 1375
@@ -6630,7 +6630,7 @@ CVIF4 4
 ASGNF4
 line 1376
 ;1376:		}
-LABELV $787
+LABELV $785
 line 1377
 ;1377:		if (pmq2->ps->origin[i] * 0.125 == pmlq2.origin[i])
 ADDRLP4 36
@@ -6655,7 +6655,7 @@ INDIRI4
 ADDRGP4 pmlq2
 ADDP4
 INDIRF4
-NEF4 $788
+NEF4 $786
 line 1378
 ;1378:			sign[i] = 0;
 ADDRLP4 0
@@ -6666,10 +6666,10 @@ ADDRLP4 8
 ADDP4
 CNSTI4 0
 ASGNI4
-LABELV $788
+LABELV $786
 line 1379
 ;1379:	}
-LABELV $781
+LABELV $779
 line 1365
 ADDRLP4 0
 ADDRLP4 0
@@ -6680,7 +6680,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $780
+LTI4 $778
 line 1380
 ;1380:	VectorCopy(pmq2->ps->origin, base);
 ADDRLP4 24
@@ -6698,7 +6698,7 @@ line 1383
 ADDRLP4 20
 CNSTI4 0
 ASGNI4
-LABELV $790
+LABELV $788
 line 1384
 ;1384:	{
 line 1385
@@ -6708,7 +6708,7 @@ ADDRLP4 20
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $767
+ADDRGP4 $765
 ADDP4
 INDIRI4
 ASGNI4
@@ -6727,7 +6727,7 @@ line 1387
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $794
+LABELV $792
 line 1388
 ;1388:			if (bits & (1 << i))
 ADDRLP4 4
@@ -6738,7 +6738,7 @@ INDIRI4
 LSHI4
 BANDI4
 CNSTI4 0
-EQI4 $798
+EQI4 $796
 line 1389
 ;1389:				pmq2->ps->origin[i] += sign[i];
 ADDRLP4 36
@@ -6770,8 +6770,8 @@ INDIRI4
 CVIF4 4
 ADDF4
 ASGNF4
-LABELV $798
-LABELV $795
+LABELV $796
+LABELV $793
 line 1387
 ADDRLP4 0
 ADDRLP4 0
@@ -6782,7 +6782,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $794
+LTI4 $792
 line 1391
 ;1390:
 ;1391:		if (PMQ2_GoodPosition())
@@ -6793,15 +6793,15 @@ ASGNI4
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-EQI4 $800
+EQI4 $798
 line 1392
 ;1392:			return;
-ADDRGP4 $766
+ADDRGP4 $764
 JUMPV
-LABELV $800
+LABELV $798
 line 1393
 ;1393:	}
-LABELV $791
+LABELV $789
 line 1383
 ADDRLP4 20
 ADDRLP4 20
@@ -6812,7 +6812,7 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 8
-LTI4 $790
+LTI4 $788
 line 1396
 ;1394:
 ;1395:	// go back to the last position
@@ -6833,11 +6833,11 @@ line 1403
 ;1401:
 ;1402:	
 ;1403:}
-LABELV $766
+LABELV $764
 endproc PMQ2_SnapPosition 48 0
 data
 align 4
-LABELV $804
+LABELV $802
 byte 4 0
 byte 4 3212836864
 byte 4 1065353216
@@ -6919,7 +6919,7 @@ line 1464
 ADDRLP4 20
 CNSTI4 0
 ASGNI4
-LABELV $805
+LABELV $803
 line 1465
 ;1465:		pmq2->ps->origin[2] = base[2] + offset[z];
 ADDRGP4 pmq2
@@ -6933,7 +6933,7 @@ ADDRLP4 20
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $804
+ADDRGP4 $802
 ADDP4
 INDIRF4
 ADDF4
@@ -6943,7 +6943,7 @@ line 1466
 ADDRLP4 16
 CNSTI4 0
 ASGNI4
-LABELV $810
+LABELV $808
 line 1467
 ;1467:			pmq2->ps->origin[1] = base[1] + offset[y];
 ADDRGP4 pmq2
@@ -6957,7 +6957,7 @@ ADDRLP4 16
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $804
+ADDRGP4 $802
 ADDP4
 INDIRF4
 ADDF4
@@ -6967,7 +6967,7 @@ line 1468
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $815
+LABELV $813
 line 1469
 ;1469:				pmq2->ps->origin[0] = base[0] + offset[x];
 ADDRGP4 pmq2
@@ -6981,7 +6981,7 @@ ADDRLP4 0
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $804
+ADDRGP4 $802
 ADDP4
 INDIRF4
 ADDF4
@@ -6995,7 +6995,7 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-EQI4 $819
+EQI4 $817
 line 1472
 ;1471:#ifdef AUTHENTIC_Q2SNAP
 ;1472:					pmlq2.origin[0] = pmq2->ps->origin[0] * 0.125;
@@ -7050,13 +7050,13 @@ INDIRB
 ASGNB 12
 line 1481
 ;1481:					return;
-ADDRGP4 $803
+ADDRGP4 $801
 JUMPV
-LABELV $819
+LABELV $817
 line 1483
 ;1482:				}
 ;1483:			}
-LABELV $816
+LABELV $814
 line 1468
 ADDRLP4 0
 ADDRLP4 0
@@ -7067,10 +7067,10 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $815
+LTI4 $813
 line 1484
 ;1484:		}
-LABELV $811
+LABELV $809
 line 1466
 ADDRLP4 16
 ADDRLP4 16
@@ -7081,10 +7081,10 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 3
-LTI4 $810
+LTI4 $808
 line 1485
 ;1485:	}
-LABELV $806
+LABELV $804
 line 1464
 ADDRLP4 20
 ADDRLP4 20
@@ -7095,13 +7095,13 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 3
-LTI4 $805
+LTI4 $803
 line 1489
 ;1486:#ifdef CRINGY_STUCK_DEBUG
 ;1487:	Com_Printf("Bad InitialSnapPosition\n");
 ;1488:#endif
 ;1489:}
-LABELV $803
+LABELV $801
 endproc PMQ2_InitialSnapPosition 28 0
 export PMQ2_ClampAngles
 proc PMQ2_ClampAngles 16 16
@@ -7135,7 +7135,7 @@ line 1513
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-LABELV $825
+LABELV $823
 line 1514
 ;1514:		{
 line 1515
@@ -7192,7 +7192,7 @@ MULF4
 ASGNF4
 line 1517
 ;1517:		}
-LABELV $826
+LABELV $824
 line 1513
 ADDRLP4 0
 ADDRLP4 0
@@ -7203,7 +7203,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-LTI4 $825
+LTI4 $823
 line 1520
 ;1518:
 ;1519:		// don't let the player look up or down more than 90 degrees
@@ -7219,11 +7219,11 @@ ASGNF4
 ADDRLP4 8
 INDIRF4
 CNSTF4 1118961664
-LEF4 $829
+LEF4 $827
 ADDRLP4 8
 INDIRF4
 CNSTF4 1127481344
-GEF4 $829
+GEF4 $827
 line 1521
 ;1521:			pmq2->ps->viewangles[PITCH] = 89;
 ADDRGP4 pmq2
@@ -7233,9 +7233,9 @@ CNSTI4 156
 ADDP4
 CNSTF4 1118961664
 ASGNF4
-ADDRGP4 $830
+ADDRGP4 $828
 JUMPV
-LABELV $829
+LABELV $827
 line 1522
 ;1522:		else if (pmq2->ps->viewangles[PITCH] < 271 && pmq2->ps->viewangles[PITCH] >= 180)
 ADDRLP4 12
@@ -7249,11 +7249,11 @@ ASGNF4
 ADDRLP4 12
 INDIRF4
 CNSTF4 1132953600
-GEF4 $831
+GEF4 $829
 ADDRLP4 12
 INDIRF4
 CNSTF4 1127481344
-LTF4 $831
+LTF4 $829
 line 1523
 ;1523:			pmq2->ps->viewangles[PITCH] = 271;
 ADDRGP4 pmq2
@@ -7263,8 +7263,8 @@ CNSTI4 156
 ADDP4
 CNSTF4 1132953600
 ASGNF4
-LABELV $831
-LABELV $830
+LABELV $829
+LABELV $828
 line 1524
 ;1524:	}
 line 1525
@@ -7286,7 +7286,7 @@ CALLV
 pop
 line 1526
 ;1526:}
-LABELV $824
+LABELV $822
 endproc PMQ2_ClampAngles 16 16
 export PmoveQ2
 proc PmoveQ2 56 16
@@ -7404,7 +7404,7 @@ CNSTI4 292
 ADDP4
 INDIRI4
 CNSTI4 -2
-NEI4 $837
+NEI4 $835
 line 1559
 ;1559:		pmq2->ps->origin[0] = (pmq2->ps->origin[0] * 8.0f);
 ADDRLP4 8
@@ -7510,9 +7510,9 @@ MULF4
 ASGNF4
 line 1566
 ;1566:	}
-ADDRGP4 $838
+ADDRGP4 $836
 JUMPV
-LABELV $837
+LABELV $835
 line 1567
 ;1567:	else {
 line 1568
@@ -7632,7 +7632,7 @@ CVIF4 4
 ASGNF4
 line 1575
 ;1575:	}
-LABELV $838
+LABELV $836
 line 1578
 ;1576:
 ;1577:	// convert origin and velocity to float values
@@ -7852,7 +7852,7 @@ CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $855
+NEI4 $853
 line 1614
 ;1614:	{
 line 1615
@@ -7976,9 +7976,9 @@ line 1628
 ;1626:		VectorCopy(pmlq2.velocity, pmq2->ps->velocity);
 ;1627:#endif
 ;1628:		return;
-ADDRGP4 $836
+ADDRGP4 $834
 JUMPV
-LABELV $855
+LABELV $853
 line 1631
 ;1629:	}
 ;1630:
@@ -7995,7 +7995,7 @@ ADDP4
 INDIRI4
 ADDRLP4 20
 INDIRI4
-LTI4 $857
+LTI4 $855
 line 1632
 ;1632:	{
 line 1633
@@ -8015,7 +8015,7 @@ CNSTI4 0
 ASGNI4
 line 1636
 ;1636:	}
-LABELV $857
+LABELV $855
 line 1638
 ;1637:
 ;1638:	if (pmq2->ps->pm_type == PM_FREEZE)
@@ -8026,12 +8026,12 @@ CNSTI4 4
 ADDP4
 INDIRI4
 CNSTI4 5
-NEI4 $862
+NEI4 $860
 line 1639
 ;1639:		return;		// no movement at all
-ADDRGP4 $836
+ADDRGP4 $834
 JUMPV
-LABELV $862
+LABELV $860
 line 1642
 ;1640:
 ;1641:	// set mins, maxs, and viewheight
@@ -8048,13 +8048,13 @@ CNSTI4 32
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $864
+EQI4 $862
 line 1645
 ;1645:		PMQ2_InitialSnapPosition();
 ADDRGP4 PMQ2_InitialSnapPosition
 CALLV
 pop
-LABELV $864
+LABELV $862
 line 1649
 ;1646:
 ;1647:	//pmlq2.clipped = qtrue;
@@ -8081,13 +8081,13 @@ ADDP4
 INDIRI4
 ADDRLP4 24
 INDIRI4
-NEI4 $866
+NEI4 $864
 line 1653
 ;1653:		PMQ2_DeadMove();
 ADDRGP4 PMQ2_DeadMove
 CALLV
 pop
-LABELV $866
+LABELV $864
 line 1655
 ;1654:
 ;1655:	PMQ2_CheckSpecialMovement();
@@ -8105,7 +8105,7 @@ CNSTI4 16
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $868
+EQI4 $866
 line 1659
 ;1659:	{
 line 1663
@@ -8124,13 +8124,13 @@ line 1664
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-NEI4 $871
+NEI4 $869
 line 1665
 ;1665:			msec = 1;
 ADDRLP4 28
 CNSTI4 1
 ASGNI4
-LABELV $871
+LABELV $869
 line 1666
 ;1666:		if (msec >= pmq2->ps->pm_time)
 ADDRLP4 28
@@ -8141,7 +8141,7 @@ INDIRP4
 CNSTI4 16
 ADDP4
 INDIRI4
-LTI4 $873
+LTI4 $871
 line 1667
 ;1667:		{
 line 1668
@@ -8172,9 +8172,9 @@ CNSTI4 0
 ASGNI4
 line 1670
 ;1670:		}
-ADDRGP4 $874
+ADDRGP4 $872
 JUMPV
-LABELV $873
+LABELV $871
 line 1672
 ;1671:		else
 ;1672:			pmq2->ps->pm_time -= msec;
@@ -8194,10 +8194,10 @@ ADDRLP4 28
 INDIRI4
 SUBI4
 ASGNI4
-LABELV $874
+LABELV $872
 line 1673
 ;1673:	}
-LABELV $868
+LABELV $866
 line 1679
 ;1674:
 ;1675:	//if (pmq2->ps->pm_flags & PMF_TIME_TELEPORT)
@@ -8214,7 +8214,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $875
+EQI4 $873
 line 1680
 ;1680:	{	// waterjump has no control, but falls
 line 1681
@@ -8244,7 +8244,7 @@ line 1682
 ADDRGP4 pmlq2+12+8
 INDIRF4
 CNSTF4 0
-GEF4 $880
+GEF4 $878
 line 1683
 ;1683:		{	// cancel as soon as we are falling down again
 line 1684
@@ -8275,7 +8275,7 @@ CNSTI4 0
 ASGNI4
 line 1686
 ;1686:		}
-LABELV $880
+LABELV $878
 line 1688
 ;1687:
 ;1688:		PMQ2_StepSlideMove();
@@ -8289,9 +8289,9 @@ CALLV
 pop
 line 1690
 ;1690:	}
-ADDRGP4 $876
+ADDRGP4 $874
 JUMPV
-LABELV $875
+LABELV $873
 line 1692
 ;1691:	else
 ;1692:	{
@@ -8315,15 +8315,15 @@ CNSTI4 196
 ADDP4
 INDIRI4
 CNSTI4 2
-LTI4 $884
+LTI4 $882
 line 1698
 ;1698:			PMQ2_WaterMove();
 ADDRGP4 PMQ2_WaterMove
 CALLV
 pop
-ADDRGP4 $885
+ADDRGP4 $883
 JUMPV
-LABELV $884
+LABELV $882
 line 1699
 ;1699:		else {
 line 1702
@@ -8343,7 +8343,7 @@ line 1703
 ADDRLP4 28
 INDIRF4
 CNSTF4 1127481344
-LEF4 $886
+LEF4 $884
 line 1704
 ;1704:				angles[PITCH] = angles[PITCH] - 360;
 ADDRLP4 28
@@ -8352,7 +8352,7 @@ INDIRF4
 CNSTF4 1135869952
 SUBF4
 ASGNF4
-LABELV $886
+LABELV $884
 line 1705
 ;1705:			angles[PITCH] /= 3;
 ADDRLP4 28
@@ -8383,10 +8383,10 @@ CALLV
 pop
 line 1710
 ;1710:		}
-LABELV $885
+LABELV $883
 line 1711
 ;1711:	}
-LABELV $876
+LABELV $874
 line 1714
 ;1712:
 ;1713:	// set groundentity, watertype, and waterlevel for final spot
@@ -8411,7 +8411,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $891
+LEI4 $889
 line 1722
 ;1722:		pm->ps->weaponTime -= pmlq2.msec;
 ADDRLP4 28
@@ -8432,7 +8432,7 @@ SUBI4
 ASGNI4
 line 1723
 ;1723:	}
-LABELV $891
+LABELV $889
 line 1724
 ;1724:	if (pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING) {
 ADDRLP4 28
@@ -8446,15 +8446,15 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $896
+LEI4 $894
 ADDRLP4 28
 INDIRP4
 CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 3
-EQI4 $894
-LABELV $896
+EQI4 $892
+LABELV $894
 line 1725
 ;1725:		if (pm->ps->weapon != pm->cmd.weapon) {
 ADDRLP4 32
@@ -8473,7 +8473,7 @@ CNSTI4 24
 ADDP4
 INDIRU1
 CVUI4 1
-EQI4 $897
+EQI4 $895
 line 1726
 ;1726:			PM_BeginWeaponChange(pm->cmd.weapon);
 ADDRGP4 pm
@@ -8488,10 +8488,10 @@ CALLV
 pop
 line 1727
 ;1727:		}
-LABELV $897
+LABELV $895
 line 1728
 ;1728:	}
-LABELV $894
+LABELV $892
 line 1730
 ;1729:
 ;1730:	if (pm->ps->weaponTime > 0) {
@@ -8502,12 +8502,12 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $899
+LEI4 $897
 line 1731
 ;1731:	}
-ADDRGP4 $900
+ADDRGP4 $898
 JUMPV
-LABELV $899
+LABELV $897
 line 1732
 ;1732:	else {
 line 1734
@@ -8520,7 +8520,7 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $901
+NEI4 $899
 line 1735
 ;1735:			PM_FinishWeaponChange();
 ADDRGP4 PM_FinishWeaponChange
@@ -8528,10 +8528,10 @@ CALLV
 pop
 line 1736
 ;1736:		}
-LABELV $901
+LABELV $899
 line 1737
 ;1737:	}
-LABELV $900
+LABELV $898
 line 1744
 ;1738:
 ;1739:
@@ -8652,7 +8652,7 @@ line 1756
 ;1754:	VectorCopy(pmlq2.velocity,pmq2->ps->velocity);
 ;1755:#endif
 ;1756:}
-LABELV $836
+LABELV $834
 endproc PmoveQ2 56 16
 import PM_FinishWeaponChange
 import PM_BeginWeaponChange
@@ -8795,14 +8795,12 @@ import allowedMapDefaultRunFlags
 import allowedRunFlags
 import allowedRollRunFlags
 import defaultRunFlags
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -8949,6 +8947,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -8989,7 +8989,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $599
+LABELV $597
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9000,7 +9000,7 @@ byte 1 112
 byte 1 10
 byte 1 0
 align 1
-LABELV $536
+LABELV $534
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9052,7 +9052,7 @@ byte 1 41
 byte 1 10
 byte 1 0
 align 1
-LABELV $523
+LABELV $521
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9141,7 +9141,7 @@ byte 1 41
 byte 1 10
 byte 1 0
 align 1
-LABELV $501
+LABELV $499
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9240,7 +9240,7 @@ byte 1 41
 byte 1 10
 byte 1 0
 align 1
-LABELV $493
+LABELV $491
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9256,7 +9256,7 @@ byte 1 112
 byte 1 10
 byte 1 0
 align 1
-LABELV $490
+LABELV $488
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9272,7 +9272,7 @@ byte 1 112
 byte 1 10
 byte 1 0
 align 1
-LABELV $487
+LABELV $485
 byte 1 37
 byte 1 105
 byte 1 58
@@ -9294,7 +9294,7 @@ byte 1 100
 byte 1 10
 byte 1 0
 align 1
-LABELV $465
+LABELV $463
 byte 1 37
 byte 1 105
 byte 1 58

@@ -73,6 +73,9 @@
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weapons.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_painpredict.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_blaster.c">
       <Filter>Source Files</Filter>
     </ClCompile>

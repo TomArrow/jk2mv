@@ -25,7 +25,7 @@ line 18
 ADDRGP4 cmd_argc
 INDIRI4
 RETI4
-LABELV $50
+LABELV $48
 endproc BG_Cmd_Argc 0 0
 export BG_Cmd_Argv
 proc BG_Cmd_Argv 0 0
@@ -46,14 +46,14 @@ CVIU4 4
 ADDRGP4 cmd_argc
 INDIRI4
 CVIU4 4
-LTU4 $52
+LTU4 $50
 line 28
 ;28:		return "";
-ADDRGP4 $54
+ADDRGP4 $52
 RETP4
-ADDRGP4 $51
+ADDRGP4 $49
 JUMPV
-LABELV $52
+LABELV $50
 line 30
 ;29:	}
 ;30:	return cmd_argv[arg];
@@ -65,11 +65,11 @@ ADDRGP4 cmd_argv
 ADDP4
 INDIRP4
 RETP4
-LABELV $51
+LABELV $49
 endproc BG_Cmd_Argv 0 0
 bss
 align 1
-LABELV $56
+LABELV $54
 skip 1024
 export BG_Cmd_Args
 code
@@ -91,7 +91,7 @@ line 45
 ;43:	int i;
 ;44:
 ;45:	cmd_args[0] = 0;
-ADDRGP4 $56
+ADDRGP4 $54
 CNSTI1 0
 ASGNI1
 line 46
@@ -99,12 +99,12 @@ line 46
 ADDRLP4 0
 CNSTI4 1
 ASGNI4
-ADDRGP4 $60
+ADDRGP4 $58
 JUMPV
-LABELV $57
+LABELV $55
 line 47
 ;47:		Q_strcat(cmd_args, sizeof(cmd_args), cmd_argv[i]);
-ADDRGP4 $56
+ADDRGP4 $54
 ARGP4
 CNSTI4 1024
 ARGI4
@@ -127,24 +127,24 @@ CNSTI4 1
 ADDI4
 ADDRGP4 cmd_argc
 INDIRI4
-EQI4 $61
+EQI4 $59
 line 49
 ;49:			Q_strcat(cmd_args, sizeof(cmd_args), " ");
-ADDRGP4 $56
+ADDRGP4 $54
 ARGP4
 CNSTI4 1024
 ARGI4
-ADDRGP4 $63
+ADDRGP4 $61
 ARGP4
 ADDRGP4 Q_strcat
 CALLV
 pop
 line 50
 ;50:		}
-LABELV $61
+LABELV $59
 line 51
 ;51:	}
-LABELV $58
+LABELV $56
 line 46
 ADDRLP4 0
 ADDRLP4 0
@@ -152,22 +152,22 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $60
+LABELV $58
 ADDRLP4 0
 INDIRI4
 ADDRGP4 cmd_argc
 INDIRI4
-LTI4 $57
+LTI4 $55
 line 53
 ;52:
 ;53:	return cmd_args;
-ADDRGP4 $56
+ADDRGP4 $54
 RETP4
-LABELV $55
+LABELV $53
 endproc BG_Cmd_Args 4 12
 bss
 align 1
-LABELV $65
+LABELV $63
 skip 8192
 export BG_Cmd_ArgsFrom
 code
@@ -188,7 +188,7 @@ line 67
 ;65:	int i;
 ;66:
 ;67:	cmd_args[0] = 0;
-ADDRGP4 $65
+ADDRGP4 $63
 CNSTI1 0
 ASGNI1
 line 68
@@ -196,25 +196,25 @@ line 68
 ADDRFP4 0
 INDIRI4
 CNSTI4 0
-GEI4 $66
+GEI4 $64
 line 69
 ;69:		arg = 0;
 ADDRFP4 0
 CNSTI4 0
 ASGNI4
-LABELV $66
+LABELV $64
 line 70
 ;70:	for (i = arg; i < cmd_argc; i++) {
 ADDRLP4 0
 ADDRFP4 0
 INDIRI4
 ASGNI4
-ADDRGP4 $71
+ADDRGP4 $69
 JUMPV
-LABELV $68
+LABELV $66
 line 71
 ;71:		Q_strcat(cmd_args, sizeof(cmd_args), cmd_argv[i]);
-ADDRGP4 $65
+ADDRGP4 $63
 ARGP4
 CNSTI4 8192
 ARGI4
@@ -237,24 +237,24 @@ CNSTI4 1
 ADDI4
 ADDRGP4 cmd_argc
 INDIRI4
-EQI4 $72
+EQI4 $70
 line 73
 ;73:			Q_strcat(cmd_args, sizeof(cmd_args), " ");
-ADDRGP4 $65
+ADDRGP4 $63
 ARGP4
 CNSTI4 8192
 ARGI4
-ADDRGP4 $63
+ADDRGP4 $61
 ARGP4
 ADDRGP4 Q_strcat
 CALLV
 pop
 line 74
 ;74:		}
-LABELV $72
+LABELV $70
 line 75
 ;75:	}
-LABELV $69
+LABELV $67
 line 70
 ADDRLP4 0
 ADDRLP4 0
@@ -262,18 +262,18 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $71
+LABELV $69
 ADDRLP4 0
 INDIRI4
 ADDRGP4 cmd_argc
 INDIRI4
-LTI4 $68
+LTI4 $66
 line 77
 ;76:
 ;77:	return cmd_args;
-ADDRGP4 $65
+ADDRGP4 $63
 RETP4
-LABELV $64
+LABELV $62
 endproc BG_Cmd_ArgsFrom 4 12
 export BG_Cmd_Cmd
 proc BG_Cmd_Cmd 0 0
@@ -285,7 +285,7 @@ line 81
 ;81:	return cmd_cmd;
 ADDRGP4 cmd_cmd
 RETP4
-LABELV $74
+LABELV $72
 endproc BG_Cmd_Cmd 0 0
 export BG_Cmd_ArgsBuffer
 proc BG_Cmd_ArgsBuffer 4 12
@@ -321,7 +321,7 @@ CALLV
 pop
 line 94
 ;94:}
-LABELV $75
+LABELV $73
 endproc BG_Cmd_ArgsBuffer 4 12
 export BG_Cmd_DropArg
 proc BG_Cmd_DropArg 8 0
@@ -345,17 +345,17 @@ ASGNI4
 CNSTI4 0
 ADDRLP4 0
 INDIRI4
-GTI4 $77
+GTI4 $75
 ADDRLP4 0
 INDIRI4
 ADDRGP4 cmd_argc
 INDIRI4
-GEI4 $77
+GEI4 $75
 line 106
 ;106:		for (; arg < cmd_argc - 1; arg++) {
-ADDRGP4 $82
+ADDRGP4 $80
 JUMPV
-LABELV $79
+LABELV $77
 line 107
 ;107:			cmd_argv[arg] = cmd_argv[arg + 1];
 ADDRLP4 4
@@ -376,7 +376,7 @@ INDIRP4
 ASGNP4
 line 108
 ;108:		}
-LABELV $80
+LABELV $78
 line 106
 ADDRFP4 0
 ADDRFP4 0
@@ -384,14 +384,14 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $82
+LABELV $80
 ADDRFP4 0
 INDIRI4
 ADDRGP4 cmd_argc
 INDIRI4
 CNSTI4 1
 SUBI4
-LTI4 $79
+LTI4 $77
 line 110
 ;109:
 ;110:		cmd_argc--;
@@ -408,10 +408,10 @@ SUBI4
 ASGNI4
 line 111
 ;111:	}
-LABELV $77
+LABELV $75
 line 112
 ;112:}
-LABELV $76
+LABELV $74
 endproc BG_Cmd_DropArg 8 0
 proc BG_Cmd_TokenizeString2 36 12
 line 129
@@ -453,12 +453,12 @@ ADDRFP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $85
+NEU4 $83
 line 142
 ;142:		return;
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $85
+LABELV $83
 line 145
 ;143:	}
 ;144:
@@ -485,9 +485,9 @@ line 148
 ADDRLP4 4
 ADDRGP4 cmd_tokenized
 ASGNP4
-ADDRGP4 $88
+ADDRGP4 $86
 JUMPV
-LABELV $87
+LABELV $85
 line 150
 ;149:
 ;150:	while (1) {
@@ -496,16 +496,16 @@ line 151
 ADDRGP4 cmd_argc
 INDIRI4
 CNSTI4 1024
-NEI4 $93
+NEI4 $91
 line 152
 ;152:			return;			// this is usually something malicious
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
 line 155
 ;153:		}
 ;154:
 ;155:		while (1) {
-LABELV $95
+LABELV $93
 line 157
 ;156:			// skip whitespace
 ;157:			while (*text && *(const unsigned char* /*eurofix*/)text <= ' ') {
@@ -519,21 +519,21 @@ ADDP4
 ASGNP4
 line 159
 ;159:			}
-LABELV $96
+LABELV $94
 line 157
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-EQI4 $98
+EQI4 $96
 ADDRLP4 0
 INDIRP4
 INDIRU1
 CVUI4 1
 CNSTI4 32
-LEI4 $95
-LABELV $98
+LEI4 $93
+LABELV $96
 line 160
 ;160:			if (!*text) {
 ADDRLP4 0
@@ -541,12 +541,12 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $99
+NEI4 $97
 line 161
 ;161:				return;			// all tokens parsed
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $99
+LABELV $97
 line 165
 ;162:			}
 ;163:
@@ -561,7 +561,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 16
 INDIRI4
-NEI4 $101
+NEI4 $99
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
@@ -570,12 +570,12 @@ INDIRI1
 CVII4 1
 ADDRLP4 16
 INDIRI4
-NEI4 $101
+NEI4 $99
 line 166
 ;166:				return;			// all tokens parsed
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $101
+LABELV $99
 line 170
 ;167:			}
 ;168:
@@ -586,7 +586,7 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 47
-NEI4 $94
+NEI4 $92
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
@@ -594,10 +594,10 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 42
-NEI4 $94
-ADDRGP4 $106
+NEI4 $92
+ADDRGP4 $104
 JUMPV
-LABELV $105
+LABELV $103
 line 171
 ;171:				while (*text && (text[0] != '*' || text[1] != '/')) {
 line 172
@@ -610,7 +610,7 @@ ADDP4
 ASGNP4
 line 173
 ;173:				}
-LABELV $106
+LABELV $104
 line 171
 ADDRLP4 28
 ADDRLP4 0
@@ -621,11 +621,11 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-EQI4 $108
+EQI4 $106
 ADDRLP4 28
 INDIRI4
 CNSTI4 42
-NEI4 $105
+NEI4 $103
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
@@ -633,8 +633,8 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 47
-NEI4 $105
-LABELV $108
+NEI4 $103
+LABELV $106
 line 174
 ;174:				if (!*text) {
 ADDRLP4 0
@@ -642,12 +642,12 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $109
+NEI4 $107
 line 175
 ;175:					return;		// all tokens parsed
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $109
+LABELV $107
 line 177
 ;176:				}
 ;177:				text += 2;
@@ -663,15 +663,15 @@ line 179
 ;179:			else {
 line 180
 ;180:				break;			// we are ready to parse a token
-LABELV $104
+LABELV $102
 line 182
 ;181:			}
 ;182:		}
-LABELV $93
+LABELV $91
 line 155
-ADDRGP4 $96
+ADDRGP4 $94
 JUMPV
-LABELV $94
+LABELV $92
 line 186
 ;183:
 ;184:		// handle quoted strings
@@ -680,13 +680,13 @@ line 186
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $111
+NEI4 $109
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 34
-NEI4 $111
+NEI4 $109
 line 187
 ;187:			cmd_argv[cmd_argc] = textOut;
 ADDRGP4 cmd_argc
@@ -719,9 +719,9 @@ INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-ADDRGP4 $114
+ADDRGP4 $112
 JUMPV
-LABELV $113
+LABELV $111
 line 190
 ;190:			while (*text && *text != '"') {
 line 191
@@ -759,7 +759,7 @@ INDIRI1
 ASGNI1
 line 192
 ;192:			}
-LABELV $114
+LABELV $112
 line 190
 ADDRLP4 12
 ADDRLP4 0
@@ -770,12 +770,12 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-EQI4 $116
+EQI4 $114
 ADDRLP4 12
 INDIRI4
 CNSTI4 34
-NEI4 $113
-LABELV $116
+NEI4 $111
+LABELV $114
 line 193
 ;193:			*textOut++ = 0;
 ADDRLP4 16
@@ -799,12 +799,12 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $117
+NEI4 $115
 line 195
 ;195:				return;		// all tokens parsed
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $117
+LABELV $115
 line 197
 ;196:			}
 ;197:			text++;
@@ -816,9 +816,9 @@ ADDP4
 ASGNP4
 line 198
 ;198:			continue;
-ADDRGP4 $88
+ADDRGP4 $86
 JUMPV
-LABELV $111
+LABELV $109
 line 202
 ;199:		}
 ;200:
@@ -846,9 +846,9 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-ADDRGP4 $120
+ADDRGP4 $118
 JUMPV
-LABELV $119
+LABELV $117
 line 206
 ;204:
 ;205:		// skip until whitespace, quote, or command
@@ -858,18 +858,18 @@ line 207
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $122
+NEI4 $120
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 34
-NEI4 $122
+NEI4 $120
 line 208
 ;208:				break;
-ADDRGP4 $121
+ADDRGP4 $119
 JUMPV
-LABELV $122
+LABELV $120
 line 211
 ;209:			}
 ;210:
@@ -883,7 +883,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 16
 INDIRI4
-NEI4 $124
+NEI4 $122
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
@@ -892,12 +892,12 @@ INDIRI1
 CVII4 1
 ADDRLP4 16
 INDIRI4
-NEI4 $124
+NEI4 $122
 line 212
 ;212:				break;
-ADDRGP4 $121
+ADDRGP4 $119
 JUMPV
-LABELV $124
+LABELV $122
 line 216
 ;213:			}
 ;214:
@@ -908,7 +908,7 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 47
-NEI4 $126
+NEI4 $124
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
@@ -916,12 +916,12 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 42
-NEI4 $126
+NEI4 $124
 line 217
 ;217:				break;
-ADDRGP4 $121
+ADDRGP4 $119
 JUMPV
-LABELV $126
+LABELV $124
 line 220
 ;218:			}
 ;219:
@@ -959,15 +959,15 @@ INDIRI1
 ASGNI1
 line 221
 ;221:		}
-LABELV $120
+LABELV $118
 line 206
 ADDRLP4 0
 INDIRP4
 INDIRU1
 CVUI4 1
 CNSTI4 32
-GTI4 $119
-LABELV $121
+GTI4 $117
+LABELV $119
 line 223
 ;222:
 ;223:		*textOut++ = 0;
@@ -993,23 +993,23 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $128
+NEI4 $126
 line 226
 ;226:			return;		// all tokens parsed
-ADDRGP4 $84
+ADDRGP4 $82
 JUMPV
-LABELV $128
+LABELV $126
 line 228
 ;227:		}
 ;228:	}
-LABELV $88
+LABELV $86
 line 150
-ADDRGP4 $87
+ADDRGP4 $85
 JUMPV
 line 230
 ;229:
 ;230:}
-LABELV $84
+LABELV $82
 endproc BG_Cmd_TokenizeString2 36 12
 export BG_Cmd_TokenizeString
 proc BG_Cmd_TokenizeString 0 8
@@ -1032,7 +1032,7 @@ CALLV
 pop
 line 238
 ;238:}
-LABELV $130
+LABELV $128
 endproc BG_Cmd_TokenizeString 0 8
 export Cmd_TokenizeStringIgnoreQuotes
 proc Cmd_TokenizeStringIgnoreQuotes 0 8
@@ -1056,7 +1056,7 @@ CALLV
 pop
 line 247
 ;247:}
-LABELV $131
+LABELV $129
 endproc Cmd_TokenizeStringIgnoreQuotes 0 8
 bss
 align 1
@@ -1071,14 +1071,12 @@ skip 4096
 align 4
 LABELV cmd_argc
 skip 4
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -1225,6 +1223,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -1265,9 +1265,9 @@ import srand
 import qsort
 lit
 align 1
-LABELV $63
+LABELV $61
 byte 1 32
 byte 1 0
 align 1
-LABELV $54
+LABELV $52
 byte 1 0

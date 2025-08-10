@@ -42,14 +42,14 @@ line 31
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 6
-EQI4 $123
+EQI4 $121
 line 32
 ;32:	{
 line 33
 ;33:		goto failure;
-ADDRGP4 $126
+ADDRGP4 $124
 JUMPV
-LABELV $123
+LABELV $121
 line 36
 ;34:	}
 ;35:
@@ -73,9 +73,9 @@ line 41
 ;41:	trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 ADDRLP4 8776
 ARGP4
-ADDRGP4 $127
+ADDRGP4 $125
 ARGP4
-ADDRGP4 $128
+ADDRGP4 $126
 ARGP4
 CNSTI4 68
 ARGI4
@@ -89,7 +89,7 @@ ADDRLP4 0
 ARGP4
 CNSTI4 512
 ARGI4
-ADDRGP4 $129
+ADDRGP4 $127
 ARGP4
 ADDRLP4 8776+16
 ARGP4
@@ -103,14 +103,14 @@ ADDRLP4 0
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $131
+NEI4 $129
 line 46
 ;46:	{
 line 47
 ;47:		goto failure;
-ADDRGP4 $126
+ADDRGP4 $124
 JUMPV
-LABELV $131
+LABELV $129
 line 50
 ;48:	}
 ;49:
@@ -135,19 +135,19 @@ line 52
 ADDRLP4 8772
 INDIRI4
 CNSTI4 0
-EQI4 $135
+EQI4 $133
 ADDRLP4 8704
 INDIRI4
 CNSTI4 8192
-LTI4 $133
-LABELV $135
+LTI4 $131
+LABELV $133
 line 53
 ;53:	{
 line 54
 ;54:		goto failure;
-ADDRGP4 $126
+ADDRGP4 $124
 JUMPV
-LABELV $133
+LABELV $131
 line 57
 ;55:	}
 ;56:
@@ -174,7 +174,7 @@ line 61
 ;61:	if (GetValueGroup(saga_info, "Rebel", objectives))
 ADDRGP4 saga_info
 ARGP4
-ADDRGP4 $138
+ADDRGP4 $136
 ARGP4
 ADDRLP4 512
 ARGP4
@@ -185,14 +185,14 @@ ASGNI4
 ADDRLP4 9052
 INDIRI4
 CNSTI4 0
-EQI4 $136
+EQI4 $134
 line 62
 ;62:	{
 line 63
 ;63:		if (GetPairedValue(objectives, "RequiredObjectives", goalreq))
 ADDRLP4 512
 ARGP4
-ADDRGP4 $141
+ADDRGP4 $139
 ARGP4
 ADDRLP4 8708
 ARGP4
@@ -203,7 +203,7 @@ ASGNI4
 ADDRLP4 9056
 INDIRI4
 CNSTI4 0
-EQI4 $139
+EQI4 $137
 line 64
 ;64:		{
 line 65
@@ -220,12 +220,12 @@ INDIRI4
 ASGNI4
 line 66
 ;66:		}
-LABELV $139
+LABELV $137
 line 67
 ;67:		if (GetPairedValue(objectives, "attackers", goalreq))
 ADDRLP4 512
 ARGP4
-ADDRGP4 $144
+ADDRGP4 $142
 ARGP4
 ADDRLP4 8708
 ARGP4
@@ -236,7 +236,7 @@ ASGNI4
 ADDRLP4 9060
 INDIRI4
 CNSTI4 0
-EQI4 $142
+EQI4 $140
 line 68
 ;68:		{
 line 69
@@ -253,15 +253,15 @@ INDIRI4
 ASGNI4
 line 70
 ;70:		}
-LABELV $142
+LABELV $140
 line 71
 ;71:	}
-LABELV $136
+LABELV $134
 line 72
 ;72:	if (GetValueGroup(saga_info, "Imperial", objectives))
 ADDRGP4 saga_info
 ARGP4
-ADDRGP4 $147
+ADDRGP4 $145
 ARGP4
 ADDRLP4 512
 ARGP4
@@ -272,14 +272,14 @@ ASGNI4
 ADDRLP4 9056
 INDIRI4
 CNSTI4 0
-EQI4 $122
+EQI4 $120
 line 73
 ;73:	{
 line 74
 ;74:		if (GetPairedValue(objectives, "RequiredObjectives", goalreq))
 ADDRLP4 512
 ARGP4
-ADDRGP4 $141
+ADDRGP4 $139
 ARGP4
 ADDRLP4 8708
 ARGP4
@@ -290,7 +290,7 @@ ASGNI4
 ADDRLP4 9060
 INDIRI4
 CNSTI4 0
-EQI4 $148
+EQI4 $146
 line 75
 ;75:		{
 line 76
@@ -307,12 +307,12 @@ INDIRI4
 ASGNI4
 line 77
 ;77:		}
-LABELV $148
+LABELV $146
 line 78
 ;78:		if (GetPairedValue(objectives, "attackers", goalreq))
 ADDRLP4 512
 ARGP4
-ADDRGP4 $144
+ADDRGP4 $142
 ARGP4
 ADDRLP4 8708
 ARGP4
@@ -323,7 +323,7 @@ ASGNI4
 ADDRLP4 9064
 INDIRI4
 CNSTI4 0
-EQI4 $122
+EQI4 $120
 line 79
 ;79:		{
 line 80
@@ -345,9 +345,9 @@ line 82
 line 84
 ;83:
 ;84:	return;
-ADDRGP4 $122
+ADDRGP4 $120
 JUMPV
-LABELV $126
+LABELV $124
 line 87
 ;85:
 ;86:failure:
@@ -357,7 +357,7 @@ CNSTI4 0
 ASGNI4
 line 88
 ;88:}
-LABELV $122
+LABELV $120
 endproc InitSagaMode 9072 16
 export UseSagaTarget
 proc UseSagaTarget 32 12
@@ -382,7 +382,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $155
+EQU4 $153
 ADDRLP4 8
 INDIRP4
 CNSTI4 408
@@ -391,8 +391,8 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-NEU4 $153
-LABELV $155
+NEU4 $151
+LABELV $153
 line 96
 ;96:	{ //looks like we don't have access to a player, so just use the activating entity
 line 97
@@ -403,9 +403,9 @@ INDIRP4
 ASGNP4
 line 98
 ;98:	}
-ADDRGP4 $154
+ADDRGP4 $152
 JUMPV
-LABELV $153
+LABELV $151
 line 100
 ;99:	else
 ;100:	{
@@ -417,7 +417,7 @@ INDIRP4
 ASGNP4
 line 102
 ;102:	}
-LABELV $154
+LABELV $152
 line 104
 ;103:
 ;104:	if (!en)
@@ -425,14 +425,14 @@ ADDRFP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $156
+NEU4 $154
 line 105
 ;105:	{
 line 106
 ;106:		return;
-ADDRGP4 $152
+ADDRGP4 $150
 JUMPV
-LABELV $156
+LABELV $154
 line 109
 ;107:	}
 ;108:
@@ -441,14 +441,14 @@ ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $158
+NEU4 $156
 line 110
 ;110:	{
 line 111
 ;111:		return;
-ADDRGP4 $152
+ADDRGP4 $150
 JUMPV
-LABELV $158
+LABELV $156
 line 114
 ;112:	}
 ;113:
@@ -456,9 +456,9 @@ line 114
 ADDRLP4 0
 CNSTP4 0
 ASGNP4
-ADDRGP4 $161
+ADDRGP4 $159
 JUMPV
-LABELV $160
+LABELV $158
 line 116
 ;115:	while ( (t = G_Find (t, FOFS(targetname), target)) != NULL )
 ;116:	{
@@ -470,21 +470,21 @@ CVPU4 4
 ADDRLP4 4
 INDIRP4
 CVPU4 4
-NEU4 $163
+NEU4 $161
 line 118
 ;118:		{
 line 119
 ;119:			G_Printf ("WARNING: Entity used itself.\n");
-ADDRGP4 $165
+ADDRGP4 $163
 ARGP4
 ADDRGP4 G_Printf
 CALLV
 pop
 line 120
 ;120:		}
-ADDRGP4 $164
+ADDRGP4 $162
 JUMPV
-LABELV $163
+LABELV $161
 line 122
 ;121:		else
 ;122:		{
@@ -498,7 +498,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 20
 INDIRU4
-EQU4 $166
+EQU4 $164
 ADDRLP4 0
 INDIRP4
 CNSTI4 664
@@ -507,7 +507,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 20
 INDIRU4
-EQU4 $166
+EQU4 $164
 line 124
 ;124:			{
 line 125
@@ -530,42 +530,42 @@ CALLV
 pop
 line 126
 ;126:			}
-LABELV $166
+LABELV $164
 line 127
 ;127:		}
-LABELV $164
+LABELV $162
 line 128
 ;128:		if ( ent && !ent->inuse )
 ADDRLP4 4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $168
+EQU4 $166
 ADDRLP4 4
 INDIRP4
 CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $168
+NEI4 $166
 line 129
 ;129:		{
 line 130
 ;130:			G_Printf("entity was removed while using targets\n");
-ADDRGP4 $170
+ADDRGP4 $168
 ARGP4
 ADDRGP4 G_Printf
 CALLV
 pop
 line 131
 ;131:			return;
-ADDRGP4 $152
+ADDRGP4 $150
 JUMPV
-LABELV $168
+LABELV $166
 line 133
 ;132:		}
 ;133:	}
-LABELV $161
+LABELV $159
 line 115
 ADDRLP4 0
 INDIRP4
@@ -587,10 +587,10 @@ ADDRLP4 16
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $160
+NEU4 $158
 line 134
 ;134:}
-LABELV $152
+LABELV $150
 endproc UseSagaTarget 32 12
 export SagaBroadcast_OBJECTIVECOMPLETE
 proc SagaBroadcast_OBJECTIVECOMPLETE 28 8
@@ -678,7 +678,7 @@ INDIRI4
 ASGNI4
 line 148
 ;148:}
-LABELV $171
+LABELV $169
 endproc SagaBroadcast_OBJECTIVECOMPLETE 28 8
 export SagaBroadcast_ROUNDOVER
 proc SagaBroadcast_ROUNDOVER 28 8
@@ -757,7 +757,7 @@ INDIRI4
 ASGNI4
 line 161
 ;161:}
-LABELV $174
+LABELV $172
 endproc SagaBroadcast_ROUNDOVER 28 8
 export BroadcastObjectiveCompletion
 proc BroadcastObjectiveCompletion 12 12
@@ -774,7 +774,7 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 1023
-EQI4 $178
+EQI4 $176
 ADDRLP4 4
 CNSTI4 2352
 ADDRLP4 0
@@ -788,7 +788,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $178
+EQU4 $176
 ADDRLP4 4
 INDIRI4
 ADDRGP4 g_entities+408
@@ -799,7 +799,7 @@ ADDP4
 INDIRI4
 ADDRFP4 0
 INDIRI4
-NEI4 $178
+NEI4 $176
 line 166
 ;166:	{ //guy who completed this objective gets points, providing he's on the opposing team
 line 167
@@ -830,7 +830,7 @@ CALLV
 pop
 line 168
 ;168:	}
-LABELV $178
+LABELV $176
 line 170
 ;169:	
 ;170:	SagaBroadcast_OBJECTIVECOMPLETE(team, client, objective);
@@ -849,7 +849,7 @@ pop
 line 172
 ;171:	//G_Printf("Broadcast goal completion team %i objective %i final %i\n", team, objective, final);
 ;172:}
-LABELV $177
+LABELV $175
 endproc BroadcastObjectiveCompletion 12 12
 export AddSagaWinningTeamPoints
 proc AddSagaWinningTeamPoints 24 12
@@ -862,9 +862,9 @@ line 176
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $185
+ADDRGP4 $183
 JUMPV
-LABELV $184
+LABELV $182
 line 180
 ;177:	gentity_t *ent;
 ;178:
@@ -891,7 +891,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $187
+EQU4 $185
 ADDRLP4 16
 ADDRLP4 0
 INDIRP4
@@ -904,7 +904,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 12
 INDIRU4
-EQU4 $187
+EQU4 $185
 ADDRLP4 16
 INDIRP4
 CNSTI4 43440
@@ -912,7 +912,7 @@ ADDP4
 INDIRI4
 ADDRFP4 0
 INDIRI4
-NEI4 $187
+NEI4 $185
 line 184
 ;184:		{
 line 185
@@ -921,7 +921,7 @@ ADDRLP4 4
 INDIRI4
 ADDRFP4 4
 INDIRI4
-NEI4 $189
+NEI4 $187
 line 186
 ;186:			{
 line 187
@@ -944,9 +944,9 @@ CALLV
 pop
 line 188
 ;188:			}
-ADDRGP4 $190
+ADDRGP4 $188
 JUMPV
-LABELV $189
+LABELV $187
 line 190
 ;189:			else
 ;190:			{
@@ -970,10 +970,10 @@ CALLV
 pop
 line 192
 ;192:			}
-LABELV $190
+LABELV $188
 line 193
 ;193:		}
-LABELV $187
+LABELV $185
 line 195
 ;194:
 ;195:		i++;
@@ -985,15 +985,15 @@ ADDI4
 ASGNI4
 line 196
 ;196:	}
-LABELV $185
+LABELV $183
 line 179
 ADDRLP4 4
 INDIRI4
 CNSTI4 32
-LTI4 $184
+LTI4 $182
 line 197
 ;197:}
-LABELV $183
+LABELV $181
 endproc AddSagaWinningTeamPoints 24 12
 export SagaRoundComplete
 proc SagaRoundComplete 24 8
@@ -1020,7 +1020,7 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 1023
-EQI4 $192
+EQI4 $190
 ADDRLP4 16
 CNSTI4 2352
 ADDRLP4 12
@@ -1034,7 +1034,7 @@ ADDP4
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $192
+EQU4 $190
 ADDRLP4 16
 INDIRI4
 ADDRGP4 g_entities+408
@@ -1045,7 +1045,7 @@ ADDP4
 INDIRI4
 ADDRFP4 0
 INDIRI4
-EQI4 $192
+EQI4 $190
 line 209
 ;208:		(int)g_entities[winningclient].client->sess.sessionTeam != winningteam)
 ;209:	{ //this person just won the round for the other team..
@@ -1056,7 +1056,7 @@ CNSTI4 1023
 ASGNI4
 line 211
 ;211:	}
-LABELV $192
+LABELV $190
 line 213
 ;212:
 ;213:	VectorClear(nomatter);
@@ -1105,37 +1105,37 @@ line 219
 ADDRFP4 0
 INDIRI4
 CNSTI4 1
-NEI4 $198
+NEI4 $196
 line 220
 ;220:	{
 line 221
 ;221:		LogExit( "The Imperials completed their final objective." );
-ADDRGP4 $200
+ADDRGP4 $198
 ARGP4
 ADDRGP4 LogExit
 CALLV
 pop
 line 222
 ;222:	}
-ADDRGP4 $199
+ADDRGP4 $197
 JUMPV
-LABELV $198
+LABELV $196
 line 224
 ;223:	else
 ;224:	{
 line 225
 ;225:		LogExit( "The Rebels completed their final objective." );
-ADDRGP4 $201
+ADDRGP4 $199
 ARGP4
 ADDRGP4 LogExit
 CALLV
 pop
 line 226
 ;226:	}
-LABELV $199
+LABELV $197
 line 227
 ;227:}
-LABELV $191
+LABELV $189
 endproc SagaRoundComplete 24 8
 export SagaObjectiveCompleted
 proc SagaObjectiveCompleted 12 16
@@ -1150,14 +1150,14 @@ line 233
 ADDRGP4 saga_round_over
 INDIRI4
 CNSTI4 0
-EQI4 $203
+EQI4 $201
 line 234
 ;234:	{
 line 235
 ;235:		return;
-ADDRGP4 $202
+ADDRGP4 $200
 JUMPV
-LABELV $203
+LABELV $201
 line 238
 ;236:	}
 ;237:
@@ -1165,7 +1165,7 @@ line 238
 ADDRFP4 8
 INDIRI4
 CNSTI4 -1
-EQI4 $205
+EQI4 $203
 line 239
 ;239:	{
 line 240
@@ -1173,7 +1173,7 @@ line 240
 ADDRFP4 0
 INDIRI4
 CNSTI4 1
-NEI4 $207
+NEI4 $205
 line 241
 ;241:		{
 line 242
@@ -1191,9 +1191,9 @@ ADDI4
 ASGNI4
 line 243
 ;243:		}
-ADDRGP4 $208
+ADDRGP4 $206
 JUMPV
-LABELV $207
+LABELV $205
 line 245
 ;244:		else
 ;245:		{
@@ -1212,17 +1212,17 @@ ADDI4
 ASGNI4
 line 247
 ;247:		}
-LABELV $208
+LABELV $206
 line 248
 ;248:	}
-LABELV $205
+LABELV $203
 line 250
 ;249:
 ;250:	if (team == SAGATEAM_IMPERIAL)
 ADDRFP4 0
 INDIRI4
 CNSTI4 1
-NEI4 $209
+NEI4 $207
 line 251
 ;251:	{
 line 252
@@ -1239,9 +1239,9 @@ INDIRI4
 ASGNI4
 line 254
 ;254:	}
-ADDRGP4 $210
+ADDRGP4 $208
 JUMPV
-LABELV $209
+LABELV $207
 line 256
 ;255:	else
 ;256:	{
@@ -1259,20 +1259,20 @@ INDIRI4
 ASGNI4
 line 259
 ;259:	}
-LABELV $210
+LABELV $208
 line 261
 ;260:
 ;261:	if (final == 1 || goals_completed >= goals_required)
 ADDRFP4 8
 INDIRI4
 CNSTI4 1
-EQI4 $213
+EQI4 $211
 ADDRLP4 0
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LTI4 $211
-LABELV $213
+LTI4 $209
+LABELV $211
 line 262
 ;262:	{
 line 263
@@ -1288,9 +1288,9 @@ CALLV
 pop
 line 264
 ;264:	}
-ADDRGP4 $212
+ADDRGP4 $210
 JUMPV
-LABELV $211
+LABELV $209
 line 266
 ;265:	else
 ;266:	{
@@ -1313,10 +1313,10 @@ CALLV
 pop
 line 268
 ;268:	}
-LABELV $212
+LABELV $210
 line 269
 ;269:}
-LABELV $202
+LABELV $200
 endproc SagaObjectiveCompleted 12 16
 export StripTabs
 proc StripTabs 12 0
@@ -1334,9 +1334,9 @@ line 274
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $216
+ADDRGP4 $214
 JUMPV
-LABELV $215
+LABELV $213
 line 277
 ;275:
 ;276:	while (buf[i])
@@ -1351,7 +1351,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 9
-EQI4 $218
+EQI4 $216
 line 279
 ;279:		{
 line 280
@@ -1382,7 +1382,7 @@ ADDI4
 ASGNI4
 line 282
 ;282:		}
-LABELV $218
+LABELV $216
 line 284
 ;283:
 ;284:		i++;
@@ -1394,7 +1394,7 @@ ADDI4
 ASGNI4
 line 285
 ;285:	}
-LABELV $216
+LABELV $214
 line 276
 ADDRLP4 0
 INDIRI4
@@ -1404,7 +1404,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $215
+NEI4 $213
 line 286
 ;286:	buf[i_r] = '\0';
 ADDRLP4 4
@@ -1416,7 +1416,7 @@ CNSTI1 0
 ASGNI1
 line 287
 ;287:}
-LABELV $214
+LABELV $212
 endproc StripTabs 12 0
 export sagaTriggerUse
 proc sagaTriggerUse 16556 16
@@ -1449,14 +1449,14 @@ line 299
 ADDRGP4 saga_valid
 INDIRI4
 CNSTI4 0
-NEI4 $221
+NEI4 $219
 line 300
 ;300:	{
 line 301
 ;301:		return;
-ADDRGP4 $220
+ADDRGP4 $218
 JUMPV
-LABELV $221
+LABELV $219
 line 304
 ;302:	}
 ;303:
@@ -1473,7 +1473,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 16528
 INDIRU4
-EQU4 $223
+EQU4 $221
 ADDRLP4 16524
 INDIRP4
 CNSTI4 408
@@ -1482,7 +1482,7 @@ INDIRP4
 CVPU4 4
 ADDRLP4 16528
 INDIRU4
-EQU4 $223
+EQU4 $221
 line 305
 ;305:	{ //activator will hopefully be the person who triggered this event
 line 306
@@ -1494,7 +1494,7 @@ INDIRI4
 ASGNI4
 line 307
 ;307:	}
-LABELV $223
+LABELV $221
 line 309
 ;308:
 ;309:	if (ent->side == SAGATEAM_IMPERIAL)
@@ -1504,7 +1504,7 @@ CNSTI4 444
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $225
+NEI4 $223
 line 310
 ;310:	{
 line 311
@@ -1513,16 +1513,16 @@ ADDRLP4 0
 ARGP4
 CNSTI4 64
 ARGI4
-ADDRGP4 $147
+ADDRGP4 $145
 ARGP4
 ADDRGP4 Com_sprintf
 CALLV
 pop
 line 312
 ;312:	}
-ADDRGP4 $226
+ADDRGP4 $224
 JUMPV
-LABELV $225
+LABELV $223
 line 314
 ;313:	else
 ;314:	{
@@ -1532,14 +1532,14 @@ ADDRLP4 0
 ARGP4
 CNSTI4 64
 ARGI4
-ADDRGP4 $138
+ADDRGP4 $136
 ARGP4
 ADDRGP4 Com_sprintf
 CALLV
 pop
 line 316
 ;316:	}
-LABELV $226
+LABELV $224
 line 318
 ;317:
 ;318:	if (GetValueGroup(saga_info, teamstr, objectives))
@@ -1556,7 +1556,7 @@ ASGNI4
 ADDRLP4 16532
 INDIRI4
 CNSTI4 0
-EQI4 $227
+EQI4 $225
 line 319
 ;319:	{
 line 320
@@ -1565,7 +1565,7 @@ ADDRLP4 8264
 ARGP4
 CNSTI4 64
 ARGI4
-ADDRGP4 $229
+ADDRGP4 $227
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -1600,14 +1600,14 @@ ASGNI4
 ADDRLP4 16536
 INDIRI4
 CNSTI4 0
-EQI4 $230
+EQI4 $228
 line 325
 ;325:		{
 line 326
 ;326:			if (GetPairedValue(desiredobjective, "final", teamstr))
 ADDRLP4 8332
 ARGP4
-ADDRGP4 $234
+ADDRGP4 $232
 ARGP4
 ADDRLP4 0
 ARGP4
@@ -1618,7 +1618,7 @@ ASGNI4
 ADDRLP4 16540
 INDIRI4
 CNSTI4 0
-EQI4 $232
+EQI4 $230
 line 327
 ;327:			{
 line 328
@@ -1635,13 +1635,13 @@ INDIRI4
 ASGNI4
 line 329
 ;329:			}
-LABELV $232
+LABELV $230
 line 331
 ;330:
 ;331:			if (GetPairedValue(desiredobjective, "target", teamstr))
 ADDRLP4 8332
 ARGP4
-ADDRGP4 $237
+ADDRGP4 $235
 ARGP4
 ADDRLP4 0
 ARGP4
@@ -1652,12 +1652,12 @@ ASGNI4
 ADDRLP4 16544
 INDIRI4
 CNSTI4 0
-EQI4 $235
+EQI4 $233
 line 332
 ;332:			{
-ADDRGP4 $239
+ADDRGP4 $237
 JUMPV
-LABELV $238
+LABELV $236
 line 334
 ;333:				while (teamstr[i])
 ;334:				{
@@ -1674,12 +1674,12 @@ ASGNI4
 ADDRLP4 16548
 INDIRI4
 CNSTI4 13
-EQI4 $243
+EQI4 $241
 ADDRLP4 16548
 INDIRI4
 CNSTI4 10
-NEI4 $241
-LABELV $243
+NEI4 $239
+LABELV $241
 line 337
 ;336:						teamstr[i] == '\n')
 ;337:					{
@@ -1693,7 +1693,7 @@ CNSTI1 0
 ASGNI1
 line 339
 ;339:					}
-LABELV $241
+LABELV $239
 line 341
 ;340:
 ;341:					i++;
@@ -1705,7 +1705,7 @@ ADDI4
 ASGNI4
 line 342
 ;342:				}
-LABELV $239
+LABELV $237
 line 333
 ADDRLP4 64
 INDIRI4
@@ -1714,7 +1714,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $238
+NEI4 $236
 line 343
 ;343:				UseSagaTarget(other, activator, teamstr);
 ADDRFP4 4
@@ -1730,7 +1730,7 @@ CALLV
 pop
 line 344
 ;344:			}
-LABELV $235
+LABELV $233
 line 346
 ;345:
 ;346:			if (ent->target && ent->target[0])
@@ -1745,13 +1745,13 @@ ADDRLP4 16548
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $244
+EQU4 $242
 ADDRLP4 16548
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-EQI4 $244
+EQI4 $242
 line 347
 ;347:			{ //use this too
 line 348
@@ -1773,7 +1773,7 @@ CALLV
 pop
 line 349
 ;349:			}
-LABELV $244
+LABELV $242
 line 351
 ;350:
 ;351:			SagaObjectiveCompleted(ent->side, ent->objective, final, clUser);
@@ -1804,13 +1804,13 @@ CALLV
 pop
 line 352
 ;352:		}
-LABELV $230
+LABELV $228
 line 353
 ;353:	}
-LABELV $227
+LABELV $225
 line 354
 ;354:}
-LABELV $220
+LABELV $218
 endproc sagaTriggerUse 16556 16
 export SP_info_saga_objective
 proc SP_info_saga_objective 8 12
@@ -1828,12 +1828,12 @@ line 363
 ADDRGP4 saga_valid
 INDIRI4
 CNSTI4 0
-EQI4 $250
+EQI4 $248
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 6
-EQI4 $247
-LABELV $250
+EQI4 $245
+LABELV $248
 line 364
 ;364:	{
 line 365
@@ -1846,9 +1846,9 @@ CALLV
 pop
 line 366
 ;366:		return;
-ADDRGP4 $246
+ADDRGP4 $244
 JUMPV
-LABELV $247
+LABELV $245
 line 369
 ;367:	}
 ;368:
@@ -1861,9 +1861,9 @@ ADDRGP4 sagaTriggerUse
 ASGNP4
 line 370
 ;370:	G_SpawnInt( "objective", "0", &ent->objective);
-ADDRGP4 $251
+ADDRGP4 $249
 ARGP4
-ADDRGP4 $252
+ADDRGP4 $250
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -1875,9 +1875,9 @@ CALLI4
 pop
 line 371
 ;371:	G_SpawnInt( "side", "0", &ent->side);
-ADDRGP4 $253
+ADDRGP4 $251
 ARGP4
-ADDRGP4 $252
+ADDRGP4 $250
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -1904,7 +1904,7 @@ ADDP4
 INDIRI4
 ADDRLP4 4
 INDIRI4
-EQI4 $256
+EQI4 $254
 ADDRLP4 0
 INDIRP4
 CNSTI4 444
@@ -1912,8 +1912,8 @@ ADDP4
 INDIRI4
 ADDRLP4 4
 INDIRI4
-NEI4 $254
-LABELV $256
+NEI4 $252
+LABELV $254
 line 374
 ;374:	{ //j00 fux0red something up
 line 375
@@ -1926,18 +1926,18 @@ CALLV
 pop
 line 376
 ;376:		G_Printf("ERROR: info_saga_objective without an objective or side value\n");
-ADDRGP4 $257
+ADDRGP4 $255
 ARGP4
 ADDRGP4 G_Printf
 CALLV
 pop
 line 377
 ;377:		return;
-LABELV $254
+LABELV $252
 line 379
 ;378:	}
 ;379:}
-LABELV $246
+LABELV $244
 endproc SP_info_saga_objective 8 12
 import GetPairedValue
 import GetValueGroup
@@ -2846,14 +2846,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -3000,6 +2998,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -3040,7 +3040,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $257
+LABELV $255
 byte 1 69
 byte 1 82
 byte 1 82
@@ -3105,18 +3105,18 @@ byte 1 101
 byte 1 10
 byte 1 0
 align 1
-LABELV $253
+LABELV $251
 byte 1 115
 byte 1 105
 byte 1 100
 byte 1 101
 byte 1 0
 align 1
-LABELV $252
+LABELV $250
 byte 1 48
 byte 1 0
 align 1
-LABELV $251
+LABELV $249
 byte 1 111
 byte 1 98
 byte 1 106
@@ -3128,7 +3128,7 @@ byte 1 118
 byte 1 101
 byte 1 0
 align 1
-LABELV $237
+LABELV $235
 byte 1 116
 byte 1 97
 byte 1 114
@@ -3137,7 +3137,7 @@ byte 1 101
 byte 1 116
 byte 1 0
 align 1
-LABELV $234
+LABELV $232
 byte 1 102
 byte 1 105
 byte 1 110
@@ -3145,7 +3145,7 @@ byte 1 97
 byte 1 108
 byte 1 0
 align 1
-LABELV $229
+LABELV $227
 byte 1 79
 byte 1 98
 byte 1 106
@@ -3159,7 +3159,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $201
+LABELV $199
 byte 1 84
 byte 1 104
 byte 1 101
@@ -3205,7 +3205,7 @@ byte 1 101
 byte 1 46
 byte 1 0
 align 1
-LABELV $200
+LABELV $198
 byte 1 84
 byte 1 104
 byte 1 101
@@ -3254,7 +3254,7 @@ byte 1 101
 byte 1 46
 byte 1 0
 align 1
-LABELV $170
+LABELV $168
 byte 1 101
 byte 1 110
 byte 1 116
@@ -3296,7 +3296,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $165
+LABELV $163
 byte 1 87
 byte 1 65
 byte 1 82
@@ -3328,7 +3328,7 @@ byte 1 46
 byte 1 10
 byte 1 0
 align 1
-LABELV $147
+LABELV $145
 byte 1 73
 byte 1 109
 byte 1 112
@@ -3339,7 +3339,7 @@ byte 1 97
 byte 1 108
 byte 1 0
 align 1
-LABELV $144
+LABELV $142
 byte 1 97
 byte 1 116
 byte 1 116
@@ -3351,7 +3351,7 @@ byte 1 114
 byte 1 115
 byte 1 0
 align 1
-LABELV $141
+LABELV $139
 byte 1 82
 byte 1 101
 byte 1 113
@@ -3372,7 +3372,7 @@ byte 1 101
 byte 1 115
 byte 1 0
 align 1
-LABELV $138
+LABELV $136
 byte 1 82
 byte 1 101
 byte 1 98
@@ -3380,7 +3380,7 @@ byte 1 101
 byte 1 108
 byte 1 0
 align 1
-LABELV $129
+LABELV $127
 byte 1 109
 byte 1 97
 byte 1 112
@@ -3395,10 +3395,10 @@ byte 1 103
 byte 1 97
 byte 1 0
 align 1
-LABELV $128
+LABELV $126
 byte 1 0
 align 1
-LABELV $127
+LABELV $125
 byte 1 109
 byte 1 97
 byte 1 112

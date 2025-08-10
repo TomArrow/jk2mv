@@ -83,7 +83,7 @@ line 66
 ;66:{
 line 67
 ;67:	G_Printf("MVSDK: trap_G2API_GetBoltMatrix_NoRecNoRot called in 1.02 mode\n");
-ADDRGP4 $123
+ADDRGP4 $121
 ARGP4
 ADDRGP4 G_Printf
 CALLV
@@ -92,7 +92,7 @@ line 68
 ;68:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $122
+LABELV $120
 endproc trap_G2API_GetBoltMatrix_NoRecNoRot_DoesNotExistIn_1_02 0 4
 export trap_G2API_CollisionDetect_DoesNotExistIn_1_02
 proc trap_G2API_CollisionDetect_DoesNotExistIn_1_02 0 4
@@ -103,14 +103,14 @@ line 72
 ;72:{
 line 73
 ;73:	G_Printf("MVSDK: trap_G2API_CollisionDetect called in 1.02 mode");
-ADDRGP4 $125
+ADDRGP4 $123
 ARGP4
 ADDRGP4 G_Printf
 CALLV
 pop
 line 74
 ;74:}
-LABELV $124
+LABELV $122
 endproc trap_G2API_CollisionDetect_DoesNotExistIn_1_02 0 4
 export MV_SetGameVersion
 proc MV_SetGameVersion 8 4
@@ -127,20 +127,20 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 2
-EQI4 $130
+EQI4 $128
 ADDRLP4 0
 INDIRI4
 CNSTI4 3
-EQI4 $131
+EQI4 $129
 ADDRLP4 0
 INDIRI4
 CNSTI4 4
-EQI4 $131
-ADDRGP4 $127
+EQI4 $129
+ADDRGP4 $125
 JUMPV
 line 79
 ;79:	{
-LABELV $130
+LABELV $128
 line 81
 ;80:		case VERSION_1_02:
 ;81:			MV_BuildAnimationMappingTable(); // Only need this in 1.02 mode!
@@ -220,10 +220,10 @@ ADDRGP4 trap_G2API_SetBoneAnim_1_02
 ASGNP4
 line 97
 ;97:			break;
-ADDRGP4 $128
+ADDRGP4 $126
 JUMPV
-LABELV $131
-LABELV $127
+LABELV $129
+LABELV $125
 line 101
 ;98:		case VERSION_1_03:
 ;99:		case VERSION_1_04:
@@ -299,7 +299,7 @@ ADDRGP4 trap_G2API_SetBoneAnim_1_04
 ASGNP4
 line 115
 ;115:			break;
-LABELV $128
+LABELV $126
 line 118
 ;116:	}
 ;117:
@@ -307,28 +307,28 @@ line 118
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $132
+EQI4 $130
 ADDRFP4 0
 INDIRI4
 ARGI4
 ADDRGP4 MV_SetGamePlay
 CALLV
 pop
-LABELV $132
+LABELV $130
 line 119
 ;119:}
-LABELV $126
+LABELV $124
 endproc MV_SetGameVersion 8 4
 lit
 align 4
-LABELV $138
-byte 4 608
+LABELV $136
+byte 4 620
 align 4
-LABELV $139
+LABELV $137
 byte 4 760
 export MV_PlayerStateToEngine
 code
-proc MV_PlayerStateToEngine 1372 12
+proc MV_PlayerStateToEngine 1384 12
 line 122
 ;120:
 ;121:
@@ -342,13 +342,13 @@ ADDRGP4 jk2version
 INDIRI4
 ADDRLP4 0
 INDIRI4
-EQI4 $137
+EQI4 $135
 ADDRGP4 jk2startversion
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $134
-LABELV $137
+NEI4 $132
+LABELV $135
 line 124
 ;124:	{ // Do the magic
 line 130
@@ -361,7 +361,7 @@ line 130
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-NEI4 $140
+NEI4 $138
 line 131
 ;131:		{
 line 134
@@ -500,12 +500,12 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 10
-EQI4 $144
+EQI4 $142
 ADDRLP4 36
 INDIRI4
 CNSTI4 7
-NEI4 $142
-LABELV $144
+NEI4 $140
+LABELV $142
 line 141
 ;141:			{
 line 142
@@ -540,7 +540,7 @@ BORI4
 ASGNI4
 line 143
 ;143:			}
-LABELV $142
+LABELV $140
 line 146
 ;144:
 ;145:			/* The following two seem to be unused, but maybe custom cgames make use of them (well, fullAnimExecute seems to not even be set at least once - could probably just leave that one out) */
@@ -613,7 +613,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $145
+LEI4 $143
 line 151
 ;151:				ps->saberBlocked--;
 ADDRLP4 56
@@ -632,21 +632,21 @@ SUBI4
 ASGNI4
 line 152
 ;152:			}
-LABELV $145
+LABELV $143
 line 153
 ;153:		}
-LABELV $140
+LABELV $138
 line 155
 ;154:
 ;155:		if (jk2version == VERSION_1_02 && !mvStructConversionDisabled)
 ADDRGP4 jk2version
 INDIRI4
 CNSTI4 2
-NEI4 $136
+NEI4 $134
 ADDRGP4 mvStructConversionDisabled
 INDIRI4
 CNSTI4 0
-NEI4 $136
+NEI4 $134
 line 156
 ;156:		{ // 1.04 to 1.02
 line 158
@@ -656,7 +656,7 @@ ADDRLP4 4
 ARGP4
 CNSTI4 0
 ARGI4
-CNSTU4 1368
+CNSTU4 1380
 ARGU4
 ADDRGP4 memset
 CALLP4
@@ -669,7 +669,7 @@ ARGP4
 ADDRFP4 0
 INDIRP4
 ARGP4
-ADDRGP4 $138
+ADDRGP4 $136
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -677,14 +677,14 @@ CALLP4
 pop
 line 161
 ;161:			memcpy(&tmpPs.saberIndex, &ps->saberIndex, section4);
-ADDRLP4 4+608
+ADDRLP4 4+620
 ARGP4
 ADDRFP4 0
 INDIRP4
 CNSTI4 620
 ADDP4
 ARGP4
-ADDRGP4 $139
+ADDRGP4 $137
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -709,7 +709,7 @@ INDIRP4
 ARGP4
 ADDRLP4 4
 ARGP4
-CNSTU4 1368
+CNSTU4 1380
 ARGU4
 ADDRGP4 memcpy
 CALLP4
@@ -723,22 +723,22 @@ line 167
 ;167:	{ // No magic required for 1.03 and 1.04...
 line 168
 ;168:		return;
-LABELV $136
+LABELV $134
 line 170
 ;169:	}
 ;170:}
-LABELV $134
-endproc MV_PlayerStateToEngine 1372 12
+LABELV $132
+endproc MV_PlayerStateToEngine 1384 12
 lit
 align 4
-LABELV $154
+LABELV $152
 byte 4 608
 align 4
-LABELV $155
+LABELV $153
 byte 4 760
 export MV_PlayerStateFromEngine
 code
-proc MV_PlayerStateFromEngine 1372 12
+proc MV_PlayerStateFromEngine 1384 12
 line 172
 ;171:
 ;172:void MV_PlayerStateFromEngine(playerState_t* ps) {
@@ -752,13 +752,13 @@ ADDRGP4 jk2version
 INDIRI4
 ADDRLP4 0
 INDIRI4
-EQI4 $153
+EQI4 $151
 ADDRGP4 jk2startversion
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $150
-LABELV $153
+NEI4 $148
+LABELV $151
 line 175
 ;175:	{ // Do the magic
 line 182
@@ -772,11 +772,11 @@ line 182
 ADDRGP4 jk2version
 INDIRI4
 CNSTI4 2
-NEI4 $156
+NEI4 $154
 ADDRGP4 mvStructConversionDisabled
 INDIRI4
 CNSTI4 0
-NEI4 $156
+NEI4 $154
 line 183
 ;183:		{
 line 185
@@ -786,7 +786,7 @@ ADDRLP4 4
 ARGP4
 CNSTI4 0
 ARGI4
-CNSTU4 1368
+CNSTU4 1380
 ARGU4
 ADDRGP4 memset
 CALLP4
@@ -798,7 +798,7 @@ ARGP4
 ADDRFP4 0
 INDIRP4
 ARGP4
-CNSTU4 1368
+CNSTU4 1380
 ARGU4
 ADDRGP4 memcpy
 CALLP4
@@ -823,7 +823,7 @@ INDIRP4
 ARGP4
 ADDRLP4 4
 ARGP4
-ADDRGP4 $154
+ADDRGP4 $152
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -837,9 +837,9 @@ INDIRP4
 CNSTI4 620
 ADDP4
 ARGP4
-ADDRLP4 4+608
+ADDRLP4 4+620
 ARGP4
-ADDRGP4 $155
+ADDRGP4 $153
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -847,14 +847,14 @@ CALLP4
 pop
 line 192
 ;192:		}
-LABELV $156
+LABELV $154
 line 194
 ;193:
 ;194:		if (jk2startversion == VERSION_1_02)
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-NEI4 $152
+NEI4 $150
 line 195
 ;195:		{
 line 198
@@ -993,12 +993,12 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 10
-EQI4 $163
+EQI4 $161
 ADDRLP4 36
 INDIRI4
 CNSTI4 7
-NEI4 $161
-LABELV $163
+NEI4 $159
+LABELV $161
 line 205
 ;205:			{
 line 206
@@ -1033,7 +1033,7 @@ BORI4
 ASGNI4
 line 207
 ;207:			}
-LABELV $161
+LABELV $159
 line 210
 ;208:
 ;209:			/* The following two seem to be unused, but maybe custom cgames make use of them (well, fullAnimExecute seems to not even be set at least once - could probably just leave that one out) */
@@ -1106,7 +1106,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $152
+LEI4 $150
 line 215
 ;215:				ps->saberBlocked++;
 ADDRLP4 56
@@ -1134,24 +1134,24 @@ line 220
 ;220:	{ // No magic required for 1.03 and 1.04...
 line 221
 ;221:		return;
-LABELV $152
+LABELV $150
 line 223
 ;222:	}
 ;223:}
-LABELV $150
-endproc MV_PlayerStateFromEngine 1372 12
+LABELV $148
+endproc MV_PlayerStateFromEngine 1384 12
 lit
 align 4
-LABELV $170
+LABELV $168
 byte 4 608
 align 4
-LABELV $171
+LABELV $169
 byte 4 760
 align 4
-LABELV $172
-byte 4 608
+LABELV $170
+byte 4 620
 align 4
-LABELV $173
+LABELV $171
 byte 4 760
 export MV_VersionMagic
 code
@@ -1169,13 +1169,13 @@ ADDRGP4 jk2version
 INDIRI4
 ADDRLP4 0
 INDIRI4
-EQI4 $169
+EQI4 $167
 ADDRGP4 jk2startversion
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $166
-LABELV $169
+NEI4 $164
+LABELV $167
 line 228
 ;228:	{ // Do the magic
 line 235
@@ -1202,7 +1202,7 @@ line 239
 ADDRFP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $175
+NEI4 $173
 line 240
 ;240:		{ // 1.02 to 1.04
 line 241
@@ -1210,9 +1210,9 @@ line 241
 ADDRLP4 12
 CNSTI4 0
 ASGNI4
-ADDRGP4 $180
+ADDRGP4 $178
 JUMPV
-LABELV $177
+LABELV $175
 line 242
 ;242:			{
 line 243
@@ -1233,10 +1233,10 @@ CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $182
-ADDRGP4 $178
+NEI4 $180
+ADDRGP4 $176
 JUMPV
-LABELV $182
+LABELV $180
 line 246
 ;245:
 ;246:				ps = &ent->client->ps;
@@ -1253,11 +1253,11 @@ line 248
 ADDRGP4 jk2version
 INDIRI4
 CNSTI4 2
-NEI4 $184
+NEI4 $182
 ADDRGP4 mvStructConversionDisabled
 INDIRI4
 CNSTI4 0
-NEI4 $184
+NEI4 $182
 line 249
 ;249:				{
 line 251
@@ -1266,14 +1266,14 @@ line 251
 ADDRLP4 4
 INDIRP4
 ARGP4
-CNSTI4 1368
+CNSTI4 1380
 ADDRLP4 12
 INDIRI4
 MULI4
 ADDRGP4 g_ps
 ADDP4
 ARGP4
-ADDRGP4 $170
+ADDRGP4 $168
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -1287,14 +1287,14 @@ INDIRP4
 CNSTI4 620
 ADDP4
 ARGP4
-CNSTI4 1368
+CNSTI4 1380
 ADDRLP4 12
 INDIRI4
 MULI4
-ADDRGP4 g_ps+608
+ADDRGP4 g_ps+620
 ADDP4
 ARGP4
-ADDRGP4 $171
+ADDRGP4 $169
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -1302,14 +1302,14 @@ CALLP4
 pop
 line 254
 ;254:				}
-LABELV $184
+LABELV $182
 line 256
 ;255:
 ;256:				if ( jk2startversion == VERSION_1_02 )
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-NEI4 $187
+NEI4 $185
 line 257
 ;257:				{
 line 260
@@ -1448,12 +1448,12 @@ ASGNI4
 ADDRLP4 52
 INDIRI4
 CNSTI4 10
-EQI4 $191
+EQI4 $189
 ADDRLP4 52
 INDIRI4
 CNSTI4 7
-NEI4 $189
-LABELV $191
+NEI4 $187
+LABELV $189
 line 267
 ;267:					{
 line 268
@@ -1488,7 +1488,7 @@ BORI4
 ASGNI4
 line 269
 ;269:					}
-LABELV $189
+LABELV $187
 line 272
 ;270:
 ;271:					/* The following two seem to be unused, but maybe custom cgames make use of them (well, fullAnimExecute seems to not even be set at least once - could probably just leave that one out) */
@@ -1561,7 +1561,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $192
+LEI4 $190
 line 277
 ;277:						ps->saberBlocked++;
 ADDRLP4 72
@@ -1580,13 +1580,13 @@ ADDI4
 ASGNI4
 line 278
 ;278:					}
-LABELV $192
+LABELV $190
 line 279
 ;279:				}
-LABELV $187
+LABELV $185
 line 280
 ;280:			}
-LABELV $178
+LABELV $176
 line 241
 ADDRLP4 12
 ADDRLP4 12
@@ -1594,31 +1594,31 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $180
+LABELV $178
 ADDRLP4 12
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-LTI4 $177
+LTI4 $175
 line 282
 ;281:
 ;282:			if ( jk2startversion != VERSION_1_02 ) return;
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-EQI4 $194
-ADDRGP4 $166
+EQI4 $192
+ADDRGP4 $164
 JUMPV
-LABELV $194
+LABELV $192
 line 284
 ;283:
 ;284:			for ( ent = g_entities; ent < entEnd; ent++ )
 ADDRLP4 8
 ADDRGP4 g_entities
 ASGNP4
-ADDRGP4 $199
+ADDRGP4 $197
 JUMPV
-LABELV $196
+LABELV $194
 line 285
 ;285:			{
 line 286
@@ -1629,10 +1629,10 @@ CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $200
-ADDRGP4 $197
+NEI4 $198
+ADDRGP4 $195
 JUMPV
-LABELV $200
+LABELV $198
 line 288
 ;287:
 ;288:				ent->s.torsoAnim = MV_MapAnimation104( ent->s.torsoAnim );
@@ -1696,7 +1696,7 @@ BORI4
 ASGNI4
 line 290
 ;290:			}
-LABELV $197
+LABELV $195
 line 284
 ADDRLP4 8
 ADDRLP4 8
@@ -1704,19 +1704,19 @@ INDIRP4
 CNSTI4 2352
 ADDP4
 ASGNP4
-LABELV $199
+LABELV $197
 ADDRLP4 8
 INDIRP4
 CVPU4 4
 ADDRLP4 16
 INDIRP4
 CVPU4 4
-LTU4 $196
+LTU4 $194
 line 291
 ;291:		}
-ADDRGP4 $168
+ADDRGP4 $166
 JUMPV
-LABELV $175
+LABELV $173
 line 293
 ;292:		else	// revert
 ;293:		{
@@ -1725,7 +1725,7 @@ line 294
 ADDRLP4 12
 CNSTI4 0
 ASGNI4
-LABELV $202
+LABELV $200
 line 295
 ;295:			{
 line 296
@@ -1746,10 +1746,10 @@ CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $206
-ADDRGP4 $203
+NEI4 $204
+ADDRGP4 $201
 JUMPV
-LABELV $206
+LABELV $204
 line 299
 ;298:
 ;299:				ps = &ent->client->ps;
@@ -1766,7 +1766,7 @@ line 301
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-NEI4 $208
+NEI4 $206
 line 302
 ;302:				{
 line 305
@@ -1905,12 +1905,12 @@ ASGNI4
 ADDRLP4 52
 INDIRI4
 CNSTI4 10
-EQI4 $212
+EQI4 $210
 ADDRLP4 52
 INDIRI4
 CNSTI4 7
-NEI4 $210
-LABELV $212
+NEI4 $208
+LABELV $210
 line 312
 ;312:					{
 line 313
@@ -1945,7 +1945,7 @@ BORI4
 ASGNI4
 line 314
 ;314:					}
-LABELV $210
+LABELV $208
 line 317
 ;315:
 ;316:					/* The following two seem to be unused, but maybe custom cgames make use of them (well, fullAnimExecute seems to not even be set at least once - could probably just leave that one out) */
@@ -2018,7 +2018,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $213
+LEI4 $211
 line 322
 ;322:						ps->saberBlocked--;
 ADDRLP4 72
@@ -2037,27 +2037,27 @@ SUBI4
 ASGNI4
 line 323
 ;323:					}
-LABELV $213
+LABELV $211
 line 324
 ;324:				}
-LABELV $208
+LABELV $206
 line 326
 ;325:
 ;326:				if ( jk2version == VERSION_1_02 && !mvStructConversionDisabled )
 ADDRGP4 jk2version
 INDIRI4
 CNSTI4 2
-NEI4 $215
+NEI4 $213
 ADDRGP4 mvStructConversionDisabled
 INDIRI4
 CNSTI4 0
-NEI4 $215
+NEI4 $213
 line 327
 ;327:				{ // 1.04 to 1.02
 line 329
 ;328:					/* Convert the 1.04 struct into a 1.02 struct so the engine can handle it */
 ;329:					memcpy( &g_ps[i], ps, section3);
-CNSTI4 1368
+CNSTI4 1380
 ADDRLP4 12
 INDIRI4
 MULI4
@@ -2067,7 +2067,7 @@ ARGP4
 ADDRLP4 4
 INDIRP4
 ARGP4
-ADDRGP4 $172
+ADDRGP4 $170
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -2075,11 +2075,11 @@ CALLP4
 pop
 line 330
 ;330:					memcpy( &g_ps[i].saberIndex, &ps->saberIndex, section4);
-CNSTI4 1368
+CNSTI4 1380
 ADDRLP4 12
 INDIRI4
 MULI4
-ADDRGP4 g_ps+608
+ADDRGP4 g_ps+620
 ADDP4
 ARGP4
 ADDRLP4 4
@@ -2087,7 +2087,7 @@ INDIRP4
 CNSTI4 620
 ADDP4
 ARGP4
-ADDRGP4 $173
+ADDRGP4 $171
 INDIRU4
 ARGU4
 ADDRGP4 memcpy
@@ -2095,10 +2095,10 @@ CALLP4
 pop
 line 331
 ;331:				}
-LABELV $215
+LABELV $213
 line 332
 ;332:			}
-LABELV $203
+LABELV $201
 line 294
 ADDRLP4 12
 ADDRLP4 12
@@ -2109,17 +2109,17 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 32
-LTI4 $202
+LTI4 $200
 line 334
 ;333:
 ;334:			if ( jk2startversion != VERSION_1_02 ) return;
 ADDRGP4 jk2startversion
 INDIRI4
 CNSTI4 2
-EQI4 $218
-ADDRGP4 $166
+EQI4 $216
+ADDRGP4 $164
 JUMPV
-LABELV $218
+LABELV $216
 line 337
 ;335:
 ;336:			/* Things that must be converted for all entities (like the torsoAnim and legsAnim, g2animent have them as well) */
@@ -2127,9 +2127,9 @@ line 337
 ADDRLP4 8
 ADDRGP4 g_entities
 ASGNP4
-ADDRGP4 $223
+ADDRGP4 $221
 JUMPV
-LABELV $220
+LABELV $218
 line 338
 ;338:			{
 line 339
@@ -2140,10 +2140,10 @@ CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $224
-ADDRGP4 $221
+NEI4 $222
+ADDRGP4 $219
 JUMPV
-LABELV $224
+LABELV $222
 line 341
 ;340:
 ;341:				ent->s.torsoAnim = MV_MapAnimation102( ent->s.torsoAnim );
@@ -2207,7 +2207,7 @@ BORI4
 ASGNI4
 line 343
 ;343:			}
-LABELV $221
+LABELV $219
 line 337
 ADDRLP4 8
 ADDRLP4 8
@@ -2215,14 +2215,14 @@ INDIRP4
 CNSTI4 2352
 ADDP4
 ASGNP4
-LABELV $223
+LABELV $221
 ADDRLP4 8
 INDIRP4
 CVPU4 4
 ADDRLP4 16
 INDIRP4
 CVPU4 4
-LTU4 $220
+LTU4 $218
 line 344
 ;344:		}
 line 345
@@ -2232,11 +2232,11 @@ line 347
 ;347:	{ // No magic required for 1.03 and 1.04...
 line 348
 ;348:		return;
-LABELV $168
+LABELV $166
 line 350
 ;349:	}
 ;350:}
-LABELV $166
+LABELV $164
 endproc MV_VersionMagic 76 12
 import trap_G2API_SetBoneAnim_1_04
 import trap_G2API_GetGLAName_1_04
@@ -2340,7 +2340,7 @@ skip 4
 export g_ps
 align 4
 LABELV g_ps
-skip 43776
+skip 44160
 import trap_MVAPI_EnableSubmodelBypass
 import trap_MVAPI_EnablePlayerSnapshots
 import trap_MVAPI_ResetServerTime
@@ -3174,14 +3174,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -3328,6 +3326,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -3368,7 +3368,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $125
+LABELV $123
 byte 1 77
 byte 1 86
 byte 1 83
@@ -3424,7 +3424,7 @@ byte 1 100
 byte 1 101
 byte 1 0
 align 1
-LABELV $123
+LABELV $121
 byte 1 77
 byte 1 86
 byte 1 83

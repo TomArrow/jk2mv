@@ -19,7 +19,7 @@ line 12
 ADDRFP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $95
+EQI4 $93
 line 19
 ;13://#ifdef DEBUG
 ;14://		// find bad calls: PM_irand_timesync\s*\([^,]+,\s*([^,\s]+)\s*,[^,]+,\s*\1\s*\)
@@ -31,9 +31,9 @@ line 19
 ADDRFP4 12
 INDIRI4
 RETI4
-ADDRGP4 $94
+ADDRGP4 $92
 JUMPV
-LABELV $95
+LABELV $93
 line 22
 ;20:	}
 ;21:
@@ -70,7 +70,7 @@ ADDRLP4 0
 INDIRI4
 ADDRFP4 0
 INDIRI4
-GEI4 $98
+GEI4 $96
 line 24
 ;24:	{
 line 25
@@ -81,14 +81,14 @@ INDIRI4
 ASGNI4
 line 26
 ;26:	}
-LABELV $98
+LABELV $96
 line 27
 ;27:	if (i > val2)
 ADDRLP4 0
 INDIRI4
 ADDRFP4 4
 INDIRI4
-LEI4 $100
+LEI4 $98
 line 28
 ;28:	{
 line 29
@@ -99,14 +99,14 @@ INDIRI4
 ASGNI4
 line 30
 ;30:	}
-LABELV $100
+LABELV $98
 line 32
 ;31:
 ;32:	return i;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $94
+LABELV $92
 endproc PM_irand_timesync 8 4
 export BG_GetMovePhysics
 proc BG_GetMovePhysics 0 0
@@ -121,14 +121,14 @@ ADDRFP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $103
+NEU4 $101
 line 38
 ;38:		return MV_JK2;
 CNSTI4 0
 RETI4
-ADDRGP4 $102
+ADDRGP4 $100
 JUMPV
-LABELV $103
+LABELV $101
 line 40
 ;39:#if JK2_GAME
 ;40:	if (ps->stats[STAT_RACEMODE])
@@ -138,7 +138,7 @@ CNSTI4 260
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $105
+EQI4 $103
 line 41
 ;41:		return (ps->stats[STAT_MOVEMENTSTYLE]);
 ADDRFP4 0
@@ -147,9 +147,9 @@ CNSTI4 268
 ADDP4
 INDIRI4
 RETI4
-ADDRGP4 $102
+ADDRGP4 $100
 JUMPV
-LABELV $105
+LABELV $103
 line 59
 ;42:	//else if ((g_movementStyle.integer >= MV_SIEGE && g_movementStyle.integer <= MV_WSW) || g_movementStyle.integer == MV_SP)
 ;43:	//	return (g_movementStyle.integer);
@@ -171,7 +171,7 @@ line 59
 ;59:	return MV_JK2; // this can happen when we die in racemode too!
 CNSTI4 0
 RETI4
-LABELV $102
+LABELV $100
 endproc BG_GetMovePhysics 0 0
 export BG_ForcePowerDrain
 proc BG_ForcePowerDrain 20 4
@@ -214,7 +214,7 @@ line 76
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $108
+NEI4 $106
 line 77
 ;77:	{
 line 78
@@ -246,20 +246,20 @@ INDIRI4
 ASGNI4
 line 79
 ;79:	}
-LABELV $108
+LABELV $106
 line 80
 ;80:	if ( !drain )
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $110
+NEI4 $108
 line 81
 ;81:	{
 line 82
 ;82:		return;
-ADDRGP4 $107
+ADDRGP4 $105
 JUMPV
-LABELV $110
+LABELV $108
 line 85
 ;83:	}
 ;84:
@@ -267,11 +267,11 @@ line 85
 ADDRFP4 4
 INDIRI4
 CNSTI4 1
-NEI4 $112
+NEI4 $110
 ADDRLP4 4
 INDIRI4
 CNSTI4 12
-EQI4 $112
+EQI4 $110
 line 86
 ;86:	{ //special case
 line 87
@@ -288,7 +288,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1132068864
-LEF4 $114
+LEF4 $112
 line 90
 ;90:		{
 line 91
@@ -298,9 +298,9 @@ CNSTI4 20
 ASGNI4
 line 92
 ;92:		}
-ADDRGP4 $115
+ADDRGP4 $113
 JUMPV
-LABELV $114
+LABELV $112
 line 93
 ;93:		else if (ps->velocity[2] > 200)
 ADDRFP4 0
@@ -309,7 +309,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1128792064
-LEF4 $116
+LEF4 $114
 line 94
 ;94:		{
 line 95
@@ -319,9 +319,9 @@ CNSTI4 16
 ASGNI4
 line 96
 ;96:		}
-ADDRGP4 $117
+ADDRGP4 $115
 JUMPV
-LABELV $116
+LABELV $114
 line 97
 ;97:		else if (ps->velocity[2] > 150)
 ADDRFP4 0
@@ -330,7 +330,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1125515264
-LEF4 $118
+LEF4 $116
 line 98
 ;98:		{
 line 99
@@ -340,9 +340,9 @@ CNSTI4 12
 ASGNI4
 line 100
 ;100:		}
-ADDRGP4 $119
+ADDRGP4 $117
 JUMPV
-LABELV $118
+LABELV $116
 line 101
 ;101:		else if (ps->velocity[2] > 100)
 ADDRFP4 0
@@ -351,7 +351,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1120403456
-LEF4 $120
+LEF4 $118
 line 102
 ;102:		{
 line 103
@@ -361,9 +361,9 @@ CNSTI4 8
 ASGNI4
 line 104
 ;104:		}
-ADDRGP4 $121
+ADDRGP4 $119
 JUMPV
-LABELV $120
+LABELV $118
 line 105
 ;105:		else if (ps->velocity[2] > 50)
 ADDRFP4 0
@@ -372,7 +372,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1112014848
-LEF4 $122
+LEF4 $120
 line 106
 ;106:		{
 line 107
@@ -382,9 +382,9 @@ CNSTI4 6
 ASGNI4
 line 108
 ;108:		}
-ADDRGP4 $123
+ADDRGP4 $121
 JUMPV
-LABELV $122
+LABELV $120
 line 109
 ;109:		else if (ps->velocity[2] > 0)
 ADDRFP4 0
@@ -393,7 +393,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 0
-LEF4 $124
+LEF4 $122
 line 110
 ;110:		{
 line 111
@@ -403,19 +403,19 @@ CNSTI4 4
 ASGNI4
 line 112
 ;112:		}
-LABELV $124
-LABELV $123
+LABELV $122
 LABELV $121
 LABELV $119
 LABELV $117
 LABELV $115
+LABELV $113
 line 114
 ;113:
 ;114:		if (jumpDrain)
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-EQI4 $126
+EQI4 $124
 line 115
 ;115:		{
 line 116
@@ -432,7 +432,7 @@ DIVI4
 ASGNI4
 line 117
 ;117:		}
-LABELV $126
+LABELV $124
 line 119
 ;118:
 ;119:		ps->fd.forcePower -= jumpDrain;
@@ -459,7 +459,7 @@ CNSTI4 932
 ADDP4
 INDIRI4
 CNSTI4 0
-GEI4 $107
+GEI4 $105
 line 121
 ;121:		{
 line 122
@@ -475,9 +475,9 @@ line 123
 line 125
 ;124:
 ;125:		return;
-ADDRGP4 $107
+ADDRGP4 $105
 JUMPV
-LABELV $112
+LABELV $110
 line 128
 ;126:	}
 ;127:
@@ -505,7 +505,7 @@ CNSTI4 932
 ADDP4
 INDIRI4
 CNSTI4 0
-GEI4 $130
+GEI4 $128
 line 130
 ;130:	{
 line 131
@@ -518,10 +518,10 @@ CNSTI4 0
 ASGNI4
 line 132
 ;132:	}
-LABELV $130
+LABELV $128
 line 133
 ;133:}
-LABELV $107
+LABELV $105
 endproc BG_ForcePowerDrain 20 4
 export BG_EnoughForcePowerForMove
 proc BG_EnoughForcePowerForMove 0 4
@@ -539,7 +539,7 @@ ADDP4
 INDIRI4
 ADDRFP4 0
 INDIRI4
-GEI4 $133
+GEI4 $131
 line 138
 ;138:	{
 line 139
@@ -553,22 +553,22 @@ line 140
 ;140:		return qfalse;
 CNSTI4 0
 RETI4
-ADDRGP4 $132
+ADDRGP4 $130
 JUMPV
-LABELV $133
+LABELV $131
 line 143
 ;141:	}
 ;142:
 ;143:	return qtrue;
 CNSTI4 1
 RETI4
-LABELV $132
+LABELV $130
 endproc BG_EnoughForcePowerForMove 0 4
 data
 export saberMoveData
 align 4
 LABELV saberMoveData
-address $135
+address $133
 byte 4 571
 byte 4 1
 byte 4 1
@@ -578,7 +578,7 @@ byte 4 0
 byte 4 0
 byte 4 0
 byte 4 0
-address $136
+address $134
 byte 4 573
 byte 4 1
 byte 4 1
@@ -588,7 +588,7 @@ byte 4 2
 byte 4 1
 byte 4 22
 byte 4 0
-address $137
+address $135
 byte 4 587
 byte 4 1
 byte 4 1
@@ -598,7 +598,7 @@ byte 4 0
 byte 4 1
 byte 4 22
 byte 4 0
-address $138
+address $136
 byte 4 588
 byte 4 1
 byte 4 1
@@ -608,7 +608,7 @@ byte 4 0
 byte 4 1
 byte 4 22
 byte 4 0
-address $139
+address $137
 byte 4 141
 byte 4 4
 byte 4 0
@@ -618,7 +618,7 @@ byte 4 1
 byte 4 25
 byte 4 25
 byte 4 200
-address $140
+address $138
 byte 4 139
 byte 4 5
 byte 4 1
@@ -628,7 +628,7 @@ byte 4 1
 byte 4 26
 byte 4 26
 byte 4 200
-address $141
+address $139
 byte 4 143
 byte 4 6
 byte 4 2
@@ -638,7 +638,7 @@ byte 4 1
 byte 4 27
 byte 4 27
 byte 4 200
-address $142
+address $140
 byte 4 142
 byte 4 0
 byte 4 4
@@ -648,7 +648,7 @@ byte 4 1
 byte 4 28
 byte 4 28
 byte 4 200
-address $143
+address $141
 byte 4 140
 byte 4 1
 byte 4 5
@@ -658,7 +658,7 @@ byte 4 1
 byte 4 29
 byte 4 29
 byte 4 200
-address $144
+address $142
 byte 4 144
 byte 4 2
 byte 4 6
@@ -668,7 +668,7 @@ byte 4 1
 byte 4 30
 byte 4 30
 byte 4 200
-address $145
+address $143
 byte 4 138
 byte 4 3
 byte 4 7
@@ -678,7 +678,7 @@ byte 4 1
 byte 4 31
 byte 4 31
 byte 4 200
-address $146
+address $144
 byte 4 564
 byte 4 1
 byte 4 1
@@ -688,7 +688,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $147
+address $145
 byte 4 565
 byte 4 1
 byte 4 1
@@ -698,7 +698,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $148
+address $146
 byte 4 570
 byte 4 1
 byte 4 1
@@ -708,7 +708,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $149
+address $147
 byte 4 569
 byte 4 7
 byte 4 3
@@ -718,7 +718,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $150
+address $148
 byte 4 568
 byte 4 3
 byte 4 7
@@ -728,7 +728,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $151
+address $149
 byte 4 567
 byte 4 1
 byte 4 3
@@ -738,7 +738,7 @@ byte 4 1
 byte 4 1
 byte 4 51
 byte 4 200
-address $152
+address $150
 byte 4 566
 byte 4 5
 byte 4 1
@@ -748,7 +748,7 @@ byte 4 1
 byte 4 1
 byte 4 40
 byte 4 200
-address $153
+address $151
 byte 4 190
 byte 4 1
 byte 4 4
@@ -758,7 +758,7 @@ byte 4 1
 byte 4 4
 byte 4 4
 byte 4 200
-address $154
+address $152
 byte 4 188
 byte 4 1
 byte 4 5
@@ -768,7 +768,7 @@ byte 4 1
 byte 4 5
 byte 4 5
 byte 4 200
-address $155
+address $153
 byte 4 192
 byte 4 1
 byte 4 6
@@ -778,7 +778,7 @@ byte 4 1
 byte 4 6
 byte 4 6
 byte 4 200
-address $156
+address $154
 byte 4 191
 byte 4 1
 byte 4 0
@@ -788,7 +788,7 @@ byte 4 1
 byte 4 7
 byte 4 7
 byte 4 200
-address $157
+address $155
 byte 4 189
 byte 4 1
 byte 4 1
@@ -798,7 +798,7 @@ byte 4 1
 byte 4 8
 byte 4 8
 byte 4 200
-address $158
+address $156
 byte 4 193
 byte 4 1
 byte 4 2
@@ -808,7 +808,7 @@ byte 4 1
 byte 4 9
 byte 4 9
 byte 4 200
-address $159
+address $157
 byte 4 187
 byte 4 1
 byte 4 3
@@ -818,7 +818,7 @@ byte 4 1
 byte 4 10
 byte 4 10
 byte 4 200
-address $160
+address $158
 byte 4 198
 byte 4 0
 byte 4 1
@@ -828,7 +828,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $161
+address $159
 byte 4 196
 byte 4 1
 byte 4 1
@@ -838,7 +838,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $162
+address $160
 byte 4 200
 byte 4 2
 byte 4 1
@@ -848,7 +848,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $163
+address $161
 byte 4 197
 byte 4 4
 byte 4 1
@@ -858,7 +858,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $164
+address $162
 byte 4 195
 byte 4 5
 byte 4 1
@@ -868,7 +868,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $165
+address $163
 byte 4 199
 byte 4 6
 byte 4 1
@@ -878,7 +878,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $166
+address $164
 byte 4 194
 byte 4 7
 byte 4 1
@@ -888,7 +888,7 @@ byte 4 1
 byte 4 1
 byte 4 1
 byte 4 200
-address $167
+address $165
 byte 4 145
 byte 4 0
 byte 4 1
@@ -898,7 +898,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $168
+address $166
 byte 4 172
 byte 4 0
 byte 4 2
@@ -908,7 +908,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $169
+address $167
 byte 4 173
 byte 4 0
 byte 4 3
@@ -918,7 +918,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $170
+address $168
 byte 4 146
 byte 4 0
 byte 4 4
@@ -928,7 +928,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $171
+address $169
 byte 4 147
 byte 4 0
 byte 4 5
@@ -938,7 +938,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $172
+address $170
 byte 4 148
 byte 4 0
 byte 4 6
@@ -948,7 +948,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $173
+address $171
 byte 4 174
 byte 4 1
 byte 4 0
@@ -958,7 +958,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $174
+address $172
 byte 4 149
 byte 4 1
 byte 4 2
@@ -968,7 +968,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $175
+address $173
 byte 4 175
 byte 4 1
 byte 4 3
@@ -978,7 +978,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $176
+address $174
 byte 4 150
 byte 4 1
 byte 4 4
@@ -988,7 +988,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $177
+address $175
 byte 4 151
 byte 4 1
 byte 4 5
@@ -998,7 +998,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $178
+address $176
 byte 4 152
 byte 4 1
 byte 4 6
@@ -1008,7 +1008,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $179
+address $177
 byte 4 153
 byte 4 2
 byte 4 0
@@ -1018,7 +1018,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $180
+address $178
 byte 4 176
 byte 4 2
 byte 4 1
@@ -1028,7 +1028,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $181
+address $179
 byte 4 177
 byte 4 2
 byte 4 3
@@ -1038,7 +1038,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $182
+address $180
 byte 4 154
 byte 4 2
 byte 4 4
@@ -1048,7 +1048,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $183
+address $181
 byte 4 155
 byte 4 2
 byte 4 5
@@ -1058,7 +1058,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $184
+address $182
 byte 4 156
 byte 4 2
 byte 4 6
@@ -1068,7 +1068,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $185
+address $183
 byte 4 157
 byte 4 3
 byte 4 0
@@ -1078,7 +1078,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $186
+address $184
 byte 4 158
 byte 4 3
 byte 4 1
@@ -1088,7 +1088,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $187
+address $185
 byte 4 159
 byte 4 3
 byte 4 2
@@ -1098,7 +1098,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $188
+address $186
 byte 4 160
 byte 4 3
 byte 4 4
@@ -1108,7 +1108,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $189
+address $187
 byte 4 161
 byte 4 3
 byte 4 5
@@ -1118,7 +1118,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $190
+address $188
 byte 4 162
 byte 4 3
 byte 4 6
@@ -1128,7 +1128,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $191
+address $189
 byte 4 163
 byte 4 4
 byte 4 0
@@ -1138,7 +1138,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $192
+address $190
 byte 4 178
 byte 4 4
 byte 4 1
@@ -1148,7 +1148,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $193
+address $191
 byte 4 179
 byte 4 4
 byte 4 2
@@ -1158,7 +1158,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $194
+address $192
 byte 4 180
 byte 4 4
 byte 4 3
@@ -1168,7 +1168,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $195
+address $193
 byte 4 181
 byte 4 4
 byte 4 5
@@ -1178,7 +1178,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $196
+address $194
 byte 4 164
 byte 4 4
 byte 4 6
@@ -1188,7 +1188,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $197
+address $195
 byte 4 165
 byte 4 5
 byte 4 0
@@ -1198,7 +1198,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $198
+address $196
 byte 4 166
 byte 4 5
 byte 4 1
@@ -1208,7 +1208,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $199
+address $197
 byte 4 182
 byte 4 5
 byte 4 2
@@ -1218,7 +1218,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $200
+address $198
 byte 4 183
 byte 4 5
 byte 4 3
@@ -1228,7 +1228,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $201
+address $199
 byte 4 167
 byte 4 5
 byte 4 4
@@ -1238,7 +1238,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $202
+address $200
 byte 4 184
 byte 4 5
 byte 4 6
@@ -1248,7 +1248,7 @@ byte 4 0
 byte 4 30
 byte 4 6
 byte 4 150
-address $203
+address $201
 byte 4 168
 byte 4 6
 byte 4 0
@@ -1258,7 +1258,7 @@ byte 4 0
 byte 4 25
 byte 4 7
 byte 4 150
-address $204
+address $202
 byte 4 169
 byte 4 6
 byte 4 1
@@ -1268,7 +1268,7 @@ byte 4 0
 byte 4 26
 byte 4 8
 byte 4 150
-address $205
+address $203
 byte 4 170
 byte 4 6
 byte 4 2
@@ -1278,7 +1278,7 @@ byte 4 0
 byte 4 27
 byte 4 9
 byte 4 150
-address $206
+address $204
 byte 4 185
 byte 4 6
 byte 4 3
@@ -1288,7 +1288,7 @@ byte 4 0
 byte 4 27
 byte 4 10
 byte 4 150
-address $207
+address $205
 byte 4 186
 byte 4 6
 byte 4 4
@@ -1298,7 +1298,7 @@ byte 4 0
 byte 4 28
 byte 4 4
 byte 4 150
-address $208
+address $206
 byte 4 171
 byte 4 6
 byte 4 5
@@ -1308,7 +1308,7 @@ byte 4 0
 byte 4 29
 byte 4 5
 byte 4 150
-address $209
+address $207
 byte 4 201
 byte 4 0
 byte 4 0
@@ -1318,7 +1318,7 @@ byte 4 0
 byte 4 25
 byte 4 33
 byte 4 150
-address $210
+address $208
 byte 4 202
 byte 4 1
 byte 4 1
@@ -1328,7 +1328,7 @@ byte 4 0
 byte 4 26
 byte 4 42
 byte 4 150
-address $211
+address $209
 byte 4 203
 byte 4 2
 byte 4 2
@@ -1338,7 +1338,7 @@ byte 4 0
 byte 4 27
 byte 4 47
 byte 4 150
-address $212
+address $210
 byte 4 204
 byte 4 3
 byte 4 3
@@ -1348,7 +1348,7 @@ byte 4 0
 byte 4 27
 byte 4 55
 byte 4 150
-address $213
+address $211
 byte 4 205
 byte 4 4
 byte 4 4
@@ -1358,7 +1358,7 @@ byte 4 0
 byte 4 28
 byte 4 58
 byte 4 150
-address $214
+address $212
 byte 4 206
 byte 4 5
 byte 4 5
@@ -1368,7 +1368,7 @@ byte 4 0
 byte 4 29
 byte 4 63
 byte 4 150
-address $215
+address $213
 byte 4 207
 byte 4 6
 byte 4 6
@@ -1378,7 +1378,7 @@ byte 4 0
 byte 4 30
 byte 4 70
 byte 4 150
-address $216
+address $214
 byte 4 208
 byte 4 0
 byte 4 0
@@ -1388,7 +1388,7 @@ byte 4 0
 byte 4 25
 byte 4 33
 byte 4 150
-address $217
+address $215
 byte 4 209
 byte 4 1
 byte 4 1
@@ -1398,7 +1398,7 @@ byte 4 0
 byte 4 26
 byte 4 42
 byte 4 150
-address $218
+address $216
 byte 4 210
 byte 4 2
 byte 4 2
@@ -1408,7 +1408,7 @@ byte 4 0
 byte 4 27
 byte 4 47
 byte 4 150
-address $219
+address $217
 byte 4 204
 byte 4 3
 byte 4 3
@@ -1418,7 +1418,7 @@ byte 4 0
 byte 4 27
 byte 4 55
 byte 4 150
-address $220
+address $218
 byte 4 211
 byte 4 4
 byte 4 4
@@ -1428,7 +1428,7 @@ byte 4 0
 byte 4 28
 byte 4 58
 byte 4 150
-address $221
+address $219
 byte 4 212
 byte 4 5
 byte 4 5
@@ -1438,7 +1438,7 @@ byte 4 0
 byte 4 29
 byte 4 63
 byte 4 150
-address $222
+address $220
 byte 4 213
 byte 4 6
 byte 4 6
@@ -1448,7 +1448,7 @@ byte 4 0
 byte 4 30
 byte 4 70
 byte 4 150
-address $223
+address $221
 byte 4 214
 byte 4 7
 byte 4 7
@@ -1458,7 +1458,7 @@ byte 4 0
 byte 4 27
 byte 4 55
 byte 4 150
-address $224
+address $222
 byte 4 534
 byte 4 0
 byte 4 0
@@ -1468,7 +1468,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $225
+address $223
 byte 4 535
 byte 4 1
 byte 4 1
@@ -1478,7 +1478,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $226
+address $224
 byte 4 536
 byte 4 2
 byte 4 2
@@ -1488,7 +1488,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $227
+address $225
 byte 4 537
 byte 4 3
 byte 4 3
@@ -1498,7 +1498,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $228
+address $226
 byte 4 538
 byte 4 4
 byte 4 4
@@ -1508,7 +1508,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $229
+address $227
 byte 4 539
 byte 4 5
 byte 4 5
@@ -1518,7 +1518,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $230
+address $228
 byte 4 540
 byte 4 6
 byte 4 6
@@ -1528,7 +1528,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $231
+address $229
 byte 4 541
 byte 4 7
 byte 4 7
@@ -1538,7 +1538,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $232
+address $230
 byte 4 542
 byte 4 3
 byte 4 7
@@ -1548,7 +1548,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $233
+address $231
 byte 4 543
 byte 4 2
 byte 4 6
@@ -1558,7 +1558,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $234
+address $232
 byte 4 544
 byte 4 4
 byte 4 0
@@ -1568,7 +1568,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $235
+address $233
 byte 4 545
 byte 4 6
 byte 4 2
@@ -1578,7 +1578,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $236
+address $234
 byte 4 546
 byte 4 7
 byte 4 3
@@ -1588,7 +1588,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $237
+address $235
 byte 4 547
 byte 4 0
 byte 4 4
@@ -1598,7 +1598,7 @@ byte 4 0
 byte 4 1
 byte 4 1
 byte 4 150
-address $238
+address $236
 byte 4 528
 byte 4 1
 byte 4 3
@@ -1608,7 +1608,7 @@ byte 4 2
 byte 4 27
 byte 4 50
 byte 4 150
-address $239
+address $237
 byte 4 529
 byte 4 1
 byte 4 2
@@ -1618,7 +1618,7 @@ byte 4 2
 byte 4 27
 byte 4 45
 byte 4 150
-address $240
+address $238
 byte 4 530
 byte 4 1
 byte 4 4
@@ -1628,7 +1628,7 @@ byte 4 2
 byte 4 28
 byte 4 60
 byte 4 150
-address $241
+address $239
 byte 4 531
 byte 4 1
 byte 4 6
@@ -1638,7 +1638,7 @@ byte 4 2
 byte 4 25
 byte 4 72
 byte 4 150
-address $242
+address $240
 byte 4 533
 byte 4 1
 byte 4 0
@@ -1648,7 +1648,7 @@ byte 4 2
 byte 4 30
 byte 4 33
 byte 4 150
-address $243
+address $241
 byte 4 523
 byte 4 1
 byte 4 3
@@ -1657,28 +1657,28 @@ byte 4 50
 byte 4 2
 byte 4 27
 byte 4 10
+byte 4 150
+address $242
+byte 4 524
+byte 4 1
+byte 4 4
+byte 4 10
+byte 4 50
+byte 4 2
+byte 4 27
+byte 4 9
+byte 4 150
+address $243
+byte 4 525
+byte 4 1
+byte 4 2
+byte 4 10
+byte 4 50
+byte 4 2
+byte 4 28
+byte 4 4
 byte 4 150
 address $244
-byte 4 524
-byte 4 1
-byte 4 4
-byte 4 10
-byte 4 50
-byte 4 2
-byte 4 27
-byte 4 9
-byte 4 150
-address $245
-byte 4 525
-byte 4 1
-byte 4 2
-byte 4 10
-byte 4 50
-byte 4 2
-byte 4 28
-byte 4 4
-byte 4 150
-address $246
 byte 4 526
 byte 4 1
 byte 4 0
@@ -1688,7 +1688,7 @@ byte 4 2
 byte 4 25
 byte 4 7
 byte 4 150
-address $247
+address $245
 byte 4 527
 byte 4 1
 byte 4 6
@@ -1698,7 +1698,7 @@ byte 4 2
 byte 4 30
 byte 4 6
 byte 4 150
-address $248
+address $246
 byte 4 523
 byte 4 1
 byte 4 3
@@ -1708,7 +1708,7 @@ byte 4 2
 byte 4 27
 byte 4 10
 byte 4 300
-address $249
+address $247
 byte 4 525
 byte 4 1
 byte 4 2
@@ -1718,7 +1718,7 @@ byte 4 2
 byte 4 28
 byte 4 4
 byte 4 300
-address $250
+address $248
 byte 4 524
 byte 4 1
 byte 4 4
@@ -1728,7 +1728,7 @@ byte 4 2
 byte 4 27
 byte 4 9
 byte 4 300
-address $251
+address $249
 byte 4 527
 byte 4 1
 byte 4 6
@@ -1738,7 +1738,7 @@ byte 4 2
 byte 4 30
 byte 4 6
 byte 4 300
-address $252
+address $250
 byte 4 526
 byte 4 1
 byte 4 0
@@ -1748,7 +1748,7 @@ byte 4 2
 byte 4 25
 byte 4 7
 byte 4 300
-address $253
+address $251
 byte 4 905
 byte 4 1
 byte 4 4
@@ -1758,7 +1758,7 @@ byte 4 1
 byte 4 1
 byte 4 4
 byte 4 200
-address $254
+address $252
 byte 4 906
 byte 4 1
 byte 4 2
@@ -2101,111 +2101,111 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-LTI4 $256
+LTI4 $254
 ADDRLP4 0
 INDIRI4
 CNSTI4 7
-GTI4 $256
+GTI4 $254
 ADDRLP4 0
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $265
+ADDRGP4 $263
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $265
+LABELV $263
+address $256
+address $257
 address $258
 address $259
 address $260
 address $261
 address $262
-address $263
-address $264
-address $258
+address $256
 code
 line 398
 ;398:	{
-LABELV $258
+LABELV $256
 line 401
 ;399:	case Q_B:
 ;400:	case Q_BR:
 ;401:		return LS_A_BR2TL;
 CNSTI4 7
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 402
 ;402:		break;
-LABELV $259
+LABELV $257
 line 404
 ;403:	case Q_R:
 ;404:		return LS_A_R2L;
 CNSTI4 8
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 405
 ;405:		break;
-LABELV $260
+LABELV $258
 line 407
 ;406:	case Q_TR:
 ;407:		return LS_A_TR2BL;
 CNSTI4 9
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 408
 ;408:		break;
-LABELV $261
+LABELV $259
 line 410
 ;409:	case Q_T:
 ;410:		return LS_A_T2B;
 CNSTI4 10
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 411
 ;411:		break;
-LABELV $262
+LABELV $260
 line 413
 ;412:	case Q_TL:
 ;413:		return LS_A_TL2BR;
 CNSTI4 4
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 414
 ;414:		break;
-LABELV $263
+LABELV $261
 line 416
 ;415:	case Q_L:
 ;416:		return LS_A_L2R;
 CNSTI4 5
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 417
 ;417:		break;
-LABELV $264
+LABELV $262
 line 419
 ;418:	case Q_BL:
 ;419:		return LS_A_BL2TR;
 CNSTI4 6
 RETI4
-ADDRGP4 $255
+ADDRGP4 $253
 JUMPV
 line 420
 ;420:		break;
-LABELV $256
+LABELV $254
 line 422
 ;421:	}
 ;422:	return LS_NONE;
 CNSTI4 0
 RETI4
-LABELV $255
+LABELV $253
 endproc PM_AttackMoveForQuad 4 0
 export PM_SaberAnimTransitionAnim
 proc PM_SaberAnimTransitionAnim 48 8
@@ -2231,7 +2231,7 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 1
-EQI4 $269
+EQI4 $267
 ADDRLP4 8
 ADDRGP4 pm
 INDIRP4
@@ -2246,7 +2246,7 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-NEI4 $267
+NEI4 $265
 ADDRLP4 8
 INDIRP4
 CNSTI4 568
@@ -2254,7 +2254,7 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-EQI4 $267
+EQI4 $265
 ADDRLP4 4
 INDIRI4
 ARGI4
@@ -2265,8 +2265,8 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-EQI4 $267
-LABELV $269
+EQI4 $265
+LABELV $267
 line 431
 ;431:	{//just standing there
 line 432
@@ -2278,33 +2278,33 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 4
-LTI4 $268
+LTI4 $266
 ADDRLP4 20
 INDIRI4
 CNSTI4 10
-GTI4 $268
+GTI4 $266
 ADDRLP4 20
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $273-16
+ADDRGP4 $271-16
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $273
-address $272
-address $272
-address $272
-address $272
-address $272
-address $272
-address $272
+LABELV $271
+address $270
+address $270
+address $270
+address $270
+address $270
+address $270
+address $270
 code
 line 433
 ;433:		{
-LABELV $272
+LABELV $270
 line 442
 ;434:		case LS_A_TL2BR:
 ;435:		case LS_A_L2R:
@@ -2328,9 +2328,9 @@ line 443
 line 445
 ;444:		}
 ;445:	}
-ADDRGP4 $268
+ADDRGP4 $266
 JUMPV
-LABELV $267
+LABELV $265
 line 447
 ;446:	else
 ;447:	{
@@ -2343,36 +2343,36 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 1
-LTI4 $275
+LTI4 $273
 ADDRLP4 20
 INDIRI4
 CNSTI4 10
-GTI4 $275
+GTI4 $273
 ADDRLP4 20
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $313-4
+ADDRGP4 $311-4
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $313
-address $277
+LABELV $311
 address $275
-address $275
-address $283
-address $283
-address $283
-address $283
-address $283
-address $283
-address $283
+address $273
+address $273
+address $281
+address $281
+address $281
+address $281
+address $281
+address $281
+address $281
 code
 line 449
 ;449:		{
-LABELV $277
+LABELV $275
 line 452
 ;450:		//transitioning to ready pose
 ;451:		case LS_READY:
@@ -2384,33 +2384,33 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 4
-LTI4 $276
+LTI4 $274
 ADDRLP4 24
 INDIRI4
 CNSTI4 10
-GTI4 $276
+GTI4 $274
 ADDRLP4 24
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $281-16
+ADDRGP4 $279-16
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $281
-address $280
-address $280
-address $280
-address $280
-address $280
-address $280
-address $280
+LABELV $279
+address $278
+address $278
+address $278
+address $278
+address $278
+address $278
+address $278
 code
 line 453
 ;453:			{
-LABELV $280
+LABELV $278
 line 463
 ;454:			//transitioning from an attack
 ;455:			case LS_A_TL2BR:
@@ -2435,9 +2435,9 @@ line 464
 line 466
 ;465:			}
 ;466:			break;
-ADDRGP4 $276
+ADDRGP4 $274
 JUMPV
-LABELV $283
+LABELV $281
 line 475
 ;467:		//transitioning to an attack
 ;468:		case LS_A_TL2BR:
@@ -2452,11 +2452,11 @@ ADDRFP4 4
 INDIRI4
 ADDRFP4 0
 INDIRI4
-NEI4 $284
+NEI4 $282
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $284
+EQI4 $282
 line 476
 ;476:			{
 line 478
@@ -2475,7 +2475,7 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-EQI4 $286
+EQI4 $284
 line 479
 ;479:				{//done with this kata, must return to ready before attack again
 line 480
@@ -2490,9 +2490,9 @@ ADDI4
 ASGNI4
 line 481
 ;481:				}
-ADDRGP4 $276
+ADDRGP4 $274
 JUMPV
-LABELV $286
+LABELV $284
 line 483
 ;482:				else
 ;483:				{//okay to chain to another attack
@@ -2531,9 +2531,9 @@ line 485
 ;485:				}
 line 486
 ;486:			}
-ADDRGP4 $276
+ADDRGP4 $274
 JUMPV
-LABELV $284
+LABELV $282
 line 487
 ;487:			else if ( saberMoveData[curmove].endQuad == saberMoveData[newmove].startQuad )
 ADDRLP4 28
@@ -2555,7 +2555,7 @@ MULI4
 ADDRGP4 saberMoveData+8
 ADDP4
 INDIRI4
-NEI4 $290
+NEI4 $288
 line 488
 ;488:			{//new move starts from same quadrant
 line 489
@@ -2566,9 +2566,9 @@ INDIRI4
 ASGNI4
 line 490
 ;490:			}
-ADDRGP4 $276
+ADDRGP4 $274
 JUMPV
-LABELV $290
+LABELV $288
 line 492
 ;491:			else
 ;492:			{
@@ -2581,52 +2581,52 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 4
-LTI4 $276
+LTI4 $274
 ADDRLP4 32
 INDIRI4
 CNSTI4 31
-GTI4 $308
+GTI4 $306
 ADDRLP4 32
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $309-16
+ADDRGP4 $307-16
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $309
-address $299
-address $299
-address $299
-address $299
-address $299
-address $299
-address $299
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $276
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
+LABELV $307
+address $297
+address $297
+address $297
+address $297
+address $297
+address $297
+address $297
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $274
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
 code
-LABELV $308
+LABELV $306
 ADDRLP4 36
 ADDRFP4 0
 INDIRI4
@@ -2634,63 +2634,63 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 81
-LTI4 $276
+LTI4 $274
 ADDRLP4 36
 INDIRI4
 CNSTI4 117
-GTI4 $276
+GTI4 $274
 ADDRLP4 36
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $311-324
+ADDRGP4 $309-324
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $311
-address $296
-address $296
-address $296
-address $296
-address $296
-address $296
-address $296
-address $296
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $276
-address $302
-address $302
-address $302
-address $302
-address $302
-address $302
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
-address $305
+LABELV $309
+address $294
+address $294
+address $294
+address $294
+address $294
+address $294
+address $294
+address $294
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $274
+address $300
+address $300
+address $300
+address $300
+address $300
+address $300
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
+address $303
 code
 line 494
 ;494:				{
-LABELV $296
+LABELV $294
 line 504
 ;495:				//transitioning from an attack
 ;496:				case LS_D1_BR:
@@ -2705,11 +2705,11 @@ line 504
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $297
-ADDRGP4 $276
+NEI4 $295
+ADDRGP4 $274
 JUMPV
+LABELV $295
 LABELV $297
-LABELV $299
 line 512
 ;505:				case LS_A_TL2BR:
 ;506:				case LS_A_L2R:
@@ -2750,9 +2750,9 @@ INDIRI4
 ASGNI4
 line 513
 ;513:					break;
-ADDRGP4 $276
+ADDRGP4 $274
 JUMPV
-LABELV $302
+LABELV $300
 line 533
 ;514:				//transitioning from a return
 ;515:				case LS_K1_T_:
@@ -2777,11 +2777,11 @@ line 533
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $303
-ADDRGP4 $276
+NEI4 $301
+ADDRGP4 $274
 JUMPV
+LABELV $301
 LABELV $303
-LABELV $305
 line 570
 ;534:				case LS_R_TL2BR:
 ;535:				case LS_R_L2R:
@@ -2857,20 +2857,20 @@ line 574
 ;574:			}
 line 575
 ;575:			break;
-LABELV $275
-LABELV $276
+LABELV $273
+LABELV $274
 line 578
 ;576:		//transitioning to any other anim is not supported
 ;577:		}
 ;578:	}
-LABELV $268
+LABELV $266
 line 580
 ;579:
 ;580:	if ( retmove == LS_NONE )
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $315
+NEI4 $313
 line 581
 ;581:	{
 line 582
@@ -2878,9 +2878,9 @@ line 582
 ADDRFP4 4
 INDIRI4
 RETI4
-ADDRGP4 $266
+ADDRGP4 $264
 JUMPV
-LABELV $315
+LABELV $313
 line 585
 ;583:	}
 ;584:
@@ -2888,7 +2888,7 @@ line 585
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $266
+LABELV $264
 endproc PM_SaberAnimTransitionAnim 48 8
 export PM_SaberMoveQuadrantForMovement
 proc PM_SaberMoveQuadrantForMovement 0 0
@@ -2906,7 +2906,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $318
+LEI4 $316
 line 591
 ;591:	{//moving right
 line 592
@@ -2918,16 +2918,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $320
+LEI4 $318
 line 593
 ;593:		{//forward right = TL2BR slash
 line 594
 ;594:			return Q_TL;
 CNSTI4 4
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $320
+LABELV $318
 line 596
 ;595:		}
 ;596:		else if ( ucmd->forwardmove < 0 )
@@ -2938,16 +2938,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $322
+GEI4 $320
 line 597
 ;597:		{//backward right = BL2TR uppercut
 line 598
 ;598:			return Q_BL;
 CNSTI4 6
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $322
+LABELV $320
 line 601
 ;599:		}
 ;600:		else
@@ -2956,9 +2956,9 @@ line 602
 ;602:			return Q_L;
 CNSTI4 5
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $318
+LABELV $316
 line 605
 ;603:		}
 ;604:	}
@@ -2970,7 +2970,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $324
+GEI4 $322
 line 606
 ;606:	{//moving left
 line 607
@@ -2982,16 +2982,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $326
+LEI4 $324
 line 608
 ;608:		{//forward left = TR2BL slash
 line 609
 ;609:			return Q_TR;
 CNSTI4 2
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $326
+LABELV $324
 line 611
 ;610:		}
 ;611:		else if ( ucmd->forwardmove < 0 )
@@ -3002,16 +3002,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $328
+GEI4 $326
 line 612
 ;612:		{//backward left = BR2TL uppercut
 line 613
 ;613:			return Q_BR;
 CNSTI4 0
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $328
+LABELV $326
 line 616
 ;614:		}
 ;615:		else
@@ -3020,9 +3020,9 @@ line 617
 ;617:			return Q_R;
 CNSTI4 1
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $324
+LABELV $322
 line 621
 ;618:		}
 ;619:	}
@@ -3037,16 +3037,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $330
+LEI4 $328
 line 623
 ;623:		{//forward= T2B slash
 line 624
 ;624:			return Q_T;
 CNSTI4 3
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $330
+LABELV $328
 line 626
 ;625:		}
 ;626:		else if ( ucmd->forwardmove < 0 )
@@ -3057,16 +3057,16 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $332
+GEI4 $330
 line 627
 ;627:		{//backward= T2B slash	//or B2T uppercut?
 line 628
 ;628:			return Q_T;
 CNSTI4 3
 RETI4
-ADDRGP4 $317
+ADDRGP4 $315
 JUMPV
-LABELV $332
+LABELV $330
 line 631
 ;629:		}
 ;630:		else
@@ -3075,7 +3075,7 @@ line 632
 ;632:			return Q_R;
 CNSTI4 1
 RETI4
-LABELV $317
+LABELV $315
 endproc PM_SaberMoveQuadrantForMovement 0 0
 export PM_SaberInBounce
 proc PM_SaberInBounce 8 0
@@ -3096,20 +3096,20 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 74
-LTI4 $335
+LTI4 $333
 ADDRLP4 0
 INDIRI4
 CNSTI4 80
-GTI4 $335
+GTI4 $333
 line 641
 ;641:	{
 line 642
 ;642:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $334
+ADDRGP4 $332
 JUMPV
-LABELV $335
+LABELV $333
 line 644
 ;643:	}
 ;644:	if ( move >= LS_D1_BR && move <= LS_D1_BL )
@@ -3120,26 +3120,26 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 81
-LTI4 $337
+LTI4 $335
 ADDRLP4 4
 INDIRI4
 CNSTI4 87
-GTI4 $337
+GTI4 $335
 line 645
 ;645:	{
 line 646
 ;646:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $334
+ADDRGP4 $332
 JUMPV
-LABELV $337
+LABELV $335
 line 648
 ;647:	}
 ;648:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $334
+LABELV $332
 endproc PM_SaberInBounce 8 0
 export PM_SaberInTransition
 proc PM_SaberInTransition 4 0
@@ -3157,26 +3157,26 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 32
-LTI4 $340
+LTI4 $338
 ADDRLP4 0
 INDIRI4
 CNSTI4 73
-GTI4 $340
+GTI4 $338
 line 654
 ;654:	{
 line 655
 ;655:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $339
+ADDRGP4 $337
 JUMPV
-LABELV $340
+LABELV $338
 line 657
 ;656:	}
 ;657:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $339
+LABELV $337
 endproc PM_SaberInTransition 4 0
 data
 export saberMoveTransitionAngle
@@ -3347,22 +3347,22 @@ ADDRFP4 0
 INDIRI4
 ADDRLP4 0
 INDIRI4
-EQI4 $345
+EQI4 $343
 ADDRFP4 4
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $343
-LABELV $345
+NEI4 $341
+LABELV $343
 line 747
 ;747:	{
 line 748
 ;748:		return -1;
 CNSTI4 -1
 RETI4
-ADDRGP4 $342
+ADDRGP4 $340
 JUMPV
-LABELV $343
+LABELV $341
 line 750
 ;749:	}
 ;750:	return saberMoveTransitionAngle[saberMoveData[move1].endQuad][saberMoveData[move2].startQuad];
@@ -3394,7 +3394,7 @@ ADDP4
 ADDP4
 INDIRI4
 RETI4
-LABELV $342
+LABELV $340
 endproc PM_SaberAttackChainAngle 8 0
 export PM_SaberKataDone_1_02
 proc PM_SaberKataDone_1_02 32 16
@@ -3420,7 +3420,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 3
-LTI4 $354
+LTI4 $352
 ADDRLP4 8
 CNSTI4 0
 ASGNI4
@@ -3452,8 +3452,8 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-GTI4 $353
-LABELV $354
+GTI4 $351
+LABELV $352
 ADDRLP4 16
 ADDRGP4 pm
 INDIRP4
@@ -3473,7 +3473,7 @@ ADDP4
 INDIRI4
 ADDRLP4 24
 INDIRI4
-NEI4 $349
+NEI4 $347
 ADDRLP4 24
 INDIRI4
 ARGI4
@@ -3501,8 +3501,8 @@ ADDP4
 INDIRI4
 ADDRLP4 28
 INDIRI4
-LEI4 $349
-LABELV $353
+LEI4 $347
+LABELV $351
 line 757
 ;756:		( pm->ps->fd.saberAnimLevel == FORCE_LEVEL_2 && pm->ps->saberAttackChainCount > PM_irand_timesync( 2, 5 + pml.randomAdd, pm->modParms.raceMode, 4) ) )
 ;757:	{
@@ -3510,15 +3510,15 @@ line 758
 ;758:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $348
+ADDRGP4 $346
 JUMPV
-LABELV $349
+LABELV $347
 line 760
 ;759:	}
 ;760:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $348
+LABELV $346
 endproc PM_SaberKataDone_1_02 32 16
 export PM_SaberKataDone
 proc PM_SaberKataDone 28 16
@@ -3536,7 +3536,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $356
+NEI4 $354
 line 766
 ;766:	{
 line 767
@@ -3548,13 +3548,13 @@ ADDRFP4 0
 INDIRI4
 ADDRLP4 0
 INDIRI4
-EQI4 $360
+EQI4 $358
 ADDRFP4 4
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $358
-LABELV $360
+NEI4 $356
+LABELV $358
 line 768
 ;768:		{
 line 769
@@ -3574,7 +3574,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 3
-LTI4 $357
+LTI4 $355
 ADDRLP4 12
 CNSTI4 0
 ASGNI4
@@ -3606,19 +3606,19 @@ ADDP4
 INDIRI4
 ADDRLP4 16
 INDIRI4
-LEI4 $357
+LEI4 $355
 line 770
 ;770:			{
 line 771
 ;771:				return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
 line 773
 ;772:			}
 ;773:		}
-LABELV $358
+LABELV $356
 line 774
 ;774:		else if ( pm->ps->saberAttackChainCount > PM_irand_timesync( 2, 3 + pml.randomAdd, pm->modParms.raceMode, 2) )
 ADDRLP4 4
@@ -3657,16 +3657,16 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-LEI4 $364
+LEI4 $362
 line 775
 ;775:		{
 line 776
 ;776:			return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
-LABELV $364
+LABELV $362
 line 778
 ;777:		}
 ;778:		else if ( pm->ps->saberAttackChainCount > 0 )
@@ -3677,7 +3677,7 @@ CNSTI4 1308
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $357
+LEI4 $355
 line 779
 ;779:		{
 line 780
@@ -3705,28 +3705,28 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 135
-LTI4 $371
+LTI4 $369
 ADDRLP4 24
 INDIRI4
 CNSTI4 215
-LEI4 $369
-LABELV $371
+LEI4 $367
+LABELV $369
 line 782
 ;782:			{//if trying to chain to a move that doesn't continue the momentum
 line 783
 ;783:				return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
-LABELV $369
+LABELV $367
 line 785
 ;784:			}
 ;785:			else if ( chainAngle == 180 )
 ADDRLP4 16
 INDIRI4
 CNSTI4 180
-NEI4 $372
+NEI4 $370
 line 786
 ;786:			{//continues the momentum perfectly, allow it to chain 66% of the time
 line 787
@@ -3738,19 +3738,19 @@ CNSTI4 1308
 ADDP4
 INDIRI4
 CNSTI4 1
-LEI4 $357
+LEI4 $355
 line 788
 ;788:				{
 line 789
 ;789:					return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
 line 791
 ;790:				}
 ;791:			}
-LABELV $372
+LABELV $370
 line 793
 ;792:			else
 ;793:			{//would continue the movement somewhat, 50% chance of continuing
@@ -3763,14 +3763,14 @@ CNSTI4 1308
 ADDP4
 INDIRI4
 CNSTI4 2
-LEI4 $357
+LEI4 $355
 line 795
 ;795:				{
 line 796
 ;796:					return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
 line 798
 ;797:				}
@@ -3779,7 +3779,7 @@ line 799
 ;799:		}
 line 800
 ;800:	}
-LABELV $356
+LABELV $354
 line 802
 ;801:	else 
 ;802:	{//Perhaps have chainAngle influence fast and medium chains as well? For now, just do level 3.
@@ -3792,28 +3792,28 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 4
-EQI4 $384
+EQI4 $382
 ADDRLP4 0
 INDIRI4
 CNSTI4 5
-EQI4 $384
+EQI4 $382
 ADDRLP4 0
 INDIRI4
 CNSTI4 6
-EQI4 $384
+EQI4 $382
 ADDRLP4 0
 INDIRI4
 CNSTI4 7
-EQI4 $384
+EQI4 $382
 ADDRLP4 0
 INDIRI4
 CNSTI4 8
-EQI4 $384
+EQI4 $382
 ADDRLP4 0
 INDIRI4
 CNSTI4 9
-NEI4 $378
-LABELV $384
+NEI4 $376
+LABELV $382
 line 809
 ;804:			newmove == LS_A_L2R ||
 ;805:			newmove == LS_A_BL2TR ||
@@ -3832,7 +3832,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $385
+NEI4 $383
 line 813
 ;813:			{
 line 814
@@ -3842,9 +3842,9 @@ CNSTI4 5
 ASGNI4
 line 815
 ;815:			}
-ADDRGP4 $386
+ADDRGP4 $384
 JUMPV
-LABELV $385
+LABELV $383
 line 817
 ;816:			else
 ;817:			{
@@ -3855,7 +3855,7 @@ CNSTI4 3
 ASGNI4
 line 819
 ;819:			}
-LABELV $386
+LABELV $384
 line 821
 ;820:
 ;821:			if (pm->ps->saberAttackChainCount >= chainTolerance && PM_irand_timesync(1, pm->ps->saberAttackChainCount + pml.randomAdd, pm->modParms.raceMode, pm->ps->saberAttackChainCount-1) > chainTolerance)
@@ -3875,7 +3875,7 @@ ADDRLP4 12
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LTI4 $387
+LTI4 $385
 ADDRLP4 16
 CNSTI4 1
 ASGNI4
@@ -3908,20 +3908,20 @@ ADDRLP4 20
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LEI4 $387
+LEI4 $385
 line 822
 ;822:			{
 line 823
 ;823:				return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
-LABELV $387
+LABELV $385
 line 825
 ;824:			}
 ;825:		}
-LABELV $378
+LABELV $376
 line 826
 ;826:		if ( pm->ps->fd.saberAnimLevel == FORCE_LEVEL_2 && pm->ps->saberAttackChainCount > PM_irand_timesync( 2, 5 + pml.randomAdd, pm->modParms.raceMode, 4) )
 ADDRLP4 4
@@ -3943,7 +3943,7 @@ ADDP4
 INDIRI4
 ADDRLP4 12
 INDIRI4
-NEI4 $390
+NEI4 $388
 ADDRLP4 12
 INDIRI4
 ARGI4
@@ -3971,25 +3971,25 @@ ADDP4
 INDIRI4
 ADDRLP4 16
 INDIRI4
-LEI4 $390
+LEI4 $388
 line 827
 ;827:		{
 line 828
 ;828:			return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $355
+ADDRGP4 $353
 JUMPV
-LABELV $390
+LABELV $388
 line 830
 ;829:		}
 ;830:	}
-LABELV $357
+LABELV $355
 line 831
 ;831:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $355
+LABELV $353
 endproc PM_SaberKataDone 28 16
 export PM_SetAnimFrame
 proc PM_SetAnimFrame 0 0
@@ -4009,7 +4009,7 @@ INDIRI4
 ASGNI4
 line 837
 ;837:}
-LABELV $393
+LABELV $391
 endproc PM_SetAnimFrame 0 0
 export PM_SaberLockBreak
 proc PM_SaberLockBreak 84 16
@@ -4048,30 +4048,30 @@ ADDRLP4 8
 INDIRI4
 ADDRLP4 16
 INDIRI4
-EQI4 $398
+EQI4 $396
 ADDRLP4 8
 INDIRI4
 CNSTI4 553
-EQI4 $401
+EQI4 $399
 ADDRLP4 8
 INDIRI4
 ADDRLP4 16
 INDIRI4
-LTI4 $395
-LABELV $410
+LTI4 $393
+LABELV $408
 ADDRLP4 8
 INDIRI4
 CNSTI4 560
-EQI4 $404
+EQI4 $402
 ADDRLP4 8
 INDIRI4
 CNSTI4 561
-EQI4 $407
-ADDRGP4 $395
+EQI4 $405
+ADDRGP4 $393
 JUMPV
 line 846
 ;846:	{
-LABELV $398
+LABELV $396
 line 848
 ;847:	case BOTH_BF2LOCK:
 ;848:		pm->ps->saberMove = LS_A_T2B;
@@ -4092,7 +4092,7 @@ line 850
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $399
+NEI4 $397
 line 851
 ;851:		{//no-one won
 line 852
@@ -4106,9 +4106,9 @@ ASGNI4
 line 854
 ;853:			// loseAnim = winAnim;
 ;854:		}
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $399
+LABELV $397
 line 856
 ;855:		else
 ;856:		{
@@ -4121,9 +4121,9 @@ line 858
 ;858:		}
 line 859
 ;859:		break;
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $401
+LABELV $399
 line 861
 ;860:	case BOTH_BF1LOCK:
 ;861:		pm->ps->saberMove = LS_K1_T_;
@@ -4144,7 +4144,7 @@ line 863
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $402
+NEI4 $400
 line 864
 ;864:		{//no-one won
 line 865
@@ -4158,9 +4158,9 @@ ASGNI4
 line 867
 ;866:			// loseAnim = winAnim;
 ;867:		}
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $402
+LABELV $400
 line 869
 ;868:		else
 ;869:		{
@@ -4173,9 +4173,9 @@ line 871
 ;871:		}
 line 872
 ;872:		break;
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $404
+LABELV $402
 line 874
 ;873:	case BOTH_CWCIRCLELOCK:
 ;874:		winAnim = BOTH_CWCIRCLEBREAK;
@@ -4187,15 +4187,15 @@ line 875
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $405
+NEI4 $403
 line 876
 ;876:		{//no-one won
 line 878
 ;877:			// loseAnim = winAnim;
 ;878:		}
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $405
+LABELV $403
 line 880
 ;879:		else
 ;880:		{
@@ -4224,9 +4224,9 @@ line 884
 ;884:		}
 line 885
 ;885:		break;
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $407
+LABELV $405
 line 887
 ;886:	case BOTH_CCWCIRCLELOCK:
 ;887:		winAnim = BOTH_CCWCIRCLEBREAK;
@@ -4238,15 +4238,15 @@ line 888
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $408
+NEI4 $406
 line 889
 ;889:		{//no-one won
 line 891
 ;890:			// loseAnim = winAnim;
 ;891:		}
-ADDRGP4 $396
+ADDRGP4 $394
 JUMPV
-LABELV $408
+LABELV $406
 line 893
 ;892:		else
 ;893:		{
@@ -4275,8 +4275,8 @@ line 897
 ;897:		}
 line 898
 ;898:		break;
-LABELV $395
-LABELV $396
+LABELV $393
+LABELV $394
 line 900
 ;899:	}
 ;900:	PM_SetAnim( SETANIM_BOTH, winAnim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, -1 );
@@ -4303,7 +4303,7 @@ line 902
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $411
+EQI4 $409
 line 903
 ;903:	{ //someone lost the lock, so punish them by knocking them down
 line 906
@@ -4517,9 +4517,9 @@ ADDI4
 ASGNI4
 line 924
 ;924:	}
-ADDRGP4 $412
+ADDRGP4 $410
 JUMPV
-LABELV $411
+LABELV $409
 line 926
 ;925:	else
 ;926:	{ //If no one lost, then shove each player away from the other
@@ -4770,7 +4770,7 @@ CNSTI4 6
 ASGNI4
 line 944
 ;944:	}
-LABELV $412
+LABELV $410
 line 946
 ;945:
 ;946:	pm->ps->weaponTime = 0;
@@ -4888,7 +4888,7 @@ line 956
 ADDRFP4 4
 INDIRI4
 CNSTI4 0
-NEI4 $422
+NEI4 $420
 line 957
 ;957:	{//no-one won
 line 958
@@ -4905,9 +4905,9 @@ CALLV
 pop
 line 959
 ;959:	}
-ADDRGP4 $423
+ADDRGP4 $421
 JUMPV
-LABELV $422
+LABELV $420
 line 961
 ;960:	else
 ;961:	{
@@ -4916,7 +4916,7 @@ line 962
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $429
+NEI4 $427
 ADDRLP4 56
 CNSTI4 0
 ASGNI4
@@ -4945,9 +4945,9 @@ ADDRLP4 52
 ADDRLP4 60
 INDIRI4
 ASGNI4
-ADDRGP4 $430
+ADDRGP4 $428
 JUMPV
-LABELV $429
+LABELV $427
 ADDRLP4 64
 CNSTI4 0
 ASGNI4
@@ -4976,11 +4976,11 @@ ADDRLP4 52
 ADDRLP4 68
 INDIRI4
 ASGNI4
-LABELV $430
+LABELV $428
 ADDRLP4 52
 INDIRI4
 CNSTI4 0
-EQI4 $424
+EQI4 $422
 line 963
 ;963:		{
 line 964
@@ -5017,13 +5017,13 @@ CALLV
 pop
 line 965
 ;965:		}
-LABELV $424
+LABELV $422
 line 966
 ;966:	}
-LABELV $423
+LABELV $421
 line 967
 ;967:}
-LABELV $394
+LABELV $392
 endproc PM_SaberLockBreak 84 16
 export PM_SaberLocked
 proc PM_SaberLocked 88 16
@@ -5066,14 +5066,14 @@ ADDRLP4 0
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $433
+NEU4 $431
 line 976
 ;976:	{
 line 977
 ;977:		return;
-ADDRGP4 $432
+ADDRGP4 $430
 JUMPV
-LABELV $433
+LABELV $431
 line 979
 ;978:	}
 ;979:	if ( ( (pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF2LOCK ||
@@ -5090,20 +5090,20 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 550
-EQI4 $439
+EQI4 $437
 ADDRLP4 12
 INDIRI4
 CNSTI4 553
-EQI4 $439
+EQI4 $437
 ADDRLP4 12
 INDIRI4
 CNSTI4 560
-EQI4 $439
+EQI4 $437
 ADDRLP4 12
 INDIRI4
 CNSTI4 561
-NEI4 $435
-LABELV $439
+NEI4 $433
+LABELV $437
 ADDRLP4 16
 ADDRLP4 0
 INDIRP4
@@ -5116,20 +5116,20 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 550
-EQI4 $442
+EQI4 $440
 ADDRLP4 16
 INDIRI4
 CNSTI4 553
-EQI4 $442
+EQI4 $440
 ADDRLP4 16
 INDIRI4
 CNSTI4 560
-EQI4 $442
+EQI4 $440
 ADDRLP4 16
 INDIRI4
 CNSTI4 561
-NEI4 $435
-LABELV $442
+NEI4 $433
+LABELV $440
 line 988
 ;980:			(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF1LOCK ||
 ;981:			(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_CWCIRCLELOCK ||
@@ -5216,12 +5216,12 @@ ASGNF4
 ADDRLP4 32
 INDIRF4
 CNSTF4 1115684864
-LTF4 $445
+LTF4 $443
 ADDRLP4 32
 INDIRF4
 CNSTF4 1170735104
-LEF4 $443
-LABELV $445
+LEF4 $441
+LABELV $443
 line 998
 ;998:		{//between 8 and 80 from each other
 line 999
@@ -5236,9 +5236,9 @@ CALLV
 pop
 line 1000
 ;1000:			return;
-ADDRGP4 $432
+ADDRGP4 $430
 JUMPV
-LABELV $443
+LABELV $441
 line 1002
 ;1001:		}
 ;1002:		if ( (pm->cmd.buttons & BUTTON_ATTACK) || pm->ps->saberLockAdvance )
@@ -5258,7 +5258,7 @@ CNSTI4 1
 BANDI4
 ADDRLP4 40
 INDIRI4
-NEI4 $448
+NEI4 $446
 ADDRLP4 36
 INDIRP4
 INDIRP4
@@ -5267,8 +5267,8 @@ ADDP4
 INDIRI4
 ADDRLP4 40
 INDIRI4
-EQI4 $436
-LABELV $448
+EQI4 $434
+LABELV $446
 line 1003
 ;1003:		{//holding attack
 line 1006
@@ -5282,7 +5282,7 @@ CNSTI4 540
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $432
+EQI4 $430
 line 1007
 ;1007:			{//tapping
 line 1011
@@ -5369,12 +5369,12 @@ ASGNI4
 ADDRLP4 68
 INDIRI4
 CNSTI4 561
-EQI4 $453
+EQI4 $451
 ADDRLP4 68
 INDIRI4
 CNSTI4 550
-NEI4 $451
-LABELV $453
+NEI4 $449
+LABELV $451
 line 1023
 ;1022:					(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF2LOCK )
 ;1023:				{
@@ -5404,7 +5404,7 @@ INDIRI4
 ADDRLP4 52
 INDIRP4
 INDIRI4
-GTI4 $454
+GTI4 $452
 line 1027
 ;1027:					{//I won!  Break out
 line 1028
@@ -5419,9 +5419,9 @@ CALLV
 pop
 line 1029
 ;1029:						return;
-ADDRGP4 $432
+ADDRGP4 $430
 JUMPV
-LABELV $454
+LABELV $452
 line 1032
 ;1030:					}
 ;1031:					else
@@ -5461,9 +5461,9 @@ line 1035
 ;1035:					}
 line 1036
 ;1036:				}
-ADDRGP4 $452
+ADDRGP4 $450
 JUMPV
-LABELV $451
+LABELV $449
 line 1038
 ;1037:				else
 ;1038:				{
@@ -5503,7 +5503,7 @@ CNSTI4 4
 ADDP4
 INDIRI4
 ADDI4
-LTI4 $456
+LTI4 $454
 line 1042
 ;1042:					{//I won!  Break out
 line 1043
@@ -5518,9 +5518,9 @@ CALLV
 pop
 line 1044
 ;1044:						return;
-ADDRGP4 $432
+ADDRGP4 $430
 JUMPV
-LABELV $456
+LABELV $454
 line 1047
 ;1045:					}
 ;1046:					else
@@ -5570,13 +5570,13 @@ line 1050
 ;1050:					}
 line 1051
 ;1051:				}
-LABELV $452
+LABELV $450
 line 1052
 ;1052:				if ( !(jk2gameplay == VERSION_1_02 ? Q_irand( 0, 2 + pml.randomAdd, pm->modParms.raceMode, 1) : PM_irand_timesync( 0, 2 + pml.randomAdd, pm->modParms.raceMode, 1)) )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $463
+NEI4 $461
 CNSTI4 0
 ARGI4
 ADDRGP4 pml+1168
@@ -5600,9 +5600,9 @@ ADDRLP4 72
 ADDRLP4 76
 INDIRI4
 ASGNI4
-ADDRGP4 $464
+ADDRGP4 $462
 JUMPV
-LABELV $463
+LABELV $461
 CNSTI4 0
 ARGI4
 ADDRGP4 pml+1168
@@ -5626,11 +5626,11 @@ ADDRLP4 72
 ADDRLP4 80
 INDIRI4
 ASGNI4
-LABELV $464
+LABELV $462
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-NEI4 $450
+NEI4 $448
 line 1053
 ;1053:				{
 line 1054
@@ -5649,7 +5649,7 @@ line 1058
 ;1058:			{
 line 1059
 ;1059:				return;
-LABELV $450
+LABELV $448
 line 1062
 ;1060:			}
 ;1061:
@@ -5686,12 +5686,12 @@ ASGNI4
 ADDRLP4 48
 INDIRI4
 CNSTI4 560
-EQI4 $467
+EQI4 $465
 ADDRLP4 48
 INDIRI4
 CNSTI4 553
-NEI4 $465
-LABELV $467
+NEI4 $463
+LABELV $465
 line 1066
 ;1065:				(genemy->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF1LOCK )
 ;1066:			{
@@ -5700,7 +5700,7 @@ line 1067
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $473
+NEI4 $471
 CNSTI4 0
 ARGI4
 ADDRGP4 pml+1168
@@ -5724,9 +5724,9 @@ ADDRLP4 52
 ADDRLP4 56
 INDIRI4
 ASGNI4
-ADDRGP4 $474
+ADDRGP4 $472
 JUMPV
-LABELV $473
+LABELV $471
 CNSTI4 0
 ARGI4
 ADDRGP4 pml+1168
@@ -5750,11 +5750,11 @@ ADDRLP4 52
 ADDRLP4 60
 INDIRI4
 ASGNI4
-LABELV $474
+LABELV $472
 ADDRLP4 52
 INDIRI4
 CNSTI4 0
-NEI4 $468
+NEI4 $466
 line 1068
 ;1068:				{
 line 1069
@@ -5779,7 +5779,7 @@ CALLV
 pop
 line 1070
 ;1070:				}
-LABELV $468
+LABELV $466
 line 1071
 ;1071:				PM_SetAnimFrame( genemy, anim->firstFrame+remaining, qtrue, qtrue );
 ADDRLP4 0
@@ -5806,9 +5806,9 @@ CALLV
 pop
 line 1072
 ;1072:			}
-ADDRGP4 $436
+ADDRGP4 $434
 JUMPV
-LABELV $465
+LABELV $463
 line 1074
 ;1073:			else
 ;1074:			{
@@ -5852,9 +5852,9 @@ line 1077
 ;1077:		}
 line 1078
 ;1078:	}
-ADDRGP4 $436
+ADDRGP4 $434
 JUMPV
-LABELV $435
+LABELV $433
 line 1080
 ;1079:	else
 ;1080:	{//something broke us out of it
@@ -5870,10 +5870,10 @@ CALLV
 pop
 line 1082
 ;1082:	}
-LABELV $436
+LABELV $434
 line 1083
 ;1083:}
-LABELV $432
+LABELV $430
 endproc PM_SaberLocked 88 16
 export PM_SaberInBrokenParry
 proc PM_SaberInBrokenParry 8 0
@@ -5890,24 +5890,24 @@ ASGNI4
 ADDRLP4 0
 INDIRI4
 CNSTI4 89
-LTI4 $476
+LTI4 $474
 ADDRLP4 0
 INDIRI4
 CNSTI4 96
-GTI4 $476
+GTI4 $474
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $476
+EQI4 $474
 line 1088
 ;1088:	{
 line 1089
 ;1089:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $475
+ADDRGP4 $473
 JUMPV
-LABELV $476
+LABELV $474
 line 1091
 ;1090:	}
 ;1091:	if ( move >= LS_H1_T_ && move <= LS_H1_BL )
@@ -5918,26 +5918,26 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 97
-LTI4 $478
+LTI4 $476
 ADDRLP4 4
 INDIRI4
 CNSTI4 102
-GTI4 $478
+GTI4 $476
 line 1092
 ;1092:	{
 line 1093
 ;1093:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $475
+ADDRGP4 $473
 JUMPV
-LABELV $478
+LABELV $476
 line 1095
 ;1094:	}
 ;1095:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $475
+LABELV $473
 endproc PM_SaberInBrokenParry 8 0
 export PM_BrokenParryForParry
 proc PM_BrokenParryForParry 12 0
@@ -5960,13 +5960,13 @@ ADDRLP4 0
 INDIRI4
 ADDRLP4 4
 INDIRI4
-EQI4 $488
+EQI4 $486
 ADDRLP4 0
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LTI4 $481
-LABELV $489
+LTI4 $479
+LABELV $487
 ADDRLP4 8
 ADDRFP4 0
 INDIRI4
@@ -5974,106 +5974,106 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 108
-LTI4 $481
+LTI4 $479
 ADDRLP4 8
 INDIRI4
 CNSTI4 112
-GTI4 $481
+GTI4 $479
 ADDRLP4 8
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $490-432
+ADDRGP4 $488-432
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $490
+LABELV $488
+address $481
+address $482
 address $483
 address $484
 address $485
-address $486
-address $487
 code
 line 1102
 ;1102:	{
-LABELV $483
+LABELV $481
 line 1104
 ;1103:	case LS_PARRY_UP:
 ;1104:		return LS_H1_T_;
 CNSTI4 97
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1105
 ;1105:		break;
-LABELV $484
+LABELV $482
 line 1107
 ;1106:	case LS_PARRY_UR:
 ;1107:		return LS_H1_TR;
 CNSTI4 98
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1108
 ;1108:		break;
-LABELV $485
+LABELV $483
 line 1110
 ;1109:	case LS_PARRY_UL:
 ;1110:		return LS_H1_TL;
 CNSTI4 99
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1111
 ;1111:		break;
-LABELV $486
+LABELV $484
 line 1113
 ;1112:	case LS_PARRY_LR:
 ;1113:		return LS_H1_BL;
 CNSTI4 102
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1114
 ;1114:		break;
-LABELV $487
+LABELV $485
 line 1116
 ;1115:	case LS_PARRY_LL:
 ;1116:		return LS_H1_BR;
 CNSTI4 100
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1117
 ;1117:		break;
-LABELV $488
+LABELV $486
 line 1119
 ;1118:	case LS_READY:
 ;1119:		return LS_H1_B_;
 CNSTI4 101
 RETI4
-ADDRGP4 $480
+ADDRGP4 $478
 JUMPV
 line 1120
 ;1120:		break;
-LABELV $481
+LABELV $479
 line 1122
 ;1121:	}
 ;1122:	return LS_NONE;
 CNSTI4 0
 RETI4
-LABELV $480
+LABELV $478
 endproc PM_BrokenParryForParry 12 0
 lit
 align 4
-LABELV $493
+LABELV $491
 byte 4 3245342720
 byte 4 3245342720
 byte 4 3238002688
 align 4
-LABELV $494
+LABELV $492
 byte 4 1097859072
 byte 4 1097859072
 byte 4 1090519040
@@ -6093,13 +6093,13 @@ line 1132
 ;1131:	vec3_t fwd, back;
 ;1132:	vec3_t trmins = {-15, -15, -8};
 ADDRLP4 1116
-ADDRGP4 $493
+ADDRGP4 $491
 INDIRB
 ASGNB 12
 line 1133
 ;1133:	vec3_t trmaxs = {15, 15, 8};
 ADDRLP4 1128
-ADDRGP4 $494
+ADDRGP4 $492
 INDIRB
 ASGNB 12
 line 1135
@@ -6229,31 +6229,31 @@ line 1146
 ADDRLP4 0+8
 INDIRF4
 CNSTF4 1065353216
-EQF4 $499
+EQF4 $497
 ADDRLP4 0+52
 INDIRI4
 CNSTI4 0
-LTI4 $499
+LTI4 $497
 ADDRLP4 0+52
 INDIRI4
 CNSTI4 32
-GEI4 $499
+GEI4 $497
 line 1147
 ;1147:	{ //We don't have real entity access here so we can't do an indepth check. But if it's a client and it's behind us, I guess that's reason enough to stab backward
 line 1148
 ;1148:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $492
+ADDRGP4 $490
 JUMPV
-LABELV $499
+LABELV $497
 line 1151
 ;1149:	}
 ;1150:
 ;1151:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $492
+LABELV $490
 endproc PM_CanBackstab 1152 28
 export PM_SaberFlipOverAttackMove
 proc PM_SaberFlipOverAttackMove 64 16
@@ -6378,7 +6378,7 @@ ADDRLP4 28
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $508
+EQU4 $506
 line 1170
 ;1170:	{
 line 1171
@@ -6404,9 +6404,9 @@ SUBF4
 ASGNF4
 line 1172
 ;1172:	}
-ADDRGP4 $509
+ADDRGP4 $507
 JUMPV
-LABELV $508
+LABELV $506
 line 1174
 ;1173:	else
 ;1174:	{
@@ -6417,7 +6417,7 @@ CNSTF4 0
 ASGNF4
 line 1176
 ;1176:	}
-LABELV $509
+LABELV $507
 line 1177
 ;1177:	pm->ps->velocity[2] += (zDiff)*1.5f;
 ADDRLP4 40
@@ -6445,7 +6445,7 @@ line 1180
 ADDRLP4 24
 INDIRF4
 CNSTF4 0
-GTF4 $510
+GTF4 $508
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -6453,7 +6453,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1128792064
-GEF4 $510
+GEF4 $508
 line 1181
 ;1181:	{//if we're on same level, don't let me jump so low, I clip into the ground
 line 1182
@@ -6467,9 +6467,9 @@ CNSTF4 1128792064
 ASGNF4
 line 1183
 ;1183:	}
-ADDRGP4 $511
+ADDRGP4 $509
 JUMPV
-LABELV $510
+LABELV $508
 line 1184
 ;1184:	else if ( pm->ps->velocity[2] < 100 )
 ADDRGP4 pm
@@ -6479,7 +6479,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1120403456
-GEF4 $512
+GEF4 $510
 line 1185
 ;1185:	{
 line 1186
@@ -6493,9 +6493,9 @@ CNSTF4 1120403456
 ASGNF4
 line 1187
 ;1187:	}
-ADDRGP4 $513
+ADDRGP4 $511
 JUMPV
-LABELV $512
+LABELV $510
 line 1188
 ;1188:	else if ( pm->ps->velocity[2] > 400 )
 ADDRGP4 pm
@@ -6505,7 +6505,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1137180672
-LEF4 $514
+LEF4 $512
 line 1189
 ;1189:	{
 line 1190
@@ -6519,9 +6519,9 @@ CNSTF4 1137180672
 ASGNF4
 line 1191
 ;1191:	}
-LABELV $514
-LABELV $513
+LABELV $512
 LABELV $511
+LABELV $509
 line 1193
 ;1192:
 ;1193:	PM_SetForceJumpZStart(pm->ps->origin[2]);//so we don't take damage if we land at same height
@@ -6566,14 +6566,14 @@ line 1199
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $520
+NEI4 $518
 ADDRGP4 pm
 INDIRP4
 CNSTI4 564
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $520
+NEI4 $518
 ADDRLP4 48
 CNSTI4 0
 ASGNI4
@@ -6599,9 +6599,9 @@ ADDRLP4 44
 ADDRLP4 52
 INDIRI4
 ASGNI4
-ADDRGP4 $521
+ADDRGP4 $519
 JUMPV
-LABELV $520
+LABELV $518
 ADDRLP4 56
 CNSTI4 0
 ASGNI4
@@ -6630,20 +6630,20 @@ ADDRLP4 44
 ADDRLP4 60
 INDIRI4
 ASGNI4
-LABELV $521
+LABELV $519
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-EQI4 $516
+EQI4 $514
 line 1200
 ;1200:	{
 line 1201
 ;1201:		return LS_A_FLIP_STAB;
 CNSTI4 16
 RETI4
-ADDRGP4 $504
+ADDRGP4 $502
 JUMPV
-LABELV $516
+LABELV $514
 line 1204
 ;1202:	}
 ;1203:	else
@@ -6652,16 +6652,16 @@ line 1205
 ;1205:		return LS_A_FLIP_SLASH;
 CNSTI4 17
 RETI4
-LABELV $504
+LABELV $502
 endproc PM_SaberFlipOverAttackMove 64 16
 lit
 align 4
-LABELV $523
+LABELV $521
 byte 4 3245342720
 byte 4 3245342720
 byte 4 3238002688
 align 4
-LABELV $524
+LABELV $522
 byte 4 1097859072
 byte 4 1097859072
 byte 4 1090519040
@@ -6681,13 +6681,13 @@ line 1215
 ;1214:	vec3_t fwd, back;
 ;1215:	vec3_t trmins = {-15, -15, -8};
 ADDRLP4 36
-ADDRGP4 $523
+ADDRGP4 $521
 INDIRB
 ASGNB 12
 line 1216
 ;1216:	vec3_t trmaxs = {15, 15, 8};
 ADDRLP4 48
-ADDRGP4 $524
+ADDRGP4 $522
 INDIRB
 ASGNB 12
 line 1218
@@ -6825,7 +6825,7 @@ CNSTI4 8
 ADDP4
 INDIRF4
 CNSTF4 1065353216
-EQF4 $529
+EQF4 $527
 ADDRLP4 76
 ADDRLP4 72
 INDIRP4
@@ -6836,27 +6836,27 @@ ASGNI4
 ADDRLP4 76
 INDIRI4
 CNSTI4 0
-LTI4 $529
+LTI4 $527
 ADDRLP4 76
 INDIRI4
 CNSTI4 32
-GEI4 $529
+GEI4 $527
 line 1230
 ;1230:	{
 line 1231
 ;1231:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $522
+ADDRGP4 $520
 JUMPV
-LABELV $529
+LABELV $527
 line 1234
 ;1232:	}
 ;1233:
 ;1234:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $522
+LABELV $520
 endproc PM_SomeoneInFront 80 28
 export PM_SaberLungeAttackMove
 proc PM_SaberLungeAttackMove 32 16
@@ -6953,7 +6953,7 @@ line 1248
 ;1248:	return LS_A_LUNGE;
 CNSTI4 14
 RETI4
-LABELV $531
+LABELV $529
 endproc PM_SaberLungeAttackMove 32 16
 export PM_SaberJumpAttackMove
 proc PM_SaberJumpAttackMove 32 16
@@ -7091,7 +7091,7 @@ line 1269
 ;1269:	return LS_A_JUMP_T__B_;
 CNSTI4 15
 RETI4
-LABELV $535
+LABELV $533
 endproc PM_SaberJumpAttackMove 32 16
 export PM_GroundDistance
 proc PM_GroundDistance 1108 28
@@ -7220,7 +7220,7 @@ ASGNF4
 ADDRLP4 1104
 INDIRF4
 RETF4
-LABELV $539
+LABELV $537
 endproc PM_GroundDistance 1108 28
 export PM_SaberAttackForMovement
 proc PM_SaberAttackForMovement 1112 16
@@ -7249,7 +7249,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $549
+LEI4 $547
 line 1298
 ;1298:	{//moving right
 line 1300
@@ -7271,7 +7271,7 @@ CNSTI4 256
 BANDI4
 ADDRLP4 8
 INDIRI4
-EQI4 $551
+EQI4 $549
 ADDRLP4 4
 INDIRP4
 INDIRP4
@@ -7279,7 +7279,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1101004800
-LEF4 $551
+LEF4 $549
 ADDRLP4 4
 INDIRP4
 CNSTI4 20
@@ -7289,7 +7289,7 @@ CNSTI4 1
 BANDI4
 ADDRLP4 8
 INDIRI4
-EQI4 $551
+EQI4 $549
 ADDRLP4 12
 ADDRGP4 PM_GroundDistance
 CALLF4
@@ -7297,7 +7297,7 @@ ASGNF4
 ADDRLP4 12
 INDIRF4
 CNSTF4 1116471296
-GEF4 $551
+GEF4 $549
 ADDRLP4 16
 ADDRGP4 pm
 INDIRP4
@@ -7313,7 +7313,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 20
 INDIRI4
-GTI4 $553
+GTI4 $551
 ADDRLP4 16
 INDIRP4
 INDIRP4
@@ -7324,8 +7324,8 @@ CNSTI4 2
 BANDI4
 ADDRLP4 20
 INDIRI4
-EQI4 $551
-LABELV $553
+EQI4 $549
+LABELV $551
 CNSTI4 10
 ARGI4
 ADDRLP4 24
@@ -7335,7 +7335,7 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-EQI4 $551
+EQI4 $549
 line 1308
 ;1301:			//&& overrideJumpRightAttackMove != LS_NONE
 ;1302:			&& pm->ps->velocity[2] > 20.0f //pm->ps->groundEntityNum != ENTITYNUM_NONE//on ground
@@ -7535,9 +7535,9 @@ line 1349
 ;1349:			}
 line 1350
 ;1350:		} 
-ADDRGP4 $550
+ADDRGP4 $548
 JUMPV
-LABELV $551
+LABELV $549
 line 1351
 ;1351:		else if ( pm->cmd.forwardmove > 0 )
 ADDRGP4 pm
@@ -7547,7 +7547,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $560
+LEI4 $558
 line 1352
 ;1352:		{//forward right = TL2BR slash
 line 1353
@@ -7557,9 +7557,9 @@ CNSTI4 4
 ASGNI4
 line 1354
 ;1354:		}
-ADDRGP4 $550
+ADDRGP4 $548
 JUMPV
-LABELV $560
+LABELV $558
 line 1355
 ;1355:		else if ( pm->cmd.forwardmove < 0 )
 ADDRGP4 pm
@@ -7569,7 +7569,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $562
+GEI4 $560
 line 1356
 ;1356:		{//backward right = BL2TR uppercut
 line 1357
@@ -7579,9 +7579,9 @@ CNSTI4 6
 ASGNI4
 line 1358
 ;1358:		}
-ADDRGP4 $550
+ADDRGP4 $548
 JUMPV
-LABELV $562
+LABELV $560
 line 1360
 ;1359:		else
 ;1360:		{//just right is a left slice
@@ -7594,9 +7594,9 @@ line 1362
 ;1362:		}
 line 1363
 ;1363:	}
-ADDRGP4 $550
+ADDRGP4 $548
 JUMPV
-LABELV $549
+LABELV $547
 line 1364
 ;1364:	else if ( pm->cmd.rightmove < 0 )
 ADDRGP4 pm
@@ -7606,7 +7606,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $564
+GEI4 $562
 line 1365
 ;1365:	{//moving left
 line 1367
@@ -7628,7 +7628,7 @@ CNSTI4 256
 BANDI4
 ADDRLP4 8
 INDIRI4
-EQI4 $566
+EQI4 $564
 ADDRLP4 4
 INDIRP4
 INDIRP4
@@ -7636,7 +7636,7 @@ CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1101004800
-LEF4 $566
+LEF4 $564
 ADDRLP4 4
 INDIRP4
 CNSTI4 20
@@ -7646,7 +7646,7 @@ CNSTI4 1
 BANDI4
 ADDRLP4 8
 INDIRI4
-EQI4 $566
+EQI4 $564
 ADDRLP4 12
 ADDRGP4 PM_GroundDistance
 CALLF4
@@ -7654,7 +7654,7 @@ ASGNF4
 ADDRLP4 12
 INDIRF4
 CNSTF4 1116471296
-GEF4 $566
+GEF4 $564
 ADDRLP4 16
 ADDRGP4 pm
 INDIRP4
@@ -7670,7 +7670,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 20
 INDIRI4
-GTI4 $568
+GTI4 $566
 ADDRLP4 16
 INDIRP4
 INDIRP4
@@ -7681,8 +7681,8 @@ CNSTI4 2
 BANDI4
 ADDRLP4 20
 INDIRI4
-EQI4 $566
-LABELV $568
+EQI4 $564
+LABELV $566
 CNSTI4 10
 ARGI4
 ADDRLP4 24
@@ -7692,7 +7692,7 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-EQI4 $566
+EQI4 $564
 line 1375
 ;1368:			//&& overrideJumpLeftAttackMove != LS_NONE
 ;1369:			&& pm->ps->velocity[2] > 20.0f //pm->ps->groundEntityNum != ENTITYNUM_NONE//on ground
@@ -7892,9 +7892,9 @@ line 1416
 ;1416:			}
 line 1417
 ;1417:		}
-ADDRGP4 $565
+ADDRGP4 $563
 JUMPV
-LABELV $566
+LABELV $564
 line 1418
 ;1418:		else if ( pm->cmd.forwardmove > 0 )
 ADDRGP4 pm
@@ -7904,7 +7904,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $575
+LEI4 $573
 line 1419
 ;1419:		{//forward left = TR2BL slash
 line 1420
@@ -7914,9 +7914,9 @@ CNSTI4 9
 ASGNI4
 line 1421
 ;1421:		}
-ADDRGP4 $565
+ADDRGP4 $563
 JUMPV
-LABELV $575
+LABELV $573
 line 1422
 ;1422:		else if ( pm->cmd.forwardmove < 0 )
 ADDRGP4 pm
@@ -7926,7 +7926,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $577
+GEI4 $575
 line 1423
 ;1423:		{//backward left = BR2TL uppercut
 line 1424
@@ -7936,9 +7936,9 @@ CNSTI4 7
 ASGNI4
 line 1425
 ;1425:		}
-ADDRGP4 $565
+ADDRGP4 $563
 JUMPV
-LABELV $577
+LABELV $575
 line 1427
 ;1426:		else
 ;1427:		{//just left is a right slice
@@ -7951,9 +7951,9 @@ line 1429
 ;1429:		}
 line 1430
 ;1430:	}
-ADDRGP4 $565
+ADDRGP4 $563
 JUMPV
-LABELV $564
+LABELV $562
 line 1432
 ;1431:	else
 ;1432:	{//not moving left or right
@@ -7966,7 +7966,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-LEI4 $579
+LEI4 $577
 line 1434
 ;1434:		{//forward= T2B slash
 line 1435
@@ -7982,14 +7982,14 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $581
+NEI4 $579
 ADDRLP4 4
 INDIRP4
 CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1120403456
-LEF4 $581
+LEF4 $579
 ADDRLP4 8
 ADDRGP4 PM_GroundDistance
 CALLF4
@@ -7997,7 +7997,7 @@ ASGNF4
 ADDRLP4 8
 INDIRF4
 CNSTF4 1107296256
-GEF4 $581
+GEF4 $579
 ADDRLP4 12
 ADDRGP4 pm
 INDIRP4
@@ -8022,7 +8022,7 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-NEI4 $581
+NEI4 $579
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -8037,12 +8037,12 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 0
-EQI4 $583
+EQI4 $581
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-EQI4 $581
-LABELV $583
+EQI4 $579
+LABELV $581
 line 1440
 ;1436:				pm->ps->velocity[2] > 100 &&
 ;1437:				PM_GroundDistance() < 32 &&
@@ -8062,7 +8062,7 @@ ASGNI4
 ADDRLP4 1104
 INDIRI4
 CNSTI4 0
-EQI4 $580
+EQI4 $578
 line 1444
 ;1444:				{
 line 1445
@@ -8081,9 +8081,9 @@ line 1446
 ;1446:				}
 line 1447
 ;1447:			}
-ADDRGP4 $580
+ADDRGP4 $578
 JUMPV
-LABELV $581
+LABELV $579
 line 1449
 ;1448:			else if (
 ;1449:				(pm->modParms.runFlags & RFL_CLIMBTECH) &&
@@ -8099,7 +8099,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $586
+EQI4 $584
 ADDRLP4 28
 ADDRLP4 24
 INDIRP4
@@ -8111,14 +8111,14 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $586
+NEI4 $584
 ADDRLP4 28
 INDIRP4
 CNSTI4 40
 ADDP4
 INDIRF4
 CNSTF4 1120403456
-LEF4 $586
+LEF4 $584
 ADDRLP4 32
 ADDRGP4 PM_GroundDistance
 CALLF4
@@ -8126,7 +8126,7 @@ ASGNF4
 ADDRLP4 32
 INDIRF4
 CNSTF4 1107296256
-GEF4 $586
+GEF4 $584
 ADDRLP4 36
 ADDRGP4 pm
 INDIRP4
@@ -8151,7 +8151,7 @@ ASGNI4
 ADDRLP4 40
 INDIRI4
 CNSTI4 0
-NEI4 $586
+NEI4 $584
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -8166,7 +8166,7 @@ ASGNI4
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-NEI4 $586
+NEI4 $584
 CNSTI4 25
 ARGI4
 ADDRLP4 48
@@ -8176,7 +8176,7 @@ ASGNI4
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-EQI4 $586
+EQI4 $584
 line 1457
 ;1450:				pm->ps->fd.saberAnimLevel == FORCE_LEVEL_3 &&
 ;1451:				pm->ps->velocity[2] > 100 &&
@@ -8207,11 +8207,11 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 10
-EQI4 $580
+EQI4 $578
 ADDRLP4 56
 INDIRI4
 CNSTI4 0
-EQI4 $580
+EQI4 $578
 line 1462
 ;1461:						&& newmove != LS_NONE)
 ;1462:					{
@@ -8234,9 +8234,9 @@ line 1465
 ;1465:				}
 line 1466
 ;1466:			}
-ADDRGP4 $580
+ADDRGP4 $578
 JUMPV
-LABELV $586
+LABELV $584
 line 1467
 ;1467:			else if (pm->ps->fd.saberAnimLevel == FORCE_LEVEL_1 &&
 ADDRLP4 52
@@ -8250,19 +8250,19 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $590
+NEI4 $588
 ADDRLP4 52
 INDIRP4
 CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-NEI4 $592
+NEI4 $590
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-EQI4 $590
-LABELV $592
+EQI4 $588
+LABELV $590
 ADDRLP4 56
 ADDRGP4 pm
 INDIRP4
@@ -8280,7 +8280,7 @@ CNSTI4 1
 BANDI4
 ADDRLP4 60
 INDIRI4
-EQI4 $590
+EQI4 $588
 ADDRLP4 56
 INDIRP4
 CNSTI4 44
@@ -8288,7 +8288,7 @@ ADDP4
 INDIRI4
 ADDRLP4 60
 INDIRI4
-GTI4 $590
+GTI4 $588
 ADDRLP4 56
 INDIRP4
 CNSTI4 100
@@ -8302,12 +8302,12 @@ ASGNI4
 ADDRLP4 64
 INDIRI4
 CNSTI4 0
-EQI4 $593
+EQI4 $591
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-EQI4 $590
-LABELV $593
+EQI4 $588
+LABELV $591
 line 1472
 ;1468:				(pm->ps->groundEntityNum != ENTITYNUM_NONE || jk2gameplay != VERSION_1_04) &&
 ;1469:				(pm->ps->pm_flags & PMF_DUCKED) &&
@@ -8326,9 +8326,9 @@ INDIRI4
 ASGNI4
 line 1474
 ;1474:			}
-ADDRGP4 $580
+ADDRGP4 $578
 JUMPV
-LABELV $590
+LABELV $588
 line 1476
 ;1475:			else
 ;1476:			{
@@ -8341,9 +8341,9 @@ line 1478
 ;1478:			}
 line 1479
 ;1479:		}
-ADDRGP4 $580
+ADDRGP4 $578
 JUMPV
-LABELV $579
+LABELV $577
 line 1480
 ;1480:		else if ( pm->cmd.forwardmove < 0 )
 ADDRGP4 pm
@@ -8353,7 +8353,7 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-GEI4 $594
+GEI4 $592
 line 1481
 ;1481:		{//backward= T2B slash//B2T uppercut?
 line 1482
@@ -8365,7 +8365,7 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $596
+EQI4 $594
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -8380,12 +8380,12 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $598
+EQI4 $596
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 4
-EQI4 $596
-LABELV $598
+EQI4 $594
+LABELV $596
 line 1483
 ;1483:			{ //BACKSTAB (attack varies by level)
 line 1484
@@ -8397,7 +8397,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 2
-LTI4 $599
+LTI4 $597
 line 1485
 ;1485:				{//medium and higher attacks
 line 1486
@@ -8419,7 +8419,7 @@ CNSTI4 1
 BANDI4
 ADDRLP4 16
 INDIRI4
-NEI4 $603
+NEI4 $601
 ADDRLP4 12
 INDIRP4
 CNSTI4 30
@@ -8428,8 +8428,8 @@ INDIRI1
 CVII4 1
 ADDRLP4 16
 INDIRI4
-GEI4 $601
-LABELV $603
+GEI4 $599
+LABELV $601
 line 1487
 ;1487:					{
 line 1488
@@ -8439,9 +8439,9 @@ CNSTI4 13
 ASGNI4
 line 1489
 ;1489:					}
-ADDRGP4 $595
+ADDRGP4 $593
 JUMPV
-LABELV $601
+LABELV $599
 line 1491
 ;1490:					else
 ;1491:					{
@@ -8454,9 +8454,9 @@ line 1493
 ;1493:					}
 line 1494
 ;1494:				}
-ADDRGP4 $595
+ADDRGP4 $593
 JUMPV
-LABELV $599
+LABELV $597
 line 1496
 ;1495:				else
 ;1496:				{ //weak attack
@@ -8469,9 +8469,9 @@ line 1498
 ;1498:				}
 line 1499
 ;1499:			}
-ADDRGP4 $595
+ADDRGP4 $593
 JUMPV
-LABELV $596
+LABELV $594
 line 1501
 ;1500:			else
 ;1501:			{
@@ -8484,9 +8484,9 @@ line 1503
 ;1503:			}
 line 1504
 ;1504:		}
-ADDRGP4 $595
+ADDRGP4 $593
 JUMPV
-LABELV $594
+LABELV $592
 line 1505
 ;1505:		else if ( PM_SaberInBounce( curmove ) )
 ADDRFP4 0
@@ -8499,7 +8499,7 @@ ASGNI4
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-EQI4 $604
+EQI4 $602
 line 1506
 ;1506:		{//bounces should go to their default attack if you don't specify a direction but are attacking
 line 1507
@@ -8507,7 +8507,7 @@ line 1507
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $606
+EQI4 $604
 ADDRLP4 0
 CNSTI4 40
 ADDRFP4 0
@@ -8517,14 +8517,14 @@ ADDRGP4 saberMoveData+32
 ADDP4
 INDIRI4
 ASGNI4
-LABELV $606
+LABELV $604
 line 1509
 ;1508:
 ;1509:			if ( (jk2gameplay != VERSION_1_02 && PM_SaberKataDone(curmove, newmove)) || (jk2gameplay == VERSION_1_02 && PM_SaberKataDone_1_02()) )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $612
+EQI4 $610
 ADDRFP4 0
 INDIRI4
 ARGI4
@@ -8538,12 +8538,12 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-NEI4 $611
-LABELV $612
+NEI4 $609
+LABELV $610
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $609
+NEI4 $607
 ADDRLP4 12
 ADDRGP4 PM_SaberKataDone_1_02
 CALLI4
@@ -8551,8 +8551,8 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-EQI4 $609
-LABELV $611
+EQI4 $607
+LABELV $609
 line 1510
 ;1510:			{
 line 1511
@@ -8568,9 +8568,9 @@ INDIRI4
 ASGNI4
 line 1512
 ;1512:			}
-ADDRGP4 $605
+ADDRGP4 $603
 JUMPV
-LABELV $609
+LABELV $607
 line 1514
 ;1513:			else
 ;1514:			{
@@ -8589,15 +8589,15 @@ line 1516
 ;1516:			}
 line 1517
 ;1517:		}
-ADDRGP4 $605
+ADDRGP4 $603
 JUMPV
-LABELV $604
+LABELV $602
 line 1518
 ;1518:		else if ( curmove == LS_READY )
 ADDRFP4 0
 INDIRI4
 CNSTI4 1
-NEI4 $615
+NEI4 $613
 line 1519
 ;1519:		{//Not moving at all, shouldn't have gotten here...?
 line 1526
@@ -8611,7 +8611,7 @@ line 1526
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $617
+NEI4 $615
 ADDRLP4 8
 CNSTI4 4
 ASGNI4
@@ -8640,32 +8640,32 @@ ADDRLP4 0
 ADDRLP4 12
 INDIRI4
 ASGNI4
-ADDRGP4 $618
+ADDRGP4 $616
 JUMPV
-LABELV $617
+LABELV $615
 line 1527
 ;1527:			else							   newmove = LS_A_T2B; //decided we don't like random attacks when idle, use an overhead instead.
 ADDRLP4 0
 CNSTI4 10
 ASGNI4
-LABELV $618
+LABELV $616
 line 1528
 ;1528:		}
-LABELV $615
-LABELV $605
-LABELV $595
-LABELV $580
+LABELV $613
+LABELV $603
+LABELV $593
+LABELV $578
 line 1529
 ;1529:	}
-LABELV $565
-LABELV $550
+LABELV $563
+LABELV $548
 line 1531
 ;1530:
 ;1531:	return newmove;
 ADDRLP4 0
 INDIRI4
 RETI4
-LABELV $548
+LABELV $546
 endproc PM_SaberAttackForMovement 1112 16
 export PM_WeaponLightsaber
 proc PM_WeaponLightsaber 116 16
@@ -8721,7 +8721,7 @@ INDIRP4
 CNSTI4 4
 ADDP4
 INDIRI4
-LEI4 $621
+LEI4 $619
 line 1552
 ;1552:	{
 line 1553
@@ -8740,9 +8740,9 @@ CALLV
 pop
 line 1555
 ;1555:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $621
+LABELV $619
 line 1558
 ;1556:	}
 ;1557:	else
@@ -8766,27 +8766,27 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 550
-EQI4 $628
+EQI4 $626
 ADDRLP4 32
 INDIRI4
 CNSTI4 553
-EQI4 $628
+EQI4 $626
 ADDRLP4 32
 INDIRI4
 CNSTI4 560
-EQI4 $628
+EQI4 $626
 ADDRLP4 32
 INDIRI4
 CNSTI4 561
-EQI4 $628
+EQI4 $626
 ADDRLP4 28
 INDIRP4
 CNSTI4 532
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $623
-LABELV $628
+EQI4 $621
+LABELV $626
 line 1565
 ;1560:				(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF1LOCK ||
 ;1561:				(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_CWCIRCLELOCK ||
@@ -8807,11 +8807,11 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 1023
-GEI4 $629
+GEI4 $627
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-LTI4 $629
+LTI4 $627
 line 1568
 ;1567:				pm->ps->saberLockEnemy >= 0)
 ;1568:			{
@@ -8846,7 +8846,7 @@ ADDRLP4 40
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $631
+EQU4 $629
 line 1574
 ;1574:				{
 line 1575
@@ -8861,13 +8861,13 @@ CALLV
 pop
 line 1576
 ;1576:					return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $631
+LABELV $629
 line 1578
 ;1577:				}
 ;1578:			}
-LABELV $629
+LABELV $627
 line 1580
 ;1579:
 ;1580:			if ( ( (pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF2LOCK ||
@@ -8888,27 +8888,27 @@ ASGNI4
 ADDRLP4 44
 INDIRI4
 CNSTI4 550
-EQI4 $638
+EQI4 $636
 ADDRLP4 44
 INDIRI4
 CNSTI4 553
-EQI4 $638
+EQI4 $636
 ADDRLP4 44
 INDIRI4
 CNSTI4 560
-EQI4 $638
+EQI4 $636
 ADDRLP4 44
 INDIRI4
 CNSTI4 561
-EQI4 $638
+EQI4 $636
 ADDRLP4 40
 INDIRP4
 CNSTI4 532
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $633
-LABELV $638
+EQI4 $631
+LABELV $636
 line 1586
 ;1581:					(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_BF1LOCK ||
 ;1582:					(pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == BOTH_CWCIRCLELOCK ||
@@ -8954,10 +8954,10 @@ CNSTI4 0
 ASGNI4
 line 1590
 ;1590:			}
-LABELV $633
+LABELV $631
 line 1591
 ;1591:		}
-LABELV $623
+LABELV $621
 line 1592
 ;1592:	}
 line 1594
@@ -8970,7 +8970,7 @@ CNSTI4 1312
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $639
+EQI4 $637
 line 1595
 ;1595:	{
 line 1596
@@ -8982,7 +8982,7 @@ CNSTI4 512
 ADDP4
 INDIRI4
 CNSTI4 1
-EQI4 $641
+EQI4 $639
 line 1597
 ;1597:		{
 line 1598
@@ -8994,7 +8994,7 @@ CALLV
 pop
 line 1599
 ;1599:		}
-LABELV $641
+LABELV $639
 line 1601
 ;1600:
 ;1601:		if ((pm->ps->legsAnim & ~ANIM_TOGGLEBIT) != (pm->ps->torsoAnim & ~ANIM_TOGGLEBIT))
@@ -9022,7 +9022,7 @@ INDIRI4
 ADDRLP4 32
 INDIRI4
 BANDI4
-EQI4 $643
+EQI4 $641
 line 1602
 ;1602:		{
 line 1603
@@ -9052,7 +9052,7 @@ CALLV
 pop
 line 1604
 ;1604:		}
-LABELV $643
+LABELV $641
 line 1606
 ;1605:
 ;1606:		if (BG_InSaberStandAnim(pm->ps->torsoAnim))
@@ -9070,7 +9070,7 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-EQI4 $645
+EQI4 $643
 line 1607
 ;1607:		{
 line 1608
@@ -9093,7 +9093,7 @@ CALLV
 pop
 line 1609
 ;1609:		}
-LABELV $645
+LABELV $643
 line 1611
 ;1610:
 ;1611:		if (pm->ps->weaponTime < 1 && ((pm->cmd.buttons & BUTTON_ALT_ATTACK) || (pm->cmd.buttons & BUTTON_ATTACK)))
@@ -9112,7 +9112,7 @@ ADDP4
 INDIRI4
 ADDRLP4 44
 INDIRI4
-GEI4 $647
+GEI4 $645
 ADDRLP4 48
 ADDRLP4 40
 INDIRP4
@@ -9129,7 +9129,7 @@ CNSTI4 128
 BANDI4
 ADDRLP4 52
 INDIRI4
-NEI4 $649
+NEI4 $647
 ADDRLP4 48
 INDIRI4
 ADDRLP4 44
@@ -9137,8 +9137,8 @@ INDIRI4
 BANDI4
 ADDRLP4 52
 INDIRI4
-EQI4 $647
-LABELV $649
+EQI4 $645
+LABELV $647
 line 1612
 ;1612:		{
 line 1613
@@ -9158,15 +9158,15 @@ INDIRP4
 CNSTI4 4
 ADDP4
 INDIRI4
-LTI4 $652
+LTI4 $650
 ADDRLP4 56
 INDIRP4
 CNSTI4 296
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $650
-LABELV $652
+EQI4 $648
+LABELV $650
 line 1614
 ;1614:			{
 line 1615
@@ -9187,10 +9187,10 @@ CALLV
 pop
 line 1617
 ;1617:			}
-LABELV $650
+LABELV $648
 line 1618
 ;1618:		}
-LABELV $647
+LABELV $645
 line 1620
 ;1619:
 ;1620:		if ( pm->ps->weaponTime > 0 )
@@ -9201,7 +9201,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $653
+LEI4 $651
 line 1621
 ;1621:		{
 line 1622
@@ -9224,7 +9224,7 @@ SUBI4
 ASGNI4
 line 1623
 ;1623:		}
-LABELV $653
+LABELV $651
 line 1625
 ;1624:
 ;1625:		checkOnlyWeap = qtrue;
@@ -9233,9 +9233,9 @@ CNSTI4 1
 ASGNI4
 line 1626
 ;1626:		goto weapChecks;
-ADDRGP4 $656
+ADDRGP4 $654
 JUMPV
-LABELV $639
+LABELV $637
 line 1629
 ;1627:	}
 ;1628:
@@ -9256,7 +9256,7 @@ CNSTI4 128
 BANDI4
 ADDRLP4 32
 INDIRI4
-EQI4 $657
+EQI4 $655
 ADDRLP4 36
 ADDRLP4 28
 INDIRP4
@@ -9268,7 +9268,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 1
-GEI4 $657
+GEI4 $655
 ADDRLP4 36
 INDIRP4
 CNSTI4 560
@@ -9276,7 +9276,7 @@ ADDP4
 INDIRI4
 ADDRLP4 32
 INDIRI4
-EQI4 $657
+EQI4 $655
 ADDRLP4 36
 INDIRP4
 CNSTI4 932
@@ -9295,7 +9295,7 @@ ADDP4
 CNSTI4 68
 ADDP4
 INDIRI4
-LTI4 $657
+LTI4 $655
 ADDRLP4 28
 INDIRP4
 CNSTI4 252
@@ -9312,7 +9312,7 @@ ASGNI4
 ADDRLP4 40
 INDIRI4
 CNSTI4 0
-NEI4 $657
+NEI4 $655
 ADDRLP4 44
 ADDRGP4 pm
 INDIRP4
@@ -9346,7 +9346,7 @@ ADDRLP4 48
 INDIRI4
 ADDRLP4 52
 INDIRI4
-EQI4 $657
+EQI4 $655
 ADDRGP4 pm
 INDIRP4
 CNSTI4 296
@@ -9354,7 +9354,7 @@ ADDP4
 INDIRI4
 ADDRLP4 52
 INDIRI4
-NEI4 $657
+NEI4 $655
 line 1637
 ;1630:		pm->ps->weaponTime < 1 &&
 ;1631:		pm->ps->saberCanThrow &&
@@ -9374,7 +9374,7 @@ CNSTI4 504
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $659
+NEI4 $657
 line 1640
 ;1640:		{
 line 1641
@@ -9412,7 +9412,7 @@ SUBI4
 ASGNI4
 line 1642
 ;1642:		}
-LABELV $659
+LABELV $657
 line 1644
 ;1643:
 ;1644:		pm->ps->saberInFlight = qtrue;
@@ -9425,7 +9425,7 @@ CNSTI4 1
 ASGNI4
 line 1645
 ;1645:	}
-LABELV $657
+LABELV $655
 line 1647
 ;1646:	
 ;1647:	if ( pm->ps->saberInFlight )
@@ -9436,7 +9436,7 @@ CNSTI4 504
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $661
+EQI4 $659
 line 1648
 ;1648:	{//guiding saber
 line 1649
@@ -9463,9 +9463,9 @@ CNSTI4 1
 ASGNI4
 line 1651
 ;1651:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $661
+LABELV $659
 line 1656
 ;1652:	}
 ;1653:
@@ -9481,16 +9481,16 @@ INDIRI4
 CNSTI4 512
 BANDI4
 CNSTI4 0
-EQI4 $663
+EQI4 $661
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $663
+NEI4 $661
 line 1657
 ;1657:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $663
+LABELV $661
 line 1661
 ;1658:	}
 ;1659:
@@ -9503,12 +9503,12 @@ CNSTI4 216
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $665
+GTI4 $663
 line 1662
 ;1662:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $665
+LABELV $663
 line 1665
 ;1663:	}
 ;1664:
@@ -9524,12 +9524,12 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 0
-EQI4 $669
+EQI4 $667
 ADDRLP4 56
 INDIRI4
 CNSTI4 6
-NEI4 $667
-LABELV $669
+NEI4 $665
+LABELV $667
 line 1667
 ;1666:		pm->ps->weaponstate == WEAPON_IDLE)
 ;1667:	{
@@ -9546,7 +9546,7 @@ CNSTI4 512
 ADDP4
 INDIRI4
 CNSTI4 1
-EQI4 $670
+EQI4 $668
 ADDRLP4 64
 CNSTI4 0
 ASGNI4
@@ -9557,7 +9557,7 @@ ADDP4
 INDIRI4
 ADDRLP4 64
 INDIRI4
-GTI4 $670
+GTI4 $668
 ADDRLP4 60
 INDIRP4
 CNSTI4 520
@@ -9565,7 +9565,7 @@ ADDP4
 INDIRI4
 ADDRLP4 64
 INDIRI4
-NEI4 $670
+NEI4 $668
 line 1669
 ;1669:		{
 line 1670
@@ -9577,10 +9577,10 @@ CALLV
 pop
 line 1671
 ;1671:		}
-LABELV $670
+LABELV $668
 line 1672
 ;1672:	}
-LABELV $667
+LABELV $665
 line 1674
 ;1673:
 ;1674:	if( (pm->ps->torsoAnim & ~ANIM_TOGGLEBIT) == BOTH_RUN2 ||
@@ -9597,12 +9597,12 @@ ASGNI4
 ADDRLP4 60
 INDIRI4
 CNSTI4 836
-EQI4 $674
+EQI4 $672
 ADDRLP4 60
 INDIRI4
 CNSTI4 833
-NEI4 $672
-LABELV $674
+NEI4 $670
+LABELV $672
 line 1676
 ;1675:		(pm->ps->torsoAnim & ~ANIM_TOGGLEBIT) == BOTH_RUN1 )
 ;1676:	{
@@ -9632,7 +9632,7 @@ INDIRI4
 ADDRLP4 68
 INDIRI4
 BANDI4
-EQI4 $675
+EQI4 $673
 line 1678
 ;1678:		{
 line 1679
@@ -9662,10 +9662,10 @@ CALLV
 pop
 line 1680
 ;1680:		}
-LABELV $675
+LABELV $673
 line 1681
 ;1681:	}
-LABELV $672
+LABELV $670
 line 1684
 ;1682:
 ;1683:	// make weapon function
@@ -9677,7 +9677,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $677
+LEI4 $675
 line 1685
 ;1685:		pm->ps->weaponTime -= pml.msec;
 ADDRLP4 64
@@ -9710,7 +9710,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $678
+EQI4 $676
 ADDRLP4 68
 INDIRP4
 CNSTI4 100
@@ -9726,7 +9726,7 @@ MULI4
 ADDRGP4 saberMoveData+4
 ADDP4
 INDIRI4
-EQI4 $678
+EQI4 $676
 line 1688
 ;1688:		{ //rww - keep him in the blocking pose until he can attack again
 line 1689
@@ -9769,12 +9769,12 @@ CALLV
 pop
 line 1690
 ;1690:			return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
 line 1692
 ;1691:		}
 ;1692:	}
-LABELV $677
+LABELV $675
 line 1694
 ;1693:	else
 ;1694:	{
@@ -9789,7 +9789,7 @@ CNSTI4 0
 ASGNI4
 line 1696
 ;1696:	}
-LABELV $678
+LABELV $676
 line 1699
 ;1697:
 ;1698:	// Now we react to a block action by the player's lightsaber.
@@ -9801,7 +9801,7 @@ CNSTI4 520
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $686
+EQI4 $684
 line 1700
 ;1700:	{
 line 1701
@@ -9819,7 +9819,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $688
+NEI4 $686
 line 1704
 ;1704:		{
 line 1705
@@ -9829,7 +9829,7 @@ CNSTI4 1
 ASGNI4
 line 1706
 ;1706:		}
-LABELV $688
+LABELV $686
 line 1708
 ;1707:
 ;1708:		switch ( pm->ps->saberBlocked )
@@ -9844,46 +9844,46 @@ ASGNI4
 ADDRLP4 68
 INDIRI4
 CNSTI4 1
-LTI4 $690
+LTI4 $688
 ADDRLP4 68
 INDIRI4
 CNSTI4 13
-GTI4 $690
+GTI4 $688
 ADDRLP4 68
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $734-4
+ADDRGP4 $732-4
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $734
-address $693
-address $696
-address $705
+LABELV $732
+address $691
+address $694
+address $703
+address $722
 address $724
 address $726
 address $728
 address $730
-address $732
+address $723
 address $725
 address $727
 address $729
 address $731
-address $733
 code
 line 1709
 ;1709:		{
-LABELV $693
+LABELV $691
 line 1711
 ;1710:			case BLOCKED_BOUNCE_MOVE:
 ;1711:				if ( jk2gameplay != VERSION_1_02 )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $691
+EQI4 $689
 line 1712
 ;1712:				{ //act as a bounceMove and reset the saberMove instead of using a seperate value for it
 line 1713
@@ -9930,9 +9930,9 @@ line 1716
 ;1716:				}
 line 1717
 ;1717:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $696
+LABELV $694
 line 1720
 ;1718:			case BLOCKED_PARRY_BROKEN:
 ;1719:				//whatever parry we were is in now broken, play the appropriate knocked-away anim
@@ -9955,7 +9955,7 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 0
-EQI4 $697
+EQI4 $695
 line 1724
 ;1724:					{//already have one...?
 line 1725
@@ -9970,9 +9970,9 @@ INDIRI4
 ASGNI4
 line 1726
 ;1726:					}
-ADDRGP4 $698
+ADDRGP4 $696
 JUMPV
-LABELV $697
+LABELV $695
 line 1728
 ;1727:					else
 ;1728:					{
@@ -9995,13 +9995,13 @@ INDIRI4
 ASGNI4
 line 1730
 ;1730:					}
-LABELV $698
+LABELV $696
 line 1731
 ;1731:					if ( nextMove != LS_NONE )
 ADDRLP4 76
 INDIRI4
 CNSTI4 0
-EQI4 $699
+EQI4 $697
 line 1732
 ;1732:					{
 line 1733
@@ -10033,15 +10033,15 @@ INDIRI4
 ASGNI4
 line 1735
 ;1735:					}
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $699
+LABELV $697
 line 1736
 ;1736:					else if ( jk2gameplay != VERSION_1_02 )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $691
+EQI4 $689
 line 1737
 ;1737:					{//Maybe in a knockaway?
 line 1738
@@ -10053,7 +10053,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $691
+GTI4 $689
 line 1739
 ;1739:						{
 line 1740
@@ -10073,9 +10073,9 @@ line 1743
 ;1743:				}
 line 1744
 ;1744:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $705
+LABELV $703
 line 1748
 ;1745:			case BLOCKED_ATK_BOUNCE:
 ;1746:				// If there is absolutely no blocked move in the chart, don't even mess with the animation.
@@ -10088,7 +10088,7 @@ CNSTI4 512
 ADDP4
 INDIRI4
 CNSTI4 32
-LTI4 $706
+LTI4 $704
 line 1749
 ;1749:				{//an actual bounce?  Other bounces before this are actually transitions?
 line 1750
@@ -10102,9 +10102,9 @@ CNSTI4 0
 ASGNI4
 line 1751
 ;1751:				}
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $706
+LABELV $704
 line 1753
 ;1752:				else
 ;1753:				{
@@ -10120,7 +10120,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $708
+EQI4 $706
 line 1757
 ;1757:					{//transition to a new attack
 line 1758
@@ -10138,9 +10138,9 @@ ADDRLP4 80
 ADDRLP4 84
 INDIRI4
 ASGNI4
-ADDRGP4 $711
+ADDRGP4 $709
 JUMPV
-LABELV $710
+LABELV $708
 line 1760
 ;1759:						while ( newQuad == saberMoveData[pm->ps->saberMove].startQuad )
 ;1760:						{//player is still in same attack quad, don't repeat that attack because it looks bad, 
@@ -10179,7 +10179,7 @@ ASGNI4
 line 1765
 ;1764:							//FIXME: sanity check, just in case?
 ;1765:						}//else player is switching up anyway, take the new attack dir
-LABELV $711
+LABELV $709
 line 1759
 ADDRLP4 80
 INDIRI4
@@ -10194,7 +10194,7 @@ MULI4
 ADDRGP4 saberMoveData+8
 ADDP4
 INDIRI4
-EQI4 $710
+EQI4 $708
 line 1766
 ;1766:						bounceMove = transitionMove[saberMoveData[pm->ps->saberMove].startQuad][newQuad];
 ADDRLP4 76
@@ -10222,9 +10222,9 @@ INDIRI4
 ASGNI4
 line 1767
 ;1767:					}
-ADDRGP4 $709
+ADDRGP4 $707
 JUMPV
-LABELV $708
+LABELV $706
 line 1769
 ;1768:					else
 ;1769:					{//return to ready
@@ -10242,7 +10242,7 @@ ADDRGP4 saberMoveData+8
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $716
+NEI4 $714
 line 1771
 ;1771:						{
 line 1772
@@ -10252,9 +10252,9 @@ CNSTI4 27
 ASGNI4
 line 1773
 ;1773:						}
-ADDRGP4 $717
+ADDRGP4 $715
 JUMPV
-LABELV $716
+LABELV $714
 line 1774
 ;1774:						else if ( saberMoveData[pm->ps->saberMove].startQuad < Q_T )
 CNSTI4 40
@@ -10269,7 +10269,7 @@ ADDRGP4 saberMoveData+8
 ADDP4
 INDIRI4
 CNSTI4 3
-GEI4 $719
+GEI4 $717
 line 1775
 ;1775:						{
 line 1776
@@ -10291,9 +10291,9 @@ ADDI4
 ASGNI4
 line 1777
 ;1777:						}
-ADDRGP4 $720
+ADDRGP4 $718
 JUMPV
-LABELV $719
+LABELV $717
 line 1779
 ;1778:						else// if ( saberMoveData[pm->ps->saberMove].startQuad > Q_T )
 ;1779:						{
@@ -10318,11 +10318,11 @@ SUBI4
 ASGNI4
 line 1781
 ;1781:						}
-LABELV $720
-LABELV $717
+LABELV $718
+LABELV $715
 line 1782
 ;1782:					}
-LABELV $709
+LABELV $707
 line 1783
 ;1783:					PM_SetSaberMove( bounceMove );
 ADDRLP4 76
@@ -10356,9 +10356,9 @@ line 1787
 ;1787:				}
 line 1788
 ;1788:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $724
+LABELV $722
 line 1790
 ;1789:			case BLOCKED_UPPER_RIGHT:
 ;1790:				PM_SetSaberMove( LS_PARRY_UR );
@@ -10369,9 +10369,9 @@ CALLV
 pop
 line 1791
 ;1791:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $725
+LABELV $723
 line 1793
 ;1792:			case BLOCKED_UPPER_RIGHT_PROJ:
 ;1793:				PM_SetSaberMove( LS_REFLECT_UR );
@@ -10382,9 +10382,9 @@ CALLV
 pop
 line 1794
 ;1794:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $726
+LABELV $724
 line 1796
 ;1795:			case BLOCKED_UPPER_LEFT:
 ;1796:				PM_SetSaberMove( LS_PARRY_UL );
@@ -10395,9 +10395,9 @@ CALLV
 pop
 line 1797
 ;1797:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $727
+LABELV $725
 line 1799
 ;1798:			case BLOCKED_UPPER_LEFT_PROJ:
 ;1799:				PM_SetSaberMove( LS_REFLECT_UL );
@@ -10408,9 +10408,9 @@ CALLV
 pop
 line 1800
 ;1800:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $728
+LABELV $726
 line 1802
 ;1801:			case BLOCKED_LOWER_RIGHT:
 ;1802:				PM_SetSaberMove( LS_PARRY_LR );
@@ -10421,9 +10421,9 @@ CALLV
 pop
 line 1803
 ;1803:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $729
+LABELV $727
 line 1805
 ;1804:			case BLOCKED_LOWER_RIGHT_PROJ:
 ;1805:				PM_SetSaberMove( LS_REFLECT_LR );
@@ -10434,9 +10434,9 @@ CALLV
 pop
 line 1806
 ;1806:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $730
+LABELV $728
 line 1808
 ;1807:			case BLOCKED_LOWER_LEFT:
 ;1808:				PM_SetSaberMove( LS_PARRY_LL );
@@ -10447,9 +10447,9 @@ CALLV
 pop
 line 1809
 ;1809:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $731
+LABELV $729
 line 1811
 ;1810:			case BLOCKED_LOWER_LEFT_PROJ:
 ;1811:				PM_SetSaberMove( LS_REFLECT_LL);
@@ -10460,9 +10460,9 @@ CALLV
 pop
 line 1812
 ;1812:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $732
+LABELV $730
 line 1814
 ;1813:			case BLOCKED_TOP:
 ;1814:				PM_SetSaberMove( LS_PARRY_UP );
@@ -10473,9 +10473,9 @@ CALLV
 pop
 line 1815
 ;1815:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $733
+LABELV $731
 line 1817
 ;1816:			case BLOCKED_TOP_PROJ:
 ;1817:				PM_SetSaberMove( LS_REFLECT_UP );
@@ -10486,9 +10486,9 @@ CALLV
 pop
 line 1818
 ;1818:				break;
-ADDRGP4 $691
+ADDRGP4 $689
 JUMPV
-LABELV $690
+LABELV $688
 line 1820
 ;1819:			default:
 ;1820:				pm->ps->saberBlocked = BLOCKED_NONE;
@@ -10501,7 +10501,7 @@ CNSTI4 0
 ASGNI4
 line 1821
 ;1821:				break;
-LABELV $691
+LABELV $689
 line 1824
 ;1822:		}
 ;1823:
@@ -10521,18 +10521,18 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 3
-EQI4 $736
+EQI4 $734
 ADDRLP4 80
 INDIRI4
 CNSTI4 2
-EQI4 $736
+EQI4 $734
 ADDRLP4 76
 INDIRP4
 CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 1
-GEI4 $736
+GEI4 $734
 line 1825
 ;1825:		{
 line 1826
@@ -10563,21 +10563,21 @@ INDIRI4
 ASGNI4
 line 1828
 ;1828:		}
-LABELV $736
+LABELV $734
 line 1830
 ;1829:
 ;1830:		if (firstSet)
 ADDRLP4 64
 INDIRI4
 CNSTI4 0
-EQI4 $738
+EQI4 $736
 line 1831
 ;1831:		{
 line 1832
 ;1832:			return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $738
+LABELV $736
 line 1836
 ;1833:		}
 ;1834:
@@ -10594,10 +10594,10 @@ line 1839
 ;1837:
 ;1838:		// Done with block, so stop these active weapon branches.
 ;1839:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $686
-LABELV $656
+LABELV $684
+LABELV $654
 line 1845
 ;1840:	}
 ;1841:
@@ -10616,15 +10616,15 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $742
+LEI4 $740
 ADDRLP4 64
 INDIRP4
 CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 3
-EQI4 $740
-LABELV $742
+EQI4 $738
+LABELV $740
 line 1846
 ;1846:		if ( pm->ps->weapon != pm->cmd.weapon ) {
 ADDRLP4 68
@@ -10643,7 +10643,7 @@ CNSTI4 24
 ADDP4
 INDIRU1
 CVUI4 1
-EQI4 $743
+EQI4 $741
 line 1847
 ;1847:			PM_BeginWeaponChange( pm->cmd.weapon );
 ADDRGP4 pm
@@ -10658,10 +10658,10 @@ CALLV
 pop
 line 1848
 ;1848:		}
-LABELV $743
+LABELV $741
 line 1849
 ;1849:	}
-LABELV $740
+LABELV $738
 line 1851
 ;1850:
 ;1851:	if ( pm->ps->weaponTime > 0 ) 
@@ -10672,14 +10672,14 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $745
+LEI4 $743
 line 1852
 ;1852:	{
 line 1853
 ;1853:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $745
+LABELV $743
 line 1861
 ;1854:	}
 ;1855:
@@ -10696,7 +10696,7 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $747
+NEI4 $745
 line 1862
 ;1862:		PM_FinishWeaponChange();
 ADDRGP4 PM_FinishWeaponChange
@@ -10704,9 +10704,9 @@ CALLV
 pop
 line 1863
 ;1863:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $747
+LABELV $745
 line 1870
 ;1864:	}
 ;1865:
@@ -10722,7 +10722,7 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $749
+NEI4 $747
 line 1871
 ;1871:	{//Just selected the weapon
 line 1872
@@ -10745,7 +10745,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 822
-NEI4 $751
+NEI4 $749
 line 1874
 ;1874:		{
 line 1875
@@ -10763,9 +10763,9 @@ CALLV
 pop
 line 1876
 ;1876:		}
-ADDRGP4 $752
+ADDRGP4 $750
 JUMPV
-LABELV $751
+LABELV $749
 line 1877
 ;1877:		else if((pm->ps->legsAnim & ~ANIM_TOGGLEBIT) == BOTH_RUN2 )
 ADDRGP4 pm
@@ -10777,7 +10777,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 836
-NEI4 $753
+NEI4 $751
 line 1878
 ;1878:		{
 line 1879
@@ -10795,9 +10795,9 @@ CALLV
 pop
 line 1880
 ;1880:		}
-ADDRGP4 $754
+ADDRGP4 $752
 JUMPV
-LABELV $753
+LABELV $751
 line 1881
 ;1881:		else if((pm->ps->legsAnim & ~ANIM_TOGGLEBIT) == BOTH_WALK2 )
 ADDRGP4 pm
@@ -10809,7 +10809,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 823
-NEI4 $755
+NEI4 $753
 line 1882
 ;1882:		{
 line 1883
@@ -10827,9 +10827,9 @@ CALLV
 pop
 line 1884
 ;1884:		}
-ADDRGP4 $756
+ADDRGP4 $754
 JUMPV
-LABELV $755
+LABELV $753
 line 1886
 ;1885:		else
 ;1886:		{
@@ -10853,9 +10853,9 @@ CALLV
 pop
 line 1888
 ;1888:		}
-LABELV $756
 LABELV $754
 LABELV $752
+LABELV $750
 line 1890
 ;1889:
 ;1890:		if (pm->ps->weaponstate == WEAPON_RAISING)
@@ -10866,33 +10866,33 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $757
+NEI4 $755
 line 1891
 ;1891:		{
 line 1892
 ;1892:			return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $757
+LABELV $755
 line 1895
 ;1893:		}
 ;1894:
 ;1895:	}
-LABELV $749
+LABELV $747
 line 1897
 ;1896:
 ;1897:	if (checkOnlyWeap)
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-EQI4 $759
+EQI4 $757
 line 1898
 ;1898:	{
 line 1899
 ;1899:		return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $759
+LABELV $757
 line 1906
 ;1900:	}
 ;1901:
@@ -10904,7 +10904,7 @@ line 1906
 ADDRLP4 20
 INDIRI4
 CNSTI4 0
-NEI4 $761
+NEI4 $759
 line 1907
 ;1907:	{
 line 1909
@@ -10921,11 +10921,11 @@ ASGNI4
 ADDRLP4 68
 INDIRI4
 CNSTI4 0
-LEI4 $763
+LEI4 $761
 ADDRLP4 68
 INDIRI4
 CNSTI4 120
-GEI4 $763
+GEI4 $761
 line 1910
 ;1910:		{
 line 1911
@@ -10940,9 +10940,9 @@ INDIRI4
 ASGNI4
 line 1912
 ;1912:		}
-ADDRGP4 $764
+ADDRGP4 $762
 JUMPV
-LABELV $763
+LABELV $761
 line 1914
 ;1913:		else
 ;1914:		{
@@ -10953,7 +10953,7 @@ CNSTI4 1
 ASGNI4
 line 1916
 ;1916:		}
-LABELV $764
+LABELV $762
 line 1918
 ;1917:		// check for fire
 ;1918:		if ( !(pm->cmd.buttons & (BUTTON_ATTACK)) )
@@ -10965,7 +10965,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-NEI4 $765
+NEI4 $763
 line 1919
 ;1919:		{
 line 1920
@@ -10977,7 +10977,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $767
+EQI4 $765
 line 1921
 ;1921:			{//Still firing
 line 1922
@@ -10991,9 +10991,9 @@ CNSTI4 3
 ASGNI4
 line 1923
 ;1923:			}
-ADDRGP4 $768
+ADDRGP4 $766
 JUMPV
-LABELV $767
+LABELV $765
 line 1924
 ;1924:			else if ( pm->ps->weaponstate != WEAPON_READY )
 ADDRGP4 pm
@@ -11003,7 +11003,7 @@ CNSTI4 152
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $769
+EQI4 $767
 line 1925
 ;1925:			{
 line 1926
@@ -11017,8 +11017,8 @@ CNSTI4 6
 ASGNI4
 line 1927
 ;1927:			}
-LABELV $769
-LABELV $768
+LABELV $767
+LABELV $766
 line 1929
 ;1928:			//Check for finishing an anim if necc.
 ;1929:			if ( curmove >= LS_S_TL2BR && curmove <= LS_S_T2B )
@@ -11029,11 +11029,11 @@ ASGNI4
 ADDRLP4 72
 INDIRI4
 CNSTI4 18
-LTI4 $771
+LTI4 $769
 ADDRLP4 72
 INDIRI4
 CNSTI4 24
-GTI4 $771
+GTI4 $769
 line 1930
 ;1930:			{//started a swing, must continue from here
 line 1931
@@ -11048,9 +11048,9 @@ ADDI4
 ASGNI4
 line 1932
 ;1932:			}
-ADDRGP4 $772
+ADDRGP4 $770
 JUMPV
-LABELV $771
+LABELV $769
 line 1933
 ;1933:			else if ( curmove >= LS_A_TL2BR && curmove <= LS_A_T2B )
 ADDRLP4 76
@@ -11060,11 +11060,11 @@ ASGNI4
 ADDRLP4 76
 INDIRI4
 CNSTI4 4
-LTI4 $773
+LTI4 $771
 ADDRLP4 76
 INDIRI4
 CNSTI4 10
-GTI4 $773
+GTI4 $771
 line 1934
 ;1934:			{//finished an attack, must continue from here
 line 1935
@@ -11079,9 +11079,9 @@ ADDI4
 ASGNI4
 line 1936
 ;1936:			}
-ADDRGP4 $774
+ADDRGP4 $772
 JUMPV
-LABELV $773
+LABELV $771
 line 1937
 ;1937:			else if ( PM_SaberInTransition( curmove ) )
 ADDRLP4 4
@@ -11094,7 +11094,7 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 0
-EQI4 $775
+EQI4 $773
 line 1938
 ;1938:			{//in a transition, must play sequential attack
 line 1939
@@ -11110,9 +11110,9 @@ INDIRI4
 ASGNI4
 line 1940
 ;1940:			}
-ADDRGP4 $776
+ADDRGP4 $774
 JUMPV
-LABELV $775
+LABELV $773
 line 1941
 ;1941:			else if ( PM_SaberInBounce( curmove ) )
 ADDRLP4 4
@@ -11125,7 +11125,7 @@ ASGNI4
 ADDRLP4 84
 INDIRI4
 CNSTI4 0
-EQI4 $778
+EQI4 $776
 line 1942
 ;1942:			{//in a bounce
 line 1943
@@ -11141,9 +11141,9 @@ INDIRI4
 ASGNI4
 line 1944
 ;1944:			}
-ADDRGP4 $779
+ADDRGP4 $777
 JUMPV
-LABELV $778
+LABELV $776
 line 1946
 ;1945:			else
 ;1946:			{//FIXME: what about returning from a parry?
@@ -11156,16 +11156,16 @@ CALLV
 pop
 line 1948
 ;1948:				return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $779
-LABELV $776
+LABELV $777
 LABELV $774
 LABELV $772
+LABELV $770
 line 1950
 ;1949:			}
 ;1950:		}
-LABELV $765
+LABELV $763
 line 1955
 ;1951:
 ;1952:		// ***************************************************
@@ -11179,7 +11179,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-LEI4 $781
+LEI4 $779
 line 1956
 ;1956:		{	// Last attack is not yet complete.
 line 1957
@@ -11193,9 +11193,9 @@ CNSTI4 3
 ASGNI4
 line 1958
 ;1958:			return;
-ADDRGP4 $620
+ADDRGP4 $618
 JUMPV
-LABELV $781
+LABELV $779
 line 1961
 ;1959:		}
 ;1960:		else
@@ -11215,11 +11215,11 @@ ASGNI4
 ADDRLP4 76
 INDIRI4
 CNSTI4 108
-LTI4 $783
+LTI4 $781
 ADDRLP4 76
 INDIRI4
 CNSTI4 117
-GTI4 $783
+GTI4 $781
 line 1965
 ;1965:			{//from a parry or deflection, can go directly into an attack (?)
 line 1966
@@ -11236,33 +11236,33 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 0
-LTI4 $785
+LTI4 $783
 ADDRLP4 80
 INDIRI4
 CNSTI4 6
-GTI4 $785
+GTI4 $783
 ADDRLP4 80
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $794
+ADDRGP4 $792
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $794
-address $792
-address $785
+LABELV $792
 address $790
+address $783
+address $788
+address $787
 address $789
+address $783
 address $791
-address $785
-address $793
 code
 line 1967
 ;1967:				{
-LABELV $789
+LABELV $787
 line 1969
 ;1968:				case Q_T:
 ;1969:					newmove = LS_A_T2B;
@@ -11271,9 +11271,9 @@ CNSTI4 10
 ASGNI4
 line 1970
 ;1970:					break;
-ADDRGP4 $786
+ADDRGP4 $784
 JUMPV
-LABELV $790
+LABELV $788
 line 1972
 ;1971:				case Q_TR:
 ;1972:					newmove = LS_A_TL2BR;
@@ -11282,9 +11282,9 @@ CNSTI4 4
 ASGNI4
 line 1973
 ;1973:					break;
-ADDRGP4 $786
+ADDRGP4 $784
 JUMPV
-LABELV $791
+LABELV $789
 line 1975
 ;1974:				case Q_TL:
 ;1975:					newmove = LS_A_TR2BL;
@@ -11293,9 +11293,9 @@ CNSTI4 9
 ASGNI4
 line 1976
 ;1976:					break;
-ADDRGP4 $786
+ADDRGP4 $784
 JUMPV
-LABELV $792
+LABELV $790
 line 1978
 ;1977:				case Q_BR:
 ;1978:					newmove = LS_A_BR2TL;
@@ -11304,9 +11304,9 @@ CNSTI4 7
 ASGNI4
 line 1979
 ;1979:					break;
-ADDRGP4 $786
+ADDRGP4 $784
 JUMPV
-LABELV $793
+LABELV $791
 line 1981
 ;1980:				case Q_BL:
 ;1981:					newmove = LS_A_BL2TR;
@@ -11315,20 +11315,20 @@ CNSTI4 6
 ASGNI4
 line 1982
 ;1982:					break;
-LABELV $785
-LABELV $786
+LABELV $783
+LABELV $784
 line 1985
 ;1983:				//shouldn't be a parry that ends at L, R or B
 ;1984:				}
 ;1985:			}
-LABELV $783
+LABELV $781
 line 1987
 ;1986:
 ;1987:			if ( newmove != LS_NONE )
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $795
+EQI4 $793
 line 1988
 ;1988:			{//have a valid, final LS_ move picked, so skip findingt he transition move and just get the anim
 line 1989
@@ -11344,7 +11344,7 @@ INDIRI4
 ASGNI4
 line 1990
 ;1990:			}
-LABELV $795
+LABELV $793
 line 1993
 ;1991:
 ;1992:			//FIXME: diagonal dirs use the figure-eight attacks from ready pose?
@@ -11352,7 +11352,7 @@ line 1993
 ADDRLP4 12
 INDIRI4
 CNSTI4 -1
-NEI4 $798
+NEI4 $796
 line 1994
 ;1994:			{
 line 1996
@@ -11368,7 +11368,7 @@ ASGNI4
 ADDRLP4 80
 INDIRI4
 CNSTI4 0
-EQI4 $800
+EQI4 $798
 line 1997
 ;1997:				{//in a transition, must play sequential attack
 line 1998
@@ -11384,9 +11384,9 @@ INDIRI4
 ASGNI4
 line 1999
 ;1999:				}
-ADDRGP4 $801
+ADDRGP4 $799
 JUMPV
-LABELV $800
+LABELV $798
 line 2000
 ;2000:				else if ( curmove >= LS_S_TL2BR && curmove <= LS_S_T2B )
 ADDRLP4 84
@@ -11396,11 +11396,11 @@ ASGNI4
 ADDRLP4 84
 INDIRI4
 CNSTI4 18
-LTI4 $803
+LTI4 $801
 ADDRLP4 84
 INDIRI4
 CNSTI4 24
-GTI4 $803
+GTI4 $801
 line 2001
 ;2001:				{//started a swing, must continue from here
 line 2002
@@ -11415,9 +11415,9 @@ ADDI4
 ASGNI4
 line 2003
 ;2003:				}
-ADDRGP4 $804
+ADDRGP4 $802
 JUMPV
-LABELV $803
+LABELV $801
 line 2004
 ;2004:				else if ( PM_SaberInBrokenParry( curmove ) && jk2gameplay != VERSION_1_02 )
 ADDRLP4 4
@@ -11430,11 +11430,11 @@ ASGNI4
 ADDRLP4 88
 INDIRI4
 CNSTI4 0
-EQI4 $805
+EQI4 $803
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $805
+EQI4 $803
 line 2005
 ;2005:				{//broken parries must always return to ready
 line 2006
@@ -11444,9 +11444,9 @@ CNSTI4 1
 ASGNI4
 line 2007
 ;2007:				}
-ADDRGP4 $806
+ADDRGP4 $804
 JUMPV
-LABELV $805
+LABELV $803
 line 2009
 ;2008:				else//if ( pm->cmd.buttons&BUTTON_ATTACK && !(pm->ps->pm_flags&PMF_ATTACK_HELD) )//only do this if just pressed attack button?
 ;2009:				{//get attack move from movement command
@@ -11455,7 +11455,7 @@ line 2010
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $807
+EQI4 $805
 line 2011
 ;2011:					{
 line 2012
@@ -11476,7 +11476,7 @@ line 2013
 ADDRLP4 92
 INDIRI4
 CNSTI4 -1
-EQI4 $809
+EQI4 $807
 line 2014
 ;2014:						{
 line 2015
@@ -11487,7 +11487,7 @@ INDIRI4
 ASGNI4
 line 2016
 ;2016:						}
-LABELV $809
+LABELV $807
 line 2018
 ;2017:
 ;2018:						if ( (PM_SaberInBounce( curmove )||PM_SaberInBrokenParry( curmove ))
@@ -11501,7 +11501,7 @@ ASGNI4
 ADDRLP4 100
 INDIRI4
 CNSTI4 0
-NEI4 $815
+NEI4 $813
 ADDRLP4 4
 INDIRI4
 ARGI4
@@ -11512,8 +11512,8 @@ ASGNI4
 ADDRLP4 104
 INDIRI4
 CNSTI4 0
-EQI4 $811
-LABELV $815
+EQI4 $809
+LABELV $813
 ADDRLP4 108
 CNSTI4 40
 ASGNI4
@@ -11533,7 +11533,7 @@ MULI4
 ADDRGP4 saberMoveData+12
 ADDP4
 INDIRI4
-NEI4 $811
+NEI4 $809
 line 2020
 ;2019:							&& saberMoveData[newmove].startQuad == saberMoveData[curmove].endQuad )
 ;2020:						{//this attack would be a repeat of the last (which was blocked), so don't actually use it, use the default chain attack for this bounce
@@ -11550,7 +11550,7 @@ INDIRI4
 ASGNI4
 line 2022
 ;2022:						}
-LABELV $811
+LABELV $809
 line 2024
 ;2023:
 ;2024:						if ( PM_SaberKataDone(curmove, newmove) )
@@ -11567,7 +11567,7 @@ ASGNI4
 ADDRLP4 112
 INDIRI4
 CNSTI4 0
-EQI4 $808
+EQI4 $806
 line 2025
 ;2025:						{//we came from a bounce and cannot chain to another attack because our kata is done
 line 2026
@@ -11585,9 +11585,9 @@ line 2027
 ;2027:						}
 line 2028
 ;2028:					}
-ADDRGP4 $808
+ADDRGP4 $806
 JUMPV
-LABELV $807
+LABELV $805
 line 2030
 ;2029:					else
 ;2030:					{
@@ -11601,7 +11601,7 @@ INDIRI4
 CNSTI4 256
 BANDI4
 CNSTI4 0
-EQI4 $820
+EQI4 $818
 line 2033
 ;2032:							// flip the order so we can trigger the jka dfa
 ;2033: 							saberMoveName_t checkMove = PM_SaberAttackForMovement(curmove);
@@ -11621,7 +11621,7 @@ line 2034
 ADDRLP4 92
 INDIRI4
 CNSTI4 -1
-EQI4 $822
+EQI4 $820
 line 2035
 ;2035:							{
 line 2036
@@ -11632,7 +11632,7 @@ INDIRI4
 ASGNI4
 line 2037
 ;2037:							}
-LABELV $822
+LABELV $820
 line 2038
 ;2038:							if (PM_SaberKataDone_1_02())
 ADDRLP4 100
@@ -11642,7 +11642,7 @@ ASGNI4
 ADDRLP4 100
 INDIRI4
 CNSTI4 0
-EQI4 $821
+EQI4 $819
 line 2039
 ;2039:							{//we came from a bounce and cannot chain to another attack because our kata is done
 line 2040
@@ -11660,9 +11660,9 @@ line 2041
 ;2041:							}
 line 2042
 ;2042:						}
-ADDRGP4 $821
+ADDRGP4 $819
 JUMPV
-LABELV $820
+LABELV $818
 line 2043
 ;2043:						else {
 line 2044
@@ -11674,7 +11674,7 @@ ASGNI4
 ADDRLP4 92
 INDIRI4
 CNSTI4 0
-EQI4 $827
+EQI4 $825
 line 2045
 ;2045:							{//we came from a bounce and cannot chain to another attack because our kata is done
 line 2046
@@ -11690,9 +11690,9 @@ INDIRI4
 ASGNI4
 line 2047
 ;2047:							}
-ADDRGP4 $828
+ADDRGP4 $826
 JUMPV
-LABELV $827
+LABELV $825
 line 2049
 ;2048:							else
 ;2049:							{
@@ -11714,7 +11714,7 @@ line 2051
 ADDRLP4 96
 INDIRI4
 CNSTI4 -1
-EQI4 $830
+EQI4 $828
 line 2052
 ;2052:								{
 line 2053
@@ -11725,28 +11725,28 @@ INDIRI4
 ASGNI4
 line 2054
 ;2054:								}
-LABELV $830
+LABELV $828
 line 2055
 ;2055:							}
-LABELV $828
+LABELV $826
 line 2056
 ;2056:						}
-LABELV $821
+LABELV $819
 line 2057
 ;2057:					}
-LABELV $808
+LABELV $806
 line 2058
 ;2058:				}
-LABELV $806
 LABELV $804
-LABELV $801
+LABELV $802
+LABELV $799
 line 2060
 ;2059:
 ;2060:				if ( newmove != LS_NONE )
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-EQI4 $832
+EQI4 $830
 line 2061
 ;2061:				{
 line 2063
@@ -11784,17 +11784,17 @@ INDIRI4
 ASGNI4
 line 2069
 ;2069:				}
-LABELV $832
+LABELV $830
 line 2070
 ;2070:			}
-LABELV $798
+LABELV $796
 line 2072
 ;2071:
 ;2072:			if (anim == -1)
 ADDRLP4 12
 INDIRI4
 CNSTI4 -1
-NEI4 $835
+NEI4 $833
 line 2073
 ;2073:			{//not side-stepping, pick neutral anim
 line 2075
@@ -11839,7 +11839,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 84
 INDIRI4
-NEI4 $839
+NEI4 $837
 ADDRLP4 80
 INDIRP4
 CNSTI4 29
@@ -11848,7 +11848,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 84
 INDIRI4
-NEI4 $839
+NEI4 $837
 ADDRLP4 80
 INDIRP4
 CNSTI4 30
@@ -11857,7 +11857,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 84
 INDIRI4
-LTI4 $839
+LTI4 $837
 ADDRLP4 80
 INDIRP4
 INDIRP4
@@ -11865,7 +11865,7 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-EQI4 $839
+EQI4 $837
 line 2080
 ;2080:				{//not moving at all, so set the anim on entire body
 line 2081
@@ -11875,18 +11875,18 @@ CNSTI4 1
 ASGNI4
 line 2082
 ;2082:				}
-LABELV $839
+LABELV $837
 line 2084
 ;2083:			
 ;2084:			}
-LABELV $835
+LABELV $833
 line 2086
 ;2085:
 ;2086:			if ( anim == -1)
 ADDRLP4 12
 INDIRI4
 CNSTI4 -1
-NEI4 $841
+NEI4 $839
 line 2087
 ;2087:			{
 line 2088
@@ -11900,7 +11900,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 822
-NEI4 $843
+NEI4 $841
 line 2089
 ;2089:				{
 line 2090
@@ -11910,9 +11910,9 @@ CNSTI4 822
 ASGNI4
 line 2091
 ;2091:				}
-ADDRGP4 $844
+ADDRGP4 $842
 JUMPV
-LABELV $843
+LABELV $841
 line 2092
 ;2092:				else if((pm->ps->legsAnim & ~ANIM_TOGGLEBIT) == BOTH_RUN2 )
 ADDRGP4 pm
@@ -11924,7 +11924,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 836
-NEI4 $845
+NEI4 $843
 line 2093
 ;2093:				{
 line 2094
@@ -11934,9 +11934,9 @@ CNSTI4 836
 ASGNI4
 line 2095
 ;2095:				}
-ADDRGP4 $846
+ADDRGP4 $844
 JUMPV
-LABELV $845
+LABELV $843
 line 2096
 ;2096:				else if((pm->ps->legsAnim & ~ANIM_TOGGLEBIT) == BOTH_WALK2 )
 ADDRGP4 pm
@@ -11948,7 +11948,7 @@ INDIRI4
 CNSTI4 -2049
 BANDI4
 CNSTI4 823
-NEI4 $847
+NEI4 $845
 line 2097
 ;2097:				{
 line 2098
@@ -11958,9 +11958,9 @@ CNSTI4 823
 ASGNI4
 line 2099
 ;2099:				}
-ADDRGP4 $848
+ADDRGP4 $846
 JUMPV
-LABELV $847
+LABELV $845
 line 2101
 ;2100:				else
 ;2101:				{
@@ -11976,16 +11976,16 @@ INDIRI4
 ASGNI4
 line 2103
 ;2103:				}
-LABELV $848
 LABELV $846
 LABELV $844
+LABELV $842
 line 2105
 ;2104:
 ;2105:				if (anim == BOTH_RUN2 && !pm->cmd.forwardmove && !pm->cmd.rightmove && jk2gameplay != VERSION_1_02)
 ADDRLP4 12
 INDIRI4
 CNSTI4 836
-NEI4 $849
+NEI4 $847
 ADDRLP4 80
 ADDRGP4 pm
 INDIRP4
@@ -12001,7 +12001,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 84
 INDIRI4
-NEI4 $849
+NEI4 $847
 ADDRLP4 80
 INDIRP4
 CNSTI4 29
@@ -12010,11 +12010,11 @@ INDIRI1
 CVII4 1
 ADDRLP4 84
 INDIRI4
-NEI4 $849
+NEI4 $847
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $849
+EQI4 $847
 line 2106
 ;2106:				{ //semi-hacky (if not moving on x-y and still playing the running anim, force the player out of it)
 line 2107
@@ -12029,7 +12029,7 @@ INDIRI4
 ASGNI4
 line 2108
 ;2108:				}
-LABELV $849
+LABELV $847
 line 2109
 ;2109:				newmove = LS_READY;
 ADDRLP4 8
@@ -12037,7 +12037,7 @@ CNSTI4 1
 ASGNI4
 line 2110
 ;2110:			}
-LABELV $841
+LABELV $839
 line 2112
 ;2111:
 ;2112:			if ( !pm->ps->saberActive )
@@ -12048,7 +12048,7 @@ CNSTI4 508
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $851
+NEI4 $849
 line 2113
 ;2113:			{//turn on the saber if it's not on
 line 2114
@@ -12062,7 +12062,7 @@ CNSTI4 1
 ASGNI4
 line 2115
 ;2115:			}
-LABELV $851
+LABELV $849
 line 2117
 ;2116:
 ;2117:			PM_SetSaberMove( newmove );
@@ -12080,7 +12080,7 @@ line 2119
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-EQI4 $853
+EQI4 $851
 line 2120
 ;2120:			{
 line 2121
@@ -12099,7 +12099,7 @@ CALLV
 pop
 line 2122
 ;2122:			}
-LABELV $853
+LABELV $851
 line 2125
 ;2123:
 ;2124:			//don't fire again until anim is done
@@ -12123,7 +12123,7 @@ line 2126
 ;2126:		}
 line 2127
 ;2127:	}
-LABELV $761
+LABELV $759
 line 2133
 ;2128:
 ;2129:	// *********************************************************
@@ -12172,7 +12172,7 @@ line 2138
 ADDRLP4 0
 INDIRI4
 CNSTI4 0
-NEI4 $855
+NEI4 $853
 line 2139
 ;2139:	{
 line 2140
@@ -12195,7 +12195,7 @@ INDIRI4
 ASGNI4
 line 2141
 ;2141:	}
-LABELV $855
+LABELV $853
 line 2142
 ;2142:	pm->ps->weaponTime = addTime;
 ADDRGP4 pm
@@ -12208,7 +12208,7 @@ INDIRI4
 ASGNI4
 line 2143
 ;2143:}
-LABELV $620
+LABELV $618
 endproc PM_WeaponLightsaber 116 16
 export PM_SetSaberMove
 proc PM_SetSaberMove 84 16
@@ -12265,21 +12265,21 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 1
-EQI4 $862
+EQI4 $860
 ADDRLP4 12
 INDIRI4
 CNSTI4 16
-EQI4 $863
+EQI4 $861
 ADDRLP4 12
 INDIRI4
 CNSTI4 17
-NEI4 $860
-LABELV $863
+NEI4 $858
+LABELV $861
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $860
-LABELV $862
+EQI4 $858
+LABELV $860
 line 2157
 ;2156:		jk2gameplay != VERSION_1_02) )
 ;2157:	{//finished with a kata (or in a special move) reset attack counter
@@ -12294,9 +12294,9 @@ CNSTI4 0
 ASGNI4
 line 2159
 ;2159:	}
-ADDRGP4 $861
+ADDRGP4 $859
 JUMPV
-LABELV $860
+LABELV $858
 line 2160
 ;2160:	else if ( BG_SaberInAttack( newMove ) )
 ADDRFP4 0
@@ -12310,7 +12310,7 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-EQI4 $864
+EQI4 $862
 line 2161
 ;2161:	{//continuing with a kata, increment attack counter
 line 2162
@@ -12332,8 +12332,8 @@ ADDI4
 ASGNI4
 line 2163
 ;2163:	}
-LABELV $864
-LABELV $861
+LABELV $862
+LABELV $859
 line 2165
 ;2164:
 ;2165:	if (pm->ps->saberAttackChainCount > 16)
@@ -12344,7 +12344,7 @@ CNSTI4 1308
 ADDP4
 INDIRI4
 CNSTI4 16
-LEI4 $866
+LEI4 $864
 line 2166
 ;2166:	{ //for the sake of being able to send the value over the net within a reasonable bit count
 line 2167
@@ -12358,14 +12358,14 @@ CNSTI4 16
 ASGNI4
 line 2168
 ;2168:	}
-LABELV $866
+LABELV $864
 line 2170
 ;2169:
 ;2170:	if ( jk2gameplay != VERSION_1_02 )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $868
+EQI4 $866
 line 2171
 ;2171:	{
 line 2172
@@ -12377,7 +12377,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 1
-LEI4 $870
+LEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12389,7 +12389,7 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12401,7 +12401,7 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12413,7 +12413,7 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12425,7 +12425,7 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12437,7 +12437,7 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12449,7 +12449,7 @@ ASGNI4
 ADDRLP4 40
 INDIRI4
 CNSTI4 0
-NEI4 $870
+NEI4 $868
 line 2174
 ;2173:			 !BG_SaberInIdle( newMove ) && !PM_SaberInParry( newMove ) && !PM_SaberInKnockaway( newMove ) && !PM_SaberInBrokenParry( newMove ) && !PM_SaberInReflect( newMove ) && !BG_SaberInSpecial(newMove))
 ;2174:		{//readies, parries and reflections have only 1 level 
@@ -12478,17 +12478,17 @@ ADDI4
 ASGNI4
 line 2177
 ;2177:		}
-LABELV $870
+LABELV $868
 line 2178
 ;2178:	}
-LABELV $868
+LABELV $866
 line 2180
 ;2179:	
 ;2180:	if ( jk2gameplay == VERSION_1_02 )
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $872
+NEI4 $870
 line 2181
 ;2181:	{
 line 2182
@@ -12500,7 +12500,7 @@ CNSTI4 1228
 ADDP4
 INDIRI4
 CNSTI4 1
-LEI4 $874
+LEI4 $872
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12512,7 +12512,7 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 0
-NEI4 $874
+NEI4 $872
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12524,7 +12524,7 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-NEI4 $874
+NEI4 $872
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12536,7 +12536,7 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
-NEI4 $874
+NEI4 $872
 ADDRFP4 0
 INDIRI2
 CVII4 2
@@ -12548,7 +12548,7 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 0
-NEI4 $874
+NEI4 $872
 line 2184
 ;2183:				!BG_SaberInIdle( newMove ) && !PM_SaberInParry( newMove ) && !PM_SaberInReflect( newMove ) && !BG_SaberInSpecial(newMove))
 ;2184:		{//readies, parries and reflections have only 1 level 
@@ -12566,7 +12566,7 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-NEI4 $876
+NEI4 $874
 line 2187
 ;2187:			{//FIXME: only have level 1 transitions for now
 line 2188
@@ -12593,13 +12593,13 @@ ADDI4
 ASGNI4
 line 2189
 ;2189:			}
-LABELV $876
+LABELV $874
 line 2190
 ;2190:		}
-LABELV $874
+LABELV $872
 line 2191
 ;2191:	}
-LABELV $872
+LABELV $870
 line 2194
 ;2192:
 ;2193:	// If the move does the same animation as the last one, we need to force a restart...
@@ -12617,12 +12617,12 @@ ADDP4
 INDIRI4
 ADDRLP4 0
 INDIRI4
-NEI4 $878
+NEI4 $876
 ADDRFP4 0
 INDIRI2
 CVII4 2
 CNSTI4 3
-LEI4 $878
+LEI4 $876
 line 2195
 ;2195:	{
 line 2196
@@ -12635,7 +12635,7 @@ BORU4
 ASGNU4
 line 2197
 ;2197:	}
-LABELV $878
+LABELV $876
 line 2200
 ;2198:
 ;2199:	//saber torso anims should always be highest priority (4/12/02 - for special anims only)
@@ -12648,44 +12648,44 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 14
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 15
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 11
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 12
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 13
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 16
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 17
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 118
-EQI4 $891
+EQI4 $889
 ADDRLP4 20
 INDIRI4
 CNSTI4 119
-EQI4 $891
+EQI4 $889
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $881
-LABELV $891
+NEI4 $879
+LABELV $889
 line 2210
 ;2201:		|| newMove == LS_A_JUMP_T__B_ 
 ;2202:		|| newMove == LS_A_BACKSTAB
@@ -12707,7 +12707,7 @@ BORU4
 ASGNU4
 line 2212
 ;2212:	}
-LABELV $881
+LABELV $879
 line 2214
 ;2213:
 ;2214:	if ( BG_InSaberStandAnim(anim) || anim == BOTH_STAND1 )
@@ -12721,12 +12721,12 @@ ASGNI4
 ADDRLP4 24
 INDIRI4
 CNSTI4 0
-NEI4 $894
+NEI4 $892
 ADDRLP4 0
 INDIRI4
 CNSTI4 571
-NEI4 $892
-LABELV $894
+NEI4 $890
+LABELV $892
 line 2215
 ;2215:	{
 line 2216
@@ -12747,21 +12747,21 @@ line 2218
 ADDRLP4 0
 INDIRI4
 CNSTI4 571
-LTI4 $898
+LTI4 $896
 ADDRLP4 0
 INDIRI4
 CNSTI4 592
-LEI4 $897
-LABELV $898
+LEI4 $895
+LABELV $896
 ADDRLP4 0
 INDIRI4
 CNSTI4 1091
-LTI4 $895
+LTI4 $893
 ADDRLP4 0
 INDIRI4
 CNSTI4 1122
-GTI4 $895
-LABELV $897
+GTI4 $893
+LABELV $895
 line 2220
 ;2219:			(anim >= TORSO_DROPWEAP1 && anim <= TORSO_WEAPONIDLE12))
 ;2220:		{ //If standing then use the special saber stand anim
@@ -12777,7 +12777,7 @@ INDIRI4
 ASGNI4
 line 2222
 ;2222:		}
-LABELV $895
+LABELV $893
 line 2224
 ;2223:
 ;2224:		if (pm->ps->pm_flags & PMF_DUCKED)
@@ -12790,7 +12790,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-EQI4 $899
+EQI4 $897
 line 2225
 ;2225:		{ //Playing torso walk anims while crouched makes you look like a monkey
 line 2226
@@ -12805,19 +12805,19 @@ INDIRI4
 ASGNI4
 line 2227
 ;2227:		}
-LABELV $899
+LABELV $897
 line 2229
 ;2228:
 ;2229:		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2)
 ADDRLP4 0
 INDIRI4
 CNSTI4 852
-EQI4 $903
+EQI4 $901
 ADDRLP4 0
 INDIRI4
 CNSTI4 853
-NEI4 $901
-LABELV $903
+NEI4 $899
+LABELV $901
 line 2230
 ;2230:		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
 line 2231
@@ -12832,7 +12832,7 @@ INDIRI4
 ASGNI4
 line 2232
 ;2232:		}
-LABELV $901
+LABELV $899
 line 2234
 ;2233:
 ;2234:		parts = SETANIM_TORSO;
@@ -12841,7 +12841,7 @@ CNSTI4 1
 ASGNI4
 line 2235
 ;2235:	}
-LABELV $892
+LABELV $890
 line 2237
 ;2236:
 ;2237:	if (newMove == LS_JUMPATTACK_ARIAL_RIGHT || // jka cartwheel
@@ -12853,12 +12853,12 @@ ASGNI4
 ADDRLP4 28
 INDIRI4
 CNSTI4 119
-EQI4 $906
+EQI4 $904
 ADDRLP4 28
 INDIRI4
 CNSTI4 118
-NEI4 $904
-LABELV $906
+NEI4 $902
+LABELV $904
 line 2239
 ;2238:		newMove == LS_JUMPATTACK_ARIAL_LEFT)// jka cartwheel
 ;2239:	{ //force only on legs
@@ -12869,9 +12869,9 @@ CNSTI4 2
 ASGNI4
 line 2241
 ;2241:	}
-ADDRGP4 $905
+ADDRGP4 $903
 JUMPV
-LABELV $904
+LABELV $902
 line 2242
 ;2242:	else if ( newMove == LS_A_LUNGE
 ADDRLP4 32
@@ -12882,40 +12882,40 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 14
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 15
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 11
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 12
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 13
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 16
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 17
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 118
-EQI4 $916
+EQI4 $914
 ADDRLP4 32
 INDIRI4
 CNSTI4 119
-NEI4 $907
-LABELV $916
+NEI4 $905
+LABELV $914
 line 2251
 ;2243:		|| newMove == LS_A_JUMP_T__B_ 
 ;2244:		|| newMove == LS_A_BACKSTAB
@@ -12933,9 +12933,9 @@ CNSTI4 3
 ASGNI4
 line 2253
 ;2253:	}
-ADDRGP4 $908
+ADDRGP4 $906
 JUMPV
-LABELV $907
+LABELV $905
 line 2254
 ;2254:	else if ( BG_SpinningSaberAnim( anim ) )
 ADDRLP4 0
@@ -12948,7 +12948,7 @@ ASGNI4
 ADDRLP4 36
 INDIRI4
 CNSTI4 0
-EQI4 $917
+EQI4 $915
 line 2255
 ;2255:	{//spins must be played on entire body
 line 2256
@@ -12958,9 +12958,9 @@ CNSTI4 3
 ASGNI4
 line 2257
 ;2257:	}
-ADDRGP4 $918
+ADDRGP4 $916
 JUMPV
-LABELV $917
+LABELV $915
 line 2258
 ;2258:	else if ( (!pm->cmd.forwardmove&&!pm->cmd.rightmove&&!pm->cmd.upmove) && jk2gameplay != VERSION_1_02 )
 ADDRLP4 40
@@ -12978,7 +12978,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 44
 INDIRI4
-NEI4 $919
+NEI4 $917
 ADDRLP4 40
 INDIRP4
 CNSTI4 29
@@ -12987,7 +12987,7 @@ INDIRI1
 CVII4 1
 ADDRLP4 44
 INDIRI4
-NEI4 $919
+NEI4 $917
 ADDRLP4 40
 INDIRP4
 CNSTI4 30
@@ -12996,11 +12996,11 @@ INDIRI1
 CVII4 1
 ADDRLP4 44
 INDIRI4
-NEI4 $919
+NEI4 $917
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-EQI4 $919
+EQI4 $917
 line 2259
 ;2259:	{//not trying to run, duck or jump
 line 2260
@@ -13019,7 +13019,7 @@ ASGNI4
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 ADDRLP4 52
 ADDRGP4 pm
 INDIRP4
@@ -13041,7 +13041,7 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -13053,7 +13053,7 @@ ASGNI4
 ADDRLP4 60
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 ADDRGP4 pm
 INDIRP4
 INDIRP4
@@ -13068,7 +13068,7 @@ ASGNI4
 ADDRLP4 64
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 ADDRLP4 68
 ADDRGP4 pm
 INDIRP4
@@ -13093,7 +13093,7 @@ ASGNI4
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 ADDRLP4 76
 ADDRGP4 PM_GetSaberStance
 CALLI4
@@ -13102,7 +13102,7 @@ ADDRLP4 0
 INDIRI4
 ADDRLP4 76
 INDIRI4
-EQI4 $921
+EQI4 $919
 ADDRLP4 80
 ADDRGP4 pm
 INDIRP4
@@ -13114,7 +13114,7 @@ CNSTI4 84
 ADDP4
 INDIRI4
 CNSTI4 1023
-EQI4 $921
+EQI4 $919
 ADDRLP4 80
 INDIRP4
 CNSTI4 12
@@ -13123,7 +13123,7 @@ INDIRI4
 CNSTI4 1
 BANDI4
 CNSTI4 0
-NEI4 $921
+NEI4 $919
 line 2268
 ;2261:			!BG_InRoll( pm->ps, pm->ps->legsAnim ) && 
 ;2262:			!PM_InKnockDown( pm->ps ) && 
@@ -13140,13 +13140,13 @@ CNSTI4 3
 ASGNI4
 line 2270
 ;2270:		}
-LABELV $921
+LABELV $919
 line 2271
 ;2271:	}
-LABELV $919
-LABELV $918
-LABELV $908
-LABELV $905
+LABELV $917
+LABELV $916
+LABELV $906
+LABELV $903
 line 2276
 ;2272:
 ;2273:#ifdef JK2_CGAME
@@ -13162,21 +13162,21 @@ ARGI4
 ADDRGP4 jk2gameplay
 INDIRI4
 CNSTI4 2
-NEI4 $925
+NEI4 $923
 ADDRLP4 48
 ADDRLP4 8
 INDIRU4
 CNSTU4 2
 BORU4
 ASGNU4
-ADDRGP4 $926
+ADDRGP4 $924
 JUMPV
-LABELV $925
+LABELV $923
 ADDRLP4 48
 ADDRLP4 8
 INDIRU4
 ASGNU4
-LABELV $926
+LABELV $924
 ADDRLP4 48
 INDIRU4
 CVUI4 4
@@ -13200,7 +13200,7 @@ line 2279
 ADDRLP4 4
 INDIRI4
 CNSTI4 2
-EQI4 $927
+EQI4 $925
 ADDRLP4 52
 ADDRGP4 pm
 INDIRP4
@@ -13212,12 +13212,12 @@ ASGNI4
 ADDRLP4 52
 INDIRI4
 CNSTI4 905
-EQI4 $929
+EQI4 $927
 ADDRLP4 52
 INDIRI4
 CNSTI4 906
-NEI4 $927
-LABELV $929
+NEI4 $925
+LABELV $927
 line 2282
 ;2280:		(pm->ps->legsAnim == BOTH_ARIAL_LEFT ||
 ;2281:			pm->ps->legsAnim == BOTH_ARIAL_RIGHT)) // can this even ever be true?!
@@ -13239,7 +13239,7 @@ INDIRP4
 CNSTI4 96
 ADDP4
 INDIRI4
-LEI4 $930
+LEI4 $928
 line 2284
 ;2284:		{
 line 2285
@@ -13261,10 +13261,10 @@ INDIRI4
 ASGNI4
 line 2286
 ;2286:		}
-LABELV $930
+LABELV $928
 line 2287
 ;2287:	}
-LABELV $927
+LABELV $925
 line 2289
 ;2288:
 ;2289:	if ( (pm->ps->torsoAnim&~ANIM_TOGGLEBIT) == anim )
@@ -13278,7 +13278,7 @@ CNSTI4 -2049
 BANDI4
 ADDRLP4 0
 INDIRI4
-NEI4 $932
+NEI4 $930
 line 2290
 ;2290:	{//successfully changed anims
 line 2293
@@ -13296,7 +13296,7 @@ ASGNI4
 ADDRLP4 56
 INDIRI4
 CNSTI4 0
-NEI4 $936
+NEI4 $934
 ADDRLP4 0
 INDIRI4
 ARGI4
@@ -13307,8 +13307,8 @@ ASGNI4
 ADDRLP4 60
 INDIRI4
 CNSTI4 0
-EQI4 $934
-LABELV $936
+EQI4 $932
+LABELV $934
 line 2294
 ;2294:		{
 line 2295
@@ -13322,7 +13322,7 @@ INDIRI4
 ADDRFP4 0
 INDIRI2
 CVII4 2
-EQI4 $937
+EQI4 $935
 line 2296
 ;2296:			{//wasn't playing that attack before
 line 2297
@@ -13334,10 +13334,10 @@ CALLV
 pop
 line 2298
 ;2298:			}
-LABELV $937
+LABELV $935
 line 2299
 ;2299:		}
-LABELV $934
+LABELV $932
 line 2308
 ;2300:
 ;2301:		// just testing this to see if it makes cartwheel climbs easier. eh idk.
@@ -13394,7 +13394,7 @@ CNSTI4 44
 ADDP4
 INDIRI4
 CNSTI4 0
-GTI4 $940
+GTI4 $938
 line 2314
 ;2314:		{
 line 2315
@@ -13408,13 +13408,13 @@ CNSTI4 0
 ASGNI4
 line 2316
 ;2316:		}
-LABELV $940
+LABELV $938
 line 2317
 ;2317:	}
-LABELV $932
+LABELV $930
 line 2318
 ;2318:}
-LABELV $857
+LABELV $855
 endproc PM_SetSaberMove 84 16
 import ValidAnimFileIndex
 import PM_SetGroundEntityNum
@@ -13592,14 +13592,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -13746,6 +13744,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -13786,64 +13786,38 @@ import srand
 import qsort
 lit
 align 1
-LABELV $254
-byte 1 68
-byte 1 117
-byte 1 97
-byte 1 108
-byte 1 74
-byte 1 117
-byte 1 109
-byte 1 112
-byte 1 65
-byte 1 116
-byte 1 107
-byte 1 82
-byte 1 95
-byte 1 65
-byte 1 0
-align 1
-LABELV $253
-byte 1 68
-byte 1 117
-byte 1 97
-byte 1 108
-byte 1 74
-byte 1 117
-byte 1 109
-byte 1 112
-byte 1 65
-byte 1 116
-byte 1 107
-byte 1 76
-byte 1 95
-byte 1 65
-byte 1 0
-align 1
 LABELV $252
-byte 1 82
-byte 1 101
-byte 1 102
+byte 1 68
+byte 1 117
+byte 1 97
 byte 1 108
-byte 1 101
-byte 1 99
+byte 1 74
+byte 1 117
+byte 1 109
+byte 1 112
+byte 1 65
 byte 1 116
-byte 1 32
-byte 1 76
-byte 1 76
+byte 1 107
+byte 1 82
+byte 1 95
+byte 1 65
 byte 1 0
 align 1
 LABELV $251
-byte 1 82
-byte 1 101
-byte 1 102
+byte 1 68
+byte 1 117
+byte 1 97
 byte 1 108
-byte 1 101
-byte 1 99
+byte 1 74
+byte 1 117
+byte 1 109
+byte 1 112
+byte 1 65
 byte 1 116
-byte 1 32
+byte 1 107
 byte 1 76
-byte 1 82
+byte 1 95
+byte 1 65
 byte 1 0
 align 1
 LABELV $250
@@ -13855,7 +13829,7 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 76
 byte 1 0
 align 1
@@ -13868,7 +13842,7 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 82
 byte 1 0
 align 1
@@ -13881,31 +13855,35 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 84
-byte 1 111
-byte 1 112
+byte 1 85
+byte 1 76
 byte 1 0
 align 1
 LABELV $247
-byte 1 80
-byte 1 97
-byte 1 114
-byte 1 114
-byte 1 121
+byte 1 82
+byte 1 101
+byte 1 102
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
 byte 1 32
-byte 1 76
-byte 1 76
+byte 1 85
+byte 1 82
 byte 1 0
 align 1
 LABELV $246
-byte 1 80
-byte 1 97
-byte 1 114
-byte 1 114
-byte 1 121
-byte 1 32
-byte 1 76
 byte 1 82
+byte 1 101
+byte 1 102
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 32
+byte 1 84
+byte 1 111
+byte 1 112
 byte 1 0
 align 1
 LABELV $245
@@ -13915,7 +13893,7 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 76
 byte 1 0
 align 1
@@ -13926,7 +13904,7 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 82
 byte 1 0
 align 1
@@ -13937,31 +13915,31 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 84
-byte 1 111
-byte 1 112
+byte 1 85
+byte 1 76
 byte 1 0
 align 1
 LABELV $242
-byte 1 75
-byte 1 110
-byte 1 111
-byte 1 99
-byte 1 107
+byte 1 80
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 121
 byte 1 32
-byte 1 76
-byte 1 76
+byte 1 85
+byte 1 82
 byte 1 0
 align 1
 LABELV $241
-byte 1 75
-byte 1 110
-byte 1 111
-byte 1 99
-byte 1 107
+byte 1 80
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 121
 byte 1 32
-byte 1 76
-byte 1 82
+byte 1 84
+byte 1 111
+byte 1 112
 byte 1 0
 align 1
 LABELV $240
@@ -13971,7 +13949,7 @@ byte 1 111
 byte 1 99
 byte 1 107
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 76
 byte 1 0
 align 1
@@ -13982,7 +13960,7 @@ byte 1 111
 byte 1 99
 byte 1 107
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 82
 byte 1 0
 align 1
@@ -13993,34 +13971,31 @@ byte 1 111
 byte 1 99
 byte 1 107
 byte 1 32
-byte 1 84
-byte 1 111
-byte 1 112
+byte 1 85
+byte 1 76
 byte 1 0
 align 1
 LABELV $237
-byte 1 66
-byte 1 80
-byte 1 97
-byte 1 114
-byte 1 114
-byte 1 121
+byte 1 75
+byte 1 110
+byte 1 111
+byte 1 99
+byte 1 107
 byte 1 32
-byte 1 76
-byte 1 76
+byte 1 85
+byte 1 82
 byte 1 0
 align 1
 LABELV $236
-byte 1 66
-byte 1 80
-byte 1 97
-byte 1 114
-byte 1 114
-byte 1 121
-byte 1 32
-byte 1 66
+byte 1 75
+byte 1 110
 byte 1 111
-byte 1 116
+byte 1 99
+byte 1 107
+byte 1 32
+byte 1 84
+byte 1 111
+byte 1 112
 byte 1 0
 align 1
 LABELV $235
@@ -14032,7 +14007,7 @@ byte 1 114
 byte 1 121
 byte 1 32
 byte 1 76
-byte 1 82
+byte 1 76
 byte 1 0
 align 1
 LABELV $234
@@ -14043,8 +14018,9 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 85
-byte 1 76
+byte 1 66
+byte 1 111
+byte 1 116
 byte 1 0
 align 1
 LABELV $233
@@ -14055,7 +14031,7 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 85
+byte 1 76
 byte 1 82
 byte 1 0
 align 1
@@ -14067,38 +14043,33 @@ byte 1 114
 byte 1 114
 byte 1 121
 byte 1 32
-byte 1 84
-byte 1 111
-byte 1 112
+byte 1 85
+byte 1 76
 byte 1 0
 align 1
 LABELV $231
-byte 1 82
-byte 1 101
-byte 1 102
-byte 1 108
-byte 1 101
-byte 1 99
-byte 1 116
-byte 1 101
-byte 1 100
-byte 1 32
 byte 1 66
+byte 1 80
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 121
+byte 1 32
+byte 1 85
+byte 1 82
 byte 1 0
 align 1
 LABELV $230
-byte 1 82
-byte 1 101
-byte 1 102
-byte 1 108
-byte 1 101
-byte 1 99
-byte 1 116
-byte 1 101
-byte 1 100
-byte 1 32
 byte 1 66
-byte 1 76
+byte 1 80
+byte 1 97
+byte 1 114
+byte 1 114
+byte 1 121
+byte 1 32
+byte 1 84
+byte 1 111
+byte 1 112
 byte 1 0
 align 1
 LABELV $229
@@ -14112,7 +14083,7 @@ byte 1 116
 byte 1 101
 byte 1 100
 byte 1 32
-byte 1 76
+byte 1 66
 byte 1 0
 align 1
 LABELV $228
@@ -14126,7 +14097,7 @@ byte 1 116
 byte 1 101
 byte 1 100
 byte 1 32
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 0
 align 1
@@ -14141,7 +14112,7 @@ byte 1 116
 byte 1 101
 byte 1 100
 byte 1 32
-byte 1 84
+byte 1 76
 byte 1 0
 align 1
 LABELV $226
@@ -14156,7 +14127,7 @@ byte 1 101
 byte 1 100
 byte 1 32
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 0
 align 1
 LABELV $225
@@ -14170,7 +14141,7 @@ byte 1 116
 byte 1 101
 byte 1 100
 byte 1 32
-byte 1 82
+byte 1 84
 byte 1 0
 align 1
 LABELV $224
@@ -14184,33 +14155,37 @@ byte 1 116
 byte 1 101
 byte 1 100
 byte 1 32
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 0
 align 1
 LABELV $223
-byte 1 68
+byte 1 82
 byte 1 101
 byte 1 102
 byte 1 108
 byte 1 101
 byte 1 99
 byte 1 116
+byte 1 101
+byte 1 100
 byte 1 32
-byte 1 66
+byte 1 82
 byte 1 0
 align 1
 LABELV $222
-byte 1 68
+byte 1 82
 byte 1 101
 byte 1 102
 byte 1 108
 byte 1 101
 byte 1 99
 byte 1 116
+byte 1 101
+byte 1 100
 byte 1 32
 byte 1 66
-byte 1 76
+byte 1 82
 byte 1 0
 align 1
 LABELV $221
@@ -14222,7 +14197,7 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 76
+byte 1 66
 byte 1 0
 align 1
 LABELV $220
@@ -14234,7 +14209,7 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 0
 align 1
@@ -14247,7 +14222,7 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 84
+byte 1 76
 byte 1 0
 align 1
 LABELV $218
@@ -14260,7 +14235,7 @@ byte 1 99
 byte 1 116
 byte 1 32
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 0
 align 1
 LABELV $217
@@ -14272,10 +14247,35 @@ byte 1 101
 byte 1 99
 byte 1 116
 byte 1 32
-byte 1 82
+byte 1 84
 byte 1 0
 align 1
 LABELV $216
+byte 1 68
+byte 1 101
+byte 1 102
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 32
+byte 1 84
+byte 1 82
+byte 1 0
+align 1
+LABELV $215
+byte 1 68
+byte 1 101
+byte 1 102
+byte 1 108
+byte 1 101
+byte 1 99
+byte 1 116
+byte 1 32
+byte 1 82
+byte 1 0
+align 1
+LABELV $214
 byte 1 68
 byte 1 101
 byte 1 102
@@ -14288,29 +14288,6 @@ byte 1 66
 byte 1 82
 byte 1 0
 align 1
-LABELV $215
-byte 1 66
-byte 1 111
-byte 1 117
-byte 1 110
-byte 1 99
-byte 1 101
-byte 1 32
-byte 1 66
-byte 1 76
-byte 1 0
-align 1
-LABELV $214
-byte 1 66
-byte 1 111
-byte 1 117
-byte 1 110
-byte 1 99
-byte 1 101
-byte 1 32
-byte 1 76
-byte 1 0
-align 1
 LABELV $213
 byte 1 66
 byte 1 111
@@ -14319,7 +14296,7 @@ byte 1 110
 byte 1 99
 byte 1 101
 byte 1 32
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 0
 align 1
@@ -14331,7 +14308,7 @@ byte 1 110
 byte 1 99
 byte 1 101
 byte 1 32
-byte 1 84
+byte 1 76
 byte 1 0
 align 1
 LABELV $211
@@ -14343,7 +14320,7 @@ byte 1 99
 byte 1 101
 byte 1 32
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 0
 align 1
 LABELV $210
@@ -14354,10 +14331,33 @@ byte 1 110
 byte 1 99
 byte 1 101
 byte 1 32
-byte 1 82
+byte 1 84
 byte 1 0
 align 1
 LABELV $209
+byte 1 66
+byte 1 111
+byte 1 117
+byte 1 110
+byte 1 99
+byte 1 101
+byte 1 32
+byte 1 84
+byte 1 82
+byte 1 0
+align 1
+LABELV $208
+byte 1 66
+byte 1 111
+byte 1 117
+byte 1 110
+byte 1 99
+byte 1 101
+byte 1 32
+byte 1 82
+byte 1 0
+align 1
+LABELV $207
 byte 1 66
 byte 1 111
 byte 1 117
@@ -14369,38 +14369,11 @@ byte 1 66
 byte 1 82
 byte 1 0
 align 1
-LABELV $208
-byte 1 66
-byte 1 76
-byte 1 50
-byte 1 76
-byte 1 32
-byte 1 84
-byte 1 114
-byte 1 97
-byte 1 110
-byte 1 115
-byte 1 0
-align 1
-LABELV $207
-byte 1 66
-byte 1 76
-byte 1 50
-byte 1 84
-byte 1 76
-byte 1 32
-byte 1 84
-byte 1 114
-byte 1 97
-byte 1 110
-byte 1 115
-byte 1 0
-align 1
 LABELV $206
 byte 1 66
 byte 1 76
 byte 1 50
-byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14414,7 +14387,7 @@ byte 1 66
 byte 1 76
 byte 1 50
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14427,7 +14400,7 @@ LABELV $204
 byte 1 66
 byte 1 76
 byte 1 50
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14440,7 +14413,7 @@ LABELV $203
 byte 1 66
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 84
@@ -14451,10 +14424,10 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $202
-byte 1 76
-byte 1 50
 byte 1 66
 byte 1 76
+byte 1 50
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14464,10 +14437,11 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $201
+byte 1 66
 byte 1 76
 byte 1 50
-byte 1 84
-byte 1 76
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14479,7 +14453,8 @@ align 1
 LABELV $200
 byte 1 76
 byte 1 50
-byte 1 84
+byte 1 66
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14492,7 +14467,7 @@ LABELV $199
 byte 1 76
 byte 1 50
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14504,7 +14479,7 @@ align 1
 LABELV $198
 byte 1 76
 byte 1 50
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14516,7 +14491,7 @@ align 1
 LABELV $197
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 84
@@ -14527,11 +14502,9 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $196
-byte 1 84
 byte 1 76
 byte 1 50
-byte 1 66
-byte 1 76
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14541,10 +14514,10 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $195
-byte 1 84
 byte 1 76
 byte 1 50
-byte 1 76
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14557,7 +14530,8 @@ LABELV $194
 byte 1 84
 byte 1 76
 byte 1 50
-byte 1 84
+byte 1 66
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14570,8 +14544,7 @@ LABELV $193
 byte 1 84
 byte 1 76
 byte 1 50
-byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14584,7 +14557,7 @@ LABELV $192
 byte 1 84
 byte 1 76
 byte 1 50
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14597,7 +14570,7 @@ LABELV $191
 byte 1 84
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 84
@@ -14609,9 +14582,9 @@ byte 1 0
 align 1
 LABELV $190
 byte 1 84
-byte 1 50
-byte 1 66
 byte 1 76
+byte 1 50
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14622,8 +14595,10 @@ byte 1 0
 align 1
 LABELV $189
 byte 1 84
-byte 1 50
 byte 1 76
+byte 1 50
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14635,7 +14610,7 @@ align 1
 LABELV $188
 byte 1 84
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 84
@@ -14648,8 +14623,7 @@ align 1
 LABELV $187
 byte 1 84
 byte 1 50
-byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14661,7 +14635,8 @@ align 1
 LABELV $186
 byte 1 84
 byte 1 50
-byte 1 82
+byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14673,7 +14648,7 @@ align 1
 LABELV $185
 byte 1 84
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 84
@@ -14685,10 +14660,8 @@ byte 1 0
 align 1
 LABELV $184
 byte 1 84
-byte 1 82
 byte 1 50
-byte 1 66
-byte 1 76
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14699,9 +14672,9 @@ byte 1 0
 align 1
 LABELV $183
 byte 1 84
-byte 1 82
 byte 1 50
-byte 1 76
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14714,7 +14687,7 @@ LABELV $182
 byte 1 84
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 84
@@ -14728,7 +14701,7 @@ LABELV $181
 byte 1 84
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14741,7 +14714,8 @@ LABELV $180
 byte 1 84
 byte 1 82
 byte 1 50
-byte 1 82
+byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14754,8 +14728,7 @@ LABELV $179
 byte 1 84
 byte 1 82
 byte 1 50
-byte 1 66
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14765,10 +14738,10 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $178
+byte 1 84
 byte 1 82
 byte 1 50
-byte 1 66
-byte 1 76
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14778,9 +14751,11 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $177
+byte 1 84
 byte 1 82
 byte 1 50
-byte 1 76
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14792,7 +14767,7 @@ align 1
 LABELV $176
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 84
@@ -14805,7 +14780,7 @@ align 1
 LABELV $175
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14818,7 +14793,7 @@ LABELV $174
 byte 1 82
 byte 1 50
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14830,8 +14805,7 @@ align 1
 LABELV $173
 byte 1 82
 byte 1 50
-byte 1 66
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14841,11 +14815,10 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $172
-byte 1 66
 byte 1 82
 byte 1 50
-byte 1 66
-byte 1 76
+byte 1 84
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14855,10 +14828,10 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $171
-byte 1 66
 byte 1 82
 byte 1 50
-byte 1 76
+byte 1 66
+byte 1 82
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14871,7 +14844,7 @@ LABELV $170
 byte 1 66
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 84
@@ -14885,7 +14858,7 @@ LABELV $169
 byte 1 66
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14899,7 +14872,7 @@ byte 1 66
 byte 1 82
 byte 1 50
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14912,7 +14885,7 @@ LABELV $167
 byte 1 66
 byte 1 82
 byte 1 50
-byte 1 82
+byte 1 84
 byte 1 32
 byte 1 84
 byte 1 114
@@ -14922,31 +14895,36 @@ byte 1 115
 byte 1 0
 align 1
 LABELV $166
-byte 1 84
-byte 1 50
 byte 1 66
-byte 1 32
 byte 1 82
-byte 1 101
-byte 1 116
+byte 1 50
+byte 1 84
+byte 1 82
+byte 1 32
+byte 1 84
+byte 1 114
+byte 1 97
+byte 1 110
+byte 1 115
 byte 1 0
 align 1
 LABELV $165
-byte 1 84
+byte 1 66
 byte 1 82
 byte 1 50
-byte 1 66
-byte 1 76
-byte 1 32
 byte 1 82
-byte 1 101
-byte 1 116
+byte 1 32
+byte 1 84
+byte 1 114
+byte 1 97
+byte 1 110
+byte 1 115
 byte 1 0
 align 1
 LABELV $164
-byte 1 82
+byte 1 84
 byte 1 50
-byte 1 76
+byte 1 66
 byte 1 32
 byte 1 82
 byte 1 101
@@ -14954,10 +14932,10 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $163
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 82
@@ -14966,11 +14944,9 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $162
-byte 1 66
-byte 1 76
-byte 1 50
-byte 1 84
 byte 1 82
+byte 1 50
+byte 1 76
 byte 1 32
 byte 1 82
 byte 1 101
@@ -14978,9 +14954,11 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $161
-byte 1 76
-byte 1 50
+byte 1 66
 byte 1 82
+byte 1 50
+byte 1 84
+byte 1 76
 byte 1 32
 byte 1 82
 byte 1 101
@@ -14988,10 +14966,10 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $160
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 82
@@ -15000,39 +14978,41 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $159
-byte 1 84
+byte 1 76
 byte 1 50
-byte 1 66
+byte 1 82
 byte 1 32
-byte 1 83
+byte 1 82
+byte 1 101
 byte 1 116
 byte 1 0
 align 1
 LABELV $158
 byte 1 84
-byte 1 82
+byte 1 76
 byte 1 50
 byte 1 66
-byte 1 76
+byte 1 82
 byte 1 32
-byte 1 83
+byte 1 82
+byte 1 101
 byte 1 116
 byte 1 0
 align 1
 LABELV $157
-byte 1 82
+byte 1 84
 byte 1 50
-byte 1 76
+byte 1 66
 byte 1 32
 byte 1 83
 byte 1 116
 byte 1 0
 align 1
 LABELV $156
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 83
@@ -15040,30 +15020,30 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $155
-byte 1 66
-byte 1 76
-byte 1 50
-byte 1 84
 byte 1 82
+byte 1 50
+byte 1 76
 byte 1 32
 byte 1 83
 byte 1 116
 byte 1 0
 align 1
 LABELV $154
-byte 1 76
-byte 1 50
+byte 1 66
 byte 1 82
+byte 1 50
+byte 1 84
+byte 1 76
 byte 1 32
 byte 1 83
 byte 1 116
 byte 1 0
 align 1
 LABELV $153
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 83
@@ -15071,6 +15051,26 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $152
+byte 1 76
+byte 1 50
+byte 1 82
+byte 1 32
+byte 1 83
+byte 1 116
+byte 1 0
+align 1
+LABELV $151
+byte 1 84
+byte 1 76
+byte 1 50
+byte 1 66
+byte 1 82
+byte 1 32
+byte 1 83
+byte 1 116
+byte 1 0
+align 1
+LABELV $150
 byte 1 70
 byte 1 108
 byte 1 105
@@ -15083,7 +15083,7 @@ byte 1 115
 byte 1 104
 byte 1 0
 align 1
-LABELV $151
+LABELV $149
 byte 1 70
 byte 1 108
 byte 1 105
@@ -15095,7 +15095,7 @@ byte 1 97
 byte 1 98
 byte 1 0
 align 1
-LABELV $150
+LABELV $148
 byte 1 74
 byte 1 117
 byte 1 109
@@ -15106,7 +15106,7 @@ byte 1 116
 byte 1 116
 byte 1 0
 align 1
-LABELV $149
+LABELV $147
 byte 1 76
 byte 1 117
 byte 1 110
@@ -15118,7 +15118,7 @@ byte 1 116
 byte 1 116
 byte 1 0
 align 1
-LABELV $148
+LABELV $146
 byte 1 67
 byte 1 82
 byte 1 32
@@ -15132,7 +15132,7 @@ byte 1 116
 byte 1 116
 byte 1 0
 align 1
-LABELV $147
+LABELV $145
 byte 1 66
 byte 1 97
 byte 1 99
@@ -15143,7 +15143,7 @@ byte 1 116
 byte 1 116
 byte 1 0
 align 1
-LABELV $146
+LABELV $144
 byte 1 66
 byte 1 97
 byte 1 99
@@ -15155,32 +15155,10 @@ byte 1 97
 byte 1 98
 byte 1 0
 align 1
-LABELV $145
-byte 1 84
-byte 1 50
-byte 1 66
-byte 1 32
-byte 1 65
-byte 1 116
-byte 1 116
-byte 1 0
-align 1
-LABELV $144
-byte 1 84
-byte 1 82
-byte 1 50
-byte 1 66
-byte 1 76
-byte 1 32
-byte 1 65
-byte 1 116
-byte 1 116
-byte 1 0
-align 1
 LABELV $143
-byte 1 82
+byte 1 84
 byte 1 50
-byte 1 76
+byte 1 66
 byte 1 32
 byte 1 65
 byte 1 116
@@ -15188,10 +15166,10 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $142
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 50
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 32
 byte 1 65
@@ -15200,11 +15178,9 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $141
-byte 1 66
-byte 1 76
-byte 1 50
-byte 1 84
 byte 1 82
+byte 1 50
+byte 1 76
 byte 1 32
 byte 1 65
 byte 1 116
@@ -15212,9 +15188,11 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $140
-byte 1 76
-byte 1 50
+byte 1 66
 byte 1 82
+byte 1 50
+byte 1 84
+byte 1 76
 byte 1 32
 byte 1 65
 byte 1 116
@@ -15222,10 +15200,10 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $139
-byte 1 84
+byte 1 66
 byte 1 76
 byte 1 50
-byte 1 66
+byte 1 84
 byte 1 82
 byte 1 32
 byte 1 65
@@ -15234,6 +15212,28 @@ byte 1 116
 byte 1 0
 align 1
 LABELV $138
+byte 1 76
+byte 1 50
+byte 1 82
+byte 1 32
+byte 1 65
+byte 1 116
+byte 1 116
+byte 1 0
+align 1
+LABELV $137
+byte 1 84
+byte 1 76
+byte 1 50
+byte 1 66
+byte 1 82
+byte 1 32
+byte 1 65
+byte 1 116
+byte 1 116
+byte 1 0
+align 1
+LABELV $136
 byte 1 80
 byte 1 117
 byte 1 116
@@ -15243,14 +15243,14 @@ byte 1 97
 byte 1 121
 byte 1 0
 align 1
-LABELV $137
+LABELV $135
 byte 1 68
 byte 1 114
 byte 1 97
 byte 1 119
 byte 1 0
 align 1
-LABELV $136
+LABELV $134
 byte 1 82
 byte 1 101
 byte 1 97
@@ -15258,7 +15258,7 @@ byte 1 100
 byte 1 121
 byte 1 0
 align 1
-LABELV $135
+LABELV $133
 byte 1 78
 byte 1 111
 byte 1 110

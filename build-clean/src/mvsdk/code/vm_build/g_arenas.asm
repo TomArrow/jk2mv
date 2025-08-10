@@ -44,9 +44,9 @@ line 33
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $126
+ADDRGP4 $124
 JUMPV
-LABELV $123
+LABELV $121
 line 34
 ;34:		player = &g_entities[i];
 ADDRLP4 40
@@ -65,12 +65,12 @@ CNSTI4 412
 ADDP4
 INDIRI4
 CNSTI4 0
-NEI4 $128
+NEI4 $126
 line 36
 ;36:			continue;
-ADDRGP4 $124
+ADDRGP4 $122
 JUMPV
-LABELV $128
+LABELV $126
 line 38
 ;37:		}
 ;38:		if ( !( player->r.svFlags & SVF_BOT ) ) {
@@ -82,16 +82,16 @@ INDIRI4
 CNSTI4 8
 BANDI4
 CNSTI4 0
-NEI4 $130
+NEI4 $128
 line 39
 ;39:			break;
-ADDRGP4 $125
+ADDRGP4 $123
 JUMPV
-LABELV $130
+LABELV $128
 line 41
 ;40:		}
 ;41:	}
-LABELV $124
+LABELV $122
 line 33
 ADDRLP4 0
 ADDRLP4 0
@@ -99,13 +99,13 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $126
+LABELV $124
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-LTI4 $123
-LABELV $125
+LTI4 $121
+LABELV $123
 line 43
 ;42:	// this should never happen!
 ;43:	if ( !player || i == level.maxclients ) {
@@ -113,18 +113,18 @@ ADDRLP4 40
 INDIRP4
 CVPU4 4
 CNSTU4 0
-EQU4 $135
+EQU4 $133
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-NEI4 $132
-LABELV $135
+NEI4 $130
+LABELV $133
 line 44
 ;44:		return;
-ADDRGP4 $122
+ADDRGP4 $120
 JUMPV
-LABELV $132
+LABELV $130
 line 46
 ;45:	}
 ;46:	playerClientNum = i;
@@ -152,14 +152,14 @@ CNSTI4 43440
 ADDP4
 INDIRI4
 CNSTI4 3
-NEI4 $136
+NEI4 $134
 line 51
 ;51:		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0 0 0 0 0 0 0 0 0", level.numNonSpectatorClients, playerClientNum );
 ADDRLP4 44
 ARGP4
 CNSTI4 1024
 ARGI4
-ADDRGP4 $138
+ADDRGP4 $136
 ARGP4
 ADDRGP4 level+88
 INDIRI4
@@ -172,9 +172,9 @@ CALLV
 pop
 line 52
 ;52:	}
-ADDRGP4 $137
+ADDRGP4 $135
 JUMPV
-LABELV $136
+LABELV $134
 line 53
 ;53:	else {
 line 54
@@ -188,7 +188,7 @@ CNSTI4 43664
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $140
+EQI4 $138
 line 55
 ;55:			accuracy = player->client->accuracy_hits * 100 / player->client->accuracy_shots;
 ADDRLP4 1100
@@ -215,9 +215,9 @@ DIVI4
 ASGNI4
 line 56
 ;56:		}
-ADDRGP4 $141
+ADDRGP4 $139
 JUMPV
-LABELV $140
+LABELV $138
 line 57
 ;57:		else {
 line 58
@@ -227,7 +227,7 @@ CNSTI4 0
 ASGNI4
 line 59
 ;59:		}
-LABELV $141
+LABELV $139
 line 60
 ;60:		won = qfalse;
 ADDRLP4 1080
@@ -238,7 +238,7 @@ line 61
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 7
-LTI4 $142
+LTI4 $140
 line 62
 ;62:			score1 = level.teamScores[TEAM_RED];
 ADDRLP4 1092
@@ -264,50 +264,50 @@ CNSTI4 43440
 ADDP4
 INDIRI4
 CNSTI4 1
-NEI4 $149
+NEI4 $147
 line 65
 ;65:				won = (level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE]);
 ADDRGP4 level+52+4
 INDIRI4
 ADDRGP4 level+52+8
 INDIRI4
-LEI4 $156
+LEI4 $154
 ADDRLP4 1100
 CNSTI4 1
 ASGNI4
-ADDRGP4 $157
+ADDRGP4 $155
 JUMPV
-LABELV $156
+LABELV $154
 ADDRLP4 1100
 CNSTI4 0
 ASGNI4
-LABELV $157
+LABELV $155
 ADDRLP4 1080
 ADDRLP4 1100
 INDIRI4
 ASGNI4
 line 66
 ;66:			} else {
-ADDRGP4 $143
+ADDRGP4 $141
 JUMPV
-LABELV $149
+LABELV $147
 line 67
 ;67:				won = (level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED]);
 ADDRGP4 level+52+8
 INDIRI4
 ADDRGP4 level+52+4
 INDIRI4
-LEI4 $163
+LEI4 $161
 ADDRLP4 1100
 CNSTI4 1
 ASGNI4
-ADDRGP4 $164
+ADDRGP4 $162
 JUMPV
-LABELV $163
+LABELV $161
 ADDRLP4 1100
 CNSTI4 0
 ASGNI4
-LABELV $164
+LABELV $162
 ADDRLP4 1080
 ADDRLP4 1100
 INDIRI4
@@ -316,9 +316,9 @@ line 68
 ;68:			}
 line 69
 ;69:		} else {
-ADDRGP4 $143
+ADDRGP4 $141
 JUMPV
-LABELV $142
+LABELV $140
 line 70
 ;70:			if (&level.clients[playerClientNum] == &level.clients[ level.sortedClients[0] ]) {
 ADDRLP4 1100
@@ -346,7 +346,7 @@ ADDRLP4 1104
 INDIRP4
 ADDP4
 CVPU4 4
-NEU4 $165
+NEU4 $163
 line 71
 ;71:				won = qtrue;
 ADDRLP4 1080
@@ -382,9 +382,9 @@ INDIRI4
 ASGNI4
 line 74
 ;74:			} else {
-ADDRGP4 $166
+ADDRGP4 $164
 JUMPV
-LABELV $165
+LABELV $163
 line 75
 ;75:				score2 = level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE];
 ADDRLP4 1096
@@ -415,10 +415,10 @@ INDIRI4
 ASGNI4
 line 77
 ;77:			}
-LABELV $166
+LABELV $164
 line 78
 ;78:		}
-LABELV $143
+LABELV $141
 line 79
 ;79:		if (won && player->client->ps.persistant[PERS_KILLED] == 0) {
 ADDRLP4 1100
@@ -428,7 +428,7 @@ ADDRLP4 1080
 INDIRI4
 ADDRLP4 1100
 INDIRI4
-EQI4 $174
+EQI4 $172
 ADDRLP4 40
 INDIRP4
 CNSTI4 408
@@ -439,7 +439,7 @@ ADDP4
 INDIRI4
 ADDRLP4 1100
 INDIRI4
-NEI4 $174
+NEI4 $172
 line 80
 ;80:			perfect = 1;
 ADDRLP4 1088
@@ -447,9 +447,9 @@ CNSTI4 1
 ASGNI4
 line 81
 ;81:		} else {
-ADDRGP4 $175
+ADDRGP4 $173
 JUMPV
-LABELV $174
+LABELV $172
 line 82
 ;82:			perfect = 0;
 ADDRLP4 1088
@@ -457,14 +457,14 @@ CNSTI4 0
 ASGNI4
 line 83
 ;83:		}
-LABELV $175
+LABELV $173
 line 84
 ;84:		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 ADDRLP4 44
 ARGP4
 CNSTI4 1024
 ARGI4
-ADDRGP4 $176
+ADDRGP4 $174
 ARGP4
 ADDRGP4 level+88
 INDIRI4
@@ -544,7 +544,7 @@ line 88
 ;86:			player->client->ps.persistant[PERS_ASSIST_COUNT], player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
 ;87:			perfect, score1, score2, level.time, player->client->ps.persistant[PERS_CAPTURES] );
 ;88:	}
-LABELV $137
+LABELV $135
 line 90
 ;89:
 ;90:	msglen = strlen( msg );
@@ -564,9 +564,9 @@ line 91
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $182
+ADDRGP4 $180
 JUMPV
-LABELV $179
+LABELV $177
 line 92
 ;92:		n = level.sortedClients[i];
 ADDRLP4 4
@@ -584,7 +584,7 @@ ADDRLP4 8
 ARGP4
 CNSTI4 32
 ARGI4
-ADDRGP4 $185
+ADDRGP4 $183
 ARGP4
 ADDRLP4 4
 INDIRI4
@@ -636,12 +636,12 @@ ADDI4
 CNSTI4 1
 ADDI4
 CNSTI4 1024
-LTI4 $186
+LTI4 $184
 line 96
 ;96:			break;
-ADDRGP4 $181
+ADDRGP4 $179
 JUMPV
-LABELV $186
+LABELV $184
 line 98
 ;97:		}
 ;98:		Q_strcat( msg,sizeof(msg), buf );
@@ -656,7 +656,7 @@ CALLV
 pop
 line 99
 ;99:	}
-LABELV $180
+LABELV $178
 line 91
 ADDRLP4 0
 ADDRLP4 0
@@ -664,20 +664,20 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $182
+LABELV $180
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+88
 INDIRI4
-LTI4 $179
-LABELV $181
+LTI4 $177
+LABELV $179
 line 100
 ;100:	Q_strcat( msg, sizeof(msg), "\n" );
 ADDRLP4 44
 ARGP4
 CNSTI4 1024
 ARGI4
-ADDRGP4 $188
+ADDRGP4 $186
 ARGP4
 ADDRGP4 Q_strcat
 CALLV
@@ -693,7 +693,7 @@ CALLV
 pop
 line 102
 ;102:}
-LABELV $122
+LABELV $120
 endproc UpdateTournamentInfo 1116 68
 bss
 export podium3
@@ -1575,14 +1575,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -1729,6 +1727,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -1769,11 +1769,11 @@ import srand
 import qsort
 lit
 align 1
-LABELV $188
+LABELV $186
 byte 1 10
 byte 1 0
 align 1
-LABELV $185
+LABELV $183
 byte 1 32
 byte 1 37
 byte 1 105
@@ -1785,7 +1785,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $176
+LABELV $174
 byte 1 112
 byte 1 111
 byte 1 115
@@ -1838,7 +1838,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $138
+LABELV $136
 byte 1 112
 byte 1 111
 byte 1 115

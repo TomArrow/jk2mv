@@ -36,7 +36,7 @@ line 32
 ;30:	const char	*var;
 ;31:
 ;32:	s = va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %s",
-ADDRGP4 $123
+ADDRGP4 $121
 ARGP4
 ADDRLP4 8
 ADDRFP4 0
@@ -247,7 +247,7 @@ line 61
 ;59:		);
 ;60:
 ;61:	var = va( "session%i", (int)(client - level.clients) );
-ADDRGP4 $126
+ADDRGP4 $124
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -283,7 +283,7 @@ pop
 line 65
 ;64:
 ;65:	s = va("%i %i %i %i %i",
-ADDRGP4 $127
+ADDRGP4 $125
 ARGP4
 ADDRLP4 20
 CNSTI4 20
@@ -344,7 +344,7 @@ line 72
 ;70:		mv_clientSessions[client-g_clients].localClient
 ;71:		);
 ;72:	var = va( "sessionmv%i", (int)(client-level.clients) );
-ADDRGP4 $132
+ADDRGP4 $130
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -378,7 +378,7 @@ CALLV
 pop
 line 74
 ;74:}
-LABELV $122
+LABELV $120
 endproc G_WriteClientSessionData 32 108
 export G_ReadSessionData
 proc G_ReadSessionData 1108 112
@@ -418,7 +418,7 @@ line 108
 ;106:	int nameTagType;
 ;107:
 ;108:	var = va( "session%i", (int)(client - level.clients) );
-ADDRGP4 $126
+ADDRGP4 $124
 ARGP4
 ADDRFP4 0
 INDIRP4
@@ -456,7 +456,7 @@ line 111
 ;111:	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %s",
 ADDRLP4 0
 ARGP4
-ADDRGP4 $123
+ADDRGP4 $121
 ARGP4
 ADDRLP4 1036
 ARGP4
@@ -795,7 +795,7 @@ CNSTI4 43560
 ADDP4
 INDIRI4
 CNSTI4 0
-EQI4 $136
+EQI4 $134
 line 166
 ;166:		DF_RequestPlayerDefaultTime(g_entities + (client - g_clients));
 CNSTI4 2352
@@ -817,7 +817,7 @@ CALLV
 pop
 line 167
 ;167:	}
-LABELV $136
+LABELV $134
 line 169
 ;168:
 ;169:	DF_SetSubContestDefaults(client); // would be nicer to keep it but lets just set defaults who cares. means a few more db requests that could be avoided, but it wont cause any issues beyond that, maybe TODO someday
@@ -838,7 +838,7 @@ CNSTI4 1
 ASGNI4
 line 172
 ;172:}
-LABELV $133
+LABELV $131
 endproc G_ReadSessionData 1108 112
 export MV_ReadSessionData
 proc MV_ReadSessionData 1040 28
@@ -859,7 +859,7 @@ line 187
 ;185:	int localClient;
 ;186:
 ;187:	var = va( "sessionmv%i", clientNum );
-ADDRGP4 $132
+ADDRGP4 $130
 ARGP4
 ADDRFP4 0
 INDIRI4
@@ -888,7 +888,7 @@ line 189
 ;189:	sscanf( s, "%i %i %i %i %i",
 ADDRLP4 0
 ARGP4
-ADDRGP4 $127
+ADDRGP4 $125
 ARGP4
 ADDRLP4 1036
 CNSTI4 20
@@ -942,7 +942,7 @@ ASGNI4
 line 199
 ;198:	//trap_Cvar_Set( var, "" ); // Causes issues, if people aren't fully ingam, but the server changes maps again.
 ;199:}
-LABELV $138
+LABELV $136
 endproc MV_ReadSessionData 1040 28
 export G_InitSessionData
 proc G_InitSessionData 28 8
@@ -1036,13 +1036,13 @@ line 228
 ADDRGP4 g_gametype+12
 INDIRI4
 CNSTI4 5
-LTI4 $147
+LTI4 $145
 line 229
 ;229:		if ( g_teamAutoJoin.integer ) {
 ADDRGP4 g_teamAutoJoin+12
 INDIRI4
 CNSTI4 0
-EQI4 $150
+EQI4 $148
 line 230
 ;230:			sess->sessionTeam = PickTeam( -1 );
 CNSTI4 -1
@@ -1068,16 +1068,16 @@ CALLV
 pop
 line 232
 ;232:		} else {
-ADDRGP4 $148
+ADDRGP4 $146
 JUMPV
-LABELV $150
+LABELV $148
 line 234
 ;233:			// always spawn as spectator in team games
 ;234:			if (!isBot)
 ADDRFP4 8
 INDIRI4
 CNSTI4 0
-NEI4 $153
+NEI4 $151
 line 235
 ;235:			{
 line 236
@@ -1088,9 +1088,9 @@ CNSTI4 3
 ASGNI4
 line 237
 ;237:			}
-ADDRGP4 $148
+ADDRGP4 $146
 JUMPV
-LABELV $153
+LABELV $151
 line 239
 ;238:			else
 ;239:			{ //Bots choose their team on creation
@@ -1099,7 +1099,7 @@ line 240
 ADDRFP4 4
 INDIRP4
 ARGP4
-ADDRGP4 $155
+ADDRGP4 $153
 ARGP4
 ADDRLP4 12
 ADDRGP4 Info_ValueForKey
@@ -1120,12 +1120,12 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 114
-EQI4 $158
+EQI4 $156
 ADDRLP4 16
 INDIRI4
 CNSTI4 82
-NEI4 $156
-LABELV $158
+NEI4 $154
+LABELV $156
 line 242
 ;242:				{
 line 243
@@ -1136,9 +1136,9 @@ CNSTI4 1
 ASGNI4
 line 244
 ;244:				}
-ADDRGP4 $157
+ADDRGP4 $155
 JUMPV
-LABELV $156
+LABELV $154
 line 245
 ;245:				else if (value[0] == 'b' || value[0] == 'B')
 ADDRLP4 20
@@ -1150,12 +1150,12 @@ ASGNI4
 ADDRLP4 20
 INDIRI4
 CNSTI4 98
-EQI4 $161
+EQI4 $159
 ADDRLP4 20
 INDIRI4
 CNSTI4 66
-NEI4 $159
-LABELV $161
+NEI4 $157
+LABELV $159
 line 246
 ;246:				{
 line 247
@@ -1166,9 +1166,9 @@ CNSTI4 2
 ASGNI4
 line 248
 ;248:				}
-ADDRGP4 $160
+ADDRGP4 $158
 JUMPV
-LABELV $159
+LABELV $157
 line 250
 ;249:				else
 ;250:				{
@@ -1187,8 +1187,8 @@ INDIRI4
 ASGNI4
 line 252
 ;252:				}
-LABELV $160
-LABELV $157
+LABELV $158
+LABELV $155
 line 253
 ;253:				BroadcastTeamChange( client, -1 );
 ADDRFP4 0
@@ -1205,15 +1205,15 @@ line 255
 ;255:		}
 line 256
 ;256:	} else {
-ADDRGP4 $148
+ADDRGP4 $146
 JUMPV
-LABELV $147
+LABELV $145
 line 257
 ;257:		value = Info_ValueForKey( userinfo, "team" );
 ADDRFP4 4
 INDIRP4
 ARGP4
-ADDRGP4 $155
+ADDRGP4 $153
 ARGP4
 ADDRLP4 12
 ADDRGP4 Info_ValueForKey
@@ -1230,7 +1230,7 @@ INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 115
-NEI4 $162
+NEI4 $160
 line 260
 ;259:			// a willing spectator, not a waiting-in-line
 ;260:			sess->sessionTeam = TEAM_SPECTATOR;
@@ -1240,9 +1240,9 @@ CNSTI4 3
 ASGNI4
 line 261
 ;261:		} else {
-ADDRGP4 $163
+ADDRGP4 $161
 JUMPV
-LABELV $162
+LABELV $160
 line 262
 ;262:			switch ( g_gametype.integer ) {
 ADDRLP4 16
@@ -1252,30 +1252,30 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-LTI4 $164
+LTI4 $162
 ADDRLP4 16
 INDIRI4
 CNSTI4 4
-GTI4 $164
+GTI4 $162
 ADDRLP4 16
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $177
+ADDRGP4 $175
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $177
-address $167
-address $167
-address $167
-address $173
-address $167
+LABELV $175
+address $165
+address $165
+address $165
+address $171
+address $165
 code
-LABELV $164
-LABELV $167
+LABELV $162
+LABELV $165
 line 268
 ;263:			default:
 ;264:			case GT_FFA:
@@ -1286,12 +1286,12 @@ line 268
 ADDRGP4 g_maxGameClients+12
 INDIRI4
 CNSTI4 0
-LEI4 $168
+LEI4 $166
 ADDRGP4 level+88
 INDIRI4
 ADDRGP4 g_maxGameClients+12
 INDIRI4
-LTI4 $168
+LTI4 $166
 line 269
 ;269:					level.numNonSpectatorClients >= g_maxGameClients.integer ) {
 line 270
@@ -1302,9 +1302,9 @@ CNSTI4 3
 ASGNI4
 line 271
 ;271:				} else {
-ADDRGP4 $165
+ADDRGP4 $163
 JUMPV
-LABELV $168
+LABELV $166
 line 272
 ;272:					sess->sessionTeam = TEAM_FREE;
 ADDRLP4 0
@@ -1315,9 +1315,9 @@ line 273
 ;273:				}
 line 274
 ;274:				break;
-ADDRGP4 $165
+ADDRGP4 $163
 JUMPV
-LABELV $173
+LABELV $171
 line 277
 ;275:			case GT_TOURNAMENT:
 ;276:				// if the game is full, go into a waiting mode
@@ -1325,7 +1325,7 @@ line 277
 ADDRGP4 level+88
 INDIRI4
 CNSTI4 2
-LTI4 $174
+LTI4 $172
 line 278
 ;278:					sess->sessionTeam = TEAM_SPECTATOR;
 ADDRLP4 0
@@ -1334,9 +1334,9 @@ CNSTI4 3
 ASGNI4
 line 279
 ;279:				} else {
-ADDRGP4 $165
+ADDRGP4 $163
 JUMPV
-LABELV $174
+LABELV $172
 line 280
 ;280:					sess->sessionTeam = TEAM_FREE;
 ADDRLP4 0
@@ -1347,14 +1347,14 @@ line 281
 ;281:				}
 line 282
 ;282:				break;
-LABELV $165
+LABELV $163
 line 284
 ;283:			}
 ;284:		}
-LABELV $163
+LABELV $161
 line 285
 ;285:	}
-LABELV $148
+LABELV $146
 line 287
 ;286:
 ;287:	sess->spectatorState = SPECTATOR_FREE;
@@ -1401,7 +1401,7 @@ CALLV
 pop
 line 295
 ;295:}
-LABELV $143
+LABELV $141
 endproc G_InitSessionData 28 8
 export G_InitWorldSession
 proc G_InitWorldSession 1032 12
@@ -1420,7 +1420,7 @@ line 308
 ;306:	int			gt;
 ;307:
 ;308:	trap_Cvar_VariableStringBuffer( "session", s, sizeof(s) );
-ADDRGP4 $179
+ADDRGP4 $177
 ARGP4
 ADDRLP4 0
 ARGP4
@@ -1450,7 +1450,7 @@ ADDRGP4 g_gametype+12
 INDIRI4
 ADDRLP4 1024
 INDIRI4
-EQI4 $180
+EQI4 $178
 line 314
 ;314:		level.newSession = qtrue;
 ADDRGP4 level+72
@@ -1458,17 +1458,17 @@ CNSTI4 1
 ASGNI4
 line 315
 ;315:		G_Printf( "Gametype changed, clearing session data.\n" );
-ADDRGP4 $184
+ADDRGP4 $182
 ARGP4
 ADDRGP4 G_Printf
 CALLV
 pop
 line 316
 ;316:	}
-LABELV $180
+LABELV $178
 line 317
 ;317:}
-LABELV $178
+LABELV $176
 endproc G_InitWorldSession 1032 12
 export G_WriteSessionData
 proc G_WriteSessionData 8 8
@@ -1485,7 +1485,7 @@ line 328
 ;326:	int		i;
 ;327:
 ;328:	trap_Cvar_Set( "session", va("%i", g_gametype.integer) );
-ADDRGP4 $186
+ADDRGP4 $184
 ARGP4
 ADDRGP4 g_gametype+12
 INDIRI4
@@ -1494,7 +1494,7 @@ ADDRLP4 4
 ADDRGP4 va
 CALLP4
 ASGNP4
-ADDRGP4 $179
+ADDRGP4 $177
 ARGP4
 ADDRLP4 4
 INDIRP4
@@ -1508,9 +1508,9 @@ line 330
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $191
+ADDRGP4 $189
 JUMPV
-LABELV $188
+LABELV $186
 line 331
 ;331:		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 CNSTI4 53196
@@ -1524,7 +1524,7 @@ CNSTI4 1380
 ADDP4
 INDIRI4
 CNSTI4 2
-NEI4 $193
+NEI4 $191
 line 332
 ;332:			G_WriteClientSessionData( &level.clients[i] );
 CNSTI4 53196
@@ -1540,10 +1540,10 @@ CALLV
 pop
 line 333
 ;333:		}
-LABELV $193
+LABELV $191
 line 334
 ;334:	}
-LABELV $189
+LABELV $187
 line 330
 ADDRLP4 0
 ADDRLP4 0
@@ -1551,15 +1551,15 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $191
+LABELV $189
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-LTI4 $188
+LTI4 $186
 line 335
 ;335:}
-LABELV $185
+LABELV $183
 endproc G_WriteSessionData 8 8
 import UpdateClientRaceVars
 import DF_RequestPlayerDefaultTime
@@ -2428,14 +2428,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -2582,6 +2580,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -2622,12 +2622,12 @@ import srand
 import qsort
 lit
 align 1
-LABELV $186
+LABELV $184
 byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $184
+LABELV $182
 byte 1 71
 byte 1 97
 byte 1 109
@@ -2671,7 +2671,7 @@ byte 1 46
 byte 1 10
 byte 1 0
 align 1
-LABELV $179
+LABELV $177
 byte 1 115
 byte 1 101
 byte 1 115
@@ -2681,14 +2681,14 @@ byte 1 111
 byte 1 110
 byte 1 0
 align 1
-LABELV $155
+LABELV $153
 byte 1 116
 byte 1 101
 byte 1 97
 byte 1 109
 byte 1 0
 align 1
-LABELV $132
+LABELV $130
 byte 1 115
 byte 1 101
 byte 1 115
@@ -2702,7 +2702,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $127
+LABELV $125
 byte 1 37
 byte 1 105
 byte 1 32
@@ -2719,7 +2719,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $126
+LABELV $124
 byte 1 115
 byte 1 101
 byte 1 115
@@ -2731,7 +2731,7 @@ byte 1 37
 byte 1 105
 byte 1 0
 align 1
-LABELV $123
+LABELV $121
 byte 1 37
 byte 1 105
 byte 1 32

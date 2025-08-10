@@ -18,7 +18,7 @@ line 15
 ;13:	char	text[MAX_TOKEN_CHARS];
 ;14:	int thelen;
 ;15:	trap_Cvar_VariableStringBuffer("sv_crossServerCommandIdent", ourIdent, sizeof(ourIdent));
-ADDRGP4 $123
+ADDRGP4 $121
 ARGP4
 ADDRLP4 3080
 ARGP4
@@ -29,7 +29,7 @@ CALLV
 pop
 line 16
 ;16:	trap_Cvar_VariableStringBuffer("sv_hostname", ourHostname, sizeof(ourHostname));
-ADDRGP4 $124
+ADDRGP4 $122
 ARGP4
 ADDRLP4 4104
 ARGP4
@@ -55,7 +55,7 @@ ADDRLP4 2056
 INDIRI1
 CVII4 1
 CNSTI4 0
-EQI4 $127
+EQI4 $125
 ADDRLP4 3080
 ARGP4
 ADDRLP4 2056
@@ -67,8 +67,8 @@ ASGNI4
 ADDRLP4 5132
 INDIRI4
 CNSTI4 0
-NEI4 $125
-LABELV $127
+NEI4 $123
+LABELV $125
 line 19
 ;19:		trap_Argv(1, source, sizeof(source)); // 1 is sv_hostname
 CNSTI4 1
@@ -82,17 +82,17 @@ CALLV
 pop
 line 20
 ;20:	}
-LABELV $125
+LABELV $123
 line 21
 ;21:	if (!source[0] || !Q_stricmp(source,"noname") || !Q_stricmp(source, ourHostname)) { // use mapname if server has no name or is identical to ours
 ADDRLP4 2056
 INDIRI1
 CVII4 1
 CNSTI4 0
-EQI4 $132
+EQI4 $130
 ADDRLP4 2056
 ARGP4
-ADDRGP4 $130
+ADDRGP4 $128
 ARGP4
 ADDRLP4 5136
 ADDRGP4 Q_stricmp
@@ -101,7 +101,7 @@ ASGNI4
 ADDRLP4 5136
 INDIRI4
 CNSTI4 0
-EQI4 $132
+EQI4 $130
 ADDRLP4 2056
 ARGP4
 ADDRLP4 4104
@@ -113,8 +113,8 @@ ASGNI4
 ADDRLP4 5140
 INDIRI4
 CNSTI4 0
-NEI4 $128
-LABELV $132
+NEI4 $126
+LABELV $130
 line 22
 ;22:		trap_Argv(5, source, sizeof(source)); // 5 is mapname
 CNSTI4 5
@@ -128,7 +128,7 @@ CALLV
 pop
 line 23
 ;23:	}
-LABELV $128
+LABELV $126
 line 25
 ;24:
 ;25:	if (!source[0]) {
@@ -136,13 +136,13 @@ ADDRLP4 2056
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $133
+NEI4 $131
 line 27
 ;26:		// huh..
 ;27:		Q_strncpyz(name, "^l>^jCROSS-SERVER^l>^7: ", sizeof(name));
 ADDRLP4 8
 ARGP4
-ADDRGP4 $135
+ADDRGP4 $133
 ARGP4
 CNSTI4 1024
 ARGI4
@@ -151,9 +151,9 @@ CALLV
 pop
 line 28
 ;28:	}
-ADDRGP4 $134
+ADDRGP4 $132
 JUMPV
-LABELV $133
+LABELV $131
 line 29
 ;29:	else {
 line 30
@@ -169,7 +169,7 @@ ADDRLP4 8
 ARGP4
 CNSTI4 1024
 ARGI4
-ADDRGP4 $136
+ADDRGP4 $134
 ARGP4
 ADDRLP4 2056
 ARGP4
@@ -178,7 +178,7 @@ CALLV
 pop
 line 32
 ;32:	}
-LABELV $134
+LABELV $132
 line 33
 ;33:	thelen = strlen(name);
 ADDRLP4 8
@@ -225,7 +225,7 @@ pop
 line 37
 ;36:
 ;37:	G_LogPrintf("say(cross-server from %s): %s: %s\n",source, name, text);
-ADDRGP4 $137
+ADDRGP4 $135
 ARGP4
 ADDRLP4 2056
 ARGP4
@@ -242,10 +242,10 @@ line 39
 ADDRGP4 g_dedicated+12
 INDIRI4
 CNSTI4 0
-EQI4 $138
+EQI4 $136
 line 40
 ;40:		G_Printf("(cross-server from %s) %s%s\n", source, name, text);
-ADDRGP4 $141
+ADDRGP4 $139
 ARGP4
 ADDRLP4 2056
 ARGP4
@@ -258,7 +258,7 @@ CALLV
 pop
 line 41
 ;41:	}
-LABELV $138
+LABELV $136
 line 44
 ;42:
 ;43:	// send it to all the apropriate clients
@@ -266,9 +266,9 @@ line 44
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
-ADDRGP4 $145
+ADDRGP4 $143
 JUMPV
-LABELV $142
+LABELV $140
 line 45
 ;45:		other = &g_entities[i];
 ADDRLP4 4
@@ -294,14 +294,14 @@ ADDRLP4 8
 ARGP4
 ADDRLP4 1032
 ARGP4
-ADDRGP4 $147
+ADDRGP4 $145
 ARGP4
 ADDRGP4 G_SayTo
 CALLV
 pop
 line 47
 ;47:	}
-LABELV $143
+LABELV $141
 line 44
 ADDRLP4 0
 ADDRLP4 0
@@ -309,15 +309,15 @@ INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $145
+LABELV $143
 ADDRLP4 0
 INDIRI4
 ADDRGP4 level+28
 INDIRI4
-LTI4 $142
+LTI4 $140
 line 48
 ;48:}
-LABELV $122
+LABELV $120
 endproc G_CrossServerChatAll 5152 28
 proc G_CrossServerPrint 1036 12
 line 49
@@ -344,7 +344,7 @@ ADDRLP4 1028
 ADDRGP4 ConcatArgsQuoted
 CALLP4
 ASGNP4
-ADDRGP4 $149
+ADDRGP4 $147
 ARGP4
 ADDRLP4 0
 ARGP4
@@ -371,7 +371,7 @@ CALLV
 pop
 line 56
 ;56:}
-LABELV $148
+LABELV $146
 endproc G_CrossServerPrint 1036 12
 export G_CrossServerCommand
 proc G_CrossServerCommand 1048 12
@@ -409,7 +409,7 @@ CALLV
 pop
 line 78
 ;78:	G_Printf("G_CrossServerCommand: received %s.\n",cmd);
-ADDRGP4 $151
+ADDRGP4 $149
 ARGP4
 ADDRLP4 0
 ARGP4
@@ -420,7 +420,7 @@ line 79
 ;79:	if (!Q_stricmp(cmd, "chatAll") && g_crossServerChat.integer) {
 ADDRLP4 0
 ARGP4
-ADDRGP4 $154
+ADDRGP4 $152
 ARGP4
 ADDRLP4 1032
 ADDRGP4 Q_stricmp
@@ -433,12 +433,12 @@ ADDRLP4 1032
 INDIRI4
 ADDRLP4 1036
 INDIRI4
-NEI4 $152
+NEI4 $150
 ADDRGP4 g_crossServerChat+12
 INDIRI4
 ADDRLP4 1036
 INDIRI4
-EQI4 $152
+EQI4 $150
 line 80
 ;80:		G_CrossServerChatAll();
 ADDRGP4 G_CrossServerChatAll
@@ -448,14 +448,14 @@ line 81
 ;81:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $150
+ADDRGP4 $148
 JUMPV
-LABELV $152
+LABELV $150
 line 82
 ;82:	} else if (!Q_stricmp(cmd, "defragPrint") && g_crossServerDefragTimes.integer) {
 ADDRLP4 0
 ARGP4
-ADDRGP4 $158
+ADDRGP4 $156
 ARGP4
 ADDRLP4 1040
 ADDRGP4 Q_stricmp
@@ -468,12 +468,12 @@ ADDRLP4 1040
 INDIRI4
 ADDRLP4 1044
 INDIRI4
-NEI4 $156
+NEI4 $154
 ADDRGP4 g_crossServerDefragTimes+12
 INDIRI4
 ADDRLP4 1044
 INDIRI4
-EQI4 $156
+EQI4 $154
 line 83
 ;83:		G_CrossServerPrint();
 ADDRGP4 G_CrossServerPrint
@@ -483,15 +483,15 @@ line 84
 ;84:		return qtrue;
 CNSTI4 1
 RETI4
-ADDRGP4 $150
+ADDRGP4 $148
 JUMPV
-LABELV $156
+LABELV $154
 line 86
 ;85:	}
 ;86:	return qfalse;
 CNSTI4 0
 RETI4
-LABELV $150
+LABELV $148
 endproc G_CrossServerCommand 1048 12
 export G_SendCrossServerCommand
 proc G_SendCrossServerCommand 0 4
@@ -506,12 +506,12 @@ INDIRI4
 CNSTI4 1048576
 BANDI4
 CNSTI4 0
-NEI4 $161
+NEI4 $159
 line 91
 ;91:		return;
-ADDRGP4 $160
+ADDRGP4 $158
 JUMPV
-LABELV $161
+LABELV $159
 line 93
 ;92:	}
 ;93:	trap_G_COOL_API_CrossServerCommand(cmd);
@@ -523,7 +523,7 @@ CALLV
 pop
 line 94
 ;94:}
-LABELV $160
+LABELV $158
 endproc G_SendCrossServerCommand 0 4
 import ClientInactivitySpecTimerReset
 import G_ResetClientVote
@@ -1391,14 +1391,12 @@ import weaponData
 import weaponData_1_04
 import weaponData_1_03
 import weaponData_1_02
-import fpclassify
 import clampedIntAdd
 import clampedIntMult
 import parseHex
 import colorToHex
 import safeatoi
 import sanitizeFilename
-import ezDemoBuffer
 import GetStringForID
 import GetIDForString
 import Q_irandExpectedIf
@@ -1545,6 +1543,8 @@ import colorTable
 import bytedirs
 import Hunk_Alloc
 import forceSpeedLevels
+import bsearch
+import copysignf
 import powf
 import logf
 import expf
@@ -1585,7 +1585,7 @@ import srand
 import qsort
 lit
 align 1
-LABELV $158
+LABELV $156
 byte 1 100
 byte 1 101
 byte 1 102
@@ -1599,7 +1599,7 @@ byte 1 110
 byte 1 116
 byte 1 0
 align 1
-LABELV $154
+LABELV $152
 byte 1 99
 byte 1 104
 byte 1 97
@@ -1609,7 +1609,7 @@ byte 1 108
 byte 1 108
 byte 1 0
 align 1
-LABELV $151
+LABELV $149
 byte 1 71
 byte 1 95
 byte 1 67
@@ -1647,7 +1647,7 @@ byte 1 46
 byte 1 10
 byte 1 0
 align 1
-LABELV $149
+LABELV $147
 byte 1 112
 byte 1 114
 byte 1 105
@@ -1663,7 +1663,7 @@ byte 1 37
 byte 1 115
 byte 1 0
 align 1
-LABELV $147
+LABELV $145
 byte 1 32
 byte 1 99
 byte 1 114
@@ -1678,7 +1678,7 @@ byte 1 101
 byte 1 114
 byte 1 0
 align 1
-LABELV $141
+LABELV $139
 byte 1 40
 byte 1 99
 byte 1 114
@@ -1709,7 +1709,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $137
+LABELV $135
 byte 1 115
 byte 1 97
 byte 1 121
@@ -1746,7 +1746,7 @@ byte 1 115
 byte 1 10
 byte 1 0
 align 1
-LABELV $136
+LABELV $134
 byte 1 94
 byte 1 108
 byte 1 62
@@ -1763,7 +1763,7 @@ byte 1 58
 byte 1 32
 byte 1 0
 align 1
-LABELV $135
+LABELV $133
 byte 1 94
 byte 1 108
 byte 1 62
@@ -1790,7 +1790,7 @@ byte 1 58
 byte 1 32
 byte 1 0
 align 1
-LABELV $130
+LABELV $128
 byte 1 110
 byte 1 111
 byte 1 110
@@ -1799,7 +1799,7 @@ byte 1 109
 byte 1 101
 byte 1 0
 align 1
-LABELV $124
+LABELV $122
 byte 1 115
 byte 1 118
 byte 1 95
@@ -1813,7 +1813,7 @@ byte 1 109
 byte 1 101
 byte 1 0
 align 1
-LABELV $123
+LABELV $121
 byte 1 115
 byte 1 118
 byte 1 95
