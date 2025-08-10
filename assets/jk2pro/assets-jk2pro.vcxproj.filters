@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\CMakeFiles\c9b3446f5be5009cf373d898bd562f78\jk2pro-assets.pk3.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\CMakeFiles\1cf47ec31e38e4b2eca90eb0c3246e07\assets-jk2pro.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\assets\jk2pro\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Workspace\jk2mv-tom\assets\jk2pro\CMakeFiles\assets-jk2pro" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{CC361CF0-1B93-36C2-A315-31A52ECDE8F4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

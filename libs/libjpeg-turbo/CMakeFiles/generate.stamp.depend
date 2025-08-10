@@ -1,0 +1,15 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.1/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFiles.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/Internal/CheckSourceCompiles.cmake
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/CMakeLists.txt
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jconfig.h
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jconfig.h.in
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jconfigint.h.in
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jerror.h
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jmorecfg.h
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jpeglib.h
+D:/Workspace/jk2mv-tom/libs/libjpeg-turbo/jversion.h.in

@@ -1,0 +1,736 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_bspq3.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_cluster.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_debug.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_entity.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_file.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_main.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_move.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_optimize.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_reach.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_route.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_routealt.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_sample.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_char.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_chat.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_gen.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_goal.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_move.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_weap.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_weight.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_ea.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\be_interface.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_crc.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_libvar.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_log.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_memory.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_precomp.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_script.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\botlib\l_struct.cpp">
+      <Filter>botlib</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_bot.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_ccmds.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_client.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_game.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_init.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_main.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_net_chan.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_snapshot.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\server\sv_world.cpp">
+      <Filter>server</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_API.cpp">
+      <Filter>ghoul2</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_bolts.cpp">
+      <Filter>ghoul2</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_bones.cpp">
+      <Filter>ghoul2</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_misc.cpp">
+      <Filter>ghoul2</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_surfaces.cpp">
+      <Filter>ghoul2</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\CNetProfile.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\GenericParser2.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\RoffSystem.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_load.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_patch.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_polylib.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_test.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_trace.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cmd.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\common.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\cvar.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\files.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\hstring.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\huffman.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\md4.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\msg.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\net_chan.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\net_ip.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\net_http.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\q_math.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\q_shared.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\strip.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\vm.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\vm_interpreted.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\qcommon\vm_x86.cpp">
+      <Filter>qcommon</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\matcomp.c">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_backend.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_ghoul2.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_image.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_init.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_main.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_mesh.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_model.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_shader.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\StackWalker\StackWalker.cpp">
+      <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\con_win32.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\con_log.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\sys_main.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\sys_event.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sys\sys_win32.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FXExport.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FxPrimitives.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FxScheduler.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FxSystem.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FxTemplate.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\FxUtil.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_avi.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_cgame.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_cin.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_console.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_demos_auto.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_input.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_keys.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_main.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_net_chan.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_parse.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_scrn.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\cl_ui.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\snd_dma.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\snd_mem.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\snd_mix.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\client\snd_mp3.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cdct.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\csbt.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\csbtb.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\csbtl3.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cup.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cupini.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cupl1.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cupl3.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cwin.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cwinb.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\cwinm.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\hwin.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\l3dq.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\l3init.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\mdct.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\mhead.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\msis.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\towave.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\uph.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\upsf.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\mp3\wavep.c">
+      <Filter>mp3</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_WorldEffects.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_animation.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_bsp.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_cmds.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_curve.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_flares.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_font.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_light.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_marks.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_noise.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_quicksprite.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_scene.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_shade.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_shade_calc.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_shadows.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_sky.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_surface.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_surfacesprites.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\renderer\tr_world.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sdl\sdl_input.cpp">
+      <Filter>sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sdl\sdl_sound.cpp">
+      <Filter>sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\src\sdl\sdl_window.cpp">
+      <Filter>sdl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\aasfile.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_bsp.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_cluster.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_debug.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_def.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_entity.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_file.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_funcs.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_main.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_move.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_optimize.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_reach.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_route.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_routealt.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_aas_sample.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_ai_weight.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\be_interface.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_crc.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_libvar.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_log.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_memory.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_precomp.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_script.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_struct.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\botlib\l_utils.h">
+      <Filter>botlib</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\server\server.h">
+      <Filter>server</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2.h">
+      <Filter>ghoul2</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\ghoul2\G2_local.h">
+      <Filter>ghoul2</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\ghoul2\ghoul2_shared.h">
+      <Filter>ghoul2</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\GenericParser2.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\INetProfile.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\MiniHeap.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\RoffSystem.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\chash.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_local.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_patch.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_polylib.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\cm_public.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\hstring.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\qcommon.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\qfiles.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\q_shared.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\strip.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\tags.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\qcommon\vm_local.h">
+      <Filter>qcommon</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\matcomp.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\mdx_format.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\qgl.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\tr_font.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\tr_local.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\tr_public.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\tr_quicksprite.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\StackWalker\include\StackWalker.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\sys\sys_public.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\sys\sys_local.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\api\mvapi.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\api\mvmenu.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\FXExport.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\FxPrimitives.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\FxScheduler.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\FxSystem.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\FxUtil.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\client.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\keys.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\snd_local.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\snd_mp3.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\client\snd_public.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\config.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\copyright.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\htable.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\jdw.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\l3.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\mhead.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\mp3struct.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\port.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\small_header.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\libs\mp3\tableawd.h">
+      <Filter>mp3</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\glext.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\renderer\tr_WorldEffects.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Workspace\jk2mv-tom\src\win32\resource.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="D:\Workspace\jk2mv-tom\src\win32\q3asm.asm">
+      <Filter>win32</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Workspace\jk2mv-tom\src\win32\mv.rc">
+      <Filter>win32</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="api">
+      <UniqueIdentifier>{6CF0662F-E877-3811-BEFD-FC2FEA9A336D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="botlib">
+      <UniqueIdentifier>{40EB89B1-D395-3618-AE96-76276001F5FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{0361537A-987E-3E8D-92C7-899F7905AE2D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ghoul2">
+      <UniqueIdentifier>{05EC7323-202B-38A2-B50C-5A6116DA8FC7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mp3">
+      <UniqueIdentifier>{2F565A9D-84BD-32BF-91A7-D022AB512AEE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="qcommon">
+      <UniqueIdentifier>{0143C214-B73F-3F9C-A3D1-C9C239E99278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="renderer">
+      <UniqueIdentifier>{CF76C94F-A88C-3F8B-B2FE-8EF626D08A3A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdl">
+      <UniqueIdentifier>{DEF47FE1-7091-3690-8F2F-92A40231736D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="server">
+      <UniqueIdentifier>{B7A6D2E9-7392-3A13-B462-B0946B288025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{27307C1B-AFC2-3075-8934-F350FA9537CC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="win32">
+      <UniqueIdentifier>{D410AA4D-22E6-3A36-A0B8-5AF5A6B6D2AC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
