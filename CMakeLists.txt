@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 4.1)
 
-# Adopt all CMake policies up to 4.1 as NEW for consistent behavior.
+# Adopt all policies up to 4.1 so subdirectories share a consistent baseline
 cmake_policy(VERSION 4.1)
 
-# Link directly against libGL.so instead of using GLVND
-if (${CMAKE_VERSION} VERSION_GREATER "3.11")
-	cmake_policy(SET CMP0072 OLD)
+# OpenGL policy: use NEW behavior (prefer GLVND when available)
+if(POLICY CMP0072)
+	cmake_policy(SET CMP0072 NEW)
 endif()
 
 # For checks in subdirectories
@@ -24,7 +24,65 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(ProjectName "EternalJK2" CACHE STRING "Project Name")
 set(ProjectURL "https://jk2mv.org")
-project(${ProjectName})
+
+# Early Windows toolchain sanity check before project()
+if(WIN32)
+	option(FORCE_MINGW "Force using a MinGW GCC toolchain instead of MSVC" OFF)
+	# Detect absence of a properly initialized MSVC environment (common cause of MSB4019 / missing Microsoft.Cpp.Default.props)
+
+	# Derive a plausible Visual Studio install root without relying on ProgramFiles(x86) env var (parentheses break newer policy parsing)
+	set(_MSVC_DIR_HINT "")
+	# Prefer 64-bit Program Files (x86) conventional path when building 64-bit
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(_PF86 "${CMAKE_SYSTEM_DRIVE}/Program Files (x86)")
+		if(EXISTS "${_PF86}/Microsoft Visual Studio")
+			set(_MSVC_DIR_HINT "${_PF86}/Microsoft Visual Studio")
+		endif()
+	endif()
+	# Fallback to ProgramFiles env var if still empty
+	if(_MSVC_DIR_HINT STREQUAL "" AND DEFINED ENV{ProgramFiles})
+		set(_PF "$ENV{ProgramFiles}")
+		if(EXISTS "${_PF}/Microsoft Visual Studio")
+			set(_MSVC_DIR_HINT "${_PF}/Microsoft Visual Studio")
+		endif()
+	endif()
+
+	if(NOT FORCE_MINGW
+	   AND NOT DEFINED ENV{VSINSTALLDIR}
+	   AND NOT DEFINED ENV{VCToolsInstallDir}
+	   AND ( _MSVC_DIR_HINT STREQUAL "" OR NOT EXISTS "${_MSVC_DIR_HINT}" )
+	)
+		# Try to see if a MinGW gcc is available as a potential fallback
+		find_program(_MINGW_GCC NAMES gcc)
+		if(_MINGW_GCC)
+			message(WARNING
+				"MSVC Build Tools not detected (Microsoft.Cpp.Default.props likely missing). "
+				"To build with MinGW run CMake with: -G \"MinGW Makefiles\" "
+				"or set FORCE_MINGW=ON. "
+				"Otherwise install Visual Studio C++ components or run from a 'Developer Command Prompt'.")
+		else()
+			message(FATAL_ERROR
+				"MSVC Build Tools not detected (environment variables VSINSTALLDIR / VCToolsInstallDir missing and Microsoft.Cpp.Default.props not found). "
+				"Install Visual Studio (Desktop development with C++), or VS Build Tools, then re-run CMake from the proper Developer Command Prompt. "
+				"Alternatively install MinGW and re-run with -G \"MinGW Makefiles\".")
+		endif()
+	endif()
+
+	if(FORCE_MINGW)
+		# User explicitly wants MinGW; ensure compilers are discoverable before project()
+		if(NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
+			find_program(CMAKE_C_COMPILER NAMES gcc)
+			find_program(CMAKE_CXX_COMPILER NAMES g++)
+		endif()
+		if(NOT CMAKE_C_COMPILER OR NOT CMAKE_CXX_COMPILER)
+			message(FATAL_ERROR "FORCE_MINGW=ON but gcc/g++ not found in PATH.")
+		else()
+			message(STATUS "FORCE_MINGW enabled; using gcc at ${CMAKE_C_COMPILER}. Specify -G \"MinGW Makefiles\" when invoking CMake if not already.")
+		endif()
+	endif()
+endif()
+
+project(${ProjectName} LANGUAGES C CXX)
 
 include(GetGitRevisionDescription)
 git_describe(MV_VERSION --tags)
@@ -39,6 +97,16 @@ message(STATUS "${ProjectName} Version: ${MV_VERSION}")
 enable_language(C CXX)
 if(MSVC)
 	enable_language(ASM_MASM)
+endif()
+
+# Optional NASM (for libjpeg-turbo SIMD); purely informational here.
+find_program(NASM_EXECUTABLE nasm)
+if(NASM_EXECUTABLE)
+	message(STATUS "Found NASM: ${NASM_EXECUTABLE}")
+	set(HAVE_NASM TRUE CACHE BOOL "NASM assembler available")
+else()
+	message(STATUS "NASM not found: libjpeg-turbo (INTERNAL_JPEG) will compile without SIMD optimizations")
+	set(HAVE_NASM FALSE CACHE BOOL "NASM assembler available")
 endif()
 
 if(CMAKE_CONFIGURATION_TYPES)
@@ -429,3 +497,14 @@ include(CPack)
 
 add_subdirectory(assets)
 add_subdirectory(src)
+
+# Convenience alias to build only packaged assets (pk3 archives) without compiling binaries.
+# Defined after 'src' so that the mv-assets meta target from the mvsdk submodule is available.
+if(TARGET mv-assets)
+	if(NOT TARGET build-assets)
+		add_custom_target(build-assets DEPENDS mv-assets)
+		set_property(TARGET build-assets PROPERTY FOLDER "assets")
+	endif()
+else()
+	message(STATUS "mv-assets target not found, skipping build-assets target creation.")
+endif()

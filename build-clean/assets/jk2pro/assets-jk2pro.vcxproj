@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{33178E54-4EFE-3C8B-87A7-002B57049A8F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>assets-jk2pro</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\build-clean\CMakeFiles\aced6a179f5744eef0bdc6226a3774d0\jk2pro-assets.pk3.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating jk2pro-assets.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2pro
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 --format=zip -- gfx/2d/crosshaira.tga gfx/2d/crosshairj.tga gfx/2d/mp_yteam_symbol.tga gfx/effects/mp_y_forcefield.jpg gfx/effects/mp_y_forcefield_d.jpg gfx/effects/mp_y_forcefield_d1.jpg gfx/hud/keys/back_off.tga gfx/hud/keys/back_on.tga gfx/hud/keys/crouch_off.tga gfx/hud/keys/crouch_on.tga gfx/hud/keys/forward_off.tga gfx/hud/keys/forward_on.tga gfx/hud/keys/jump_off.tga gfx/hud/keys/jump_on.tga gfx/hud/keys/jump_off_autokick.tga gfx/hud/keys/jump_on_autokick.tga gfx/hud/keys/left_off.tga gfx/hud/keys/left_on.tga gfx/hud/keys/right_off.tga gfx/hud/keys/right_on.tga icons/iconf_neutral1.tga icons/iconf_neutral1_x.tga menu/medals/medal_assist.png menu/medals/medal_capture.png menu/medals/medal_defend.png menu/medals/medal_excellent.png menu/medals/medal_gauntlet.png menu/medals/medal_impressive.png models/flags/n_flag.md3 models/map_objects/mp/flag3.jpg models/players/desann/sounds.cfg models/players/galak/sounds.cfg models/players/jeditrainer/sounds.cfg models/players/kyle/sounds.cfg models/players/lando/sounds.cfg models/players/luke/sounds.cfg models/players/morgan/sounds.cfg models/players/ugnaught/sounds.cfg models/players/weequay/sounds.cfg shaders/ctf3_yellowteam.shader shaders/q3mod.shader sound/chars/mothma/misc/40MOM017.mp3 sound/chars/mothma/misc/40MOM019.mp3 sound/chars/mothma/misc/40MOM024.mp3 sound/chars/mothma/misc/40MOM025.mp3 sound/chars/mothma/misc/40MOM026.mp3 sound/chars/mothma/misc/40MOM053.mp3 sound/chars/tavion/misc/jump1.mp3 sound/common/warning.wav ui/jk2mp/ingame.menu ui/jk2mp/ingame_camera.menu ui/jk2mp/ingame_server.menu ui/jk2mp/ingame_character_colors.menu ui/jk2mpingame.txt
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 D:/Workspace/jk2mv-tom/build-clean/out/Debug/eternaljk2/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating jk2pro-assets.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2pro
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 --format=zip -- gfx/2d/crosshaira.tga gfx/2d/crosshairj.tga gfx/2d/mp_yteam_symbol.tga gfx/effects/mp_y_forcefield.jpg gfx/effects/mp_y_forcefield_d.jpg gfx/effects/mp_y_forcefield_d1.jpg gfx/hud/keys/back_off.tga gfx/hud/keys/back_on.tga gfx/hud/keys/crouch_off.tga gfx/hud/keys/crouch_on.tga gfx/hud/keys/forward_off.tga gfx/hud/keys/forward_on.tga gfx/hud/keys/jump_off.tga gfx/hud/keys/jump_on.tga gfx/hud/keys/jump_off_autokick.tga gfx/hud/keys/jump_on_autokick.tga gfx/hud/keys/left_off.tga gfx/hud/keys/left_on.tga gfx/hud/keys/right_off.tga gfx/hud/keys/right_on.tga icons/iconf_neutral1.tga icons/iconf_neutral1_x.tga menu/medals/medal_assist.png menu/medals/medal_capture.png menu/medals/medal_defend.png menu/medals/medal_excellent.png menu/medals/medal_gauntlet.png menu/medals/medal_impressive.png models/flags/n_flag.md3 models/map_objects/mp/flag3.jpg models/players/desann/sounds.cfg models/players/galak/sounds.cfg models/players/jeditrainer/sounds.cfg models/players/kyle/sounds.cfg models/players/lando/sounds.cfg models/players/luke/sounds.cfg models/players/morgan/sounds.cfg models/players/ugnaught/sounds.cfg models/players/weequay/sounds.cfg shaders/ctf3_yellowteam.shader shaders/q3mod.shader sound/chars/mothma/misc/40MOM017.mp3 sound/chars/mothma/misc/40MOM019.mp3 sound/chars/mothma/misc/40MOM024.mp3 sound/chars/mothma/misc/40MOM025.mp3 sound/chars/mothma/misc/40MOM026.mp3 sound/chars/mothma/misc/40MOM053.mp3 sound/chars/tavion/misc/jump1.mp3 sound/common/warning.wav ui/jk2mp/ingame.menu ui/jk2mp/ingame_camera.menu ui/jk2mp/ingame_server.menu ui/jk2mp/ingame_character_colors.menu ui/jk2mpingame.txt
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 D:/Workspace/jk2mv-tom/build-clean/out/Release/eternaljk2/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Generating jk2pro-assets.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2pro
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 --format=zip -- gfx/2d/crosshaira.tga gfx/2d/crosshairj.tga gfx/2d/mp_yteam_symbol.tga gfx/effects/mp_y_forcefield.jpg gfx/effects/mp_y_forcefield_d.jpg gfx/effects/mp_y_forcefield_d1.jpg gfx/hud/keys/back_off.tga gfx/hud/keys/back_on.tga gfx/hud/keys/crouch_off.tga gfx/hud/keys/crouch_on.tga gfx/hud/keys/forward_off.tga gfx/hud/keys/forward_on.tga gfx/hud/keys/jump_off.tga gfx/hud/keys/jump_on.tga gfx/hud/keys/jump_off_autokick.tga gfx/hud/keys/jump_on_autokick.tga gfx/hud/keys/left_off.tga gfx/hud/keys/left_on.tga gfx/hud/keys/right_off.tga gfx/hud/keys/right_on.tga icons/iconf_neutral1.tga icons/iconf_neutral1_x.tga menu/medals/medal_assist.png menu/medals/medal_capture.png menu/medals/medal_defend.png menu/medals/medal_excellent.png menu/medals/medal_gauntlet.png menu/medals/medal_impressive.png models/flags/n_flag.md3 models/map_objects/mp/flag3.jpg models/players/desann/sounds.cfg models/players/galak/sounds.cfg models/players/jeditrainer/sounds.cfg models/players/kyle/sounds.cfg models/players/lando/sounds.cfg models/players/luke/sounds.cfg models/players/morgan/sounds.cfg models/players/ugnaught/sounds.cfg models/players/weequay/sounds.cfg shaders/ctf3_yellowteam.shader shaders/q3mod.shader sound/chars/mothma/misc/40MOM017.mp3 sound/chars/mothma/misc/40MOM019.mp3 sound/chars/mothma/misc/40MOM024.mp3 sound/chars/mothma/misc/40MOM025.mp3 sound/chars/mothma/misc/40MOM026.mp3 sound/chars/mothma/misc/40MOM053.mp3 sound/chars/tavion/misc/jump1.mp3 sound/common/warning.wav ui/jk2mp/ingame.menu ui/jk2mp/ingame_camera.menu ui/jk2mp/ingame_server.menu ui/jk2mp/ingame_character_colors.menu ui/jk2mpingame.txt
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 D:/Workspace/jk2mv-tom/build-clean/out/MinSizeRel/eternaljk2/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Generating jk2pro-assets.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2pro
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 --format=zip -- gfx/2d/crosshaira.tga gfx/2d/crosshairj.tga gfx/2d/mp_yteam_symbol.tga gfx/effects/mp_y_forcefield.jpg gfx/effects/mp_y_forcefield_d.jpg gfx/effects/mp_y_forcefield_d1.jpg gfx/hud/keys/back_off.tga gfx/hud/keys/back_on.tga gfx/hud/keys/crouch_off.tga gfx/hud/keys/crouch_on.tga gfx/hud/keys/forward_off.tga gfx/hud/keys/forward_on.tga gfx/hud/keys/jump_off.tga gfx/hud/keys/jump_on.tga gfx/hud/keys/jump_off_autokick.tga gfx/hud/keys/jump_on_autokick.tga gfx/hud/keys/left_off.tga gfx/hud/keys/left_on.tga gfx/hud/keys/right_off.tga gfx/hud/keys/right_on.tga icons/iconf_neutral1.tga icons/iconf_neutral1_x.tga menu/medals/medal_assist.png menu/medals/medal_capture.png menu/medals/medal_defend.png menu/medals/medal_excellent.png menu/medals/medal_gauntlet.png menu/medals/medal_impressive.png models/flags/n_flag.md3 models/map_objects/mp/flag3.jpg models/players/desann/sounds.cfg models/players/galak/sounds.cfg models/players/jeditrainer/sounds.cfg models/players/kyle/sounds.cfg models/players/lando/sounds.cfg models/players/luke/sounds.cfg models/players/morgan/sounds.cfg models/players/ugnaught/sounds.cfg models/players/weequay/sounds.cfg shaders/ctf3_yellowteam.shader shaders/q3mod.shader sound/chars/mothma/misc/40MOM017.mp3 sound/chars/mothma/misc/40MOM019.mp3 sound/chars/mothma/misc/40MOM024.mp3 sound/chars/mothma/misc/40MOM025.mp3 sound/chars/mothma/misc/40MOM026.mp3 sound/chars/mothma/misc/40MOM053.mp3 sound/chars/tavion/misc/jump1.mp3 sound/common/warning.wav ui/jk2mp/ingame.menu ui/jk2mp/ingame_camera.menu ui/jk2mp/ingame_server.menu ui/jk2mp/ingame_character_colors.menu ui/jk2mpingame.txt
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/jk2pro-assets.pk3 D:/Workspace/jk2mv-tom/build-clean/out/RelWithDebInfo/eternaljk2/jk2pro-assets.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\build-clean\CMakeFiles\28e047677cde9fb5080d0e5b61a1224a\assets-jk2pro.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\assets-jk2pro</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\assets-jk2pro</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\assets-jk2pro</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\jk2pro-assets.pk3;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshaira.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\crosshairj.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\2d\mp_yteam_symbol.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\effects\mp_y_forcefield_d1.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\back_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\crouch_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\forward_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_off_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\jump_on_autokick.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\left_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_off.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\gfx\hud\keys\right_on.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\icons\iconf_neutral1_x.tga;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_assist.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_capture.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_defend.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_excellent.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_gauntlet.png;D:\Workspace\jk2mv-tom\assets\jk2pro\menu\medals\medal_impressive.png;D:\Workspace\jk2mv-tom\assets\jk2pro\models\flags\n_flag.md3;D:\Workspace\jk2mv-tom\assets\jk2pro\models\map_objects\mp\flag3.jpg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\desann\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\galak\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\jeditrainer\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\kyle\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\lando\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\luke\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\morgan\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\ugnaught\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\models\players\weequay\sounds.cfg;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\ctf3_yellowteam.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\shaders\q3mod.shader;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM017.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM019.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM024.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM025.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM026.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\mothma\misc\40MOM053.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\chars\tavion\misc\jump1.mp3;D:\Workspace\jk2mv-tom\assets\jk2pro\sound\common\warning.wav;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_camera.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_server.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mp\ingame_character_colors.menu;D:\Workspace\jk2mv-tom\assets\jk2pro\ui\jk2mpingame.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\assets-jk2pro</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\assets\jk2pro\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2pro/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-clean --check-stamp-file D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2pro/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-clean --check-stamp-file D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2pro/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-clean --check-stamp-file D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2pro/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-clean --check-stamp-file D:/Workspace/jk2mv-tom/build-clean/assets/jk2pro/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Workspace\jk2mv-tom\build-clean\assets\jk2pro\CMakeFiles\assets-jk2pro">
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build-clean\ZERO_CHECK.vcxproj">
+      <Project>{865F6F25-0428-3653-B187-88FA31909834}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

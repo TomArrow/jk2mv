@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3999C3AD-333C-30B1-8DBB-DD23D309BF82}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Build QVMs</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\build_verify\CMakeFiles\1d18f42e976a5877502b789d3d6a13cd\qvms.rule">
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\vm_build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3lcc.exe -DQ3_VM -DJK2_GAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_util.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_wpnav.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_active.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_arenas.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_bot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_client.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_cmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_crossserver.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_combat.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_defrag.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_items.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_log.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mem.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_missile.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mover.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_object.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_session.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_spawn.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_svcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_target.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_team.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_trigger.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_utils.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_weapon.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/jk2mpgame.qvm g_main.asm ai_main.asm ai_util.asm ai_wpnav.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm g_active.asm g_arenas.asm g_bot.asm g_client.asm g_cmds.asm g_crossserver.asm g_combat.asm g_defrag.asm g_dbcmds.asm bg_defrag_global.asm g_items.asm g_log.asm g_mem.asm g_misc.asm g_missile.asm g_mover.asm g_object.asm g_saga.asm g_session.asm g_spawn.asm g_svcmds.asm g_target.asm g_team.asm g_trigger.asm g_utils.asm g_weapon.asm q_math.asm q_shared.asm w_force.asm w_saber.asm g_multiversion.asm g_multiversion_syscalls.asm bg_multiversion.asm animMappingTable.asm crypt_blowfish.asm fp16.asm levenshtein.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/game/g_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3lcc.exe -DQ3_VM -DJK2_CGAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_consolecmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_draw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_drawtools.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_effects.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_ents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_event.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_info.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_light.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_localents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_marks.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_newDraw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_players.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_playerstate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_predict.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_scoreboard.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_servercmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_snapshot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_turret.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_view.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weaponinit.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_blaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bowcaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bryarpistol.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_demp2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_disruptor.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_flechette.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_heavyrepeater.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_rocketlauncher.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saberLoad.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/cgame.qvm cg_main.asm cg_dbcmds.asm cg_consolecmds.asm cg_draw.asm cg_drawtools.asm cg_effects.asm cg_ents.asm cg_event.asm cg_info.asm cg_light.asm cg_localents.asm cg_marks.asm cg_newDraw.asm cg_players.asm cg_playerstate.asm cg_predict.asm cg_saga.asm cg_scoreboard.asm cg_servercmds.asm cg_snapshot.asm cg_turret.asm cg_view.asm cg_weaponinit.asm cg_weapons.asm fx_blaster.asm fx_bowcaster.asm fx_bryarpistol.asm fx_demp2.asm fx_disruptor.asm fx_flechette.asm fx_force.asm fx_heavyrepeater.asm fx_rocketlauncher.asm cg_multiversion.asm cg_multiversion_syscalls.asm bg_multiversion.asm bg_defrag_global.asm bg_saberLoad.asm animMappingTable.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm q_math.asm q_shared.asm crypt_blowfish.asm fp16.asm levenshtein.asm ui_shared.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/cgame/cg_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3lcc.exe -DQ3_VM -DJK2_UI -S -Wf-target=bytecode -Wf-g -ID:/Workspace/jk2mv-tom/src/mvsdk/code/cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_atoms.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_gameinfo.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_skin.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/ui.qvm ui_main.asm ui_atoms.asm ui_force.asm ui_gameinfo.asm ui_saber.asm ui_shared.asm ui_skin.asm ui_multiversion.asm ui_saber.asm bg_misc.asm bg_weapons.asm q_math.asm q_shared.asm ui_multiversion_syscalls.asm bg_multiversion.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/ui/ui_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3lcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3cpp.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3rcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Debug\q3asm.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\qvms</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\vm_build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3lcc.exe -DQ3_VM -DJK2_GAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_util.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_wpnav.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_active.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_arenas.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_bot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_client.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_cmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_crossserver.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_combat.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_defrag.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_items.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_log.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mem.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_missile.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mover.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_object.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_session.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_spawn.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_svcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_target.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_team.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_trigger.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_utils.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_weapon.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/jk2mpgame.qvm g_main.asm ai_main.asm ai_util.asm ai_wpnav.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm g_active.asm g_arenas.asm g_bot.asm g_client.asm g_cmds.asm g_crossserver.asm g_combat.asm g_defrag.asm g_dbcmds.asm bg_defrag_global.asm g_items.asm g_log.asm g_mem.asm g_misc.asm g_missile.asm g_mover.asm g_object.asm g_saga.asm g_session.asm g_spawn.asm g_svcmds.asm g_target.asm g_team.asm g_trigger.asm g_utils.asm g_weapon.asm q_math.asm q_shared.asm w_force.asm w_saber.asm g_multiversion.asm g_multiversion_syscalls.asm bg_multiversion.asm animMappingTable.asm crypt_blowfish.asm fp16.asm levenshtein.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/game/g_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3lcc.exe -DQ3_VM -DJK2_CGAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_consolecmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_draw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_drawtools.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_effects.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_ents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_event.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_info.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_light.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_localents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_marks.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_newDraw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_players.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_playerstate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_predict.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_scoreboard.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_servercmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_snapshot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_turret.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_view.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weaponinit.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_blaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bowcaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bryarpistol.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_demp2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_disruptor.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_flechette.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_heavyrepeater.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_rocketlauncher.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saberLoad.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/cgame.qvm cg_main.asm cg_dbcmds.asm cg_consolecmds.asm cg_draw.asm cg_drawtools.asm cg_effects.asm cg_ents.asm cg_event.asm cg_info.asm cg_light.asm cg_localents.asm cg_marks.asm cg_newDraw.asm cg_players.asm cg_playerstate.asm cg_predict.asm cg_saga.asm cg_scoreboard.asm cg_servercmds.asm cg_snapshot.asm cg_turret.asm cg_view.asm cg_weaponinit.asm cg_weapons.asm fx_blaster.asm fx_bowcaster.asm fx_bryarpistol.asm fx_demp2.asm fx_disruptor.asm fx_flechette.asm fx_force.asm fx_heavyrepeater.asm fx_rocketlauncher.asm cg_multiversion.asm cg_multiversion_syscalls.asm bg_multiversion.asm bg_defrag_global.asm bg_saberLoad.asm animMappingTable.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm q_math.asm q_shared.asm crypt_blowfish.asm fp16.asm levenshtein.asm ui_shared.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/cgame/cg_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3lcc.exe -DQ3_VM -DJK2_UI -S -Wf-target=bytecode -Wf-g -ID:/Workspace/jk2mv-tom/src/mvsdk/code/cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_atoms.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_gameinfo.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_skin.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/ui.qvm ui_main.asm ui_atoms.asm ui_force.asm ui_gameinfo.asm ui_saber.asm ui_shared.asm ui_skin.asm ui_multiversion.asm ui_saber.asm bg_misc.asm bg_weapons.asm q_math.asm q_shared.asm ui_multiversion_syscalls.asm bg_multiversion.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/ui/ui_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3lcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3cpp.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3rcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\Release\q3asm.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\qvms</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\vm_build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3lcc.exe -DQ3_VM -DJK2_GAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_util.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_wpnav.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_active.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_arenas.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_bot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_client.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_cmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_crossserver.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_combat.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_defrag.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_items.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_log.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mem.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_missile.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mover.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_object.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_session.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_spawn.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_svcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_target.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_team.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_trigger.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_utils.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_weapon.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/jk2mpgame.qvm g_main.asm ai_main.asm ai_util.asm ai_wpnav.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm g_active.asm g_arenas.asm g_bot.asm g_client.asm g_cmds.asm g_crossserver.asm g_combat.asm g_defrag.asm g_dbcmds.asm bg_defrag_global.asm g_items.asm g_log.asm g_mem.asm g_misc.asm g_missile.asm g_mover.asm g_object.asm g_saga.asm g_session.asm g_spawn.asm g_svcmds.asm g_target.asm g_team.asm g_trigger.asm g_utils.asm g_weapon.asm q_math.asm q_shared.asm w_force.asm w_saber.asm g_multiversion.asm g_multiversion_syscalls.asm bg_multiversion.asm animMappingTable.asm crypt_blowfish.asm fp16.asm levenshtein.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/game/g_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3lcc.exe -DQ3_VM -DJK2_CGAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_consolecmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_draw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_drawtools.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_effects.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_ents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_event.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_info.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_light.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_localents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_marks.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_newDraw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_players.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_playerstate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_predict.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_scoreboard.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_servercmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_snapshot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_turret.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_view.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weaponinit.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_blaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bowcaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bryarpistol.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_demp2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_disruptor.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_flechette.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_heavyrepeater.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_rocketlauncher.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saberLoad.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/cgame.qvm cg_main.asm cg_dbcmds.asm cg_consolecmds.asm cg_draw.asm cg_drawtools.asm cg_effects.asm cg_ents.asm cg_event.asm cg_info.asm cg_light.asm cg_localents.asm cg_marks.asm cg_newDraw.asm cg_players.asm cg_playerstate.asm cg_predict.asm cg_saga.asm cg_scoreboard.asm cg_servercmds.asm cg_snapshot.asm cg_turret.asm cg_view.asm cg_weaponinit.asm cg_weapons.asm fx_blaster.asm fx_bowcaster.asm fx_bryarpistol.asm fx_demp2.asm fx_disruptor.asm fx_flechette.asm fx_force.asm fx_heavyrepeater.asm fx_rocketlauncher.asm cg_multiversion.asm cg_multiversion_syscalls.asm bg_multiversion.asm bg_defrag_global.asm bg_saberLoad.asm animMappingTable.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm q_math.asm q_shared.asm crypt_blowfish.asm fp16.asm levenshtein.asm ui_shared.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/cgame/cg_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3lcc.exe -DQ3_VM -DJK2_UI -S -Wf-target=bytecode -Wf-g -ID:/Workspace/jk2mv-tom/src/mvsdk/code/cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_atoms.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_gameinfo.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_skin.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/ui.qvm ui_main.asm ui_atoms.asm ui_force.asm ui_gameinfo.asm ui_saber.asm ui_shared.asm ui_skin.asm ui_multiversion.asm ui_saber.asm bg_misc.asm bg_weapons.asm q_math.asm q_shared.asm ui_multiversion_syscalls.asm bg_multiversion.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/ui/ui_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3lcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3cpp.exe;D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3rcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\MinSizeRel\q3asm.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\qvms</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\vm_build
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3lcc.exe -DQ3_VM -DJK2_GAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_util.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\ai_wpnav.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_active.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_arenas.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_bot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_client.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_cmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_crossserver.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_combat.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_defrag.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_items.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_log.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mem.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_missile.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_mover.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_object.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_session.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_spawn.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_svcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_target.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_team.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_trigger.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_utils.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_weapon.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\w_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\g_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/jk2mpgame.qvm g_main.asm ai_main.asm ai_util.asm ai_wpnav.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm g_active.asm g_arenas.asm g_bot.asm g_client.asm g_cmds.asm g_crossserver.asm g_combat.asm g_defrag.asm g_dbcmds.asm bg_defrag_global.asm g_items.asm g_log.asm g_mem.asm g_misc.asm g_missile.asm g_mover.asm g_object.asm g_saga.asm g_session.asm g_spawn.asm g_svcmds.asm g_target.asm g_team.asm g_trigger.asm g_utils.asm g_weapon.asm q_math.asm q_shared.asm w_force.asm w_saber.asm g_multiversion.asm g_multiversion_syscalls.asm bg_multiversion.asm animMappingTable.asm crypt_blowfish.asm fp16.asm levenshtein.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/game/g_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3lcc.exe -DQ3_VM -DJK2_CGAME -DMISSIONPACK -S -Wf-target=bytecode -Wf-g -I..\..\..\..\..\src\mvsdk\code\cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_dbcmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_consolecmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_draw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_drawtools.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_effects.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_ents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_event.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_info.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_light.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_localents.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_marks.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_newDraw.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_players.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_playerstate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_predict.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_saga.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_scoreboard.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_servercmds.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_snapshot.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_turret.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_view.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weaponinit.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_blaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bowcaster.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_bryarpistol.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_demp2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_disruptor.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_flechette.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_heavyrepeater.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\fx_rocketlauncher.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cg_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_defrag_global.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saberLoad.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\animMappingTable.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_panimate.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_css.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_pmove_q2.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_slidemove.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_cmd.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\crypt_blowfish.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\fp16.c D:\Workspace\jk2mv-tom\src\mvsdk\code\qcommon\levenshtein.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/cgame.qvm cg_main.asm cg_dbcmds.asm cg_consolecmds.asm cg_draw.asm cg_drawtools.asm cg_effects.asm cg_ents.asm cg_event.asm cg_info.asm cg_light.asm cg_localents.asm cg_marks.asm cg_newDraw.asm cg_players.asm cg_playerstate.asm cg_predict.asm cg_saga.asm cg_scoreboard.asm cg_servercmds.asm cg_snapshot.asm cg_turret.asm cg_view.asm cg_weaponinit.asm cg_weapons.asm fx_blaster.asm fx_bowcaster.asm fx_bryarpistol.asm fx_demp2.asm fx_disruptor.asm fx_flechette.asm fx_force.asm fx_heavyrepeater.asm fx_rocketlauncher.asm cg_multiversion.asm cg_multiversion_syscalls.asm bg_multiversion.asm bg_defrag_global.asm bg_saberLoad.asm animMappingTable.asm bg_misc.asm bg_panimate.asm bg_pmove.asm bg_pmove_css.asm bg_pmove_q2.asm bg_saber.asm bg_slidemove.asm bg_weapons.asm bg_cmd.asm q_math.asm q_shared.asm crypt_blowfish.asm fp16.asm levenshtein.asm ui_shared.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/cgame/cg_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3lcc.exe -DQ3_VM -DJK2_UI -S -Wf-target=bytecode -Wf-g -ID:/Workspace/jk2mv-tom/src/mvsdk/code/cgame -I..\..\..\..\..\src\mvsdk\code\game -I..\..\..\..\..\src\mvsdk\code\ui -I..\..\..\..\ D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_main.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_atoms.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_force.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_gameinfo.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_skin.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_saber.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_misc.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_weapons.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_math.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\q_shared.c D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_multiversion_syscalls.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_multiversion.c D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c
+if %errorlevel% neq 0 goto :cmEnd
+D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3asm.exe -vq3 -m -v -o D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/vm/ui.qvm ui_main.asm ui_atoms.asm ui_force.asm ui_gameinfo.asm ui_saber.asm ui_shared.asm ui_skin.asm ui_multiversion.asm ui_saber.asm bg_misc.asm bg_weapons.asm q_math.asm q_shared.asm ui_multiversion_syscalls.asm bg_multiversion.asm bg_lib.asm D:/Workspace/jk2mv-tom/src/mvsdk/code/ui/ui_syscalls.asm
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3lcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3cpp.exe;D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3rcc.exe;D:\Workspace\jk2mv-tom\build_verify\tools\RelWithDebInfo\q3asm.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\qvms</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\src\mvsdk\code\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/src/mvsdk/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build_verify --check-stamp-file D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\src\mvsdk\code\mv.info;D:\Workspace\jk2mv-tom\src\mvsdk\code\mvsdk_setup.h.in;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/src/mvsdk/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build_verify --check-stamp-file D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\src\mvsdk\code\mv.info;D:\Workspace\jk2mv-tom\src\mvsdk\code\mvsdk_setup.h.in;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/src/mvsdk/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build_verify --check-stamp-file D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\src\mvsdk\code\mv.info;D:\Workspace\jk2mv-tom\src\mvsdk\code\mvsdk_setup.h.in;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/src/mvsdk/code/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build_verify --check-stamp-file D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/code/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\src\mvsdk\code\mv.info;D:\Workspace\jk2mv-tom\src\mvsdk\code\mvsdk_setup.h.in;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\code\CMakeFiles\qvms">
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build_verify\ZERO_CHECK.vcxproj">
+      <Project>{A8EB8C02-EAB4-3A76-A91B-286908A56F60}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\tools\asm\q3asm.vcxproj">
+      <Project>{60816232-FCD8-3AF4-8BCF-4B0BBAAAD519}</Project>
+      <Name>q3asm</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\tools\cpp\q3cpp.vcxproj">
+      <Project>{0A4C46B2-5CE2-30DD-9380-73A8A93FAB89}</Project>
+      <Name>q3cpp</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\tools\lcc\q3lcc.vcxproj">
+      <Project>{AFB88092-8939-3CC1-830A-46180222D648}</Project>
+      <Name>q3lcc</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build_verify\src\mvsdk\tools\rcc\q3rcc.vcxproj">
+      <Project>{FA7A9434-D276-3D99-BD7E-1DDD5D2A8F20}</Project>
+      <Name>q3rcc</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

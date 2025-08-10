@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jccolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcdiffct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jclossls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcprepct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdapistd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdcolor.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jddiffct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdlossls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdmainct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdpostct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdsample.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jccoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcdctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdcoefct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jddctmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdmerge.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jfdctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jfdctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jidctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jidctfst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jidctint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jidctred.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jquant1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jquant2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jchuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcicc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcinit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jclhuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcomapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcparam.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jcphuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jctrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdapimin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdatadst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdatasrc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdhuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdicc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdinput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdlhuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdmarker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdmaster.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdphuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jdtrans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jerror.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jfdctflt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jmemmgr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jmemnobs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg_nbits.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcapistd.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jccolor.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcdiffct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jclossls.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcmainct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcprepct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcsample.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdapistd.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdcolor.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jddiffct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdlossls.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdmainct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdpostct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdsample.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jutils.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jccoefct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jcdctmgr.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdcoefct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jddctmgr.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jdmerge.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jfdctfst.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jfdctint.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jidctflt.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jidctfst.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jidctint.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jidctred.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jquant1.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg12-static.dir\$(Configuration)\jquant2.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jcapistd.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jccolor.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jcdiffct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jclossls.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jcmainct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jcprepct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jcsample.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdapistd.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdcolor.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jddiffct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdlossls.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdmainct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdpostct.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jdsample.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="D:\Workspace\jk2mv-tom\build-config-test\libs\libjpeg-turbo\jpeg16-static.dir\$(Configuration)\jutils.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{37DD7CC1-1E8F-33A3-9E81-4A54BD02D630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{B5658E07-7327-30A5-9300-96212E88C497}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

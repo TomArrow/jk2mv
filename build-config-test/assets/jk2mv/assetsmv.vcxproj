@@ -1,0 +1,334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AF3F1E69-A8E1-36B9-B4BC-2850580C06BD}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>assetsmv</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\build-config-test\CMakeFiles\d635b5e4776a5cd1bc498b5d56f2433b\assetsmv.pk3.rule">
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating assetsmv.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2mv
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 --format=zip -- fonts/anewhope.fontdat fonts/anewhope_sharp1.fontdat fonts/anewhope_sharp1.tga fonts/anewhope_sharp2.fontdat fonts/anewhope_sharp2.tga fonts/anewhope_sharp3.fontdat fonts/anewhope_sharp3.tga fonts/anewhope_sharp4.fontdat fonts/anewhope_sharp4.tga fonts/anewhope_sharp5.fontdat fonts/anewhope_sharp5.tga fonts/anewhope.tga fonts/ergoec_sharp1.fontdat fonts/ergoec_sharp1.tga fonts/ergoec_sharp2.fontdat fonts/ergoec_sharp2.tga fonts/ergoec_sharp3.fontdat fonts/ergoec_sharp3.tga fonts/ergoec_sharp4.fontdat fonts/ergoec_sharp4.tga fonts/ergoec_sharp5.fontdat fonts/ergoec_sharp5.tga fonts/ocr_a.fontdat fonts/ocr_a_sharp1.fontdat fonts/ocr_a_sharp1.tga fonts/ocr_a_sharp2.fontdat fonts/ocr_a_sharp2.tga fonts/ocr_a_sharp3.fontdat fonts/ocr_a_sharp3.tga fonts/ocr_a_sharp4.fontdat fonts/ocr_a_sharp4.tga fonts/ocr_a.tga gfx/2d/code_new_roman_mip1.tga gfx/2d/code_new_roman_mip2.tga gfx/2d/code_new_roman_mip3.tga gfx/2d/code_new_roman.tga gfx/2d/demorec.tga gfx/2d/mplus_1m_bold_mip1.tga gfx/2d/mplus_1m_bold_mip2.tga gfx/2d/mplus_1m_bold_mip3.tga gfx/2d/mplus_1m_bold.tga gfx/menus/srv_102.jpg gfx/menus/srv_103.jpg gfx/menus/srv_104.jpg shaders/jk2mv.shader_mv shaders/sabers.dynGlow strip/mv.sp ui/jk2mpingame.txt ui/jk2mp/controls.menu_patch ui/jk2mp/createserver.menu_patch ui/jk2mp/ingame_controls.menu_patch ui/jk2mp/ingame_player.menu_patch ui/jk2mp/ingame_setup.menu_patch ui/jk2mp/ingame_setup_modoptions.menu ui/jk2mp/joinserver.menu_patch ui/jk2mp/setup.menu_patch ui/jk2mv/download_info.menu ui/jk2mv/download_popup.menu vm/cgame_102.map vm/cgame_103.map vm/cgame_104.map vm/jk2mpgame_102.map vm/jk2mpgame_103.map vm/jk2mpgame_104.map vm/ui_102.map vm/ui_103.map vm/ui_104.map
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 D:/Workspace/jk2mv-tom/build-config-test/out/Debug/base/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating assetsmv.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2mv
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 --format=zip -- fonts/anewhope.fontdat fonts/anewhope_sharp1.fontdat fonts/anewhope_sharp1.tga fonts/anewhope_sharp2.fontdat fonts/anewhope_sharp2.tga fonts/anewhope_sharp3.fontdat fonts/anewhope_sharp3.tga fonts/anewhope_sharp4.fontdat fonts/anewhope_sharp4.tga fonts/anewhope_sharp5.fontdat fonts/anewhope_sharp5.tga fonts/anewhope.tga fonts/ergoec_sharp1.fontdat fonts/ergoec_sharp1.tga fonts/ergoec_sharp2.fontdat fonts/ergoec_sharp2.tga fonts/ergoec_sharp3.fontdat fonts/ergoec_sharp3.tga fonts/ergoec_sharp4.fontdat fonts/ergoec_sharp4.tga fonts/ergoec_sharp5.fontdat fonts/ergoec_sharp5.tga fonts/ocr_a.fontdat fonts/ocr_a_sharp1.fontdat fonts/ocr_a_sharp1.tga fonts/ocr_a_sharp2.fontdat fonts/ocr_a_sharp2.tga fonts/ocr_a_sharp3.fontdat fonts/ocr_a_sharp3.tga fonts/ocr_a_sharp4.fontdat fonts/ocr_a_sharp4.tga fonts/ocr_a.tga gfx/2d/code_new_roman_mip1.tga gfx/2d/code_new_roman_mip2.tga gfx/2d/code_new_roman_mip3.tga gfx/2d/code_new_roman.tga gfx/2d/demorec.tga gfx/2d/mplus_1m_bold_mip1.tga gfx/2d/mplus_1m_bold_mip2.tga gfx/2d/mplus_1m_bold_mip3.tga gfx/2d/mplus_1m_bold.tga gfx/menus/srv_102.jpg gfx/menus/srv_103.jpg gfx/menus/srv_104.jpg shaders/jk2mv.shader_mv shaders/sabers.dynGlow strip/mv.sp ui/jk2mpingame.txt ui/jk2mp/controls.menu_patch ui/jk2mp/createserver.menu_patch ui/jk2mp/ingame_controls.menu_patch ui/jk2mp/ingame_player.menu_patch ui/jk2mp/ingame_setup.menu_patch ui/jk2mp/ingame_setup_modoptions.menu ui/jk2mp/joinserver.menu_patch ui/jk2mp/setup.menu_patch ui/jk2mv/download_info.menu ui/jk2mv/download_popup.menu vm/cgame_102.map vm/cgame_103.map vm/cgame_104.map vm/jk2mpgame_102.map vm/jk2mpgame_103.map vm/jk2mpgame_104.map vm/ui_102.map vm/ui_103.map vm/ui_104.map
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 D:/Workspace/jk2mv-tom/build-config-test/out/Release/base/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Generating assetsmv.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2mv
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 --format=zip -- fonts/anewhope.fontdat fonts/anewhope_sharp1.fontdat fonts/anewhope_sharp1.tga fonts/anewhope_sharp2.fontdat fonts/anewhope_sharp2.tga fonts/anewhope_sharp3.fontdat fonts/anewhope_sharp3.tga fonts/anewhope_sharp4.fontdat fonts/anewhope_sharp4.tga fonts/anewhope_sharp5.fontdat fonts/anewhope_sharp5.tga fonts/anewhope.tga fonts/ergoec_sharp1.fontdat fonts/ergoec_sharp1.tga fonts/ergoec_sharp2.fontdat fonts/ergoec_sharp2.tga fonts/ergoec_sharp3.fontdat fonts/ergoec_sharp3.tga fonts/ergoec_sharp4.fontdat fonts/ergoec_sharp4.tga fonts/ergoec_sharp5.fontdat fonts/ergoec_sharp5.tga fonts/ocr_a.fontdat fonts/ocr_a_sharp1.fontdat fonts/ocr_a_sharp1.tga fonts/ocr_a_sharp2.fontdat fonts/ocr_a_sharp2.tga fonts/ocr_a_sharp3.fontdat fonts/ocr_a_sharp3.tga fonts/ocr_a_sharp4.fontdat fonts/ocr_a_sharp4.tga fonts/ocr_a.tga gfx/2d/code_new_roman_mip1.tga gfx/2d/code_new_roman_mip2.tga gfx/2d/code_new_roman_mip3.tga gfx/2d/code_new_roman.tga gfx/2d/demorec.tga gfx/2d/mplus_1m_bold_mip1.tga gfx/2d/mplus_1m_bold_mip2.tga gfx/2d/mplus_1m_bold_mip3.tga gfx/2d/mplus_1m_bold.tga gfx/menus/srv_102.jpg gfx/menus/srv_103.jpg gfx/menus/srv_104.jpg shaders/jk2mv.shader_mv shaders/sabers.dynGlow strip/mv.sp ui/jk2mpingame.txt ui/jk2mp/controls.menu_patch ui/jk2mp/createserver.menu_patch ui/jk2mp/ingame_controls.menu_patch ui/jk2mp/ingame_player.menu_patch ui/jk2mp/ingame_setup.menu_patch ui/jk2mp/ingame_setup_modoptions.menu ui/jk2mp/joinserver.menu_patch ui/jk2mp/setup.menu_patch ui/jk2mv/download_info.menu ui/jk2mv/download_popup.menu vm/cgame_102.map vm/cgame_103.map vm/cgame_104.map vm/jk2mpgame_102.map vm/jk2mpgame_103.map vm/jk2mpgame_104.map vm/ui_102.map vm/ui_103.map vm/ui_104.map
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 D:/Workspace/jk2mv-tom/build-config-test/out/MinSizeRel/base/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Generating assetsmv.pk3</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd D:\Workspace\jk2mv-tom\assets\jk2mv
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E remove D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E tar c D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 --format=zip -- fonts/anewhope.fontdat fonts/anewhope_sharp1.fontdat fonts/anewhope_sharp1.tga fonts/anewhope_sharp2.fontdat fonts/anewhope_sharp2.tga fonts/anewhope_sharp3.fontdat fonts/anewhope_sharp3.tga fonts/anewhope_sharp4.fontdat fonts/anewhope_sharp4.tga fonts/anewhope_sharp5.fontdat fonts/anewhope_sharp5.tga fonts/anewhope.tga fonts/ergoec_sharp1.fontdat fonts/ergoec_sharp1.tga fonts/ergoec_sharp2.fontdat fonts/ergoec_sharp2.tga fonts/ergoec_sharp3.fontdat fonts/ergoec_sharp3.tga fonts/ergoec_sharp4.fontdat fonts/ergoec_sharp4.tga fonts/ergoec_sharp5.fontdat fonts/ergoec_sharp5.tga fonts/ocr_a.fontdat fonts/ocr_a_sharp1.fontdat fonts/ocr_a_sharp1.tga fonts/ocr_a_sharp2.fontdat fonts/ocr_a_sharp2.tga fonts/ocr_a_sharp3.fontdat fonts/ocr_a_sharp3.tga fonts/ocr_a_sharp4.fontdat fonts/ocr_a_sharp4.tga fonts/ocr_a.tga gfx/2d/code_new_roman_mip1.tga gfx/2d/code_new_roman_mip2.tga gfx/2d/code_new_roman_mip3.tga gfx/2d/code_new_roman.tga gfx/2d/demorec.tga gfx/2d/mplus_1m_bold_mip1.tga gfx/2d/mplus_1m_bold_mip2.tga gfx/2d/mplus_1m_bold_mip3.tga gfx/2d/mplus_1m_bold.tga gfx/menus/srv_102.jpg gfx/menus/srv_103.jpg gfx/menus/srv_104.jpg shaders/jk2mv.shader_mv shaders/sabers.dynGlow strip/mv.sp ui/jk2mpingame.txt ui/jk2mp/controls.menu_patch ui/jk2mp/createserver.menu_patch ui/jk2mp/ingame_controls.menu_patch ui/jk2mp/ingame_player.menu_patch ui/jk2mp/ingame_setup.menu_patch ui/jk2mp/ingame_setup_modoptions.menu ui/jk2mp/joinserver.menu_patch ui/jk2mp/setup.menu_patch ui/jk2mv/download_info.menu ui/jk2mv/download_popup.menu vm/cgame_102.map vm/cgame_103.map vm/cgame_104.map vm/jk2mpgame_102.map vm/jk2mpgame_103.map vm/jk2mpgame_104.map vm/ui_102.map vm/ui_103.map vm/ui_104.map
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/assetsmv.pk3 D:/Workspace/jk2mv-tom/build-config-test/out/RelWithDebInfo/base/assetsmv.pk3
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\build-config-test\CMakeFiles\f56f07d4dc3feb083f778449680041d2\assetsmv.rule">
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\assetsmv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\assetsmv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\assetsmv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\assetsmv.pk3;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\anewhope.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ergoec_sharp5.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.fontdat;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a_sharp4.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\fonts\ocr_a.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\code_new_roman.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\demorec.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip1.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip2.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold_mip3.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\2d\mplus_1m_bold.tga;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_102.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_103.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\gfx\menus\srv_104.jpg;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\jk2mv.shader_mv;D:\Workspace\jk2mv-tom\assets\jk2mv\shaders\sabers.dynGlow;D:\Workspace\jk2mv-tom\assets\jk2mv\strip\mv.sp;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mpingame.txt;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\createserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_controls.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_player.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\ingame_setup_modoptions.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\joinserver.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mp\setup.menu_patch;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_info.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\ui\jk2mv\download_popup.menu;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\cgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\jk2mpgame_104.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_102.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_103.map;D:\Workspace\jk2mv-tom\assets\jk2mv\vm\ui_104.map;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\assetsmv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Workspace\jk2mv-tom\assets\jk2mv\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2mv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-config-test --check-stamp-file D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2mv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-config-test --check-stamp-file D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2mv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-config-test --check-stamp-file D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Workspace/jk2mv-tom/assets/jk2mv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Workspace/jk2mv-tom -BD:/Workspace/jk2mv-tom/build-config-test --check-stamp-file D:/Workspace/jk2mv-tom/build-config-test/assets/jk2mv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.1\Modules\CMakeParseArguments.cmake;D:\Workspace\jk2mv-tom\tools\InstallZIP.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Workspace\jk2mv-tom\build-config-test\assets\jk2mv\CMakeFiles\assetsmv">
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\build-config-test\ZERO_CHECK.vcxproj">
+      <Project>{1E2870C7-9622-3C25-8C5E-A21866FD2944}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

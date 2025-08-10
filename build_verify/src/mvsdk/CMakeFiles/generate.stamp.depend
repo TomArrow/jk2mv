@@ -1,0 +1,10 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.1/Modules/FindGit.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/FindPackageMessage.cmake
+D:/Workspace/jk2mv-tom/.git/modules/src/mvsdk/HEAD
+D:/Workspace/jk2mv-tom/.git/modules/src/mvsdk/refs/heads/everything
+D:/Workspace/jk2mv-tom/build_verify/src/mvsdk/CMakeFiles/git-data/grabRef.cmake
+D:/Workspace/jk2mv-tom/src/mvsdk/CMakeLists.txt
+D:/Workspace/jk2mv-tom/src/mvsdk/cmake/GetGitRevisionDescription.cmake
+D:/Workspace/jk2mv-tom/tools/GetGitRevisionDescription.cmake.in

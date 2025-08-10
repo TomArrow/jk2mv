@@ -544,12 +544,20 @@ if (BuildMVMP)
 		endif()
 	endif()
 
-	# jk2mvmenu and assetsmv are required to run JK2MV
-	add_dependencies(${MVMP} ${MVMENU} assetsmv)
-	add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
-
-	if(BuildMVSDK)
-		add_dependencies(${MVMP} bins-jk2pro)
+	# Ensure assets are built before the client. Prefer consolidated 'mv-assets' if present.
+	if(TARGET mv-assets)
+		add_dependencies(${MVMP} ${MVMENU} mv-assets)
+	else()
+		# Legacy targets fallback (kept for compatibility with older submodule revisions)
+		if(TARGET assetsmv)
+			add_dependencies(${MVMP} ${MVMENU} assetsmv)
+		endif()
+		if(TARGET assets-jk2pro)
+			add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
+		endif()
+		if(BuildMVSDK AND TARGET bins-jk2pro)
+			add_dependencies(${MVMP} bins-jk2pro)
+		endif()
 	endif()
 
 	# mvmenu is now built from source conainted in the mvsdk submodule
@@ -657,10 +665,16 @@ if (BuildMVDED)
 	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "JK2MV MP Dedicated Server")
 
-	add_dependencies(${MVDED} assetsmv)
-
-	if(BuildMVSDK)
-		add_dependencies(${MVDED} bins-jk2pro)
+	# Dedicated server asset dependency
+	if(TARGET mv-assets)
+		add_dependencies(${MVDED} mv-assets)
+	else()
+		if(TARGET assetsmv)
+			add_dependencies(${MVDED} assetsmv)
+		endif()
+		if(BuildMVSDK AND TARGET bins-jk2pro)
+			add_dependencies(${MVDED} bins-jk2pro)
+		endif()
 	endif()
 
 	# installation

@@ -29,7 +29,7 @@ These builds are automatically generated on every push to the repository. For te
 1. Clone the JK2MV repository
 Clone the JK2MV repository including submodules (required if you also want to build the [mvsdk](https://github.com/mvdevs/mvsdk) modules), e.g.:
 	* `git clone --recursive https://github.com/mvdevs/jk2mv`
-2. Get CMake from either https://cmake.org or, in case of Linux, from the repositories of your distribution.
+2. Install CMake (minimum version 4.1 required). If your distribution or package manager does not yet provide 4.1 you must install a newer binary release from https://cmake.org.
 3. Dependencies
  	* Windows: Requires at least Visual Studio 2013, required libraries are shipped with JK2MV in the `libs` directory.
 		* If you plan to build the installer package get NSIS from http://nsis.sourceforge.net
@@ -55,10 +55,16 @@ Clone the JK2MV repository including submodules (required if you also want to bu
 		* `BuildMVSDK` Whether to build and integrate the mvsdk modules.
 		* `CMAKE_BUILD_TYPE=Debug/Release` Build for development/release.
 5. Building
-	* Unix-Makefiles
-		* `make` Build all previously selected binaries.
+	* Common targets
+		* `make` (or the default build command in your generator / IDE) builds all selected binaries and assets.
+		* `make build-assets` builds only the packaged pk3 asset archives (no engine binaries). This is an alias for the meta target `mv-assets` which bundles:
+			* `assetsmv2.pk3` (core assets)
+			* `jk2pro-bins.pk3` (legacy/compatibility bins) when the SDK is enabled
 		* `make install` Installs JK2MV to `/usr` on Linux. On MacOSX it finishes the App-Package.
 		* `make package` Generates rpm/deb packages on Linux and a dmg image on MacOSX.
+
+6. Performance (optional)
+	* If NASM is installed it will be detected and used by the internal libjpeg-turbo to build SIMD accelerated routines. Without NASM the build is still functional but image decoding is slower.
 
 # License
 JK2MV is licensed under GPLv2 as free software. You are free to use, modify and redistribute JK2MV following the terms in the LICENSE file. Please be aware of the implications of the GPLv2 licence. In short, be prepared to share your code under the same GPLv2 licence.
