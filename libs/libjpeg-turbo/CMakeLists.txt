@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 4.1)
 
 set(JPEG_LIB_VERSION 62)
 set(ENABLE_STATIC 1)

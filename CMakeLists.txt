@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 4.1)
+
+# Adopt all CMake policies up to 4.1 as NEW for consistent behavior.
+cmake_policy(VERSION 4.1)
 
 # Link directly against libGL.so instead of using GLVND
 if (${CMAKE_VERSION} VERSION_GREATER "3.11")
