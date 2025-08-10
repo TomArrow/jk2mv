@@ -31,46 +31,8 @@ set(ProjectURL "https://jk2mv.org")
 # Early Windows toolchain sanity check before project()
 if(WIN32)
 	option(FORCE_MINGW "Force using a MinGW GCC toolchain instead of MSVC" OFF)
-	# Detect absence of a properly initialized MSVC environment (common cause of MSB4019 / missing Microsoft.Cpp.Default.props)
-
-	# Derive a plausible Visual Studio install root without relying on ProgramFiles(x86) env var (parentheses break newer policy parsing)
-	set(_MSVC_DIR_HINT "")
-	# Prefer 64-bit Program Files (x86) conventional path when building 64-bit
-	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(_PF86 "${CMAKE_SYSTEM_DRIVE}/Program Files (x86)")
-		if(EXISTS "${_PF86}/Microsoft Visual Studio")
-			set(_MSVC_DIR_HINT "${_PF86}/Microsoft Visual Studio")
-		endif()
-	endif()
-	# Fallback to ProgramFiles env var if still empty
-	if(_MSVC_DIR_HINT STREQUAL "" AND DEFINED ENV{ProgramFiles})
-		set(_PF "$ENV{ProgramFiles}")
-		if(EXISTS "${_PF}/Microsoft Visual Studio")
-			set(_MSVC_DIR_HINT "${_PF}/Microsoft Visual Studio")
-		endif()
-	endif()
-
-	if(NOT FORCE_MINGW
-	   AND NOT DEFINED ENV{VSINSTALLDIR}
-	   AND NOT DEFINED ENV{VCToolsInstallDir}
-	   AND ( _MSVC_DIR_HINT STREQUAL "" OR NOT EXISTS "${_MSVC_DIR_HINT}" )
-	)
-		# Try to see if a MinGW gcc is available as a potential fallback
-		find_program(_MINGW_GCC NAMES gcc)
-		if(_MINGW_GCC)
-			message(WARNING
-				"MSVC Build Tools not detected (Microsoft.Cpp.Default.props likely missing). "
-				"To build with MinGW run CMake with: -G \"MinGW Makefiles\" "
-				"or set FORCE_MINGW=ON. "
-				"Otherwise install Visual Studio C++ components or run from a 'Developer Command Prompt'.")
-		else()
-			message(FATAL_ERROR
-				"MSVC Build Tools not detected (environment variables VSINSTALLDIR / VCToolsInstallDir missing and Microsoft.Cpp.Default.props not found). "
-				"Install Visual Studio (Desktop development with C++), or VS Build Tools, then re-run CMake from the proper Developer Command Prompt. "
-				"Alternatively install MinGW and re-run with -G \"MinGW Makefiles\".")
-		endif()
-	endif()
-
+	
+	# Check if user wants to use MinGW
 	if(FORCE_MINGW)
 		# User explicitly wants MinGW; ensure compilers are discoverable before project()
 		if(NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
@@ -81,6 +43,64 @@ if(WIN32)
 			message(FATAL_ERROR "FORCE_MINGW=ON but gcc/g++ not found in PATH.")
 		else()
 			message(STATUS "FORCE_MINGW enabled; using gcc at ${CMAKE_C_COMPILER}. Specify -G \"MinGW Makefiles\" when invoking CMake if not already.")
+		endif()
+	elseif(CMAKE_GENERATOR MATCHES "Visual Studio" OR CMAKE_GENERATOR MATCHES "MSBuild" OR CMAKE_GENERATOR MATCHES "NMake")
+		# Using MSVC toolchain - check environment is properly initialized
+		if(NOT DEFINED ENV{VCTargetsPath} AND NOT DEFINED ENV{VSINSTALLDIR} AND NOT DEFINED ENV{VCToolsInstallDir})
+			# Additional check: try to find vcvarsall.bat which can be used to initialize the environment
+			set(_VS_SEARCH_PATHS
+				"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2022/BuildTools/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2019/Professional/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build"
+				"C:/Program Files/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build"
+				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build"
+				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Professional/VC/Auxiliary/Build"
+				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Auxiliary/Build"
+				"C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build"
+				"C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
+			)
+			
+			set(_VCVARSALL_FOUND FALSE)
+			foreach(_PATH ${_VS_SEARCH_PATHS})
+				if(EXISTS "${_PATH}/vcvarsall.bat")
+					set(_VCVARSALL_FOUND TRUE)
+					set(_VCVARSALL_PATH "${_PATH}/vcvarsall.bat")
+					break()
+				endif()
+			endforeach()
+			
+			if(_VCVARSALL_FOUND)
+				message(FATAL_ERROR 
+					"Visual Studio environment not initialized. MSBuild cannot find Microsoft.Cpp.Default.props.\n"
+					"Please run CMake from a Developer Command Prompt or initialize the environment first.\n"
+					"Found vcvarsall.bat at: ${_VCVARSALL_PATH}\n"
+					"You can initialize the environment by running:\n"
+					"  \"${_VCVARSALL_PATH}\" x64\n"
+					"Then re-run CMake.\n"
+					"Alternatively, use MinGW by adding -DFORCE_MINGW=ON to your CMake command.")
+			else()
+				# Try to see if MinGW is available as a fallback option
+				find_program(_MINGW_GCC NAMES gcc)
+				if(_MINGW_GCC)
+					message(FATAL_ERROR 
+						"Visual Studio environment not initialized and no Visual Studio installation found.\n"
+						"MSBuild cannot find Microsoft.Cpp.Default.props.\n"
+						"MinGW detected at: ${_MINGW_GCC}\n"
+						"To use MinGW, re-run CMake with -DFORCE_MINGW=ON -G \"MinGW Makefiles\"\n"
+						"Or install Visual Studio with C++ development tools and run from Developer Command Prompt.")
+				else()
+					message(FATAL_ERROR 
+						"Visual Studio environment not initialized and no Visual Studio installation found.\n"
+						"MSBuild cannot find Microsoft.Cpp.Default.props.\n"
+						"Please install Visual Studio with C++ development tools, or install MinGW.\n"
+						"If using Visual Studio, run CMake from a Developer Command Prompt.\n"
+						"If using MinGW, add -DFORCE_MINGW=ON -G \"MinGW Makefiles\" to your CMake command.")
+				endif()
+			endif()
 		endif()
 	endif()
 endif()
