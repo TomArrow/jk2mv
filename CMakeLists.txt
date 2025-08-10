@@ -327,8 +327,12 @@ if(UseInternalMiniZip)
 endif()
 
 if(UseInternalJPEG)
+	# Prefer libjpeg-turbo over legacy jpeg-9e copy merged from v24.
+	# jpeg-9e sources remain in the tree only due to historic merge; they are not built.
 	set(GlobalDefines ${GlobalDefines} "INTERNAL_JPEG")
-	add_subdirectory(libs/jpeg-9e)
+	add_subdirectory(libs/libjpeg-turbo)
+	# Provide a compatible include hint if any code still expects JPEG_INCLUDE_DIR like jpeg-9e logic did.
+	set(JPEG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/libjpeg-turbo CACHE PATH "Internal JPEG include path")
 endif()
 
 if(UseInternalPNG)
