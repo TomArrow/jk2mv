@@ -18,11 +18,11 @@ clipHandle_t SV_ClipHandleForEntity( const sharedEntity_t *ent ) {
 	}
 	if ( ent->r.svFlags & SVF_CAPSULE ) {
 		// create a temp capsule from bounding box sizes
-		return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qtrue, ent->r.contents);
+		return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qtrue );
 	}
 
 	// create a temp tree from bounding box sizes
-	return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qfalse, ent->r.contents );
+	return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qfalse );
 }
 
 
@@ -474,7 +474,7 @@ SV_ClipToEntity
 
 ====================
 */
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule, traceCustomization_t* traceCustomization) {
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule ) {
 	sharedEntity_t	*touch;
 	clipHandle_t	clipHandle;
 	const float		*origin, *angles;
@@ -502,7 +502,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 
 	CM_TransformedBoxTrace ( trace, start, end,
 		mins, maxs, clipHandle,  contentmask,
-		origin, angles, capsule, traceCustomization);
+		origin, angles, capsule);
 
 	if ( trace->fraction < 1 ) {
 		trace->entityNum = touch->s.number;
@@ -516,7 +516,7 @@ SV_ClipMoveToEntities
 
 ====================
 */
-void SV_ClipMoveToEntities( moveclip_t *clip, traceCustomization_t* traceCustomization) {
+void SV_ClipMoveToEntities( moveclip_t *clip ) {
 	int			i, num;
 	int			touchlist[MAX_GENTITIES];
 	sharedEntity_t *touch;
@@ -549,7 +549,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip, traceCustomization_t* traceCustomi
 		if ( clip->trace.allsolid ) {
 			return;
 		}
- 		touch = SV_GentityNum( touchlist[i] );
+		touch = SV_GentityNum( touchlist[i] );
 
 		// see if we should ignore this entity
 		if ( clip->passEntityNum != ENTITYNUM_NONE ) {
@@ -574,13 +574,6 @@ void SV_ClipMoveToEntities( moveclip_t *clip, traceCustomization_t* traceCustomi
 				!(touch->r.svFlags & SVF_OWNERNOTSHARED) &&
 				!thisOwnerShared ) {
 				continue;	// don't clip against other missiles from our owner
-			}
-
-			if (touch->s.eType == ET_MISSILE &&
-				!(touch->r.svFlags & SVF_OWNERNOTSHARED) &&
-				touch->r.ownerNum == passOwnerNum)
-			{ //blah, hack (from JAPRO, do I need this?)
-				continue;
 			}
 		}
 
@@ -608,7 +601,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip, traceCustomization_t* traceCustomi
 
 		CM_TransformedBoxTrace ( &trace, clip->start, clip->end,
 			clip->mins, clip->maxs, clipHandle,  clip->contentmask,
-			origin, angles, clip->capsule, traceCustomization);
+			origin, angles, clip->capsule);
 
 /*
 Ghoul2 Insert Start
@@ -704,7 +697,7 @@ passEntityNum and entities owned by passEntityNum are explicitly not checked.
 /*
 Ghoul2 Insert Start
 */
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod, traceCustomization_t* traceCustomization) {
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod ) {
 /*
 Ghoul2 Insert End
 */
@@ -721,17 +714,11 @@ Ghoul2 Insert End
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
-	if (contentmask != CONTENTS_TRIGGER && contentmask != CONTENTS_TRIGGER_EXIT) { // No point tracing world if we want triggers. Go straight to entities.
-		CM_BoxTrace(&clip.trace, start, end, mins, maxs, 0, contentmask, capsule, traceCustomization);
-		clip.trace.entityNum = clip.trace.fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
-		if (clip.trace.fraction == 0) {
-			*results = clip.trace;
-			return;		// blocked immediately by the world
-		}
-	}
-	else {
-		clip.trace.fraction = 1;
-		clip.trace.entityNum = ENTITYNUM_NONE;
+	CM_BoxTrace( &clip.trace, start, end, mins, maxs, 0, contentmask, capsule );
+	clip.trace.entityNum = clip.trace.fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
+	if ( clip.trace.fraction == 0 ) {
+		*results = clip.trace;
+		return;		// blocked immediately by the world
 	}
 
 	clip.contentmask = contentmask;
@@ -766,7 +753,7 @@ Ghoul2 Insert End
 	}
 
 	// clip to other solid entities
-	SV_ClipMoveToEntities ( &clip, traceCustomization );
+	SV_ClipMoveToEntities ( &clip );
 
 	*results = clip.trace;
 }

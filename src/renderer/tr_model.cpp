@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-//using namespace std;
+using namespace std;
 
 
 #define	LL(x) x=LittleLong(x)
@@ -36,8 +36,8 @@ Ghoul2 Insert End
 // This stuff looks a bit messy, but it's kept here as black box, and nothing appears in any .H files for other
 //	modules to worry about. I may make another module for this sometime.
 //
-typedef std::pair<int,int> StringOffsetAndShaderIndexDest_t;
-typedef std::vector <StringOffsetAndShaderIndexDest_t> ShaderRegisterData_t;
+typedef pair<int,int> StringOffsetAndShaderIndexDest_t;
+typedef vector <StringOffsetAndShaderIndexDest_t> ShaderRegisterData_t;
 struct CachedEndianedModelBinary_s
 {
 	void	*pModelDiskImage;
@@ -57,7 +57,7 @@ struct CachedEndianedModelBinary_s
 	}
 };
 typedef struct CachedEndianedModelBinary_s CachedEndianedModelBinary_t;
-typedef std::map <std::string,CachedEndianedModelBinary_t>	CachedModels_t;
+typedef map <string,CachedEndianedModelBinary_t>	CachedModels_t;
 CachedModels_t CachedModels;	// the important cache item.
 
 void RE_RegisterModels_StoreShaderRequest(const char *psModelFileName, const char *psShaderName, int *piShaderIndexPoke)
@@ -293,12 +293,6 @@ void *RE_RegisterServerModels_Malloc(int iSize, const char *psModelFileName, qbo
 	return ModelBin.pModelDiskImage;
 }
 
-#ifndef DEDICATED
-void RE_GLFinish() { // for freeing up RAM during image loading
-	qglFinish();
-}
-#endif
-
 // dump any models not being used by this level if we're running low on memory...
 //
 static int GetModelDataAllocSize(void)
@@ -427,7 +421,7 @@ void RE_RegisterModels_Info_f( void )
 
 		ri.Printf( PRINT_ALL, "%d/%d: \"%s\" (%d bytes)",iModel,iModels,(*itModel).first.c_str(),CachedModel.iAllocSize );
 
-		#ifdef DEBUG
+		#ifdef _DEBUG
 		ri.Printf( PRINT_ALL, ", lvl %d\n",CachedModel.iLastLevelUsedOn);
 		#else
 		ri.Printf( PRINT_ALL, "\n");
@@ -599,7 +593,7 @@ void RE_InsertModelIntoHash(const char *name, model_t *mod)
 
 	mh->next = mhHashTable[hash];
 	mh->handle = mod->index;
-	Q_strncpyz(mh->name, name,sizeof(mh->name));
+	strcpy(mh->name, name);
 	mhHashTable[hash] = mh;
 }
 /*
@@ -624,7 +618,7 @@ void GenericInsertModelIntoHash(const char *name, model_t *mod)
 
 	mh->next = mhHashTable[hash];
 	mh->handle = mod->index;
-	Q_strncpyz(mh->name, name,sizeof(mh->name));
+	strcpy(mh->name, name);
 	mhHashTable[hash] = mh;
 }
 
@@ -917,7 +911,7 @@ Ghoul2 Insert End
 	for ( lod = iLODStart; lod >= 0 ; lod-- ) {
 		char filename[1024];
 
-		Q_strncpyz( filename, name, sizeof(filename));
+		strcpy( filename, name );
 
 		if ( lod != 0 ) {
 			char namebuf[80];
@@ -925,8 +919,8 @@ Ghoul2 Insert End
 			if ( strrchr( filename, '.' ) ) {
 				*strrchr( filename, '.' ) = 0;
 			}
-			Com_sprintf( namebuf,sizeof(namebuf), "_%d.md3", lod );
-			Q_strcat( filename, sizeof(filename), namebuf );
+			sprintf( namebuf, "_%d.md3", lod );
+			strcat( filename, namebuf );
 		}
 
 		qboolean bAlreadyCached = qfalse;
@@ -1106,7 +1100,7 @@ Ghoul2 Insert End
 	for ( lod = iLODStart; lod >= 0 ; lod-- ) {
 		char filename[1024];
 
-		Q_strncpyz( filename, name, sizeof(filename));
+		strcpy( filename, name );
 
 		if ( lod != 0 ) {
 			char namebuf[80];
@@ -1114,8 +1108,8 @@ Ghoul2 Insert End
 			if ( strrchr( filename, '.' ) ) {
 				*strrchr( filename, '.' ) = 0;
 			}
-			Com_sprintf( namebuf, sizeof(namebuf), "_%d.md3", lod );
-			Q_strcat( filename,sizeof(filename), namebuf );
+			sprintf( namebuf, "_%d.md3", lod );
+			strcat( filename, namebuf );
 		}
 
 		qboolean bAlreadyCached = qfalse;

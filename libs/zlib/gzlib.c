@@ -1,5 +1,5 @@
 /* gzlib.c -- zlib functions common to reading and writing gzip files
- * Copyright (C) 2004-2024 Mark Adler
+ * Copyright (C) 2004-2019 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -26,7 +26,9 @@
 
    The gz_strwinerror function does not change the current setting of
    GetLastError. */
-char ZLIB_INTERNAL *gz_strwinerror(DWORD error) {
+char ZLIB_INTERNAL *gz_strwinerror(error)
+     DWORD error;
+{
     static char buf[1024];
 
     wchar_t *msgbuf;
@@ -285,7 +287,10 @@ gzFile ZEXPORT gzdopen(int fd, const char *mode) {
 
 /* -- see zlib.h -- */
 #ifdef WIDECHAR
-gzFile ZEXPORT gzopen_w(const wchar_t *path, const char *mode) {
+gzFile ZEXPORT gzopen_w(path, mode)
+    const wchar_t *path;
+    const char *mode;
+{
     return gz_open(path, -2, mode);
 }
 #endif
@@ -308,8 +313,8 @@ int ZEXPORT gzbuffer(gzFile file, unsigned size) {
     /* check and set requested size */
     if ((size << 1) < size)
         return -1;              /* need to be able to double it */
-    if (size < 8)
-        size = 8;               /* needed to behave well with flushing */
+    if (size < 2)
+        size = 2;               /* need two bytes to check magic header */
     state->want = size;
     return 0;
 }

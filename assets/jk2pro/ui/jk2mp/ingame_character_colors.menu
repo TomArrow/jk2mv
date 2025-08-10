@@ -1,0 +1,180 @@
+{
+	menuDef
+	{
+		name					ingame_character_colors
+		visible					0
+		fullScreen				0
+		outOfBoundsClick
+		rect					10 392 346 68
+		focusColor				1 1 1 1
+		
+		// Overall window backdrop
+		itemDef 
+		{
+			name				background_pic
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				0 0 346 68
+			background			"gfx/menus/menu_box_ingame"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+		}
+		itemDef
+		{
+			name				redColorSlider
+			group				characterColorsGroup
+			type				ITEM_TYPE_SLIDER
+			text				"Red"
+			cvarFloat			"char_color_red" 255 0 255
+			rect				10 4 156 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			52
+			font				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+			}
+		}
+		
+		itemDef 
+		{
+			name				redColorField
+			group				characterColorsGroup
+			type				ITEM_TYPE_NUMERICFIELD
+			text				""
+			cvar				"char_color_red"
+			rect				176 4 40 20
+			font 				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action				{ play "sound/interface/button1.wav" ; }
+		}
+		
+		itemDef
+		{
+			name				redColorReset
+ 			group				characterColorsGroup
+	 		type				ITEM_TYPE_BUTTON
+			text				"Reset"
+			rect				286 4 30 20
+			font 				4
+			textscale			0.75
+			forecolor			1 .682 0 1
+			visible				1
+			action
+			{
+				play "sound/interface/button1.wav" ;
+				setcvar char_color_red "255"
+			}
+		}
+		itemDef
+		{
+			name				greenColorSlider
+			group				characterColorsGroup
+			type				ITEM_TYPE_SLIDER
+			text				"Green"
+			cvarFloat			"char_color_green" 255 0 255
+			rect				10 24 156 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			52
+			font				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+			}
+		}
+		
+		itemDef 
+		{
+			name				greenColorField
+			group				characterColorsGroup
+			type				ITEM_TYPE_NUMERICFIELD
+			text				""
+			cvar				"char_color_green"
+			rect				176 24 40 20
+			font 				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action				{ play "sound/interface/button1.wav" ; }
+		}
+		
+		itemDef
+		{
+			name				greenColorReset
+ 			group				characterColorsGroup
+	 		type				ITEM_TYPE_BUTTON
+			text				"Reset"
+			rect				286 24 30 20
+			font 				4
+			textscale			0.75
+			forecolor			1 .682 0 1
+			visible				1
+			action
+			{
+				play "sound/interface/button1.wav" ;
+				setcvar char_color_green "255"
+			}
+		}
+		itemDef
+		{
+			name				blueColorSlider
+			group				characterColorsGroup
+			type				ITEM_TYPE_SLIDER
+			text				"Blue"
+			cvarFloat			"char_color_blue" 255 0 255
+			rect				10 44 156 20
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			52
+			font				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+			}
+		}
+		
+		itemDef 
+		{
+			name				blueColorField
+			group				characterColorsGroup
+			type				ITEM_TYPE_NUMERICFIELD
+			text				""
+			cvar				"char_color_blue"
+			rect				176 44 40 20
+			font 				4
+			textscale			0.75
+			forecolor			.615 .615 .956 1
+			visible				1
+			action				{ play "sound/interface/button1.wav" ; }
+		}
+		
+		itemDef
+		{
+			name				blueColorReset
+ 			group				characterColorsGroup
+	 		type				ITEM_TYPE_BUTTON
+			text				"Reset"
+			rect				286 44 30 20
+			font 				4
+			textscale			0.75
+			forecolor			1 .682 0 1
+			visible				1
+			action
+			{
+				play "sound/interface/button1.wav" ;
+				setcvar char_color_blue "255"
+			}
+		}
+	}
+}

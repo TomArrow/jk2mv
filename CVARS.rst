@@ -162,19 +162,6 @@ Client-Side
 
 ..
 
-:Name: in_mouse
-:Values: "0", "1", "2", "3"
-:Default: "1"
-:Description:
-   Mouse input mode
-
-   | 0: Mouse disabled.
-   | 1: Same as in retail client - high latency, follows desktop mouse speed and acceleration settings.
-   | 2: Raw, no acceleration, lowest latency.
-   | 3: Raw, lowest latency but with desktop mouse speed and acceleration settings.
-
-..
-
 :Name: mv_allowDownload
 :Values: "0", "1"
 :Default: "1"
@@ -313,15 +300,6 @@ Client-Side
 :Description:
    Enable / Disable high DPI rendering when desktop scaling is
    enabled.
-
-..
-
-:Name: r_openglMipMaps
-:Values: "0", "1"
-:Default: "1"
-:Description:
-   Enable / Disable OpenGL mipmap generation. Disable to restore
-   original downsampling algorithms.
 
 ..
 

@@ -9,6 +9,7 @@ GetIDForString
 -------------------------
 */
 
+
 int GetIDForString(stringID_table_t *table, const char *string) {
 	int	index = 0;
 
@@ -105,18 +106,6 @@ void COM_DefaultExtension(char *path, size_t maxSize, const char *extension) {
 		}
 		src--;
 	}
-
-	Q_strncpyz(oldPath, path, sizeof(oldPath));
-	Com_sprintf(path, maxSize, "%s%s", oldPath, extension);
-}
-
-/*
-==================
-COM_AddExtension
-==================
-*/
-void COM_AddExtension(char *path, size_t maxSize, const char *extension) {
-	char	oldPath[MAX_QPATH];
 
 	Q_strncpyz(oldPath, path, sizeof(oldPath));
 	Com_sprintf(path, maxSize, "%s%s", oldPath, extension);
@@ -744,23 +733,6 @@ void Q_strncpyz(char *dest, const char *src, int destsize) {
 	strncpy(dest, src, destsize - 1);
 	dest[destsize - 1] = 0;
 }
-/*
-=============
-Q_strnncpyz
-
-Safe strncpy that ensures a trailing zero (and lets us still specify amount of chars to copy)
-=============
-*/
-void Q_strnncpyz(char *dest, const char *src, int charsToCopy, int destsize) {
-	if (destsize < 1) {
-		Com_Error(ERR_FATAL, "Q_strncpyz: destsize < 1");
-	}
-	if (charsToCopy >= destsize) {
-		charsToCopy = destsize - 1;
-	}
-	strncpy(dest, src, charsToCopy);
-	dest[charsToCopy] = 0;
-}
 
 int Q_stricmpn(const char *s1, const char *s2, int n) {
 	int		c1, c2;
@@ -821,82 +793,6 @@ int Q_strncmp(const char *s1, const char *s2, int n) {
 
 int Q_stricmp(const char *s1, const char *s2) {
 	return (s1 && s2) ? Q_stricmpn(s1, s2, 99999) : -1;
-}
-
-
-qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
-	char c = *p++;
-	int i;
-	int val = 0;
-
-	qboolean doWrite = qtrue;
-	if (!color || !(color + 3)) {
-		doWrite = qfalse;
-	}
-
-	*skipCount = 0; // We update it only if successful. If not successful, we want the string to be parsed normally.
-
-	int countToParse = 8;
-	qboolean halfPrecision = qfalse;
-	if (c == 'Y') {
-		countToParse = 8;
-	}
-	else if (c == 'y') {
-		countToParse = 4;
-		halfPrecision = qtrue;
-	}
-	else if (c == 'X') {
-		countToParse = 6;
-		if (doWrite) color[3] = 1.0f; // Z and z don't contain alpha.
-	}
-	else if (c == 'x') {
-		countToParse = 3;
-		if (doWrite) color[3] = 1.0f;
-		halfPrecision = qtrue;
-	}
-
-	int presumableSkipCount = countToParse + 1; // skip count will be set to this if successful.
-
-	for (i = 0; i < countToParse; i++) {
-		int readHex;
-		c = p[i];
-		if (c >= '0' && c <= '9') {
-			readHex = c - '0';
-		}
-		else if (c >= 'a' && c <= 'f') {
-			readHex = 0xa + c - 'a';
-		}
-		else if (c >= 'A' && c <= 'F') {
-			readHex = 0xa + c - 'A';
-		}
-		else {
-			if (color) {
-				color[0] = color[1] = color[2] = color[3] = 1.0f;
-			}
-			return qfalse;
-		}
-		if (doWrite) {
-
-			if (halfPrecision) { // Single digit per value.
-				val = readHex;
-				color[i] = val * (1 / 15.0f);
-			}
-			else {
-				if (i & 1) {
-					val |= readHex;
-					color[i >> 1] = val * (1 / 255.0f);
-				}
-				else {
-					val = readHex << 4;
-				}
-			}
-		}
-
-	}
-
-	*skipCount = presumableSkipCount;
-	return qtrue;
-
 }
 
 char *Q_stristr(const char *str, char *charset) {
@@ -965,7 +861,7 @@ void Q_strcat(char *dest, int size, const char *src) {
 }
 
 
-int Q_PrintStrlen(const char *string, qboolean use102color, qboolean ntModColors) {
+int Q_PrintStrlen(const char *string, qboolean use102color) {
 	int			len;
 	const char	*p;
 
@@ -976,7 +872,7 @@ int Q_PrintStrlen(const char *string, qboolean use102color, qboolean ntModColors
 	len = 0;
 	p = string;
 	while (*p) {
-		if (Q_IsColorString(p) || (use102color && Q_IsColorString_1_02(p))|| (ntModColors && Q_IsColorStringNT(p))) {
+		if (Q_IsColorString(p) || (use102color && Q_IsColorString_1_02(p))) {
 			p += 2;
 			continue;
 		}
@@ -987,13 +883,13 @@ int Q_PrintStrlen(const char *string, qboolean use102color, qboolean ntModColors
 	return len;
 }
 
-int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color, qboolean ntModColors) {
+int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color) {
 	int			advance = 0;
 	char		lastColor = 0;
 	int			i;
 
 	for (i = 0; advance < pos && str[i]; i++) {
-		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i])) || (ntModColors && Q_IsColorStringNT(&str[i]))) {
+		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i]))) {
 			i++;
 			lastColor = str[i];
 		} else {
@@ -1009,13 +905,13 @@ int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102colo
 }
 
 
-int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color, qboolean ntModColors) {
+int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color) {
 	int		offset = 0;
 	char	lastColor = 0;
 	int		i;
 
 	for (i = 0; i < chars && str[i]; i++) {
-		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i])) || (ntModColors && Q_IsColorStringNT(&str[i]))) {
+		if (Q_IsColorString(&str[i]) || (use102color && Q_IsColorString_1_02(&str[i]))) {
 			i++;
 			lastColor = str[i];
 		} else {
@@ -1031,13 +927,13 @@ int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102colo
 }
 
 // copy a substring of len printable characters from 'from' offset, saving initial color
-void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color, qboolean ntModColors) {
-	int		fromOffset = Q_PrintStrLenTo(src, from, NULL, use102color, ntModColors);
+void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color) {
+	int		fromOffset = Q_PrintStrLenTo(src, from, NULL, use102color);
 	int		to;
 	char	color;
 
-	from = Q_PrintStrCharsTo(src, fromOffset, &color, use102color, ntModColors);
-	to = Q_PrintStrCharsTo(src, fromOffset + len, NULL, use102color, ntModColors);
+	from = Q_PrintStrCharsTo(src, fromOffset, &color, use102color);
+	to = Q_PrintStrCharsTo(src, fromOffset + len, NULL, use102color);
 
 	assert(dstSize >= 3);
 
@@ -1050,7 +946,7 @@ void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, 
 	Q_strncpyz(dst, src + from, MIN(dstSize, to - from + 1));
 }
 
-char *Q_CleanStr(char *string, qboolean use102color, qboolean ntModColors) {
+char *Q_CleanStr(char *string, qboolean use102color) {
 	char*	d;
 	char*	s;
 	int		c;
@@ -1058,7 +954,7 @@ char *Q_CleanStr(char *string, qboolean use102color, qboolean ntModColors) {
 	s = string;
 	d = string;
 	while ((c = *s) != 0) {
-		if (Q_IsColorString(s) || (use102color && Q_IsColorString_1_02(s)) || (ntModColors && Q_IsColorStringNT(s))) {
+		if (Q_IsColorString(s) || (use102color && Q_IsColorString_1_02(s))) {
 			s++;
 		} else if (c >= 0x20 && c <= 0x7E) {
 			*d++ = c;
@@ -1081,7 +977,7 @@ This function modifies INPUT (is mutable)
 (Also strips ^8 and ^9)
 ==================
 */
-void Q_StripColor(char *text,qboolean doHex)
+void Q_StripColor(char *text)
 {
 	qboolean doPass = qtrue;
 	char *read;
@@ -1093,12 +989,7 @@ void Q_StripColor(char *text,qboolean doHex)
 		read = write = text;
 		while ( *read )
 		{
-			if (doHex && *read == Q_COLOR_ESCAPE && Q_IsColorStringHex(read + 1)) {
-				int skipCount = 0;
-				Q_parseColorHex(read + 1, 0, &skipCount);
-				read += 1 + skipCount;
-			}
-			else if ( Q_IsColorString(read) || Q_IsColorString_1_02(read) )
+			if ( Q_IsColorString(read) || Q_IsColorString_1_02(read) )
 			{
 				doPass = qtrue;
 				read += 2;
@@ -1638,131 +1529,4 @@ char *Com_SkipTokens(char *s, int numTokens, char *sep) {
 		return p;
 	else
 		return s;
-}
-
-
-/*
-==================
-safeatoi
-==================
-This is a slightly adapted version of strtol from newlib, 
-specifically for 32 bit integers, so we can use it for cvar conversion.
-If someone enters 9999999999999999, we want that to be a positive number in the end, not wrap around and cause extremely weird behavior
-
-*/
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-/*
- * Convert a string to a long integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
-int safeatoi(const char* nptr, char** endptr, int base, int* error)
-{
-	const unsigned char* s = (const unsigned char*)nptr;
-	unsigned int acc;
-	int c;
-	unsigned int cutoff;
-	int neg = 0, any, cutlim;
-
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
-	do {
-		c = *s++;
-	} while (isspace(c));
-	if (c == '-') {
-		neg = 1;
-		c = *s++;
-	}
-	else if (c == '+')
-		c = *s++;
-	if ((base == 0 || base == 16) &&
-		c == '0' && (*s == 'x' || *s == 'X')) {
-		c = s[1];
-		s += 2;
-		base = 16;
-	}
-	if (base == 0)
-		base = c == '0' ? 8 : 10;
-
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for longs is
-	 * [-2147483648..2147483647] and the input base is 10,
-	 * cutoff will be set to 214748364 and cutlim to either
-	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
-	 * the number is too big, and we will return a range error.
-	 *
-	 * Set any if any `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
-	cutoff = neg ? -(unsigned int)INT_MIN : INT_MAX;
-	cutlim = cutoff % (unsigned int)base;
-	cutoff /= (unsigned int)base;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
-			c -= '0';
-		else if (isalpha(c))
-			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		else
-			break;
-		if (c >= base)
-			break;
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-			any = -1;
-		else {
-			any = 1;
-			acc *= base;
-			acc += c;
-		}
-	}
-	if (any < 0) {
-		acc = neg ? INT_MIN : INT_MAX;
-		*error = ERANGE;
-	}
-	else if (neg)
-		acc = -acc;
-	if (endptr != 0)
-		*endptr = (char*)(any ? (char*)s - 1 : nptr);
-	return (acc);
 }

@@ -2,11 +2,9 @@
 
 #include "client.h"
 #include "../qcommon/strip.h"
-#include "../qcommon/stringed_ingame.h"
 #include <limits.h>
 #include "snd_local.h"
 #include <mv_setup.h>
-#include <memory>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2_local.h"
@@ -22,10 +20,6 @@
 #include "../qcommon/INetProfile.h"
 #endif
 
-clientRendererInfo_t	clRenderInfo;
-
-//#define NOCONNECT
-
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
 
@@ -37,20 +31,13 @@ cvar_t	*rconAddress;
 
 cvar_t	*cl_timeout;
 cvar_t	*cl_maxpackets;
-cvar_t	*cl_maxPacketUserCmds;
-cvar_t	*cl_dynamicUserPacket;
 cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
-cvar_t	*cl_timeNudgeAntiLagHack;
-cvar_t	*cl_timeNudgeSafeServerTime;
-cvar_t	*cl_smoothenSnapLag;
 cvar_t	*cl_showTimeDelta;
 cvar_t	*cl_freezeDemo;
 
 cvar_t	*cl_drawRecording;
 
-cvar_t	*cl_snapOrderTolerance;
-cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
@@ -58,8 +45,6 @@ cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_aviMotionJpegQuality;
 cvar_t	*cl_forceavidemo;
-cvar_t	*cl_aviPipeFormat;
-cvar_t	*cl_aviPipeExtension;
 
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;
@@ -81,8 +66,6 @@ cvar_t	*mv_allowDownload;
 cvar_t	*cl_conXOffset;
 cvar_t	*cl_inGameVideo;
 
-cvar_t	*cl_numpadNumberBinds;
-
 cvar_t	*cl_serverStatusResendTime;
 cvar_t	*cl_trn;
 cvar_t	*cl_framerate;
@@ -96,14 +79,6 @@ cvar_t *cl_colorStringCount;
 cvar_t *cl_colorStringRandom;
 
 cvar_t	*cl_autolodscale;
-
-// Buffered reordering for demo recording.
-cvar_t	*cl_demoRecordBufferedReorder;
-cvar_t	*cl_demoRecordBufferedReorderTimeout;
-
-std::map<int, std::unique_ptr<bufferedMessageContainer_t>> bufferedDemoMessages;
-typedef std::map<int, std::unique_ptr<bufferedMessageContainer_t>>::iterator bufferedDemoMessageIterator;
-
 
 cvar_t	*mv_slowrefresh;
 cvar_t	*mv_coloredTextShadows;
@@ -169,27 +144,18 @@ video [filename]
 void CL_Video_f( void )
 {
 	char  filename[ MAX_OSPATH ];
-	const char* ext;
-	qboolean pipe;
 	int   i, last;
 
 	if( !clc.demoplaying )
 		{
-			Com_Printf("The %s command can only be used when playing back demos\n", Cmd_Argv(0));
+			Com_Printf( "The video command can only be used when playing back demos\n" );
 			return;
 		}
-
-	pipe = (qboolean)(Q_stricmp(Cmd_Argv(0), "video-pipe") == 0);
-
-	if (pipe)
-		ext = cl_aviPipeExtension->string;
-	else
-		ext = "avi";
 
 	if( Cmd_Argc( ) == 2 )
 		{
 			// explicit filename
-			Com_sprintf(filename, sizeof(filename), "videos/video%04d.%s", i, ext);
+			Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
 		}
 	else
 		{
@@ -208,8 +174,8 @@ void CL_Video_f( void )
 					last -= c * 10;
 					d = last;
 
-					Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.%s",
-						     a, b, c, d, ext );
+					Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
+						     a, b, c, d );
 
 					if( !FS_FileExists( filename ) )
 						break; // file doesn't exist
@@ -222,7 +188,7 @@ void CL_Video_f( void )
 				}
 		}
 
-	CL_OpenAVIForWriting( filename, pipe );
+	CL_OpenAVIForWriting( filename );
 }
 
 /*
@@ -382,8 +348,6 @@ void CL_RandomizeColors(const char* in, char *out) {
 	*s = '\0';
 }
 
-extern cvar_t* r_fullbright;
-
 static void CL_ColorName_f(void) {
 	char name[MAX_TOKEN_CHARS];
 	char coloredName[MAX_TOKEN_CHARS];
@@ -391,7 +355,7 @@ static void CL_ColorName_f(void) {
 	int storebitcount = cl_colorStringCount->integer;
 
 	Cvar_VariableStringBuffer("name", name, sizeof(name));
-	Q_StripColor(name, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
+	Q_StripColor(name);
 	if (Cmd_Argc() == 1) {
 		CL_RandomizeColors(name, coloredName);
 		Cvar_Set("name", va("%s", coloredName));
@@ -528,12 +492,11 @@ CL_WriteDemoMessage
 Dumps the current net message, prefixed by the length
 ====================
 */
-void CL_WriteDemoMessage ( msg_t *msg, int headerBytes, int sequenceNumber ) {
+void CL_WriteDemoMessage ( msg_t *msg, int headerBytes ) {
 	int		len, swlen;
 
 	// write the packet sequence
-	//len = clc.serverMessageSequence;
-	len = sequenceNumber;
+	len = clc.serverMessageSequence;
 	swlen = LittleLong( len );
 	FS_Write (&swlen, 4, clc.demofile);
 
@@ -544,54 +507,6 @@ void CL_WriteDemoMessage ( msg_t *msg, int headerBytes, int sequenceNumber ) {
 	FS_Write ( msg->data + headerBytes, len, clc.demofile );
 }
 
-/*
-====================
-CL_WriteBufferedDemoMessages
-
-Writes messages from the buffered demo packets map into the demo if they are either 
-follow ups to a previously written messages without a gap or if they are at least the timeout age.
-
-If called with qtrue parameter, timeout will be ignored and all messages will be flushed and written
-into the demo file.
-====================
-*/
-void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
-	static msg_t tmpMsg;
-	static byte tmpMsgData[MAX_MSGLEN];
-	tmpMsg.data = tmpMsgData;
-
-	// First write messages that exist without a gap.
-	while (bufferedDemoMessages.find(clc.demoLastWrittenSequenceNumber + 1) != bufferedDemoMessages.end()) {
-		// While we have all the messages without any gaps, we can just dump them all into the demo file.
-		MSG_FromBuffered(&tmpMsg, &bufferedDemoMessages[clc.demoLastWrittenSequenceNumber + 1].get()->msg);
-		CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount, clc.demoLastWrittenSequenceNumber + 1);
-		clc.demoLastWrittenSequenceNumber = clc.demoLastWrittenSequenceNumber + 1;
-		bufferedDemoMessages.erase(clc.demoLastWrittenSequenceNumber);
-	}
-
-	// Now write messages that are older than the timeout. Also do a bit of cleanup while we're at it.
-	// bufferedDemoMessages is a map and maps are ordered, so the key (sequence number) should be incrementing.
-	for (bufferedDemoMessageIterator it = bufferedDemoMessages.begin(); it != bufferedDemoMessages.end();) {
-		bufferedDemoMessageIterator tmpIt = it;
-		it++;
-		if (tmpIt->first <= clc.demoLastWrittenSequenceNumber) { // Older or identical number to stuff we already wrote. Discard.
-			bufferedDemoMessages.erase(tmpIt);
-			continue;
-		}
-		// First potential candidate.
-		if (forceWriteAll || tmpIt->second.get()->time + cl_demoRecordBufferedReorderTimeout->integer < Com_RealTime(NULL)) {
-			MSG_FromBuffered(&tmpMsg, &tmpIt->second.get()->msg);
-			CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount,tmpIt->first);
-			clc.demoLastWrittenSequenceNumber = tmpIt->first;
-			bufferedDemoMessages.erase(tmpIt);
-		}
-		else {
-			// Not old enough. When there are gaps we want to wait X amount of seconds before writing a new
-			// message so that older ones can still arrive.
-			break; // Since the messages in the map are ordered, if we're not writing this one, no need to continue.
-		}
-	}
-}
 
 /*
 ====================
@@ -606,10 +521,6 @@ void CL_StopRecord_f( void ) {
 	if ( !clc.demorecording ) {
 		Com_Printf ("Not recording a demo.\n");
 		return;
-	}
-
-	if (cl_demoRecordBufferedReorder->integer) {
-		CL_WriteBufferedDemoMessages(qtrue); // Flush all messages into the demo file.
 	}
 
 	// finish up
@@ -718,9 +629,7 @@ void CL_Record_f( void ) {
 	Q_strncpyz( clc.demoName, demoName, sizeof( clc.demoName ) );
 
 	// don't start saving messages until a non-delta compressed message is received
-	clc.demowaiting = 2; // request non-delta message with value 2.
-	clc.demoSkipPacket = qfalse; // We sometimes want to skip a packet, for example when a packet arrives out of order
-	clc.demoLastWrittenSequenceNumber = 0;
+	clc.demowaiting = qtrue;
 
 	// write out the gamestate message
 	MSG_Init (&buf, bufData, sizeof(bufData));
@@ -790,14 +699,6 @@ CLIENT SIDE DEMO PLAYBACK
 CL_DemoCompleted
 =================
 */
-
-#ifdef CL_EZDEMO
-extern const char* PDCOUNT;
-extern int 			ezdemoPlayerstateClientNum;
-extern qboolean 	ezdemoActive;
-static qboolean 	ezdemoClearEventsAfterThisDemo = qfalse;
-#endif
-
 void CL_DemoCompleted( void ) {
 	if (cl_timedemo && cl_timedemo->integer) {
 		int	time;
@@ -808,24 +709,6 @@ void CL_DemoCompleted( void ) {
 			time/1000.0, clc.timeDemoFrames*1000.0 / time);
 		}
 	}
-
-#ifdef CL_EZDEMO
-	if (ezdemoActive) {
-		const int eventCount = Cvar_VariableIntegerValue(PDCOUNT);
-
-		if (eventCount > 0) {
-			//We found some events during ezdemo. Now start playing the demo normally and let cgame handle fastforwarding to these events.
-			ezdemoClearEventsAfterThisDemo = qtrue;
-			Cbuf_AddText(va("demo \"%s\"\n", clc.demoName));
-		}
-		else {
-			Cvar_SetValue(PDCOUNT, 0);
-		}
-	}
-
-	ezdemoActive = qfalse;
-	ezdemoPlayerstateClientNum = -1;
-#endif
 
 	CL_NextDemo();
 	CL_Disconnect_f();
@@ -841,7 +724,6 @@ void CL_ReadDemoMessage( void ) {
 	int			r;
 	msg_t		buf;
 	byte		bufData[ MAX_MSGLEN ];
-	std::vector<byte> bufDataRaw;
 	int			s;
 
 	if ( !clc.demofile ) {
@@ -858,13 +740,7 @@ void CL_ReadDemoMessage( void ) {
 	clc.serverMessageSequence = LittleLong( s );
 
 	// init the message
-	if (clc.demoIsCompressed) {
-		bufDataRaw.clear();
-		MSG_InitRaw(&buf, &bufDataRaw); // Input message
-	}
-	else {
-		MSG_Init(&buf, bufData, sizeof(bufData));
-	}
+	MSG_Init( &buf, bufData, sizeof( bufData ) );
 
 	// get the length
 	r = FS_Read (&buf.cursize, 4, clc.demofile);
@@ -880,15 +756,7 @@ void CL_ReadDemoMessage( void ) {
 	if ( buf.cursize > buf.maxsize ) {
 		Com_Error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
-
-	if (buf.raw) {
-		buf.dataRaw->resize(buf.cursize);
-		r = FS_Read(buf.dataRaw->data(), buf.cursize, clc.demofile);
-	}
-	else {
-		r = FS_Read(buf.data, buf.cursize, clc.demofile);
-	}
-
+	r = FS_Read( buf.data, buf.cursize, clc.demofile );
 	if ( r != buf.cursize ) {
 		Com_Printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
@@ -919,7 +787,7 @@ void CL_PlayDemo_f( void ) {
 	char		name[MAX_OSPATH]/*, extension[32]*/;
 	char		arg[MAX_OSPATH];
 
-	if (Cmd_Argc() < 2) {
+	if (Cmd_Argc() != 2) {
 		Com_Printf ("demo <demoname>\n");
 		return;
 	}
@@ -937,20 +805,11 @@ void CL_PlayDemo_f( void ) {
 	*/
 
 	// open the demo file
-	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) 
-		|| !Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16") // Compressed types
-		)
+	if ( !Q_stricmp( arg + strlen(arg) - strlen(".dm_15"), ".dm_15" ) || !Q_stricmp( arg + strlen(arg) - strlen(".dm_16"), ".dm_16" ) )
 	{ // Load "dm_15" and "dm_16" demos.
 		Com_sprintf (name, sizeof(name), "demos/%s", arg);
 
-		if (!Q_stricmp(arg + strlen(arg) - strlen(".dmc15"), ".dmc15") || !Q_stricmp(arg + strlen(arg) - strlen(".dmc16"), ".dmc16")) {
-			clc.demoIsCompressed = qtrue;
-			FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue); // Compressed type
-		}
-		else {
-			clc.demoIsCompressed = qfalse;
-			FS_FOpenFileRead(name, &clc.demofile, qtrue);
-		}
+		FS_FOpenFileRead( name, &clc.demofile, qtrue );
 		if (!clc.demofile)
 		{
 			if (!Q_stricmp(arg, "(null)"))
@@ -966,62 +825,28 @@ void CL_PlayDemo_f( void ) {
 	}
 	else
 	{
-
 		// Check for both, "dm_15" and "dm_16".
-		Com_sprintf(name, sizeof(name), "demos/%s.dmc15", arg);// Compressed dm_15 type
-		clc.demoIsCompressed = qtrue;
-		FS_FOpenFileRead(name, &clc.demofile, qtrue,MODULE_MAIN,qtrue);
-		if (!clc.demofile)
+		Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
+		FS_FOpenFileRead( name, &clc.demofile, qtrue );
+		if ( !clc.demofile )
 		{
-			Com_sprintf(name, sizeof(name), "demos/%s.dm_15", arg);
-			clc.demoIsCompressed = qfalse;
-			FS_FOpenFileRead(name, &clc.demofile, qtrue);
-			if (!clc.demofile)
+			Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
+			FS_FOpenFileRead( name, &clc.demofile, qtrue );
+			if ( !clc.demofile )
 			{
-				Com_sprintf(name, sizeof(name), "demos/%s.dmc16", arg);// Compressed dm_16 type
-				clc.demoIsCompressed = qtrue;
-				FS_FOpenFileRead(name, &clc.demofile, qtrue, MODULE_MAIN, qtrue);
-				if (!clc.demofile)
+				if (!Q_stricmp(arg, "(null)"))
 				{
-					Com_sprintf(name, sizeof(name), "demos/%s.dm_16", arg);
-					clc.demoIsCompressed = qfalse;
-					FS_FOpenFileRead(name, &clc.demofile, qtrue);
-					if (!clc.demofile)
-					{
-						if (!Q_stricmp(arg, "(null)"))
-						{
-							Com_Error(ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED"));
-						}
-						else
-						{
-							Com_Error(ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
-						}
-						return;
-					}
+					Com_Error( ERR_DROP, "%s", SP_GetStringTextString("CON_TEXT_NO_DEMO_SELECTED") );
 				}
+				else
+				{
+					Com_Error( ERR_DROP, "couldn't open demos/%s.dm_15 or demos/%s.dm_16", arg, arg);
+				}
+				return;
 			}
 		}
 	}
 	Q_strncpyz( clc.demoName, arg, sizeof( clc.demoName ) );
-
-
-	// Set the protocol according to the the demo-file.
-	if (!Q_stricmp(name + strlen(name) - strlen(".dm_15"), ".dm_15") || !Q_stricmp(name + strlen(name) - strlen(".dmc15"), ".dmc15")) {
-		MV_SetCurrentGameversion(VERSION_1_02);
-		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
-	}
-	else if (!Q_stricmp(name + strlen(name) - strlen(".dm_16"), ".dm_16") || !Q_stricmp(name + strlen(name) - strlen(".dmc16"), ".dmc16")) {
-		MV_SetCurrentGameversion(VERSION_1_04);
-	}
-
-#ifdef CL_EZDEMO
-	void CL_Ezemo_JustDoIt(void);
-	if (ezdemoActive) {
-		CL_Ezemo_JustDoIt();
-		ezdemoActive = qfalse;
-		return;
-	}
-#endif
 
 	Con_Close();
 
@@ -1030,6 +855,15 @@ void CL_PlayDemo_f( void ) {
 	com_demoplaying = qtrue;
 
 	Q_strncpyz( cls.servername, arg, sizeof( cls.servername ) );
+
+	// Set the protocol according to the the demo-file.
+	if ( !Q_stricmp( name + strlen(name) - strlen(".dm_15"), ".dm_15" ) ) {
+		MV_SetCurrentGameversion(VERSION_1_02);
+		demoCheckFor103 = true;	//if this demo happens to be a 1.03 demo, check for that in CL_ParseGamestate
+	}
+	else if ( !Q_stricmp( name + strlen(name) - strlen(".dm_16"), ".dm_16" ) ) {
+		MV_SetCurrentGameversion(VERSION_1_04);
+	}
 
 	// read demo messages until connected
 	while ( cls.state >= CA_CONNECTED && cls.state < CA_PRIMED ) {
@@ -1118,6 +952,8 @@ ways a client gets into a game
 Also called by Com_Error
 =================
 */
+extern void FixGhoul2InfoLeaks(bool);
+
 void CL_FlushMemory( qboolean disconnecting ) {
 
 	// shutdown all the client stuff
@@ -1126,6 +962,7 @@ void CL_FlushMemory( qboolean disconnecting ) {
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running->integer ) {
 		// clear collision map data
+		FixGhoul2InfoLeaks(false);
 		CM_ClearMap();
 		// clear the whole hunk
 		Hunk_Clear();
@@ -1209,7 +1046,6 @@ void CL_ClearState (void) {
 	Com_Memset( &cl, 0, sizeof( cl ) );
 }
 
-extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
 
 /*
 =====================
@@ -1221,35 +1057,10 @@ Sends a disconnect message to the server
 This is also called on Com_Error and Com_Quit, so it shouldn't cause any errors
 =====================
 */
-#ifdef CL_EZDEMO
-void CL_EzdemoClearEvents(void);
-#endif
 void CL_Disconnect( qboolean showMainMenu ) {
-#ifdef CL_EZDEMO
-	static int rec = 0;
-	static int demoClearAt = -1;
-#endif
-
 	if ( !com_cl_running || !com_cl_running->integer ) {
 		return;
 	}
-
-#ifdef CL_EZDEMO
-	++rec;
-
-	// WORST HACK.. EVER
-	if (rec == demoClearAt) {
-		CL_EzdemoClearEvents();
-		demoClearAt = -1;
-	}
-
-	if (ezdemoClearEventsAfterThisDemo) {
-		ezdemoClearEventsAfterThisDemo = qfalse;
-		demoClearAt = rec + 2;
-	}
-#endif
-
-	clRenderInfo.wallhackOk = qtrue;
 
 	// shutting down the client so enter full screen ui mode
 	Cvar_Set("r_uiFullScreen", "1");
@@ -1291,7 +1102,6 @@ void CL_Disconnect( qboolean showMainMenu ) {
 
 	// wipe the client connection
 	Com_Memset( &clc, 0, sizeof( clc ) );
-	fragmentBuffers.clear();
 
 	cls.state = CA_DISCONNECTED;
 
@@ -1459,14 +1269,12 @@ CL_Reconnect_f
 ================
 */
 void CL_Reconnect_f( void ) {
-#ifndef NOCONNECT
 	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
 	Cvar_Set("ui_singlePlayerActive", "0");
 	Cbuf_AddText( va("connect %s\n", cls.servername ) );
-#endif
 }
 
 /*
@@ -1476,7 +1284,6 @@ CL_Connect_f
 ================
 */
 void CL_Connect_f( void ) {
-#ifndef NOCONNECT
 	char	server[MAX_OSPATH];
 
 	if ( Cmd_Argc() != 2 ) {
@@ -1543,7 +1350,6 @@ void CL_Connect_f( void ) {
 
 	// server connection string
 	Cvar_Set( "cl_currentServerAddress", server );
-#endif
 }
 
 #define MAX_RCON_MESSAGE 1024
@@ -1624,7 +1430,7 @@ static void CL_CompleteRedirect( char *args, int argNum )
 	char *p = Com_SkipTokens( args, 1, " " );
 
 	if( p > args )
-		Field_CompleteCommand( p, qtrue, qtrue, qtrue , qtrue);
+		Field_CompleteCommand( p, qtrue, qtrue, qtrue );
 }
 
 /*
@@ -1742,21 +1548,6 @@ void CL_Vid_Restart_f( void ) {
 		// send pure checksums
 		CL_SendPureChecksums();
 	}
-
-	// Reapply mvremaps to override classic ones
-	CL_ShaderStateChanged();
-}
-
-/*
-=================
-CL_Fs_Restart_f
-
-Restart the filesystem
-=================
-*/
-
-void CL_FS_Restart_f( void ) {
-	FS_Restart( clc.checksumFeed ); //xD
 }
 
 /*
@@ -2028,6 +1819,7 @@ void CL_BeginDownload( const char *localName, const char *remoteName ) {
 			if (cls.downloadBlacklist[i].checksum == clc.downloadChksums[clc.downloadIndex]) {
 				// file is blacklisted
 				Com_Printf("Skipping download for blacklisted file %s\n", remoteName);
+				clc.downloadIndex++;
 				CL_NextDownload();
 				return;
 			}
@@ -2067,14 +1859,19 @@ Stores it in the current game directory.
 void CL_ContinueCurrentDownload(dldecision_t decision) {
 	if (decision == DL_ABORT) {
 		// user disallowed the file
+		clc.downloadIndex++;
 		CL_NextDownload();
 	} else if (decision == DL_ABORT_BLACKLIST) {
 		// user disallowed the file and never wants to be asked again
 		Com_DPrintf("Blacklisted file with checksum %i", clc.downloadChksums[clc.downloadIndex]);
 		CL_BlacklistCurrentFile();
+
+		clc.downloadIndex++;
 		CL_NextDownload();
 	} else {
 		// user accepted the file
+		clc.downloadIndex++;
+
 		Com_Printf("^1****** ^7File Download ^1******^7\n"
 			"Localname: %s\n"
 			"Remotename: %s\n"
@@ -2097,7 +1894,7 @@ void CL_ContinueCurrentDownload(dldecision_t decision) {
 			// Try to create the destination folder
 			FS_CreatePath(tmp_os_path);
 			
-			clc.httpHandle = NET_HTTP_StartDownload(remotepath, tmp_os_path, CL_EndHTTPDownload, CL_ProcessHTTPDownload);
+			clc.httpHandle = NET_HTTP_StartDownload(remotepath, tmp_os_path, CL_EndHTTPDownload, CL_ProcessHTTPDownload, Q3_VERSION, va("jk2://%s", NET_AdrToString(clc.serverAddress)));
 		} else {
 			clc.downloadBlock = 0; // Starting new file
 			clc.downloadCount = 0;
@@ -2156,7 +1953,6 @@ void CL_NextDownload(void) {
 		// move over the rest
 		memmove( clc.downloadList, s, strlen(s) + 1);
 
-		clc.downloadIndex++;
 		CL_BeginDownload(localNameCpy, remoteNameCpy);
 
 		return;
@@ -2176,7 +1972,7 @@ and determine if we need to download them
 void CL_InitDownloads(void) {
 	char missingfiles[1024];
 
-	clc.downloadIndex = -1;
+	clc.downloadIndex = 0;
 
 	if (cls.ignoreNextDownloadList) {
 		cls.ignoreNextDownloadList = qfalse;
@@ -2279,7 +2075,7 @@ void CL_CheckForResend( void ) {
 		Info_SetValueForKey( info, "qport", va("%i", port ) );
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		Com_sprintf(data, sizeof(data), "connect \"%s\"", info );
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (unsigned char *)data, (int)strlen(data), sizeof("connect")-1);
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (unsigned char *)data, (int)strlen(data) );
 
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
@@ -2533,7 +2329,7 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 #ifndef MAX_STRIPED_SV_STRING
 #define MAX_STRIPED_SV_STRING 1024
 #endif
-void CL_CheckSVStripEdRef(char *buf, int bufSize, const char *str)
+static void CL_CheckSVStripEdRef(char *buf, const char *str)
 { //I don't really like doing this. But it utilizes the system that was already in place.
 	int i = 0;
 	int b = 0;
@@ -2549,7 +2345,7 @@ void CL_CheckSVStripEdRef(char *buf, int bufSize, const char *str)
 		return;
 	}
 
-	Q_strncpyz(buf, str, bufSize);
+	strcpy(buf, str);
 
 	strLen = (int)strlen(str);
 
@@ -2601,9 +2397,6 @@ void CL_CheckSVStripEdRef(char *buf, int bufSize, const char *str)
 
 	buf[b] = 0;
 }
-
-
-
 
 
 /*
@@ -2724,7 +2517,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 			char sTemp[MAX_STRIPED_SV_STRING];
 
 			s = MSG_ReadString( msg );
-			CL_CheckSVStripEdRef(sTemp,sizeof(sTemp), s);
+			CL_CheckSVStripEdRef(sTemp, s);
 			Q_strncpyz( clc.serverMessage, sTemp, sizeof( clc.serverMessage ) );
 			Com_Printf( "%s", sTemp );
 		}
@@ -2788,16 +2581,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 		return;
 	}
 
-	int sequenceNumber;
-	qboolean validButOutOfOrder;
-	qboolean process = CL_Netchan_Process(&clc.netchan, msg, &sequenceNumber, &validButOutOfOrder);
-	if (cl_demoRecordBufferedReorder->integer && clc.demorecording && (process || validButOutOfOrder) ) {
-		std::unique_ptr<bufferedMessageContainer_t> messageContainer(new bufferedMessageContainer_t(msg));
-		messageContainer->time = Com_RealTime(NULL); // Remember when we wrote this
-		messageContainer->containsFullSnapshot = qfalse; // to be determined.
-		bufferedDemoMessages[sequenceNumber] = std::move(messageContainer);
-	}
-	if (!process) {
+	if (!CL_Netchan_Process( &clc.netchan, msg) ) {
 		return;		// out of order, duplicated, etc
 	}
 
@@ -2816,22 +2600,10 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	// we don't know if it is ok to save a demo message until
 	// after we have parsed the frame
 	//
-	if ( clc.demorecording && !clc.demowaiting && !clc.demoSkipPacket ) {
-		if (cl_demoRecordBufferedReorder->integer) {
-			CL_WriteBufferedDemoMessages();
-		}
-		else {
-			CL_WriteBufferedDemoMessages(qtrue); // Flush all messages (if any) in case cl_demoRecordBufferedReorder was deactivated and there's still something in the queue. Otherwise we might lose vital messages.
-			CL_WriteDemoMessage(msg, headerBytes, sequenceNumber);
-			clc.demoLastWrittenSequenceNumber = sequenceNumber;
-		}
+	if ( clc.demorecording && !clc.demowaiting ) {
+		CL_WriteDemoMessage( msg, headerBytes );
 	}
-	clc.demoSkipPacket = qfalse; // Reset again for next message
-	// TODO Maybe instead make a queue of packages to be written to the demo file.
-	// Then just read them in the correct order. That way we can integrate even packages out of order.
-	// However it's low priority bc this error is relatively rare.
 }
-
 
 /*
 ==================
@@ -2860,22 +2632,6 @@ void CL_CheckTimeout( void ) {
 
 
 //============================================================================
-
-
-/*
-==================
-CL_NoDelay
-==================
-*/
-qboolean CL_NoDelay(void)
-{
-	extern cvar_t* com_timedemo;
-
-	if (CL_VideoRecording() || (com_timedemo->integer && clc.demofile != FS_INVALID_HANDLE))
-		return qtrue;
-
-	return qfalse;
-}
 
 /*
 ==================
@@ -2963,6 +2719,7 @@ CL_Frame
 */
 static unsigned int frameCount;
 static float avgFrametime=0.0;
+extern void SP_CheckForLanguageUpdates(void);
 void CL_Frame ( int msec ) {
 	qboolean render = qfalse;
 
@@ -2977,7 +2734,6 @@ void CL_Frame ( int msec ) {
 
 	SP_CheckForLanguageUpdates();	// will take zero time to execute unless language changes, then will reload strings.
 									//	of course this still doesn't work for menus...
-	SE_CheckForLanguageUpdates();
 
 	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
 		&& !com_sv_running->integer ) {
@@ -3042,7 +2798,6 @@ void CL_Frame ( int msec ) {
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
 	}
 
-
 	CL_CheckCvarUpdate();
 
 	// see if we need to update any userinfo
@@ -3068,7 +2823,6 @@ void CL_Frame ( int msec ) {
 		// update audio
 		S_Update();
 	}
-
 
 	// advance local effects for next frame
 	SCR_RunCinematic();
@@ -3328,54 +3082,6 @@ void CL_SetForcePowers_f( void ) {
 #define G2_VERT_SPACE_CLIENT_SIZE 256
 #endif
 
-#ifdef CL_EZDEMO
-void CL_Ezdemo_f(void);
-#endif
-
-
-/*
-=================
-MV_UpdateClFlags
-
-Called by CL_Init. Updates the mv_clFlags accoding to the current settings
-
-At the time of initial implementation there is only two clFlags, one which is always active and one which could be determined at compile time, so the function is not required, yet.
-However in future versions users might be able to disable some of the features, so the clFlags need to be adjusted in such cases
-=================
-*/
-void MV_UpdateClFlags( void )
-{
-	// mv_clFlags - Used to inform the server about available jk2mv clientside features
-	static cvar_t *mv_clFlags;
-	char *value;
-	int intValue = 0;
-
-	// Check for the features and determine the flags
-	if ( MV_APILEVEL >= 4 ) intValue |= MV_CLFLAG_SUBMODEL_BYPASS;
-	intValue |= MV_CLFLAG_ADVANCED_REMAPS;
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// !!! Forks of JK2MV should NOT modify the mv_clFlags                             !!!
-	// !!! Removal, replacement or adding of new flags might lead to incompatibilities !!!
-	// !!! Forks should define their own userinfo cvar instead of modifying this       !!!
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	// If the current clFlags match the intValue we can return
-	if ( mv_clFlags && mv_clFlags->integer == intValue ) return;
-
-	// We need a string when registering/setting the cvar
-	value = va( "%i", intValue );
-
-	if ( !mv_clFlags )
-	{ // Register the cvar as rom, internal and userinfo for the server to see, but without users manually changing it
-		mv_clFlags = Cvar_Get( "mv_clFlags", value, CVAR_ROM|CVAR_INTERNAL|CVAR_USERINFO );
-	}
-	else
-	{ // Update the cvar
-		Cvar_Set( "mv_clFlags", value );
-	}
-}
-
 /*
 ====================
 CL_Init
@@ -3383,8 +3089,6 @@ CL_Init
 */
 void CL_Init( void ) {
 	Com_Printf( "----- Client Initialization -----\n" );
-
-	clRenderInfo.wallhackOk = qtrue; // at the start its ok (menu etc)
 
 	Con_Init ();
 
@@ -3405,11 +3109,6 @@ void CL_Init( void ) {
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
-	cl_timeNudgeAntiLagHack = Cvar_Get ("cl_timeNudgeAntiLagHack", "1", CVAR_CHEAT );
-	cl_timeNudgeSafeServerTime = Cvar_Get("cl_timeNudgeSafeServerTime", "-1", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_INTERNAL);
-	cl_smoothenSnapLag = Cvar_Get("cl_smoothenSnapLag", "1", CVAR_ARCHIVE);
-	cl_snapOrderTolerance = Cvar_Get ("cl_snapOrderTolerance", "100", CVAR_ARCHIVE);
-	cl_snapOrderToleranceDemoSkipPackets = Cvar_Get("cl_snapOrderToleranceDemoSkipPackets", "1", CVAR_ARCHIVE);
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
 	cl_showTimeDelta = Cvar_Get ("cl_showTimeDelta", "0", CVAR_TEMP );
@@ -3425,22 +3124,14 @@ void CL_Init( void ) {
 	cl_aviMotionJpegQuality = Cvar_Get("cl_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
 	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
 
-	cl_aviPipeFormat = Cvar_Get("cl_aviPipeFormat",
-		"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420p "
-		"-bf 2 -max_muxing_queue_size 4096 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
-		CVAR_ARCHIVE);
-	cl_aviPipeExtension = Cvar_Get("cl_aviPipeExtension","mp4",	CVAR_ARCHIVE);
-
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
 	cl_yawspeed = Cvar_Get("cl_yawspeed", "140", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_pitchspeed = Cvar_Get("cl_pitchspeed", "140", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_anglespeedkey = Cvar_Get("cl_anglespeedkey", "1.5", CVAR_ARCHIVE | CVAR_GLOBAL);
 
-	cl_maxpackets = Cvar_Get("cl_maxpackets", "1000", CVAR_ARCHIVE | CVAR_GLOBAL);
+	cl_maxpackets = Cvar_Get("cl_maxpackets", "125", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_packetdup = Cvar_Get("cl_packetdup", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-	cl_maxPacketUserCmds = Cvar_Get("cl_maxPacketUserCmds", "128", CVAR_ARCHIVE | CVAR_GLOBAL);
-	cl_dynamicUserPacket = Cvar_Get("cl_dynamicUserPacket", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	cl_sensitivity = Cvar_Get("sensitivity", "5", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -3453,14 +3144,9 @@ void CL_Init( void ) {
 
 	cl_autolodscale = Cvar_Get("cl_autolodscale", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
-	cl_demoRecordBufferedReorder = Cvar_Get("cl_demoRecordBufferedReorder", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-	cl_demoRecordBufferedReorderTimeout = Cvar_Get("cl_demoRecordBufferedReorderTimeout", "10", CVAR_ARCHIVE | CVAR_GLOBAL);
-
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 
 	cl_inGameVideo = Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-
-	cl_numpadNumberBinds = Cvar_Get("cl_numpadNumberBinds", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
@@ -3485,8 +3171,8 @@ void CL_Init( void ) {
 
 	// userinfo
 	Cvar_Get("name", "Padawan", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("rate", "90000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("snaps", "1000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("rate", "50000", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
+	Cvar_Get("snaps", "30", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 	Cvar_Get("model", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 //	Cvar_Get ("headmodel", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get("team_model", "kyle/default", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -3504,24 +3190,13 @@ void CL_Init( void ) {
 
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
-	//Cvar_Get ("cg_optimizedPredict", "0", CVAR_ARCHIVE );
-
-	//default sabers
-	Cvar_Get("saber1", DEFAULT_SABER1, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("saber2", DEFAULT_SABER2, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-
-	//skin color
-	Cvar_Get("char_color_red", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("char_color_green", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("char_color_blue", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
-	Cvar_Get("char_color_alpha", "255", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	// cgame might not be initialized before menu is used
 	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );
 	
 	// autorecord
 	cl_autoDemo = Cvar_Get ("cl_autoDemo", "0", CVAR_ARCHIVE | CVAR_GLOBAL );
-	cl_autoDemoFormat = Cvar_Get ("cl_autoDemoFormat", "%d_%t_%m", CVAR_ARCHIVE | CVAR_GLOBAL );
+	cl_autoDemoFormat = Cvar_Get ("cl_autoDemoFormat", "%t_%m", CVAR_ARCHIVE | CVAR_GLOBAL );
 
 	// mv cvars
 	mv_slowrefresh = Cvar_Get("mv_slowrefresh", "3", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -3543,8 +3218,6 @@ void CL_Init( void ) {
 
 	cl_logChat = Cvar_Get("cl_logChat", "1", CVAR_ARCHIVE|CVAR_GLOBAL);
 
-	// Update cl flags userinfo
-	MV_UpdateClFlags();
 
 	//
 	// register our commands
@@ -3552,7 +3225,6 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
-	Cmd_AddCommand ("fs_restart", CL_FS_Restart_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
 	Cmd_AddCommand ("vid_restart", CL_Vid_Restart_f);
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
@@ -3570,11 +3242,6 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("setenv", CL_Setenv_f );
 	Cmd_AddCommand ("ping", CL_Ping_f );
 	Cmd_AddCommand ("serverstatus", CL_ServerStatus_f );
-
-#ifdef CL_EZDEMO
-	Cmd_AddCommand("ezdemo", CL_Ezdemo_f); // "find cool events in a demo like dbs returns..\\<demo> [options]"},
-#endif
-
 	Cmd_AddCommand ("showip", CL_ShowIP_f );
 	Cmd_AddCommand ("fs_openedList", CL_OpenedPK3List_f );
 	Cmd_AddCommand ("fs_referencedList", CL_ReferencedPK3List_f );
@@ -3586,7 +3253,6 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("saveDemo", demoAutoSave_f);
 	Cmd_AddCommand ("saveDemoLast", demoAutoSaveLast_f);
 	Cmd_AddCommand ("video", CL_Video_f);
-	Cmd_AddCommand ("video-pipe", CL_Video_f); // from quake3e
 	Cmd_AddCommand ("stopvideo", CL_StopVideo_f);
 	Cmd_AddCommand ("silent", CL_Silent_f);
 	Cmd_SetCommandCompletionFunc( "silent", CL_CompleteRedirect );
@@ -3619,8 +3285,6 @@ CL_Shutdown
 */
 void CL_Shutdown( void ) {
 	static qboolean recursive = qfalse;
-
-	clRenderInfo.wallhackOk = qtrue;
 
 	Com_Printf( "----- CL_Shutdown -----\n" );
 
@@ -4720,154 +4384,4 @@ void CL_GetVMGLConfig(vmglconfig_t *vmglconfig) {
 	vmglconfig->isFullscreen = cls.glconfig.isFullscreen;
 	vmglconfig->stereoEnabled = cls.glconfig.stereoEnabled;
 	vmglconfig->smpActive = cls.glconfig.smpActive;
-}
-
-void CL_ShaderStateChanged( void ) {
-	// Originally copied from CG_ShaderStateChanged, but rewritten to avoid issues of the original implementation and to
-	// support settings
-	char originalShader[MAX_QPATH];
-	char newShader[MAX_QPATH];
-	char settings[32];
-	char *timeOffset;
-	char *lightmapMode;
-	char *styleMode;
-
-	shaderRemapLightmapType_t lightmapModeValue;
-	shaderRemapStyleType_t styleModeValue;
-
-	const char *curPos;
-	const char *endPos;
-
-	int length;
-
-	// Make sure it's a valid configstring index
-	if ( cls.cs_remaps < CS_SYSTEMINFO || cls.cs_remaps >= MAX_CONFIGSTRINGS ) return;
-
-	// Clear any active remaps. We are going to reapply those that should stay below when parsing the string anyway.
-	re.RemoveAdvancedRemaps();
-
-	curPos = cl.gameState.stringData + cl.gameState.stringOffsets[ cls.cs_remaps ];
-	endPos = curPos + strlen( curPos );
-
-	// Handling of these is really ugly. I originally wanted to handle them like the base game/cgame modules do, but
-	// those are prone to injections. Summary of delimeter issues:
-	//  - base uses '=', ':' an '@', all of them can be used in shader names
-	//  - .shader files don't seem to support spaces in shader names, but texture paths support spaces
-	//  - .shader files allow most other characters, including backspace '\'
-	//  -> using a delimeter is not a reliable option
-
-	// The next best thing seemed to be to give the length of the shader before its name to allow all characters to be
-	// used. As I don't want to waste any space (configstrings containing shader paths are wasteful as it is), I decided
-	// to encode the length in a single byte (MAX_QPATH is 80, so a single byte can easily hold the length). However the
-	// netcode and the handling of quotes lead to other issues:
-	//  - 34 maps to 32, thus 32 could mean either of these numbers while 34 doesn't exist
-	//  - 37 and >127 map to 46, thus 37 doesn't exist and 46 could mean 37, 46 or >127
-	//  -> the biggest amount of consecutive numbers without multiple meanings spans from 47 to 127; as MAX_QPATH is 80
-	//     this should fix exactly
-	//  -> could also use the range from 38 to 127, because - when isolating the range - there are no duplicates within
-	//     it; this would allow for a size of up to 89, which is unlikely to be useful if MAX_QPATH ever gets increased
-	//  -> using 47 to 127
-
-	// Example input: "6console4clear929300;p;p;":
-	//  - "6" -> ascii 54 -> 54 - 47 = 7 -> the next 7 characters are the source shader name
-	//  - "console" -> source shader (7 characters)
-	//  - "4" -> ascii 52 -> 52 - 47 = 5 -> the next 5 characters are the destination shader name
-	//  - "clear" -> destination shader (5 characters)
-	//  - "9" -> ascii 57 -> 57 - 47 = 10 -> the next 10 characters are the options
-	//  - "29300;p;p;"
-	//    - "29300" -> timeOffset
-	//    - "p" -> lightmapMode
-	//    - "p" -> styleMode
-
-	// Parse configstring
-	while ( curPos < endPos )
-	{
-		// Read original shader
-		length = *(curPos++);
-		length -= 47; // Length is increased by 47 to workaround netchan limits
-		if ( length < 1 )
-		{
-			Com_DPrintf( "CL_ShaderStateChanged: invalid length encoding for source shader\n" );
-			break;
-		}
-		Q_strncpyz( originalShader, curPos, MIN((unsigned int)length+1, sizeof(originalShader)) );
-		curPos += length;
-
-		// Read new shader
-		if ( curPos >= endPos ) break;
-		length = *(curPos++);
-		length -= 47; // Length is increased by 47 to workaround netchan limits
-		if ( length < 1 )
-		{
-			Com_DPrintf( "CL_ShaderStateChanged: invalid length encoding for destination shader\n" );
-			break;
-		}
-		Q_strncpyz( newShader, curPos, MIN((unsigned int)length+1, sizeof(newShader)) );
-		curPos += length;
-
-		// Read settings
-		if ( curPos >= endPos ) break;
-		length = *(curPos++);
-		length -= 47; // Length is increased by 47 to workaround netchan limits
-		if ( length < 1 )
-		{
-			Com_DPrintf( "CL_ShaderStateChanged: invalid length encoding for settings\n" );
-			break;
-		}
-		Q_strncpyz( settings, curPos, MIN((unsigned int)length+1, sizeof(settings)) );
-		curPos += length;
-
-		// Get values from settings
-		timeOffset = strtok( settings, ";" );
-		lightmapMode = strtok( NULL, ";" );
-		styleMode = strtok( NULL, ";" );
-
-		// Pick lightmap value
-		if ( lightmapMode && *lightmapMode )
-		{
-			switch( *lightmapMode )
-			{
-				case 'p': // preserve
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_PRESERVE;
-					break;
-				case 'n': // none
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_NONE;
-					break;
-				case 'f': // fullbright
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_FULLBRIGHT;
-					break;
-				case 'v': // vertex
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_VERTEX;
-					break;
-				case '2': // 2d
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_2D;
-					break;
-				default: // fallback to preserve
-					lightmapModeValue = SHADERREMAP_LIGHTMAP_PRESERVE;
-					break;
-			}
-		}
-		else lightmapModeValue = SHADERREMAP_LIGHTMAP_PRESERVE; // fallback to preserve
-
-		// Pick style value
-		if ( styleMode && *styleMode )
-		{
-			switch( *styleMode )
-			{
-				case 'p': // preserve
-					styleModeValue = SHADERREMAP_STYLE_PRESERVE;
-					break;
-				case 'd': // default style
-					styleModeValue = SHADERREMAP_STYLE_DEFAULT;
-					break;
-				default: // fallback to preserve
-					styleModeValue = SHADERREMAP_STYLE_PRESERVE;
-					break;
-			}
-		}
-		else styleModeValue = SHADERREMAP_STYLE_PRESERVE; // fallback to preserve
-
-		// Apply remap
-		re.RemapShaderAdvanced( originalShader, newShader, timeOffset ? atoi(timeOffset) : 0, lightmapModeValue, styleModeValue );
-	}
 }

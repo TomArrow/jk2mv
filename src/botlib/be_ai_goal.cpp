@@ -469,7 +469,7 @@ void BotInitInfoEntities(void)
 	numcampspots = 0;
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 
 		//map locations
 		if (!strcmp(classname, "target_location"))
@@ -554,7 +554,7 @@ void BotInitLevelItems(void)
 
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		//
 		spawnflags = 0;
 		AAS_IntForBSPEpairKey(ent, "spawnflags", &spawnflags);

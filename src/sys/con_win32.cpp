@@ -73,21 +73,9 @@ static WORD CON_ColorCharToAttrib( char color, bool extendedColors ) {
 	else
 	{
 		const float *rgba;
-		int colIndex;
-		if (serverIsTommyTernal && Q_IsColorCharNT(color)) {
-			colIndex = ColorIndexNT(color);
-			if (colIndex > 127) {
-				colIndex = '1';
-			}
-			rgba = g_color_table_nt[colIndex]; // am i doing this right? idk
-		}
-		else {
-			colIndex = (extendedColors ? ColorIndex_Extended(color) : ColorIndex(color));
-			if (colIndex > 7) {
-				colIndex = COLOR_JK2MV_FALLBACK;
-			}
-			rgba = g_color_table[colIndex];
-		}
+		int colIndex = (extendedColors ? ColorIndex_Extended(color) : ColorIndex(color));
+		if ( colIndex > 7 ) colIndex = COLOR_JK2MV_FALLBACK;
+		rgba = g_color_table[ colIndex ];
 
 		// set foreground color
 		attrib = ( rgba[0] >= 0.5 ? FOREGROUND_RED		: 0 ) |
@@ -235,7 +223,7 @@ static void CON_Show( void )
 		if( i < qconsole_linelen )
 		{
 			if( i + 1 < qconsole_linelen &&
-					(Q_IsColorString( qconsole_line + i ) || (use102color && Q_IsColorString_1_02( qconsole_line + i )) || (serverIsTommyTernal && Q_IsColorStringNT( qconsole_line + i ))) )
+					(Q_IsColorString( qconsole_line + i ) || (use102color && Q_IsColorString_1_02( qconsole_line + i ))) )
 				attrib = CON_ColorCharToAttrib( *( qconsole_line + i + 1 ), qfalse );
 
 			line[ i ].Char.AsciiChar = qconsole_line[ i ];
@@ -324,7 +312,7 @@ void CON_Init( void )
 	}
 #endif
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	never_detach = qtrue;
 #endif
 
@@ -496,7 +484,7 @@ char *CON_Input( void )
 
 				Field_Clear( &f );
 				Q_strncpyz( f.buffer, qconsole_line, MAX_EDIT_LINE );
-				Field_AutoComplete( &f , qtrue);
+				Field_AutoComplete( &f );
 				Q_strncpyz( qconsole_line, f.buffer, sizeof( qconsole_line ) );
 				qconsole_linelen = (int)strlen( qconsole_line );
 				qconsole_cursor = qconsole_linelen;
@@ -591,7 +579,7 @@ void CON_WindowsColorPrint( const char *msg, bool extendedColors )
 	{
 		qconsole_drawinput = ( *msg == '\n' );
 
-		if( Q_IsColorString( msg ) || (use102color && Q_IsColorString_1_02(msg)) || (extendedColors && Q_IsColorString_Extended(msg)) || (serverIsTommyTernal && Q_IsColorStringNT(msg)) || *msg == '\n' )
+		if( Q_IsColorString( msg ) || (use102color && Q_IsColorString_1_02(msg)) || (extendedColors && Q_IsColorString_Extended(msg)) || *msg == '\n' )
 		{
 			// First empty the buffer
 			if( length > 0 )

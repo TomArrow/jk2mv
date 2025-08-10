@@ -207,7 +207,7 @@ int AAS_GetJumpPadInfo(int ent, vec3_t areastart, vec3_t absmins, vec3_t absmaxs
 	if (!speed) speed = 1000;
 	VectorClear(angles);
 	//get the mins, maxs and origin of the model
-	AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model));
+	AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY);
 	if (model[0]) modelnum = atoi(model+1);
 	else modelnum = 0;
 	AAS_BSPModelMinsMaxsOrigin(modelnum, angles, absmins, absmaxs, origin);
@@ -233,10 +233,10 @@ int AAS_GetJumpPadInfo(int ent, vec3_t areastart, vec3_t absmins, vec3_t absmaxs
 	//
 	//AAS_DrawPermanentCross(origin, 4, 4);
 	//get the target entity
-	AAS_ValueForBSPEpairKey(ent, "target", target, sizeof(target));
+	AAS_ValueForBSPEpairKey(ent, "target", target, MAX_EPAIRKEY);
 	for (ent2 = AAS_NextBSPEntity(0); ent2; ent2 = AAS_NextBSPEntity(ent2))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent2, "targetname", targetname, sizeof(targetname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent2, "targetname", targetname, MAX_EPAIRKEY)) continue;
 		if (!strcmp(targetname, target)) break;
 	} //end for
 	if (!ent2)
@@ -289,7 +289,7 @@ int AAS_BestReachableFromJumpPadArea(vec3_t origin, vec3_t mins, vec3_t maxs)
 	VectorAdd(origin, maxs, bboxmaxs);
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (strcmp(classname, "trigger_push")) continue;
 		//
 		if (!AAS_GetJumpPadInfo(ent, areastart, absmins, absmaxs, velocity)) continue;
@@ -2751,17 +2751,17 @@ void AAS_Reachability_Teleport(void)
 
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (!strcmp(classname, "trigger_multiple"))
 		{
-			AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model));
+			AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY);
 //#ifdef REACH_DEBUG
 			botimport.Print(PRT_MESSAGE, "trigger_multiple model = \"%s\"\n", model);
 //#endif REACH_DEBUG
 			VectorClear(angles);
 			AAS_BSPModelMinsMaxsOrigin(atoi(model+1), angles, mins, maxs, origin);
 			//
-			if (!AAS_ValueForBSPEpairKey(ent, "target", target, sizeof(target)))
+			if (!AAS_ValueForBSPEpairKey(ent, "target", target, MAX_EPAIRKEY))
 			{
 				botimport.Print(PRT_ERROR, "trigger_multiple at %1.0f %1.0f %1.0f without target\n",
 									origin[0], origin[1], origin[2]);
@@ -2769,10 +2769,10 @@ void AAS_Reachability_Teleport(void)
 			} //end if
 			for (dest = AAS_NextBSPEntity(0); dest; dest = AAS_NextBSPEntity(dest))
 			{
-				if (!AAS_ValueForBSPEpairKey(dest, "classname", classname, sizeof(classname))) continue;
+				if (!AAS_ValueForBSPEpairKey(dest, "classname", classname, MAX_EPAIRKEY)) continue;
 				if (!strcmp(classname, "target_teleporter"))
 				{
-					if (!AAS_ValueForBSPEpairKey(dest, "targetname", targetname, sizeof(targetname))) continue;
+					if (!AAS_ValueForBSPEpairKey(dest, "targetname", targetname, MAX_EPAIRKEY)) continue;
 					if (!strcmp(targetname, target))
 					{
 						break;
@@ -2783,7 +2783,7 @@ void AAS_Reachability_Teleport(void)
 			{
 				continue;
 			} //end if
-			if (!AAS_ValueForBSPEpairKey(dest, "target", target, sizeof(target)))
+			if (!AAS_ValueForBSPEpairKey(dest, "target", target, MAX_EPAIRKEY))
 			{
 				botimport.Print(PRT_ERROR, "target_teleporter without target\n");
 				continue;
@@ -2791,14 +2791,14 @@ void AAS_Reachability_Teleport(void)
 		} //end else
 		else if (!strcmp(classname, "trigger_teleport"))
 		{
-			AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model));
+			AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY);
 //#ifdef REACH_DEBUG
 			botimport.Print(PRT_MESSAGE, "trigger_teleport model = \"%s\"\n", model);
 //#endif REACH_DEBUG
 			VectorClear(angles);
 			AAS_BSPModelMinsMaxsOrigin(atoi(model+1), angles, mins, maxs, origin);
 			//
-			if (!AAS_ValueForBSPEpairKey(ent, "target", target, sizeof(target)))
+			if (!AAS_ValueForBSPEpairKey(ent, "target", target, MAX_EPAIRKEY))
 			{
 				botimport.Print(PRT_ERROR, "trigger_teleport at %1.0f %1.0f %1.0f without target\n",
 									origin[0], origin[1], origin[2]);
@@ -2815,7 +2815,7 @@ void AAS_Reachability_Teleport(void)
 			//classname should be misc_teleporter_dest
 			//but I've also seen target_position and actually any
 			//entity could be used... burp
-			if (AAS_ValueForBSPEpairKey(dest, "targetname", targetname, sizeof(targetname)))
+			if (AAS_ValueForBSPEpairKey(dest, "targetname", targetname, MAX_EPAIRKEY))
 			{
 				if (!strcmp(targetname, target))
 				{
@@ -2947,13 +2947,13 @@ void AAS_Reachability_Elevator(void)
 #endif //REACH_DEBUG
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (!strcmp(classname, "func_plat"))
 		{
 #ifdef REACH_DEBUG
 			Log_Write("found func plat\r\n");
 #endif //REACH_DEBUG
-			if (!AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model)))
+			if (!AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY))
 			{
 				botimport.Print(PRT_ERROR, "func_plat without model\n");
 				continue;
@@ -3285,12 +3285,12 @@ void AAS_Reachability_FuncBobbing(void)
 
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (strcmp(classname, "func_bobbing")) continue;
 		AAS_FloatForBSPEpairKey(ent, "height", &height);
 		if (!height) height = 32;
 		//
-		if (!AAS_ValueForBSPEpairKey(ent, "model", model, sizeof(model)))
+		if (!AAS_ValueForBSPEpairKey(ent, "model", model, MAX_EPAIRKEY))
 		{
 			botimport.Print(PRT_ERROR, "func_bobbing without model\n");
 			continue;
@@ -3508,7 +3508,7 @@ void AAS_Reachability_JumpPad(void)
 #endif
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (strcmp(classname, "trigger_push")) continue;
 		//
 		if (!AAS_GetJumpPadInfo(ent, areastart, absmins, absmaxs, velocity)) continue;
@@ -3930,7 +3930,7 @@ void AAS_SetWeaponJumpAreaFlags(void)
 	weaponjumpareas = 0;
 	for (ent = AAS_NextBSPEntity(0); ent; ent = AAS_NextBSPEntity(ent))
 	{
-		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, sizeof(classname))) continue;
+		if (!AAS_ValueForBSPEpairKey(ent, "classname", classname, MAX_EPAIRKEY)) continue;
 		if (
 			!strcmp(classname, "item_armor_body") ||
 			!strcmp(classname, "item_health") ||

@@ -8,9 +8,6 @@
 #ifndef DEDICATED
 #include "qgl.h"
 #include "glext.h"
-#if _WIN32
-#define DORESHADE 1
-#endif
 #else
 typedef unsigned int GLuint;
 typedef int GLenum;
@@ -29,9 +26,6 @@ typedef unsigned int glIndex_t;
 #define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
-
-
-extern	clientRendererInfo_t	clRenderInfo;
 
 // can't be increased without changing bit packing for drawsurfs
 typedef enum
@@ -102,7 +96,6 @@ typedef struct {
 	int	minimize, maximize;
 } textureMode_t;
 
-
 extern	int				gl_filter_min, gl_filter_max;
 
 const textureMode_t *GetTextureMode( const char *name );
@@ -134,14 +127,6 @@ typedef struct image_s {
 	int			iLastLevelUsedOn;
 
 } image_t;
-
-typedef enum {
-	PXF_GRAY,
-	PXF_RGB,
-	PXF_BGR,
-	PXF_RGBA,
-	PXF_BGRA
-} pixelFormat_t;
 
 //===============================================================================
 
@@ -372,7 +357,6 @@ typedef struct {
 	byte			vertexLightmap;
 	byte			isVideoMap;
 
-	qboolean		isWorldBundle; // HAHAHAHAHAHAHA i suck
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -509,20 +493,9 @@ Ghoul2 Insert End
 	// True if this shader has a stage with glow in it (just an optimization).
 	qboolean hasGlow;
 
-	// qtrue if shader name is models/players/*/icon_*
-	// example: models/players/jedi_tf/icon_head_a1
-	qboolean isPlayerIcon;
-
-	qboolean isAdvancedRemap;
-
 	struct shader_s *remappedShader;                  // current shader this one is remapped too
-	struct shader_s *remappedShaderAdvanced;          // current shader from the advanced remaps this one is remapped to
-	//struct shader_s *solidityShader;				  // shader to use when solidity is activated (using similar concept as remappedShaderAdvanced to preserve lightmap) (actually dont do this for now, its a little over the top, just change the rendered image)
 
 	struct	shader_s	*next;
-
-	qboolean isWorldShader; // UGLY hack.
-	int solidity; // 0 = undefined. 1 = playerclip. -1 = nonsolid
 } shader_t;
 
 /*
@@ -580,7 +553,6 @@ typedef struct {
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
-	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
 
 } trRefdef_t;
 
@@ -590,7 +562,6 @@ typedef struct {
 // skins allow models to be retextured without modifying the model file
 typedef struct {
 	char		name[MAX_QPATH];
-	qboolean	turnedOff;
 	shader_t	*shader;
 } skinSurface_t;
 
@@ -744,9 +715,6 @@ typedef struct {
 	int			ofsIndices;
 	float		points[1][VERTEXSIZE];	// variable sized
 										// there is a variable length list of indices here also
-
-	int			flags;
-	int			contents;
 } srfSurfaceFace_t;
 
 
@@ -794,9 +762,6 @@ typedef struct msurface_s {
 	int					viewCount;		// if == tr.viewCount, already added
 	struct shader_s		*shader;
 	int					fogIndex;
-	int					contents;		// so we can determine whether to draw a particular surface based on content flags
-	int					flags;		// surfaceflags (might come in handy?)
-	qboolean			trisoupMapSurf;
 
 	surfaceType_t		*data;			// any of srf*_t
 } msurface_t;
@@ -950,7 +915,7 @@ void		R_Modellist_f (void);
 extern	refimport_t		ri;
 
 #define	MAX_DRAWIMAGES			2048
-#define	MAX_LIGHTMAPS			2048
+#define	MAX_LIGHTMAPS			256
 #define	MAX_SKINS				1024
 
 
@@ -1075,7 +1040,6 @@ typedef struct {
 	image_t					*flareImage;
 	image_t					*whiteImage;			// full of 0xff
 	image_t					*identityLightImage;	// full of tr.identityLightByte
-	image_t					*solidityImage;			// image to use when r_solidity 1
 
 	// Handle to the Glow Effect Vertex Shader. - AReis
 	GLuint					glowVShader;
@@ -1098,9 +1062,7 @@ typedef struct {
 
 	shader_t				*flareShader;
 	shader_t				*sunShader;
-	shader_t				*solidityWaterShader;
 
-	qboolean				lightmapAtlasActive; // for external lightmaps or shader hack LMs we wanna disable it
 	int						numLightmaps;
 	image_t					*lightmaps[MAX_LIGHTMAPS];
 
@@ -1144,9 +1106,6 @@ typedef struct {
 	shader_t				*shaders[MAX_SHADERS];
 	shader_t				*sortedShaders[MAX_SHADERS];
 
-	int						numAdvancedRemapShaders;
-	shader_t				*advancedRemapShaders[MAX_SHADERS];
-
 	int						numSkins;
 	skin_t					*skins[MAX_SKINS];
 
@@ -1175,16 +1134,6 @@ typedef struct {
 
 	int						dynamicGlowWidth;
 	int						dynamicGlowHeight;
-
-	vec4_t					celLineColor;
-	qboolean				celLineColorIsSet;
-
-
-	//SQL position cube query helper
-	struct {
-		vec3_t lastPos;
-	}sqlPosHelper;
-
 } trGlobals_t;
 
 
@@ -1267,11 +1216,8 @@ extern cvar_t	*r_windPointY;
 
 extern cvar_t	*r_mode;				// video mode
 extern cvar_t	*r_fullscreen;
-extern cvar_t	*r_allowResize;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
-extern cvar_t	*r_gammaPostprocessingPrecision;			// gamma correction precision (default jk2mv has 64)
-extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans
 extern cvar_t	*r_displayRefresh;		// optional display refresh option
 
 extern cvar_t	*r_allowExtensions;				// global enable/disable of OpenGL extensions
@@ -1298,7 +1244,6 @@ extern cvar_t	*r_smartpicmip;
 
 extern	cvar_t	*r_nobind;						// turns off binding to appropriate textures
 extern	cvar_t	*r_singleShader;				// make most world faces use default shader
-extern	cvar_t	*r_shaderHackLightmapFix;		// make q3map2 shader lightmap hacks work (kinda, not sure how reliable and universal)
 extern	cvar_t	*r_colorMipLevels;				// development aid to see texture mip usage
 extern	cvar_t	*r_picmip;						// controls picmip values
 extern	cvar_t	*r_finish;
@@ -1310,18 +1255,9 @@ extern	cvar_t	*r_offsetUnits;
 extern	cvar_t	*r_fullbright;					// avoid lightmap pass
 extern	cvar_t	*r_lightmap;					// render lightmaps only
 extern	cvar_t	*r_vertexLight;					// vertex lighting mode for better performance
-extern	cvar_t	*r_styleOnly;					// show only a particular style of light
 extern	cvar_t	*r_uiFullScreen;				// ui is running fullscreen
 
 extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
-
-// Cel shading ported from http://q3cellshading.sourceforge.net/
-extern	cvar_t* r_celshadalgo;					// Cell shading, chooses method: 0 = disabled, 1 = kuwahara, 2 = whiteTexture
-extern	cvar_t* r_celoutline;						//. cel outline. 1 on, 0 off. (maybe other options later)
-extern	cvar_t* r_celoutlineColor;
-extern	cvar_t* r_celoutlineWidth;
-extern	cvar_t* r_celTextureOutline;
-
 extern	cvar_t	*r_showtris;					// enables wireframe rendering of the world
 extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
 extern	cvar_t	*r_shownormals;					// draws wireframe normals
@@ -1340,34 +1276,20 @@ extern	cvar_t	*r_subdivisions;
 extern	cvar_t	*r_lodCurveError;
 extern	cvar_t	*r_skipBackEnd;
 
-extern	cvar_t	*r_markSurfaceAnglesAbove;
-extern	cvar_t	*r_markSurfaceAnglesBelow;
-extern	cvar_t	*r_rampHelper;
-
 extern	cvar_t	*r_ignoreGLErrors;
 
 extern	cvar_t	*r_overBrightBits;
-extern	cvar_t	*r_mapOverBrightBits;
 
 extern	cvar_t	*r_debugSurface;
 extern	cvar_t	*r_simpleMipMaps;
-extern	cvar_t	*r_openglMipMaps;
 
 extern	cvar_t	*r_showImages;
 extern	cvar_t	*r_debugSort;
-
-extern	cvar_t	*r_drawAllAreas;
-extern	cvar_t	*r_imageLoadLowMem;
 
 extern	cvar_t	*r_printShaders;
 
 extern	cvar_t	*r_convertModelBones;
 extern	cvar_t	*r_loadSkinsJKA;
-
-extern	cvar_t	*r_solidity;
-extern	cvar_t	*r_solidityTexture;
-extern	cvar_t	*r_solidityWaterShader;
-extern	cvar_t	*r_solidityHideTrisoup;
 
 /*
 Ghoul2 Insert Start
@@ -1383,13 +1305,6 @@ extern	cvar_t *r_textureLODBias;
 extern	cvar_t *r_saberGlow;
 extern	cvar_t *r_environmentMapping;
 extern	cvar_t *r_printMissingModels;
-extern	cvar_t *r_fixPlayerIconBrightness;
-extern	cvar_t *r_newRemaps;
-extern	cvar_t *r_newRemapsTmpFix;
-
-extern	cvar_t *r_imageLoadDotFix;
-
-extern	cvar_t * r_reshadeFix;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, double t );
@@ -1506,20 +1421,19 @@ qboolean	R_GetEntityToken( char *buffer, int size );
 model_t		*R_AllocModel( void );
 
 void		R_Init( void );
-void R_LoadImage( const char *name, byte **pic, int *width, int *height, pixelFormat_t *format );
+void R_LoadImage( const char *name, byte **pic, int *width, int *height );
 image_t		*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, qboolean allowTC, int glWrapClampMode );
 image_t		*R_FindImageFileNew( const char *name, const upload_t *upload, int glWrapClampMode );
 
-image_t		*R_CreateImage( const char *name, byte *data, int width, int height, qboolean mipmap,
-	qboolean allowPicmip, qboolean allowTC, int wrapClampMode, pixelFormat_t format );
+image_t		*R_CreateImage( const char *name, byte *data, int width, int height, qboolean mipmap
+					, qboolean allowPicmip, qboolean allowTC, int wrapClampMode );
 image_t *R_CreateImageNew( const char *name, byte * const *mipmaps, qboolean customMip, int width, int height,
-	const upload_t *upload, int glWrapClampMode, pixelFormat_t format );
+	const upload_t *upload, int glWrapClampMode );
 qboolean	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 void		R_SetColorMappings( void );
 void		R_GammaCorrect( byte *buffer, int bufSize );
 
-void	R_SQLPosCube_f(void);
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
 void	R_ScreenShot_f( void );
@@ -1545,19 +1459,15 @@ extern	const byte	stylesDefault[MAXLIGHTMAPS];
 qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex, const byte *styles ) ;
 qhandle_t		 RE_RegisterShader( const char *name );
 qhandle_t		 RE_RegisterShaderNoMip( const char *name );
-qhandle_t		 RE_RegisterShader3D( const char *name );
 qhandle_t RE_RegisterShaderFromImage(const char *name, int *lightmapIndex, byte *styles, image_t *image, qboolean mipRawImage);
 
-shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage, qboolean isAdvancedRemap = qfalse );
-shader_t	*R_FindAdvancedRemapShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage );
+shader_t	*R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage );
 shader_t	*R_GetShaderByHandle( qhandle_t hShader );
 // shader_t	*R_GetShaderByState( int index, int *cycleTime );
 shader_t *R_FindShaderByName( const char *name );
 void		R_InitShaders( void );
 void		R_ShaderList_f( void );
 void	R_RemapShader(const char *oldShader, const char *newShader, const char *timeOffset);
-void R_RemapShaderAdvanced(const char *shaderName, const char *newShaderName, int timeOffset, shaderRemapLightmapType_t lightmapMode, shaderRemapStyleType_t styleMode);
-void R_RemoveAdvancedRemaps( void );
 
 /*
 ====================================================================
@@ -1605,10 +1515,6 @@ struct shaderCommands_s
 	stageVars_t	svars;
 
 	color4ub_t	constantColor255[SHADER_MAX_VERTEXES];
-
-	byte		vertexIsMarked[SHADER_MAX_VERTEXES]; 
-	color4ub_t	vertexColorOverrides[SHADER_MAX_VERTEXES]; // for ramp helper
-	qboolean	anyVertexColorOverrides;
 
 	shader_t	*shader;
 	double		shaderTime;
@@ -1901,16 +1807,6 @@ typedef struct {
 	int		commandId;
 	shader_t	*shader;
 	float	x, y;
-	float	x2, y2;
-	float	width;
-	float	s1, t1;
-	float	s2, t2;
-} drawLineCommand_t;
-
-typedef struct {
-	int		commandId;
-	shader_t	*shader;
-	float	x, y;
 	float	m[2][2];
 	float	s1, t1;
 	float	s2, t2;
@@ -1951,15 +1847,14 @@ typedef enum {
 	RC_WORLD_EFFECTS,
 	RC_GAMMA_CORRECTION,
 	RC_READ_PIXELS,
-	RC_DRAW_LINE,
 } renderCommand_t;
 
 
 // these are sort of arbitrary limits.
 // the limits apply to the sum of all scenes in a frame --
 // the main view, all the 3D icons, etc
-#define	MAX_POLYS		1800
-#define	MAX_POLYVERTS	9000
+#define	MAX_POLYS		600
+#define	MAX_POLYVERTS	3000
 
 // all of the information needed by the back end must be
 // contained in a backEndData_t.  This entire structure is
@@ -1994,8 +1889,6 @@ void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 void RE_SetColor( const vec4_t rgba );
 void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,
 	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust );
-void RE_DrawLine(float x, float y, float x2, float y2, float width, float s1, float t1,
-	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust);
 void RE_RotatePic ( float x, float y, float w, float h, float s1, float t1,
 	float s2, float t2,float a, qhandle_t hShader, float xadjust, float yadjust );
 void RE_RotatePic2 ( float x, float y, float w, float h, float s1, float t1,

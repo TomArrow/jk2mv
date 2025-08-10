@@ -103,7 +103,6 @@ static	qboolean		deferLoad;
 
 #define FILE_HASH_SIZE		1024
 static	shader_t*		hashTable[FILE_HASH_SIZE];
-static	shader_t*		advancedRemapShadersHashTable[FILE_HASH_SIZE];
 
 #define MAX_SHADERTEXT_HASH		2048
 static const char **shaderTextHashTable[MAX_SHADERTEXT_HASH];
@@ -206,11 +205,6 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	shader_t	*sh, *sh2;
 	qhandle_t	h;
 
-	if ( r_newRemaps->integer ) {
-		R_RemapShaderAdvanced( shaderName, newShaderName, (int)(atof(timeOffset)*1000), SHADERREMAP_LIGHTMAP_PRESERVE, SHADERREMAP_STYLE_PRESERVE );
-		return;
-	}
-
 	sh = R_FindShaderByName( shaderName );
 	if (sh == NULL || sh == tr.defaultShader) {
 		h = RE_RegisterShaderLightMap(shaderName, lightmapsNone, stylesDefault);
@@ -247,77 +241,6 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	}
 	if (timeOffset) {
 		sh2->timeOffset = atof(timeOffset);
-	}
-}
-
-void R_RemapShaderAdvanced(const char *shaderName, const char *newShaderName, int timeOffset, shaderRemapLightmapType_t lightmapMode, shaderRemapStyleType_t styleMode) {
-	char		strippedName[MAX_QPATH];
-	int			hash;
-	shader_t	*sh, *sh2 = NULL;
-	int			failed = 0;
-	const int	*lightmapIndex = NULL;
-	const byte	*styles = NULL;
-	qboolean	foundShader = qfalse;
-
-	// Lightmap
-	if ( lightmapMode == SHADERREMAP_LIGHTMAP_FULLBRIGHT ) {
-		lightmapIndex = lightmapsFullBright;
-	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_NONE ) {
-		lightmapIndex = lightmapsNone;
-	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_2D ) {
-		lightmapIndex = lightmaps2d;
-	} else if ( lightmapMode == SHADERREMAP_LIGHTMAP_VERTEX ) {
-		lightmapIndex = lightmapsVertex;
-	}
-
-	// Style
-	if ( styleMode == SHADERREMAP_STYLE_DEFAULT ) {
-		styles = stylesDefault;
-	}
-
-	if ( lightmapIndex && lightmapMode != SHADERREMAP_LIGHTMAP_VERTEX ) {
-		// For fullbright, none and 2d we only need one new shader
-		sh2 = R_FindAdvancedRemapShader( newShaderName, lightmapIndex, stylesDefault, qtrue );
-
-		if ( !sh2 || sh2 == tr.defaultShader || sh2->defaultShader ) {
-			ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: new shader %s not found\n", newShaderName );
-			return;
-		}
-	}
-
-	// Remap all the shaders with the given name and copy over the lightmap + styles
-	COM_StripExtension( shaderName, strippedName, sizeof(strippedName) );
-	hash = generateHashValue(strippedName, FILE_HASH_SIZE);
-	for (sh = hashTable[hash]; sh; sh = sh->next) {
-		if (Q_stricmp(sh->name, strippedName) == 0) {
-			foundShader = qtrue;
-
-			if ( lightmapMode == SHADERREMAP_LIGHTMAP_PRESERVE || lightmapMode == SHADERREMAP_LIGHTMAP_VERTEX ) {
-				// When preserving lightmaps we need to use the correct lightmap index (+styles)
-				sh2 = R_FindAdvancedRemapShader( newShaderName, lightmapIndex ? lightmapIndex : sh->lightmapIndex, styles ? styles : sh->styles, (qboolean)!sh->upload.noMipMaps );
-			}
-
-			if ( !sh2 || sh2 == tr.defaultShader || sh2->defaultShader ) {
-				failed++;
-				continue;
-			}
-			if ( timeOffset ) sh2->timeOffset = timeOffset * 0.001;
-
-			if (sh != sh2) {
-				sh->remappedShaderAdvanced = sh2;
-			} else {
-				sh->remappedShaderAdvanced = NULL;
-			}
-		}
-	}
-	if ( !foundShader ) ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: shader %s not found\n", shaderName );
-	if ( failed ) ri.Printf( PRINT_WARNING, "WARNING: R_RemapShaderAdvanced: new shader %s not found (x%i)\n", newShaderName, failed );
-}
-
-void R_RemoveAdvancedRemaps( void ) {
-	int i;
-	for ( i = 0; i < tr.numShaders; i++ ) {
-		tr.shaders[i]->remappedShaderAdvanced = NULL;
 	}
 }
 
@@ -1534,10 +1457,6 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			else if ( !Q_stricmp( token, "identity" ) )
 			{
 				stage->rgbGen = CGEN_IDENTITY;
-				if (shader.isPlayerIcon && r_fixPlayerIconBrightness->integer)
-				{
-					stage->rgbGen = CGEN_IDENTITY_LIGHTING;
-				}
 			}
 			else if ( !Q_stricmp( token, "identityLighting" ) )
 			{
@@ -1565,14 +1484,16 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			else if ( !Q_stricmp( token, "lightingDiffuse" ) )
 			{
 				stage->rgbGen = CGEN_LIGHTING_DIFFUSE;
+
 			}
 			else if ( !Q_stricmp( token, "lightingDiffuseEntity" ) )
 			{
 				if (shader.lightmapIndex[0] != LIGHTMAP_NONE)
 				{
-					ri.Printf( PRINT_WARNING, "WARNING: rgbGen lightingDiffuseEntity used on a misc_model! in shader \'%s\'\n", shader.name );
+					ri.Printf( PRINT_ALL, S_COLOR_RED "ERROR: rgbGen lightingDiffuseEntity used on a misc_model! in shader '%s'\n", shader.name );
 				}
 				stage->rgbGen = CGEN_LIGHTING_DIFFUSE_ENTITY;
+
 			}
 			else if ( !Q_stricmp( token, "oneMinusVertex" ) )
 			{
@@ -1699,8 +1620,8 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				Q_strcat( buffer,sizeof(buffer), token );
-				Q_strcat( buffer,sizeof(buffer), " " );
+				strcat( buffer, token );
+				strcat( buffer, " " );
 			}
 
 			ParseTexMod( buffer, stage );
@@ -1738,8 +1659,8 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				Q_strcat( buffer,sizeof(buffer), token );
-				Q_strcat( buffer,sizeof(buffer), " " );
+				strcat( buffer, token );
+				strcat( buffer, " " );
 			}
 
 			ParseSurfaceSprites( buffer, stage );
@@ -1763,15 +1684,15 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 		{
 			char buffer[1024] = "";
 			char param[128];
-			Q_strncpyz(param,token,sizeof(param));
+			strcpy(param,token);
 
 			while ( 1 )
 			{
 				token = COM_ParseExt( text, qfalse );
 				if ( token[0] == 0 )
 					break;
-				Q_strcat( buffer,sizeof(buffer), token );
-				Q_strcat( buffer,sizeof(buffer), " " );
+				strcat( buffer, token );
+				strcat( buffer, " " );
 			}
 
 			ParseSurfaceSpritesOptional( param, buffer, stage );
@@ -1795,10 +1716,6 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			stage->rgbGen = CGEN_IDENTITY_LIGHTING;
 		} else {
 			stage->rgbGen = CGEN_IDENTITY;
-		}
-		if (shader.isPlayerIcon && r_fixPlayerIconBrightness->integer)
-		{
-			stage->rgbGen = CGEN_IDENTITY_LIGHTING;
 		}
 	}
 
@@ -2007,14 +1924,6 @@ static void ParseSkyParms( const char **text ) {
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
-
-	// Remember previous value
-	int			old_r_celTextureOutline;
-	// Prevent skybox images from getting black borders
-	old_r_celTextureOutline = r_celTextureOutline->integer;
-	r_celTextureOutline->integer = 0;
-
-
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s", token, suf[i] );
@@ -2033,9 +1942,6 @@ static void ParseSkyParms( const char **text ) {
 		}
 	}
 
-	// Restore value
-	r_celTextureOutline->integer = old_r_celTextureOutline;
-
 	// cloudheight
 	token = COM_ParseExt( text, qfalse );
 	if ( token[0] == 0 ) {
@@ -2049,8 +1955,6 @@ static void ParseSkyParms( const char **text ) {
 #ifndef DEDICATED
 	R_InitSkyTexCoords( shader.sky.cloudHeight );
 #endif
-
-	r_celTextureOutline->integer = 0;
 
 	// innerbox
 	token = COM_ParseExt( text, qfalse );
@@ -2071,8 +1975,6 @@ static void ParseSkyParms( const char **text ) {
 #endif // !DEDICATED
 		}
 	}
-
-	r_celTextureOutline->integer = old_r_celTextureOutline;
 
 	shader.isSky = qtrue;
 }
@@ -2163,28 +2065,27 @@ void ParseMaterial( const char **text )
 typedef struct {
 	const char	*name;
 	uint32_t	clearSolid, surfaceFlags, contents;
-	int			solidity;
 } infoParm_t;
 
 
 static const infoParm_t	infoParms[] = {
 	// Game content Flags
-	{"nonsolid",	~CONTENTS_SOLID,	0,				0, -1 },						// special hack to clear solid flag
+	{"nonsolid",	~CONTENTS_SOLID,	0,				0 },						// special hack to clear solid flag
 	{"nonopaque",	~CONTENTS_OPAQUE,	0,				0 },						// special hack to clear opaque flag
-	{"lava",		~CONTENTS_SOLID,	0,				CONTENTS_LAVA, -1 },			// very damaging
-	{"slime",		~CONTENTS_SOLID,	0,				CONTENTS_SLIME, -1 },			// mildly damaging
-	{"water",		~CONTENTS_SOLID,	0,				CONTENTS_WATER, -1 },
-	{"fog",			~CONTENTS_SOLID,	0,				CONTENTS_FOG, -1},				// carves surfaces entering
-	{"shotclip",	~CONTENTS_SOLID,	0,				CONTENTS_SHOTCLIP, -1 },		/* block shots, but not people */
-	{"playerclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_PLAYERCLIP, 1 },		/* block only the player */
-	{"monsterclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_MONSTERCLIP, -1 },
-	{"botclip",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_BOTCLIP , -1},			/* for bots */
-	{"trigger",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TRIGGER, -1 },
-	{"nodrop",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_NODROP, -1 },			// don't drop items or leave bodies (death fog, lava, etc)
+	{"lava",		~CONTENTS_SOLID,	0,				CONTENTS_LAVA },			// very damaging
+	{"slime",		~CONTENTS_SOLID,	0,				CONTENTS_SLIME },			// mildly damaging
+	{"water",		~CONTENTS_SOLID,	0,				CONTENTS_WATER },
+	{"fog",			~CONTENTS_SOLID,	0,				CONTENTS_FOG},				// carves surfaces entering
+	{"shotclip",	~CONTENTS_SOLID,	0,				CONTENTS_SHOTCLIP },		/* block shots, but not people */
+	{"playerclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_PLAYERCLIP },		/* block only the player */
+	{"monsterclip",	~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_MONSTERCLIP },
+	{"botclip",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_BOTCLIP },			/* for bots */
+	{"trigger",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TRIGGER },
+	{"nodrop",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_NODROP },			// don't drop items or leave bodies (death fog, lava, etc)
 	{"terrain",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_TERRAIN },		   	/* use special terrain collsion */
-	{"ladder",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_LADDER, -1 },			// climb up in it like water
-	{"abseil",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_ABSEIL, -1 },			// can abseil down this brush
-	{"outside",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_OUTSIDE, -1 },			// volume is considered to be in the outside (i.e. not indoors)
+	{"ladder",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_LADDER },			// climb up in it like water
+	{"abseil",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_ABSEIL },			// can abseil down this brush
+	{"outside",		~(CONTENTS_SOLID|CONTENTS_OPAQUE),0,CONTENTS_OUTSIDE },			// volume is considered to be in the outside (i.e. not indoors)
 
 	{"detail",		CONTENTS_ALL,					0,				CONTENTS_DETAIL },			// don't include in structural bsp
 	{"trans",		CONTENTS_ALL,					0,				CONTENTS_TRANSLUCENT },		// surface has an alpha component
@@ -2221,11 +2122,6 @@ static void ParseSurfaceParm( const char **text ) {
 			shader.surfaceFlags |= infoParms[i].surfaceFlags;
 			shader.contentFlags |= infoParms[i].contents;
 			shader.contentFlags &= infoParms[i].clearSolid;
-			if (infoParms[i].solidity == 1) {
-				shader.solidity = 1;
-			} else if (infoParms[i].solidity == -1 && shader.solidity == 0) {
-				shader.solidity = -1;
-			}
 			break;
 		}
 	}
@@ -2246,21 +2142,6 @@ static qboolean ParseShader( const char **text )
 	int s;
 
 	s = 0;
-
-	// check for player icon
-	// models/players/*/icon_*
-	shader.isPlayerIcon = qfalse;
-	if (Q_stricmpn(shader.name, "models/players/", 15) == 0 && shader.name[15] != '\0' && shader.name[15] != '/')
-	{
-		char *p = strchr(&shader.name[15], '/');
-		if (p != NULL && Q_stricmpn(&p[1], "icon_", 5) == 0)
-		{
-			if (strchr(&p[1], '/') == NULL)
-			{
-				shader.isPlayerIcon = qtrue;
-			}
-		}
-	}
 
 	token = COM_ParseExt( text, qtrue );
 	if ( token[0] != '{' )
@@ -2927,7 +2808,7 @@ static shader_t *GeneratePermanentShader( void ) {
 	int			i, b;
 	int			size, hash;
 
-	if ( (!shader.isAdvancedRemap && tr.numShaders == MAX_SHADERS) || (shader.isAdvancedRemap && tr.numAdvancedRemapShaders == MAX_SHADERS) ) {
+	if ( tr.numShaders == MAX_SHADERS ) {
 		ri.Printf( PRINT_WARNING, "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
 		return tr.defaultShader;
 	}
@@ -2964,19 +2845,13 @@ static shader_t *GeneratePermanentShader( void ) {
 		newShader->fogPass = FP_LE;
 	}
 
-	if ( newShader->isAdvancedRemap ) {
-		// If the shader has been created by the advanced remaps system we store it in a separate list
-		tr.advancedRemapShaders[ tr.numAdvancedRemapShaders ] = newShader;
-		tr.numAdvancedRemapShaders++;
-	} else {
-		tr.shaders[ tr.numShaders ] = newShader;
-		newShader->index = tr.numShaders;
+	tr.shaders[ tr.numShaders ] = newShader;
+	newShader->index = tr.numShaders;
 
-		tr.sortedShaders[ tr.numShaders ] = newShader;
-		newShader->sortedIndex = tr.numShaders;
+	tr.sortedShaders[ tr.numShaders ] = newShader;
+	newShader->sortedIndex = tr.numShaders;
 
-		tr.numShaders++;
-	}
+	tr.numShaders++;
 
 	for ( i = 0 ; i < newShader->numUnfoggedPasses ; i++ ) {
 		if ( !stages[i].active ) {
@@ -2994,18 +2869,11 @@ static shader_t *GeneratePermanentShader( void ) {
 		}
 	}
 
+	SortNewShader();
+
 	hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
-
-	if ( newShader->isAdvancedRemap ) {
-		// We want to keep the advanced remaps separate
-		newShader->next = advancedRemapShadersHashTable[hash];
-		advancedRemapShadersHashTable[hash] = newShader;
-	} else {
-		SortNewShader();
-
-		newShader->next = hashTable[hash];
-		hashTable[hash] = newShader;
-	}
+	newShader->next = hashTable[hash];
+	hashTable[hash] = newShader;
 
 	return newShader;
 }
@@ -3390,7 +3258,7 @@ static shader_t *FinishShader( void ) {
 		}
 		else
 		{
-			ri.Printf(PRINT_DEVELOPER, "WARNING: shader '%s' has lightmap but no lightmap stage!\n", shader.name );
+			ri.Printf(PRINT_ALL, "WARNING: shader '%s' has lightmap but no lightmap stage!\n", shader.name );
 			memcpy(shader.lightmapIndex, lightmapsNone, sizeof(shader.lightmapIndex));
 			memcpy(shader.styles, stylesDefault, sizeof(shader.styles));
 		}
@@ -3403,7 +3271,7 @@ static shader_t *FinishShader( void ) {
 	shader.numUnfoggedPasses = stage;
 
 	// fogonly shaders don't have any normal passes
-	if ( stage == 0 && !shader.isSky) {
+	if ( stage == 0 ) {
 		shader.sort = SS_FOG;
 	}
 
@@ -3512,15 +3380,18 @@ inline qboolean IsShader(shader_t *sh, const char *name, const int *lightmapInde
 		return qfalse;
 	}
 
-	for(i=0;i<MAXLIGHTMAPS;i++)
+	if (!sh->defaultShader)
 	{
-		if (sh->lightmapIndex[i] != lightmapIndex[i])
+		for(i=0;i<MAXLIGHTMAPS;i++)
 		{
-			return qfalse;
-		}
-		if (sh->styles[i] != styles[i])
-		{
-			return qfalse;
+			if (sh->lightmapIndex[i] != lightmapIndex[i])
+			{
+				return qfalse;
+			}
+			if (sh->styles[i] != styles[i])
+			{
+				return qfalse;
+			}
 		}
 	}
 
@@ -3576,7 +3447,7 @@ most world construction surfaces.
 
 ===============
 */
-shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage, qboolean isAdvancedRemap )
+shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage )
 {
 	char		strippedName[MAX_QPATH];
 	char		fileName[MAX_QPATH];
@@ -3605,7 +3476,7 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	//
 	// see if the shader is already loaded
 	//
-	for (sh = isAdvancedRemap ? advancedRemapShadersHashTable[hash] : hashTable[hash]; sh; sh = sh->next) {
+	for (sh = hashTable[hash]; sh; sh = sh->next) {
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
@@ -3626,9 +3497,6 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	for ( i = 0 ; i < MAX_SHADER_STAGES ; i++ ) {
 		stages[i].bundle[0].texMods = texMods[i];
 	}
-
-	// Mark shader as advanced remap if it is
-	shader.isAdvancedRemap = isAdvancedRemap;
 
 	// FIXME: set these "need" values apropriately
 	shader.needsNormal = qtrue;
@@ -3684,12 +3552,7 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 	if ( !image ) {
 		ri.Printf( PRINT_DEVELOPER, "Couldn't find image for shader %s\n", name );
 		shader.defaultShader = qtrue;
-		if (r_newRemapsTmpFix->integer) {
-			return FinishShader();
-		}
-		else {
-			image = tr.defaultImage;
-		}
+		return FinishShader();
 	}
 
 	//
@@ -3745,10 +3608,6 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 
 	return FinishShader();
 #endif //!DEDICATED
-}
-
-shader_t *R_FindAdvancedRemapShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage ) {
-	return R_FindShader( name, lightmapIndex, styles, mipRawImage, qtrue );
 }
 
 #if 0
@@ -3867,15 +3726,13 @@ qhandle_t RE_RegisterShaderLightMap( const char *name, const int *lightmapIndex,
 
 	sh = R_FindShader( name, lightmapIndex, styles, qtrue );
 
-	if (r_newRemapsTmpFix->integer) {
-		// we want to return 0 if the shader failed to
-		// load for some reason, but R_FindShader should
-		// still keep a name allocated for it, so if
-		// something calls RE_RegisterShader again with
-		// the same name, we don't try looking for it again
-		if (sh->defaultShader) {
-			return 0;
-		}
+	// we want to return 0 if the shader failed to
+	// load for some reason, but R_FindShader should
+	// still keep a name allocated for it, so if
+	// something calls RE_RegisterShader again with
+	// the same name, we don't try looking for it again
+	if ( sh->defaultShader ) {
+		return 0;
 	}
 
 	return sh->index;
@@ -3903,48 +3760,13 @@ qhandle_t RE_RegisterShader( const char *name ) {
 
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qtrue );
 
-	if (r_newRemapsTmpFix->integer) {
-		// we want to return 0 if the shader failed to
-		// load for some reason, but R_FindShader should
-		// still keep a name allocated for it, so if
-		// something calls RE_RegisterShader again with
-		// the same name, we don't try looking for it again
-		if (sh->defaultShader) {
-			return 0;
-		}
-	}
-
-	return sh->index;
-}
-/*
-====================
-RE_RegisterShaderDiffuse
-
-This is the exported shader entry point for the rest of the system
-It will always return an index that will be valid.
-====================
-*/
-qhandle_t RE_RegisterShader3D( const char *name ) {
-	shader_t	*sh;
-
-	if ( strlen( name ) >= MAX_QPATH ) {
-		Com_Printf( "Shader name exceeds MAX_QPATH\n" );
+	// we want to return 0 if the shader failed to
+	// load for some reason, but R_FindShader should
+	// still keep a name allocated for it, so if
+	// something calls RE_RegisterShader again with
+	// the same name, we don't try looking for it again
+	if ( sh->defaultShader ) {
 		return 0;
-	}
-
-	// I tried lightmapsNone which should set CGEN_LIGHTNING_DIFFUSE but it just leaves things black so idk.
-	// figure out sth better someday or find out how to fix the issues
-	sh = R_FindShader( name, lightmapsVertex, stylesDefault, qtrue );
-
-	if (r_newRemapsTmpFix->integer) {
-		// we want to return 0 if the shader failed to
-		// load for some reason, but R_FindShader should
-		// still keep a name allocated for it, so if
-		// something calls RE_RegisterShader again with
-		// the same name, we don't try looking for it again
-		if (sh->defaultShader) {
-			return 0;
-		}
 	}
 
 	return sh->index;
@@ -3960,36 +3782,21 @@ For menu graphics that should never be picmiped
 */
 qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 	shader_t	*sh;
-	// Remember previous value
-	int			old_r_celshadalgo;
 
 	if ( strlen( name ) >= MAX_QPATH ) {
 		Com_Printf( "Shader name exceeds MAX_QPATH\n" );
 		return 0;
 	}
 
-	/*
-	 * This will prevent sprites, like buttons, go through
-	 * cel shading filters, like kuwahara.
-	 * @author gmiranda
-	 */
-	old_r_celshadalgo = r_celshadalgo->integer;
-	r_celshadalgo->integer = 0;
-
 	sh = R_FindShader( name, lightmaps2d, stylesDefault, qfalse );
 
-	// Restore value
-	r_celshadalgo->integer = old_r_celshadalgo;
-
-	if (r_newRemapsTmpFix->integer) {
-		// we want to return 0 if the shader failed to
-		// load for some reason, but R_FindShader should
-		// still keep a name allocated for it, so if
-		// something calls RE_RegisterShader again with
-		// the same name, we don't try looking for it again
-		if (sh->defaultShader) {
-			return 0;
-		}
+	// we want to return 0 if the shader failed to
+	// load for some reason, but R_FindShader should
+	// still keep a name allocated for it, so if
+	// something calls RE_RegisterShader again with
+	// the same name, we don't try looking for it again
+	if ( sh->defaultShader ) {
+		return 0;
 	}
 
 	return sh->index;
@@ -4108,7 +3915,6 @@ static void ScanAndLoadShaderFiles( const char *path )
 	char *hashMem;
 	int shaderTextHashTableSizes[MAX_SHADERTEXT_HASH], hash, size;
 	int sum;
-	int shaderTextSize;
 
 	// scan for shader files
 	shaderFiles[0] = ri.FS_ListFiles( path, ".shader_mv", &numShaderFilesType[0] );
@@ -4150,7 +3956,7 @@ static void ScanAndLoadShaderFiles( const char *path )
 			char filename[MAX_QPATH];
 
 			Com_sprintf( filename, sizeof( filename ), "%s/%s", path, shaderFiles[type][i] );
-			ri.Printf( PRINT_DEVELOPER, "...loading '%s'\n", filename );
+			ri.Printf( PRINT_ALL, "...loading '%s'\n", filename );
 			ri.FS_ReadFile( filename, (void **)&buffers[j] );
 			if ( !buffers[j] ) {
 				ri.Error( ERR_DROP, "Couldn't load %s", filename );
@@ -4159,14 +3965,12 @@ static void ScanAndLoadShaderFiles( const char *path )
 		}
 	}
 
-	// build single large 
-	shaderTextSize = sum + numShaderFiles + 1;
-	s_shaderText = (char *)ri.Hunk_Alloc(shaderTextSize, h_low );
+	// build single large buffer
+	s_shaderText = (char *)ri.Hunk_Alloc( sum + numShaderFiles + 1, h_low );
 	pw = s_shaderText;
 	for ( i = 0; i < numShaderFiles ; i++ ) {
-		Q_strcat( pw, shaderTextSize, buffers[i] );
-		Q_strcat( pw, shaderTextSize, "\n" );
-		shaderTextSize -= strlen(pw);
+		strcat( pw, buffers[i] );
+		strcat( pw, "\n" );
 		pw += strlen( pw );
 		ri.FS_FreeFile( (void*) buffers[i] );
 	}
@@ -4233,7 +4037,6 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 	char	*p;
 	int		numDynGlowShaders;
 	int		sum, i;
-	int		dynglowShaderSize;
 
 	shaderFiles = ri.FS_ListFiles( path, ".dynGlow", &numDynGlowShaders );
 	assert(numDynGlowShaders >= 0);
@@ -4257,7 +4060,7 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 		char filename[MAX_QPATH];
 
 		Com_sprintf( filename, sizeof( filename ), "%s/%s", path, shaderFiles[i] );
-		ri.Printf(PRINT_DEVELOPER, "...loading '%s'\n", filename );
+		ri.Printf( PRINT_ALL, "...loading '%s'\n", filename );
 		ri.FS_ReadFile( filename, (void **)&dynGlowBuffers[i] );
 		if ( !dynGlowBuffers[i] ) {
 			ri.Error( ERR_DROP, "Couldn't load %s", filename );
@@ -4266,8 +4069,7 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 	}
 
 	// build single large buffer
-	dynglowShaderSize = sum + numDynGlowShaders + 1;
-	mv_dynGlowShaders = (char *)ri.Hunk_Alloc(dynglowShaderSize, h_low );
+	mv_dynGlowShaders = (char *)ri.Hunk_Alloc( sum + numDynGlowShaders + 1, h_low );
 
 	p = mv_dynGlowShaders;
 	for ( i = numDynGlowShaders - 1; i >= 0 ; i-- ) {
@@ -4276,9 +4078,8 @@ static void ScanAndLoadDynGlowFiles( const char *path )
 			continue;
 		}
 
-		Q_strcat( p, dynglowShaderSize, dynGlowBuffers[i] );
-		Q_strcat( p, dynglowShaderSize, "\n" );
-		dynglowShaderSize -= strlen(p);
+		strcat( p, dynGlowBuffers[i] );
+		strcat( p, "\n" );
 		p += strlen(p);
 		ri.FS_FreeFile( (void*) dynGlowBuffers[i] );
 	}
@@ -4342,7 +4143,6 @@ CreateInternalShaders
 */
 static void CreateInternalShaders( void ) {
 	tr.numShaders = 0;
-	tr.numAdvancedRemapShaders = 0;
 
 	// init the default shader
 	Com_Memset( &shader, 0, sizeof( shader ) );
@@ -4459,7 +4259,6 @@ static void CreateExternalShaders( void ) {
 	tr.projectionShadowShader = R_FindShader( "projectionShadow", lightmapsNone, stylesDefault, qtrue );
 	tr.flareShader = R_FindShader( "flareShader", lightmapsNone, stylesDefault, qtrue );
 	tr.sunShader = R_FindShader( "sun", lightmapsNone, stylesDefault, qtrue );
-	tr.solidityWaterShader = R_FindShader( r_solidityWaterShader->string, lightmapsNone, stylesDefault, qtrue );
 }
 
 /*
@@ -4468,10 +4267,9 @@ R_InitShaders
 ==================
 */
 void R_InitShaders( void ) {
-	ri.Printf( PRINT_DEVELOPER, "Initializing Shaders\n" );
+	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
-	Com_Memset(advancedRemapShadersHashTable, 0, sizeof(advancedRemapShadersHashTable));
 
 	deferLoad = qfalse;
 

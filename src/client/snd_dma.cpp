@@ -142,7 +142,6 @@ cvar_t		*s_doppler;
 cvar_t		*s_s_language;
 cvar_t		*s_muteWhenMinimized;
 cvar_t		*s_muteWhenUnfocused;
-cvar_t		*s_muteWhenScreensaver;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
 static	channel_t		*freelist = NULL;
@@ -163,7 +162,6 @@ ALfloat		listener_pos[3];		// Listener Position
 ALfloat		listener_ori[6];		// Listener Orientation
 int			s_numChannels;			// Number of AL Sources == Num of Channels
 short		s_rawdata[MAX_RAW_SAMPLES*4];	// Used for Raw Samples (Music etc...)
-bool		s_conditionallyMuted; // when minimized/unfocused, to avoid DMA audiospam when coming back
 
 channel_t *S_OpenALPickChannel(int entnum, int entchannel);
 void UpdateSingleShotSounds();
@@ -238,10 +236,6 @@ static inline void Channel_Clear(channel_t *ch)
 }
 
 
-static bool SNDDMA_ConditionallyMuted() {
-	return s_conditionallyMuted && !CL_VideoRecording(); // dont prevent sounds whne reocrding vid in background?
-}
-
 
 // ====================================================================
 // User-setable variables
@@ -254,9 +248,6 @@ void S_SoundInfo_f(void) {
 	} else {
 		if ( s_soundMuted ) {
 			Com_Printf ("sound system is muted\n");
-		}
-		if ( s_conditionallyMuted) {
-			Com_Printf ("sound system is conditionally muted\n");
 		}
 
 		Com_Printf("%5d stereo\n", dma.channels - 1);
@@ -316,7 +307,6 @@ void S_Init( void )
 	s_s_language = Cvar_Get("s_language", "english", CVAR_ARCHIVE | CVAR_NORESTART | CVAR_GLOBAL);
 	s_muteWhenUnfocused = Cvar_Get("s_muteWhenUnfocused", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	s_muteWhenMinimized = Cvar_Get("s_muteWhenMinimized", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-	s_muteWhenScreensaver = Cvar_Get("s_muteWhenScreensaver", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	s_lastMuteModCount = -1;
 
@@ -1274,7 +1264,7 @@ void S_StartSound(const vec3_t origin, int entityNum, int entchannel, sfxHandle_
 	int			i;
 	int			curTime;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -1441,7 +1431,7 @@ S_StartLocalSound
 ==================
 */
 void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -1462,7 +1452,7 @@ S_StartLocalLoopingSound
 void S_StartLocalLoopingSound( sfxHandle_t sfxHandle) {
 	vec3_t nullVec = {0,0,0};
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -1562,42 +1552,34 @@ S_Activate
 */
 void S_Activate(qboolean activate)
 {
+	if (activate) {
+		S_ClearSoundBuffer();
+	}
+
 #ifdef USE_OPENAL
 	if (s_UseOpenAL)
 	{
 		S_MuteAllSounds((qboolean)!activate);
-		s_conditionallyMuted = qfalse; // we don't rly have this problem with openal
 	}
 	else
 #endif
 	{
 		SNDDMA_Activate(activate);
-		s_conditionallyMuted = !activate;
 	}
 }
 
 void S_CheckMuteWhenMinimized(void)
 {
 	if (com_minimized->modificationCount +
-#if MONITORSTATUS_MAYBE_KNOWABLE
-		com_screensaverActive->modificationCount +
-#endif
 		com_unfocused->modificationCount != s_lastMuteModCount)
 	{
 		int disable =
-#if MONITORSTATUS_MAYBE_KNOWABLE
-			(com_screensaverActive->integer && s_muteWhenScreensaver->integer) ||
-#endif
 			(com_minimized->integer && s_muteWhenMinimized->integer) ||
 			(com_unfocused->integer && s_muteWhenUnfocused->integer);
 
 		S_Activate((qboolean)!disable);
 
-		s_lastMuteModCount = 
-#if MONITORSTATUS_MAYBE_KNOWABLE
-			com_screensaverActive->modificationCount +
-#endif
-			com_minimized->modificationCount +
+		s_lastMuteModCount = com_minimized->modificationCount +
 			com_unfocused->modificationCount;
 	}
 }
@@ -1649,7 +1631,7 @@ Include velocity in case I get around to doing doppler...
 void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle) {
 	sfx_t *sfx;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -1742,7 +1724,7 @@ Include velocity in case I get around to doing doppler...
 void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
 	sfx_t *sfx;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -1939,7 +1921,7 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 	float	scale;
 	int		intVolume;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -2096,7 +2078,7 @@ void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwat
 	vec3_t		origin;
 	char		*mapname;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -2108,7 +2090,7 @@ void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwat
 		if ((mapname) && (strcmp(mapname, s_LevelName) != 0))
 		{
 			EALFileInit(mapname);
-			Q_strncpyz(s_LevelName, mapname,sizeof(s_LevelName));
+			strcpy(s_LevelName, mapname);
 		}
 
 		listener_number = entityNum;
@@ -2265,26 +2247,13 @@ void S_Update( void ) {
 	int			i;
 	int			total;
 	channel_t	*ch;
-	bool wasMuted = SNDDMA_ConditionallyMuted();
 
-
-	if ( !s_soundStarted || s_soundMuted) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		Com_DPrintf ("not started or muted\n");
 		return;
 	}
 
 	S_CheckMuteWhenMinimized();
-
-	if ( SNDDMA_ConditionallyMuted() != wasMuted) {
-		if (wasMuted) {
-			Com_DPrintf("conditionally unmuted\n");
-		}
-		else {
-			Com_DPrintf("conditionally muted\n");
-		}
-		return;
-	}
-
 
 #ifdef USE_OPENAL
 	if (s_UseOpenAL)
@@ -2409,7 +2378,7 @@ void S_Update_(void) {
 	int				source;
 	float			pos[3];
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
@@ -2791,7 +2760,7 @@ void UpdateLoopingSounds()
 	float pos[3];
 	float fVolume = 0.003922f;	// 1.f / 255.f
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	// Clear AL Error State
 	alGetError();
 #endif
@@ -2861,7 +2830,7 @@ void UpdateRawSamples()
 	int i,j,src;
 
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	// Clear Open AL Error
 	alGetError();
 #endif
@@ -3355,7 +3324,7 @@ static char gsLoopMusic [MAX_QPATH];
 
 void S_RestartMusic( void )
 {
-	if (s_soundStarted && !s_soundMuted && !SNDDMA_ConditionallyMuted())
+	if (s_soundStarted && !s_soundMuted )
 	{
 		if (gsIntroMusic[0] || gsLoopMusic[0])
 		{

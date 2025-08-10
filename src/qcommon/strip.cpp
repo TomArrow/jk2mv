@@ -23,7 +23,7 @@
 
 #include <list>
 
-//using namespace std;
+using namespace std;
 
 #ifdef _STRIPED_
 
@@ -271,8 +271,8 @@ void GetLine(char *&Data, int &Size, int &token, char *&data)
 		return;
 	}
 
-//	Q_strncpyz(temp_data, "   DATA \"test of the data\ntest test\ndfa dfd");
-//	Q_strncpyz(temp_data, "   DATA");
+//	strcpy(temp_data, "   DATA \"test of the data\ntest test\ndfa dfd");
+//	strcpy(temp_data, "   DATA");
 
 	pos = temp_data;
 	while((*pos) && strchr(" \n\r", *pos))
@@ -337,7 +337,7 @@ void GetLine(char *&Data, int &Size, int &token, char *&data)
 		}
 		*pos = 0;
 
-		Q_strncpyz(save_data, test_token,sizeof(save_data));
+		strcpy(save_data, test_token);
 	}
 }
 
@@ -495,7 +495,7 @@ void cStrings::SetReference(char *newReference)
 	}
 
 	Reference = new char[strlen(newReference)+1];
-	Q_strncpyz(Reference, newReference, strlen(newReference) + 1);
+	strcpy(Reference, newReference);
 }
 
 bool cStrings::UnderstandToken(int token, char *data)
@@ -665,7 +665,7 @@ void cStringsED::SetText(unsigned int index, char *newText)
 	}
 
 	Text[index] = new char[strlen(newText)+1];
-	Q_strncpyz(Text[index], newText);
+	strcpy(Text[index], newText);
 }
 
 void cStringsED::SetNotes(char *newNotes)
@@ -682,7 +682,7 @@ void cStringsED::SetNotes(char *newNotes)
 	}
 
 	Notes = new char[strlen(newNotes)+1];
-	Q_strncpyz(Notes, newNotes);
+	strcpy(Notes, newNotes);
 }
 
 
@@ -807,22 +807,18 @@ void cStringsSingle::SetText(const char *newText)
 
 #ifndef _STRIPED_
 	// Following is for TESTING for SOF.
-	int destSize;
 	if(sp_show_strip->value)
 	{
 		Dest = Text = new char[length + 6];
-		destSize = length + 6;
-		Q_strncpyz(Dest,"SP:", length + 6);
-		destSize -= strlen(Dest);
+		strcpy(Dest,"SP:");
 		Dest += strlen(Dest);
 	}
 	else
 #endif
 	{
 		Dest = Text = new char[length];
-		destSize = length;
 	}
-	Q_strncpyz(Dest, newText, destSize);
+	strcpy(Dest, newText);
 }
 
 // fix problems caused by fucking morons entering clever "rich" chars in to new text files *after* the auto-stripper
@@ -974,7 +970,7 @@ void cStringPackage::SetReference(char *newReference)
 	}
 
 	Reference = new char[strlen(newReference)+1];
-	Q_strncpyz(Reference, newReference, strlen(newReference) + 1);
+	strcpy(Reference, newReference);
 }
 
 #ifndef _STRIPED_
@@ -1137,7 +1133,7 @@ void cStringPackageED::SetDescription(char *newDescription)
 	}
 
 	Description = new char[strlen(newDescription)+1];
-	Q_strncpyz(Description, newDescription);
+	strcpy(Description, newDescription);
 }
 
 cStringsED *cStringPackageED::FindString(int &index)
@@ -1411,7 +1407,7 @@ cStringsSingle *cStringPackageSingle::FindString(char *ReferenceLookup)
 
 int cStringPackageSingle::FindStringID(const char *ReferenceLookup)
 {
-	std::map<std::string, int>::iterator	i;
+	map<string, int>::iterator	i;
 	size_t						size;
 
 	if (!Reference)
@@ -1430,7 +1426,7 @@ int cStringPackageSingle::FindStringID(const char *ReferenceLookup)
 		return -1;
 	}
 
-	i = ReferenceTable.find(std::string(ReferenceLookup + size + 1));
+	i = ReferenceTable.find(string(ReferenceLookup + size + 1));
 	if (i != ReferenceTable.end())
 	{
 		return (*i).second;
@@ -1473,7 +1469,7 @@ bool cStringPackageSingle::UnderstandToken(char *&Data, int &Size, int token, ch
 				ReferenceLookup = Strings[pos].GetReference();
 				if (ReferenceLookup)
 				{
-					ReferenceTable[std::string(ReferenceLookup)] = pos;
+					ReferenceTable[string(ReferenceLookup)] = pos;
 				}
 			}
 			return true;
@@ -1495,8 +1491,8 @@ bool cStringPackageSingle::UnderstandToken(char *&Data, int &Size, int token, ch
 #ifndef _STRIPED_
 
 // A map of loaded string packages
-std::map<std::string, cStringPackageSingle *>		SP_ListByName;
-std::map<byte, cStringPackageSingle *>		SP_ListByID;
+map<string, cStringPackageSingle *>		SP_ListByName;
+map<byte, cStringPackageSingle *>		SP_ListByID;
 
 
 // Registration
@@ -1506,7 +1502,7 @@ cStringPackageSingle *SP_Register(const char *inPackage, unsigned char Registrat
 	char											Package[MAX_QPATH];
 	int												size;
 	cStringPackageSingle							*new_sp;
-	std::map<std::string, cStringPackageSingle *>::iterator	i;
+	map<string, cStringPackageSingle *>::iterator	i;
 
 
 	assert(SP_ListByName.size() == SP_ListByID.size());
@@ -1574,8 +1570,8 @@ qboolean SP_RegisterServer(const char *Package)
 // Unload all packages with the relevant registration bits
 void SP_Unload(unsigned char Registration)
 {
-	std::map<std::string, cStringPackageSingle *>::iterator	i, next;
-	std::map<byte, cStringPackageSingle *>::iterator		id;
+	map<string, cStringPackageSingle *>::iterator	i, next;
+	map<byte, cStringPackageSingle *>::iterator		id;
 
 	assert(SP_ListByName.size() == SP_ListByID.size());
 
@@ -1601,7 +1597,7 @@ void SP_Unload(unsigned char Registration)
 
 int SP_GetStringID(const char *inReference)
 {
-	std::map<unsigned char,cStringPackageSingle *>::iterator	i;
+	map<unsigned char,cStringPackageSingle *>::iterator	i;
 	int													ID;
 	char Reference[MAX_QPATH];
 	Q_strncpyz(Reference, inReference, MAX_QPATH);
@@ -1633,7 +1629,7 @@ cStringsSingle *SP_GetString(unsigned short ID)
 {
 	cStringPackageSingle								*sp;
 	cStringsSingle										*string;
-	std::map<unsigned char,cStringPackageSingle *>::iterator	i;
+	map<unsigned char,cStringPackageSingle *>::iterator	i;
 
 	i = SP_ListByID.find(SP_GET_PACKAGE(ID));
 	if (i == SP_ListByID.end())
@@ -1697,11 +1693,36 @@ const char *SP_GetStringTextString(const char *Reference)
 	return SP_GetStringText(index);
 }
 
+const qboolean SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize)
+{
+	if (dstsize <= 0)
+	{
+		return qfalse;
+	}
+
+	int index = SP_GetStringID(Reference);
+
+	if (index != -1)
+	{
+		cStringsSingle	*string = SP_GetString(index);;
+		char			*value = string->GetText();;
+
+		if (value)
+		{
+			Q_strncpyz(dst, value, dstsize);
+			return qtrue;
+		}
+	}
+
+	Q_strncpyz(dst, "??", dstsize);
+	return qfalse;
+}
+
 static void SP_UpdateLanguage(void)
 {
-	std::map<unsigned char, cStringPackageSingle *>::iterator	it;
-	std::list<cStringPackageID>									sps;
-	std::list<cStringPackageID>::iterator						spit;
+	map<unsigned char, cStringPackageSingle *>::iterator	it;
+	list<cStringPackageID>									sps;
+	list<cStringPackageID>::iterator						spit;
 
 	// Grab all SP ids
 	for(it = SP_ListByID.begin(); it != SP_ListByID.end(); ++it)
@@ -1752,32 +1773,6 @@ void SP_CheckForLanguageUpdates(void)
 	}
 }
 
-const char *SP_GetLanguageStringFromNumber(int language)
-{
-	switch (language)
-	{
-	case SP_LANGUAGE_ENGLISH:
-		return "english";
-	case SP_LANGUAGE_FRENCH:
-		return "french";
-	case SP_LANGUAGE_GERMAN:
-		return "german";
-	case SP_LANGUAGE_BRITISH:
-		return "british";
-	case SP_LANGUAGE_KOREAN:
-		return "korean";
-	case SP_LANGUAGE_TAIWANESE:
-		return "taiwanese";
-	case SP_LANGUAGE_ITALIAN:
-		return "italian";
-	case SP_LANGUAGE_SPANISH:
-		return "spanish";
-	case SP_LANGUAGE_JAPANESE:
-		return "japanese";
-	default:
-		return "english";
-	}
-}
 
 int Language_GetIntegerValue(void)
 {

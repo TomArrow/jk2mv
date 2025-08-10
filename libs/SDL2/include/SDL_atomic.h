@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -85,7 +85,7 @@ typedef int SDL_SpinLock;
  * ***Please note that spinlocks are dangerous if you don't know what you're
  * doing. Please be careful using any sort of spinlock!***
  *
- * \param lock a pointer to a lock variable.
+ * \param lock a pointer to a lock variable
  * \returns SDL_TRUE if the lock succeeded, SDL_FALSE if the lock is already
  *          held.
  *
@@ -102,7 +102,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicTryLock(SDL_SpinLock *lock);
  * ***Please note that spinlocks are dangerous if you don't know what you're
  * doing. Please be careful using any sort of spinlock!***
  *
- * \param lock a pointer to a lock variable.
+ * \param lock a pointer to a lock variable
  *
  * \since This function is available since SDL 2.0.0.
  *
@@ -119,7 +119,7 @@ extern DECLSPEC void SDLCALL SDL_AtomicLock(SDL_SpinLock *lock);
  * ***Please note that spinlocks are dangerous if you don't know what you're
  * doing. Please be careful using any sort of spinlock!***
  *
- * \param lock a pointer to a lock variable.
+ * \param lock a pointer to a lock variable
  *
  * \since This function is available since SDL 2.0.0.
  *
@@ -231,7 +231,7 @@ typedef void (*SDL_KernelMemoryBarrierFunc)();
 /* "REP NOP" is PAUSE, coded for tools that don't know it by that name. */
 #if (defined(__GNUC__) || defined(__clang__)) && (defined(__i386__) || defined(__x86_64__))
     #define SDL_CPUPauseInstruction() __asm__ __volatile__("pause\n")  /* Some assemblers can't do REP NOP, so go with PAUSE. */
-#elif (defined(__arm__) && defined(__ARM_ARCH) && __ARM_ARCH >= 7) || defined(__aarch64__)
+#elif (defined(__arm__) && __ARM_ARCH >= 7) || defined(__aarch64__)
     #define SDL_CPUPauseInstruction() __asm__ __volatile__("yield" ::: "memory")
 #elif (defined(__powerpc__) || defined(__powerpc64__))
     #define SDL_CPUPauseInstruction() __asm__ __volatile__("or 27,27,27");
@@ -240,21 +240,19 @@ typedef void (*SDL_KernelMemoryBarrierFunc)();
 #elif defined(_MSC_VER) && (defined(_M_ARM) || defined(_M_ARM64))
     #define SDL_CPUPauseInstruction() __yield()
 #elif defined(__WATCOMC__) && defined(__386__)
+    /* watcom assembler rejects PAUSE if CPU < i686, and it refuses REP NOP as an invalid combination. Hardcode the bytes.  */
     extern __inline void SDL_CPUPauseInstruction(void);
-    #pragma aux SDL_CPUPauseInstruction = ".686p" ".xmm2" "pause"
+    #pragma aux SDL_CPUPauseInstruction = "db 0f3h,90h"
 #else
     #define SDL_CPUPauseInstruction()
 #endif
 
 
 /**
- * A type representing an atomic integer value.
- *
- * It is a struct so people don't accidentally use numeric operations on it.
+ * \brief A type representing an atomic integer value.  It is a struct
+ *        so people don't accidentally use numeric operations on it.
  */
-typedef struct SDL_atomic_t {
-    int value;
-} SDL_atomic_t;
+typedef struct { int value; } SDL_atomic_t;
 
 /**
  * Set an atomic variable to a new value if it is currently an old value.
@@ -262,9 +260,9 @@ typedef struct SDL_atomic_t {
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified.
- * \param oldval the old value.
- * \param newval the new value.
+ * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param oldval the old value
+ * \param newval the new value
  * \returns SDL_TRUE if the atomic variable was set, SDL_FALSE otherwise.
  *
  * \since This function is available since SDL 2.0.0.
@@ -283,8 +281,8 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int 
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified.
- * \param v the desired value.
+ * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param v the desired value
  * \returns the previous value of the atomic variable.
  *
  * \since This function is available since SDL 2.0.2.
@@ -299,7 +297,7 @@ extern DECLSPEC int SDLCALL SDL_AtomicSet(SDL_atomic_t *a, int v);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable.
+ * \param a a pointer to an SDL_atomic_t variable
  * \returns the current value of an atomic variable.
  *
  * \since This function is available since SDL 2.0.2.
@@ -316,8 +314,8 @@ extern DECLSPEC int SDLCALL SDL_AtomicGet(SDL_atomic_t *a);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to an SDL_atomic_t variable to be modified.
- * \param v the desired value to add.
+ * \param a a pointer to an SDL_atomic_t variable to be modified
+ * \param v the desired value to add
  * \returns the previous value of the atomic variable.
  *
  * \since This function is available since SDL 2.0.2.
@@ -350,9 +348,9 @@ extern DECLSPEC int SDLCALL SDL_AtomicAdd(SDL_atomic_t *a, int v);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to a pointer.
- * \param oldval the old pointer value.
- * \param newval the new pointer value.
+ * \param a a pointer to a pointer
+ * \param oldval the old pointer value
+ * \param newval the new pointer value
  * \returns SDL_TRUE if the pointer was set, SDL_FALSE otherwise.
  *
  * \since This function is available since SDL 2.0.0.
@@ -369,8 +367,8 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCASPtr(void **a, void *oldval, void *
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to a pointer.
- * \param v the desired pointer value.
+ * \param a a pointer to a pointer
+ * \param v the desired pointer value
  * \returns the previous value of the pointer.
  *
  * \since This function is available since SDL 2.0.2.
@@ -386,7 +384,7 @@ extern DECLSPEC void* SDLCALL SDL_AtomicSetPtr(void **a, void* v);
  * ***Note: If you don't know what this function is for, you shouldn't use
  * it!***
  *
- * \param a a pointer to a pointer.
+ * \param a a pointer to a pointer
  * \returns the current value of a pointer.
  *
  * \since This function is available since SDL 2.0.2.

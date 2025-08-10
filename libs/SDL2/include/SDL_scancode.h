@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,8 +37,8 @@
  * in the SDL_Keysym::scancode key.keysym.scancode field of the SDL_Event
  * structure.
  *
- * The values in this enumeration are based on the USB usage page standard:
- * https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
+ *  The values in this enumeration are based on the USB usage page standard:
+ *  https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
  */
 typedef enum SDL_Scancode
 {

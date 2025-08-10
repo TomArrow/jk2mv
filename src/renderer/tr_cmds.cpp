@@ -230,36 +230,6 @@ void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,
 	cmd->s2 = s2;
 	cmd->t2 = t2;
 }
-/*
-=============
-RE_DrawLine
-
-x, y, x2 and y2 are in virtual screen coordinates
-xadjust is 640 / virtual screen width
-yadjust is 480 / virtual screen height
-=============
-*/
-void RE_DrawLine ( float x, float y, float x2, float y2, float width, float s1, float t1,
-	float s2, float t2, qhandle_t hShader, float xadjust, float yadjust )
-{
-	drawLineCommand_t*	cmd;
-
-	cmd = (drawLineCommand_t*)R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_DRAW_LINE;
-	cmd->shader = R_GetShaderByHandle( hShader );
-	cmd->x = x * xadjust;
-	cmd->y = y * yadjust;
-	cmd->x2 = x2 * xadjust;
-	cmd->y2 = y2 * yadjust;
-	cmd->width = width;
-	cmd->s1 = s1;
-	cmd->t1 = t1;
-	cmd->s2 = s2;
-	cmd->t2 = t2;
-}
 
 /*
 =============
@@ -334,29 +304,6 @@ void RE_RotatePic2 ( float x, float y, float w, float h, float s1, float t1,
 	cmd->t1 = t1;
 	cmd->s2 = s2;
 	cmd->t2 = t2;
-}
-
-static int parseVec4(const char* text, vec4_t out) {
-	int matches = sscanf(text, "%f %f %f %f", &out[0], &out[1], &out[2], &out[3]);
-	if (matches <= 0) {
-		out[0] = out[1] = out[2] = out[3] = 1.0f;
-	}
-	else if (matches == 1) {
-		// Only 1 number. Use as scale in general for colors.
-		out[1] = out[2] = out[0];
-		out[3] = 1.0f;
-	}
-	else if (matches == 3) { // Alpha not specified
-		out[3] = 1.0f;
-	}
-	else if (matches == 2) { // First number is color scale, second is alpha
-		out[3] = out[1];
-		out[1] = out[2] = out[0];
-	}
-	else {
-		// I guess we got all 4? All good.
-	}
-	return matches;
 }
 
 /*
@@ -443,7 +390,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 		R_SetColorMappings();
 	}
 
-	if (r_overBrightBits->modified || r_mapOverBrightBits->modified) {
+	if (r_overBrightBits->modified) {
 		char mapname[MAX_QPATH] = {0};
 
 		R_SyncRenderThread();
@@ -455,15 +402,11 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 			tr.worldMapLoaded = qfalse;
 			tr.world = NULL;
 			RE_LoadWorldMap(mapname);
-
-			tr.refdef.forceVisRefresh = qtrue; // avoid hall-of-mirrors. dunno why needed.
 		}
 
 		//reset these last...
 		if (r_overBrightBits->modified)
 			r_overBrightBits->modified = qfalse;
-		if (r_mapOverBrightBits->modified)
-			r_mapOverBrightBits->modified = qfalse;
 	}
 
 	//
@@ -488,17 +431,6 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 		if ( ( err = qglGetError() ) != GL_NO_ERROR ) {
 			ri.Error( ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!", err );
 		}
-	}
-
-	if (r_celoutlineColor->modified) {
-		tr.celLineColorIsSet = qfalse;
-		if (Q_stricmp(r_celoutlineColor->string, "0")) {
-			const char* skyColorTextPointer = r_celoutlineColor->string;
-			if (parseVec4(skyColorTextPointer,tr.celLineColor)) {
-				tr.celLineColorIsSet = qtrue;
-			}
-		}
-		r_celoutlineColor->modified = qfalse;
 	}
 
 	//

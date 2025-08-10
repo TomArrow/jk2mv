@@ -14,6 +14,8 @@ int			cvar_numIndexes;
 #define FILE_HASH_SIZE		256
 static	cvar_t*		hashTable[FILE_HASH_SIZE];
 
+cvar_t		*com_overrideCheats;
+
 cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force);
 
 /*
@@ -173,7 +175,7 @@ void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize 
 Cvar_CommandCompletion
 ============
 */
-void	Cvar_CommandCompletion( void(*callback)(const char *s,qboolean meme) ) {
+void	Cvar_CommandCompletion( void(*callback)(const char *s) ) {
 	cvar_t		*cvar;
 
 	for ( cvar = cvar_vars ; cvar ; cvar = cvar->next ) {
@@ -182,7 +184,7 @@ void	Cvar_CommandCompletion( void(*callback)(const char *s,qboolean meme) ) {
 		{
 			continue;
 		}
-		callback( cvar->name, qfalse );
+		callback( cvar->name );
 	}
 }
 
@@ -287,19 +289,11 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	var->modificationCount = 1;
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
-	int error = 0;
-	var->integer = safeatoi(var->string, NULL, 10, &error);
-	if (error) {
-		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
-	}
+	var->integer = atoi(var->string);
 #else
 	double strValue = strtod(var->string, NULL);
 	var->value = strValue;
-	int error = 0;
-	var->integer = safeatoi(var->string, NULL, 10, &error);
-	if (error) {
-		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
-	}
+	var->integer = strValue;
 #endif
 	var->resetString = CopyString( var_value );
 
@@ -423,7 +417,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 			return var;
 		}
 
-		if ( (var->flags & CVAR_CHEAT) && !cvar_cheats->integer && !com_demoplaying ) //Allow modifying cheat cvars during demo playback.
+		if ( (var->flags & CVAR_CHEAT) && !com_overrideCheats->integer && !cvar_cheats->integer && !com_demoplaying ) //Allow modifying cheat cvars during demo playback.
 		{
 			Com_Printf ("%s is cheat protected.\n", var_name);
 			return var;
@@ -450,20 +444,11 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 	var->string = CopyString(value);
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
-	//var->integer = atoi (var->string);
-	int error = 0;
-	var->integer = safeatoi(var->string, NULL, 10, &error);
-	if (error) {
-		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
-	}
+	var->integer = atoi (var->string);
 #else
 	double strValue = strtod(var->string, NULL);
 	var->value = strValue;
-	int error = 0;
-	var->integer = safeatoi(var->string, NULL, 10, &error);
-	if (error) {
-		Com_Printf("%s cvar overflow, integer value will be %d.\n", var_name, var->integer);
-	}
+	var->integer = strValue;
 #endif
 
 	return var;
@@ -539,6 +524,11 @@ Any testing variables will be reset to the safe values
 */
 void Cvar_SetCheatState( void ) {
 	cvar_t	*var;
+
+	if (com_overrideCheats->integer)
+	{
+		return;
+	}
 
 	// set all default vars to the safe value
 	for ( var = cvar_vars ; var ; var = var->next ) {
@@ -883,40 +873,6 @@ void Cvar_WriteVariables( fileHandle_t f, qboolean locals ) {
 	}
 }
 
-void Cvar_WriteNonDefaultVariables(fileHandle_t f, qboolean realTime) {
-	cvar_t	*var;
-	char	buffer[1024];
-	cvar_t *sortedCvars[MAX_CVARS];
-	qboolean doLatched = (qboolean)!realTime;
-
-	int i;
-	int numSorted = 0;
-	for (var = cvar_vars ; var ; var = var->next) {
-		if((var->flags & CVAR_ARCHIVE) || realTime) {
-			if (Q_stricmp(var->resetString, doLatched && var->latchedString ? var->latchedString : var->string)) {
-				sortedCvars[numSorted++] = var;
-			}
-		}
-	}
-
-	if (!numSorted)
-		return;
-
-	qsort(sortedCvars, numSorted, sizeof(sortedCvars[0]), Cvar_CvarCmp);
-
-	for (i = 0; i < numSorted ; ++i) {
-		var = sortedCvars[i];
-
-		// write the latched value, even if it hasn't taken effect yet
-		if ( var->latchedString && doLatched) {
-			Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->latchedString);
-		} else {
-			Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string);
-		}
-		FS_Printf (f, "%s", buffer);
-	}
-}
-
 /*
 ============
 Cvar_List_f
@@ -1198,7 +1154,7 @@ void Cvar_CompleteCvarName( char *args, int argNum )
 		char *p = Com_SkipTokens( args, 1, " " );
 
 		if( p > args )
-			Field_CompleteCommand( p, qfalse, qtrue, qtrue, qtrue );
+			Field_CompleteCommand( p, qfalse, qtrue, qtrue );
 	}
 }
 
@@ -1211,6 +1167,7 @@ Reads in all archived cvars
 */
 void Cvar_Init (void) {
 	cvar_cheats = Cvar_Get("sv_cheats", "0", CVAR_ROM | CVAR_SYSTEMINFO );
+	com_overrideCheats = Cvar_Get("com_overrideCheats", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	Cmd_AddCommand ("print", Cvar_Print_f );
 	Cmd_SetCommandCompletionFunc( "print", Cvar_CompleteCvarName );

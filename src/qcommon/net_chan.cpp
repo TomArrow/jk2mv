@@ -22,13 +22,12 @@ to the new value before sending out any replies.
 */
 
 #include "../qcommon/qcommon.h"
-#include <map>
 
-typedef std::map<int, fragmentAssemblyBuffer_t> fragmentBuffersMap;
-std::map<int, std::map<int, fragmentBuffersMap>> fragmentBuffers;
-typedef std::map<int, std::map<int, fragmentBuffersMap>>::iterator fragmentBuffersIPIterator;
-typedef std::map<int, fragmentBuffersMap>::iterator fragmentBuffersPortIterator;
-typedef fragmentBuffersMap::iterator fragmentBuffersIterator;
+#define	MAX_PACKETLEN			1400		// max size of a network packet
+#define	FRAGMENT_SIZE			(MAX_PACKETLEN - 100)
+#define	PACKET_HEADER			10			// two ints and a short
+
+#define	FRAGMENT_BIT	(1<<31)
 
 static cvar_t	*showpackets;
 static cvar_t	*showdrop;
@@ -84,8 +83,7 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 	// write the packet header
 	MSG_InitOOB(&send, send_buf, sizeof(send_buf));				// <-- only do the oob here
 
-	//MSG_WriteLong(&send, chan->outgoingSequence | FRAGMENT_BIT);
-	MSG_WriteLong(&send, chan->unsentFragmentSequenceNum | FRAGMENT_BIT);
+	MSG_WriteLong(&send, chan->outgoingSequence | FRAGMENT_BIT);
 
 	// send the qport if we are a client
 	if (chan->sock == NS_CLIENT) {
@@ -109,8 +107,7 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 		Com_Printf("%s send %4i : s=%i fragment=%i,%i\n"
 			, netsrcString[chan->sock]
 			, send.cursize
-			//, chan->outgoingSequence - 1
-			, chan->unsentFragmentSequenceNum - 1
+			, chan->outgoingSequence - 1
 			, chan->unsentFragmentStart, fragmentLength);
 	}
 
@@ -121,7 +118,7 @@ void Netchan_TransmitNextFragment(netchan_t *chan) {
 	// a second packet of zero length so that the other side
 	// can tell there aren't more to follow
 	if (chan->unsentFragmentStart == chan->unsentLength && fragmentLength != FRAGMENT_SIZE) {
-		//chan->outgoingSequence++;
+		chan->outgoingSequence++;
 		chan->unsentFragments = qfalse;
 	}
 }
@@ -135,7 +132,7 @@ Sends a message to a connection, fragmenting if necessary
 A 0 length will still generate a packet.
 ================
 */
-void Netchan_Transmit(netchan_t *chan, int length, const byte *data, qboolean fakeSend) {
+void Netchan_Transmit(netchan_t *chan, int length, const byte *data) {
 	msg_t		send;
 	byte		send_buf[MAX_PACKETLEN];
 
@@ -145,22 +142,13 @@ void Netchan_Transmit(netchan_t *chan, int length, const byte *data, qboolean fa
 	chan->unsentFragmentStart = 0;
 
 	if (chan->unsentFragments) {
-		Com_Printf("[ISM] Stomping Unsent Fragments %s\n", netsrcString[chan->sock]); // TODO how do we make this nicer?
+		Com_Printf("[ISM] Stomping Unsent Fragments %s\n", netsrcString[chan->sock]);
 	}
-
-	if (fakeSend) {
-		// might want this for debugging here and there. Or to write messages only to the serverside demo
-		chan->outgoingSequence++;
-		return;
-	}
-
 	// fragment large reliable messages
 	if (length >= FRAGMENT_SIZE) {
 		chan->unsentFragments = qtrue;
 		chan->unsentLength = length;
-		chan->unsentFragmentSequenceNum = chan->outgoingSequence;
 		Com_Memcpy(chan->unsentBuffer, data, length);
-		chan->outgoingSequence++; // do this immediately here to avoid random weirdness (like trying to create a snapshot on the number of an old outgoingSequence
 
 		// only send the first fragment now
 		Netchan_TransmitNextFragment(chan);
@@ -203,17 +191,9 @@ out of order or a fragment.
 Msg must be large enough to hold MAX_MSGLEN, because if this is the
 final fragment of a multi-part message, the entire thing will be
 copied out.
-
-Addition 2022-02-18 by Tom:
-If you plan to use valid but out of order packets, pass pointers to an integer and a qboolean. 
-If provided, sequenceNumber will be assigned the sequence number of this message and 
-validButOutOfOrder will be assigned qtrue if the message was valid but arrived too late. Likewise,
-it will be assigned qtrue if the message was the last missing fragment of a fragmented message and the 
-message was successfully reconstructed.
-Basically, it's for recording more smooth demos that include even packets that arrived too late.
 =================
 */
-qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qboolean* validButOutOfOrder) {
+qboolean Netchan_Process(netchan_t *chan, msg_t *msg) {
 	int			sequence;
 	//int			qport;
 	int			fragmentStart, fragmentLength;
@@ -222,10 +202,6 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	// get sequence numbers
 	MSG_BeginReadingOOB(msg);
 	sequence = MSG_ReadLong(msg);
-		
-	if (validButOutOfOrder) { // This will be set to true if a packet is valid/fragmented message assembled, but out of order and thus not usable for the game itself
-		*validButOutOfOrder = qfalse;
-	}
 
 	// check for fragment information
 	if (sequence & FRAGMENT_BIT) {
@@ -233,10 +209,6 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 		fragmented = qtrue;
 	} else {
 		fragmented = qfalse;
-	}
-
-	if (sequenceNumber) { // Pass the sequence number to the outside if requested
-		*sequenceNumber = sequence;
 	}
 
 	// read the qport if we are a server
@@ -271,7 +243,6 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	//
 	// discard out of order or duplicated packets
 	//
-	chan->outOfOrder = qfalse;
 	if (sequence <= chan->incomingSequence) {
 		if (showdrop->integer || showpackets->integer) {
 			Com_Printf("%s:Out of order packet %i at %i\n"
@@ -279,8 +250,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 				, sequence
 				, chan->incomingSequence);
 		}
-		//return qfalse;
-		chan->outOfOrder = qtrue; // We still want to assemble fragmented messages, even if out of order
+		return qfalse;
 	}
 
 	//
@@ -302,40 +272,8 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	// bump incoming_reliable_sequence
 	//
 	if (fragmented) {
-
-		// First, some maintenance. Remove too old fragment buffers.
-		for (fragmentBuffersIPIterator itIP = fragmentBuffers.begin(); itIP != fragmentBuffers.end(); ++itIP) { // Iterate through IPs
-			for (fragmentBuffersPortIterator itPort = itIP->second.begin(); itPort != itIP->second.end(); ++itPort) { // Iterate through Ports
-				for (fragmentBuffersIterator it = itPort->second.begin(); it != itPort->second.end(); ) { // Iterate through fragment buffers
-					fragmentBuffersIterator itTmp = it;
-					++it;
-					if (itTmp->second.time + FRAGMENT_BUFFERS_TIMEOUT < Com_RealTime(NULL)) {
-						if (showdrop->integer || showpackets->integer) {
-							netadr_t tmpAdr;
-							tmpAdr.ipi = itIP->first;
-							tmpAdr.port = itPort->first;
-							tmpAdr.type = NA_IP;
-							Com_Printf("%s:Dropped timed out message fragment buffer at %i\n"
-								, NET_AdrToString(tmpAdr)
-								, itTmp->first);
-						}
-						itPort->second.erase(itTmp);
-					}
-				}
-			}
-		}
-		
-		fragmentBuffersMap* buffersMap = &fragmentBuffers[chan->remoteAddress.ipi][chan->remoteAddress.port];
-
-		qboolean isNewBuffer = (qboolean)(buffersMap->find(sequence) == buffersMap->end());
-		fragmentAssemblyBuffer_t* thisFragmentBuffer = &(*buffersMap)[sequence]; // This will either find or insert the element.
-
-		if (isNewBuffer) { // Clear everything to 0 if it's a new buffer
-			Com_Memset(thisFragmentBuffer, 0, sizeof(*thisFragmentBuffer));
-		}
-
 		// make sure we
-		/*if (sequence != chan->fragmentSequence) {
+		if (sequence != chan->fragmentSequence) {
 			chan->fragmentSequence = sequence;
 			chan->fragmentLength = 0;
 		}
@@ -356,58 +294,25 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 
 			// hell yeah we have to dump the whole thing -gil
 			// but I am scared - mw
-			
-			//chan->fragmentLength = 0;
-			//chan->incomingSequence = sequence;
-			//chan->fragmentSequence = 0;
-			
+			/*
+			chan->fragmentLength = 0;
+			chan->incomingSequence = sequence;
+			chan->fragmentSequence = 0;
+			*/
 			return qfalse;
-		}*/
+		}
 
-		// old sanity check for fragment size adapted to new code
+		// copy the fragment to the fragment buffer
 		if (fragmentLength < 0 || msg->readcount + fragmentLength > msg->cursize ||
-			fragmentStart + fragmentLength > (int)sizeof(thisFragmentBuffer->data)) {
+			chan->fragmentLength + fragmentLength > (int)sizeof(chan->fragmentBuffer)) {
 			if (showdrop->integer || showpackets->integer) {
 				Com_Printf("%s:illegal fragment length\n"
 					, NET_AdrToString(chan->remoteAddress));
 			}
 			return qfalse;
 		}
-		
-		// Additional sanity check now since we need to track the individual pieces precisely
-		if (fragmentStart % FRAGMENT_SIZE > 0) { // Not a correct multiple of fragment size.
-			if (showdrop->integer || showpackets->integer) {
-				Com_Printf("%s:illegal fragment offset\n"
-					, NET_AdrToString(chan->remoteAddress));
-			}
-			return qfalse;
-		}
 
-		// copy to buffer 
-		int currentFragment = fragmentStart / FRAGMENT_SIZE;
-		qboolean isLastFragment = (qboolean)(fragmentLength != FRAGMENT_SIZE);
-		Com_Memcpy(thisFragmentBuffer->data + fragmentStart,
-			msg->data + msg->readcount, fragmentLength);
-		thisFragmentBuffer->fragmentsReceived[currentFragment] = qtrue;
-		thisFragmentBuffer->time = Com_RealTime(NULL);
-		if (isLastFragment) {
-			thisFragmentBuffer->lastFragment = currentFragment;
-			thisFragmentBuffer->totalLength = fragmentStart + fragmentLength;
-		}
-
-		// Any fragments missing?
-		if (!thisFragmentBuffer->lastFragment) {
-			return qfalse; // last fragment is not received, no need to even check
-		}
-		else {
-			for(int i = thisFragmentBuffer->lastFragment; i >= 0; i--) {
-				if (!thisFragmentBuffer->fragmentsReceived[i]) {
-					return qfalse; // If any fragment is missing, there's no point in continuing here.
-				}
-			}
-		}
-
-		/*Com_Memcpy(chan->fragmentBuffer + chan->fragmentLength,
+		Com_Memcpy(chan->fragmentBuffer + chan->fragmentLength,
 			msg->data + msg->readcount, fragmentLength);
 
 		chan->fragmentLength += fragmentLength;
@@ -415,9 +320,9 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 		// if this wasn't the last fragment, don't process anything
 		if (fragmentLength == FRAGMENT_SIZE) {
 			return qfalse;
-		}*/
+		}
 
-		if (thisFragmentBuffer->totalLength + 4 > msg->maxsize) {
+		if (chan->fragmentLength + 4 > msg->maxsize) {
 			Com_Printf("%s:fragmentLength %i > msg->maxsize\n"
 				, NET_AdrToString(chan->remoteAddress),
 				chan->fragmentLength + 4);
@@ -429,43 +334,23 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 		// make sure the sequence number is still there
 		*(int *)msg->data = LittleLong(sequence);
 
-		Com_Memcpy(msg->data + 4, thisFragmentBuffer->data, thisFragmentBuffer->totalLength);
-		msg->cursize = thisFragmentBuffer->totalLength + 4;
+		Com_Memcpy(msg->data + 4, chan->fragmentBuffer, chan->fragmentLength);
+		msg->cursize = chan->fragmentLength + 4;
+		chan->fragmentLength = 0;
 		msg->readcount = 4;	// past the sequence number
 		msg->bit = 32;	// past the sequence number
 
-		thisFragmentBuffer = NULL;
-		buffersMap->erase(sequence); // Now that the message is fully assembled, we can discard the fragment buffer
-
 						// but I am a wuss -mw
-		
-		
-		if (!chan->outOfOrder) {
-			chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
-			return qtrue;
-		}
-		else {
-			if (validButOutOfOrder) {
-				*validButOutOfOrder = qtrue;
-			}
-			return qfalse;
-		}
+		chan->incomingSequence = sequence;   // lets not accept any more with this sequence number -gil
+		return qtrue;
 	}
 
 	//
 	// the message can now be read from the current message pointer
 	//
-	if (!chan->outOfOrder) {
-		chan->incomingSequence = sequence;
+	chan->incomingSequence = sequence;
 
-		return qtrue;
-	}
-	else {
-		if (validButOutOfOrder) {
-			*validButOutOfOrder = qtrue;
-		}
-		return qfalse;
-	}
+	return qtrue;
 }
 
 
@@ -687,11 +572,9 @@ void QDECL NET_OutOfBandPrint(netsrc_t sock, netadr_t adr, const char *format, .
 NET_OutOfBandPrint
 
 Sends a data message in an out-of-band datagram (only used for "connect")
-
-TA: Also using for "csc" (cross-server commands) now
 ================
 */
-void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len, int cmdLen) {
+void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len) {
 	byte		string[MAX_MSGLEN * 2];
 	int			i;
 	msg_t		mbuf;
@@ -708,7 +591,7 @@ void QDECL NET_OutOfBandData(netsrc_t sock, netadr_t adr, byte *format, int len,
 
 	mbuf.data = string;
 	mbuf.cursize = len + 4;
-	Huff_Compress(&mbuf, 5 + cmdLen); //12);
+	Huff_Compress(&mbuf, 12);
 	// send the datagram
 	NET_SendPacket(sock, mbuf.cursize, mbuf.data, adr);
 }

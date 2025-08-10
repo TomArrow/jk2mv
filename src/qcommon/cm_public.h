@@ -1,20 +1,10 @@
 #ifndef _CM_PUBLIC_H_
 #define _CM_PUBLIC_H_
 
-typedef struct traceCustomization_s {
-	qboolean	nonEpsilon;
-	qboolean	customEpsilon;
-	float		customEpsilonValue;
-	int			traceCustomFlags; // e.g. TRACECUSTOMFLAG_Q2STYLE
-} traceCustomization_t;
-
-extern traceCustomization_t defaultTraceCustomization;
-extern traceCustomization_t nonEpsilonTraceCustomization;
-
 void		CM_LoadMap( const char *name, qboolean clientload, int *checksum );
 void		CM_ClearMap( void );
 clipHandle_t CM_InlineModel( int index );		// 0 = world, 1 + are bmodels
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule, int entityContents);
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule );
 
 void		CM_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
 
@@ -28,11 +18,11 @@ int			CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec
 
 void		CM_BoxTrace ( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
-						  clipHandle_t model, int brushmask, qboolean capsule, traceCustomization_t* traceCustomization);
+						  clipHandle_t model, int brushmask, qboolean capsule );
 void		CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
 						  clipHandle_t model, int brushmask,
-						  const vec3_t origin, const vec3_t angles, qboolean capsule, traceCustomization_t* traceCustomization);
+						  const vec3_t origin, const vec3_t angles, qboolean capsule );
 
 byte		*CM_ClusterPVS (int cluster);
 
@@ -67,7 +57,5 @@ void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, float *poin
 const char *CM_GetShaderText(const char *key);
 void CM_FreeShaderText(void);
 void CM_LoadShaderText(qboolean forceReload);
-
-void CM_SetBrushModelContentFlags(int modelIndex, int flags, coolApiSetBModelCFlagsMode_t setMode);
 
 #endif // _CM_PUBLIC_H_

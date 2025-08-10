@@ -270,7 +270,7 @@ int AAS_ValueForBSPEpairKey(int ent, const char *key, char *value, int size)
 	{
 		if (!strcmp(epair->key, key))
 		{
-			Q_strncpyz(value, epair->value, size);
+			strncpy(value, epair->value, size-1);
 			value[size-1] = '\0';
 			return qtrue;
 		} //end if
@@ -289,7 +289,7 @@ int AAS_VectorForBSPEpairKey(int ent, const char *key, vec3_t v)
 	double v1, v2, v3;
 
 	VectorClear(v);
-	if (!AAS_ValueForBSPEpairKey(ent, key, buf, sizeof(buf))) return qfalse;
+	if (!AAS_ValueForBSPEpairKey(ent, key, buf, MAX_EPAIRKEY)) return qfalse;
 	//scanf into doubles, then assign, so it is vec_t size independent
 	v1 = v2 = v3 = 0;
 	if ( sscanf(buf, "%lf %lf %lf", &v1, &v2, &v3) != 3 ) return qfalse;
@@ -309,7 +309,7 @@ int AAS_FloatForBSPEpairKey(int ent, const char *key, float *value)
 	char buf[MAX_EPAIRKEY];
 
 	*value = 0;
-	if (!AAS_ValueForBSPEpairKey(ent, key, buf, sizeof(buf))) return qfalse;
+	if (!AAS_ValueForBSPEpairKey(ent, key, buf, MAX_EPAIRKEY)) return qfalse;
 	*value = atof(buf);
 	return qtrue;
 } //end of the function AAS_FloatForBSPEpairKey
@@ -324,7 +324,7 @@ int AAS_IntForBSPEpairKey(int ent, const char *key, int *value)
 	char buf[MAX_EPAIRKEY];
 
 	*value = 0;
-	if (!AAS_ValueForBSPEpairKey(ent, key, buf, sizeof(buf))) return qfalse;
+	if (!AAS_ValueForBSPEpairKey(ent, key, buf, MAX_EPAIRKEY)) return qfalse;
 	*value = atoi(buf);
 	return qtrue;
 } //end of the function AAS_IntForBSPEpairKey
@@ -366,7 +366,6 @@ void AAS_ParseBSPEntities(void)
 	token_t token;
 	bsp_entity_t *ent;
 	bsp_epair_t *epair;
-	unsigned long allocSize;
 
 	script = LoadScriptMemory(bspworld.dentdata, bspworld.entdatasize, "entdata");
 	SetScriptFlags(script, SCFL_NOSTRINGWHITESPACES|SCFL_NOSTRINGESCAPECHARS);//SCFL_PRIMITIVE);
@@ -404,9 +403,8 @@ void AAS_ParseBSPEntities(void)
 				return;
 			} //end if
 			StripDoubleQuotes(token.string);
-			allocSize = (unsigned long)strlen(token.string) + 1;
-			epair->key = (char *)GetHunkMemory(allocSize);
-			Q_strncpyz(epair->key, token.string, allocSize);
+			epair->key = (char *)GetHunkMemory((unsigned long)strlen(token.string) + 1);
+			strcpy(epair->key, token.string);
 			if (!PS_ExpectTokenType(script, TT_STRING, 0, &token))
 			{
 				AAS_FreeBSPEntities();
@@ -414,9 +412,8 @@ void AAS_ParseBSPEntities(void)
 				return;
 			} //end if
 			StripDoubleQuotes(token.string);
-			allocSize = (unsigned long)strlen(token.string) + 1;
-			epair->value = (char *)GetHunkMemory(allocSize);
-			Q_strncpyz(epair->value, token.string, allocSize);
+			epair->value = (char *)GetHunkMemory((unsigned long)strlen(token.string) + 1);
+			strcpy(epair->value, token.string);
 		} //end while
 		if (strcmp(token.string, "}"))
 		{

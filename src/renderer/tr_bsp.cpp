@@ -78,32 +78,26 @@ R_ColorShiftLightingBytes
 
 ===============
 */
-static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
+static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	int		shift=0, r, g, b;
 
 	// should NOT do it if overbrightBits is 0
-	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
+	if (tr.overbrightBits)
+		shift = 1 - tr.overbrightBits;
 
 	if (!shift)
 	{
 		out[0] = in[0];
 		out[1] = in[1];
 		out[2] = in[2];
+		out[3] = in[3];
 		return;
 	}
 
 	// shift the data based on overbright range
-	if (shift < 0) {
-		shift = -shift;
-		r = in[0] >> shift;
-		g = in[1] >> shift;
-		b = in[2] >> shift;
-	}
-	else {
-		r = in[0] << shift;
-		g = in[1] << shift;
-		b = in[2] << shift;
-	}
+	r = in[0] << shift;
+	g = in[1] << shift;
+	b = in[2] << shift;
 
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 255 ) {
@@ -119,10 +113,6 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	out[0] = r;
 	out[1] = g;
 	out[2] = b;
-}
-
-static	void R_ColorShiftLightingBytes( const byte in[4], byte out[4] ) {
-	R_ColorShiftLightingBytes3(in, out);
 	out[3] = in[3];
 }
 
@@ -136,12 +126,9 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 {
 	int		shift=0, r, g, b;
 
-	//// should NOT do it if overbrightBits is 0
-	//if (tr.overbrightBits)
-	//	shift = 1 - tr.overbrightBits;
-
-	//shift = MAX(0, r_mapOverBrightBits->integer - tr.overbrightBits);
-	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
+	// should NOT do it if overbrightBits is 0
+	if (tr.overbrightBits)
+		shift = 1 - tr.overbrightBits;
 
 	if (!shift)
 	{
@@ -149,17 +136,9 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 	}
 
 	// shift the data based on overbright range
-	if (shift < 0) {
-		shift = -shift; // just adding this cuz technically its undefined otherwise, but we still wanna do it
-		r = in[0] >> shift;
-		g = in[1] >> shift;
-		b = in[2] >> shift;
-	}
-	else {
-		r = in[0] << shift;
-		g = in[1] << shift;
-		b = in[2] << shift;
-	}
+	r = in[0] << shift;
+	g = in[1] << shift;
+	b = in[2] << shift;
 
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 255 ) {
@@ -189,14 +168,12 @@ R_LoadLightmaps
 #define	LIGHTMAPS_PER_ATLAS (LIGHTMAPS_PER_ATLAS_DIMENSION * LIGHTMAPS_PER_ATLAS_DIMENSION)
 
 static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
-	const byte		*buf, *buf_p;
+	byte		*buf, *buf_p;
 	int			len;
-	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*3];
+	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*4];
 	int			i, j;
 	float maxIntensity = 0;
 	double sumIntensity = 0;
-
-	tr.lightmapAtlasActive = qfalse;
 
 	len = l->filelen;
 	if ( !len ) {
@@ -210,8 +187,6 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 		ri.Printf(PRINT_WARNING, "Lightmaps disabled because the current graphics adapter doesn't support the image size of the lightmap atlas.\n");
 		return;
 	}
-
-	tr.lightmapAtlasActive = qtrue;
 
 	// we are about to upload textures
 	R_SyncRenderThread();
@@ -229,7 +204,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 
 	// create empty lightmap atlases
 	int numberOfAtlases = ceil(tr.numLightmaps / (float)LIGHTMAPS_PER_ATLAS);
-	byte *emptyAtlas = (byte*)ri.Hunk_AllocateTempMemory(LIGHTMAP_ATLAS_SIZE * LIGHTMAP_ATLAS_SIZE * 3);
+	byte *emptyAtlas = (byte*)ri.Hunk_AllocateTempMemory(LIGHTMAP_ATLAS_SIZE * LIGHTMAP_ATLAS_SIZE * 4);
 	for (i = 0; i < numberOfAtlases; i++)
 		tr.lightmaps[i] = R_CreateImage(
 			va("*%s/lmAtlas%d", sMapName, i),
@@ -238,11 +213,11 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			qfalse,
 			qfalse,
 			(qboolean)!!r_ext_compressed_lightmaps->integer,
-			GL_CLAMP,
-			PXF_RGB);
+			GL_CLAMP);
 	ri.Hunk_FreeTempMemory(emptyAtlas);
 
 	for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
+		// expand the 24 bit on-disk to 32 bit
 		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
 
 		if ( r_lightmap->integer == 2 )
@@ -267,15 +242,17 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 
 				HSVtoRGB( intensity, 1.00, 0.50, out );
 
-				image[j*3+0] = out[0] * 255;
-				image[j*3+1] = out[1] * 255;
-				image[j*3+2] = out[2] * 255;
+				image[j*4+0] = out[0] * 255;
+				image[j*4+1] = out[1] * 255;
+				image[j*4+2] = out[2] * 255;
+				image[j*4+3] = 255;
 
 				sumIntensity += intensity;
 			}
 		} else {
 			for ( j = 0 ; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++ ) {
-				R_ColorShiftLightingBytes3( &buf_p[j*3], &image[j*3] );
+				R_ColorShiftLightingBytes( &buf_p[j*3], &image[j*4] );
+				image[j*4+3] = 255;
 			}
 		}
 
@@ -295,7 +272,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			yoff,
 			LIGHTMAP_SIZE,
 			LIGHTMAP_SIZE,
-			GL_RGB,
+			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			image
 		);
@@ -409,31 +386,12 @@ static shader_t *ShaderForShaderNum( int shaderNum, const int *lightmapNum, cons
 
 	shader = R_FindShader( dsh->shader, lightmapNum, styles, qtrue );
 
-	if (r_newRemapsTmpFix->integer) {
-		// if the shader had errors, just use default shader
-		if (shader->defaultShader) {
-			return tr.defaultShader;
-		}
-
+	// if the shader had errors, just use default shader
+	if ( shader->defaultShader ) {
+		return tr.defaultShader;
 	}
 
 	return shader;
-}
-
-static void SetFlagsForShaderForSurface( msurface_t* surf, int shaderNum )
-{
-	// TODO Find a way to see which brush it belongs to and get the texture of that brush instead.
-	// else we will have it on a per-surface basis and it may not end up valid (e.g. mixed solid and nonsolid on same brush)
-	dshader_t	*dsh;
-
-	shaderNum = LittleLong( shaderNum );
-	if ( shaderNum < 0 || shaderNum >= s_worldData.numShaders ) {
-		ri.Error( ERR_DROP, "ShaderForShaderNum: bad num %i", shaderNum );
-	}
-	dsh = &s_worldData.shaders[ shaderNum ];
-
-	surf->contents = dsh->contentFlags;
-	surf->flags = dsh->surfaceFlags;
 }
 
 /*
@@ -452,16 +410,11 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 
 	for(i = 0; i < MAXLIGHTMAPS; i++)
 	{
-		if (!tr.lightmapAtlasActive) {
-			lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
-		}
-		else {
-			atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
-			if (lightmapNum[i] > 0)
-			{
-				atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
-				lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
-			}
+		atlasLightmapNum[i] = lightmapNum[i] = LittleLong( ds->lightmapNum[i] );
+		if (lightmapNum[i] > 0)
+		{
+			atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
+			lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
 		}
 	}
 
@@ -473,8 +426,6 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 	if ( r_singleShader->integer && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
-
-	SetFlagsForShaderForSurface(surf, ds->shaderNum);
 
 	numPoints = LittleLong( ds->numVerts );
 	if (numPoints > MAX_FACE_POINTS) {
@@ -495,8 +446,6 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 	cv->numPoints = numPoints;
 	cv->numIndices = numIndexes;
 	cv->ofsIndices = ofsIndexes;
-	cv->flags = surf->flags;
-	cv->contents = surf->contents;
 
 	verts += LittleLong( ds->firstVert );
 	for ( i = 0 ; i < numPoints ; i++ ) {
@@ -505,18 +454,10 @@ static void ParseFace( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int *
 		}
 		for ( j = 0 ; j < 2 ; j++ ) {
 			cv->points[i][3+j] = LittleFloat( verts[i].st[j] );
-			if (!tr.lightmapAtlasActive) { // for external or shader hack lightmaps we need the classic coords
-				for (k = 0; k < MAXLIGHTMAPS; k++)
-				{
-					cv->points[i][VERTEX_LM + j + (k * 2)] = LittleFloat(verts[i].lightmap[k][j]);
-				}
-			}
 		}
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			if (tr.lightmapAtlasActive) {
-				R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], &cv->points[i][VERTEX_LM + (k * 2)]);
-			}
+			R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], &cv->points[i][VERTEX_LM + (k * 2)]);
 			R_ColorShiftLightingBytes( verts[i].color[k], (byte *)&cv->points[i][VERTEX_COLOR+k] );
 		}
 	}
@@ -556,16 +497,11 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 
 	for(i=0;i<MAXLIGHTMAPS;i++)
 	{
-		if (!tr.lightmapAtlasActive) {
-			lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
-		}
-		else {
-			atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
-			if (lightmapNum[i] > 0)
-			{
-				atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
-				lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
-			}
+		atlasLightmapNum[i] = lightmapNum[i] = LittleLong(ds->lightmapNum[i]);
+		if (lightmapNum[i] > 0)
+		{
+			atlasLightmapNum[i] = lightmapNum[i] % LIGHTMAPS_PER_ATLAS;
+			lightmapNum[i] = lightmapNum[i] / LIGHTMAPS_PER_ATLAS;
 		}
 	}
 
@@ -577,8 +513,6 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 	if ( r_singleShader->integer && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
-
-	SetFlagsForShaderForSurface(surf,ds->shaderNum);
 
 	// we may have a nodraw surface, because they might still need to
 	// be around for movement clipping
@@ -599,18 +533,10 @@ static void ParseMesh ( dsurface_t *ds, mapVert_t *verts, msurface_t *surf ) {
 		}
 		for ( j = 0 ; j < 2 ; j++ ) {
 			points[i].st[j] = LittleFloat( verts[i].st[j] );
-			if (!tr.lightmapAtlasActive) {
-				for (k = 0; k < MAXLIGHTMAPS; k++)
-				{
-					points[i].lightmap[k][j] = LittleFloat(verts[i].lightmap[k][j]);
-				}
-			}
 		}
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			if (tr.lightmapAtlasActive) {
-				R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], points[i].lightmap[k]);
-			}
+			R_AtlasPackUV(verts[i].lightmap[k], atlasLightmapNum[k], points[i].lightmap[k]);
 			R_ColorShiftLightingBytes( verts[i].color[k], points[i].color[k] );
 		}
 	}
@@ -650,9 +576,6 @@ static void ParseTriSurf( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, in
 	if ( r_singleShader->integer && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
-
-	SetFlagsForShaderForSurface(surf, ds->shaderNum);
-	surf->trisoupMapSurf = qtrue;
 
 	numVerts = LittleLong( ds->numVerts );
 	numIndexes = LittleLong( ds->numIndexes );
@@ -718,8 +641,6 @@ static void ParseFlare( dsurface_t *ds, mapVert_t *verts, msurface_t *surf, int 
 	if ( r_singleShader->integer && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
-
-	SetFlagsForShaderForSurface(surf, ds->shaderNum);
 
 	flare = (struct srfFlare_s *)ri.Hunk_Alloc( sizeof( *flare ), h_low );
 	flare->surfaceType = SF_FLARE;
@@ -1413,7 +1334,7 @@ void R_StitchAllPatches( void ) {
 		}
 	}
 	while (stitched);
-	ri.Printf( PRINT_DEVELOPER, "stitched %d LoD cracks\n", numstitches );
+	ri.Printf( PRINT_ALL, "stitched %d LoD cracks\n", numstitches );
 }
 
 /*
@@ -1518,7 +1439,7 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	R_MovePatchSurfacesToHunk();
 #endif
 
-	ri.Printf( PRINT_DEVELOPER, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n",
+	ri.Printf( PRINT_ALL, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n",
 		numFaces, numMeshes, numTriSurfs, numFlares );
 }
 
@@ -2133,10 +2054,9 @@ static void RE_LoadWorldMap_Actual( const char *name ) {
 
 	Com_Memset( &s_worldData, 0, sizeof( s_worldData ) );
 	Q_strncpyz( s_worldData.name, name, sizeof( s_worldData.name ) );
-	Q_strncpyz( tr.worldDir, name, sizeof( tr.worldDir ) );
+	COM_StripExtension( name, tr.worldDir, sizeof( tr.worldDir ) );
 
 	COM_StripExtension(COM_SkipPath(s_worldData.name), s_worldData.baseName, sizeof(s_worldData.baseName));
-	COM_StripExtension(name, tr.worldDir, sizeof(tr.worldDir));
 
 	R_SetColorMappings();
 

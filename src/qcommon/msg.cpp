@@ -4,8 +4,6 @@
 #include "INetProfile.h"
 #endif
 
-#include <vector>
-
 typedef struct {
 	char	*name;
 	size_t	offset;
@@ -53,43 +51,6 @@ void MSG_Init(msg_t *buf, byte *data, int length) {
 	Com_Memset(buf, 0, sizeof(*buf));
 	buf->data = data;
 	buf->maxsize = length;
-	buf->raw = qfalse;
-}
-
-void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw) {
-
-	Com_Memset(buf, 0, sizeof(*buf));
-	buf->dataRaw = dataRaw;
-	buf->dataRaw->reserve(MAX_MSGLEN_RAW); // It can become bigger of course but let's just reserve a certain amount so we don't have a slowdown from vector constantly resizing.
-	buf->cursize = dataRaw->size();
-	buf->maxsize = INT_MAX; // Since its a vector we arent really limited and MAX_MSGLEN would be too short for raw data I think
-	buf->raw = qtrue;
-}
-
-/*
-void MSG_ToBuffered(msg_t *src, bufferedMsg_t *dst) {
-	if (src->raw) {
-		Com_Error(ERR_FATAL,"Can't buffer raw messages.");
-	}
-	dst->allowoverflow = src->allowoverflow;
-	dst->overflowed = src->overflowed;
-	dst->oob = src->oob;
-	dst->maxsize = src->maxsize;
-	dst->cursize = src->cursize;
-	dst->readcount = src->readcount;
-	dst->bit = src->bit;
-	Com_Memcpy(dst->data, src->data, sizeof(dst->data));
-}*/
-
-void MSG_FromBuffered(msg_t *dst, bufferedMsg_t *src) {
-	dst->allowoverflow = src->allowoverflow;
-	dst->overflowed = src->overflowed;
-	dst->oob = src->oob;
-	dst->maxsize = src->maxsize;
-	dst->cursize = src->cursize;
-	dst->readcount = src->readcount;
-	dst->bit = src->bit;
-	Com_Memcpy(dst->data, src->data, src->cursize);
 }
 
 void MSG_InitOOB(msg_t *buf, byte *data, int length) {
@@ -100,7 +61,6 @@ void MSG_InitOOB(msg_t *buf, byte *data, int length) {
 	buf->data = data;
 	buf->maxsize = length;
 	buf->oob = qtrue;
-	buf->raw = qfalse;
 }
 
 void MSG_Clear(msg_t *buf) {
@@ -176,18 +136,7 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 	if (bits < 0) {
 		bits = -bits;
 	}
-
-	// Special handling for new raw type of message (for better compression afterwards)
-	if (msg->raw) {
-		int bitsToDo = (bits & 7) ? ((bits >> 3) + 1) << 3 : bits;
-		for (i = 0; i < bitsToDo; i += 8) {
-			msg->dataRaw->push_back(value & 0xff);
-			value = (value >> 8);
-		}
-		msg->cursize = msg->dataRaw->size();
-		return;
-	}
-	else if (msg->oob) {
+	if (msg->oob) {
 		if (bits == 8) {
 			msg->data[msg->cursize] = value;
 			msg->cursize += 1;
@@ -243,15 +192,7 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 		sgn = qfalse;
 	}
 
-	if (msg->raw) {
-		int bitsToDo = (bits & 7) ? ((bits >> 3) + 1) << 3 : bits;
-		for (i = 0; i < bitsToDo; i += 8) {
-			get = (*msg->dataRaw)[msg->readcount + (i >> 3)];
-			value |= (get << i);
-		}
-		msg->readcount += bitsToDo >> 3;
-	}
-	else if (msg->oob) {
+	if (msg->oob) {
 		if (bits == 8) {
 			value = msg->data[msg->readcount];
 			msg->readcount += 1;
@@ -591,8 +532,6 @@ delta functions
 =============================================================================
 */
 
-extern cvar_t *cl_snapOrderTolerance;
-extern cvar_t *cl_snapOrderToleranceDemoSkipPackets;
 extern cvar_t *cl_shownet;
 
 #define	LOG(x) if( cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
@@ -661,12 +600,12 @@ void MSG_WriteDeltaKey(msg_t *msg, int key, int oldV, int newV, int bits)
 		return;
 	}
 	MSG_WriteBits(msg, 1, 1);
-	MSG_WriteBits(msg, (newV ^ key) & ((1 << bits) - 1), bits); // TA: ((1 << bits) - 1) sets all bits from bit 0 to bit 15
+	MSG_WriteBits(msg, (newV ^ key) & ((1 << bits) - 1), bits);
 }
 
 int	MSG_ReadDeltaKey(msg_t *msg, int key, int oldV, int bits) {
 	if (MSG_ReadBits(msg, 1)) {
-		return MSG_ReadBits(msg, bits) ^ (key & kbitmask[bits]); // kbitmask[bits] has all bits from bit 0 to bit 16 (!!!) set. so 16th bit ends up random depending on key
+		return MSG_ReadBits(msg, bits) ^ (key & kbitmask[bits]);
 	}
 	return oldV;
 }
@@ -774,9 +713,9 @@ void MSG_ReadDeltaUsercmd(msg_t *msg, usercmd_t *from, usercmd_t *to) {
 MSG_WriteDeltaUsercmd
 =====================
 */
-void MSG_WriteDeltaUsercmdKey(msg_t *msg, int key, usercmd_t *from, usercmd_t *to, qboolean suppressError) {
+void MSG_WriteDeltaUsercmdKey(msg_t *msg, int key, usercmd_t *from, usercmd_t *to) {
 	if (to->serverTime < from->serverTime) {
-		if(!suppressError) Com_Printf(S_COLOR_YELLOW "WARNING: Command time went backwards\n");
+		Com_Printf(S_COLOR_YELLOW "WARNING: Command time went backwards\n");
 		MSG_WriteBits(msg, 0, 1);
 		MSG_WriteBits(msg, to->serverTime, 32);
 	} else if (to->serverTime - from->serverTime < 256) {
@@ -1243,7 +1182,7 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 	// just print the delta records`
 	if (cl_shownet->integer >= 2 || cl_shownet->integer == -1) {
 		print = 1;
-		Com_Printf("%3i: #%-3i ", msg->readcount, number);
+		Com_Printf("%3i: #%-3i ", msg->readcount, to->number);
 	} else {
 		print = 0;
 	}
@@ -1961,170 +1900,6 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, playerState_t *from, playerState_t *to
 	}
 }
 
-// Huffman code data structure serialization
-
-#pragma pack(push, 1)
-typedef struct {
-	int16_t left, right, parent;
-	int16_t		symbol;
-} huffNodeData_t;
-
-typedef struct {
-	int16_t			tree;
-	int16_t			loc[HMAX+1];
-
-	huffNodeData_t	nodeList[768];
-} huffData_t;
-#pragma pack(pop)
-
-static void Huff_SerializeEndiannessHelper(huffData_t *huffdat) {
-	huffdat->tree = LittleShort(huffdat->tree);
-
-	for (int i = 0; i < (int)ARRAY_LEN(huffdat->loc); i++) {
-		huffdat->loc[i] = LittleShort(huffdat->loc[i]);
-	}
-
-	for (int i = 0; i < (int)ARRAY_LEN(huffdat->nodeList); i++) {
-		huffNodeData_t *nodedat = &huffdat->nodeList[i];
-
-		nodedat->left = LittleShort(nodedat->left);
-		nodedat->right = LittleShort(nodedat->right);
-		nodedat->parent = LittleShort(nodedat->parent);
-		nodedat->symbol = LittleShort(nodedat->symbol);
-	}
-}
-
-void Huff_Serialize(huffData_t *huffdat, const huff_t *huff) {
-#define HUFF_SERIALIZE_NODEREF(noderef) ((noderef) ? (int16_t)((noderef) - huff->nodeList) : -1)
-
-	huffdat->tree = HUFF_SERIALIZE_NODEREF(huff->tree);
-
-	for (int i = 0; i < (int)ARRAY_LEN(huffdat->loc); i++) {
-		huffdat->loc[i] = HUFF_SERIALIZE_NODEREF(huff->loc[i]);
-	}
-
-	for (int i = 0; i < (int)ARRAY_LEN(huffdat->nodeList); i++) {
-		huffNodeData_t *nodedat = &huffdat->nodeList[i];
-		const node_t *node = &huff->nodeList[i];
-
-		nodedat->left = HUFF_SERIALIZE_NODEREF(node->left);
-		nodedat->right = HUFF_SERIALIZE_NODEREF(node->right);
-		nodedat->parent = HUFF_SERIALIZE_NODEREF(node->parent);
-		nodedat->symbol = node->symbol;
-	}
-
-	Huff_SerializeEndiannessHelper(huffdat);
-}
-
-void Huff_Deserialize(huffData_t *huffdat, huff_t *huff) {
-#define HUFF_DESERIALIZE_NODEREF(noderef) ((noderef) == -1 ? NULL : &huff->nodeList[noderef])
-
-	Huff_SerializeEndiannessHelper(huffdat);
-
-	huff->tree = HUFF_DESERIALIZE_NODEREF(huffdat->tree);
-
-	for (int i = 0; i < (int)ARRAY_LEN(huff->loc); i++) {
-		huff->loc[i] = HUFF_DESERIALIZE_NODEREF(huffdat->loc[i]);
-	}
-
-	for (int i = 0; i < (int)ARRAY_LEN(huff->nodeList); i++) {
-		const huffNodeData_t *nodedat = &huffdat->nodeList[i];
-		node_t *node = &huff->nodeList[i];
-
-		node->left = HUFF_DESERIALIZE_NODEREF(nodedat->left);
-		node->right = HUFF_DESERIALIZE_NODEREF(nodedat->right);
-		node->parent = HUFF_DESERIALIZE_NODEREF(nodedat->parent);
-		node->symbol = nodedat->symbol;
-	}
-}
-
-#define HUFF_DATA_VERSION 1
-
-void Huff_SaveData(const huffman_t *huffman, const char *filename) {
-	huffData_t huffdata;
-	unsigned checksum;
-	fileHandle_t fp = 0;
-
-	fp = FS_SV_FOpenFileWrite(filename);
-
-	if (!fp) {
-		Com_DPrintf("Failed to save huffman data to %s", filename);
-		return;
-	}
-
-	byte version = HUFF_DATA_VERSION;
-	FS_Write(&version, sizeof(version), fp);
-
-	Huff_Serialize(&huffdata, &huffman->compressor);
-	FS_Write(&huffdata, sizeof(huffdata), fp);
-	checksum = LittleLong(Com_BlockChecksum(&huffdata, sizeof(huffdata)));
-	FS_Write(&checksum, sizeof(checksum), fp);
-
-	Huff_Serialize(&huffdata, &huffman->decompressor);
-	FS_Write(&huffdata, sizeof(huffdata), fp);
-	checksum = LittleLong(Com_BlockChecksum(&huffdata, sizeof(huffdata)));
-	FS_Write(&checksum, sizeof(checksum), fp);
-
-	FS_FCloseFile(fp);
-}
-
-qboolean Huff_ReadData(huffman_t *huffman, const char *filename) {
-	huffData_t huffdata;
-	unsigned checksum;
-	byte version;
-	fileHandle_t fp = 0;
-
-	FS_SV_FOpenFileRead(filename, &fp);
-
-	if (!fp) {
-		Com_DPrintf("Failed to open huffman data from %s - recalculating Huffman code...\n", filename);
-		return qfalse;
-	}
-
-	if (FS_Read(&version, sizeof(version), fp) != (int)sizeof(version))
-		goto corrupted;
-
-	if (version != HUFF_DATA_VERSION) {
-		Com_DPrintf("Huffman data in %s has incompatible version - recalculating Huffman code...\n", filename);
-		goto close;
-	}
-
-	memset(&huffman->compressor, 0, sizeof(huff_t));
-	memset(&huffman->decompressor, 0, sizeof(huff_t));
-
-	if (FS_Read(&huffdata, sizeof(huffdata), fp) != (int)sizeof(huffdata))
-		goto corrupted;
-	if (FS_Read(&checksum, sizeof(checksum), fp) != (int)sizeof(checksum))
-		goto corrupted;
-	checksum = LittleLong(checksum);
-	if (checksum != Com_BlockChecksum(&huffdata, sizeof(huffdata))) {
-		Com_Printf(S_COLOR_YELLOW "WARNING: %s checksum mismatch - recalculating Huffman code...", filename);
-		goto close;
-	}
-	Huff_Deserialize(&huffdata, &huffman->compressor);
-
-	if (FS_Read(&huffdata, sizeof(huffdata), fp) != (int)sizeof(huffdata))
-		goto corrupted;
-	if (FS_Read(&checksum, sizeof(checksum), fp) != (int)sizeof(checksum))
-		goto corrupted;
-	checksum = LittleLong(checksum);
-	if (checksum != Com_BlockChecksum(&huffdata, sizeof(huffdata))) {
-		Com_Printf(S_COLOR_YELLOW "WARNING: %s checksum mismatch - recalculating Huffman code...", filename);
-		goto close;
-	}
-	Huff_Deserialize(&huffdata, &huffman->decompressor);
-
-	FS_FCloseFile(fp);
-
-	return qtrue;
-corrupted:
-	Com_Printf(S_COLOR_YELLOW "WARNING: %s corrupted - recalculating Huffman code...\n", filename);
-close:
-	FS_FCloseFile(fp);
-
-	return qfalse;
-}
-
 /*
 // New data gathered to tune Q3 to JK2MP. Takes longer to crunch and gain was minimal.
 int msg_hData[256] =
@@ -2653,11 +2428,6 @@ static const int msg_hData[256] = {
 void MSG_initHuffman() {
 	int i, j;
 
-	if (Huff_ReadData(&msgHuff, "huffman.dat")) {
-		msgInit = qtrue;
-		return;
-	}
-
 #ifdef _NEWHUFFTABLE_
 	fp = fopen("c:\\netchan.bin", "a");
 #endif // _NEWHUFFTABLE_
@@ -2670,8 +2440,6 @@ void MSG_initHuffman() {
 			Huff_addRef(&msgHuff.decompressor, (byte)i);			// Do update
 		}
 	}
-
-	Huff_SaveData(&msgHuff, "huffman.dat");
 }
 
 #else

@@ -1379,7 +1379,7 @@ LINES_INSERT 3053 [
 			backcolor			0 0 .5 .25
 			outlinecolor		.5 .5 .5 .5
 			elementtype			LISTBOX_TEXT
-			feeder				FEEDER_DOWNLOADS
+			feeder				17
 			notselectable
 			visible				0
 			columns				1	2 40 40

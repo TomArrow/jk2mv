@@ -61,7 +61,7 @@ public:
 	bool		mTimeFrozen;
 	refdef_t	refdef;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	int			mMainRefs;
 	int			mMiniRefs;
 #endif
@@ -130,14 +130,14 @@ public:
 
 	inline	void	AddFxToScene( refEntity_t *ent )
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		mMainRefs++;
 #endif
 		re.AddRefEntityToScene( ent, qtrue );
 	}
 	inline	void	AddFxToScene( miniRefEntity_t *ent )
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		mMiniRefs++;
 #endif
 		re.AddMiniRefEntityToScene( ent );

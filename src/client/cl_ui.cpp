@@ -4,7 +4,6 @@
 
 #include "../game/botlib.h"
 #include "../qcommon/strip.h"
-#include "../qcommon/stringed_ingame.h"
 
 /*
 Ghoul2 Insert Start
@@ -19,8 +18,6 @@ Ghoul2 Insert End
 */
 
 #include "mv_setup.h"
-
-cvar_t* com_coolApi_supported_ui;
 
 extern	botlib_export_t	*botlib_export;
 void SP_Register(const char *Package);
@@ -761,6 +758,7 @@ CL_UISystemCalls
 The ui module is making a system call
 ====================
 */
+
 intptr_t CL_UISystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -773,9 +771,6 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 			args[0] += 2;
 		}
 	}
-
-	int vmIndex = VM_GetIndex(uivm);
-	SetGhoul2TableIndex(vmIndex);
 
 	switch( args[0] ) {
 	case UI_ERROR:
@@ -1130,7 +1125,11 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 		return !!SP_Register(VMAS(1), SP_REGISTER_MENU);
 
 	case UI_SP_GETSTRINGTEXTSTRING:
-		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
+		const char* text;
+
+		text = SP_GetStringTextString(VMAS(1));
+		Q_strncpyz( VMAP(2, char, args[3]), text, args[3] );
+		return qtrue;
 
 /*
 Ghoul2 Insert Start
@@ -1186,72 +1185,6 @@ Ghoul2 Insert End
 		}
 	}
 
-	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
-		switch (args[0]) {
-		case UI_COOL_API_GLRESOLUTIONCHANGED:
-			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-		}
-	}
-
-	if (com_coolApi_supported_ui->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
-		switch (args[0]) {
-		case UI_COOL_API_GET_NUM_LANGUAGES:
-			return Com_GetNumLanguages();
-
-		case UI_COOL_API_GET_LANGUAGE_NAME:
-			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
-			return 0;
-
-		case UI_COOL_API_HAVE_WE_GHOUL2_MODELS:
-			return G2API_HaveWeGhoul2Models((g2handle_t)args[1]);
-
-		case UI_COOL_API_GIVE_ME_VECTOR_FROM_MATRIX:
-			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
-			return 0;
-
-		case UI_COOL_API_GET_BOLT_MATRIX:
-			return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
-
-		case UI_COOL_API_INIT_GHOUL2_MODEL:
-			return G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4], (qhandle_t) args[5], args[6], args[7]);
-
-		case UI_COOL_API_SET_SKIN:
-			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
-
-		case UI_COOL_API_SKINLESS_MODEL:
-			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
-
-		case UI_COOL_API_GET_SURFACE_RENDER_STATUS:
-			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
-
-		case UI_COOL_API_CLEAN_GHOUL2_MODELS:
-			G2API_CleanGhoul2Models(VMAV(1, g2handle_t));
-			return 0;
-
-		case UI_COOL_API_SET_BONE_ANIM:
-			return G2API_SetBoneAnim((g2handle_t)args[1], args[2], VMAS(3), args[4], args[5], args[6], VMF(7), args[8], VMF(9), args[10]);
-
-		case UI_COOL_API_GET_GLA_NAME:
-			Q_strncpyz(VMAP(3, char, args[4]), G2API_GetGLAName((g2handle_t)args[1], args[2]), args[4]);
-			return 0;
-
-		case UI_COOL_API_HAS_GHOUL2_MODEL_ON_INDEX:
-			return G2API_HasGhoul2ModelOnIndex(VMAV(1, const g2handle_t), args[2]);
-
-		case UI_COOL_API_REMOVE_GHOUL2_MODEL:
-			return G2API_RemoveGhoul2Model(VMAV(1, g2handle_t), args[2]);
-
-		case UI_COOL_API_ADD_BOLT:
-			return G2API_AddBolt((g2handle_t)args[1], args[2], VMAS(3));
-
-		case UI_COOL_API_ATTACH_G2_MODEL:
-			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
-
-		case UI_COOL_API_GET_FILE_VERSION:
-			return FS_GetFileVersion(VMAS(1), MODULE_UI);
-		}
-	}
-
 	Com_Error( ERR_DROP, "Bad UI system trap: %lli", (long long int)args[0] );
 	return 0;
 }
@@ -1262,23 +1195,15 @@ CL_ShutdownUI
 ====================
 */
 void CL_ShutdownUI( void ) {
-	int vmIndex;
-
 	cls.keyCatchers &= ~KEYCATCH_UI;
 	cls.uiStarted = qfalse;
 	if ( !uivm ) {
 		return;
 	}
 	VM_Call( uivm, UI_SHUTDOWN );
-
-	vmIndex = VM_GetIndex(uivm);
-	FixGhoul2InfoLeaks(vmIndex);
-	SetGhoul2TableIndex(-1);
-
 	VM_Free( uivm );
 	uivm = NULL;
 }
-
 
 /*
 ====================
@@ -1348,16 +1273,11 @@ void CL_InitUI(qboolean mainMenu) {
 			VM_SetMVMenuLevel( uivm, 0 );
 		}
 
-		com_coolApi_supported_ui = Cvar_Get("coolApi_supported_ui", "0", CVAR_ROM);
-
 		apireq = VM_Call( uivm, UI_INIT, mainMenu ? qfalse : (cls.state >= CA_AUTHORIZING && cls.state <= CA_ACTIVE), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, apilevel );
 		if (apireq > apilevel) {
 			apireq = apilevel;
 		}
 		VM_SetMVAPILevel(uivm, apireq);
-
-		//VM_SetCoolApiSupport(uivm,com_coolApi_supported_ui->integer); // dont care it will be in the cvar anyway
-
 		Com_DPrintf("UIVM uses MVAPI level %i.\n", apireq);
 
 		if (apireq >= 1) {

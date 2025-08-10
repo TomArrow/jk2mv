@@ -24,7 +24,7 @@
 #include <list>
 #include <string>
 
-//using namespace std;
+using namespace std;
 
 
 #define FX_FILE_PATH	"effects"
@@ -77,7 +77,7 @@ class CMediaHandles
 {
 private:
 
-	std::vector<int>	mMediaList;
+	vector<int>	mMediaList;
 
 public:
 
@@ -447,9 +447,9 @@ private:
 	};
 
 	// this makes looking up the index based on the string name much easier
-	typedef std::map<std::string, int>				TEffectID;
+	typedef map<string, int>				TEffectID;
 
-	typedef std::list<SScheduledEffect*>			TScheduledEffect;
+	typedef list<SScheduledEffect*>			TScheduledEffect;
 
 	// Effects
 	SEffectTemplate		mEffectTemplates[FX_MAX_EFFECTS];

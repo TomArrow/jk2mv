@@ -146,21 +146,15 @@ int newsize = 0;
 CL_Netchan_Process
 =================
 */
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber, qboolean* validButOutOfOrder) {
+qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg ) {
 	int ret;
 //	int i;
 //	static		int newsize = 0;
 
-	ret = Netchan_Process( chan, msg, sequenceNumber, validButOutOfOrder );
-	if (!ret) {
-		if (validButOutOfOrder && *validButOutOfOrder) {
-			CL_Netchan_Decode(msg);
-		}
+	ret = Netchan_Process( chan, msg );
+	if (!ret)
 		return qfalse;
-	}
-	else {
-		CL_Netchan_Decode(msg);
-	}
+	CL_Netchan_Decode( msg );
 //	Huff_Decompress( msg, CL_DECODE_START );
 //	for(i=CL_DECODE_START+msg->readcount;i<msg->cursize;i++) {
 //		if (msg->data[i] != chksum[i-(CL_DECODE_START+msg->readcount)]) {

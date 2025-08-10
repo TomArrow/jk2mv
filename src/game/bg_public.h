@@ -42,10 +42,6 @@
 
 #define MAX_CLIENT_SCORE_SEND 20
 
-// mv_clflags - set by the client engine in the mv_clFlags userinfo cvar to inform the server about additional features
-#define MV_CLFLAG_SUBMODEL_BYPASS           (1)          // Indicates the client engine supports bypassing the MAX_SUBMODEL limit if the cgame module and the server support it, too.
-#define MV_CLFLAG_ADVANCED_REMAPS           (1 << 1)     // Indicates the client engine supports the new advanced shader remaps.
-
 //
 // config strings are a general means of communicating variable length strings
 // from the server to all connected clients.
@@ -234,7 +230,6 @@ extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 #define PMF_UPDATE_ANIM		2048	// The server updated the animation, the pmove should set the ghoul2 anim to match.
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#define PMF_STUCK_TO_WALL	16384	// grabbing a wall
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
@@ -975,10 +970,7 @@ typedef enum {
 	LS_REFLECT_LR,
 	LS_REFLECT_LL,
 
-	LS_MOVE_MAX_DEFAULT,// default max
-	LS_JUMPATTACK_ARIAL_LEFT = LS_MOVE_MAX_DEFAULT, // cartwheel from jka
-	LS_JUMPATTACK_ARIAL_RIGHT, // cartwheel from jka
-	LS_MOVE_MAX
+	LS_MOVE_MAX//
 } saberMoveName_t;
 
 typedef enum {
@@ -1009,10 +1001,10 @@ typedef struct
 
 extern saberMoveData_t	saberMoveData[LS_MOVE_MAX];
 
-qboolean BG_LegalizedForcePowers(char *powerOut, int powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
+qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
 
 //BG anim utility functions:
-qboolean BG_InSpecialJump( int anim, int runFlags);
+qboolean BG_InSpecialJump( int anim );
 qboolean BG_InSaberStandAnim( int anim );
 qboolean BG_DirectFlippingAnim( int anim );
 qboolean BG_SaberInAttack( int move );

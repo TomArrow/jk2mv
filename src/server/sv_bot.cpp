@@ -65,14 +65,6 @@ void SV_BotFreeClient( int clientNum ) {
 	if ( cl->gentity ) {
 		cl->gentity->r.svFlags &= ~SVF_BOT;
 	}
-
-#ifdef SVDEMO
-	if (cl->demo.demorecording) {
-		SV_StopRecordDemo(cl);
-	}
-	SV_ClearClientDemoPreRecord(cl);
-	SV_ClearClientDemoMeta(cl);
-#endif
 }
 
 /*
@@ -135,10 +127,6 @@ void QDECL BotImport_Print(int type, char *fmt, ...)
 			Com_Printf("%s", str);
 			break;
 		}
-		case PRT_DEBUG: {
-			Com_DPrintf("%s", str);
-			break;
-		}
 		case PRT_WARNING: {
 			Com_Printf(S_COLOR_YELLOW "Warning: %s", str);
 			break;
@@ -172,7 +160,7 @@ void BotImport_Trace(bsp_trace_t *bsptrace, const vec3_t start, const vec3_t min
 {
 	trace_t trace;
 
-	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse, 0, 10, &defaultTraceCustomization);
+	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse, 0, 10);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
@@ -197,7 +185,7 @@ BotImport_EntityTrace
 void BotImport_EntityTrace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int entnum, int contentmask) {
 	trace_t trace;
 
-	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse, &defaultTraceCustomization);
+	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;

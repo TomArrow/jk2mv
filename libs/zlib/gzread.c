@@ -5,6 +5,15 @@
 
 #include "gzguts.h"
 
+/* Local functions */
+local int gz_load OF((gz_statep, unsigned char *, unsigned, unsigned *));
+local int gz_avail OF((gz_statep));
+local int gz_look OF((gz_statep));
+local int gz_decomp OF((gz_statep));
+local int gz_fetch OF((gz_statep));
+local int gz_skip OF((gz_statep, z_off64_t));
+local z_size_t gz_read OF((gz_statep, voidp, z_size_t));
+
 /* Use read() to load a buffer -- return -1 on error, otherwise 0.  Read from
    state->fd, and update state->eof, state->err, and state->msg as appropriate.
    This function needs to loop on read(), since read() is not guaranteed to
@@ -265,7 +274,11 @@ local int gz_skip(gz_statep state, z_off64_t len) {
    input.  Return the number of bytes read.  If zero is returned, either the
    end of file was reached, or there was an error.  state->err must be
    consulted in that case to determine which. */
-local z_size_t gz_read(gz_statep state, voidp buf, z_size_t len) {
+local z_size_t gz_read(state, buf, len)
+    gz_statep state;
+    voidp buf;
+    z_size_t len;
+{
     z_size_t got;
     unsigned n;
 
@@ -342,7 +355,11 @@ local z_size_t gz_read(gz_statep state, voidp buf, z_size_t len) {
 }
 
 /* -- see zlib.h -- */
-int ZEXPORT gzread(gzFile file, voidp buf, unsigned len) {
+int ZEXPORT gzread(file, buf, len)
+    gzFile file;
+    voidp buf;
+    unsigned len;
+{
     gz_statep state;
 
     /* get internal structure */
@@ -374,7 +391,12 @@ int ZEXPORT gzread(gzFile file, voidp buf, unsigned len) {
 }
 
 /* -- see zlib.h -- */
-z_size_t ZEXPORT gzfread(voidp buf, z_size_t size, z_size_t nitems, gzFile file) {
+z_size_t ZEXPORT gzfread(buf, size, nitems, file)
+    voidp buf;
+    z_size_t size;
+    z_size_t nitems;
+    gzFile file;
+{
     z_size_t len;
     gz_statep state;
 
@@ -405,7 +427,9 @@ z_size_t ZEXPORT gzfread(voidp buf, z_size_t size, z_size_t nitems, gzFile file)
 #else
 #  undef gzgetc
 #endif
-int ZEXPORT gzgetc(gzFile file) {
+int ZEXPORT gzgetc(file)
+    gzFile file;
+{
     unsigned char buf[1];
     gz_statep state;
 

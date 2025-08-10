@@ -2,23 +2,12 @@
 #ifndef _QCOMMON_H_
 #define _QCOMMON_H_
 
-#define NOMINMAX
 #include "../qcommon/q_shared.h"
 #include "../api/mvapi.h"
 #include "../api/mvmenu.h"
 #include "../sys/sys_public.h"
 
-#include <vector>
-#include <memory>
-
-#define ASYNCIO
-
 //============================================================================
-
-// AVI pipes
-
-fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename);
-void FS_PipeClose(fileHandle_t f);
 
 // for auto-complete (copied from OpenJK)
 #define CONSOLE_PROMPT_CHAR ']'
@@ -26,14 +15,6 @@ void FS_PipeClose(fileHandle_t f);
 #define COMMAND_HISTORY		128 // increased in jk2mv
 #define FIELD_HISTORY_SIZE	32
 #define KILL_RING_SIZE		16
-
-#define TTFLAGSSERVERINFO_HASANTILOOPSTATS		(1<<0) 
-#define TTFLAGSSERVERINFO_HASFORCESPEEDSMASH	(1<<1) 
-#define TTFLAGSSERVERINFO_HASFORCEJUMPCHARGE	(1<<2) 
-#define TTFLAGSSERVERINFO_HASCROSSSERVERCHAT	(1<<3)
-
-extern qboolean serverIsTommyTernal;
-extern int tommyTernalFlags;
 
 //For determining whether to allow 1.02 color codes:
 #define MV_USE102COLOR ((qboolean)(MV_GetCurrentGameversion() == VERSION_1_02 || MV_GetCurrentGameversion() == VERSION_1_03))
@@ -55,29 +36,26 @@ typedef struct {
 	qboolean	mod;
 } field_t;
 
-typedef void ( *callbackFunc_t )( const char *s, qboolean meme );
+typedef void ( *callbackFunc_t )( const char *s );
 typedef void (*completionFunc_t)( char *args, int argNum );
 
 // common.cpp
 void Field_CheckRep( field_t *edit );
 void Field_Clear( field_t *edit );
-void Field_AutoComplete( field_t *edit, qboolean printWhenPerfectMatch);
-void Field_AutoComplete2( field_t *field, qboolean doCommands, qboolean doCvars, qboolean doArguments, qboolean printWhenPerfectMatch);
+void Field_AutoComplete( field_t *edit );
+void Field_AutoComplete2( field_t *field, qboolean doCommands, qboolean doCvars, qboolean doArguments );
 void Field_CompleteKeyname( void );
 void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt );
 void Field_CompleteModelname( void );
-void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qboolean doArguments, qboolean printWhenPerfectMatch);
+void Field_CompleteCommand( char *cmd, qboolean doCommands, qboolean doCvars, qboolean doArguments );
 int Field_GetLastMatchCount();
 qboolean Field_WasComplete();
 int FloatAsInt( float f );
-qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize);
-int Com_GetNumLanguages(void);
-void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize);
 
 extern qboolean com_demoplaying;
 
 // cl_keys.cpp
-void Key_KeynameCompletion ( void(*callback)( const char *s, qboolean meme ) );
+void Key_KeynameCompletion ( void(*callback)( const char *s ) );
 
 // files.cpp
 void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt, callbackFunc_t callback );
@@ -108,15 +86,9 @@ typedef struct {
 	int		cursize;
 	int		readcount;
 	int		bit;				// for bitwise reads and writes
-
-	qboolean	raw;			// raw, everything saved as integers
-	std::vector<byte>* dataRaw;
 } msg_t;
 
-
-
 void MSG_Init (msg_t *buf, byte *data, int length);
-void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw);
 void MSG_InitOOB( msg_t *buf, byte *data, int length );
 void MSG_Clear (msg_t *buf);
 void MSG_WriteData (msg_t *buf, const void *data, int length);
@@ -159,7 +131,7 @@ void	MSG_SkipData (msg_t *sb, int size);
 void MSG_WriteDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
 void MSG_ReadDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
 
-void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to, qboolean suppressError = qfalse );
+void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
 void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
 
 void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to
@@ -187,20 +159,17 @@ NET
 
 #ifndef DEDICATED
 #define PACKET_BACKUP	256
-//#define PACKET_BACKUP	4096
 #else
-#define	PACKET_BACKUP	64	// number of old messages that must be kept on client and
+#define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
 							// server for delta comrpession and ping estimation
 #endif
 #define	PACKET_MASK		(PACKET_BACKUP-1)
 
-#define	MAX_PACKET_USERCMDS_MIN		32		// max number of usercmd_t in a packet (minimum value but can set via sv_maxPacketUserCmds)
-#define	MAX_PACKET_USERCMDS_MAX		256		// max number of usercmd_t in a packet (maximum value but can set via sv_maxPacketUserCmds)
+#define	MAX_PACKET_USERCMDS		32		// max number of usercmd_t in a packet
 
 #define	PORT_ANY			-1
 
-#define	MAX_RELIABLE_COMMANDS	512			// max string commands buffered for restransmit
-#define	MAX_RELIABLE_COMMANDS_VANILLA	128			// max string commands buffered for retransmit as supported by vanilla clients
+#define	MAX_RELIABLE_COMMANDS	128			// max string commands buffered for restransmit
 
 typedef enum {
 	NS_CLIENT,
@@ -216,19 +185,16 @@ typedef int dlHandle_t;
 typedef void(*dl_ended_callback)(dlHandle_t handle, qboolean success, const char *err_msg);
 typedef void(*dl_status_callback)(size_t total_bytes, size_t downloaded_bytes);
 
-void		NET_HTTP_Init();
 void		NET_HTTP_Shutdown();
 void		NET_HTTP_ProcessEvents();
-void		NET_HTTP_AllowClient(int clientNum, netadr_t addr);
-void		NET_HTTP_DenyClient(int clientNum);
 int			NET_HTTP_StartServer(int port);
 void		NET_HTTP_StopServer();
-dlHandle_t	NET_HTTP_StartDownload(const char *url, const char *toPath, dl_ended_callback ended_callback, dl_status_callback status_callback);
+dlHandle_t	NET_HTTP_StartDownload(const char *url, const char *toPath, dl_ended_callback ended_callback, dl_status_callback status_callback, const char *userAgent, const char *referer);
 void		NET_HTTP_StopDownload(dlHandle_t handle);
 
 void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
 void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
-void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len, int cmdLen );
+void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
 qboolean	NET_CompareAdr (netadr_t a, netadr_t b);
 qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b);
@@ -239,89 +205,11 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_messag
 void		NET_Sleep(int msec);
 
 #define	MAX_MSGLEN				16384		// max length of a message, which may
-#define	MAX_MSGLEN_RAW			MAX_MSGLEN*10	// max length of a message, which may
 											// be fragmented into multiple packets
 
 #define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
 #define MAX_DOWNLOAD_BLKSIZE		2048	// 2048 byte block chunks
 
-#define	MAX_PACKETLEN			1400		// max size of a network packet
-#define	FRAGMENT_SIZE			(MAX_PACKETLEN - 100)
-#define	PACKET_HEADER			10			// two ints and a short
-
-#define	FRAGMENT_BIT	(1<<31)
-
-#define FRAGMENT_BUFFERS_TIMEOUT 10			// Any fragments buffers that have seen no action for this many seconds are discarded
-
-// Buffer used to assemble a fragmented packet
-typedef struct {
-	byte data[MAX_MSGLEN]; // actual data
-	qboolean fragmentsReceived[MAX_MSGLEN / FRAGMENT_SIZE + 1]; // array indicating if a particular fragment has been received
-	int lastFragment; // index of the last fragment. 0 means we don't know yet.
-	int totalLength; // length of the entire message
-	int time; // when was this fragment buffer last accessed? we want to clean up old unfinished fragment buffers.
-} fragmentAssemblyBuffer_t;
-
-
-typedef struct bufferedMsg_s {
-	qboolean	allowoverflow;	// if false, do a Com_Error
-	qboolean	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
-	qboolean	oob;			// set to true if the buffer size failed (with allowoverflow set)
-	//byte	data[MAX_MSGLEN];
-	byte*	data;
-	int		maxsize;
-	int		cursize;
-	int		readcount;
-	int		bit;				// for bitwise reads and writes
-public:
-	bufferedMsg_s(msg_t* src) {
-		allowoverflow = src->allowoverflow;
-		overflowed = src->overflowed;
-		oob = src->oob;
-		maxsize = src->maxsize;
-		cursize = src->cursize;
-		readcount = src->readcount;
-		bit = src->bit;
-		data = new byte[src->cursize];
-		Com_Memcpy(data, src->data, src->cursize);
-	}
-	~bufferedMsg_s() {
-		if (data) {
-			delete[] data;
-			data = NULL;
-		}
-	}
-} bufferedMsg_t;
-
-typedef struct bufferedMessageContainer_s  {
-	bufferedMsg_t msg;
-	int msgNum; // Message number
-	int lastClientCommand; // Need this if we are writing metadata with pre-recording as it is the first thing writen in any message.
-	int time; // So we can discard very old buffered messages. Or for clientside recording, so we don't have to wait infinitely for old messages to arrive (which they never may).
-	qboolean containsFullSnapshot; // Doesn't matter for serverside pre-Recording because we have the keyframes. Only relevant for clientside buffered recording.
-	qboolean isKeyframe; // Is a gamestate message as typical for writing at the start of demos.
-public:
-	bufferedMessageContainer_s(msg_t* src) : msg(src) {
-		msgNum = 0;
-		lastClientCommand = 0;
-		time = 0;
-		containsFullSnapshot = qfalse;
-		isKeyframe = qfalse;
-	}
-} bufferedMessageContainer_t;
-
-//void MSG_ToBuffered(msg_t* src, bufferedMsg_t* dst);
-void MSG_FromBuffered(msg_t* dst, bufferedMsg_t* src);
-
-class userMessage_t {
-public:
-	int serverTime = 0;
-	int ping = 0;
-	int droppedPackets = 0;
-	int clientNum = 0;
-	qboolean pingKnown;
-	std::vector<std::shared_ptr<usercmd_t>> cmds; // multiple clients could be getting the same usermessage returned due to spectators, so we must make this copyable
-};
 
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression
@@ -348,20 +236,17 @@ typedef struct {
 	// we need to space out the sending of large fragmented messages
 	qboolean	unsentFragments;
 	int			unsentFragmentStart;
-	int			unsentFragmentSequenceNum;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
-
-	qboolean	outOfOrder;
 } netchan_t;
 
 void Netchan_Init( int qport );
 void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
 
-void Netchan_Transmit( netchan_t *chan, int length, const byte *data, qboolean fakeSend = qfalse );
+void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
 void Netchan_TransmitNextFragment( netchan_t *chan );
 
-qboolean Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
+qboolean Netchan_Process( netchan_t *chan, msg_t *msg );
 
 
 /*
@@ -500,15 +385,11 @@ void	VM_Forced_Unload_Done(void);
 int	VM_MVAPILevel(const vm_t *vm);
 void VM_SetMVAPILevel(vm_t *vm, int level);
 
-void VM_SetCoolApiSupport(vm_t* vm, int flags);
-int VM_CoolApiSupport(vm_t* vm);
-
 void VM_SetMVMenuLevel(vm_t *vm, int level);
 int VM_MVMenuLevel(const vm_t *vm);
 
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
-int VM_GetIndex(const vm_t *vm);
 
 /*
 ==============================================================
@@ -557,7 +438,6 @@ typedef void (*xcommand_t) (void);
 void	Cmd_Init (void);
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
-void	Cmd_AddMemeCommand( const char *cmd_name, xcommand_t function ); // no autocomplete unless typed exact
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
@@ -566,7 +446,7 @@ void	Cmd_AddMemeCommand( const char *cmd_name, xcommand_t function ); // no auto
 
 void	Cmd_RemoveCommand( const char *cmd_name );
 
-void	Cmd_CommandCompletion( void(*callback)(const char *s, qboolean meme) );
+void	Cmd_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
 int		Cmd_Argc (void);
@@ -574,7 +454,6 @@ char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 char	*Cmd_Args (void);
 char	*Cmd_ArgsFrom( int arg );
-char	*Cmd_ArgsFromQuoted( int arg );
 const char	*Cmd_Cmd( void );
 void	Cmd_ArgsBuffer( char *buffer, int bufferLength );
 void	Cmd_DropArg( int arg );
@@ -657,7 +536,7 @@ void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize 
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize, qboolean isVmCall );
 // returns an empty string if not defined
 
-void	Cvar_CommandCompletion( void(*callback)(const char *s, qboolean meme) );
+void	Cvar_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
 void 	Cvar_Reset( const char *var_name );
@@ -671,7 +550,6 @@ qboolean Cvar_Command( void );
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
 
-void Cvar_WriteNonDefaultVariables(fileHandle_t f,qboolean realTime);
 void Cvar_WriteVariables(fileHandle_t f, qboolean locals);
 // writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
@@ -716,7 +594,6 @@ issues.
 #define NUM_ID_PAKS		9
 
 #define	MAX_FILE_HANDLES	256 // increased from 64 in jk2mv
-#define	FS_INVALID_HANDLE	0
 
 typedef enum {
 	MODULE_MAIN,
@@ -728,12 +605,6 @@ typedef enum {
 	MODULE_UI,
 	MODULE_MAX
 } module_t;
-
-enum fileCompressionScheme_t {
-	FILECOMPRESSION_NONE, // Normal default file handling
-	FILECOMPRESSION_RAW, // The special compressed file format but without actually using any compression
-	FILECOMPRESSION_LZMA // The special compressed file format with LZMA compression
-};
 
 qboolean FS_Initialized();
 
@@ -765,13 +636,6 @@ int		FS_LoadStack();
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
 
-#ifdef ASYNCIO
-void			FS_AsyncAssureFileClosed(const char* ospath);
-fileHandle_t	FS_FOpenFileWriteAsync(const char* qpath, qboolean safe = qtrue);
-#endif
-
-fileHandle_t	FS_WeHaveFileOpen(const char* filename);
-
 fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN );
 fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
 // will properly create any needed paths and deal with seperater character issues
@@ -780,10 +644,8 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODUL
 fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
-
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
-
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean skipJKA = qfalse );
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean skipJKA = qfalse );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -796,7 +658,7 @@ int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 int		FS_Write( const void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 
 int		FS_Read2( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
-int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN, qboolean ignoreCompression = qfalse);
+int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MAIN );
 // properly handles partial reads and reads from other dlls
 
 void	FS_FCloseFile( fileHandle_t f, module_t module = MODULE_MAIN );
@@ -825,7 +687,6 @@ int		FS_filelength( fileHandle_t f, module_t module = MODULE_MAIN );
 
 char	*FS_BuildOSPath(const char *base, const char *game, const char *qpath);
 char	*FS_BuildOSPath(const char *base, const char *path);
-char*	FS_BuildOSPathDefault(const char* path);
 qboolean FS_CreatePath (char *OSPath);
 
 int		FS_FTell( fileHandle_t f, module_t module = MODULE_MAIN );
@@ -868,29 +729,20 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // separated checksums will be checked for files, with the
 // sole exception of .cfg files.
 
-qboolean	FS_CheckDirTraversal(const char *checkdir);
-qboolean	FS_ComparePaks(char *neededpaks, int len, int *chksums, size_t maxchksums, qboolean dlstring);
-qboolean	FS_Rename( const char *from, const char *to );
-qboolean	FS_RenameOrQueue(const char* from, const char* to);
-int			FS_CheckQueuedRenamesAll();
+qboolean FS_CheckDirTraversal(const char *checkdir);
+qboolean FS_ComparePaks(char *neededpaks, int len, int *chksums, size_t maxchksums, qboolean dlstring);
+qboolean FS_Rename( const char *from, const char *to );
 
 const char *FS_MV_VerifyDownloadPath(const char *pk3file);
-qboolean FS_SV_VerifyZipFile( const char *zipfile, int *checksum );
 
 int FS_GetDLList(dlfile_t *files, int maxfiles);
 qboolean FS_RMDLPrefix(const char *qpath);
 qboolean FS_DeleteDLFile(const char *qpath);
 
 void FS_HomeRemove( const char *homePath );
-
-void FS_Rmdir(const char* osPath, qboolean recursive);
-void FS_HomeRmdir(const char* homePath, qboolean recursive);
-
 qboolean FS_IsFifo( const char *filename );
 int FS_FLock( fileHandle_t h, flockCmd_t cmd, qboolean nb, module_t module = MODULE_MAIN );
-qboolean FS_CopyFile(const char* fromFile, const char* toFile);// , module_t module = MODULE_MAIN );
-uint32_t FS_GetFileVersion(const char *fileName, module_t module);
-
+qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module = MODULE_MAIN );
 
 /*
 ==============================================================
@@ -923,19 +775,8 @@ MISC
 //==========================================================
 
 
-typedef struct clientRendererInfo_s {
-	qboolean	wallhackOk;
-} clientRendererInfo_t;
-
 const char	*CopyString( const char *in );
 const char	*CopyString( const char *in, memtag_t eTag );
-
-struct stringPool_s;
-typedef struct stringPool_s stringPool_t;
-stringPool_t	*Z_StringPoolNew(unsigned int blockSize, memtag_t eTag);
-void			Z_StringPoolFree(stringPool_t * pool);
-const char		*Z_StringPoolAdd(stringPool_t * pool, const char * string);
-
 void		Info_Print( const char *s );
 
 void		Com_BeginRedirect (char *buffer, size_t buffersize, void (*flush)(char *), qboolean silent);
@@ -954,7 +795,7 @@ unsigned	Com_BlockChecksum( const void *buffer, int length );
 unsigned	Com_BlockChecksumKey (void *buffer, int length, int key);
 int			Com_HashKey(const char *string, int maxlen);
 int			Com_Filter(const char *filter, const char *name, int casesensitive);
-int			Com_FilterPath(char *filter, const char *name, int casesensitive);
+int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
 qboolean	Com_SafeMode( void );
 void Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
@@ -969,7 +810,6 @@ extern	cvar_t	*com_developer;
 extern	cvar_t	*com_dedicated;
 extern	cvar_t	*com_speeds;
 extern	cvar_t	*com_timescale;
-//extern	cvar_t	*com_sv_maxPacketUserCmds;
 extern	cvar_t	*com_sv_running;
 extern	cvar_t	*com_cl_running;
 extern	cvar_t	*com_viewlog;			// 0 = hidden, 1 = visible, 2 = minimized
@@ -979,20 +819,11 @@ extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
-extern	cvar_t	*com_silentScreenshots;
-
-extern	cvar_t	*com_cool_apiFeatures;
-extern	cvar_t	*com_cool_apiDBVersion;
-extern	cvar_t	*com_cool_apiJKAVersion;
-extern	cvar_t	*com_cool_apiUserCmdStoreVersion;
 
 extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;
-extern	cvar_t	*mg_loglevel;
 
 extern	cvar_t	*com_renderfps;
-
-extern	cvar_t	*com_hunkDynamic;
 
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;
@@ -1041,7 +872,7 @@ temp file loading
 
 */
 
-#if defined(DEBUG) && !defined(BSPC)
+#if defined(_DEBUG) && !defined(BSPC)
 	#define ZONE_DEBUG
 #endif
 
@@ -1079,7 +910,6 @@ void  Z_TagFree	( memtag_t eTag );
 void  Z_Free	( void *ptr );
 int	  Z_Size	( void *pvAddress);
 void Com_ShutdownZoneMemory(void);
-void Com_ShutdownHunkMemory(void);
 
 void Hunk_Clear( void );
 void Hunk_ClearToMark( void );
@@ -1096,7 +926,7 @@ void Com_TouchMemory( void );
 
 // commandLine should not include the executable name (argv[0])
 void Com_Init( char *commandLine );
-void Com_Frame( qboolean noDelay );
+void Com_Frame( void );
 void Com_Shutdown( void );
 
 
@@ -1203,11 +1033,6 @@ typedef struct {
 	node_t*		lhead;
 	node_t*		ltail;
 	node_t*		loc[HMAX+1];
-	// freelist is a head of linked list of nodePtrs
-	// elements. nodePtrs element type is overloaded and may hold
-	// node_t* pointer pointing to nodeList element or node_t**
-	// pointer pointing to another nodePtrs element when part of
-	// freelist!
 	node_t**	freelist;
 
 	node_t		nodeList[768];

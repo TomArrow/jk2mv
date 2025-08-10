@@ -7,12 +7,12 @@
 #include "hstring.h"
 #include "INetProfile.h"
 
-//using namespace std;
+using namespace std;
 
 class CNetProfile : public INetProfile
 {
 	float						mElapsedTime;
-	std::map <hstring,unsigned int>	mFieldCounts;
+	map <hstring,unsigned int>	mFieldCounts;
 	float						mFrameCount;
 
 public:
@@ -29,7 +29,7 @@ public:
 		{
 			return;
 		}
-		std::map<hstring,unsigned int>::iterator f=mFieldCounts.find(fieldName);
+		map<hstring,unsigned int>::iterator f=mFieldCounts.find(fieldName);
 		if(f==mFieldCounts.end())
 		{
 			mFieldCounts[fieldName]=(unsigned int)sizeBytes;
@@ -48,15 +48,15 @@ public:
 	void ShowTotals(void)
 	{
 		float									totalBytes=0;
-		std::multimap<unsigned int,hstring>			sort;
-		std::map<hstring,unsigned int>::iterator		f;
+		multimap<unsigned int,hstring>			sort;
+		map<hstring,unsigned int>::iterator		f;
 		for(f=mFieldCounts.begin();f!=mFieldCounts.end();f++)
 		{
-			sort.insert(std::pair<unsigned int,hstring> ((*f).second,(*f).first));
+			sort.insert(pair<unsigned int,hstring> ((*f).second,(*f).first));
 			totalBytes+=(*f).second;
 		}
 
-		std::multimap<unsigned int,hstring>::iterator	j;
+		multimap<unsigned int,hstring>::iterator	j;
 		char										msg[1024];
 		float										percent;
 		sprintf(msg,

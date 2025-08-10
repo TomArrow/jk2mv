@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -131,7 +131,7 @@ extern "C" {
  * call SDL_Quit() to force shutdown). If a subsystem is already loaded then
  * this call will increase the ref-count and return.
  *
- * \param flags subsystem initialization flags.
+ * \param flags subsystem initialization flags
  * \returns 0 on success or a negative error code on failure; call
  *          SDL_GetError() for more information.
  *

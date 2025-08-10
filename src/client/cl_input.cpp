@@ -5,9 +5,6 @@
 unsigned	frame_msec;
 int			old_com_frameTime;
 
-//valar how often to cycle to get to the saberstyle we want
-extern int saberCycleThisManyTimes = 0;
-extern int cycledThisframe = 0;
 /*
 ===============================================================================
 
@@ -171,55 +168,6 @@ void IN_GenCMD20( void )
 	cl.gcmdValue = GENCMD_FORCE_THROW;
 }
 
-/*valar new commands*/
-void IN_blue(void)			//POC command for saberstyle switching
-{
-	cl.gcmdValue = GENCMD_SABERATTACKCYCLE;
-	cl.gcmdSendValue = qtrue;
-}
-
-void IN_GenCMD21( void )	//valar  goal: blue stance
-{
-	if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_1) {
-	 saberCycleThisManyTimes = 0;	//do nothing
-	}else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_3) {
-	 saberCycleThisManyTimes = 1;	//cycle once
-	}else{
-	 saberCycleThisManyTimes = 2;}	//cycle twice
-	if (cycledThisframe == 1) {
-	--saberCycleThisManyTimes;
-	}
-}
-void IN_GenCMD22( void )	//valar goal: ylw stance
-{	
-	if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_2) {
-	 saberCycleThisManyTimes = 0;
-	}
-	else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_1) {
-	 saberCycleThisManyTimes = 1;
-	}else{
-	 saberCycleThisManyTimes = 2; }
-	if (cycledThisframe == 1) {
-	--saberCycleThisManyTimes;
-	}
-}
-void IN_GenCMD23( void )	//valar goal: red stance
-{
-	if ( cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_3 ) {
-	 saberCycleThisManyTimes = 0;
-	}
-	else if (cl.snap.ps.fd.saberAnimLevel == FORCE_LEVEL_2) {
-	 saberCycleThisManyTimes = 1;
-	}else{
-	 saberCycleThisManyTimes = 2; }
-	if (cycledThisframe == 1) {
-	--saberCycleThisManyTimes;
-	}
-}
-/*valar end of new commands*/
-
-
-
 void IN_KeyDown( kbutton_t *b ) {
 	int		k;
 	char	*c;
@@ -305,14 +253,12 @@ CL_KeyState
 Returns the fraction of the frame that the key was down
 ===============
 */
-float CL_KeyState( kbutton_t *key, qboolean temporaryViewAnglesOnly) {
+float CL_KeyState( kbutton_t *key ) {
 	float		val;
 	int			msec;
 
 	msec = key->msec;
-	if (!temporaryViewAnglesOnly) {
-		key->msec = 0;
-	}
+	key->msec = 0;
 
 	if ( key->active ) {
 		// still down
@@ -321,10 +267,8 @@ float CL_KeyState( kbutton_t *key, qboolean temporaryViewAnglesOnly) {
 		} else {
 			msec += com_frameTime - key->downtime;
 		}
-		if (!cl_idrive->integer && !temporaryViewAnglesOnly)
+		if (!cl_idrive->integer)
 			key->downtime = com_frameTime;//Loda - Not sure what the fuck this is doing here, downtime is supposed to store time of when the key was initially pressed, not the most recent time its been held down..
-
-		//valar removed: key->downtime = com_frameTime;
 	}
 
 #if 0
@@ -458,7 +402,7 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles( qboolean temporaryViewAnglesOnly = qfalse) {
+void CL_AdjustAngles( void ) {
 	float	speed;
 
 	if ( in_speed.active ) {
@@ -468,12 +412,12 @@ void CL_AdjustAngles( qboolean temporaryViewAnglesOnly = qfalse) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right, temporaryViewAnglesOnly);
-		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left, temporaryViewAnglesOnly);
+		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
+		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
 	}
 
-	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup, temporaryViewAnglesOnly);
-	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown, temporaryViewAnglesOnly);
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
+	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
 }
 
 /*
@@ -488,8 +432,6 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	int		forward, side, up;
 	float	s1, s2;
 
-	//int		forward,f,b,	side,r,l,	up,u,d; // valar's version
-	
 	//
 	// adjust for speed key / running
 	// the walking flag is to keep animations consistant
@@ -560,39 +502,6 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	}
 	forward += movespeed * s1;
 	forward -= movespeed * s2;	
-/* valar's version
-	if ( in_strafe.active ) {
-		side += movespeed * CL_KeyState (&in_right);
-		side -= movespeed * CL_KeyState (&in_left);
-	}
-
-	//valar new right/left input handling
-	//---
-	r = movespeed * CL_KeyState (&in_moveright);
-	l = movespeed * CL_KeyState (&in_moveleft);
-	side = r - l;
-	//if both are down send only the most recent input.
-	if (r && l) {
-		side = (in_moveright.downtime > in_moveleft.downtime ? r : -l);
-	}
-
-	//valar new up+down input handling
-	//---
-	u = movespeed * CL_KeyState (&in_up);
-	d = movespeed * CL_KeyState (&in_down);
-	//if both are down send only up input.
-	up = (u >= d ? u : -d);
-
-	//valar new forward/back input handling
-	//--
-	f = movespeed * CL_KeyState (&in_forward);
-	b = movespeed * CL_KeyState (&in_back);
-	forward = f - b;
-	//if both are down send only the most recent input.
-	if (f && b) {
-		forward = (in_forward.downtime > in_back.downtime ? f : -b);
-	}
-	*/
 
 	cmd->forwardmove = ClampChar( forward );
 	cmd->rightmove = ClampChar( side );
@@ -671,7 +580,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 CL_MouseMove
 =================
 */
-void CL_MouseMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
+void CL_MouseMove( usercmd_t *cmd ) {
 	float	mx, my;
 	float	accelSensitivity;
 	float	rate;
@@ -684,11 +593,9 @@ void CL_MouseMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
 		mx = cl.mouseDx[cl.mouseIndex];
 		my = cl.mouseDy[cl.mouseIndex];
 	}
-	if(!temporaryViewAnglesOnly){
-		cl.mouseIndex ^= 1;
-		cl.mouseDx[cl.mouseIndex] = 0;
-		cl.mouseDy[cl.mouseIndex] = 0;
-	}
+	cl.mouseIndex ^= 1;
+	cl.mouseDx[cl.mouseIndex] = 0;
+	cl.mouseDy[cl.mouseIndex] = 0;
 
 	rate = sqrtf( mx * mx + my * my ) / frame_msec;
 	accelSensitivity = cl_sensitivity->value + rate * cl_mouseAccel->value;
@@ -763,31 +670,66 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 	}
 }
 
-int	CL_GetClientCommandServerTime() {
-	if (cl_timeNudgeAntiLagHack->integer) {
-		return cl.serverTimeNoTN;
-	}
-	else {
-		return cl.serverTime;
-	}
-}
 
 /*
 ==============
 CL_FinishMove
 ==============
 */
-void CL_FinishMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
+void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 	qboolean didForce = qfalse;
-	float oldLastViewYaw;
+	unsigned int flags;
 
 	// copy the state that the cgame is currently sending
-	cmd->weapon = cl.cgameUserCmdValue;
-	cmd->forcesel = cl.cgameForceSelection;
-	cmd->invensel = cl.cgameInvenSelection;
+	flags = cl.cgameUserCmdFlags;
 
-	if (cl.gcmdSendValue && !temporaryViewAnglesOnly)
+	if (flags & USERCMD_SET_SERVERTIME)
+	{
+		cmd->serverTime = cl.cgameUserCmd.serverTime;
+	}
+	if (flags & USERCMD_SET_ANGLES)
+	{
+		cl.viewangles[0] = SHORT2ANGLE(cl.cgameUserCmd.angles[0]);
+		cl.viewangles[1] = SHORT2ANGLE(cl.cgameUserCmd.angles[1]);
+		cl.viewangles[2] = SHORT2ANGLE(cl.cgameUserCmd.angles[2]);
+	}
+	if (flags & USERCMD_SET_BUTTONS)
+	{
+		cmd->buttons = cl.cgameUserCmd.buttons;
+	}
+	if (flags & USERCMD_SET_WEAPON)
+	{
+		cmd->weapon = cl.cgameUserCmd.weapon;
+	}
+	if (flags & USERCMD_SET_FORCESEL)
+	{
+		cmd->forcesel = cl.cgameUserCmd.forcesel;
+	}
+	if (flags & USERCMD_SET_INVENSEL)
+	{
+		cmd->invensel = cl.cgameUserCmd.invensel;
+	}
+	if (flags & USERCMD_SET_GENERIC_CMD)
+	{
+		cmd->generic_cmd = cl.cgameUserCmd.generic_cmd;
+	}
+	if (flags & USERCMD_SET_FORWARDMOVE)
+	{
+		cmd->forwardmove = cl.cgameUserCmd.forwardmove;
+	}
+	if (flags & USERCMD_SET_RIGHTMOVE)
+	{
+		cmd->rightmove = cl.cgameUserCmd.rightmove;
+	}
+	if (flags & USERCMD_SET_UPMOVE)
+	{
+		cmd->upmove = cl.cgameUserCmd.upmove;
+	}
+
+	cl.cgameUserCmdFlags = 0;
+
+	if (cl.gcmdSendValue)
 	{
 		cmd->generic_cmd = cl.gcmdValue;
 		cl.gcmdSendValue = qfalse;
@@ -799,26 +741,17 @@ void CL_FinishMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
 
 	// send the current server time so the amount of movement
 	// can be determined without allowing cheating
-	cmd->serverTime = CL_GetClientCommandServerTime();
+	cmd->serverTime = cl.serverTime;
 
 	if (cl.cgameViewAngleForceTime > cl.serverTime)
 	{
+		cl.cgameViewAngleForce[YAW] -= SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
 
-		if (temporaryViewAnglesOnly) {
+		cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW];
+		cl.cgameViewAngleForceTime = 0;
 
-			cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW] - SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
-		}
-		else {
-
-			cl.cgameViewAngleForce[YAW] -= SHORT2ANGLE(cl.snap.ps.delta_angles[YAW]);
-
-			cl.viewangles[YAW] = cl.cgameViewAngleForce[YAW];
-			cl.cgameViewAngleForceTime = 0;
-		}
 		didForce = qtrue;
 	}
-
-	oldLastViewYaw = cl.lastViewYaw;
 
 	if (cl.viewangles[YAW] < 0)
 	{
@@ -875,80 +808,14 @@ void CL_FinishMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
 			cl.viewangles[YAW] = cl.lastViewYaw;
 		}
 
-		if(!temporaryViewAnglesOnly) cl.cgameTurnExtentTime = 0;
+		cl.cgameTurnExtentTime = 0;
 	}
 
 	cl.lastViewYaw = cl.viewangles[YAW];
 
-	if (temporaryViewAnglesOnly) {
-		cl.lastViewYaw = oldLastViewYaw;
-	}
-
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
-}
-
-
-
-/*
-=================
-CL_CreateCmdReal
-=================
-*/
-usercmd_t CL_CreateCmdReal(qboolean temporaryViewAnglesOnly = qfalse) {
-	usercmd_t	cmd;
-	vec3_t		oldAngles;
-
-	VectorCopy(cl.viewangles, oldAngles);
-
-	// keyboard angle adjustment
-	CL_AdjustAngles(temporaryViewAnglesOnly);
-
-	Com_Memset(&cmd, 0, sizeof(cmd));
-
-	if (!temporaryViewAnglesOnly){
-
-		CL_CmdButtons(&cmd);
-
-		// get basic movement from keyboard
-		CL_KeyMove(&cmd);
-	}
-
-	// get basic movement from mouse
-	CL_MouseMove(&cmd, temporaryViewAnglesOnly);
-
-	// get basic movement from joystick
-	CL_JoystickMove(&cmd);
-
-	// check to make sure the angles haven't wrapped
-	if (cl.viewangles[PITCH] - oldAngles[PITCH] > 90) {
-		cl.viewangles[PITCH] = oldAngles[PITCH] + 90;
-	}
-	else if (oldAngles[PITCH] - cl.viewangles[PITCH] > 90) {
-		cl.viewangles[PITCH] = oldAngles[PITCH] - 90;
-	}
-
-	// store out the final values
-	CL_FinishMove(&cmd, temporaryViewAnglesOnly);
-
-	// draw debug graphs of turning for mouse testing
-	if (!temporaryViewAnglesOnly && cl_debugMove->integer) {
-		if (cl_debugMove->integer == 1) {
-			SCR_DebugGraph(abs((int)(cl.viewangles[YAW] - oldAngles[YAW])), 0);
-		}
-		if (cl_debugMove->integer == 2) {
-			SCR_DebugGraph(abs((int)(cl.viewangles[PITCH] - oldAngles[PITCH])), 0);
-		}
-	}
-
-	if (temporaryViewAnglesOnly) {
-
-		// Just doing a temporary cmd for view angles, restore everything to old state.
-		VectorCopy(oldAngles, cl.viewangles);
-	}
-
-	return cmd;
 }
 
 
@@ -957,258 +824,51 @@ usercmd_t CL_CreateCmdReal(qboolean temporaryViewAnglesOnly = qfalse) {
 CL_CreateCmd
 =================
 */
-usercmd_t CL_CreateCmd(qboolean temporaryViewAnglesOnly =qfalse) {
+usercmd_t CL_CreateCmd( void ) {
+	usercmd_t	cmd;
+	vec3_t		oldAngles;
 
-	return CL_CreateCmdReal(temporaryViewAnglesOnly);
+	VectorCopy( cl.viewangles, oldAngles );
 
+	// keyboard angle adjustment
+	CL_AdjustAngles ();
+
+	Com_Memset( &cmd, 0, sizeof( cmd ) );
+
+	CL_CmdButtons( &cmd );
+
+	// get basic movement from keyboard
+	CL_KeyMove( &cmd );
+
+	// get basic movement from mouse
+	CL_MouseMove( &cmd );
+
+	// get basic movement from joystick
+	CL_JoystickMove( &cmd );
+
+	// check to make sure the angles haven't wrapped
+	if ( cl.viewangles[PITCH] - oldAngles[PITCH] > 90 ) {
+		cl.viewangles[PITCH] = oldAngles[PITCH] + 90;
+	} else if ( oldAngles[PITCH] - cl.viewangles[PITCH] > 90 ) {
+		cl.viewangles[PITCH] = oldAngles[PITCH] - 90;
+	}
+
+	// store out the final values
+	CL_FinishMove( &cmd );
+
+	// draw debug graphs of turning for mouse testing
+	if ( cl_debugMove->integer ) {
+		if ( cl_debugMove->integer == 1 ) {
+			SCR_DebugGraph( abs((int)(cl.viewangles[YAW] - oldAngles[YAW])), 0 );
+		}
+		if ( cl_debugMove->integer == 2 ) {
+			SCR_DebugGraph( abs((int)(cl.viewangles[PITCH] - oldAngles[PITCH])), 0 );
+		}
+	}
+
+	return cmd;
 }
 
-typedef enum rampState_s {
-	RAMP_NORAMP,
-	RAMP_NOTAPPLICABLE,
-	RAMP_GOOD,
-	RAMP_DEAD
-}rampState_t;
-
-
-typedef struct
-{
-	vec3_t		forward, right, up;
-	float		frametime;
-} deadRampPML_t;
-
-static void CL_Accelerate(predictedMovement_t* ps,vec3_t wishdir, float wishspeed, float accel, float frametime) {
-
-	// q2 style
-	int			i;
-	float		addspeed, accelspeed, currentspeed;
-
-	currentspeed = DotProduct(ps->velocity, wishdir);
-	addspeed = wishspeed - currentspeed;
-	if (addspeed <= 0) {
-		return;
-	}
-	accelspeed = accel * frametime * wishspeed;
-	if (accelspeed > addspeed) {
-		accelspeed = addspeed;
-	}
-
-	for (i = 0; i < 3; i++) {
-		ps->velocity[i] += accelspeed * wishdir[i];
-	}
-}
-
-static float CL_CmdScale(usercmd_t* cmd, float speed) {
-	int		max;
-	float	total;
-	float	scale;
-	int		umove = 0; //cmd->upmove;
-			//don't factor upmove into scaling speed
-
-	max = abs(cmd->forwardmove);
-	if (abs(cmd->rightmove) > max) {
-		max = abs(cmd->rightmove);
-	}
-	if (abs(umove) > max) {
-		max = abs(umove);
-	}
-	if (!max) {
-		return 0;
-	}
-
-	total = sqrt(cmd->forwardmove * cmd->forwardmove
-		+ cmd->rightmove * cmd->rightmove + umove * umove);
-	scale = (float)speed * max / (127.0 * total);
-
-	return scale;
-}
-
-void CL_UpdateViewAngles(predictedMovement_t* ps, const usercmd_t* cmd) {
-	short		temp;
-	int		i;
-
-	if (ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION) {
-		return;		// no view changes at all
-	}
-
-	if (ps->pm_type != PM_SPECTATOR && ps->eFlags & EF_DEAD) {
-		return;		// no view changes at all
-	}
-
-	// circularly clamp the angles with deltas
-	for (i = 0; i < 3; i++) {
-		temp = cmd->angles[i] + ps->delta_angles[i];
-		if (i == PITCH) {
-			// don't let the player look up or down more than 90 degrees
-			if (temp > 16000) {
-				ps->delta_angles[i] = 16000 - cmd->angles[i];
-				temp = 16000;
-			}
-			else if (temp < -16000) {
-				ps->delta_angles[i] = -16000 - cmd->angles[i];
-				temp = -16000;
-			}
-		}
-		ps->viewangles[i] = SHORT2ANGLE(temp);
-	}
-
-}
-
-void CL_AirAccel(usercmd_t* cmd, predictedMovement_t* currentPs, float frametime) {
-	int			i;
-	vec3_t		wishvel;
-	float		fmove, smove;
-	vec3_t		wishdir;
-	float		wishspeed;
-	float		scale;
-	deadRampPML_t		pml;
-
-	CL_UpdateViewAngles(currentPs,cmd);
-	AngleVectors(currentPs->viewangles, pml.forward, pml.right, pml.up);
-
-	fmove = cmd->forwardmove;
-	smove = cmd->rightmove;
-
-	scale = CL_CmdScale(cmd, currentPs->speed);
-
-	// project moves down to flat plane
-	pml.forward[2] = 0;
-	pml.right[2] = 0;
-	VectorNormalize(pml.forward);
-	VectorNormalize(pml.right);
-
-	for (i = 0; i < 2; i++)
-	{
-		wishvel[i] = pml.forward[i] * fmove + pml.right[i] * smove;
-	}
-	wishvel[2] = 0;
-
-
-	VectorCopy(wishvel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
-	wishspeed *= scale;
-
-	// not on ground, so little effect on velocity
-	CL_Accelerate(currentPs,wishdir, wishspeed, 1.0f,frametime);
-}
-
-rampState_t CL_PredictDeadRamp(usercmd_t cmd,predictedMovement_t* currentPs, float frameTime) {
-	trace_t	trace;
-	vec3_t		end;
-	//vec3_t		testVelocity;
-	vec3_t		point;
-	//vec3_t		newPos;
-	int			i, j, k; 
-	static vec3_t	playerMins = { -15, -15, DEFAULT_MINS_2 };
-	static vec3_t	playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
-
-	if (currentPs->groundEntityNum != ENTITYNUM_NONE || currentPs->pm_type == PM_FLOAT) {
-		return RAMP_NOTAPPLICABLE;
-	}
-
-	Sys_SnapVector(currentPs->velocity);
-
-	CL_AirAccel(&cmd,currentPs,frameTime);
-
-	currentPs->velocity[2] = (currentPs->velocity[2] + (currentPs->velocity[2] - currentPs->gravity * frameTime)) * 0.5;
-	//if (gravity) {
-		//testVelocity[2] -= currentPs->gravity * frameTime;
-		//testVelocity[2] = (currentPs->velocity[2] + testVelocity[2]) * 0.5;
-	//}
-
-	// calculate position we are trying to move to
-	VectorMA(currentPs->origin, frameTime, currentPs->velocity, end);
-
-	// see if we can make it there
-	CM_BoxTrace(&trace, currentPs->origin, end, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, &defaultTraceCustomization);
-
-	if (trace.fraction == 1) {
-		VectorCopy(trace.endpos, currentPs->origin);
-
-		point[0] = currentPs->origin[0];
-		point[1] = currentPs->origin[1];
-		point[2] = currentPs->origin[2] - 0.25;
-
-		CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, &defaultTraceCustomization);
-
-		// do something corrective if the trace starts in a solid...
-		if (trace.allsolid) {
-			// jitter around
-			for (i = -1; i <= 1; i++) {
-				for (j = -1; j <= 1; j++) {
-					for (k = -1; k <= 1; k++) {
-						VectorCopy(currentPs->origin, point);
-						point[0] += (float)i;
-						point[1] += (float)j;
-						point[2] += (float)k;
-						CM_BoxTrace(&trace, point, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, &defaultTraceCustomization);
-						if (!trace.allsolid) {
-							point[0] = currentPs->origin[0];
-							point[1] = currentPs->origin[1];
-							point[2] = currentPs->origin[2] - 0.25;
-
-							CM_BoxTrace(&trace, currentPs->origin, point, playerMins, playerMaxs, 0, MASK_PLAYERSOLID, qfalse, &defaultTraceCustomization);
-							i = j = k = 2; // Stupid way to end the loop lol.
-						}
-					}
-				}
-			}
-		}
-
-		if (trace.fraction != 1.0 && (trace.plane.normal[0] != 0.0f || trace.plane.normal[1] != 0.0f || trace.plane.normal[2] != 1.0f)) {
-			return RAMP_DEAD;
-		}
-		else {
-			return RAMP_NORAMP;
-		}
-	}
-	return RAMP_GOOD;
-}
-
-
-qboolean CL_DeadRampCMDFix(usercmd_t* cmd, usercmd_t* lastCmd, predictedMovement_t* frameStartPredictMoveCopy) {
-	int originalServerTime = cmd->serverTime;
-	int msecDelta = originalServerTime - lastCmd->serverTime; // wait wut. why cl.serverTime? shouldnt that be cmd->serverTime?
-	bool deadRamp = true;
-	int offset = 0;
-	int realOffset = 0;
-	const int minDelta = 5;
-	const int maxDelta = 10;
-	int maxNeg = MAX(0, msecDelta - minDelta);
-	int maxDeltaReal = MAX(msecDelta+2, maxDelta);
-	while (deadRamp) {
-
-		realOffset = offset > maxNeg ? offset : -offset; // We try to subtract first. If that doesn't work we add.
-		int modifiedMsecDelta = msecDelta + realOffset;
-		if (modifiedMsecDelta > maxDeltaReal) {
-			if (com_deadRampFix->integer > 1) {
-				Com_Printf("DEAD RAMP: can't fix @ (offset %d)\n", realOffset);
-			}
-			realOffset = 0;
-			break; // guess we can't fix it.
-		}
-		float deadRampPredictFrameTime = (modifiedMsecDelta) * 0.001f;
-		predictedMovement_t predictMoveCopy = *frameStartPredictMoveCopy;
-		deadRamp = (CL_PredictDeadRamp(*cmd, &predictMoveCopy, deadRampPredictFrameTime) == RAMP_DEAD);
-		if (deadRamp) {
-			offset++;
-		}
-		else {
-			*frameStartPredictMoveCopy = predictMoveCopy;
-		}
-	}
-	cmd->serverTime += realOffset;
-	if (realOffset) {
-		//if (com_deadRampFix->integer > 1) {
-		//}
-		if (com_deadRampFix->integer > 1) {
-			Com_Printf("DEAD RAMP FIX! (offset %d)\n", realOffset);
-		}
-		Cvar_Set("com_deadRampFixedCount", va("%d", com_deadRampFixedCount->integer + 1));
-		return qtrue;
-	}
-	return qfalse;
-}
 
 /*
 =================
@@ -1218,172 +878,37 @@ Create a new usercmd_t structure for this frame
 =================
 */
 void CL_CreateNewCommands( void ) {
+	usercmd_t	*cmd;
 	int			cmdNum;
-	int			sentPacketNum, availableCmdCount;
-	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
-	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
-	int			clServerTime = CL_GetClientCommandServerTime();
 
-	cl.newCmdsGenerated = qfalse;
-
-	//const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE  // YOU CANT DO THIS! the -1 and bitmark & trick only works on powers of 2! otherwise you'll get some complete weird mess. For freely configurable values, use modulo instead.
+	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
 	// no need to create usercmds until we have a gamestate
 	if ( cls.state < CA_PRIMED ) {
 		return;
 	}
 
-	sentPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
-	availableCmdCount = MAX_PACKET_USERCMDS- (cl.cmdNumber - cl.outPackets[sentPacketNum].p_cmdNumber); // see how many cmds we can generate before hitting MAX_USER_CMDS error
+	frame_msec = com_frameTime - old_com_frameTime;
 
-	int desiredPhysicsMsec = (MAX(1, MIN(1000, 1000 / MAX(1,com_physicsFps->integer))));
-	if (com_physicsFps->integer && cl.cmdNumber > 0 && clServerTime > cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime && (clServerTime - cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime) < (desiredPhysicsMsec* availableCmdCount)) {
-
-		int oldCmdServerTime = cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
-		int serverTimeDelta = clServerTime - oldCmdServerTime;
-		int frameCount = serverTimeDelta / desiredPhysicsMsec;
-
-
-		// Not sure if this whole frame_msec part should be outside the if(frameCount) condition or inside...
-		frame_msec = com_frameTime - old_com_frameTime;
-
-		// if running over 1000fps, act as if each frame is 1ms
-		// prevents division by zero
-		if (frame_msec < 1) {
-			frame_msec = 1;
-		}
-
-		// if running less than 5fps, truncate the extra time to prevent
-		// unexpected moves after a hitch
-		if (frame_msec > 200) {
-			frame_msec = 200;
-		}
-
-		if (frameCount) {
-
-			old_com_frameTime = com_frameTime;
-
-			int genericCommandValue = 0;
-			if (cl.gcmdSendValue)
-			{
-				// Gotta intercept them earlier as they are only to be sent once but we might be duplicating our command to create multiple ones.
-				genericCommandValue = cl.gcmdValue;
-				cl.gcmdSendValue = qfalse;
-			}
-			usercmd_t newCommand = CL_CreateCmd();
-
-			int newClServerTime = oldCmdServerTime + desiredPhysicsMsec;
-			predictedMovement_t frameStartPredictMoveCopy = cl.predictedMovement;
-			for (int i = 0; i < frameCount; i++) {
-
-				// duplicate the command a few times until we are close to cl.serverTime.
-				cl.cmdNumber++;
-				cmdNum = cl.cmdNumber % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
-				newCommand.serverTime = newClServerTime;
-
-				// COOL API, set move values.
-				if (cl.cgameMoveSet & 1) {
-					newCommand.forwardmove = cl.cgameForwardmove;
-				} 
-				if (cl.cgameMoveSet & 2) {
-					newCommand.rightmove = cl.cgameRightmove;
-				}
-				if (cl.cgameMoveSet & 4) {
-					newCommand.upmove = cl.cgameUpmove;
-				}
-				cl.cgameMoveSet = 0;
-
-				if (cl.cgameAngleSet & 1) {
-					newCommand.angles[0] = cl.cgamePitchAngle;
-				}
-				if (cl.cgameAngleSet & 2) {
-					newCommand.angles[1] = cl.cgameYawAngle;
-				}
-				if (cl.cgameAngleSet & 4) {
-					newCommand.angles[2] = cl.cgameRollAngle;
-				}
-				// dont reset cl.cgameAngleSet to stay consistent. cgame must set it back to off
-
-				newCommand.generic_cmd = genericCommandValue;
-				genericCommandValue = 0;
-				cl.temporaryCmd = cl.cmds[cmdNum] = newCommand;
-				cl.newCmdsGenerated = qtrue;
-				if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
-					CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) % EFFECTIVE_CMD_BACKUP], &frameStartPredictMoveCopy);
-					newClServerTime = cl.cmds[cmdNum].serverTime;
-					
-				}
-
-				newClServerTime += desiredPhysicsMsec;
-			}
-
-		}
-		else {
-
-			// Create a temporary one we won't send, just for view angles
-			cl.temporaryCmd = CL_CreateCmd(qtrue);
-
-
-		}
-
-
-		
-	}
-	else {
-
-		frame_msec = com_frameTime - old_com_frameTime;
-
-		// if running over 1000fps, act as if each frame is 1ms
-		// prevents division by zero
-		if (frame_msec < 1) {
-			frame_msec = 1;
-		}
-
-		// if running less than 5fps, truncate the extra time to prevent
-		// unexpected moves after a hitch
-		if (frame_msec > 200) {
-			frame_msec = 200;
-		}
-		old_com_frameTime = com_frameTime; 
-
-
-		// generate a command for this frame
-		cl.cmdNumber++;
-		cmdNum = cl.cmdNumber % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
-		cl.temporaryCmd = cl.cmds[cmdNum] = CL_CreateCmd();
-		cl.newCmdsGenerated = qtrue;
-
-		// COOL API, set move values.
-		if (cl.cgameMoveSet & 1) {
-			cl.cmds[cmdNum].forwardmove = cl.cgameForwardmove;
-		}
-		if (cl.cgameMoveSet & 2) {
-			cl.cmds[cmdNum].rightmove = cl.cgameRightmove;
-		}
-		if (cl.cgameMoveSet & 4) {
-			cl.cmds[cmdNum].upmove = cl.cgameUpmove;
-		}
-		cl.cgameMoveSet = 0;
-
-		if (cl.cgameAngleSet & 1) {
-			cl.cmds[cmdNum].angles[0] = cl.cgamePitchAngle;
-		}
-		if (cl.cgameAngleSet & 2) {
-			cl.cmds[cmdNum].angles[1] = cl.cgameYawAngle;
-		}
-		if (cl.cgameAngleSet & 4) {
-			cl.cmds[cmdNum].angles[2] = cl.cgameRollAngle;
-		}
-		// dont reset cl.cgameAngleSet to stay consistent. cgame must set it back to off
-
-		if (com_deadRampFix->integer && cl.predictedMovementIsSet && cl.cmdNumber > 1) {
-
-			predictedMovement_t predictedMovementCopy = cl.predictedMovement;
-			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) % EFFECTIVE_CMD_BACKUP], &predictedMovementCopy);
-			
-		}
+	// if running over 1000fps, act as if each frame is 1ms
+	// prevents division by zero
+	if ( frame_msec < 1 ) {
+		frame_msec = 1;
 	}
 
+	// if running less than 5fps, truncate the extra time to prevent
+	// unexpected moves after a hitch
+	if ( frame_msec > 200 ) {
+		frame_msec = 200;
+	}
+	old_com_frameTime = com_frameTime;
+
+
+	// generate a command for this frame
+	cl.cmdNumber++;
+	cmdNum = cl.cmdNumber & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
+	cl.cmds[cmdNum] = CL_CreateCmd ();
+	cmd = &cl.cmds[cmdNum];
 }
 
 /*
@@ -1397,15 +922,9 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no new usercmds were generated this frame...
+qboolean CL_ReadyToSendPacket( void ) {
 	int		oldPacketNum;
 	int		delta;
-
-	if (!cl.newCmdsGenerated && cls.state >= CA_PRIMED) {
-		// When using com_physicsFps we may/will not generate new commands on every frame.
-		// If no new ones were generated, don't send a packet
-		return qfalse;
-	}
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
@@ -1436,26 +955,19 @@ qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no ne
 	if ( Sys_IsLANAddress( clc.netchan.remoteAddress ) ) {
 		return qtrue;
 	}
-/*
+
 	// check for exceeding cl_maxpackets
 	if ( cl_maxpackets->integer < 1 ) {
 		Cvar_Set( "cl_maxpackets", "1" );
 	} else if ( cl_maxpackets->integer > 2000 ) {
 		Cvar_Set( "cl_maxpackets", "2000" );
-	//	valar: let's not.
-	//if ( cl_maxpackets->integer < 15 ) {
-	//	Cvar_Set( "cl_maxpackets", "15" );
-	//} else if ( cl_maxpackets->integer > 100 ) {
-	//	Cvar_Set( "cl_maxpackets", "100" );
 	}
-*/
 	oldPacketNum = (clc.netchan.outgoingSequence - 1) & PACKET_MASK;
 	delta = cls.realtime -  cl.outPackets[ oldPacketNum ].p_realtime;
 	if ( delta < 1000 / cl_maxpackets->integer ) {
 		// the accumulated commands will go out in the next packet
 		return qfalse;
 	}
-	
 
 	return qtrue;
 }
@@ -1490,16 +1002,11 @@ void CL_WritePacket( void ) {
 	int			packetNum;
 	int			oldPacketNum;
 	int			count, key;
-	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
-	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
-	bool		commandTimeBasedUserCmds = cl_dynamicUserPacket->integer && cl.playerCommandTimeValid && cl.playerCommandTime < cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
 		return;
 	}
-
-	MAX_PACKET_USERCMDS = MAX(MAX_PACKET_USERCMDS_MIN, MIN(cl.serverMaxPacketUserCmds, MAX_PACKET_USERCMDS)); // server must support more than 32 to send more than 32
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
@@ -1531,64 +1038,23 @@ void CL_WritePacket( void ) {
 	// all the cmds will make it to the server
 	if ( cl_packetdup->integer < 0 ) {
 		Cvar_Set( "cl_packetdup", "0" );
-	}/* else if ( cl_packetdup->integer > 5 ) {
-		Cvar_Set( "cl_packetdup", "5" ); // I need MOAR
-	}*/
+	} else if ( cl_packetdup->integer > 5 ) {
+		Cvar_Set( "cl_packetdup", "5" );
+	}
 	oldPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
 		count = MAX_PACKET_USERCMDS;
 		Com_Printf("MAX_PACKET_USERCMDS\n");
 	}
-
-	if (commandTimeBasedUserCmds) { // only send cmds the server actually needs. may mean more or less than usual.
-		if (count >= cl.cmdNumber) count = cl.cmdNumber - 1;
-		if (count > EFFECTIVE_CMD_BACKUP) count = EFFECTIVE_CMD_BACKUP;
-		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
-
-		// increase count so that the entire duration from current server's commandTime to now is covered. 
-		while (cl.cmds[j].serverTime > cl.playerCommandTime) {
-			if (count >= EFFECTIVE_CMD_BACKUP) {
-				count = EFFECTIVE_CMD_BACKUP;
-				break;
-			}
-			if (count >= cl.cmdNumber) {
-				count = cl.cmdNumber - 1;
-				break;
-			}
-			count++;
-			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
-		}
-		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
-		// reduce count to only as much as necessary. we will never need to send cmds <= what server already has
-		while (cl.cmds[j].serverTime <= cl.playerCommandTime) {
-			if (count <= 0) {
-				count = 0;
-				break;
-			}
-			count--;
-			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
-		}
-		if (count > MAX_PACKET_USERCMDS) {
-			count = MAX_PACKET_USERCMDS;
-			//Com_Printf("MAX_PACKET_USERCMDS\n"); // don't show an error here, it's not a user error or anything.
-		}
-	}
-
-	if (cl_showSend->integer) {
-		Com_Printf("(%i)", count);
-	}
-
 	if ( count >= 1 ) {
-		//const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
-
-		if (count > EFFECTIVE_CMD_BACKUP) {
-			Com_Printf("count > EFFECTIVE_CMD_BACKUP\n"); // obviously if we're only backing up 4 commands, we can't send more.
-			count = EFFECTIVE_CMD_BACKUP;
+		const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
+		if ( cl_showSend->integer ) {
+			Com_Printf( "(%i)", count );
 		}
 
 		// begin a client move command
-		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting == 2
+		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
 			|| clc.serverMessageSequence != cl.snap.messageNum ) {
 			MSG_WriteByte (&buf, clc_moveNoDelta);
 		} else {
@@ -1607,7 +1073,7 @@ void CL_WritePacket( void ) {
 
 		// write all the commands, including the predicted command
 		for ( i = 0 ; i < count ; i++ ) {
-			j = (cl.cmdNumber - count + i + 1) % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
+			j = (cl.cmdNumber - count + i + 1) & REAL_CMD_MASK;//Loda - FPS UNLOCK ENGINE
 			cmd = &cl.cmds[j];
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;
@@ -1649,16 +1115,7 @@ void CL_SendCmd( void ) {
 	if ( cls.state < CA_CONNECTED ) {
 		return;
 	}
-	cycledThisframe = 0;
 
-	if (saberCycleThisManyTimes == 0) {
-	//do nothing
-	}else{
-	cl.gcmdValue = GENCMD_SABERATTACKCYCLE;
-	cl.gcmdSendValue = qtrue;
-	saberCycleThisManyTimes--;
-	cycledThisframe = 1;
-	}
 	// don't send commands if paused
 	if ( com_sv_running->integer && sv_paused->integer && cl_paused->integer ) {
 		return;
@@ -1728,12 +1185,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-force_lightning", IN_Button10Up);
 	Cmd_AddCommand ("+force_drain", IN_Button11Down);//active force power
 	Cmd_AddCommand ("-force_drain", IN_Button11Up);
-	Cmd_AddCommand ("+laserpointer", IN_Button12Down);
-	Cmd_AddCommand ("-laserpointer", IN_Button12Up);
-	Cmd_AddCommand ("+bouncepower", IN_Button13Down);
-	Cmd_AddCommand ("-bouncepower", IN_Button13Up);
-	Cmd_AddCommand ("+strafebot", IN_Button14Down);
-	Cmd_AddCommand ("-strafebot", IN_Button14Up);
 	//buttons
 	Cmd_AddCommand ("+button0", IN_Button0Down);//attack
 	Cmd_AddCommand ("-button0", IN_Button0Up);
@@ -1788,10 +1239,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("use_sentry", IN_GenCMD18);
 	Cmd_AddCommand ("saberAttackCycle", IN_GenCMD19);
 	Cmd_AddCommand ("force_throw", IN_GenCMD20);
-	/*valar new client commands*/
-	Cmd_AddCommand ("select_fast", IN_GenCMD21);
-	Cmd_AddCommand ("select_medium", IN_GenCMD22);
-	Cmd_AddCommand ("select_heavy", IN_GenCMD23);
 
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);

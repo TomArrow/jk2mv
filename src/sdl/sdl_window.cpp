@@ -7,10 +7,6 @@
 
 #define CLIENT_WINDOW_TITLE "EternalJK2"
 
-
-void Sys_RegisterPowerNotifications(SDL_Window* window);
-void Sys_UnRegisterPowerNotifications(SDL_Window* window);
-
 enum rserr_t
 {
 	RSERR_OK,
@@ -31,7 +27,6 @@ static cvar_t *r_sdlDriver;
 
 // Window cvars
 cvar_t			*r_fullscreen;
-cvar_t			*r_allowResize;
 static cvar_t	*r_noborder;
 static cvar_t	*r_centerWindow;
 static cvar_t	*r_customwidth;
@@ -50,9 +45,6 @@ static cvar_t	*r_colorbits;
 static cvar_t	*r_ext_multisample;
 static cvar_t	*r_allowsoftwaregl;
 cvar_t			*r_gammamethod;
-cvar_t			*r_gammaPostprocessingPrecision;
-cvar_t			*r_gammabypass;
-cvar_t			*r_allowScreenSaver;
 
 static float GLimp_GetDisplayScale(int display);
 
@@ -107,7 +99,6 @@ static const vidmode_t r_vidModes[] = {
 static const int	s_numVidModes = ARRAY_LEN( r_vidModes );
 
 #define R_MODE_FALLBACK 3 // 640x480
-
 
 qboolean R_GetModeInfo( int *width, int *height, int mode ) {
 	const vidmode_t	*vm;
@@ -411,19 +402,6 @@ void WIN_UpdateGLConfig( glconfig_t *glConfig ) {
 	// moving window to another monitor with different scaling,
 	// changing scaling in display settings.
 	SDL_GL_GetDrawableSize(screen, &glConfig->vidWidth, &glConfig->vidHeight);
-	if (r_allowResize->integer) {
-		SDL_DisplayMode desktopMode;
-		Com_Memset(&desktopMode, 0, sizeof(SDL_DisplayMode));
-		if (desktopMode.w > 0 && desktopMode.h > 0) {
-			glConfig->winWidth = desktopMode.w;
-			glConfig->winHeight = desktopMode.h;
-		}
-		else if(glConfig->vidWidth > 0 && glConfig->vidHeight > 0){
-			// idk
-			glConfig->winWidth = glConfig->vidWidth;
-			glConfig->winHeight = glConfig->vidHeight;
-		}
-	}
 	glConfig->displayScale = displayBaseScale * glConfig->vidHeight / glConfig->winHeight;
 }
 
@@ -588,7 +566,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 	int samples;
 	int i = 0;
 	SDL_Surface *icon = NULL;
-	Uint32 flags = SDL_WINDOW_SHOWN | (r_allowResize->integer ? SDL_WINDOW_RESIZABLE : 0);
+	Uint32 flags = SDL_WINDOW_SHOWN;
 	SDL_DisplayMode desktopMode;
 	int display = 0;
 	int x = SDL_WINDOWPOS_CENTERED, y = SDL_WINDOWPOS_CENTERED;
@@ -616,13 +594,6 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
 		);
 
-	// Destroy existing state if it exists
-	if( opengl_context != NULL )
-	{
-		SDL_GL_DeleteContext( opengl_context );
-		opengl_context = NULL;
-	}
-
 	// If a window exists, note its display index
 	if ( screen != NULL )
 	{
@@ -634,9 +605,6 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 
 		SDL_GetWindowPosition( screen, &x, &y );
 		Com_DPrintf( "Existing window at %dx%d before being destroyed\n", x, y );
-#if MONITORSTATUS_MAYBE_KNOWABLE
-		Sys_UnRegisterPowerNotifications(screen);
-#endif
 		SDL_DestroyWindow( screen );
 		screen = NULL;
 	} else {
@@ -683,6 +651,13 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		return RSERR_INVALID_MODE;
 	}
 	Com_Printf( " %d %d\n", winWidth, winHeight);
+
+	// Destroy existing state if it exists
+	if( opengl_context != NULL )
+	{
+		SDL_GL_DeleteContext( opengl_context );
+		opengl_context = NULL;
+	}
 
 	if ( r_centerWindow->integer )
 	{
@@ -854,11 +829,6 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 				Com_DPrintf( "SDL_CreateWindow failed: %s\n", SDL_GetError( ) );
 				continue;
 			}
-#if MONITORSTATUS_MAYBE_KNOWABLE
-			else {
-				Sys_RegisterPowerNotifications(screen);
-			}
-#endif
 
 #ifndef MACOS_X
 			SDL_SetWindowIcon(screen, icon);
@@ -922,9 +892,6 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 		}
 		else
 		{
-#if MONITORSTATUS_MAYBE_KNOWABLE
-			Sys_RegisterPowerNotifications(screen);
-#endif
 #ifndef MACOS_X
 			SDL_SetWindowIcon(screen, icon);
 #endif
@@ -971,10 +938,6 @@ static qboolean GLimp_StartDriverAndSetMode(glconfig_t *glConfig, const windowDe
 	if (!SDL_WasInit(SDL_INIT_VIDEO))
 	{
 		const char *driverName;
-
-		if (r_allowScreenSaver->integer) {
-			SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "1");
-		}
 
 		if (SDL_Init(SDL_INIT_VIDEO) == -1)
 		{
@@ -1036,7 +999,6 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 
 	// Window cvars
 	r_fullscreen		= Cvar_Get( "r_fullscreen",			"1",		CVAR_ARCHIVE | CVAR_GLOBAL );
-	r_allowResize		= Cvar_Get( "r_allowResize",		"1",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_noborder			= Cvar_Get( "r_noborder",			"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_centerWindow		= Cvar_Get( "r_centerWindow",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_customwidth		= Cvar_Get( "r_customwidth",		"1600",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
@@ -1044,7 +1006,7 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 	r_swapInterval		= Cvar_Get( "r_swapInterval",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL );
 	r_stereo			= Cvar_Get( "r_stereo",				"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_mode				= Cvar_Get( "r_mode",				"-2",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
-	r_displayRefresh	= Cvar_Get( "r_displayRefresh",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
+	r_displayRefresh	= Cvar_Get( "r_displayRefresh",		"0",		CVAR_LATCH );
 	r_savedWindows		= Cvar_Get( "r_savedWindows",		" ",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_ROM );
 	r_highdpi			= Cvar_Get( "r_highdpi",			"1",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 
@@ -1055,9 +1017,6 @@ window_t WIN_Init( const windowDesc_t *windowDesc, glconfig_t *glConfig )
 	r_ext_multisample	= Cvar_Get( "r_ext_multisample",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_allowsoftwaregl	= Cvar_Get( "r_allowsoftwaregl",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	r_gammamethod		= Cvar_Get( "r_gammamethod",		"2",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
-	r_gammaPostprocessingPrecision = Cvar_Get( "r_gammaPostprocessingPrecision",		"256",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
-	r_gammabypass		= Cvar_Get( "r_gammabypass",		"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
-	r_allowScreenSaver	= Cvar_Get( "r_allowScreenSaver",	"0",		CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	Cvar_Get( "r_availableModes", "", CVAR_ROM );
 
 	// Create the window and set up the context
@@ -1131,20 +1090,8 @@ void WIN_Shutdown( void )
 
 	IN_Shutdown();
 
-	if ( opengl_context ) {
-		SDL_GL_DeleteContext( opengl_context );
-		opengl_context = NULL;
-	}
-
-	if ( screen ) {
-#if MONITORSTATUS_MAYBE_KNOWABLE
-		Sys_UnRegisterPowerNotifications(screen);
-#endif
-		SDL_DestroyWindow( screen );
-		screen = NULL;
-	}
-
 	SDL_QuitSubSystem( SDL_INIT_VIDEO );
+	screen = NULL;
 }
 
 void GLimp_EnableLogging( qboolean enable )
@@ -1160,7 +1107,7 @@ void WIN_SetGamma( glconfig_t *glConfig, byte red[256], byte green[256], byte bl
 	Uint16 table[3][256];
 	int i, j;
 
-	if( r_gammamethod->integer != GAMMA_HARDWARE  || r_gammabypass->integer)
+	if( r_gammamethod->integer != GAMMA_HARDWARE )
 		return;
 
 	for (i = 0; i < 256; i++)

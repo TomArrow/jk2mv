@@ -11,8 +11,6 @@ int Key_GetProtocolKey(mvversion_t protocol, int key16);
 
 field_t		chatField;
 qboolean	chat_team;
-qboolean	chat_demoMoment;
-qboolean	chat_crossServer;
 
 int			chat_playerNum;
 
@@ -369,7 +367,7 @@ EDIT FIELDS
 */
 
 static void Key_CheckRep( void ) {
-#ifdef DEBUG
+#ifndef NDEBUG
 	assert( kg.killTail >= 0 && kg.killTail < KILL_RING_SIZE );
 	assert( kg.killHead >= 0 && kg.killHead < KILL_RING_SIZE );
 
@@ -385,7 +383,7 @@ static void Key_CheckRep( void ) {
 	}
 
 	Field_CheckRep( &kg.g_consoleField );
-#endif // DEBUG
+#endif // NDEBUG
 }
 
 /*
@@ -405,10 +403,10 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, qboolean smallSize, qb
 	char	str[MAX_EDIT_LINE];
 
 	len = strlen(edit->buffer);
-	printLen = Q_PrintStrlen(edit->buffer, (qboolean)MV_USE102COLOR, serverIsTommyTernal);
+	printLen = Q_PrintStrlen(edit->buffer, (qboolean)MV_USE102COLOR);
 
-	cursorOffset = Q_PrintStrLenTo(edit->buffer, edit->cursor, NULL, MV_USE102COLOR, serverIsTommyTernal);
-	scrollOffset = Q_PrintStrLenTo(edit->buffer, edit->scroll, NULL, MV_USE102COLOR, serverIsTommyTernal);
+	cursorOffset = Q_PrintStrLenTo(edit->buffer, edit->cursor, NULL, MV_USE102COLOR);
+	scrollOffset = Q_PrintStrLenTo(edit->buffer, edit->scroll, NULL, MV_USE102COLOR);
 
 	if (scrollOffset > cursorOffset - 1)
 		scrollOffset = MAX(0, cursorOffset - 1);
@@ -419,9 +417,9 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, qboolean smallSize, qb
 	if (scrollOffset < cursorOffset - edit->widthInChars + 1)
 		scrollOffset = MAX(0, cursorOffset - edit->widthInChars + 1);
 
-	edit->scroll = Q_PrintStrCharsTo(edit->buffer, scrollOffset, NULL, MV_USE102COLOR,serverIsTommyTernal);
+	edit->scroll = Q_PrintStrCharsTo(edit->buffer, scrollOffset, NULL, MV_USE102COLOR);
 
-	Q_PrintStrCopy(str, edit->buffer, sizeof(str), edit->scroll, edit->widthInChars, MV_USE102COLOR, serverIsTommyTernal);
+	Q_PrintStrCopy(str, edit->buffer, sizeof(str), edit->scroll, edit->widthInChars, MV_USE102COLOR);
 
 	// draw it
 	if ( smallSize ) {
@@ -1047,7 +1045,6 @@ CONSOLE LINE EDITING
 static const char *completionString;
 static char shortestMatch[MAX_TOKEN_CHARS];
 static int	matchCount;
-static qboolean perfectMatch;
 
 /*
 ===============
@@ -1055,26 +1052,13 @@ FindMatches
 
 ===============
 */
-static void FindMatches( const char *s, qboolean meme ) {
+static void FindMatches( const char *s ) {
 	int		i;
 
-	if (meme) {
-		if (Q_stricmp(s, completionString)) {
-			return;
-		}
+	if ( Q_stricmpn( s, completionString, (int)strlen( completionString ) ) ) {
+		return;
 	}
-	else {
-		if (Q_stricmpn(s, completionString, (int)strlen(completionString))) {
-			return;
-		}
-	}
-
 	matchCount++;
-
-	if (!Q_stricmp(s, completionString)) {
-		perfectMatch = qtrue; // found an actual perfect match
-	}
-
 	if ( matchCount == 1 ) {
 		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
 		return;
@@ -1161,7 +1145,7 @@ void CompleteCommand( void )
 	char		temp[MAX_EDIT_LINE];
 
 	// Field_AutoComplete( &kg.g_consoleField );
-	Field_AutoComplete2( &kg.g_consoleField, qtrue, qtrue, qfalse, qfalse );
+	Field_AutoComplete2( &kg.g_consoleField, qtrue, qtrue, qfalse );
 
 	edit = &kg.g_consoleField;
 
@@ -1173,7 +1157,6 @@ void CompleteCommand( void )
 		completionString++;
 	}
 	matchCount = 0;
-	perfectMatch = qfalse;
 	shortestMatch[0] = 0;
 
 	if ( strlen( completionString ) == 0 ) {
@@ -1226,7 +1209,6 @@ void Console_Key (int key) {
 		(keynames[ key ].lower == 'm' && kg.keys[A_CTRL].down) ||
 		(keynames[ key ].lower == 'j' && kg.keys[A_CTRL].down) )
 	{
-		int cmplen = 0;
 		// if not in the game explicitly prepent a slash if needed
 		/*if ( cls.state != CA_ACTIVE && kg.g_consoleField.buffer[0] != '\\'
 			&& kg.g_consoleField.buffer[0] != '/' ) {
@@ -1241,17 +1223,10 @@ void Console_Key (int key) {
 			CompleteCommand();
 		}
 
-		cmplen = strlen(kg.g_consoleField.buffer);
-		while (cmplen > 1 && kg.g_consoleField.buffer[cmplen-1] == ' ') {
-			cmplen--;
-		}
-
-		if (!com_silentScreenshots->integer || (Q_stricmpn(kg.g_consoleField.buffer,"screenshot", cmplen) && Q_stricmpn(kg.g_consoleField.buffer,"screenshot_tga", cmplen))) {
-			if (con_timestamps && con_timestamps->integer)
-				Com_Printf("\\%s\n", kg.g_consoleField.buffer);
-			else
-				Com_Printf("]%s\n", kg.g_consoleField.buffer);
-		}
+		if (con_timestamps && con_timestamps->integer)
+			Com_Printf("\\%s\n", kg.g_consoleField.buffer);
+		else
+			Com_Printf ( "]%s\n", kg.g_consoleField.buffer );
 
 		// leading slash is an explicit command
 		if ( kg.g_consoleField.buffer[0] == '\\' || kg.g_consoleField.buffer[0] == '/' ) {
@@ -1288,7 +1263,7 @@ void Console_Key (int key) {
 
 	if (key == A_TAB) {
 		//CompleteCommand();
-		Field_AutoComplete( &kg.g_consoleField,qtrue ); // for auto-complete (copied from OpenJK)
+		Field_AutoComplete( &kg.g_consoleField ); // for auto-complete (copied from OpenJK)
 		return;
 	}
 
@@ -1373,23 +1348,6 @@ void Console_Key (int key) {
 //============================================================================
 
 
-qboolean CL_StringIsDigitsOnly(const char* buf) {
-	int i;
-	int len = strlen(buf);
-
-	for (i = 0; i < len; i++) {
-
-		if (buf[i] >= '0' && buf[i] <= '9') {}
-		else
-			return qfalse;
-	}
-
-	return qtrue;
-}
-
-
-
-
 /*
 ================
 Message_Key
@@ -1442,14 +1400,10 @@ void Message_Key( int key ) {
 			}
 
 			CL_RandomizeColors(chatField.buffer, coloredString);
-			if (chat_demoMoment)
-				Com_sprintf(buffer, sizeof(buffer), "tell %i \"[DEMOMOMENT] %s\"\n", chat_playerNum, chatField.buffer);
-			else if (chat_playerNum != -1 )
+			if (chat_playerNum != -1 )
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
 			else if (chat_team)
 				Com_sprintf( buffer, sizeof( buffer ), "say_team \"%s\"\n", chatField.buffer );
-			else if (chat_crossServer && (tommyTernalFlags & TTFLAGSSERVERINFO_HASCROSSSERVERCHAT))
-				Com_sprintf( buffer, sizeof( buffer ), "say_cross \"%s\"\n", chatField.buffer );
 			else
 				Com_sprintf( buffer, sizeof( buffer ), "say \"%s\"\n", coloredString );
 			CL_AddReliableCommand( buffer );
@@ -1877,7 +1831,7 @@ Key_KeynameCompletion
 void Key_KeynameCompletion( callbackFunc_t callback ) { // for auto-complete (copied from OpenJK)
 	for ( size_t i=0; i<numKeynames; i++ ) {
 		if ( keynames[i].name )
-			callback( keynames[i].name, qfalse );
+			callback( keynames[i].name );
 	}
 }
 
@@ -1915,7 +1869,7 @@ static void Key_CompleteBind( char *args, int argNum ) { // for auto-complete (c
 		p = Com_SkipTokens( args, 2, " " );
 
 		if ( p > args )
-			Field_CompleteCommand( p, qtrue, qtrue, qtrue, qtrue );
+			Field_CompleteCommand( p, qtrue, qtrue, qtrue );
 	}
 }
 

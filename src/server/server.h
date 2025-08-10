@@ -2,8 +2,6 @@
 #pragma once
 #endif
 
-#define SVDEMO
-
 #if !defined(SERVER_H_INC)
 #define SERVER_H_INC
 
@@ -14,7 +12,6 @@
 #include "../qcommon/cm_public.h"
 
 #include "../api/mvapi.h"
-#include <memory>
 
 //=============================================================================
 
@@ -34,12 +31,6 @@ typedef struct svEntity_s {
 	int			areanum, areanum2;
 	int			snapshotCounter;	// used to prevent double adding from portal views
 } svEntity_t;
-
-typedef enum {
-	MSG_ALL,
-	MSG_DEMO,
-	MSG_CLIENT,
-} messageType_t;
 
 typedef enum {
 	SS_DEAD,			// no map loaded
@@ -64,7 +55,7 @@ typedef struct {
 
 	// the game virtual machine will update these on init and changes
 	sharedEntity_t	*gentities;
-	size_t			gentitySize;
+	int				gentitySize;
 	int				num_entities;		// current number, <= MAX_GENTITIES
 
 	void			*gameClients;
@@ -84,10 +75,6 @@ typedef struct {
 	int				resetServerTime;	// Reset sv.time on map change.
 										// 0 = cvar, 1 = always, 2 = never
 	qboolean		vmPlayerSnapshots;
-
-	time_t			realMapTimeStarted;	// time the current map was started
-	qboolean		demosPruned; // whether or not existing demos were cleaned up already
-
 	qboolean		submodelBypass;
 } server_t;
 
@@ -126,47 +113,10 @@ typedef enum {
 	CS_ACTIVE		// client is fully in game
 } clientState_t;
 
-#ifdef SVDEMO
-// struct to hold demo data for a single demo
-typedef struct {
-	char		demoName[MAX_OSPATH];
-	qboolean	demorecording;
-	qboolean	demowaiting;	// don't record until a non-delta message is sent
-	int			minDeltaFrame;	// the first non-delta frame stored in the demo.  cannot delta against frames older than this
-	fileHandle_t	demofile;
-	qboolean	isBot;
-	int			botReliableAcknowledge; // for bots, need to maintain a separate reliableAcknowledge to record server messages into the demo file
-	int			clientDemoReliableAcknowledge; // for clients when sv_demoSpaceSaving is 1
-	struct {
-		// this is basically the equivalent of the demowaiting and minDeltaFrame values above, except it's for the demo pre-record feature and will be done every sv_demoPreRecordKeyframeDistance seconds.
-		qboolean keyframeWaiting;
-		int minDeltaFrame;
-
-		int lastKeyframeTime; // When was the last keyframe (gamestate followed by non-delta frames) saved? If more than sv_demoPreRecordKeyframeDistance, we make a new keyframe.
-	} preRecord;
-	struct {
-		// for debug/developer prints
-		int		totalSizeClient;
-		int		totalSizeDemo;
-		int		sampleCount;
-	}spaceSaving;
-	int			lastSnap;
-} demoInfo_t;
-
-//typedef std::vector<bufferedMessageContainer_t>::iterator demoPreRecordBufferIt;
-typedef std::vector<std::unique_ptr<bufferedMessageContainer_t>>::iterator demoPreRecordBufferIt;
-#endif
-
 typedef struct leakyBucket_s {
 	int					lastTime;
 	unsigned short		burst;
 } leakyBucket_t;
-
-typedef enum checkedNumberType_s {
-	CHECKEDTYPE_RATE,
-	CHECKEDTYPE_SNAPS,
-	CHECKEDTYPE_TYPECOUNT,
-} checkedNumberType_t;
 
 typedef struct client_s {
 	clientState_t	state;
@@ -203,8 +153,6 @@ typedef struct client_s {
 	int				downloadSendTime;	// time we last got an ack from the client
 
 	int				deltaMessage;		// frame last client usercmd message
-	int				deltaMessageWarning;	// for debugging: avoid spamming "delta request from out of date blahblah". 1= out of date packet. 2=out of date entities. reset when deltamessage changes
-	int				deltaMessageWarningLast;	// svs.time of last such warning
 	int				nextReliableTime;	// svs.time when another reliable command will be allowed
 	int				lastPacketTime;		// svs.time when packet was last received
 	int				lastConnectTime;	// svs.time when connection started
@@ -214,26 +162,14 @@ typedef struct client_s {
 	clientSnapshot_t	frames[PACKET_BACKUP];	// updates can be delta'd from here
 	int				ping;
 	int				rate;				// bytes / second
-	int				snaps;
 	int				snapshotMsec;		// requests a snapshot every snapshotMsec unless rate choked
-	int				snapshotMsecSpec;		// same as snapshotMsec but specifically for spectators (can allow more leeway)
 	int				pureAuthentic;
 	netchan_t		netchan;
 	int				oldServerTime;		// client server time before map change
 	leakyBucket_t	cmdBucket;			// for command flood protection
-	leakyBucket_t	cmdBucketSaveposRespos;			// for command flood protection of respos/savepos
 
 	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
-
-	int				invalidValues;		// checkedNumberType_t
-	int				lastInvalidValuesWarning;
-
-#ifdef SVDEMO
-	demoInfo_t		demo;
-#endif
-
-	qboolean		zombified;
 } client_t;
 
 //=============================================================================
@@ -290,9 +226,6 @@ extern	serverStatic_t	svs;				// persistant server info across maps
 extern	server_t		sv;					// cleared each map
 extern	vm_t			*gvm;				// game virtual machine
 
-extern	cvar_t	*com_coolApi_supported_game_userCmdStoreVersion;
-extern	cvar_t	*com_coolApi_supported_game;
-extern	cvar_t	*com_coolApi_supported_game_vmflags;
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
@@ -313,10 +246,8 @@ extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
 extern	cvar_t	*sv_minSnaps;
-extern	cvar_t	*sv_minSnapsSpec;
 extern	cvar_t	*sv_maxSnaps;
 extern	cvar_t	*sv_enforceSnaps;
-extern	cvar_t	*sv_enforceSnapsDebug; // Generate all snapshots but only actually send the messages according to max snaps etc
 extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
 extern	cvar_t	*sv_maxOOBRate;
@@ -325,38 +256,14 @@ extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
 extern	cvar_t	*sv_pure;
 extern	cvar_t	*sv_floodProtect;
-extern	cvar_t	*sv_floodProtectSaveposRespos;
 extern	cvar_t	*sv_allowAnonymous;
 extern	cvar_t	*sv_needpass;
 extern	cvar_t	*mv_serverversion;
 extern	cvar_t	*sv_hibernateFps;
 extern	cvar_t	*mv_apiConnectionless;
 extern	cvar_t	*sv_pingFix;
-extern	cvar_t	*sv_maxPacketUserCmds;
 extern	cvar_t	*sv_autoWhitelist;
 extern	cvar_t	*sv_dynamicSnapshots;
-
-#ifdef SVDEMO
-extern	cvar_t* sv_autoDemo;
-extern	cvar_t* sv_autoDemoBots;
-extern	cvar_t* sv_autoDemoMaxMaps;
-extern	cvar_t* sv_demoSpaceSaving;
-extern	cvar_t* sv_demoPreRecord;
-extern	cvar_t* sv_demoPreRecordBots;
-extern	cvar_t* sv_demoPreRecordTime;
-extern	cvar_t* sv_demoPreRecordKeyframeDistance;
-extern	cvar_t* sv_demoWriteMeta;
-#endif
-
-extern	cvar_t* sv_ucmdSendback;
-extern	cvar_t* sv_ucmdSendbackMinCount;
-
-extern	cvar_t* sv_crossServerCommands;
-extern	cvar_t* sv_crossServerCommandRemoteServer;
-extern	cvar_t* sv_crossServerCommandPassword;
-extern	cvar_t* sv_crossServerCommandIdent;
-
-extern	cvar_t* sv_specAllEnts;
 
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
@@ -396,10 +303,6 @@ extern qboolean mvStructConversionDisabled;
 qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period, int now);
 void SVC_LoadWhitelist( void );
 void SVC_WhitelistAdr( netadr_t adr );
-extern int serverUniqueCrossServerCommandsId;
-bool SVC_CrossServerCommandsActive();
-void SVC_CrossServerCommandForwardToSubscribers(netadr_t* addr, const char* rawString);
-void SVC_CrossServerCommandsMaintenance();
 
 //
 // sv_init.c
@@ -445,25 +348,16 @@ void SV_ClientUpdateSnaps( client_t *client );
 //
 void SV_Heartbeat_f( void );
 
-void SV_RecordDemo(client_t* cl, char* demoName);
-void SV_StopRecordDemo(client_t* cl);
-void SV_ClearClientDemoMeta(client_t* cl);
-void SV_ClearClientDemoPreRecord(client_t* cl);
-void SV_ClearAllDemoPreRecord();
-void SV_AutoRecordDemo(client_t* cl);
-void SV_StopAutoRecordDemos();
-void SV_BeginAutoRecordDemos();
-
 //
 // sv_snapshot.c
 //
 void SV_AddServerCommand( client_t *client, const char *cmd );
-void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, messageType_t msgType);
-qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial, messageType_t msgType);
+void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
+qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
-void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse, qboolean isSnapshot = qfalse, messageType_t msgType = MSG_ALL);
+void SV_SendMessageToClient( msg_t *msg, client_t *client );
 void SV_SendClientMessages( void );
-void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
+void SV_SendClientSnapshot( client_t *client );
 
 //
 // sv_game.c
@@ -541,7 +435,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod, traceCustomization_t* traceCustomization);
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, qboolean capsule, int traceFlags, int useLod );
 // mins and maxs are relative
 
 // if the entire move stays in a solid volume, trace.allsolid will be set,
@@ -553,18 +447,14 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 // passEntityNum is explicitly excluded from clipping checks (normally ENTITYNUM_NONE)
 
 
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule, traceCustomization_t* traceCustomization);
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, qboolean capsule );
 // clip to a specific entity
 
 //
 // sv_net_chan.c
 //
-void SV_Netchan_Transmit( client_t *client, msg_t *msg, qboolean fakeSend = qfalse);	//int length, const byte *data );
+void SV_Netchan_Transmit( client_t *client, msg_t *msg);	//int length, const byte *data );
 void SV_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
-
-extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
-extern int userStoredUcmdCounts[MAX_CLIENTS];
-
 
 #endif // SERVER_H_INC

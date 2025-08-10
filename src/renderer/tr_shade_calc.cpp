@@ -331,13 +331,6 @@ void DeformText( const char *text ) {
 	// clear the shader indexes
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
-	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
-		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
-	}
-	if (r_rampHelper->integer || r_solidity->integer > 2) {
-		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
-	}
-	tess.anyVertexColorOverrides = qfalse;
 
 	color[0] = color[1] = color[2] = color[3] = 255;
 
@@ -401,13 +394,6 @@ static void AutospriteDeform( void ) {
 	oldVerts = tess.numVertexes;
 	tess.numVertexes = 0;
 	tess.numIndexes = 0;
-	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
-		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
-	}
-	if (r_rampHelper->integer || r_solidity->integer > 2) {
-		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
-	}
-	tess.anyVertexColorOverrides = qfalse;
 
 	if ( backEnd.currentEntity != &tr.worldEntity ) {
 		GlobalVectorToLocal( backEnd.viewParms.ori.axis[1], leftDir );
@@ -1213,7 +1199,7 @@ void RB_CalcDiffuseEntityColor( unsigned char *colors )
 		if ( incoming <= 0 ) {
 			*(int *)&colors[i*4] = ambientLightInt;
 			continue;
-		} 
+		}
 		j = ( ambientLight[0] + incoming * directedLight[0] );
 		if ( j > 255 ) {
 			j = 255;

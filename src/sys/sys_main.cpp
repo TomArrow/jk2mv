@@ -20,30 +20,12 @@
 #include "../sys/sys_local.h"
 #include "../sys/sys_public.h"
 #include "con_local.h"
-#if MONITORSTATUS_MAYBE_KNOWABLE && defined(_WINNT_) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#include <winnt.h>
-#include <SDL_syswm.h>
-#include <unordered_map>
-#define MONITORSTATUS_KNOWABLE 1
-#define MONITORSTATUS_WINNT 1
-#endif
 
 cvar_t *com_minimized;
 cvar_t *com_unfocused;
 cvar_t *com_maxfps;
 cvar_t *com_maxfpsMinimized;
 cvar_t *com_maxfpsUnfocused;
-cvar_t* com_slowDriftAdjustMaxFPS;
-cvar_t* com_physicsFps;
-cvar_t* com_deadRampFix;
-cvar_t* com_deadRampFixedCount;
-cvar_t* com_placebo;
-
-#if MONITORSTATUS_MAYBE_KNOWABLE
-cvar_t* com_maxfpsScreenSaver;
-cvar_t* com_screensaverActive;
-
-#endif
 
 static volatile sig_atomic_t sys_signal = 0;
 
@@ -102,79 +84,6 @@ void Sys_Print(const char *msg, qboolean extendedColors) {
 	CON_Print(msg, (extendedColors ? true : false));
 }
 
-#if MONITORSTATUS_WINNT
-//static void SDLCALL Sys_WinPowerMsgHook(void* userdata, void* hWnd, unsigned int message, Uint64 wParam, Sint64 lParam) {
-//	if (message == WM_POWERBROADCAST) {
-//		if (wParam == PBT_POWERSETTINGCHANGE) {
-//			POWERBROADCAST_SETTING* setting = (POWERBROADCAST_SETTING*)lParam;
-//			if (IsEqualGUID(setting->PowerSetting, GUID_MONITOR_POWER_ON)) {
-//				DWORD state = *(DWORD*)setting->Data;
-//				Com_DPrintf("Sys_WinPowerMsgHook: Display status is %d\n", state);
-//				Cvar_SetValue("com_screensaverActive", (qboolean)(!state));
-//			}
-//		}
-//	}
-//}
-
-static std::unordered_map<HWND, HPOWERNOTIFY> notifyIds;
-static std::unordered_map<HWND, HPOWERNOTIFY> notifyIds2;
-void Sys_RegisterPowerNotifications(SDL_Window* window) {
-	static bool inited = false;
-
-	if (!inited) {
-		SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
-		//SDL_SetWindowsMessageHook(Sys_WinPowerMsgHook, NULL);
-	}
-
-	SDL_SysWMinfo info;
-
-	SDL_VERSION(&info.version);
-	if (!SDL_GetWindowWMInfo(window, &info))
-		return;
-
-	HWND win = info.info.win.window;
-	HPOWERNOTIFY id = RegisterPowerSettingNotification(win, &GUID_MONITOR_POWER_ON, DEVICE_NOTIFY_WINDOW_HANDLE);
-	HPOWERNOTIFY id2 = RegisterPowerSettingNotification(win, &GUID_CONSOLE_DISPLAY_STATE, DEVICE_NOTIFY_WINDOW_HANDLE);
-	if (id) {
-		notifyIds[win] = id;
-	}
-	if (id2) {
-		notifyIds2[win] = id;
-	}
-}
-void Sys_UnRegisterPowerNotifications(SDL_Window* window) {
-	SDL_SysWMinfo info;
-
-	SDL_VERSION(&info.version);
-	if (!SDL_GetWindowWMInfo(window, &info))
-		return;
-
-	HWND win = info.info.win.window;
-	if (notifyIds.find(win) == notifyIds.end()) {
-		return;
-	}
-	HPOWERNOTIFY id = notifyIds[win];
-	notifyIds.erase(win);
-	UnregisterPowerSettingNotification(id);
-
-	if (notifyIds2.find(win) == notifyIds2.end()) {
-		return;
-	}
-	id = notifyIds2[win];
-	notifyIds2.erase(win);
-	UnregisterPowerSettingNotification(id);
-}
-#elif MONITORSTATUS_MAYBE_KNOWABLE
-
-void Sys_RegisterPowerNotifications(SDL_Window* window) {
-
-}
-void Sys_UnRegisterPowerNotifications(SDL_Window* window) {
-
-}
-#endif
-
-
 /*
 ================
 Sys_Init
@@ -193,22 +102,6 @@ void Sys_Init(void) {
 	com_maxfps = Cvar_Get("com_maxfps", "125", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsUnfocused = Cvar_Get("com_maxfpsUnfocused", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_maxfpsMinimized = Cvar_Get("com_maxfpsMinimized", "50", CVAR_ARCHIVE | CVAR_GLOBAL);
-	com_slowDriftAdjustMaxFPS = Cvar_Get("com_slowDriftAdjustMaxFPS", "25", CVAR_ARCHIVE | CVAR_GLOBAL);
-	com_physicsFps = Cvar_Get("com_physicsFps", "0", CVAR_ARCHIVE | CVAR_USERINFO | CVAR_GLOBAL);
-	com_deadRampFix = Cvar_Get("com_deadRampFix", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
-	com_deadRampFixedCount = Cvar_Get("com_deadRampFixedCount", "0", CVAR_VM_NOWRITE | CVAR_INIT);
-	com_placebo = Cvar_Get("com_placebo", "0", CVAR_ARCHIVE);
-
-#if MONITORSTATUS_KNOWABLE
-	com_maxfpsScreenSaver = Cvar_Get("com_maxfpsScreenSaver", "5", CVAR_ARCHIVE | CVAR_GLOBAL);
-	com_screensaverActive = Cvar_Get("com_screensaverActive", "0", CVAR_ROM);
-	Cvar_SetValue("com_screensaverActive", 0); // set to 0 initially.
-#elif MONITORSTATUS_MAYBE_KNOWABLE
-	com_maxfpsScreenSaver = Cvar_Get("com_maxfpsScreenSaver", "5", CVAR_ROM | CVAR_INTERNAL);
-	com_screensaverActive = Cvar_Get("com_screensaverActive", "0", CVAR_ROM | CVAR_INTERNAL);
-	Cvar_SetValue("com_screensaverActive", 0); // set to 0 initially.
-#endif
-
 }
 
 static void Q_NORETURN Sys_Exit(int ex) {
@@ -221,9 +114,6 @@ static void Q_NORETURN Sys_Exit(int ex) {
 
 	Sys_PlatformExit();
 
-	if (com_hunkDynamic->integer) {
-		Com_ShutdownHunkMemory();
-	}
 	Com_ShutdownZoneMemory();
 
 	CON_Shutdown();
@@ -310,11 +200,6 @@ time_t Sys_FileTime(const char *path) {
 	return buf.st_mtime;
 }
 
-#if DEDICATED
-#else
-qboolean CL_NoDelay(void);
-#endif
-
 /*
 =================
 Sys_SigHandler
@@ -340,7 +225,7 @@ int main(int argc, char* argv[]) {
 
 	Sys_PlatformInit(argc, argv);
 
-#if defined(DEBUG) && !defined(DEDICATED)
+#if defined(_DEBUG) && !defined(DEDICATED)
 	CON_CreateConsoleWindow();
 #endif
 	CON_Init();
@@ -395,11 +280,6 @@ int main(int argc, char* argv[]) {
 		if (com_busyWait->integer) {
 			bool shouldSleep = false;
 
-#if MONITORSTATUS_KNOWABLE
-			if (com_screensaverActive->integer) {
-				shouldSleep = true;
-			}
-#endif
 			if (com_dedicated->integer) {
 				shouldSleep = true;
 			}
@@ -414,11 +294,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		// run the game
-#if DEDICATED
-		Com_Frame(qfalse);
-#else
-		Com_Frame(CL_NoDelay());
-#endif
+		Com_Frame();
 	}
 
 	Com_Quit(sys_signal);

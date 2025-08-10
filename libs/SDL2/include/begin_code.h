@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -172,18 +172,18 @@
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202000L)
 #define SDL_FALLTHROUGH [[fallthrough]]
 #else
-#if defined(__has_attribute) && !defined(__SUNPRO_C) && !defined(__SUNPRO_CC)
-#define SDL_HAS_FALLTHROUGH __has_attribute(__fallthrough__)
+#if defined(__has_attribute)
+#define _HAS_FALLTHROUGH __has_attribute(__fallthrough__)
 #else
-#define SDL_HAS_FALLTHROUGH 0
+#define _HAS_FALLTHROUGH 0
 #endif /* __has_attribute */
-#if SDL_HAS_FALLTHROUGH && \
+#if _HAS_FALLTHROUGH && \
    ((defined(__GNUC__) && __GNUC__ >= 7) || \
     (defined(__clang_major__) && __clang_major__ >= 10))
 #define SDL_FALLTHROUGH __attribute__((__fallthrough__))
 #else
 #define SDL_FALLTHROUGH do {} while (0) /* fallthrough */
-#endif /* SDL_HAS_FALLTHROUGH */
-#undef SDL_HAS_FALLTHROUGH
+#endif /* _HAS_FALLTHROUGH */
+#undef _HAS_FALLTHROUGH
 #endif /* C++17 or C2x */
 #endif /* SDL_FALLTHROUGH not defined */

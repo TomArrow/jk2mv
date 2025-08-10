@@ -2,7 +2,6 @@
 
 #include "server.h"
 #include "../qcommon/strip.h"
-#include "../qcommon/levenshtein.h"
 
 #include <mv_setup.h>
 
@@ -211,16 +210,7 @@ void SV_DirectConnect( netadr_t from ) {
 		}
 		if ( NET_CompareBaseAdr( from, cl->netchan.remoteAddress )
 			&& ( cl->netchan.qport == qport
-			|| from.port == cl->netchan.remoteAddress.port ) && !(cl->state == CS_ZOMBIE && cl->zombified) ) {
-
-			//if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
-
-			//	if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, cl - svs.clients)) {
-			//		continue;
-			//	}
-			//	
-			//}
-
+			|| from.port == cl->netchan.remoteAddress.port ) ) {
 			Com_Printf ("%s:reconnect\n", NET_AdrToString (from));
 			newcl = cl;
 			// disconnect the client from the game first so any flags the
@@ -299,15 +289,11 @@ gotnewcl:
 	ent = SV_GentityNum( clientNum );
 	newcl->gentity = ent;
 
-	userMessages[clientNum].clear();
-	userStoredUcmdCounts[clientNum] = 0;
-
 	// save the challenge
 	newcl->challenge = challenge;
 
 	// save the address
 	Netchan_Setup (NS_SERVER, &newcl->netchan , from, qport);
-	NET_HTTP_AllowClient( clientNum, from );
 
 	// save the userinfo
 	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
@@ -363,8 +349,6 @@ gotnewcl:
 }
 
 
-extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
-
 /*
 =====================
 SV_DropClient
@@ -408,7 +392,6 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 
 	// Kill any download
 	SV_CloseDownload( drop );
-	NET_HTTP_DenyClient( drop - svs.clients );
 
 	// tell everyone why they got dropped
 	SV_SendServerCommand( NULL, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name, reason );
@@ -420,40 +403,15 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// this will remove the body, among other things
 	VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
 
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
-
-		if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, drop - svs.clients)) {
-			drop->zombified = qtrue;
-		}
-	}
-
-	if (!drop->zombified) {
-		// add the disconnect command
-		SV_SendServerCommand(drop, "disconnect");
-	}
+	// add the disconnect command
+	SV_SendServerCommand( drop, "disconnect" );
 
 	if ( drop->netchan.remoteAddress.type == NA_BOT ) {
 		SV_BotFreeClient( drop - svs.clients );
 	}
 
-	// Clear associated fragment buffers
-	fragmentBuffers[drop->netchan.remoteAddress.ipi][drop->netchan.remoteAddress.port].clear();
-
-
-	if (!drop->zombified) {
-
-		// nuke user info
-		SV_SetUserinfo(drop - svs.clients, "");
-
-#ifdef SVDEMO
-
-		if (drop->demo.demorecording) {
-			SV_StopRecordDemo(drop);
-		}
-		SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
-		SV_ClearClientDemoMeta(drop);
-#endif
-	}
+	// nuke user info
+	SV_SetUserinfo( drop - svs.clients, "" );
 
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty
@@ -475,57 +433,6 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		SV_Heartbeat_f();
 	}
 }
-
-#ifdef SVDEMO
-void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg) {
-	int			start;
-	entityState_t* base, nullstate;
-
-	// NOTE, MRE: all server->client messages now acknowledge
-	// let the client know which reliable clientCommands we have received
-	MSG_WriteLong(msg, client->lastClientCommand);
-
-	// send any server commands waiting to be sent first.
-	// we have to do this cause we send the client->reliableSequence
-	// with a gamestate and it sets the clc.serverCommandSequence at
-	// the client side
-	SV_UpdateServerCommandsToClient(client, msg,MSG_ALL);
-
-	// send the gamestate
-	MSG_WriteByte(msg, svc_gamestate);
-	MSG_WriteLong(msg, client->reliableSequence);
-
-	// write the configstrings
-	for (start = 0; start < MAX_CONFIGSTRINGS; start++) {
-		if (sv.configstrings[start][0]) {
-			MSG_WriteByte(msg, svc_configstring);
-			MSG_WriteShort(msg, start);
-			MSG_WriteBigString(msg, sv.configstrings[start]);
-		}
-	}
-
-	// write the baselines
-	Com_Memset(&nullstate, 0, sizeof(nullstate));
-	for (start = 0; start < MAX_GENTITIES; start++) {
-		base = &sv.svEntities[start].baseline;
-		if (!base->number) {
-			continue;
-		}
-		MSG_WriteByte(msg, svc_baseline);
-		MSG_WriteDeltaEntity(msg, &nullstate, base, qtrue);
-	}
-
-	MSG_WriteByte(msg, svc_EOF);
-
-	MSG_WriteLong(msg, client - svs.clients);
-
-	// write the checksum feed
-	MSG_WriteLong(msg, sv.checksumFeed);
-
-	// For old RMG system.
-	//MSG_WriteShort(msg, 0);
-}
-#endif
 
 /*
 ================
@@ -576,7 +483,7 @@ void SV_SendClientGameState( client_t *client ) {
 	// we have to do this cause we send the client->reliableSequence
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
-	SV_UpdateServerCommandsToClient( client, &msg, MSG_ALL);
+	SV_UpdateServerCommandsToClient( client, &msg );
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_gamestate );
@@ -629,7 +536,7 @@ void SV_SendClientMapChange( client_t *client )
 	// we have to do this cause we send the client->reliableSequence
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
-	SV_UpdateServerCommandsToClient( client, &msg, MSG_ALL);
+	SV_UpdateServerCommandsToClient( client, &msg );
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_mapchange );
@@ -664,18 +571,11 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	client->lastUserInfoCount = 0; //reset the count
 
 	client->deltaMessage = -1;
-	client->deltaMessageWarning = 0;
 	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 	client->lastUsercmd = *cmd;
 
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
-
-#ifdef SVDEMO
-	if (sv_autoDemo->integer == 1) { //Bots dont trigger this so whatever
-		SV_BeginAutoRecordDemos();
-	}
-#endif
 }
 
 /*
@@ -1119,49 +1019,6 @@ static void SV_ResetPureClient_f( client_t *cl ) {
 	cl->pureAuthentic = 0;
 }
 
-const char* checkedTypeKeys[CHECKEDTYPE_TYPECOUNT] = {
-	"rate",
-	"snaps"
-};
-
-int SV_GetUserInfoKeyVerifiedNumber(client_t* cl, checkedNumberType_t type) {
-	const char* valueString;
-	const char* s;
-	bool invalidValue = false;
-
-	if (type >= CHECKEDTYPE_TYPECOUNT || type < 0) {
-		Com_Error(ERR_FATAL,"SV_GetUserInfoKeyVerifiedNumber: Unknown type %d", (int)type);
-		return 0;
-	}
-
-	valueString = Info_ValueForKey(cl->userinfo, checkedTypeKeys[type]);
-
-	if (!*valueString) {
-		invalidValue = true;
-	}
-	else {
-		s = valueString;
-		while (*s) {
-			if (!(*s >= '0' && *s <= '9' || *s == '-')) {
-				invalidValue = true;
-				break;
-			}
-			s++;
-		}
-	}
-	if (invalidValue) {
-		cl->invalidValues |= (1 << (int)type);
-		Com_Printf("^3Invalid '%s' value detected for client '%s' (%d): '%s'", checkedTypeKeys[type],cl->name,cl-svs.clients,valueString);
-	}
-	else {
-		cl->invalidValues &= ~(1 << (int)type);
-	}
-
-	cl->lastInvalidValuesWarning = 0;
-
-	return atoi(valueString);
-}
-
 /*
 =================
 SV_UserinfoChanged
@@ -1182,8 +1039,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	cl->rate = SV_GetUserInfoKeyVerifiedNumber(cl,CHECKEDTYPE_RATE);
-	cl->snaps = SV_GetUserInfoKeyVerifiedNumber(cl, CHECKEDTYPE_SNAPS);
+	cl->rate = atoi( Info_ValueForKey(cl->userinfo, "rate") );
 	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 && cl->rate < 99999 ) {
 		cl->rate = 99999;	// lans should not rate limit
 	}
@@ -1333,7 +1189,6 @@ void SV_UserinfoChanged( client_t *cl ) {
 #define INFO_CHANGE_MIN_INTERVAL	5000
 #define INFO_CHANGE_MAX_COUNT		4
 
-extern cvar_t* com_coolApi_supported_game;
 /*
 ==================
 SV_UpdateUserinfo_f
@@ -1352,26 +1207,8 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 		cl->lastUserInfoCount++;
 
 		if (cl->lastUserInfoCount >= INFO_CHANGE_MAX_COUNT) {
-			qboolean doWarn = qtrue;
-			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_GAME_VMCALL_PHYSICSFPSUPDATE) {
-				int currentValue = atoi(Info_ValueForKey(cl->userinfo, "com_physicsFps"));
-				int newValue = atoi(Info_ValueForKey(arg, "com_physicsFps"));
-				if (currentValue != newValue) {
-					doWarn = qfalse; // allow fast fps toggles without raising a stink.
-					Info_SetValueForKey(cl->userinfo, "com_physicsFps", Info_ValueForKey(arg, "com_physicsFps")); // set new physicsfps value now.
-					if (!VM_Call(gvm, GAME_COOL_API_PHYSICSFPSUPDATE, cl - svs.clients)) {
-						doWarn = qtrue;
-					}
-				}
-			}
-
 			Q_strncpyz( cl->userinfoPostponed, arg, sizeof(cl->userinfoPostponed) );
-			if (doWarn) {
-				SV_SendServerCommand(cl, "print \"Warning: Too many info changes, last info postponed\n\"\n");
-			}
-			else {
-				SV_SendServerCommand(cl, "print \"Fast toggle detected, allowed. Other changes postponed. Nothing to worry about.\n\"\n");
-			}
+			SV_SendServerCommand(cl, "print \"Warning: Too many info changes, last info postponed\n\"\n");
 			return;
 		}
 	} else {
@@ -1486,12 +1323,6 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	int		seq;
 	const char	*s;
 	qboolean clientOk = qtrue;
-	const char* cmd;
-	const char* arg1;
-	int argc;
-	char		lowercaseCmd[20]; // for levenshtein check. doesnt need to be longer. that long of a cmd wouldn't trigger it anyway
-	int			cmdLen,i;
-
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1501,31 +1332,7 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 		return qtrue;
 	}
 
-	// dont print full login/register commands to not leak pws
-	Cmd_TokenizeString(s);
-	cmd = Cmd_Argv(0);
-	arg1 = Cmd_Argv(1);
-	argc = Cmd_Argc();
-
-	Q_strncpyz(lowercaseCmd, cmd, sizeof(lowercaseCmd));
-	cmdLen = strlen(lowercaseCmd);
-	for (i = 0; i < cmdLen; i++) {
-		lowercaseCmd[i] = tolower(lowercaseCmd[i]);
-	}
-
-	//if ((!Q_stricmp(cmd,"say") || !Q_stricmp(cmd, "say_team")) && (levenshtein(lowercaseCmd, "login") <= 2 && argc >= 4 && argc <= 5 || levenshtein(lowercaseCmd, "register") <= 2 || levenshtein(lowercaseCmd, "changepassword") <= 3)) {
-
-	//}
-	//else 
-	if (levenshtein("login",lowercaseCmd) <= 2 || levenshtein("register",lowercaseCmd) <= 2) {
-		Com_DPrintf("clientCommand: %s : %i : %s %s ****** %s\n", cl->name, seq, cmd, arg1, Cmd_ArgsFrom(3));
-	}
-	else if (levenshtein("changepassword",lowercaseCmd) <= 3) {
-		Com_DPrintf("clientCommand: %s : %i : %s ****** %s\n", cl->name, seq, cmd, Cmd_ArgsFrom(2));
-	}
-	else {
-		Com_DPrintf("clientCommand: %s : %i : %s\n", cl->name, seq, s);
-	}
+	Com_DPrintf( "clientCommand: %s : %i : %s\n", cl->name, seq, s );
 
 	// drop the connection if we have somehow lost commands
 	if ( seq > cl->lastClientCommand + 1 ) {
@@ -1546,17 +1353,7 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	// Applying floodprotect only to "CS_ACTIVE" clients leaves too much room for abuse. Extending floodprotect to clients pre CS_ACTIVE shouldn't cause any issues, as the download-commands are handled within the engine and floodprotect only filters calls to the VM.
 	if ( !com_cl_running->integer && /* cl->state >= CS_ACTIVE && */ sv_floodProtect->integer )
 	{
-		if (!Q_stricmpn(s, "savepos", 7) || !Q_stricmpn(s, "respos", 6)) { // let us spam these a lil bit more, its often annoying otherwise
-			if (sv_floodProtectSaveposRespos->integer == 1 && svs.time < cl->nextReliableTime)
-			{
-				clientOk = qfalse;
-			}
-			else if (SVC_RateLimit(&cl->cmdBucketSaveposRespos, sv_floodProtectSaveposRespos->integer, 1000, svs.time))
-			{
-				clientOk = qfalse;
-			}
-		}
-		else if (sv_floodProtect->integer == 1 && svs.time < cl->nextReliableTime)
+		if ( sv_floodProtect->integer == 1 && svs.time < cl->nextReliableTime )
 		{
 			clientOk = qfalse;
 		}
@@ -1637,12 +1434,11 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t* umsg ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 	int			i, key;
 	int			cmdCount;
-	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX,MAX(MAX_PACKET_USERCMDS_MIN, sv_maxPacketUserCmds->integer));
 	usercmd_t	nullcmd;
-	usercmd_t	cmds[MAX_PACKET_USERCMDS_MAX];
+	usercmd_t	cmds[MAX_PACKET_USERCMDS];
 	usercmd_t	*cmd, *oldcmd;
 
 	if ( delta ) {
@@ -1650,7 +1446,6 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 	} else {
 		cl->deltaMessage = -1;
 	}
-	cl->deltaMessageWarning = 0;
 
 	cmdCount = MSG_ReadByte( msg );
 
@@ -1660,7 +1455,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 	}
 
 	if ( cmdCount > MAX_PACKET_USERCMDS ) {
-		Com_Printf( "cmdCount > MAX_PACKET_USERCMDS (%d)\n", MAX_PACKET_USERCMDS);
+		Com_Printf( "cmdCount > MAX_PACKET_USERCMDS\n" );
 		return;
 	}
 
@@ -1681,13 +1476,8 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 
 	// save time for ping calculation
 	// With sv_pingFix enabled we store the time of the first acknowledge, instead of the last. And we use a time value that is not limited by sv_fps.
-	if (!sv_pingFix->integer || cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked == -1) {
-		cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
-		if (umsg) {
-			umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
-			umsg->pingKnown = qtrue;
-		}
-	}
+	if ( !sv_pingFix->integer || cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked == -1 )
+		cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
 
 	// if this is the first usercmd we have received
 	// this gamestate, put the client into the world
@@ -1705,7 +1495,6 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 
 	if ( cl->state != CS_ACTIVE ) {
 		cl->deltaMessage = -1;
-		cl->deltaMessageWarning = 0;
 		return;
 	}
 
@@ -1726,12 +1515,6 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 		if ( cmds[i].serverTime <= cl->lastUsercmd.serverTime ) {
 			continue;
 		}
-
-		if (umsg) { // save this for sending back if wanted
-			std::unique_ptr<usercmd_t> tmp = std::make_unique<usercmd_t>();
-			*tmp = cmds[i];
-			umsg->cmds.push_back(std::move(tmp));
-		}
 		SV_ClientThink (cl - svs.clients, &cmds[ i ]);
 	}
 }
@@ -1745,29 +1528,6 @@ USER CMD EXECUTION
 ===========================================================================
 */
 
-void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg) {
-	for (int o = 0; o < sv_maxclients->integer; o++) {
-		client_t* clOther = svs.clients + o;
-		if (clOther->state == CS_ACTIVE) {
-			playerState_t* ps = SV_GameClientNum(o);
-			if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl) { // spectators :)
-				userMessage_t* messageDupe = new userMessage_t();
-				*messageDupe = *umsg;
-				userStoredUcmdCounts[o] += messageDupe->cmds.size();
-				userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
-			}
-		}
-	}
-	playerState_t* myps = SV_GameClientNum(myCl);
-	if (myps->clientNum == myCl){// && !(myps->pm_flags & PMF_FOLLOW)) {
-		userStoredUcmdCounts[myCl] += umsg->cmds.size();
-		userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
-	}
-	else {
-		delete umsg;
-	}
-}
-
 /*
 ===================
 SV_ExecuteClientMessage
@@ -1778,7 +1538,6 @@ Parse a client packet
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	int			c;
 	int			serverId;
-	userMessage_t* umsg = NULL;
 
 	MSG_Bitstream(msg);
 
@@ -1793,9 +1552,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	}
 
 	cl->reliableAcknowledge = MSG_ReadLong( msg );
-	if (cl->reliableAcknowledge > cl->demo.clientDemoReliableAcknowledge) {
-		cl->demo.clientDemoReliableAcknowledge = cl->reliableAcknowledge;
-	}
 
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server
@@ -1836,15 +1592,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		cl->oldServerTime = 0;
 	}
 
-	if (sv_ucmdSendback->integer) {
-		if (!((com_coolApi_supported_game->integer & COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED) && (SV_GentityNum(cl - svs.clients)->r.svFlags & SVF_COOLAPI_GAMEGENERATEDSENDBACKUSERCMD))) { // game can override this whole thing.
-			umsg = new userMessage_t();
-			umsg->serverTime = sv.time;
-			umsg->droppedPackets = cl->netchan.dropped;
-			umsg->clientNum = cl - svs.clients;
-		}
-	}
-
 	// read optional clientCommand strings
 	do {
 		c = MSG_ReadByte( msg );
@@ -1864,40 +1611,15 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 
 	// read the usercmd_t
 	if ( c == clc_move ) {
-		SV_UserMove( cl, msg, qtrue, umsg );
+		SV_UserMove( cl, msg, qtrue );
 	} else if ( c == clc_moveNoDelta ) {
-		SV_UserMove( cl, msg, qfalse, umsg );
+		SV_UserMove( cl, msg, qfalse );
 	} else if ( c != clc_EOF ) {
 		Com_Printf( "WARNING: bad command byte for client %i\n", (int)(cl - svs.clients) );
 	}
 //	if ( msg->readcount != msg->cursize ) {
 //		Com_Printf( "WARNING: Junk at end of packet for client %i\n", cl - svs.clients );
 //	}
-
-	if (umsg) {
-		SV_AddUserMessageForClient(cl - svs.clients, umsg);
-		//int myCl = cl - svs.clients;
-		//for (int o = 0; o < sv_maxclients->integer; o++) {
-		//	client_t* clOther = svs.clients + o;
-		//	if (clOther->state == CS_ACTIVE) {
-		//		playerState_t* ps = SV_GameClientNum(o);
-		//		if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl ) { // spectators :)
-		//			userMessage_t* messageDupe = new userMessage_t();
-		//			*messageDupe = *umsg;
-		//			userStoredUcmdCounts[o] += messageDupe->cmds.size();
-		//			userMessages[o].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
-		//		}
-		//	}
-		//}
-		//playerState_t* myps = SV_GameClientNum(cl-svs.clients);
-		//if (myps->clientNum == myCl && !(myps->pm_flags & PMF_FOLLOW)) {
-		//	userStoredUcmdCounts[myCl] += umsg->cmds.size();
-		//	userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
-		//}
-		//else {
-		//	delete umsg;
-		//}
-	}
 }
 
 int SV_ClientRate( client_t *client )
@@ -1919,14 +1641,13 @@ int SV_ClientRate( client_t *client )
 	return Com_Clampi( minRate, maxRate, client->rate );
 }
 
-int SV_ClientSnaps( client_t *client, qboolean spec )
+int SV_ClientSnaps( client_t *client )
 {
 	int maxSnaps = Com_Clampi( 1, sv_fps->integer, sv_maxSnaps->integer );
-	int minSnaps = Com_Clampi( 1, maxSnaps, spec ? sv_minSnapsSpec->integer : sv_minSnaps->integer );
+	int minSnaps = Com_Clampi( 1, maxSnaps, sv_minSnaps->integer );
 
 	// Get the desired snaps value (either sv_fps or the value from the userinfo)
-	//int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
-	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : client->snaps;
+	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
 
 	// Ensure the snaps value is within the allowed range
 	return Com_Clampi( minSnaps, maxSnaps, wishSnaps );
@@ -1934,18 +1655,12 @@ int SV_ClientSnaps( client_t *client, qboolean spec )
 
 void SV_ClientUpdateSnaps( client_t *client )
 {
-	int snapsMsec = 1000 / SV_ClientSnaps( client, qfalse );
-	int snapsMsecSpec = 1000 / SV_ClientSnaps( client, qtrue );
+	int snapsMsec = 1000 / SV_ClientSnaps( client );
 
 	if ( snapsMsec != client->snapshotMsec ) {
 		// Reset next snapshot so we avoid desync between server frame time and snapshot send time
 		client->nextSnapshotTime = -1;
 		client->snapshotMsec = snapsMsec;
-	}
-	if (snapsMsecSpec != client->snapshotMsecSpec ) {
-		// Reset next snapshot so we avoid desync between server frame time and snapshot send time
-		client->nextSnapshotTime = -1;
-		client->snapshotMsecSpec = snapsMsecSpec;
 	}
 }
 

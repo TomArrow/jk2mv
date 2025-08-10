@@ -3,9 +3,9 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: everything
+    branches: eternaljk2
   pull_request:
-    branches: everything
+    branches: eternaljk2
   release:
     types: [created]
 
@@ -14,7 +14,6 @@ jobs:
     name: Build VS 2022 (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
-      fail-fast: false
       matrix:
         build_type: [RelWithDebInfo]
         arch: [Win32]
@@ -22,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: recursive
+        submodules: true
         fetch-depth: 0
 
     - name: Add msbuild to PATH
@@ -41,12 +40,12 @@ jobs:
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v4'
+    #- uses: 'actions/upload-artifact@v3'
     #  with:
     #    name: Windows Binaries (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v4'
+    - uses: 'actions/upload-artifact@v3'
       with:
         name: Windows Package (Installer), ${{ matrix.build_type }}, ${{ matrix.arch }}
         path: ${{github.workspace}}/build/actions/out/*.exe
@@ -79,7 +78,6 @@ jobs:
     name: Build VS 2022 (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
-      fail-fast: false
       matrix:
         build_type: [Debug, RelWithDebInfo]
         arch: [Win32, x64]
@@ -87,7 +85,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: recursive
+        submodules: true
         fetch-depth: 0
 
     - name: Add msbuild to PATH
@@ -106,12 +104,12 @@ jobs:
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v4'
+    #- uses: 'actions/upload-artifact@v3'
     #  with:
     #    name: Windows Binaries (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v4'
+    - uses: 'actions/upload-artifact@v3'
       if: ${{ matrix.build_type == 'RelWithDebInfo' }}
       with:
         name: Windows Package (Portable), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -143,9 +141,8 @@ jobs:
 
   vs2019_xp:
     name: Build VS 2019 (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
-    runs-on: windows-2022
+    runs-on: windows-2019
     strategy:
-      fail-fast: false
       matrix:
         build_type: [Debug, RelWithDebInfo]
         arch: [Win32]
@@ -153,7 +150,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: recursive
+        submodules: true
         fetch-depth: 0
 
     - name: Install WinXP Toolset
@@ -163,9 +160,7 @@ jobs:
         Start-Process -FilePath vs_installer.exe -ArgumentList "modify", "--installPath", "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise", "--add Microsoft.VisualStudio.Component.WinXP", "--quiet", "--norestart", "--nocache" -Wait -PassThru -WindowStyle Hidden
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: '[16.4,16.5)'
+      uses: microsoft/setup-msbuild@v1.1
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build/actions
@@ -173,19 +168,19 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{github.workspace}}/build/actions
-      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF
+      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build/actions
       shell: cmd
       run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
 
-    #- uses: 'actions/upload-artifact@v4'
+    #- uses: 'actions/upload-artifact@v3'
     #  with:
     #    name: Windows Binaries (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v4'
+    - uses: 'actions/upload-artifact@v3'
       if: ${{ matrix.build_type == 'RelWithDebInfo' }}
       with:
         name: Windows Package (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -217,9 +212,8 @@ jobs:
 
   macos:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
-    runs-on: macos-14
+    runs-on: macos-12
     strategy:
-      fail-fast: false
       matrix:
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
@@ -228,7 +222,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: recursive
+        submodules: true
         fetch-depth: 0
 
     - name: Set CMake parameters
@@ -261,12 +255,12 @@ jobs:
       shell: bash
       run: make package
 
-    #- uses: 'actions/upload-artifact@v4'
+    #- uses: 'actions/upload-artifact@v3'
     #  with:
     #    name: macOS Binaries (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v4'
+    - uses: 'actions/upload-artifact@v3'
       if: ${{ matrix.build_type == 'Release' }}
       with:
         name: macOS Package (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
@@ -302,17 +296,15 @@ jobs:
     name: Build Linux (${{ matrix.portable }} - ${{ matrix.container_image }}), ${{ matrix.build_type }}
     runs-on: ubuntu-22.04
     strategy:
-      fail-fast: false
       matrix:
-        #arch: [x86, x86_64]
-        container_image: ["ubuntu:22.04"] #, "i386/ubuntu:22.04"]
+        container_image: ["ubuntu:16.04", "i386/ubuntu:16.04"]
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
 
     steps:
     - uses: actions/checkout@v3
       with:
-        submodules: recursive
+        submodules: true
         fetch-depth: 0
 
     - name: Determine parameters
@@ -336,7 +328,7 @@ jobs:
         podman pull docker.io/${{ matrix.container_image }}
         podman run --name buildenv -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
         podman exec buildenv apt-get update
-        podman exec buildenv apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file
+        podman exec buildenv apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm
         mkdir -p ${{github.workspace}}/build/actions
 
     - name: Configure CMake
@@ -351,12 +343,12 @@ jobs:
       shell: bash
       run: podman exec -w /jk2mv/build/actions buildenv make package
 
-    #- uses: 'actions/upload-artifact@v4'
+    #- uses: 'actions/upload-artifact@v3'
     #  with:
     #    name: ${{ steps.parameters.outputs.BINARTIFACTNAME }}
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
-    - uses: 'actions/upload-artifact@v4'
+    - uses: 'actions/upload-artifact@v3'
       if: ${{ matrix.build_type == 'Release' }}
       with:
         name: ${{ steps.parameters.outputs.PKGARTIFACTNAME }}
@@ -388,34 +380,3 @@ jobs:
               );
             }
           }
-
-
-  create-latest:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/everything'
-    needs: [vs2022-installer,vs2022,macos,linux]
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-            path: ./artifacts
-
-      - name: Create binary archives
-        run: |
-            ls -l
-            find ./artifacts -type d -mindepth 1 -maxdepth 1 -exec 7z a -r "{}.zip" "{}/*" \;
-
-      - name: Create latest build
-        uses: TomArrow/GH-Automatic-Releases@v1
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: "latest-postxp"
-          prerelease: false
-          title: Latest Build
-          files: |
-            artifacts/*.zip
-            

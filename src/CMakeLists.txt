@@ -13,8 +13,6 @@ if (BuildMVMP OR BuildMVDED)
 	# mongoose
 	set(MVMPDEDLibraries ${MVMPDEDLibraries} ${MONGOOSE_LIBRARIES})
 	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MONGOOSE_INCLUDE_DIRS})
-	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MARIADBCPP_INCLUDES})
-	message(STATUS "MariaDB includes: ${MARIADBCPP_INCLUDES}") 
 	
 	if(WIN32)
 		set(MVMPDEDLibraries ${MVMPDEDLibraries} "winmm" "ws2_32")
@@ -25,9 +23,21 @@ if (BuildMVMP OR BuildMVDED)
 	endif()
 
 	# zlib
+	if(NOT UseInternalZLIB)
+		find_package(ZLIB)
+		if(NOT ZLIB_FOUND)
+			message(FATAL_ERROR "zlib dev files not found! Install it or set UseInternalZLIB ON")
+		endif()
+	endif()
 	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${ZLIB_INCLUDE_DIRS})
 	
 	# minizip
+	if(NOT UseInternalMiniZip)
+		find_package(MiniZip)
+		if(NOT MINIZIP_FOUND)
+			message(FATAL_ERROR "minizip dev files not found! Install it or set UseInternalMiniZip ON")
+		endif()
+	endif()
 	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MINIZIP_INCLUDE_DIRS})
 	
 	# Source
@@ -135,14 +145,8 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/qfiles.h"
 		"qcommon/q_shared.h"
 		"qcommon/strip.h"
-		"qcommon/stringed_ingame.h"
-		"qcommon/stringed_interface.h"
 		"qcommon/tags.h"
 		"qcommon/vm_local.h"
-		"qcommon/mariadb.h"
-		"qcommon/crypt_blowfish.h"
-		"qcommon/randombytes.h"
-		"qcommon/levenshtein.h"
 
 		"qcommon/CNetProfile.cpp"
 		"qcommon/GenericParser2.cpp"
@@ -166,21 +170,15 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/q_math.cpp"
 		"qcommon/q_shared.cpp"
 		"qcommon/strip.cpp"
-		"qcommon/stringed_ingame.cpp"
-		"qcommon/stringed_interface.cpp"
 		"qcommon/vm.cpp"
 		"qcommon/vm_interpreted.cpp"
-		"qcommon/mariadb.cpp"
-		"qcommon/crypt_blowfish.cpp"
-		"qcommon/randombytes.cpp"
-		"qcommon/levenshtein.cpp"
 	)
 
 	if(ARCH_X86)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_x86.cpp"
 		)
-	elseif(ARCH_ARM32)
+	elseif(ARCH_ARM)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}
 			"qcommon/vm_arm.cpp"
 		)
@@ -220,7 +218,6 @@ if (BuildMVMP OR BuildMVDED)
 
 			"win32/q3asm.asm"
 		)
-		set_source_files_properties("win32/q3asm.asm" PROPERTIES LANGUAGE ASM_MASM)
 		source_group("win32" FILES ${MVMPDEDWIN32Files})
 		set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} "${LIBDir}/StackWalker/include")
 		set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDWIN32Files})
@@ -326,14 +323,23 @@ if (BuildMVMP)
 
 	# EAX
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/eax")
-	
-	# ReShade API
-	set(MVMPIncludeDirs ${MVMPIncludeDirs} "${LIBDir}/reshade_api")
 
 	# JPEG
+	if(NOT UseInternalJPEG)
+		find_package(JPEG)
+		if(NOT JPEG_FOUND)
+			message(FATAL_ERROR "libjpeg dev files not found! Install it or set UseInternalJPEG ON")
+		endif()
+	endif()
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} ${JPEG_INCLUDE_DIR})
 
 	# PNG
+	if(NOT UseInternalPNG)
+		find_package(PNG)
+		if(NOT PNG_FOUND)
+			message(FATAL_ERROR "libpng dev files not found! Install it or set UseInternalPNG ON")
+		endif()
+	endif()
 	set(MVMPIncludeDirs ${MVMPIncludeDirs} ${PNG_INCLUDE_DIRS})
 
 	# Source
@@ -366,7 +372,6 @@ if (BuildMVMP)
 		"client/cl_net_chan.cpp"
 		"client/cl_parse.cpp"
 		"client/cl_scrn.cpp"
-		"client/cl_tc_vis.cpp"
 		"client/cl_ui.cpp"
 		"client/snd_dma.cpp"
 		"client/snd_mem.cpp"
@@ -464,9 +469,6 @@ if (BuildMVMP)
 		set_source_files_properties(${LibFiles} PROPERTIES COMPILE_FLAGS "-w")
 	endif()
 
-	# Defines
-	set(MVMPDefines "_HAS_STD_BYTE=0")
-
 	# Project
 	if(WIN32)
 		add_executable(${MVMP} WIN32 ${MVMPFiles})
@@ -499,15 +501,15 @@ if (BuildMVMP)
 	endif()
 
 	target_compile_definitions(${MVMP}
-		PRIVATE ${GlobalDefines} ${MVMPDefines}
+		PRIVATE ${GlobalDefines}
 		PRIVATE $<$<CONFIG:Debug>:${DebugDefines}>
 		PRIVATE $<$<CONFIG:Release>:${ReleaseDefines}>
 		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
 	)
 
-	set_target_properties(${MVMP} PROPERTIES CXX_STANDARD 17)
+	set_target_properties(${MVMP} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVMP} PROPERTIES INCLUDE_DIRECTORIES "${MVMPIncludeDirs}")
-	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES} ${MARIADB_LIBRARIES})
+	target_link_libraries(${MVMP} ${MVMPLibraries} ${JPEG_LIBRARIES} ${PNG_LIBRARIES} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 	set_target_properties(${MVMP} PROPERTIES PROJECT_LABEL "JK2MV MP Client")
 
 	# installation
@@ -543,14 +545,12 @@ if (BuildMVMP)
 	endif()
 
 	# jk2mvmenu and assetsmv are required to run JK2MV
-	# TA: Don't do this. It makes QVM recompile every time you try to compile client. Too annoying.
-	# These are required to run JK2MV but NOT to compile it. They will still get built when you build all.
-	#add_dependencies(${MVMP} ${MVMENU} assetsmv)
-	#add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
+	add_dependencies(${MVMP} ${MVMENU} assetsmv)
+	add_dependencies(${MVMP} ${MVMENU} assets-jk2pro)
 
-	#if(BuildMVSDK)
-	#	add_dependencies(${MVMP} bins-jk2pro)
-	#endif()
+	if(BuildMVSDK)
+		add_dependencies(${MVMP} bins-jk2pro)
+	endif()
 
 	# mvmenu is now built from source conainted in the mvsdk submodule
 	set(MVMENUDefines "GAME_EXPORTS")
@@ -578,7 +578,6 @@ if (BuildMVMP)
 		"mvsdk/code/ui/ui_gameinfo.c"
 		"mvsdk/code/ui/ui_shared.c"
 		"mvsdk/code/ui/ui_multiversion.c"
-		"mvsdk/code/ui/ui_saber.c"
 
 		"mvsdk/code/game/bg_misc.c"
 		"mvsdk/code/game/bg_weapons.c"
@@ -641,7 +640,7 @@ if (BuildMVDED)
 	set(MVDEDFiles ${MVDEDFiles} ${MVDEDNullFiles})
 
 	# Defines
-	set(MVDEDDefines "DEDICATED" "_HAS_STD_BYTE=0")
+	set(MVDEDDefines "DEDICATED")
 
 	# Project
 	add_executable(${MVDED} ${MVDEDFiles})
@@ -653,18 +652,16 @@ if (BuildMVDED)
 		PRIVATE $<$<CONFIG:RelWithDebInfo>:${ReleaseDefines}>
 	)
 
-	set_target_properties(${MVDED} PROPERTIES CXX_STANDARD 17)
+	set_target_properties(${MVDED} PROPERTIES CXX_STANDARD 11)
 	set_target_properties(${MVDED} PROPERTIES INCLUDE_DIRECTORIES "${MVDEDIncludeDirs}")
-	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES} ${MARIADB_LIBRARIES})
+	target_link_libraries(${MVDED} ${MVDEDLibraries} ${MINIZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 	set_target_properties(${MVDED} PROPERTIES PROJECT_LABEL "JK2MV MP Dedicated Server")
 
-	# TA: Don't do this. It makes QVM recompile every time you try to compile client. Too annoying.
-	# These are required to run JK2MV but NOT to compile it. They will still get built when you build all.
-	# add_dependencies(${MVDED} assetsmv)
+	add_dependencies(${MVDED} assetsmv)
 
-	#if(BuildMVSDK)
-	#	add_dependencies(${MVDED} bins-jk2pro)
-	#endif()
+	if(BuildMVSDK)
+		add_dependencies(${MVDED} bins-jk2pro)
+	endif()
 
 	# installation
 	if(WIN32 OR APPLE OR BuildPortableVersion)

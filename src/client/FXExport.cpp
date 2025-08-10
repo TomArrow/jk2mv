@@ -59,7 +59,6 @@ void FX_PlayBoltedEffectID( int id, sharedBoltInterface_t *fxObj )
 void FX_AddScheduledEffects( void )
 {
 	theFxScheduler.AddScheduledEffects();
-	tc_vis_render();
 }
 
 int FX_InitSystem( void )

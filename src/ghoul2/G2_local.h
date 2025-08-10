@@ -5,9 +5,8 @@
 class CMiniHeap;
 
 // internal surface calls  G2_surfaces.cpp
-qboolean	G2_SetSurfaceOnOff(CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName, const int offFlags);
-void		G2_SetSurfaceOnOffFromSkin(CGhoul2Info *ghlInfo, qhandle_t renderSkin);
-int			G2_IsSurfaceOff(CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName);
+qboolean	G2_SetSurfaceOnOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName, const int offFlags);
+int			G2_IsSurfaceOff (CGhoul2Info *ghlInfo, surfaceInfo_v &slist, const char *surfaceName);
 qboolean	G2_SetRootSurface(g2handle_t g2h, CGhoul2Info_v &ghoul2, const int modelIndex, const char *surfaceName);
 int			G2_AddSurface(CGhoul2Info *ghoul2, int surfaceNumber, int polyNumber, float BarycentricI, float BarycentricJ, int lod );
 qboolean	G2_RemoveSurface(surfaceInfo_v &slist, const int index);
@@ -77,14 +76,14 @@ void		G2_RemoveRedundantBolts(boltInfo_v &bltlist, surfaceInfo_v &slist, int *ac
 
 
 // API calls - G2_API.cpp
-int			G2API_GetMaxModelIndex(int vmIndex);
+int			G2API_GetMaxModelIndex(bool ricksCrazyOnServer);
 qhandle_t	G2API_PrecacheGhoul2Model(const char *fileName);
 CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h);
 
 int			G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelIndex, qhandle_t customSkin = 0,
 	qhandle_t customShader = 0, int modelFlags = 0, int lodBias = 0);
 qboolean	G2API_SetLodBias(CGhoul2Info *ghlInfo, int lodBias);
-qboolean	G2API_SetSkin(g2handle_t g2h, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin);
+qboolean	G2API_SetSkin(CGhoul2Info_v& ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin);
 qboolean	G2API_SetShader(CGhoul2Info *ghlInfo, qhandle_t customShader);
 qboolean	G2API_HasGhoul2ModelOnIndex(const g2handle_t *g2hPtr, const int modelIndex);
 qboolean	G2API_RemoveGhoul2Model(g2handle_t *g2hPtr, const int modelIndex);
@@ -156,15 +155,13 @@ void		G2API_LoadGhoul2Models(g2handle_t g2h, char *buffer);
 void		G2API_LoadSaveCodeDestructGhoul2Info(g2handle_t g2h);
 void		G2API_FreeSaveBuffer(char *buffer);
 char		*G2API_GetAnimFileNameIndex(qhandle_t modelIndex);
-int			G2API_GetSurfaceRenderStatus(g2handle_t g2h, int modelIndex, const char *surfaceName);
+int			G2API_GetSurfaceRenderStatus(CGhoul2Info_v& ghoul2, int modelIndex, const char *surfaceName);
 void		G2API_CopySpecificG2Model(g2handle_t g2hFrom, int modelFrom, g2handle_t g2hTo, int modelTo);
 void		G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr);
-qboolean	G2API_SkinlessModel(g2handle_t g2h, int modelIndex);
-
-void		FixGhoul2InfoLeaks(int tableIndex);
-void		SetGhoul2TableIndex(int index);
 
 extern qboolean gG2_GBMNoReconstruct;
 extern qboolean gG2_GBMUseSPMethod;
 // From tr_ghoul2.cpp
 void		G2_ConstructGhoulSkeleton( CGhoul2Info_v &ghoul2, const int frameNum, const qhandle_t *modelList, bool checkForNewOrigin, const vec3_t angles, const vec3_t position, const vec3_t scale, bool modelSet);
+
+qboolean	G2API_SkinlessModel(CGhoul2Info_v& ghoul2, int modelIndex);

@@ -12,8 +12,6 @@
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
-extern	clientRendererInfo_t	clRenderInfo;
-
 // Wind
 extern vec3_t cl_windVec;
 
@@ -81,9 +79,7 @@ typedef struct {
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
-#define	MAX_PARSE_ENTITIES	4096
-#define SERVERTIME_DELTA_SMOOTH_SAMPLES	100 // samples used for averaging
-//#define	MAX_PARSE_ENTITIES	32768
+#define	MAX_PARSE_ENTITIES	2048
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
@@ -93,8 +89,6 @@ typedef struct {
 
 	int			serverTime;			// may be paused during play
 	int			oldServerTime;		// to prevent time from flowing bakcwards
-	int			serverTimeNoTN;
-	int			oldServerTimeNoTN;
 	int			oldFrameServerTime;	// to check tournament restarts
 	int			serverTimeDelta;	// cl.serverTime = cls.realtime + cl.serverTimeDelta
 									// this value changes as net lag varies
@@ -112,26 +106,14 @@ typedef struct {
 	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
 
 	// cgame communicates a few values to the client system
-	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+	usercmd_t	cgameUserCmd;
+	unsigned int cgameUserCmdFlags;
 	vec3_t		cgameViewAngleForce;
 	int			cgameViewAngleForceTime;
 	float		cgameTurnExtentAdd;
 	float		cgameTurnExtentSub;
 	int			cgameTurnExtentTime;
 	float		cgameSensitivity;
-
-	int			cgameForceSelection;
-	int			cgameInvenSelection;
-
-	int			cgameUpmove;
-	int			cgameRightmove;
-	int			cgameForwardmove;
-	int			cgameMoveSet;
-
-	int			cgameYawAngle;
-	int			cgamePitchAngle;
-	int			cgameRollAngle;
-	int			cgameAngleSet;
 
 	qboolean	gcmdSendValue;
 	byte		gcmdValue;
@@ -141,10 +123,8 @@ typedef struct {
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
-	usercmd_t	temporaryCmd;		// temporary cmd when using com_physicsFps to have up to date view angles.
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
-	qboolean	newCmdsGenerated;	// For com_physicsfps. Let us know whether new cmds were generated on this frame. If not, don't send out new packets.
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
 
@@ -165,32 +145,9 @@ typedef struct {
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
 
 	char			*mSharedMemory;
-
-	predictedMovement_t	predictedMovement;
-	qboolean		predictedMovementIsSet;
-
-	int				snapshotReceivedRealTimes[PACKET_BACKUP]; // Cool API "get time since snapshot received"
-
-	// cl_dynamicUserPacket (send all cmds needed to go from the server's current commandTime to the newest available
-	int				serverMaxPacketUserCmds;
-	int				playerCommandTime;
-	qboolean		playerCommandTimeValid; // we might be spectating someone, then commandTime is invalid.
-
-	struct {
-		// Every 1/10s we save a sample into pastDeltas.
-		// Then we copy the pastDeltas, sort them, and index 4 is the value we use.
-		// Essentially it's the median of the lowest 10 values.
-		// During strong lag, that should give us a solid idea of the true latency
-		// to the server
-		int	pastDeltas[SERVERTIME_DELTA_SMOOTH_SAMPLES];
-		int pastDeltasCount;
-		int lastDeltaTime; // we save a sample once every 1/10 s. So 10 seconds will fill up our sample buffer
-		int medianValue;
-	} serverTimeDeltaSmooth;
 } clientActive_t;
 
 extern	clientActive_t		cl;
-extern	ezDemoBuffer_t		ezDemoBuffer;
 
 /*
 =============================================================================
@@ -255,16 +212,13 @@ typedef struct {
 	int udpdl;
 
 	// demo information
-	char		demoName[MAX_OSPATH];
+	char		demoName[MAX_QPATH];
 	qboolean	spDemoRecording;
 	qboolean	demorecording;
 	qboolean	demoplaying;
-	int			demowaiting;	// don't record until a non-delta message is received. Changed to int. 0=not waiting. 1=waiting for delta message with correct deltanum. 2= waiting for full snapshot
-	qboolean	demoSkipPacket;
+	qboolean	demowaiting;	// don't record until a non-delta message is received
 	qboolean	firstDemoFrameSkipped;
-	int			demoLastWrittenSequenceNumber;
 	fileHandle_t	demofile;
-	qboolean	demoIsCompressed;
 
 	int			timeDemoFrames;		// counter of rendered frames
 	int			timeDemoStart;		// cls.realtime before first frame
@@ -278,8 +232,6 @@ typedef struct {
 } clientConnection_t;
 
 extern	clientConnection_t clc;
-
-
 
 /*
 ==================================================================
@@ -334,34 +286,7 @@ typedef struct {
 	netadr_t server;
 } blacklistentry_t;
 
-
-typedef enum fpsGuessMethod3SampleType_s {
-	FPSGUESSSAMPLE_MEASURED,
-	FPSGUESSSAMPLE_MEASURED_SLIDE,
-	FPSGUESSSAMPLE_REPEAT
-}fpsGuessMethod3SampleType_t;
-
-typedef struct fpsGuessMethod3HistorySample_s {
-	int globalTime;
-	fpsGuessMethod3SampleType_t sampleType;
-	float measuredEffectiveGravity;
-} fpsGuessMethod3HistorySample_t;
-
-
-typedef enum showMouseSampleFlags_s {
-	SMSF_CLOSE_TO_VERTICAL_LIMIT = (1 << 0),
-	SMSF_TOUCHING_VERTICAL_LIMIT = (1 << 1)
-} showMouseSampleFlags_t;
-
-typedef struct showMouseSample_s {
-	vec2_t		angleDelta;
-	float		angleChangeSpeed;
-	float		angleChangeSpeedXY[2];
-	int			cmdTimeDelta;
-	int			flags;
-} showMouseSample_t;
-
-typedef struct clientStatic_s {
+typedef struct {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
 
@@ -426,67 +351,12 @@ typedef struct clientStatic_s {
 	qboolean ignoreNextDownloadList;
 
 	int			fixes;
-
+	qboolean	submodelBypass;
 
 	//EternalJK2MV
 	struct {
 		fileHandle_t	chat;
 	} log;
-
-	#define SHOWMOUSE_PAST_SAMPLES 400
-
-	#define FPS_GUESS_METHOD2_MSEC_LIMIT 100
-	#define FPS_GUESS_METHOD2_FRAMEAVG_COUNT 30
-	#define FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT 20
-	#define FPS_GUESS_METHOD3_MAX_FRAMEAVG_COUNT 10
-	#define FPS_GUESS_METHOD3_MSEC_LIMIT 100
-	#define FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY 5
-	#define FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES 1000
-	
-	struct {
-		int lastPsCommandTime;
-		vec3_t lastVelocity;
-		vec3_t lastPosition;
-		qboolean lastMovementDown;
-		int lastCertainGuessedFps;
-		int lastCertainGuessedFpsServerTime;
-		int lastGuessedFps;
-		int lastGuessedFpsPercentage;
-		int currentGuessedFps;
-		int lastGuessedFpsServerTime;
-		int method2PossibleMsecValues[FPS_GUESS_METHOD2_PRIME_REVERSE_LOOKUP_COUNT];
-		int method3PossibleMsecValues[FPS_GUESS_METHOD3_POSSIBILITIES_DISPLAY];
-		int method3EffectiveFPSGravities[FPS_GUESS_METHOD3_MSEC_LIMIT];
-		fpsGuessMethod3HistorySample_t method3MeasuredGravitySamples[FPS_GUESS_METHOD3_HISTORY_LINE_DRAW_SAMPLES];
-		int method3MeasuredGravitySamplesIndex = 0;
-		int method3MeasuredGravityGlobalTime = 0;
-		float method3MeasuredEffectiveGravity;
-		qboolean lastFrameWasMeasured;
-		qboolean lastFrameWasSlide;
-	} fpsGuess;
-
-	struct {
-		showMouseSample_t	samples[SHOWMOUSE_PAST_SAMPLES];
-		int		angleDeltaIndex;
-		vec2_t	oldAngle;
-		int		oldCommandTime;
-		int		oldDrawDeltaIndex;
-		vec2_t	centerOffset;
-	} showMouse;
-
-	struct { // Data for a reasonable number of past frames.
-		float maxVelocity;
-		float maxVelocityV;
-		float maxVelocityH;
-		float maxVelocityDelta;
-		float maxVelocityDeltaV;
-		float maxVelocityDeltaH;
-	} showVelocity;
-
-
-	qboolean	submodelBypass;
-
-	int			cs_remaps;
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -509,13 +379,13 @@ typedef struct {
 	// or contains `CON_WRAP_CHAR' indicating a line wrap.
 	conChar_t	text[CON_TEXTSIZE];
 
-	size_t	current;		// line where next message will be printed
+	int		current;		// line where next message will be printed
 	int		x;				// offset in current line for next print
 	int		display;		// bottom of console displays this line
 
-	size_t 	linewidth;		// characters across screen
-	size_t	rowwidth;		// timestamp, text and line wrap character
-	size_t	totallines;		// total lines in console scrollback
+	int 	linewidth;		// characters across screen
+	int		rowwidth;		// timestamp, text and line wrap character
+	int		totallines;		// total lines in console scrollback
 
 	int		charWidth;		// Scaled console character width
 	int		charHeight;		// Scaled console character height
@@ -549,39 +419,11 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
-extern	cvar_t	* cl_showVelocity;
-extern	cvar_t	* cl_showVelocityAllowNegative;
-extern	cvar_t	* cl_showMouse;
-extern	cvar_t	* cl_showMouseScale;
-extern	cvar_t	* cl_showMouseYScale;
-extern	cvar_t	* cl_showMouseVelocityScale;
-extern	cvar_t	* cl_showMouseVelocityYScale;
-extern	cvar_t	* cl_showMouseVelocityTimeScale;
-extern	cvar_t	* cl_showMouseDecay;
-extern	cvar_t	* cl_showMouseFadeExp;
-extern	cvar_t	* cl_showMouseVelocityExp;
-extern	cvar_t	* cl_showMouseVelocityLog;
-extern	cvar_t	* cl_fpsGuess;
-extern	cvar_t	* cl_drawPS;
-extern	cvar_t	* cl_fpsGuessMode;
-extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
-extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
-extern	cvar_t	* cl_fpsGuessMethod2DebugDumpPrimeResiduals;
-extern	cvar_t	* cl_fpsGuessMethod3FrameAvgCount;
-extern	cvar_t	* cl_fpsGuessMethod3GravityMatchPrecision;
-extern	cvar_t	* cl_fpsGuessMethod3ReferenceLines;
 extern	cvar_t	*cl_maxpackets;
-extern	cvar_t  *cl_maxPacketUserCmds;
-extern	cvar_t  *cl_dynamicUserPacket;
 extern	cvar_t	*cl_packetdup;
-extern	cvar_t	*cl_snapOrderTolerance;
-extern	cvar_t	*cl_snapOrderToleranceDemoSkipPackets;
 extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;
-extern	cvar_t	*cl_timeNudgeAntiLagHack;
-extern	cvar_t	*cl_timeNudgeSafeServerTime;
-extern	cvar_t	*cl_smoothenSnapLag;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 
@@ -613,8 +455,6 @@ extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
 extern	cvar_t	*cl_aviMotionJpeg;
 extern  cvar_t  *cl_aviMotionJpegQuality;
-extern	cvar_t	*cl_aviPipeFormat;
-extern	cvar_t	*cl_aviPipeExtension;
 
 extern	cvar_t	*cl_activeAction;
 
@@ -627,8 +467,6 @@ extern	cvar_t	*mv_menuOverride;
 extern	cvar_t	*cl_autoDemo;
 extern	cvar_t	*cl_autoDemoFormat;
 
-extern	cvar_t	*cl_numpadNumberBinds;
-
 //=================================================
 
 //
@@ -639,11 +477,6 @@ void CL_Init (void);
 void CL_FlushMemory( qboolean disconnecting );
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
-void CL_ConfigstringModified(void);
-
-#define CL_EZDEMO
-
-qboolean CL_StringStartsWith(const char* str, const char* check);
 
 qboolean CL_ServerVersionIs103 (const char *versionstr);
 
@@ -679,13 +512,10 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 
 void CL_GetVMGLConfig(vmglconfig_t *vmglconfig);
 int CL_ScaledMilliseconds(void);
-void CL_ShaderStateChanged( void );
 
 //EternalJK2MV
 void CL_RandomizeColors(const char* in, char *out);
 void CL_LogPrintf(fileHandle_t fileHandle, const char *fmt, ...);
-
-qboolean CL_NoDelay( void );
 
 //
 // cl_input
@@ -708,7 +538,7 @@ void IN_CenterView (void);
 
 void CL_VerifyCode( void );
 
-float CL_KeyState (kbutton_t *key, qboolean temporaryViewAnglesOnly = qfalse);
+float CL_KeyState (kbutton_t *key);
 const char *Key_KeynumToString( int keynum/*, qboolean bTranslate */ ); //note: translate is only called for menu display not configs
 
 int Key_GetProtocolKey15(mvversion_t protocol, int key15);
@@ -827,7 +657,7 @@ void LAN_SaveServersToCache();
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 void CL_Netchan_TransmitNextFragment( netchan_t *chan );
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg, int* sequenceNumber = NULL, qboolean* validButOutOfOrder = NULL);
+qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 
 // cg_demos_auto.c
 
@@ -838,15 +668,9 @@ extern void demoAutoRecord(void);
 extern void demoAutoInit(void);
 
 //
-// cl_tc_vis.c
-//
-void tc_vis_init(void);
-void tc_vis_render(void);
-
-//
 // cl_avi.c
 //
-qboolean CL_OpenAVIForWriting( const char *filename, qboolean pipe );
+qboolean CL_OpenAVIForWriting( const char *filename );
 void CL_TakeVideoFrame( void );
 void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
 void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );

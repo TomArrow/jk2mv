@@ -73,9 +73,9 @@ VM_Init
 ==============
 */
 void VM_Init( void ) {
-	Cvar_Get( "vm_cgame", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
-	Cvar_Get( "vm_game", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
-	Cvar_Get( "vm_ui", "2", CVAR_ARCHIVE );		// !@# SHIP WITH SET TO 2
+	Cvar_Get( "vm_cgame", "0", CVAR_ARCHIVE );
+	Cvar_Get( "vm_game", "0", CVAR_ARCHIVE );
+	Cvar_Get( "vm_ui", "0", CVAR_ARCHIVE );
 
 	Cmd_AddCommand ("vmprofile", VM_VmProfile_f );
 	Cmd_AddCommand ("vminfo", VM_VmInfo_f );
@@ -413,7 +413,7 @@ void VM_LoadSymbols( vm_t *vm ) {
 		}
 
 		vm->numSymbols += count;
-		Com_DPrintf( "%i symbols parsed from %s\n", count, symbols );
+		Com_Printf( "%i symbols parsed from %s\n", count, symbols );
 		FS_FreeFile( mapfile.v );
 	} else {
 		const char	*symName = "vmMain";
@@ -536,7 +536,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc)
 
 	// load the image
 	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", vm->name );
-	Com_DPrintf( "Loading vm file %s...\n", filename );
+	Com_Printf( "Loading vm file %s...\n", filename );
 
 	FS_ReadFile(filename, &header.v);
 
@@ -714,7 +714,6 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 	Q_strncpyz(vm->name, module, sizeof(vm->name));
 
 	vm->mvmenu = 0;
-	vm->index = i;
 
 	if (interpret == VMI_NATIVE) {
 		// try to load as a system dll
@@ -778,7 +777,7 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 	vm->programStack = vm->dataMask + 1;
 	vm->stackBottom = vm->programStack - PROGRAM_STACK_SIZE;
 
-	Com_DPrintf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
+	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
 
 	vm->gameversion = MV_GetCurrentGameversion();
 
@@ -1080,9 +1079,8 @@ intptr_t QDECL  __attribute__((no_sanitize_address)) VM_Call( vm_t *vm, int call
 	}
 	--vm->callLevel;
 
-	if ( oldVM != NULL ) {
+	if ( oldVM != NULL )
 	  currentVM = oldVM;
-	}
 	return r;
 }
 
@@ -1328,13 +1326,6 @@ void VM_SetMVAPILevel(vm_t *vm, int level) {
 	vm->mvapilevel = level;
 }
 
-void VM_SetCoolApiSupport(vm_t *vm, int flags) {
-	vm->coolApiSupport = flags;
-}
-int VM_CoolApiSupport(vm_t *vm) {
-	return vm->coolApiSupport;
-}
-
 void VM_SetMVMenuLevel(vm_t *vm, int level) {
 	vm->mvmenu = level;
 }
@@ -1349,9 +1340,4 @@ mvversion_t VM_GetGameversion(const vm_t *vm) {
 
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion) {
 	vm->gameversion = gameversion;
-}
-
-int VM_GetIndex(const vm_t *vm)
-{
-	return vm->index;
 }

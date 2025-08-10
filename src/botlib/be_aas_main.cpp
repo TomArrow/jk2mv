@@ -125,16 +125,14 @@ int AAS_IndexFromModel(char *modelname)
 void AAS_UpdateStringIndexes(int numconfigstrings, char *configstrings[])
 {
 	int i;
-	unsigned long allocSize;
 	//set string pointers and copy the strings
 	for (i = 0; i < numconfigstrings; i++)
 	{
 		if (configstrings[i])
 		{
 			//if (aasworld.configstrings[i]) FreeMemory(aasworld.configstrings[i]);
-			allocSize = (unsigned long)strlen(configstrings[i]) + 1;
-			aasworld.configstrings[i] = (char *)GetMemory(allocSize);
-			Q_strncpyz(aasworld.configstrings[i], configstrings[i], allocSize);
+			aasworld.configstrings[i] = (char *)GetMemory((unsigned long)strlen(configstrings[i]) + 1);
+			strcpy(aasworld.configstrings[i], configstrings[i]);
 		} //end if
 	} //end for
 	aasworld.indexessetup = qtrue;
@@ -298,7 +296,7 @@ int AAS_LoadFiles(const char *mapname)
 	char aasfile[MAX_PATH];
 //	char bspfile[MAX_PATH];
 
-	Q_strncpyz(aasworld.mapname, mapname, sizeof(aasworld.mapname));
+	strcpy(aasworld.mapname, mapname);
 	//NOTE: first reset the entity links into the AAS areas and BSP leaves
 	// the AAS link heap and BSP link heap are reset after respectively the
 	// AAS file and BSP file are loaded
@@ -307,13 +305,13 @@ int AAS_LoadFiles(const char *mapname)
 	AAS_LoadBSPFile();
 
 	//load the aas file
-	Com_sprintf(aasfile, sizeof(aasfile), "maps/%s.aas", mapname);
+	Com_sprintf(aasfile, MAX_PATH, "maps/%s.aas", mapname);
 	errnum = AAS_LoadAASFile(aasfile);
 	if (errnum != BLERR_NOERROR)
 		return errnum;
 
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", aasfile);
-	Q_strncpyz(aasworld.filename, aasfile, sizeof(aasworld.filename));
+	strncpy(aasworld.filename, aasfile, MAX_PATH);
 	return BLERR_NOERROR;
 } //end of the function AAS_LoadFiles
 //===========================================================================

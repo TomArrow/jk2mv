@@ -7,15 +7,12 @@
 # files from the root of the tarball to this folder, and then moving the public
 # header files (zlib.h, zconf.h) into the include/ subfolder.
 #
-# The current bundled copy comes from the zlib 1.2.8 release.
+# The current bundled copy comes from the zlib 1.2.13 release.
 
 include_directories(include/)
 
-add_definitions(-DHAVE_STDARG_H)
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-else()
-	add_definitions(-DHAVE_UNISTD_H)
 endif(MSVC)
 
 add_library(zlib STATIC adler32.c
@@ -39,11 +36,9 @@ add_library(zlib STATIC adler32.c
 # cache.  These are the same variables exported by the built-in FindZLIB module.
 set(ZLIB_LIBRARIES zlib PARENT_SCOPE)
 set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/libs/zlib/include/ PARENT_SCOPE)
-set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/zlib/include/ PARENT_SCOPE)
 set(ZLIB_FOUND TRUE)
 
 mark_as_advanced(ZLIB_LIBRARIES ZLIB_INCLUDE_DIRS)
-mark_as_advanced(ZLIB_LIBRARIES ZLIB_INCLUDE_DIR)
 
 # Build as position-independent code, since it will probably be linked into a
 # dynamic library.

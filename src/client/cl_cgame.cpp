@@ -27,17 +27,10 @@ Ghoul2 Insert Start
 #endif
 
 #include "../qcommon/strip.h"
-#include "../qcommon/stringed_ingame.h"
-
-#include "../qcommon/mariadb.h"
 
 #ifdef G2_COLLISION_ENABLED
 extern CMiniHeap *G2VertSpaceClient;
 #endif
-
-vec3_t psVelocity; // disgusting hack for ramphelper
-
-cvar_t* com_coolApi_supported_cgame;
 
 /*
 Ghoul2 Insert End
@@ -66,12 +59,6 @@ CL_GetUserCmd
 */
 qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
-	
-	// COOL_APIFEATURE_GETTEMPORARYUSERCMD:
-	if (cmdNumber == -1) {
-		*ucmd = cl.temporaryCmd;
-		return qtrue;
-	}
 
 	const int REAL_CMD_MASK = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? (cl_commandsize->integer - 1) : (CMD_MASK);//Loda - FPS UNLOCK ENGINE
 
@@ -292,11 +279,70 @@ qboolean	CL_GetSnapshot(int snapshotNumber, snapshot_t *snapshot) {
 CL_SetUserCmdValue
 =====================
 */
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int fpSel, int invenSel ) {
-	cl.cgameUserCmdValue = userCmdValue;
-	cl.cgameSensitivity = sensitivityScale;
-	cl.cgameForceSelection = fpSel;
-	cl.cgameInvenSelection = invenSel;
+void
+CL_SetUserCmdValue(
+	int serverTime,
+	const int *angles,
+	int buttons,
+	byte weapon,
+	byte forcesel,
+	byte invensel,
+	byte generic_cmd,
+	signed char forwardmove,
+	signed char rightmove,
+	signed char upmove,
+	float sensitivityScale,
+	unsigned int flags
+)
+{
+	if (flags & USERCMD_SET_SERVERTIME)
+	{
+		cl.cgameUserCmd.serverTime = serverTime;
+	}
+	if (flags & USERCMD_SET_ANGLES)
+	{
+		cl.cgameUserCmd.angles[0] = angles[0];
+		cl.cgameUserCmd.angles[1] = angles[1];
+		cl.cgameUserCmd.angles[2] = angles[2];
+	}
+	if (flags & USERCMD_SET_BUTTONS)
+	{
+		cl.cgameUserCmd.buttons = buttons;
+	}
+	if (flags & USERCMD_SET_WEAPON)
+	{
+		cl.cgameUserCmd.weapon = weapon;
+	}
+	if (flags & USERCMD_SET_FORCESEL)
+	{
+		cl.cgameUserCmd.forcesel = forcesel;
+	}
+	if (flags & USERCMD_SET_INVENSEL)
+	{
+		cl.cgameUserCmd.invensel = invensel;
+	}
+	if (flags & USERCMD_SET_GENERIC_CMD)
+	{
+		cl.cgameUserCmd.generic_cmd = generic_cmd;
+	}
+	if (flags & USERCMD_SET_FORWARDMOVE)
+	{
+		cl.cgameUserCmd.forwardmove = forwardmove;
+	}
+	if (flags & USERCMD_SET_RIGHTMOVE)
+	{
+		cl.cgameUserCmd.rightmove = rightmove;
+	}
+	if (flags & USERCMD_SET_UPMOVE)
+	{
+		cl.cgameUserCmd.upmove = upmove;
+	}
+	if (flags & USERCMD_SET_SENSITIVITYSCALE)
+	{
+		cl.cgameSensitivity = sensitivityScale;
+	}
+
+	cl.cgameUserCmdFlags |= flags;
 }
 
 /*
@@ -322,13 +368,8 @@ void CL_SetTurnExtents(float turnAdd, float turnSub, int turnTime)
 CL_AddCgameCommand
 =====================
 */
-void CL_AddCgameCommand( const char *cmdName, qboolean meme ) {
-	if (meme) {
-		Cmd_AddMemeCommand(cmdName, NULL);
-	}
-	else {
-		Cmd_AddCommand(cmdName, NULL);
-	}
+void CL_AddCgameCommand( const char *cmdName ) {
+	Cmd_AddCommand( cmdName, NULL );
 }
 
 /*
@@ -359,105 +400,6 @@ void CL_DoAutoLODScale(void)
 	Cvar_Set( "r_autolodscalevalue", va("%f", finalLODScaleFactor) );
 }
 
-// These are bit indexes that can be set on uni_clientFlags to disable cheats in the UnityMod client.
-// We reuse these for compatibility and to not reinvent the wheel
-typedef enum {
-	WALLHACK_DISABLE_ITEMS = 0,
-	WALLHACK_DISABLE_PLAYERS,
-} clientFlags_t;
-
-// check if its ok to do r_showtris and such
-void CL_CheckWallhackAllowed(const char* serverInfo) {
-	static char serverCheatDisableCvar[16]; // uni_clientFlags
-	static char nwhCompareSmall[4]; // nwh
-	static char nwhCompareBig[4]; // NWH
-	static char manhuntCompare[8]; // Manhunt
-	static qboolean stringsInited = qfalse;
-
-	const char* info = serverInfo;
-	char* v = NULL;
-
-	if (com_demoplaying) {
-		clRenderInfo.wallhackOk = qtrue;
-		return;
-	}
-
-	if (!stringsInited) {
-
-		serverCheatDisableCvar[0] = 'u';
-		serverCheatDisableCvar[1] = 'n';
-		serverCheatDisableCvar[2] = 'i';
-		serverCheatDisableCvar[3] = '_';
-		serverCheatDisableCvar[4] = 'c';
-		serverCheatDisableCvar[5] = 'l';
-		serverCheatDisableCvar[6] = 'i';
-		serverCheatDisableCvar[7] = 'e';
-		serverCheatDisableCvar[8] = 'n';
-		serverCheatDisableCvar[9] = 't';
-		serverCheatDisableCvar[10] = 'F';
-		serverCheatDisableCvar[11] = 'l';
-		serverCheatDisableCvar[12] = 'a';
-		serverCheatDisableCvar[13] = 'g';
-		serverCheatDisableCvar[14] = 's';
-		serverCheatDisableCvar[15] = '\0';
-
-		nwhCompareSmall[0] = 'n';
-		nwhCompareSmall[1] = 'w';
-		nwhCompareSmall[2] = 'h';
-		nwhCompareSmall[3] = '\0';
-
-		nwhCompareBig[0] = 'N';
-		nwhCompareBig[1] = 'W';
-		nwhCompareBig[2] = 'H';
-		nwhCompareBig[3] = '\0';
-
-		manhuntCompare[0] = 'M';
-		manhuntCompare[1] = 'a';
-		manhuntCompare[2] = 'n';
-		manhuntCompare[3] = 'h';
-		manhuntCompare[4] = 'u';
-		manhuntCompare[5] = 'n';
-		manhuntCompare[6] = 't';
-		manhuntCompare[7] = '\0';
-		stringsInited = qtrue;
-	}
-
-	qboolean wallhackOk = qtrue;
-	v = Info_ValueForKey(info, "g_gametype");
-	int gametype = atoi(v);
-	if (gametype > GT_TEAM) {
-		wallhackOk = qfalse;
-	}
-	else {
-
-		int uni_clientFlags = atoi(Info_ValueForKey(info, serverCheatDisableCvar));
-		if ((uni_clientFlags & (1 << WALLHACK_DISABLE_ITEMS)) || (uni_clientFlags & (1 << WALLHACK_DISABLE_PLAYERS))) {
-			wallhackOk = qfalse;
-		}
-		else {
-			v = Info_ValueForKey(info, "version");
-			if (v)
-			{
-				Q_CleanStr(v, qtrue,serverIsTommyTernal);
-				if (strstr(v, nwhCompareSmall) || strstr(v, nwhCompareBig)) {
-					wallhackOk = qfalse;
-				}
-			}
-			v = Info_ValueForKey(info, "sv_hostname");
-			if (v)
-			{
-				Q_CleanStr(v, qtrue, serverIsTommyTernal);
-				if (strstr(v, manhuntCompare)) { // Stupid, ugly and gay.
-					wallhackOk = qfalse;
-				}
-			}
-		}
-	}
-	clRenderInfo.wallhackOk = wallhackOk;
-
-	
-}
-
 /*
 =====================
 CL_ConfigstringModified
@@ -467,8 +409,8 @@ void CL_ConfigstringModified( void ) {
 	char		*old, *s;
 	int			i, index;
 	char		*dup;
-	static gameState_t	oldGs;
-	size_t		len;
+	gameState_t	oldGs;
+	int			len;
 
 	index = atoi( Cmd_Argv(1) );
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
@@ -508,11 +450,8 @@ void CL_ConfigstringModified( void ) {
 			Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 		}
 
-		if (i == CS_SERVERINFO) {
-			CL_CheckWallhackAllowed(dup);
-		}
 		// ClientSide AntiGalak - replace "galak_mech" with "galak-mech"...
-		else if ( i >= CS_PLAYERS && i < (CS_PLAYERS + MAX_CLIENTS) )
+		if ( i >= CS_PLAYERS && i < (CS_PLAYERS + MAX_CLIENTS) )
 		{
 			char *model;
 			char *modelEnd;
@@ -561,7 +500,7 @@ void CL_ConfigstringModified( void ) {
 
 			gCLTotalClientNum = clientCount;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			Com_DPrintf("%i clients\n", gCLTotalClientNum);
 #endif
 
@@ -574,10 +513,6 @@ void CL_ConfigstringModified( void ) {
 		CL_SystemInfoChanged();
 	}
 
-	// Shader Remaps
-	if ( index == cls.cs_remaps ) {
-		CL_ShaderStateChanged();
-	}
 }
 
 
@@ -595,8 +530,6 @@ extern cvar_t	*con_notifyvote;
 #define	MAX_NOTIFYWORDS 8
 extern char	notifyWords[MAX_NOTIFYWORDS][32];
 extern int stampColor;
-
-extern cvar_t* r_fullbright;
 
 qboolean CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
@@ -703,7 +636,7 @@ rescan:
 
 			s = Cmd_Argv(1);
 			Com_sprintf(chat, sizeof(chat), "%s\n", s);
-			Q_StripColor(chat,(qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
+			Q_StripColor(chat);
 
 			//Remove escape char from name
 			l = 0;
@@ -795,7 +728,6 @@ void CL_CM_LoadMap( const char *mapname ) {
 	if ( CM_NumInlineModels() > MAX_SUBMODELS && !cls.submodelBypass ) {
 		Com_Error( ERR_DROP, "MAX_SUBMODELS exceeded\n\nYour CGame module doesn't support\nthe submodel bypass." );
 	}
-	tc_vis_init();
 }
 
 /*
@@ -805,19 +737,12 @@ CL_ShutdonwCGame
 ====================
 */
 void CL_ShutdownCGame( void ) {
-	int vmIndex;
-
 	cls.keyCatchers &= ~KEYCATCH_CGAME;
 	cls.cgameStarted = qfalse;
 	if ( !cgvm ) {
 		return;
 	}
 	VM_Call( cgvm, CG_SHUTDOWN );
-
-	vmIndex = VM_GetIndex(cgvm);
-	FixGhoul2InfoLeaks(vmIndex);
-	SetGhoul2TableIndex(-1);
-
 	VM_Free( cgvm );
 	cgvm = NULL;
 	cls.fixes = MVFIX_NONE;
@@ -868,9 +793,6 @@ void CL_CgameSetVirtualScreen(float w, float h) {
 	cls.cgyadj = SCREEN_HEIGHT / h;
 }
 
-
-float Q_asin(float c);
-
 /*
 ====================
 CL_CgameEnableSubmodelBypass
@@ -888,6 +810,7 @@ CL_CgameSystemCalls
 The cgame module is making a system call
 ====================
 */
+extern bool RicksCrazyOnServer;
 intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -900,8 +823,8 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 			args[0] = CG_G2_INITGHOUL2MODEL;
 	}
 
-	int vmIndex = VM_GetIndex(cgvm);
-	SetGhoul2TableIndex(vmIndex);
+	// set cgame ghoul2 context
+	RicksCrazyOnServer = false;
 
 	switch( args[0] ) {
 	case CG_PRINT:
@@ -947,7 +870,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		Cbuf_AddText( VMAS(1) );
 		return 0;
 	case CG_ADDCOMMAND:
-		CL_AddCgameCommand( VMAS(1),qfalse );
+		CL_AddCgameCommand( VMAS(1) );
 		return 0;
 	case CG_REMOVECOMMAND:
 		Cmd_RemoveCommand( VMAS(1) );
@@ -971,60 +894,24 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	case CG_CM_INLINEMODEL:
 		return CM_InlineModel( args[1] );
 	case CG_CM_TEMPBOXMODEL:
-		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qfalse,0 );
+		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qfalse );
 	case CG_CM_TEMPCAPSULEMODEL:
-		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qtrue,0 );
+		return CM_TempBoxModel( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), qtrue );
 	case CG_CM_POINTCONTENTS:
 		return CM_PointContents( VMAP(1, const vec_t, 3), args[2] );
 	case CG_CM_TRANSFORMEDPOINTCONTENTS:
 		return CM_TransformedPointContents( VMAP(1, const vec_t, 3), args[2], VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3) );
 	case CG_CM_BOXTRACE:
-		if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
-			traceCustomization_t traceCustomization = { qfalse,qtrue,0,0 };
-			traceCustomization.customEpsilon = (qboolean)args[8];
-			traceCustomization.customEpsilonValue = VMF(9);
-			traceCustomization.traceCustomFlags = args[10];
-			CM_BoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, &traceCustomization);
-		}
-		else {
-			CM_BoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, &defaultTraceCustomization);
-		}
+		CM_BoxTrace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse );
 		return 0;
 	case CG_CM_CAPSULETRACE:
-		if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
-			traceCustomization_t traceCustomization = { qfalse,qtrue,0,0 };
-			traceCustomization.customEpsilon = (qboolean)args[8];
-			traceCustomization.customEpsilonValue = VMF(9);
-			traceCustomization.traceCustomFlags = args[10];
-			CM_BoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, &traceCustomization);
-		}
-		else {
-			CM_BoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, &defaultTraceCustomization);
-		}
+		CM_BoxTrace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue );
 		return 0;
 	case CG_CM_TRANSFORMEDBOXTRACE:
-		if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
-			traceCustomization_t traceCustomization = { qfalse,qtrue,0,0 };
-			traceCustomization.customEpsilon = (qboolean)args[10];
-			traceCustomization.customEpsilonValue = VMF(11);
-			traceCustomization.traceCustomFlags = args[12];
-			CM_TransformedBoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qfalse, &traceCustomization);
-		}
-		else {
-			CM_TransformedBoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qfalse, &defaultTraceCustomization);
-		}
+		CM_TransformedBoxTrace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qfalse );
 		return 0;
 	case CG_CM_TRANSFORMEDCAPSULETRACE:
-		if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
-			traceCustomization_t traceCustomization = { qfalse,qtrue,0,0 };
-			traceCustomization.customEpsilon = (qboolean)args[10];
-			traceCustomization.customEpsilonValue = VMF(11);
-			traceCustomization.traceCustomFlags = args[12];
-			CM_TransformedBoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qtrue, &traceCustomization);
-		}
-		else {
-			CM_TransformedBoxTrace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qtrue, &defaultTraceCustomization);
-		}
+		CM_TransformedBoxTrace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], VMAP(8, const vec_t, 3), VMAP(9, const vec_t, 3), qtrue );
 		return 0;
 	case CG_CM_MARKFRAGMENTS:
 		return re.MarkFragments( args[1], VMAA(2, const vec3_t, args[1]), VMAP(3, const vec_t, 3), args[4], VMAA(5, vec3_t, args[4]), args[6], VMAA(7, markFragment_t, args[6]) );
@@ -1150,7 +1037,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 	case CG_GETUSERCMD:
 		return CL_GetUserCmd( args[1], VMAV(2, usercmd_t) );
 	case CG_SETUSERCMDVALUE:
-		CL_SetUserCmdValue( args[1], VMF(2), args[3], args[4] );
+		CL_SetUserCmdValue(args[1], VMAP(2, const int, 3), args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], VMF(11), args[12]);
 		return 0;
 	case CG_SETCLIENTFORCEANGLE:
 		CL_SetClientForceAngle(args[1], VMAP(2, const vec_t, 3));
@@ -1199,8 +1086,6 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		return FloatAsInt( ceilf( VMF(1) ) );
 	case CGAME_ACOS:
 		return FloatAsInt( Q_acos( VMF(1) ) );
-	case CGAME_ASIN:
-		return FloatAsInt( Q_asin( VMF(1) ) );
 
 	case CG_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMAS(1) );
@@ -1444,16 +1329,16 @@ Ghoul2 Insert Start
 		return 0;
 
 	case CG_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(false) + 1), VMAP(9, const vec_t, 3));
 
 	case CG_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1545,7 +1430,7 @@ Ghoul2 Insert End
 		return G2API_SetNewOrigin((g2handle_t)args[1], /*(const int)VMA(2)*/args[2]);
 
 	case CG_SP_GETSTRINGTEXTSTRING:
-		return Com_GetLocalizedString(VMAS(1), VMAP(2, char, args[3]), args[3]);
+		return SP_VMGetStringText(VMAS(1), VMAP(2, char, args[3]), args[3]);
 
 	case CG_SP_REGISTER:
 		return !!SP_Register(VMAS(1), SP_REGISTER_CLIENT);
@@ -1554,196 +1439,71 @@ Ghoul2 Insert End
 		cl.mSharedMemory = VMAP(1, char, MAX_CG_SHARED_BUFFER_SIZE);
 		return 0;
 
+	case CG_G2_SETSKIN:
+	{
+		CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(args[1]);
+		int modelIndex = args[2];
 
+		if (!ghoul2Ptr)
+		{
+			assert(0);
+			return qfalse;
+		}
 
+		CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+		if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
+		{
+			return qfalse;
+		}
+
+		return G2API_SetSkin( ghoul2, modelIndex, args[3], args[4] );
+	}
+
+	case CG_G2_GETSURFACERENDERSTATUS:
+	{
+		CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(args[1]);
+		int modelIndex = args[2];
+
+		if (!ghoul2Ptr)
+		{
+			assert(0);
+			return qfalse;
+		}
+
+		CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+		if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
+		{
+			return qfalse;
+		}
+
+		return G2API_GetSurfaceRenderStatus( ghoul2, modelIndex, VMAS(3) );
+	}
+
+	case CG_G2_SKINLESSMODEL:
+	{
+		CGhoul2Info_v *ghoul2Ptr = G2API_GetGhoul2Model(args[1]);
+		int modelIndex = args[2];
+
+		if (!ghoul2Ptr)
+		{
+			assert(0);
+			return qfalse;
+		}
+
+		CGhoul2Info_v &ghoul2 = *ghoul2Ptr;
+
+		if (ghoul2.size() <= (unsigned)modelIndex || ghoul2[modelIndex].mModelindex == -1)
+		{
+			return qfalse;
+		}
+
+		return G2API_SkinlessModel( ghoul2, modelIndex );
+	}
 
 	case MVAPI_GET_VERSION:
 		return (int)VM_GetGameversion(cgvm);
-	}
-
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_EXPANDEDSETUSERCMD) {
-		switch (args[0]) {
-		case CG_COOL_API_SETUSERCMDMOVE:
-			cl.cgameForwardmove = args[1];
-			cl.cgameRightmove = args[2];
-			cl.cgameUpmove = args[3];
-			cl.cgameMoveSet = args[4];
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_SETPREDICTEDMOVEMENT) {
-		switch (args[0]) {
-		case CG_COOL_API_SETPREDICTEDMOVEMENT:
-			Com_Memcpy(&cl.predictedMovement, VMAP(1, predictedMovement_t, 1), sizeof(predictedMovement_t));
-			VectorCopy(cl.predictedMovement.velocity, psVelocity);
-			cl.predictedMovementIsSet = qtrue;
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_SETUSERANGLES) {
-		switch (args[0]) {
-		case CG_COOL_API_SETUSERANGLES:
-			cl.cgamePitchAngle = args[1];
-			cl.cgameYawAngle = args[2];
-			cl.cgameRollAngle = args[3];
-			cl.cgameAngleSet = args[4];
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_EZDEMOCGAMEBUFFER) {
-		switch (args[0]) {
-		case CG_COOL_API_SET_EZDEMO_BUFFER:
-		{
-			size_t i;
-			size_t ezDemoEventSize = args[2];
-			int ezDemoMaxEventCount = args[3];
-			int* ezDemoEventCount = VMAP(4, int, 1);
-			//ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
-			void* ezDemoBufferCgame = VM_ArgPtr(args[0], args[1], ezDemoEventSize * ezDemoMaxEventCount); // is this gonna work right always? idk
-			int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
-			ezDemoEventSize = MIN(ezDemoEventSize,sizeof(ezDemoEvent_t));
-			for (i = 0; i < communicatedEventCount; i++) {
-				Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
-			}
-			*ezDemoEventCount = communicatedEventCount;
-			return 0;
-		}
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED) {
-		switch (args[0]) {
-		case CG_COOL_API_GETTIMESINCESNAPRECEIVED:
-		{
-			int snapNum = args[1];
-			if (cl.snapshots[snapNum & PACKET_MASK].messageNum != snapNum) {
-				return -1;
-			}
-			else {
-				return cls.realtime - cl.snapshotReceivedRealTimes[snapNum & PACKET_MASK];
-			}
-		}
-		}
-	}
-
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_RESOLUTIONCHANGED) {
-		switch (args[0]) {
-
-		case CG_COOL_API_GLRESOLUTIONCHANGED:
-			return args[1] != cls.glconfig.winWidth || args[2] != cls.glconfig.winHeight;
-			break;
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_ADDMEMECOMMAND) {
-		switch (args[0]) {
-
-		case CG_COOL_API_ADDMEMECOMMAND:
-			CL_AddCgameCommand(VMAS(1),qtrue); // means no autocomplete to this, it must be typed exactly
-			return 0;
-			break;
-		}
-	}
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_MARIADB) {
-		switch (args[0]) {
-
-		case CG_COOL_API_DB_ESCAPESTRING:
-			return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
-			break;
-		case CG_COOL_API_DB_ADDREQUEST:
-			return DB_AddRequest(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
-			break;
-		case CG_COOL_API_DB_ADDREQUEST_TYPED:
-			return DB_AddRequest(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);
-			break;
-		case CG_COOL_API_DB_NEXTRESPONSE:
-			// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
-			return DB_NextResponse(MODULE_CGAME,
-				VMAP(1, int, 1),			// int* requestType
-				VMAP(2, int, 1),			// int* affectedRows
-				VMAP(3, int, 1),			// int* status
-				VMAP(4, char, args[5]),		// char* errorMessage
-				args[5],					// int errorMessageSize
-				args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
-				args[7]						// int referenceLength
-			);
-			break;
-		case CG_COOL_API_DB_GETREFERENCE:
-			return DB_GetReference(MODULE_CGAME,
-				VMAP(1, byte, args[2]),		// byte* reference
-				args[2]						// int referenceLength
-			);
-			break;
-		case CG_COOL_API_DB_NEXTROW:
-			return DB_NextRow(MODULE_CGAME);
-			break;
-		case CG_COOL_API_DB_GETINT:
-			return DB_GetInt(MODULE_CGAME, args[1]);
-			break;
-		case CG_COOL_API_DB_GETFLOAT:
-		{
-			float* retVal = VMAP(2, float, 1);
-			*retVal = DB_GetFloat(MODULE_CGAME, args[1]);
-			return 0;
-		}
-		break;
-		case CG_COOL_API_DB_GETSTRING:
-			return DB_GetString(MODULE_CGAME,
-				args[1],
-				VMAP(2, char, args[3]),		// byte* reference
-				args[3]						// int referenceLength
-			);
-			break;
-		case CG_COOL_API_DB_ADDPREPAREDSTATEMENT:
-			return DB_AddPreparedStatement(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
-		case CG_COOL_API_DB_PREPAREDBINDSTRING:
-			return DB_PreparedBindString(MODULE_CGAME, VMAS(1));
-		case CG_COOL_API_DB_PREPAREDBINDFLOAT:
-			return DB_PreparedBindFloat(MODULE_CGAME, VMF(1));
-		case CG_COOL_API_DB_PREPAREDBINDINT:
-			return DB_PreparedBindInt(MODULE_CGAME, args[1]);
-		case CG_COOL_API_DB_PREPAREDBINDNULL:
-			return DB_PreparedBindNull(MODULE_CGAME);
-		case CG_COOL_API_DB_GETMORERESULTS:
-			return DB_NextResultSet(MODULE_CGAME, VMAP(1, int, 1));
-		case CG_COOL_API_DB_PREPAREDBINDBINARY:
-			return DB_PreparedBindBinary(MODULE_CGAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2]);
-		case CG_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
-			return DB_FinishAndSendPreparedStatement(MODULE_CGAME);
-		case CG_COOL_API_DB_GETBINARY:
-			return DB_GetBinary(MODULE_CGAME,
-				args[1],
-				VMAP(2, byte, args[3]),		// byte* reference
-				args[3]						// int referenceLength
-			);
-		}
-	}
-
-	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
-		switch (args[0]) {
-		case CG_COOL_API_GET_NUM_LANGUAGES:
-			return Com_GetNumLanguages();
-
-		case CG_COOL_API_GET_LANGUAGE_NAME:
-			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
-			return 0;
-
-		case CG_COOL_API_SET_SKIN:
-			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
-
-		case CG_COOL_API_SKINLESS_MODEL:
-			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
-
-		case CG_COOL_API_GET_SURFACE_RENDER_STATUS:
-			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
-
-		case CG_COOL_API_ATTACH_G2_MODEL:
-			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
-
-		case CG_COOL_API_GET_FILE_VERSION:
-			return FS_GetFileVersion(VMAS(1), MODULE_CGAME);
-
-		case CG_COOL_API_GET_FILE_LIST:
-			return FS_GetFileList(VMAS(1), VMAS(2), VMAP(3, char, args[4]), args[4]);
-		}
 	}
 
 	if (VM_MVAPILevel(cgvm) >= 1) {
@@ -1822,8 +1582,6 @@ void CL_InitCGame( void ) {
 	}
 	cls.state = CA_LOADING;
 
-	com_coolApi_supported_cgame = Cvar_Get("coolApi_supported_cgame", "0", CVAR_ROM);
-
 	// init for this gamestate
 	// use the lastExecutedServerCommand instead of the serverCommandSequence
 	// otherwise server commands sent just before a gamestate are dropped
@@ -1835,12 +1593,10 @@ void CL_InitCGame( void ) {
 	VM_SetMVAPILevel(cgvm, apireq);
 	Com_DPrintf("CGameVM uses MVAPI level %i.\n", apireq);
 
-	//VM_SetCoolApiSupport(cgvm, com_coolApi_supported_cgame->integer);// dont care it will be in the cvar anyway
-
 	if (apireq >= 1) {
 		VM_Call(cgvm, MVAPI_AFTER_INIT);
 	}
-
+	
 	demoAutoInit();
 
 	// we will send a usercmd this frame, which
@@ -1849,7 +1605,7 @@ void CL_InitCGame( void ) {
 
 	t2 = Sys_Milliseconds();
 
-	Com_DPrintf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
+	Com_Printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
 
 	// have the renderer touch all its images, so they are present
 	// on the card even if the driver does deferred loading
@@ -1908,47 +1664,6 @@ void CL_CGameRendering( stereoFrame_t stereo ) {
 	VM_Debug( 0 );
 }
 
-int	sortDeltas(const void *a, const void *b) {
-	return (*(int*)a - *(int*)b);
-}
-
-int CL_GetLowValueMedianDelta(int newDelta) {
-
-	//if (!cl_smoothenSnapLag->integer) {
-	//	return newDelta;
-	//}
-
-	if (cls.realtime - cl.serverTimeDeltaSmooth.lastDeltaTime >= 100 || !cl.serverTimeDeltaSmooth.lastDeltaTime || cl.serverTimeDeltaSmooth.pastDeltasCount) {
-		int deltasCopy[SERVERTIME_DELTA_SMOOTH_SAMPLES];
-		int deltasCount;
-		int medianIndex;
-
-		cl.serverTimeDeltaSmooth.pastDeltas[cl.serverTimeDeltaSmooth.pastDeltasCount++ % SERVERTIME_DELTA_SMOOTH_SAMPLES] = newDelta;
-		// recalculate median
-		deltasCount = MIN(cl.serverTimeDeltaSmooth.pastDeltasCount, SERVERTIME_DELTA_SMOOTH_SAMPLES);
-		memcpy(deltasCopy, cl.serverTimeDeltaSmooth.pastDeltas,deltasCount*sizeof(deltasCopy[0]));
-		qsort(deltasCopy, deltasCount, sizeof(deltasCopy[0]), sortDeltas);
-		medianIndex = deltasCount / 20; // divide by 10, then by 2
-		cl.serverTimeDeltaSmooth.medianValue = deltasCopy[medianIndex];
-		cl.serverTimeDeltaSmooth.lastDeltaTime = cls.realtime;
-	}
-
-	if (cl.serverTimeDeltaSmooth.pastDeltasCount < SERVERTIME_DELTA_SMOOTH_SAMPLES) {
-		// lets get a few valid samples first.
-		return newDelta;
-	}
-
-	// allow some natural fluctuation but keep it in check.
-	if (newDelta > cl.serverTimeDeltaSmooth.medianValue + 10) {
-		newDelta = cl.serverTimeDeltaSmooth.medianValue + 10;
-	}
-	else if (newDelta < cl.serverTimeDeltaSmooth.medianValue - 10) {
-		newDelta = cl.serverTimeDeltaSmooth.medianValue - 10;
-	}
-
-	return newDelta;
-}
-
 
 /*
 =================
@@ -1975,10 +1690,6 @@ or bursted delayed packets.
 void CL_AdjustTimeDelta( void ) {
 	int		newDelta;
 	int		deltaDelta;
-	int		slowDriftAdjustMinMsec;
-	static int	oldSlowDriftAdjustServerTime;
-	int		resetTime = RESET_TIME;
-	int		softResetTime = 100;
 
 	cl.newSnapshots = qfalse;
 
@@ -1988,33 +1699,22 @@ void CL_AdjustTimeDelta( void ) {
 	}
 
 	newDelta = cl.snap.serverTime - cls.realtime;
-	if (cl_smoothenSnapLag->integer) {
-		newDelta = CL_GetLowValueMedianDelta(newDelta);
-		resetTime = 1000;
-		softResetTime = 200;
-	}
 	deltaDelta = abs( newDelta - cl.serverTimeDelta );
 
-	slowDriftAdjustMinMsec = com_slowDriftAdjustMaxFPS->integer ? 1000/ com_slowDriftAdjustMaxFPS->integer : 0;
-	if (slowDriftAdjustMinMsec > 200) {
-		slowDriftAdjustMinMsec = 200; // Let's not let ppl set com_slowDriftAdjustMaxFPS to less than 5 fps. Idk if its really a problem but it's not really needed and we avoid potential weirdness
-	}
-
-	if ( deltaDelta > resetTime) {
+	if ( deltaDelta > RESET_TIME ) {
 		cl.serverTimeDelta = newDelta;
-		cl.oldServerTime = cl.oldServerTimeNoTN = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
-		cl.serverTime = cl.serverTimeNoTN = cl.snap.serverTime;
-		Cvar_Set("cl_timeNudgeSafeServerTime", va("%d", cl.serverTimeNoTN));
+		cl.oldServerTime = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
+		cl.serverTime = cl.snap.serverTime;
 		if ( cl_showTimeDelta->integer ) {
 			Com_Printf( "<RESET> " );
 		}
-	} else if ( deltaDelta > softResetTime) {
+	} else if ( deltaDelta > 100 ) {
 		// fast adjust, cut the difference in half
 		if ( cl_showTimeDelta->integer ) {
 			Com_Printf( "<FAST> " );
 		}
 		cl.serverTimeDelta = ( cl.serverTimeDelta + newDelta ) >> 1;
-	} else if(!slowDriftAdjustMinMsec || cl.snap.serverTime < oldSlowDriftAdjustServerTime || (cl.snap.serverTime - oldSlowDriftAdjustServerTime) > slowDriftAdjustMinMsec) { // the slow drift adjust influences physics. use com_slowDriftAdjustMaxFPS to limit how often it happens.
+	} else {
 		// slow drift adjust, only move 1 or 2 msec
 
 		// if any of the frames between this and the previous snapshot
@@ -2029,14 +1729,11 @@ void CL_AdjustTimeDelta( void ) {
 				cl.serverTimeDelta++;
 			}
 		}
-
-		oldSlowDriftAdjustServerTime = cl.snap.serverTime;
 	}
 
 	if ( cl_showTimeDelta->integer ) {
 		Com_Printf( "%i ", cl.serverTimeDelta );
 	}
-
 }
 
 
@@ -2061,7 +1758,6 @@ void CL_FirstSnapshot( void ) {
 	// set the timedelta so we are exactly on this first frame
 	cl.serverTimeDelta = cl.snap.serverTime - cls.realtime;
 	cl.oldServerTime = cl.snap.serverTime;
-	cl.oldServerTimeNoTN = cl.snap.serverTime;
 
 	clc.timeDemoBaseTime = cl.snap.serverTime;
 
@@ -2137,7 +1833,7 @@ void CL_SetCGameTime( void ) {
 
 		if (tn < 0 && (cl.snap.ps.pm_type == PM_SPECTATOR || cl.snap.ps.pm_flags & PMF_FOLLOW || clc.demoplaying))
 			tn = 0; // JAPRO ENGINE - disable negative timenudge when spectating
-#ifdef DEBUG
+#ifdef _DEBUG
 		if (tn<-900) {
 			tn = -900;
 		} else if (tn>900) {
@@ -2152,20 +1848,13 @@ void CL_SetCGameTime( void ) {
 #endif
 
 		cl.serverTime = cls.realtime + cl.serverTimeDelta - tn;
-		cl.serverTimeNoTN = cls.realtime + cl.serverTimeDelta;
 
 		// guarantee that time will never flow backwards, even if
 		// serverTimeDelta made an adjustment or cl_timeNudge was changed
 		if ( cl.serverTime < cl.oldServerTime ) {
 			cl.serverTime = cl.oldServerTime;
 		}
-		if ( cl.serverTimeNoTN < cl.oldServerTimeNoTN) {
-			cl.serverTimeNoTN = cl.oldServerTimeNoTN;
-		}
 		cl.oldServerTime = cl.serverTime;
-		cl.oldServerTimeNoTN = cl.serverTimeNoTN;
-
-		Cvar_Set("cl_timeNudgeSafeServerTime", va("%d", cl.serverTimeNoTN));
 
 		// note if we are almost past the latest frame (without timeNudge),
 		// so we will try and adjust back a bit when the next snapshot arrives

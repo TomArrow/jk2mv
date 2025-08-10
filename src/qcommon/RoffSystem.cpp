@@ -304,7 +304,7 @@ int CROFFSystem::Cache( const char *file, qboolean isClient )
 
 	if ( id )
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		Com_Printf( S_COLOR_YELLOW"Ignoring. File '%s' already cached.\n", file );
 #endif
 	}
@@ -409,7 +409,7 @@ qboolean CROFFSystem::Unload( int id )
 
 		itr = mROFFList.erase( itr );
 
-#ifdef DEBUG
+#ifdef _DEBUG
 		Com_Printf( S_COLOR_GREEN"roff unloaded\n" );
 #endif
 
@@ -418,7 +418,7 @@ qboolean CROFFSystem::Unload( int id )
 	else
 	{ // not found
 
-#ifdef DEBUG
+#ifdef _DEBUG
 		Com_Printf( S_COLOR_RED"unload failed: roff <%i> does not exist\n", id );
 #endif
 		return qfalse;

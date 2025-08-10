@@ -257,7 +257,7 @@ inline uint32_t ComputeFinalVertexColor(const byte *colors)
 	for (k = 0; k < 4; k++)
 		result.b[k] = colors[k];
 
-	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || (r_fullbright->integer && r_fullbright->integer != 200000))
+	if (tess.shader->lightmapIndex[0] != LIGHTMAP_BY_VERTEX || r_fullbright->integer)
 	{
 		result.b[0] = 255;
 		result.b[1] = 255;
@@ -282,10 +282,9 @@ inline uint32_t ComputeFinalVertexColor(const byte *colors)
 			break;
 		}
 	}
-
-	result.b[0] = Com_Clampi(0, 255, r >> 8);
-	result.b[1] = Com_Clampi(0, 255, g >> 8);
-	result.b[2] = Com_Clampi(0, 255, b >> 8);
+	result.b[0] = (r >> 8) & 0xffu;
+	result.b[1] = (g >> 8) & 0xffu;
+	result.b[2] = (b >> 8) & 0xffu;
 
 	return result.ui;
 }
@@ -464,14 +463,6 @@ static void RB_SurfaceSaberGlow()
 	if ( Q_isnan( e->saberLength ) )
 	  return;
 
-	if (e->renderfx & RF_SABERGLOWENDS) {
-		// hack for a special saber ends shader drawn at tip and bottom
-		DoSprite(e->origin, e->data.line.width2, 0.0f);
-		VectorMA(e->origin, e->saberLength, e->axis[0], end);
-		DoSprite(end, e->data.line.width2, 0.0f);
-		return;
-	}
-
 	// Render the glow part of the blade
 	for ( float i = e->saberLength; i > 0; i -= e->radius * 0.65f )
 	{
@@ -617,7 +608,7 @@ static void DoLine2( const vec3_t start, const vec3_t end, const vec3_t up, floa
 	tess.indexes[tess.numIndexes++] = vbase + 3;
 }
 
-static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t up, float spanWidth, qboolean forceColorOverride )
+static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t up, float spanWidth )
 {
 	float		spanWidth2;
 	int			vbase;
@@ -625,13 +616,6 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	vbase = tess.numVertexes;
 
 	spanWidth2 = -spanWidth;
-
-	if (forceColorOverride) {
-		if (!tess.anyVertexColorOverrides) { // TODO can we make this more performant/elegant? this is gross.
-			Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
-		}
-		tess.anyVertexColorOverrides = qtrue;
-	}
 
 	// FIXME: use quad stamp?
 	VectorMA( start, spanWidth, up, tess.xyz[tess.numVertexes] );
@@ -641,12 +625,6 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	if (forceColorOverride) {
-		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	}
 	tess.numVertexes++;
 
 	VectorMA( start, spanWidth2, up, tess.xyz[tess.numVertexes] );
@@ -656,12 +634,6 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	if (forceColorOverride) {
-		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	}
 	tess.numVertexes++;
 
 	VectorMA( end, spanWidth, up, tess.xyz[tess.numVertexes] );
@@ -672,12 +644,6 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	if (forceColorOverride) {
-		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	}
 	tess.numVertexes++;
 
 	VectorMA( end, spanWidth2, up, tess.xyz[tess.numVertexes] );
@@ -687,12 +653,6 @@ static void DoLine_Oriented( const vec3_t start, const vec3_t end, const vec3_t 
 	tess.vertexColors[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];
 	tess.vertexColors[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];
 	tess.vertexColors[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	if (forceColorOverride) {
-		tess.vertexColorOverrides[tess.numVertexes][0] = backEnd.currentEntity->e.shaderRGBA[0];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][1] = backEnd.currentEntity->e.shaderRGBA[1];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][2] = backEnd.currentEntity->e.shaderRGBA[2];// * 0.25;
-		tess.vertexColorOverrides[tess.numVertexes][3] = backEnd.currentEntity->e.shaderRGBA[3];// * 0.25;
-	}
 	tess.numVertexes++;
 
 	tess.indexes[tess.numIndexes++] = vbase;
@@ -742,7 +702,7 @@ void RB_SurfaceOrientedLine( void )
 	// compute side vector
 	VectorNormalize( e->axis[1] );
 	VectorCopy(e->axis[1], right);
-	DoLine_Oriented( start, end, right, e->data.line.width*0.5f, (qboolean)(e->saberLength == -1.0f) );
+	DoLine_Oriented( start, end, right, e->data.line.width*0.5f );
 }
 
 /*
@@ -1312,7 +1272,6 @@ void RB_SurfaceMesh(md3Surface_t *surface) {
 
 }
 
-extern vec3_t psVelocity; // disgusting hack for ramphelper. make this more reasonable if we grow too ashamed.
 
 /*
 ==============
@@ -1320,7 +1279,7 @@ RB_SurfaceFace
 ==============
 */
 void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
-	int			i, j, k;
+	int			i, k;
 	unsigned	*indices, *tessIndexes;
 	float		*v;
 	float		*normal;
@@ -1328,13 +1287,6 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	int			Bob;
 	int			numPoints;
 	int			dlightBits;
-	bool		markSurfaceAngles;
-	bool		rampHelper;
-	bool		solidityAngleColors;
-
-	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
-	rampHelper = r_rampHelper->integer;
-	solidityAngleColors = r_solidity->integer > 2;
 
 	RB_CHECKOVERFLOW( surf->numPoints, surf->numIndices );
 
@@ -1347,114 +1299,6 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	tessIndexes = tess.indexes + tess.numIndexes;
 	for ( i = surf->numIndices-1 ; i >= 0  ; i-- ) {
 		tessIndexes[i] = indices[i] + Bob;
-
-		if (markSurfaceAngles && ((i+1)%3)==0) {
-			// We want to mark all surfaces of certain angles with a color
-			// So let's first find out the angle of this surface
-			// Take cross product of two sides to get vector
-			vec3_t side1, side2, normal;
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
-			CrossProduct(side1, side2, normal);
-			VectorNormalize(normal);
-			// Cross product is a normal of the triangle
-			// We could do a dot product with other vector for angle
-			// But other vector is Z axis (0,0,1) so we the [0] and [1] would become 0 anyway
-			// So the dot product we want is simply normal[2]
-			float angle = 360.0f*acosf(normal[2])/ M_PI/2.0f;
-
-			if (
-				(r_markSurfaceAnglesAbove->value && r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value) // Both conditions must be met
-				|| (r_markSurfaceAnglesAbove->value && !r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value)
-				|| (r_markSurfaceAnglesBelow->value && !r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value)
-				) {
-				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
-			}
-			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
-		}
-		if (rampHelper && ((i+1)%3)==0) {
-			// We want to mark all surfaces of certain angles with a color
-			// So let's first find out the angle of this surface
-			// Take cross product of two sides to get vector
-			vec3_t side1, side2, normal, newVelocity;
-			float change;
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
-			CrossProduct(side1, side2, normal);
-			VectorNormalize(normal);
-			// Cross product is a normal of the triangle
-			// We could do a dot product with other vector for angle
-			// But other vector is Z axis (0,0,1) so we the [0] and [1] would become 0 anyway
-			// So the dot product we want is simply normal[2]
-
-			float oldVel = rampHelper == 2 ? VectorLength(psVelocity) : VectorLength2(psVelocity); // we only care about horizontal speed usually
-
-			// this mirrors PM_ClipVelocity
-			float backoff = DotProduct(psVelocity,normal);
-			if (backoff < 0) {
-				backoff *= 1.01;
-			}
-			else {
-				continue; // normal looking same direction we are heading, it wont clip us.
-				//backoff /= 1.01; // but that might not be known yet? idk
-			}
-			for (j = 0;j < 3; j++) {
-				change = normal[j] * backoff;
-				newVelocity[j] = psVelocity[j] - change;
-			}
-
-			float newVel = rampHelper == 2 ? VectorLength(newVelocity) : VectorLength2(newVelocity); // we only care about horizontal speed usually
-
-			if (oldVel != newVel) {
-				tess.anyVertexColorOverrides = qtrue;
-				tess.vertexColorOverrides[indices[i - 2] + Bob][3] = tess.vertexColorOverrides[indices[i - 1] + Bob][3] = tess.vertexColorOverrides[indices[i] + Bob][3] = 255; // alpha
-				tess.vertexColorOverrides[indices[i - 2] + Bob][2] = tess.vertexColorOverrides[indices[i - 1] + Bob][2] = tess.vertexColorOverrides[indices[i] + Bob][2] = 127;
-				tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = 127;
-				tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = 127;
-				if (oldVel < newVel) {
-					//tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MIN(MAX(127.0f*(newVel/oldVel),0),255);
-					tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MIN(MAX(127.0f+ powf((newVel- oldVel) / 500.0f, 0.3f) * 200.0f,0),255);
-				}
-				else if(newVel < oldVel) {
-					tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = MIN(MAX(127.0f + powf((oldVel - newVel)/500.0f,0.3f)*200.0f, 0), 255);
-				}
-			}
-
-			/*
-			float angle = 360.0f*acosf(normal[2])/ M_PI/2.0f;
-
-			if (
-				(r_markSurfaceAnglesAbove->value && r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value) // Both conditions must be met
-				|| (r_markSurfaceAnglesAbove->value && !r_markSurfaceAnglesBelow->value && angle > r_markSurfaceAnglesAbove->value)
-				|| (r_markSurfaceAnglesBelow->value && !r_markSurfaceAnglesAbove->value && angle < r_markSurfaceAnglesBelow->value)
-				) {
-				tess.vertexIsMarked[indices[i - 2] + Bob] = tess.vertexIsMarked[indices[i - 1] + Bob] = tess.vertexIsMarked[indices[i] + Bob] = 1;
-			}*/
-			// TODO Try not make this vertex color bleed into other triangles that share the same vertex index...
-		}
-		else if (solidityAngleColors && ((i+1)%3)==0) {
-			// We want to mark all surfaces with a color corresponding to their normal
-			vec3_t side1, side2, normal, newVelocity;
-			float change;
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-1], side1);
-			VectorSubtract(surf->points[0]+ VERTEXSIZE*indices[i], surf->points[0] + VERTEXSIZE * indices[i-2], side2);
-			CrossProduct(side1, side2, normal);
-			VectorNormalize(normal);
-
-			VectorScale(normal, 128.0f, normal);
-			normal[0] += 127.0f;
-			normal[1] += 127.0f;
-			if (normal[2] < 0) {
-				normal[2] = -normal[2] + 127.0f;
-			}
-
-			tess.anyVertexColorOverrides = qtrue;
-			tess.vertexColorOverrides[indices[i - 2] + Bob][3] = tess.vertexColorOverrides[indices[i - 1] + Bob][3] = tess.vertexColorOverrides[indices[i] + Bob][3] = 255; // alpha
-			tess.vertexColorOverrides[indices[i - 2] + Bob][2] = tess.vertexColorOverrides[indices[i - 1] + Bob][2] = tess.vertexColorOverrides[indices[i] + Bob][2] = MAX(0,MIN(255,(int)normal[0]));
-			tess.vertexColorOverrides[indices[i - 2] + Bob][1] = tess.vertexColorOverrides[indices[i - 1] + Bob][1] = tess.vertexColorOverrides[indices[i] + Bob][1] = MAX(0, MIN(255, (int)normal[1]));
-			tess.vertexColorOverrides[indices[i - 2] + Bob][0] = tess.vertexColorOverrides[indices[i - 1] + Bob][0] = tess.vertexColorOverrides[indices[i] + Bob][0] = MAX(0, MIN(255, (int)normal[2]));
-
-		}
 	}
 
 	tess.numIndexes += surf->numIndices;
@@ -1479,7 +1323,7 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 		tess.texCoords[0][ndx][1] = v[4];
 		for(k=0;k<MAXLIGHTMAPS;k++)
 		{
-			if (tess.shader->lightmapIndex[k] >= 0 || r_shaderHackLightmapFix->integer) // fix: dont break shader hack lightmaps
+			if (tess.shader->lightmapIndex[k] >= 0)
 			{
 				tess.texCoords[k+1][ndx][0] = v[VERTEX_LM+(k*2)];
 				tess.texCoords[k+1][ndx][1] = v[VERTEX_LM+(k*2)+1];

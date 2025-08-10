@@ -7,10 +7,6 @@
 #include "../ghoul2/G2_local.h"
 #include "matcomp.h"
 
-#if DORESHADE
-#include <reshade.hpp>
-#endif
-
 static	int			r_firstSceneDrawSurf;
 
 static	int			r_numdlights;
@@ -101,10 +97,6 @@ RE_AddPolyToScene
 
 =====================
 */
-extern cvar_t* triggers_draw;
-extern cvar_t* clips_draw;
-extern cvar_t* slicks_draw;
-static int lastRenderBrushesDisabledOrWarned = 0;
 void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys ) {
 	srfPoly_t	*poly;
 	int			i, j;
@@ -128,23 +120,7 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 
 	for ( j = 0; j < numPolys; j++ ) {
 		if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
-			qboolean canDisableOrWarn = (qboolean)(lastRenderBrushesDisabledOrWarned != tr.refdef.time); // warn/disable up to 1 time per frame
-			if (canDisableOrWarn) {
-				ri.Printf(PRINT_WARNING, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
-				if (clips_draw->integer) { // typically there is most clips, then triggers, then slicks. but can depend on map. TODO auto-detect one with most?
-					ri.Cvar_Set("r_renderClipBrushes", "0");
-					ri.Printf(PRINT_WARNING, "WARNING: RE_AddPolyToScene: Auto-disabling r_renderClipBrushes\n");
-				}
-				else if (triggers_draw->integer) {
-					ri.Cvar_Set("r_renderTriggerBrushes", "0");
-					ri.Printf(PRINT_WARNING, "WARNING: RE_AddPolyToScene: Auto-disabling r_renderTriggerBrushes\n");
-				}
-				else if (slicks_draw->integer) {
-					ri.Cvar_Set("r_renderSlickSurfaces", "0");
-					ri.Printf(PRINT_WARNING, "WARNING: RE_AddPolyToScene: Auto-disabling r_renderSlickSurfaces\n");
-				}
-				lastRenderBrushesDisabledOrWarned = tr.refdef.time;
-			}
+			ri.Printf( PRINT_WARNING, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
 			return;
 		}
 
@@ -384,13 +360,6 @@ void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, flo
 	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
-#if DORESHADE
-extern reshade::api::effect_runtime*	reshadeEffectRuntime;
-extern reshade::api::command_list*		reshadeCommandList;
-extern reshade::api::resource_view reshadeResourceView;
-extern bool reshadeResourceViewSet;
-#endif
-
 /*
 @@@@@@@@@@@@@@@@@@@@@
 RE_RenderScene
@@ -543,12 +512,6 @@ void RE_RenderScene( const refdef_t *fd ) {
 	refEntParent = -1;
 
 	RE_RenderWorldEffects();
-
-#if DORESHADE
-	if (r_reshadeFix->integer && reshadeEffectRuntime && reshadeCommandList && reshadeResourceViewSet) {
-		reshadeEffectRuntime->render_effects(reshadeCommandList, reshadeResourceView, reshadeResourceView);
-	}
-#endif
 
 	tr.frontEndMsec += ri.Milliseconds() - startTime;
 }

@@ -30,17 +30,19 @@
 extern mdxaBone_t		worldMatrix;
 extern mdxaBone_t		worldMatrixInv;
 
-typedef std::map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
+typedef map<g2handle_t, CGhoul2Info_v> CGhoul2Info_m;
 
-static CGhoul2Info_m	ghoultable[MAX_VM];
+static CGhoul2Info_m	ghoultable[2];
 static g2handle_t		nextGhoul2Handle = (g2handle_t)1;
-static int				maxModelIndex[MAX_VM];
-static int				g2TableIndex = -1;
+static int				maxModelIndex[2];
+
+// game/cgame context
+bool RicksCrazyOnServer;
 
 CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
-	CGhoul2Info_m::iterator ghlIt = ghoultable[g2TableIndex].find(g2h);
+	CGhoul2Info_m::iterator ghlIt = ghoultable[RicksCrazyOnServer].find(g2h);
 
-	if (ghlIt == ghoultable[g2TableIndex].end())
+	if (ghlIt == ghoultable[RicksCrazyOnServer].end())
 	{
 		return NULL;
 	}
@@ -48,19 +50,19 @@ CGhoul2Info_v *G2API_GetGhoul2Model(g2handle_t g2h) {
 	return &ghlIt->second;
 }
 
-void FixGhoul2InfoLeaks(int tableIndex)
+void FixGhoul2InfoLeaks(bool ricksCrazyOnServer)
 {
-	ghoultable[tableIndex].clear();
-	maxModelIndex[tableIndex] = 0;
+	ghoultable[ricksCrazyOnServer].clear();
+	maxModelIndex[ricksCrazyOnServer] = 0;
 }
 
 void G2API_CleanGhoul2Models(g2handle_t *g2hPtr) {
-	ghoultable[g2TableIndex].erase(*g2hPtr);
+	ghoultable[RicksCrazyOnServer].erase(*g2hPtr);
 	*g2hPtr = 0;
 }
 
-int G2API_GetMaxModelIndex(int vmIndex) {
-	return maxModelIndex[vmIndex];
+int G2API_GetMaxModelIndex(bool ricksCrazyOnServer) {
+	return maxModelIndex[ricksCrazyOnServer];
 }
 
 qhandle_t G2API_PrecacheGhoul2Model(const char *fileName)
@@ -86,7 +88,7 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 		*g2hPtr = g2h = nextGhoul2Handle++;
 	}
 
-	CGhoul2Info_v &ghoul2 = ghoultable[g2TableIndex][g2h];
+	CGhoul2Info_v &ghoul2 = ghoultable[RicksCrazyOnServer][g2h];
 
 	// find a free spot in the list
 	for (CGhoul2Info_v::iterator it = ghoul2.begin(); it != ghoul2.end(); ++it)
@@ -95,12 +97,12 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 		{
 			// this is only valid and used on the game side. Client side ignores this
 			it->mModelindex = modelIndex;
-			if (maxModelIndex[g2TableIndex] < modelIndex)
-				maxModelIndex[g2TableIndex] = modelIndex;
+			if (maxModelIndex[RicksCrazyOnServer] < modelIndex)
+				maxModelIndex[RicksCrazyOnServer] = modelIndex;
 				// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 			it->mModel = RE_RegisterModel(fileName);
-			it->currentModel = R_GetModelByHandle(it->mModel);
-			if (it->currentModel->type == MOD_BAD)
+			model_t		*mod_m = R_GetModelByHandle(it->mModel);
+			if (mod_m->type == MOD_BAD)
 			{
 				return -1;
 			}
@@ -128,8 +130,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 
 	// if we got this far, then we didn't find a spare position, so lets insert a new one
 	newModel.mModelindex = modelIndex;
-	if (maxModelIndex[g2TableIndex] < modelIndex)
-		maxModelIndex[g2TableIndex] = modelIndex;
+	if (maxModelIndex[RicksCrazyOnServer] < modelIndex)
+		maxModelIndex[RicksCrazyOnServer] = modelIndex;
 	// on the game side this is valid. On the client side it is valid only after it has been filled in by trap_G2_SetGhoul2ModelIndexes
 	if (customShader <= -20)
 	{ //This means the server is making the function call. And the server does not like registering models.
@@ -140,8 +142,8 @@ int G2API_InitGhoul2Model(g2handle_t *g2hPtr, const char *fileName, int modelInd
 	{
 		newModel.mModel = RE_RegisterModel(fileName);
 	}
-	newModel.currentModel = R_GetModelByHandle(newModel.mModel);
-	if (newModel.currentModel->type == MOD_BAD)
+	model_t		*mod_m = R_GetModelByHandle(newModel.mModel);
+	if (mod_m->type == MOD_BAD)
 	{
 		if (ghoul2.size() == 0)//very first model created
 		{//you can't have an empty vector, so let's not give it one
@@ -180,23 +182,18 @@ qboolean G2API_SetLodBias(CGhoul2Info *ghlInfo, int lodBias)
 	return qfalse;
 }
 
-qboolean G2API_SetSkin(g2handle_t g2h, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin)
+void G2_SetSurfaceOnOffFromSkin (CGhoul2Info *ghlInfo, qhandle_t renderSkin);
+qboolean G2API_SetSkin(CGhoul2Info_v& ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin)
 {
-	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+	CGhoul2Info *ghlInfo = &ghoul2[modelIndex];
 
-	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
-	{
-		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
-
-		ghlInfo->mCustomSkin = customSkin;
-		if (renderSkin)
-		{//this is going to set the surfs on/off matching the skin file
-			G2_SetSurfaceOnOffFromSkin( ghlInfo, renderSkin );
-		}
-
-		return qtrue;
+	ghlInfo->mCustomSkin = customSkin;
+	if (renderSkin)
+	{//this is going to set the surfs on/off matching the skin file
+		G2_SetSurfaceOnOffFromSkin( ghlInfo, renderSkin );
 	}
-	return qfalse;
+
+	return qtrue;
 }
 
 qboolean G2API_SetShader(CGhoul2Info *ghlInfo, qhandle_t customShader)
@@ -225,11 +222,7 @@ qboolean G2API_SetSurfaceOnOff(g2handle_t g2h, const char *surfaceName, const in
 
 int G2API_GetSurfaceOnOff(CGhoul2Info *ghlInfo, const char *surfaceName)
 {
-	if (ghlInfo)
-	{
-		return G2_IsSurfaceOff(ghlInfo, ghlInfo->mSlist, surfaceName);
-	}
-	return -1;
+	return G2_IsSurfaceOff(ghlInfo, ghlInfo->mSlist, surfaceName);
 }
 
 qboolean G2API_SetRootSurface(g2handle_t g2h, const int modelIndex, const char *surfaceName)
@@ -275,16 +268,10 @@ int G2API_GetParentSurface(CGhoul2Info *ghlInfo, const int index)
 	return -1;
 }
 
-int G2API_GetSurfaceRenderStatus(g2handle_t g2h, int modelIndex, const char *surfaceName)
+int G2API_GetSurfaceRenderStatus(CGhoul2Info_v& ghoul2, int modelIndex, const char *surfaceName)
 {
-	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
-
-	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
-	{
-		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
-		return G2_IsSurfaceRendered(ghlInfo, surfaceName, ghlInfo->mSlist);
-	}
-	return -1;
+	CGhoul2Info *ghlInfo = &ghoul2[modelIndex];
+	return G2_IsSurfaceRendered(ghlInfo, surfaceName, ghlInfo->mSlist);
 }
 
 qboolean G2API_HasGhoul2ModelOnIndex(const g2handle_t *g2hPtr, const int modelIndex)
@@ -1228,7 +1215,7 @@ void G2API_DuplicateGhoul2Instance(g2handle_t g2hFrom, g2handle_t *g2hToPtr)
 	}
 
 	*g2hToPtr = g2hTo = nextGhoul2Handle++;
-	ghoultable[g2TableIndex][g2hTo] = CGhoul2Info_v();
+	ghoultable[RicksCrazyOnServer][g2hTo] = CGhoul2Info_v();
 
 	G2API_CopyGhoul2Instance(g2hFrom, g2hTo, -1);
 	return;
@@ -1294,42 +1281,32 @@ qboolean G2API_SetNewOrigin(g2handle_t g2h, const int boltIndex)
 }
 
 //see if surfs have any shader info...
-qboolean G2API_SkinlessModel(g2handle_t g2h, int modelIndex)
+qboolean G2API_SkinlessModel(CGhoul2Info_v& ghoul2, int modelIndex)
 {
-	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
+	CGhoul2Info *g2 = &ghoul2[modelIndex];
+	model_t *mod = R_GetModelByHandle(g2->mModel);
 
-	if (ghoul2 && (unsigned)modelIndex < ghoul2->size())
+	if (mod &&
+		mod->mdxm)
 	{
-		CGhoul2Info *ghlInfo = &(*ghoul2)[modelIndex];
-		model_t	*mod = (model_t *)ghlInfo->currentModel;
+        mdxmSurfHierarchy_t	*surf;
+		int i;
 
-		if (mod &&
-			mod->mdxm)
+		surf = (mdxmSurfHierarchy_t *) ( (byte *)mod->mdxm + mod->mdxm->ofsSurfHierarchy );
+
+		for (i = 0; i < mod->mdxm->numSurfaces; i++)
 		{
-            mdxmSurfHierarchy_t	*surf;
-			int i;
-
-			surf = (mdxmSurfHierarchy_t *) ( (byte *)mod->mdxm + mod->mdxm->ofsSurfHierarchy );
-
-			for (i = 0; i < mod->mdxm->numSurfaces; i++) 
-			{
-				if (surf->shader && surf->shader[0])
-				{ //found a surface with a shader name, ok.
-                    return qfalse;
-				}
-
-  				surf = (mdxmSurfHierarchy_t *)( (byte *)surf + (size_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surf->numChildren ] ));
+			if (surf->shader[0])
+			{ //found a surface with a shader name, ok.
+                return qfalse;
 			}
+
+  			surf = (mdxmSurfHierarchy_t *)( (byte *)surf + (intptr_t)( &((mdxmSurfHierarchy_t *)0)->childIndexes[ surf->numChildren ] ));
 		}
 	}
 
 	//found nothing.
 	return qtrue;
-}
-
-void SetGhoul2TableIndex(int index)
-{
-	g2TableIndex = index;
 }
 
 #if 0

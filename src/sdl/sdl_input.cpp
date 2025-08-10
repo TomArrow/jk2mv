@@ -3,9 +3,6 @@
 #include "../qcommon/q_shared.h"
 #include "../client/client.h"
 #include "../sys/sys_local.h"
-#if MONITORSTATUS_MAYBE_KNOWABLE
-#include <SDL_syswm.h>
-#endif
 
 static cvar_t *in_keyboardDebug = NULL;
 
@@ -75,7 +72,7 @@ static bool IN_NumLockEnabled( void )
 
 static void IN_TranslateNumpad( SDL_Keysym *keysym, fakeAscii_t *key )
 {
-	if ( IN_NumLockEnabled() && (cls.keyCatchers || cl_numpadNumberBinds->integer) )
+	if ( IN_NumLockEnabled() && cls.keyCatchers )
 	{
 		switch ( keysym->sym )
 		{
@@ -484,30 +481,14 @@ void IN_Init( void *windowData )
 
 	mouseAvailable = (qboolean)( in_mouse->value != 0 );
 
-	if (in_mouse->integer == 0) {
-		Com_DPrintf("IN_Init: Mouse input disabled\n");
-	}
-
-	if (in_mouse->integer == 1) {
-		Com_DPrintf("IN_Init: Using raw mouse input\n");
-	}
-
 	if (in_mouse->integer == 2) {
 		Com_DPrintf("IN_Init: Not using raw input\n");
 		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
-	} else {
+	}
+	else {
+		Com_DPrintf("IN_Init: Using raw mouse input\n");
 		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "0");
 	}
-
-#if SDL_VERSION_ATLEAST(2, 26, 0)
-	if (in_mouse->integer == 3) {
-		Com_DPrintf("IN_Init: Using raw mouse input with system scaling\n");
-		// low latency of raw mouse input with system mouse scaling
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "1");
-	} else {
-		SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "0");
-	}
-#endif
 
 	IN_DeactivateMouse( );
 
@@ -752,31 +733,6 @@ static void IN_ProcessEvents( int eventTime )
 	{
 		switch( e.type )
 		{
-#if MONITORSTATUS_MAYBE_KNOWABLE
-			case SDL_SYSWMEVENT:
-				//Com_DPrintf("SDL_SYSWMEVENT %d\n", e.syswm.msg->msg.win.msg);
-				if (e.syswm.msg->msg.win.msg == WM_POWERBROADCAST) {
-					if (e.syswm.msg->msg.win.wParam == PBT_POWERSETTINGCHANGE) {
-						POWERBROADCAST_SETTING* setting = (POWERBROADCAST_SETTING*)e.syswm.msg->msg.win.lParam;
-						if (IsEqualGUID(setting->PowerSetting, GUID_MONITOR_POWER_ON)) {
-							DWORD state = *(DWORD*)setting->Data;
-							Com_DPrintf("Sys_WinPowerMsgHook: Monitor Power On is %d\n", state);
-							qboolean amScreensaving = (qboolean)(!state);
-							if (com_screensaverActive->integer != amScreensaving) {
-								Cvar_SetValue("com_screensaverActive", amScreensaving);
-							}
-						}else if (IsEqualGUID(setting->PowerSetting, GUID_CONSOLE_DISPLAY_STATE)) {
-							DWORD state = *(DWORD*)setting->Data;
-							Com_DPrintf("Sys_WinPowerMsgHook: Console Displaya State is %d\n", state);
-							qboolean amScreensaving = (qboolean)(!state);
-							if (com_screensaverActive->integer != amScreensaving) {
-								Cvar_SetValue("com_screensaverActive", amScreensaving);
-							}
-						}
-					}
-				}
-				break;
-#endif
 			case SDL_KEYDOWN:
 				if ((e.key.keysym.mod & KMOD_LALT) && !(e.key.keysym.mod & KMOD_CTRL))
 					textInput = qfalse;

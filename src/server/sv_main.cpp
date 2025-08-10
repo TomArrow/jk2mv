@@ -25,10 +25,8 @@ cvar_t	*sv_mapname;
 cvar_t	*sv_mapChecksum;
 cvar_t	*sv_serverid;
 cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
-cvar_t	*sv_minSnapsSpec;		// minimum snapshots/sec a spectator client can request, also limited by sv_maxSnaps
 cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
 cvar_t	*sv_enforceSnaps;
-cvar_t	*sv_enforceSnapsDebug;  // Generate all snapshots but only actually send the messages according to max snaps etc
 cvar_t	*sv_minRate;
 cvar_t	*sv_maxRate;
 cvar_t	*sv_maxOOBRate;
@@ -37,38 +35,14 @@ cvar_t	*sv_maxPing;
 cvar_t	*sv_gametype;
 cvar_t	*sv_pure;
 cvar_t	*sv_floodProtect;
-cvar_t	*sv_floodProtectSaveposRespos;
 cvar_t	*sv_allowAnonymous;
 cvar_t	*sv_needpass;
 cvar_t	*mv_serverversion;
 cvar_t  *sv_hibernateFps;
 cvar_t	*mv_apiConnectionless;
 cvar_t	*sv_pingFix;
-cvar_t	*sv_maxPacketUserCmds;
 cvar_t	*sv_autoWhitelist;
 cvar_t	*sv_dynamicSnapshots;
-
-#ifdef SVDEMO
-cvar_t* sv_autoDemo;
-cvar_t* sv_autoDemoBots;
-cvar_t* sv_autoDemoMaxMaps;
-cvar_t* sv_demoSpaceSaving;
-cvar_t* sv_demoPreRecord;
-cvar_t* sv_demoPreRecordBots;
-cvar_t* sv_demoPreRecordTime;
-cvar_t* sv_demoPreRecordKeyframeDistance;
-cvar_t* sv_demoWriteMeta;
-#endif
-
-cvar_t* sv_ucmdSendback;
-cvar_t* sv_ucmdSendbackMinCount;
-
-cvar_t* sv_crossServerCommands;
-cvar_t* sv_crossServerCommandRemoteServer;
-cvar_t* sv_crossServerCommandPassword;
-cvar_t* sv_crossServerCommandIdent;
-
-cvar_t* sv_specAllEnts;
 
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;
@@ -83,18 +57,6 @@ cvar_t	*mv_fixplayerghosting;
 
 // jk2mv engine flags
 cvar_t	*mv_resetServerTime;
-
-typedef struct crossServerCommandSubscriber_s {
-	netadr_t	addr;
-	int			lastTimeSubscribed;
-} crossServerCommandSubscriber_t;
-
-std::vector<crossServerCommandSubscriber_t> crossServerCommandSubscribers; // TODO use std::set for slightly better theoretical performance?
-
-netadr_t	crossServerCommandsRemoteServer;
-bool		crossServerCommandsRemoteServerSet = false;
-int			serverUniqueCrossServerCommandsId = -1;
-int			crossServerLastSubscribed = -1;
 
 /*
 =============================================================================
@@ -218,7 +180,6 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 	va_end (argptr);
 
 	// q3msgboom exploit
-	// more info? http://aluigi.altervista.org/adv/q3msgboom-adv.txt
 	if (strlen((char *)message) > 1022) {
 		return;
 	}
@@ -235,7 +196,7 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
-		if ( client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified) ) {
+		if ( client->state < CS_PRIMED ) {
 			continue;
 		}
 		SV_AddServerCommand( client, (char *)message );
@@ -607,136 +568,12 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	} else {
 		SVC_WhitelistAdr( from );
 
+		Cmd_DropArg (1);
+		Cmd_DropArg (0);
 		Cmd_Execute ();
 	}
 
 	Com_EndRedirect ();
-}
-
-bool SVC_AddCrossServerCommandSubscriber(netadr_t addr) {
-	for (auto it = crossServerCommandSubscribers.begin(); it != crossServerCommandSubscribers.end(); it++) {
-		if (it->addr.ipi == addr.ipi && it->addr.port == addr.port && it->addr.type == addr.type) {
-			it->lastTimeSubscribed = Sys_Milliseconds();
-			return false;
-		}
-	}
-	crossServerCommandSubscriber_t newSubscriber = {addr,Sys_Milliseconds()};
-	crossServerCommandSubscribers.push_back(newSubscriber);
-	return true;
-}
-void SVC_CrossServerCommandsMaintenance() {
-	int curMilli = Sys_Milliseconds();
-	// prune old subscribers
-	for (int i = crossServerCommandSubscribers.size() - 1; i >= 0;i--) {
-		if ((curMilli - crossServerCommandSubscribers[i].lastTimeSubscribed) > 60000 || crossServerCommandSubscribers[i].lastTimeSubscribed > curMilli) {
-			if (com_developer->integer > 1) {
-				Com_Printf("^3Pruning cross-server command subscriber: %s\n",NET_AdrToString(crossServerCommandSubscribers[i].addr));
-			}
-			crossServerCommandSubscribers.erase(crossServerCommandSubscribers.begin()+i);
-		}
-	}
-	if (crossServerCommandsRemoteServerSet && ((curMilli - crossServerLastSubscribed) > 10000 || crossServerLastSubscribed > curMilli)) {
-		const char* str = va("csc \"%s\" %d %d s \"%s\" \"%s\"", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, serverUniqueCrossServerCommandsId, sv_crossServerCommandIdent->string, sv_hostname->string);
-		NET_OutOfBandData(NS_CLIENT, crossServerCommandsRemoteServer, (byte*)str, strlen(str) + 1, sizeof("csc") - 1);
-		crossServerLastSubscribed = curMilli;
-	}
-}
-void SVC_CrossServerCommandForwardToSubscribers(netadr_t* addr, const char* rawString) {
-	for (auto it = crossServerCommandSubscribers.begin(); it != crossServerCommandSubscribers.end(); it++) {
-		if (addr && it->addr.ipi == addr->ipi && it->addr.port == addr->port && it->addr.type == addr->type) {
-			continue; // this is where it came from
-		}
-		if (crossServerCommandsRemoteServerSet && it->addr.ipi == crossServerCommandsRemoteServer.ipi && it->addr.port == crossServerCommandsRemoteServer.port && it->addr.type == crossServerCommandsRemoteServer.type) {
-			continue; // we check this separately but technically shouldn't happen unless misconfigured
-		}
-		if (com_developer->integer > 1) {
-			Com_Printf("^3Forwarding/sending cross-server command to '%s'\n",NET_AdrToString(it->addr));
-		}
-		NET_OutOfBandData(NS_CLIENT,it->addr,(byte*)rawString,strlen(rawString)+1,sizeof("csc")-1); // NS_CLIENT because this has to be received by the server (idk dumb)
-	}
-	if (crossServerCommandsRemoteServerSet) { // separately send to remote server
-		if (addr && crossServerCommandsRemoteServer.ipi == addr->ipi && crossServerCommandsRemoteServer.port == addr->port && crossServerCommandsRemoteServer.type == addr->type) {
-			return; // this is where it came from
-		}
-		if (com_developer->integer > 1) {
-			Com_Printf("^3Forwarding/sending cross-server command to remote '%s'\n", NET_AdrToString(crossServerCommandsRemoteServer));
-		}
-		NET_OutOfBandData(NS_CLIENT, crossServerCommandsRemoteServer, (byte*)rawString, strlen(rawString) + 1, sizeof("csc") - 1); 
-	}
-}
-
-/*
-===============
-SVC_CrossServerCommand
-
-Cross-server command received.
-
-Returns true if it's a command (not a subscription) and all checks passed.
-===============
-*/
-bool SVC_CrossServerCommand( netadr_t from ) {
-	qboolean	valid;
-
-	if (!strlen(sv_crossServerCommandPassword->string) ||
-		strcmp(Cmd_Argv(1), sv_crossServerCommandPassword->string)) {
-		valid = qfalse;
-		Com_DPrintf("Bad cross server command from %s: %s\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
-	}
-	else {
-		valid = qtrue;
-		if (com_developer->integer) {
-			Com_DPrintf("Cross server command from %s: %s\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
-		}
-	}
-
-	int cscUniqueServerId = atoi(Cmd_Argv(2));
-	int cscForwardingUniqueServerId = atoi(Cmd_Argv(3));
-	if (serverUniqueCrossServerCommandsId == cscUniqueServerId) {
-		if (com_developer->integer) {
-			Com_Printf("^1Likely badly configured cross server commands. Got back my own cmd. Not executing/forwarding.\n");
-		}
-		return false;
-	}
-	if (serverUniqueCrossServerCommandsId == cscForwardingUniqueServerId) {
-		if (com_developer->integer) {
-			Com_Printf("^1Likely badly configured cross server commands. Got back my own forwarded cmd. Not executing/forwarding.\n");
-		}
-		return false;
-	}
-
-	if ( !strlen(sv_crossServerCommandPassword->string ) ) {
-		Com_Printf ("No cross-server command password set.\n");
-	} else if ( !valid ) {
-		Com_Printf ("Bad cross-server command password.\n");
-	} else {
-		SVC_WhitelistAdr( from );
-
-		if (!Q_stricmp("s", Cmd_Argv(4))) {
-			// he is subscribing
-			if (SVC_AddCrossServerCommandSubscriber(from)) {
-				Com_DPrintf("Cross server command subscription from %s.\n", NET_AdrToString(from));
-			}
-			return false;
-		}
-		else if(!Q_stricmp("c", Cmd_Argv(4))) {
-			const char* forward = va("csc \"%s\" c %d %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, Cmd_ArgsFromQuoted(3));
-			Cmd_DropArg(4);
-			Cmd_DropArg(3);
-			Cmd_DropArg(2);
-			Cmd_DropArg(1);
-			Cmd_DropArg(0);
-			if (VM_Call(gvm, GAME_COOL_API_CROSS_SERVER_COMMAND_RECEIVED)) { // game can prevent forwarding if desired.
-				SVC_CrossServerCommandForwardToSubscribers(&from, forward);
-			}
-			return true;
-		}
-		else {
-			Com_Printf("Bad cross-server command from %s: %s.\n", NET_AdrToString(from), Cmd_ArgsFrom(4));
-		}
-		
-	}
-	return false;
-
 }
 
 /*
@@ -862,15 +699,6 @@ static bool SVC_IsWhitelisted( netadr_t adr ) {
 	}
 }
 
-bool SVC_CrossServerCommandsActive() {
-	if (sv_crossServerCommands->integer && !sv_crossServerCommandPassword->string[0]) {
-		Com_Printf("^1Warning: sv_crossServerCommands is active but sv_crossServerCommandPassword is not set. Disabling feature.\n");
-		Cvar_Set("sv_crossServerCommands","0");
-		return false;
-	}
-	return sv_crossServerCommands->integer && sv_crossServerCommandPassword->string[0];
-}
-
 //
 
 typedef enum {
@@ -883,7 +711,6 @@ typedef enum {
 	SVC_RCON,
 	SVC_DISCONNECT,
 	SVC_MVAPI,
-	SVC_CROSS_SERVER_COMMAND,
 	SVC_MAX
 } svcType_t;
 
@@ -911,8 +738,7 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		"getchallenge",
 		"rcon",
 		"disconnect",
-		"mvapi",
-		"csc" // cross-server-command
+		"mvapi"
 	};
 
 	char	*s;
@@ -932,24 +758,12 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	MSG_BeginReadingOOB( msg );
 	MSG_ReadLong( msg );		// skip the -1 marker
 
-	if (!Q_strncmp("connect", (const char *)&msg->data[4], sizeof("connect")-1)) {
+	if (!Q_strncmp("connect", (const char *)&msg->data[4], 7)) {
 		Huff_Decompress(msg, 12);
 		cmd = SVC_CONNECT;
 	}
-	if (!Q_strncmp("csc", (const char *)&msg->data[4], sizeof("csc") - 1)) {
-		if (!SVC_CrossServerCommandsActive()) {
-			return;
-		}
-		Huff_Decompress(msg, 8);
-		cmd = SVC_CROSS_SERVER_COMMAND;
-	}
 
-	if (cmd == SVC_CROSS_SERVER_COMMAND) {
-		s = MSG_ReadBigString(msg); // since this has to contain the start ("csc") and some other stuff, and cmds themselves can max out the 1024 limit, need big string here
-	}
-	else {
-		s = MSG_ReadStringLine(msg);
-	}
+	s = MSG_ReadStringLine( msg );
 	Cmd_TokenizeString( s );
 	c = Q_strlwr(Cmd_Argv(0));
 
@@ -1024,9 +838,6 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 
 			currmessage[0] = 0;
 		}
-		break;
-	case SVC_CROSS_SERVER_COMMAND:
-		SVC_CrossServerCommand(from);
 		break;
 	default:
 		Com_DPrintf("bad connectionless packet from %s:\n%s\n", NET_AdrToString(from), s);
@@ -1177,7 +988,7 @@ void SV_CheckTimeouts( void ) {
 	int			droppoint;
 	int			zombiepoint;
 
-	droppoint = svs.time - 1000 * MAX(10,sv_timeout->integer); // in case someone sets 9999999999 by accident and overflows to negative
+	droppoint = svs.time - 1000 * sv_timeout->integer;
 	zombiepoint = svs.time - 1000 * sv_zombietime->integer;
 
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
@@ -1188,32 +999,8 @@ void SV_CheckTimeouts( void ) {
 
 		if (cl->state == CS_ZOMBIE
 		&& cl->lastPacketTime < zombiepoint) {
-
-			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_KEEPZOMBIE) {
-
-				if (VM_Call(gvm, GAME_COOL_API_KEEPZOMBIE, cl - svs.clients)) {
-					cl->zombified = qtrue;
-				}
-				else if(cl->zombified){
-					cl->zombified = qfalse;
-
-					// add the disconnect command
-					SV_SendServerCommand(cl, "disconnect");
-
-					// nuke user info
-					SV_SetUserinfo(cl - svs.clients, "");
-					if (cl->demo.demorecording) {
-						SV_StopRecordDemo(cl);
-					}
-					SV_ClearClientDemoPreRecord(cl); // Happens on (re)connect too but let's be safe/clean :)
-					SV_ClearClientDemoMeta(cl);
-				}
-			}
-
-			if (!cl->zombified) {
-				Com_DPrintf("Going from CS_ZOMBIE to CS_FREE for %s\n", cl->name);
-				cl->state = CS_FREE;	// can now be reused
-			}
+			Com_DPrintf( "Going from CS_ZOMBIE to CS_FREE for %s\n", cl->name );
+			cl->state = CS_FREE;	// can now be reused
 			continue;
 		}
 		if ( cl->state >= CS_CONNECTED && cl->lastPacketTime < droppoint) {
@@ -1221,7 +1008,7 @@ void SV_CheckTimeouts( void ) {
 			// cause a timeout
 			if ( ++cl->timeoutCount > 5 ) {
 				SV_DropClient (cl, "timed out");
-				//cl->state = CS_FREE;	// don't bother with zombie state (yes do cuz we want to zombify)
+				cl->state = CS_FREE;	// don't bother with zombie state
 			}
 		} else {
 			cl->timeoutCount = 0;
@@ -1263,7 +1050,7 @@ qboolean SV_CheckPaused( void ) {
 }
 
 void SV_CheckCvars(void) {
-	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMinSpec = -1, lastModSnapsMax = -1, lastCrossServerCommandsRemoteServerModifiedCount = -1;
+	static int lastModHostname = -1, lastModFramerate = -1, lastModSnapsMin = -1, lastModSnapsMax = -1;
 	static int lastModEnforceSnaps = -1;
 	qboolean changed = qfalse;
 
@@ -1288,23 +1075,9 @@ void SV_CheckCvars(void) {
 		}
 	}
 
-	if (sv_crossServerCommandRemoteServer->modificationCount != lastCrossServerCommandsRemoteServerModifiedCount) {
-		if (!sv_crossServerCommandRemoteServer->string[0]) {
-			crossServerCommandsRemoteServerSet = false;
-		}
-		else {
-			crossServerCommandsRemoteServerSet = NET_StringToAdr(sv_crossServerCommandRemoteServer->string, &crossServerCommandsRemoteServer);
-			if (!crossServerCommandsRemoteServerSet) {
-				Com_Printf("^1Error parsing sv_crossServerCommandRemoteServer. Remote server will not be used.");
-			}
-		}
-		lastCrossServerCommandsRemoteServerModifiedCount = sv_crossServerCommandRemoteServer->modificationCount;
-	}
-
 	// check limits on client "snaps" value based on server framerate and snapshot rate
 	if (sv_fps->modificationCount != lastModFramerate ||
 		sv_minSnaps->modificationCount != lastModSnapsMin ||
-		sv_minSnapsSpec->modificationCount != lastModSnapsMinSpec ||
 		sv_maxSnaps->modificationCount != lastModSnapsMax ||
 		sv_enforceSnaps->modificationCount != lastModEnforceSnaps)
 	{
@@ -1313,7 +1086,6 @@ void SV_CheckCvars(void) {
 
 		lastModFramerate = sv_fps->modificationCount;
 		lastModSnapsMin = sv_minSnaps->modificationCount;
-		lastModSnapsMinSpec = sv_minSnapsSpec->modificationCount;
 		lastModSnapsMax = sv_maxSnaps->modificationCount;
 		lastModEnforceSnaps = sv_enforceSnaps->modificationCount;
 
@@ -1459,8 +1231,6 @@ void SV_Frame( int msec ) {
 
 	// update ping based on the all received frames
 	SV_CalcPings();
-
-	SVC_CrossServerCommandsMaintenance();
 
 	if (com_dedicated->integer) SV_BotFrame( sv.time );
 

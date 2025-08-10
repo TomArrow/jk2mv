@@ -49,11 +49,11 @@ public:
 	// Destructor
 	~CHash(void)
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 //		Com_OPrintf("Shutting down %s hash table .....", typeid(T).name());
 #endif
 		clear();
-#ifdef DEBUG
+#ifdef _DEBUG
 		Com_OPrintf(" done\n");
 #endif
 	}

@@ -188,101 +188,6 @@ static void R_DrawElements( int numIndexes, const glIndex_t *indexes ) {
 
 
 
-static void R_DrawCel(int numIndexes, const glIndex_t* indexes) {
-	int		primitives;
-
-	if (
-		//. ignore the 2d projection. do i smell the HUD?
-		(backEnd.projection2D == qtrue) ||
-		//. ignore general entitites that are sprites. SEE NOTE #3.
-		(backEnd.currentEntity->e.reType == RT_SPRITE) ||
-		//. ignore these liquids. why? ever see liquid with tris on the surface? exactly. SEE NOTE #4.
-		(tess.shader->contentFlags & (CONTENTS_WATER | CONTENTS_LAVA | CONTENTS_SLIME | CONTENTS_FOG)) ||
-		//. ignore things that are two sided, meaning mostly things that have transparency. SEE NOTE #1.		
-		(tess.shader->cullType == CT_TWO_SIDED)
-
-		) {
-		return;
-	}
-
-	primitives = r_primitives->integer;
-
-	// default is to use triangles if compiled vertex arrays are present
-	if (primitives == 0) {
-		if (qglLockArraysEXT) {
-			primitives = 2;
-		}
-		else {
-			primitives = 1;
-		}
-	}
-
-	if (r_celoutline->integer == 2 && tess.shader->isWorldShader) {
-		qglDisable(GL_CULL_FACE);
-	}
-
-	//. correction for mirrors. SEE NOTE #2.
-	if (backEnd.viewParms.isMirror == qtrue) { qglCullFace(GL_FRONT); }
-	else { qglCullFace(GL_BACK); }
-
-	qglEnable(GL_BLEND);
-	qglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	if (tr.celLineColorIsSet) {
-		qglColor4fv(tr.celLineColor);
-	}
-	else {
-		qglColor3f(0.0f, 0.0f, 0.0f);
-	}
-	qglLineWidth(r_celoutlineWidth->value);
-
-	if (primitives == 2) {
-		qglDrawElements(GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, indexes);
-	}
-	else if (primitives == 1) {
-		R_DrawStripElements(numIndexes, indexes, qglArrayElement);
-	}
-	else if (primitives == 3) {
-		R_DrawStripElements(numIndexes, indexes, R_ArrayElementDiscrete);
-	}
-
-	//. correction for mirrors. SEE NOTE #2.
-	if (backEnd.viewParms.isMirror == qtrue) { qglCullFace(GL_BACK); }
-	else { qglCullFace(GL_FRONT); }
-
-	qglDisable(GL_BLEND);
-
-	if (r_celoutline->integer == 2 && tess.shader->isWorldShader) {
-		qglEnable(GL_CULL_FACE);
-	}
-
-	return;
-
-	/* Notes
-
-	1. this is going to be a pain in the arse. it fixes things like light `beams` from being cel'd but it
-	also will ignore any other shader set with no culling. this usually is everything that is translucent.
-	but this is a good hack to clean up the screen untill something more selective comes along. or who knows
-	group desision might actually be that this is liked. if so i take back calling it a `hack`, lol.
-		= bob.
-
-	2. mirrors display correctly because the normals of the displayed are inverted of normal space. so to
-	continue to have them display correctly, we must invert them inversely from a normal inversion.
-		= bob.
-
-	3. this turns off a lot of space hogging sprite cel outlines. picture if you will five people in a small
-	room all shooting rockets. each smoke puff gets a big black square around it, each explosion gets a big
-	black square around it, and now nobody can see eachother because everyones screen is solid black.
-		= bob.
-
-	4. ignoring liquids means you will not get black tris lines all over the top of your liquid. i put this in
-	after seeing the lava on q3dm7 and water on q3ctf2 that had black lines all over the top, making the
-	liquids look solid instead of... liquid.
-		= bob.
-
-	*/
-}
-
-
 
 /*
 =============================================================
@@ -308,15 +213,9 @@ void R_BindAnimatedImage( textureBundle_t *bundle ) {
 		return;
 	}
 
-	if ((r_fullbright->value /*|| tr.refdef.doFullbright */ && r_fullbright->integer != 200000) && bundle->isLightmap)
+	if ((r_fullbright->value /*|| tr.refdef.doFullbright */) && bundle->isLightmap)
 	{
 		GL_Bind( tr.whiteImage );
-		return;
-	}
-
-	// TODO also consider surfaces that are very transparent/purposely invisible.
-	if (r_solidity->integer > 1 && clRenderInfo.wallhackOk && !bundle->isLightmap && bundle->isWorldBundle) {
-		GL_Bind(tr.solidityImage);
 		return;
 	}
 
@@ -348,32 +247,6 @@ void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	}
 
 	GL_Bind( bundle->image[ index ] );
-}
-
-static void DrawCel(shaderCommands_t* input) {
-
-	GL_Bind(tr.whiteImage);
-	qglColor3f(1, 1, 1);
-
-	GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE);
-
-	qglDisableClientState(GL_COLOR_ARRAY);
-	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	qglVertexPointer(3, GL_FLOAT, 16, input->xyz);	// padded for SIMD
-
-	if (qglLockArraysEXT) {
-		qglLockArraysEXT(0, input->numVertexes);
-		GLimp_LogComment("glLockArraysEXT\n");
-	}
-
-	R_DrawCel(input->numIndexes, input->indexes);
-
-	if (qglUnlockArraysEXT) {
-		qglUnlockArraysEXT();
-		GLimp_LogComment("glUnlockArraysEXT\n");
-	}
-
 }
 
 /*
@@ -448,21 +321,10 @@ to overflow.
 */
 void RB_BeginSurface( shader_t *shader, int fogNum ) {
 
-	shader_t *state = (shader->remappedShaderAdvanced ? shader->remappedShaderAdvanced : (shader->remappedShader ? shader->remappedShader : shader));
-	if (!r_newRemapsTmpFix->integer) {
-		if (state->defaultShader) state = tr.defaultShader;
-	}
-
+	shader_t *state = (shader->remappedShader) ? shader->remappedShader : shader;
 
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
-	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
-		Com_Memset(tess.vertexIsMarked,0,sizeof(tess.vertexIsMarked));
-	}
-	if (r_rampHelper->integer || r_solidity->integer > 2) {
-		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
-	}
-	tess.anyVertexColorOverrides = qfalse;
 	tess.shader = state;
 	tess.fogNum = fogNum;
 	tess.dlightBits = 0;		// will be OR'd in by surface functions
@@ -855,13 +717,8 @@ ComputeColors
 */
 static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 {
-	int			i,c;
+	int			i;
 	qboolean killGen = qfalse;
-	bool markSurfaceAngles;
-	bool overrideVertexColors;
-
-	markSurfaceAngles = r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value;
-	overrideVertexColors = tess.anyVertexColorOverrides;//r_rampHelper->integer;
 
 	if ( tess.shader != tr.projectionShadowShader && tess.shader != tr.shadowShader &&
 			( backEnd.currentEntity->e.renderfx & (RF_DISINTEGRATE1|RF_DISINTEGRATE2)))
@@ -1013,30 +870,6 @@ static void ComputeColors( shaderStage_t *pStage, int forceRGBGen )
 				tess.svars.colorsui[i] = tempColor;
 			}
 			break;
-	}
-
-	if (markSurfaceAngles) {
-		for (i = 0; i < tess.numVertexes; i++)
-		{
-			if (tess.vertexIsMarked[i]) {
-				tess.svars.colors[i][1] = tess.svars.colors[i][2] = 0;
-			}
-		}
-	}
-
-	if (overrideVertexColors) {
-		int tmp, min;
-		for (i = 0; i < tess.numVertexes; i++)
-		{
-			if (tess.vertexColorOverrides[i][0] || tess.vertexColorOverrides[i][1] || tess.vertexColorOverrides[i][2] || tess.vertexColorOverrides[i][3]) {
-				for (c = 0; c < 4; c++) {
-					//min = tess.vertexColorOverrides[i][c] / 4; // random idk
-					tmp = tess.svars.colors[i][c] * tess.vertexColorOverrides[i][c] / 255;
-					//tess.svars.colors[i][c] = MIN(MAX(min,tmp),255);
-					tess.svars.colors[i][c] = MIN(MAX(0,tmp),255);
-				}
-			}
-		}
 	}
 
 	//
@@ -1353,7 +1186,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			//
 			if ( pStage->bundle[0].vertexLightmap && ( r_vertexLight->integer && !r_uiFullScreen->integer ) && r_lightmap->integer )
 			{
-				GL_Bind(tr.whiteImage);
+				GL_Bind( tr.whiteImage );
 			}
 			else
 				R_BindAnimatedImage( &pStage->bundle[0] );
@@ -1409,12 +1242,6 @@ void RB_StageIteratorGeneric( void )
 	{
 		qglEnable( GL_POLYGON_OFFSET_FILL );
 		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
-	}
-
-	//. show me cel outlines.
-	//. there has to be a better place to put this.
-	if (r_celoutline->integer) {
-		DrawCel(&tess);
 	}
 
 	//
@@ -1780,10 +1607,10 @@ void RB_EndSurface( void ) {
 	//
 	// draw debugging stuff
 	//
-	if ( r_showtris->integer && clRenderInfo.wallhackOk) {
+	if ( r_showtris->integer ) {
 		DrawTris (input);
 	}
-	if ( r_shownormals->integer && clRenderInfo.wallhackOk) {
+	if ( r_shownormals->integer ) {
 		DrawNormals (input);
 	}
 	// clear shader so we can tell we don't have any unclosed surfaces

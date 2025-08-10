@@ -149,7 +149,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 	unsigned short	*startGridPos;
 
 
-	if ((r_fullbright->integer && r_fullbright->integer != 200000) || ent->e.renderfx & RF_FULLBRIGHT)
+	if (r_fullbright->integer || ent->e.renderfx & RF_FULLBRIGHT)
 	{
 		ent->ambientLight[0] = ent->ambientLight[1] = ent->ambientLight[2] = 255.0;
 		ent->directedLight[0] = ent->directedLight[1] = ent->directedLight[2] = 255.0;
@@ -223,7 +223,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 
 			gridPos = startGridPos + tr.world->lightGridOffsets[i];
 
-			if (gridPos >= tr.world->lightGridArray + tr.world->numGridArrayElements || gridPos < tr.world->lightGridArray)
+			if (gridPos >= tr.world->lightGridArray + tr.world->numGridArrayElements)
 			{
 				//we've gone off the array somehow
 				continue;
@@ -344,7 +344,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 			{
 				continue;
 			}
-			if (gridPos >= tr.world->lightGridArray + tr.world->numGridArrayElements || gridPos < tr.world->lightGridArray)
+			if (gridPos >= tr.world->lightGridArray + tr.world->numGridArrayElements)
 			{//we've gone off the array somehow
 				continue;
 			}

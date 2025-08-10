@@ -9,7 +9,7 @@ Ghoul2 Insert Start
 */
 #include <vector>
 #include <stdint.h>
-//using namespace std;
+using namespace std;
 /*
 Ghoul2 Insert End
 */
@@ -61,7 +61,7 @@ struct  boneInfo_t
 	int			boneBlendTime;	// time for duration of bone angle blend with normal animation
 	int			boneBlendStart;	// time bone angle blend with normal animation began
 	int			lastTime;		// this does not go across the network
-	mdxaBone_t	newMatrix = { 0 };		// This is the lerped matrix that Ghoul2 uses on the client side - does not go across the network
+	mdxaBone_t	newMatrix;		// This is the lerped matrix that Ghoul2 uses on the client side - does not go across the network
 
 boneInfo_t():
 	boneNumber(-1),
@@ -91,7 +91,7 @@ struct boltInfo_t{
 	int			surfaceNumber;	// surface number bolt attaches to
 	int			surfaceType;	// if we attach to a surface, this tells us if it is an original surface or a generated one - doesn't go across the network
 	int			boltUsed;		// nor does this
-	mdxaBone_t	position = { 0 };		// this does not go across the network
+	mdxaBone_t	position;		// this does not go across the network
 	boltInfo_t():
 	boneNumber(-1),
 	surfaceNumber(-1),
@@ -102,18 +102,16 @@ struct boltInfo_t{
 
 #define MAX_GHOUL_COUNT_BITS 8 // bits required to send across the MAX_G2_MODELS inside of the networking - this is the only restriction on ghoul models possible per entity
 
-typedef std::vector <surfaceInfo_t> surfaceInfo_v;
-typedef std::vector <boneInfo_t> boneInfo_v;
-typedef std::vector <boltInfo_t> boltInfo_v;
-typedef std::vector <std::pair<int,mdxaBone_t> > mdxaBone_v;
+typedef vector <surfaceInfo_t> surfaceInfo_v;
+typedef vector <boneInfo_t> boneInfo_v;
+typedef vector <boltInfo_t> boltInfo_v;
+typedef vector <pair<int,mdxaBone_t> > mdxaBone_v;
 
 // defines for stuff to go into the mflags
 #define		GHOUL2_NOCOLLIDE 0x001
 #define		GHOUL2_NORENDER	 0x002
 #define		GHOUL2_NOMODEL	 0x004
 #define		GHOUL2_NEWORIGIN 0x008
-
-struct model_s;
 
 // NOTE order in here matters. We save out from mModelindex to mFlags, but not the STL vectors that are at the top or the bottom.
 class CGhoul2Info
@@ -141,7 +139,6 @@ public:
 	size_t				*mTransformedVertsArray;	// used to create an array of pointers to transformed verts per surface for collision detection
 	mdxaBone_v		mTempBoneList;
 	int				mSkin;
-	const model_s	*currentModel;
 
 	CGhoul2Info():
 	mModelindex(-1),
@@ -158,14 +155,13 @@ public:
 	mMeshFrameNum(-1),
 	mFlags(0),
 	mTransformedVertsArray(0),
-	mSkin(0),
-	currentModel(nullptr)
+	mSkin(0)
 	{
 		mFileName[0] = 0;
 	}
 };
 
-typedef std::vector<CGhoul2Info> CGhoul2Info_v;
+typedef vector<CGhoul2Info> CGhoul2Info_v;
 
 // collision detection stuff
 #define G2_FRONTFACE 1
@@ -177,16 +173,16 @@ class CCollisionRecord
 public:
 	float		mDistance;
 	int			mEntityNum;
-	int			mModelIndex = 0;
-	int			mPolyIndex = 0;
-	int			mSurfaceIndex = 0;
-	vec3_t		mCollisionPosition = { 0 };
-	vec3_t		mCollisionNormal = { 0 };
-	int			mFlags = 0;
-	int			mMaterial = 0;
-	int			mLocation = 0;
-	float		mBarycentricI = 0; // two barycentic coodinates for the hit point
-	float		mBarycentricJ=0; // K = 1-I-J
+	int			mModelIndex;
+	int			mPolyIndex;
+	int			mSurfaceIndex;
+	vec3_t		mCollisionPosition;
+	vec3_t		mCollisionNormal;
+	int			mFlags;
+	int			mMaterial;
+	int			mLocation;
+	float		mBarycentricI; // two barycentic coodinates for the hit point
+	float		mBarycentricJ; // K = 1-I-J
 
 	CCollisionRecord():
 	mDistance(100000),

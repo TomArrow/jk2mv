@@ -15,21 +15,7 @@
 
 #include "../api/mvapi.h"
 
-#include <memory>
-
-#include "../qcommon/mariadb.h"
-
-cvar_t* com_coolApi_supported_game_userCmdStoreVersion;
-cvar_t* com_coolApi_supported_game;
-cvar_t* com_coolApi_supported_game_vmflags;
-
-float Q_asin(float c);
-
-typedef unsigned char posHashType_t;
-std::vector<std::tuple<std::unique_ptr<usercmd_t>, posHashType_t>> userCmdStore[MAX_CLIENTS]; // int added as position hash in usercmd store version 1
-
 botlib_export_t	*botlib_export;
-
 
 #ifdef G2_COLLISION_ENABLED
 extern CMiniHeap *G2VertSpaceServer;
@@ -125,21 +111,6 @@ void SV_GameSendServerCommand( int clientNum, const char *text ) {
 		}
 		SV_SendServerCommand( svs.clients + clientNum, "%s", text );
 	}
-}
-
-/*
-===============
-SV_BroadcastCrossServerCommand
-
-Broadcasts a cross-server command
-===============
-*/
-void SV_BroadcastCrossServerCommand( const char *text ) {
-	if (!SVC_CrossServerCommandsActive()) {
-		return;
-	}
-	const char* finalCmd = va("csc \"%s\" %d %d c \"%s\" \"%s\" %s",sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, serverUniqueCrossServerCommandsId, sv_crossServerCommandIdent->string, sv_hostname->string,text);
-	SVC_CrossServerCommandForwardToSubscribers(NULL, finalCmd);
 }
 
 
@@ -285,7 +256,7 @@ qboolean	SV_EntityContact( const vec3_t mins, const vec3_t maxs, const sharedEnt
 
 	ch = SV_ClipHandleForEntity( gEnt );
 	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs,
-		ch, -1, origin, angles, capsule, &defaultTraceCustomization);
+		ch, -1, origin, angles, capsule );
 
 	return trace.startsolid;
 }
@@ -378,9 +349,6 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 	if ( mv_blockspeedhack->integer && !(sv.fixes & MVFIX_SPEEDHACK)) cmd->angles[ROLL] = 0; // Prevent modified clients from gaining more speed than others...
 }
 
-
-void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg);
-
 //==============================================
 
 /*
@@ -390,6 +358,7 @@ SV_GameSystemCalls
 The module is making a system call
 ====================
 */
+extern bool RicksCrazyOnServer;
 intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	// fix syscalls from 1.02 to match 1.04
 	// this is a mess... can it be done better?
@@ -399,8 +368,8 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 	}
 
-	int vmIndex = VM_GetIndex(gvm);
-	SetGhoul2TableIndex(vmIndex);
+	// set game ghoul2 context
+	RicksCrazyOnServer = true;
 
 	switch( args[0] ) {
 	case G_PRINT:
@@ -471,10 +440,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_ENTITY_CONTACTCAPSULE:
 		return SV_EntityContact( VMAP(1, const vec_t, 3), VMAP(2, const vec_t, 3), VMAV(3, const sharedEntity_t), qtrue );
 	case G_TRACE:
-		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &defaultTraceCustomization);
+		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9] );
 		return 0;
 	case G_TRACECAPSULE:
-		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &defaultTraceCustomization);
+		SV_Trace( VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9]  );
 		return 0;
 	case G_POINT_CONTENTS:
 		return SV_PointContents( VMAP(1, const vec_t, 3), args[2] );
@@ -557,7 +526,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case SP_REGISTER_SERVER_CMD:
 		return SP_RegisterServer( VMAS(1) );
 	case SP_GETSTRINGTEXTSTRING:
-		return Com_GetLocalizedString( VMAS(1), VMAP(2, char, args[3]), args[3] );
+		return SP_VMGetStringText( VMAS(1), VMAP(2, char, args[3]), args[3] );
 
 	case G_ROFF_CLEAN:
 		return theROFFSystem.Clean(qfalse);
@@ -575,12 +544,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_ROFF_PURGE_ENT:
 		return theROFFSystem.PurgeEnt( args[1], qfalse );
 
-	case G_ACOS:
-		return FloatAsInt(Q_acos(VMF(1)));
-	case G_ASIN:
-		return FloatAsInt(Q_asin(VMF(1)));
 
-	
 
 
 		//====================================
@@ -1013,16 +977,16 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_G2_GETBOLT:
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC:
 		gG2_GBMNoReconstruct = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_GETBOLT_NOREC_NOROT:
 		gG2_GBMNoReconstruct = qtrue;
 		gG2_GBMUseSPMethod = qtrue;
-		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(vmIndex) + 1), VMAP(9, const vec_t, 3));
+		return G2API_GetBoltMatrix((g2handle_t)args[1], args[2], args[3], VMAV(4, mdxaBone_t), VMAP(5, const vec_t, 3), VMAP(6, const vec_t, 3), args[7], VMAA(8, const qhandle_t, G2API_GetMaxModelIndex(true) + 1), VMAP(9, const vec_t, 3));
 
 	case G_G2_INITGHOUL2MODEL:
 		return	G2API_InitGhoul2Model(VMAV(1, g2handle_t), VMAS(2), args[3], (qhandle_t) args[4],
@@ -1102,228 +1066,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 
 	}
 
-
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS) {
-		switch (args[0]) {
-		case G_COOL_API_SETBRUSHMODELCONTENTFLAGS:
-			CM_SetBrushModelContentFlags(VMAV(1, sharedEntity_t)->s.modelindex, args[2], (coolApiSetBModelCFlagsMode_t)args[3]);
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_G_USERCMDSTORE) {
-		switch (args[0]) {
-		case G_COOL_API_PLAYERUSERCMD_ADD:
-			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-				std::unique_ptr<usercmd_t> ucmd(new usercmd_t);
-				*ucmd = *VMAV(2, usercmd_t);
-				posHashType_t posHash = args[3];
-				userCmdStore[args[1]].push_back(std::move(std::make_tuple(std::move(ucmd),posHash)));
-				return userCmdStore[args[1]].size() - 1;
-			}
-			return 0;
-		case G_COOL_API_PLAYERUSERCMD_REMOVE:
-			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-				if (!userCmdStore[args[1]].size()) {
-					return 0;
-				}
-				int from = MIN(MAX(0, (size_t)args[2]), userCmdStore[args[1]].size() - 1);
-				int to = MIN(MAX(0, (size_t)args[3]), userCmdStore[args[1]].size() - 1);
-				if (to < from) {
-					return 0;
-				}
-				if (from >= 0 && to >= 0) {
-					userCmdStore[args[1]].erase(userCmdStore[args[1]].begin() + from, userCmdStore[args[1]].begin() + to + 1);
-				}
-				return from - to + 1;
-			}
-			return 0;
-		case G_COOL_API_PLAYERUSERCMD_CLEAR:
-			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-				int countCleared = userCmdStore[args[1]].size();
-				userCmdStore[args[1]].clear();
-				return countCleared;
-			}
-			return 0;
-		case G_COOL_API_PLAYERUSERCMD_GET:
-			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-				if (args[2] < 0 || (size_t)args[2] >= userCmdStore[args[1]].size()) {
-					return qfalse;
-				}
-				*VMAV(3, usercmd_t) = *std::get<0>(userCmdStore[args[1]][args[2]]);
-				if (com_coolApi_supported_game_userCmdStoreVersion->integer >= 1) {
-					*VMAV(4, posHashType_t) = std::get<1>(userCmdStore[args[1]][args[2]]);
-				}
-				return qtrue;
-			}
-			return qfalse;
-		case G_COOL_API_PLAYERUSERCMD_GETCOUNT:
-			if (args[1] >= 0 && args[1] < MAX_CLIENTS) {
-				return userCmdStore[args[1]].size();
-			}
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_NONEPSILONTRACE) {
-		switch (args[0]) {
-
-		case G_COOL_API_NONEPSILONTRACE:
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &nonEpsilonTraceCustomization);
-			return 0;
-		case G_COOL_API_NONEPSILONTRACE_CAPSULE:
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &nonEpsilonTraceCustomization);
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_CUSTOMEPSILONTRACE) {
-		traceCustomization_t traceCustomization = {qfalse,qtrue,0,0};
-
-		switch (args[0]) {
-
-		case G_COOL_API_CUSTOMEPSILONTRACE:
-			traceCustomization.customEpsilon = (qboolean)args[10];
-			traceCustomization.customEpsilonValue = VMF(11);
-			traceCustomization.traceCustomFlags = args[12];
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qfalse, args[8], args[9], &traceCustomization);
-			return 0;
-		case G_COOL_API_CUSTOMEPSILONTRACE_CAPSULE:
-			traceCustomization.customEpsilon = (qboolean)args[10];
-			traceCustomization.customEpsilonValue = VMF(11);
-			traceCustomization.traceCustomFlags = args[12];
-			SV_Trace(VMAV(1, trace_t), VMAP(2, const vec_t, 3), VMAP(3, const vec_t, 3), VMAP(4, const vec_t, 3), VMAP(5, const vec_t, 3), args[6], args[7], qtrue, args[8], args[9], &traceCustomization);
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_CROSS_SERVER_COMMANDS) {
-
-		switch (args[0]) {
-
-		case G_COOL_API_CROSS_SERVER_COMMAND:
-			SV_BroadcastCrossServerCommand(VMAS(1));
-			return 0;
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED) {
-		switch (args[0]) {
-
-		case G_COOL_API_SENDBACKUCMD_GAMEGENERATED:
-		{
-			userMessage_t* umsg = new userMessage_t();
-			umsg->serverTime = sv.time;
-			umsg->droppedPackets = 0;
-			umsg->clientNum = args[1];
-			umsg->pingKnown = qfalse;
-			usercmd_t* ucmd = new usercmd_t();
-			*ucmd = *VMAV(2, usercmd_t);
-			umsg->cmds.push_back(std::move(std::shared_ptr<usercmd_t>(ucmd)));
-			SV_AddUserMessageForClient(args[1], umsg);
-			return 0;
-		}
-		}
-	}
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MARIADB) {
-		switch (args[0]) {
-		case G_COOL_API_DB_ESCAPESTRING:
-			return DB_EscapeString(VMAP(1, char, args[2]), args[2]);
-			break;
-		case G_COOL_API_DB_ADDREQUEST:
-			return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), DBREQUESTTYPE_REQUEST);
-			break;
-		case G_COOL_API_DB_ADDREQUEST_TYPED:
-			return DB_AddRequest(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4), (DBRequestType_t)args[5]);
-			break;
-		case G_COOL_API_DB_NEXTRESPONSE:
-			// int* requestType, int* affectedRows, int* status, char* errorMessage, int errorMessageSize, byte* reference, int referenceLength
-			return DB_NextResponse(MODULE_GAME,
-				VMAP(1, int, 1),			// int* requestType
-				VMAP(2, int, 1),			// int* affectedRows
-				VMAP(3, int, 1),			// int* status
-				VMAP(4, char, args[5]),		// char* errorMessage
-				args[5],					// int errorMessageSize
-				args[6] ? VMAP(6, byte, args[7]) : NULL,		// byte* reference
-				args[7]						// int referenceLength
-			);
-			break;
-		case G_COOL_API_DB_GETREFERENCE:
-			return DB_GetReference(MODULE_GAME,
-				VMAP(1, byte, args[2]),		// byte* reference
-				args[2]						// int referenceLength
-			);
-			break;
-		case G_COOL_API_DB_NEXTROW:
-			return DB_NextRow(MODULE_GAME);
-			break;
-		case G_COOL_API_DB_GETINT:
-			return DB_GetInt(MODULE_GAME, args[1]);
-			break;
-		case G_COOL_API_DB_GETFLOAT:
-		{
-			float* retVal = VMAP(2, float, 1);
-			*retVal = DB_GetFloat(MODULE_GAME, args[1]);
-			return 0;
-		}
-		break;
-		case G_COOL_API_DB_GETSTRING:
-			return DB_GetString(MODULE_GAME,
-				args[1],
-				VMAP(2, char, args[3]),		// byte* reference
-				args[3]						// int referenceLength
-			);
-			break;
-		case G_COOL_API_DB_ADDPREPAREDSTATEMENT:
-			return DB_AddPreparedStatement(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2], args[3], VMAS(4));
-		case G_COOL_API_DB_PREPAREDBINDSTRING:
-			return DB_PreparedBindString(MODULE_GAME, VMAS(1));
-		case G_COOL_API_DB_PREPAREDBINDFLOAT:
-			return DB_PreparedBindFloat(MODULE_GAME, VMF(1));
-		case G_COOL_API_DB_PREPAREDBINDINT:
-			return DB_PreparedBindInt(MODULE_GAME, args[1]);
-		case G_COOL_API_DB_PREPAREDBINDNULL:
-			return DB_PreparedBindNull(MODULE_GAME);
-		case G_COOL_API_DB_GETMORERESULTS:
-			return DB_NextResultSet(MODULE_GAME, VMAP(1, int, 1));
-		case G_COOL_API_DB_PREPAREDBINDBINARY:
-			return DB_PreparedBindBinary(MODULE_GAME, args[1] ? VMAP(1, byte, args[2]) : NULL, args[2]);
-		case G_COOL_API_DB_FINISHANDSENDPREPAREDSTATEMENT:
-			return DB_FinishAndSendPreparedStatement(MODULE_GAME);
-		case G_COOL_API_DB_GETBINARY:
-			return DB_GetBinary(MODULE_GAME,
-				args[1],
-				VMAP(2, byte, args[3]),		// byte* reference
-				args[3]						// int referenceLength
-			);
-		}
-	}
-
-	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_JEDI_ACADEMY) {
-		switch (args[0]) {
-		case G_COOL_API_GET_NUM_LANGUAGES:
-			return Com_GetNumLanguages();
-
-		case G_COOL_API_GET_LANGUAGE_NAME:
-			Com_GetLanguageName(args[1], VMAP(2, char, args[3]), args[3]);
-			return 0;
-
-		case G_COOL_API_GIVE_ME_VECTOR_FROM_MATRIX:
-			G2API_GiveMeVectorFromMatrix(VMAV(1, const mdxaBone_t), (Eorientations)(args[2]), VMAP(3, vec_t, 3));
-			return 0;
-
-		case G_COOL_API_SET_SKIN:
-			return G2API_SetSkin((g2handle_t)args[1], args[2], args[3], args[4]);
-
-		case G_COOL_API_SKINLESS_MODEL:
-			return G2API_SkinlessModel((g2handle_t)args[1], args[2]);
-
-		case G_COOL_API_GET_SURFACE_RENDER_STATUS:
-			return G2API_GetSurfaceRenderStatus((g2handle_t)args[1], args[2], VMAS(3));
-
-		case G_COOL_API_ATTACH_G2_MODEL:
-			return G2API_AttachG2Model((g2handle_t)args[1], args[2], (g2handle_t)args[3], args[4], args[5]);
-
-		case G_COOL_API_GET_FILE_VERSION:
-			return FS_GetFileVersion(VMAS(1), MODULE_GAME);
-		}
-	}
-
 	if (VM_MVAPILevel(gvm) >= 1) {
 		switch (args[0]) {
 		case G_MVAPI_LOCATE_GAME_DATA:
@@ -1362,19 +1104,14 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		switch(args[0]) {
 		case G_MVAPI_RESET_SERVER_TIME:
 			return (int)SV_MVAPI_ResetServerTime((qboolean)!!args[1]);
-		//case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
-		//	return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
+		case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
+			return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
 		case G_MVAPI_ENABLE_SUBMODELBYPASS:
 			return SV_MVAPI_EnableSubmodelBypass( (qboolean)!!args[1] );
 		case MVAPI_PRINT:
 			Com_Printf_MV( args[1], "%s", VMAS(2) );
 			return 0;
 		}
-	}
-	// cool api allows us to get this as sneak peek :)
-	switch (args[0]) {
-		case G_MVAPI_ENABLE_PLAYERSNAPSHOTS:
-			return (int)SV_MVAPI_EnablePlayerSnapshots((qboolean)!!args[1]);
 	}
 
 	Com_Error( ERR_DROP, "Bad game system trap: %lli", (long long int)args[0] );
@@ -1389,17 +1126,10 @@ Called every time a map changes
 ===============
 */
 void SV_ShutdownGameProgs( void ) {
-	int vmIndex;
-
 	if ( !gvm ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
-
-	vmIndex = VM_GetIndex(gvm);
-	FixGhoul2InfoLeaks(vmIndex);
-	SetGhoul2TableIndex(-1);
-
 	VM_Free( gvm );
 	gvm = NULL;
 	sv.fixes = MVFIX_NONE;
@@ -1414,9 +1144,12 @@ SV_InitGameVM
 Called for both a full init and a restart
 ==================
 */
+extern void FixGhoul2InfoLeaks(bool);
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
+
+	FixGhoul2InfoLeaks(true);
 
 	// clear physics interaction links
 	SV_ClearWorld ();
@@ -1429,10 +1162,6 @@ static void SV_InitGameVM( qboolean restart ) {
 
 	mvStructConversionDisabled = qfalse;
 
-	com_coolApi_supported_game = Cvar_Get("coolApi_supported_game", "0", CVAR_ROM);
-	com_coolApi_supported_game_userCmdStoreVersion = Cvar_Get("coolApi_supported_game_userCmdStoreVersion", "0", CVAR_ROM);
-	com_coolApi_supported_game_vmflags = Cvar_Get("coolApi_supported_game_vmflags", "0", CVAR_ROM);
-
 	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,
 		0, 0, 0, 0, 0, 0, 0, 0, MIN(mv_apienabled->integer, MV_APILEVEL));
 	if (apireq > mv_apienabled->integer) {
@@ -1440,8 +1169,6 @@ static void SV_InitGameVM( qboolean restart ) {
 	}
 	VM_SetMVAPILevel(gvm, apireq);
 	Com_DPrintf("GameVM uses MVAPI level %i.\n", apireq);
-
-	//VM_SetCoolApiSupport(gvm, com_coolApi_supported_game->integer); // dont care it will be in the cvar anyway
 
 	if (apireq >= 1) {
 		VM_Call(gvm, MVAPI_AFTER_INIT);
@@ -1464,16 +1191,10 @@ Called on a map_restart, but not on a normal map change
 ===================
 */
 void SV_RestartGameProgs( void ) {
-	int vmIndex;
-
 	if ( !gvm ) {
 		return;
 	}
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
-
-	vmIndex = VM_GetIndex(gvm);
-	FixGhoul2InfoLeaks(vmIndex);
-	SetGhoul2TableIndex(-1);
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );

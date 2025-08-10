@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,6 +40,14 @@
 #include "SDL_video.h"
 #include "SDL_version.h"
 
+/**
+ *  \brief SDL_syswm.h
+ *
+ *  Your application has access to a special type of event ::SDL_SYSWMEVENT,
+ *  which contains window-manager specific information and arrives whenever
+ *  an unhandled window event occurs.  This event is ignored by default, but
+ *  you can enable it with SDL_EventState().
+ */
 struct SDL_SysWMinfo;
 
 #if !defined(SDL_PROTOTYPES_ONLY)
@@ -128,7 +136,6 @@ extern "C" {
 #endif
 
 #if !defined(SDL_PROTOTYPES_ONLY)
-
 /**
  * These are the various supported windowing subsystems
  */
@@ -363,8 +370,8 @@ typedef struct SDL_SysWMinfo SDL_SysWMinfo;
  * `SDL_VERSION(&info.version)`, and then this function will fill in the rest
  * of the structure with information about the given window.
  *
- * \param window the window about which information is being requested.
- * \param info an SDL_SysWMinfo structure filled in with window information.
+ * \param window the window about which information is being requested
+ * \param info an SDL_SysWMinfo structure filled in with window information
  * \returns SDL_TRUE if the function is implemented and the `version` member
  *          of the `info` struct is valid, or SDL_FALSE if the information
  *          could not be retrieved; call SDL_GetError() for more information.

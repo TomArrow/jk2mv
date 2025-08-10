@@ -279,29 +279,7 @@ static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
 		dlightBits = ( dlightBits != 0 );
 	}
 
-	if (!surf->shader->isWorldShader) {
-		surf->shader->isWorldShader = qtrue;
-		// this is so disgusting LOL
-		for (int i = 0; i < MAX_SHADER_STAGES; i++) {
-			if (!surf->shader->stages[i]) continue; // do we have to break instead? can there be gaps in stages? NO IDEA IM LAZY. 
-			for (int j = 0; j < NUM_TEXTURE_BUNDLES; j++) {
-				surf->shader->stages[i]->bundle[j].isWorldBundle = qtrue;
-			}
-		}
-	}
-
-	bool water = surf->contents & (CONTENTS_WATER | CONTENTS_LAVA | CONTENTS_SLIME);
-
-	if (r_solidity->integer &&/* surf->shader->solidity == -1*/ (!(surf->contents & CONTENTS_SOLID) && !(surf->contents & CONTENTS_PLAYERCLIP) && !water || r_solidityHideTrisoup->integer && surf->trisoupMapSurf) && clRenderInfo.wallhackOk) {
-		// this is a bit shitty i think as it relies on the correct shader being present. 
-		// a proper implementation should somehow correlate with the contents of the brushes.
-		// I have no idea how to do it tho and too lazy to think about it.
-		return;
-	}
-
-
-
-	R_AddDrawSurf( surf->data, (water && r_solidity->integer) ? tr.solidityWaterShader: surf->shader, surf->fogIndex, dlightBits );
+	R_AddDrawSurf( surf->data, surf->shader, surf->fogIndex, dlightBits );
 }
 
 /*
@@ -691,12 +669,10 @@ static void R_MarkLeaves (void) {
 	// hasn't changed, we don't need to mark everything again
 
 	// if r_showcluster was just turned on, remark everything
-	if ( tr.viewCluster == cluster && !tr.refdef.areamaskModified && !tr.refdef.forceVisRefresh
+	if ( tr.viewCluster == cluster && !tr.refdef.areamaskModified
 		&& !r_showcluster->modified ) {
 		return;
 	}
-
-	tr.refdef.forceVisRefresh = qfalse;
 
 	if ( r_showcluster->modified || r_showcluster->integer ) {
 		r_showcluster->modified = qfalse;
@@ -731,11 +707,9 @@ static void R_MarkLeaves (void) {
 		}
 
 		// check for door connection
-		if (!r_drawAllAreas->integer) {
-			if (leaf->area >= 8 * (int)ARRAY_LEN(tr.refdef.areamask) ||
-				(tr.refdef.areamask[leaf->area >> 3] & (1 << (leaf->area & 7)))) {
-				continue;		// not visible
-			}
+		if ( leaf->area >= 8 * (int)ARRAY_LEN(tr.refdef.areamask) ||
+			 (tr.refdef.areamask[leaf->area>>3] & (1<<(leaf->area&7)) ) ) {
+			continue;		// not visible
 		}
 
 		parent = leaf;
@@ -757,7 +731,7 @@ R_AddWorldSurfaces
 void R_AddWorldSurfaces (void) {
 	unsigned int dlightBits;
 
-	if ( !r_drawworld->integer  && clRenderInfo.wallhackOk) {
+	if ( !r_drawworld->integer ) {
 		return;
 	}
 

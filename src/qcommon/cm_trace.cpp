@@ -7,9 +7,6 @@
 
 //#define CAPSULE_DEBUG
 
-traceCustomization_t defaultTraceCustomization = { qfalse, qfalse, 0, 0};
-traceCustomization_t nonEpsilonTraceCustomization = { qtrue, qfalse, 0, 0};
-
 /*
 ===============================================================================
 
@@ -237,8 +234,7 @@ void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 		}
 		b->checkcount = cm.checkcount;
 
-		//if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER)&& (tw->contents != CONTENTS_TRIGGER_EXIT)) { // exception here: badly converted maps don't have proper contents set on triggers. but thats ok we wouldn't have gotten here if the entity didn't have the flag in the first place
-		if ( !(b->contents & tw->contents)) { //solved the CONTENTS_TRIGGER debacle via trap_G_COOL_API_SetBrushModelContentFlags now
+		if ( !(b->contents & tw->contents)) {
 			continue;
 		}
 
@@ -379,7 +375,7 @@ void CM_TestBoundingBoxInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	VectorSet( tw->sphere.offset, 0, 0, size[1][2] - tw->sphere.radius );
 
 	// replace the capsule with the bounding box
-	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse, -1 );
+	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse);
 	// calculate collision
 	cmod = CM_ClipHandleToModel( h );
 	CM_TestInLeaf( tw, &cmod->leaf );
@@ -528,7 +524,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 			}
 
 			// if completely in front of face, no intersection with the entire brush
-			if (d1 > 0 && ( (d2 >= tw->surfaceClipEpsilon && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) || d2 >= d1 )  ) {
+			if (d1 > 0 && ( d2 >= SURFACE_CLIP_EPSILON || d2 >= d1 )  ) {
 				return;
 			}
 
@@ -539,8 +535,8 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 
 			// crosses face
 			if (d1 > d2) {	// enter
-				f = (d1- tw->surfaceClipEpsilon) / (d1-d2);
-				if ( f < 0 && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) {
+				f = (d1-SURFACE_CLIP_EPSILON) / (d1-d2);
+				if ( f < 0 ) {
 					f = 0;
 				}
 				if (f > enterFrac) {
@@ -549,8 +545,8 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 					leadside = side;
 				}
 			} else {	// leave
-				f = (d1+ tw->surfaceClipEpsilon) / (d1-d2);
-				if ( f > 1 && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) {
+				f = (d1+SURFACE_CLIP_EPSILON) / (d1-d2);
+				if ( f > 1 ) {
 					f = 1;
 				}
 				if (f < leaveFrac) {
@@ -582,7 +578,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 			}
 
 			// if completely in front of face, no intersection with the entire brush
-			if (d1 > 0 && ( (d2 >= tw->surfaceClipEpsilon && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) || d2 >= d1 )  ) {
+			if (d1 > 0 && ( d2 >= SURFACE_CLIP_EPSILON || d2 >= d1 )  ) {
 				return;
 			}
 
@@ -593,8 +589,8 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 
 			// crosses face
 			if (d1 > d2) {	// enter
-				f = (d1- tw->surfaceClipEpsilon) / (d1-d2);
-				if ( f < 0 && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) {
+				f = (d1-SURFACE_CLIP_EPSILON) / (d1-d2);
+				if ( f < 0 ) {
 					f = 0;
 				}
 				if (f > enterFrac) {
@@ -603,8 +599,8 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 					leadside = side;
 				}
 			} else {	// leave
-				f = (d1+ tw->surfaceClipEpsilon) / (d1-d2);
-				if ( f > 1 && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_Q2STYLE)) {
+				f = (d1+SURFACE_CLIP_EPSILON) / (d1-d2);
+				if ( f > 1 ) {
 					f = 1;
 				}
 				if (f < leaveFrac) {
@@ -663,8 +659,7 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 		}
 		b->checkcount = cm.checkcount;
 
-		//if ( !(b->contents & tw->contents) && (tw->contents != CONTENTS_TRIGGER) && (tw->contents != CONTENTS_TRIGGER_EXIT)) {
-		if ( !(b->contents & tw->contents)) { //solved the CONTENTS_TRIGGER debacle via trap_G_COOL_API_SetBrushModelContentFlags now
+		if ( !(b->contents & tw->contents) ) {
 			continue;
 		}
 
@@ -738,7 +733,7 @@ void CM_TraceThroughSphere( traceWork_t *tw, vec3_t origin, float radius, vec3_t
 	VectorSubtract(end, origin, v1);
 	l2 = VectorLengthSquared(v1);
 	// if no intersection with the sphere and the end point is at least an epsilon away
-	if (l1 >= Square(radius) && l2 > Square(radius+ tw->surfaceClipEpsilon)) {
+	if (l1 >= Square(radius) && l2 > Square(radius+SURFACE_CLIP_EPSILON)) {
 		return;
 	}
 	//
@@ -833,7 +828,7 @@ void CM_TraceThroughVerticalCylinder( traceWork_t *tw, vec3_t origin, float radi
 	VectorSubtract(end2d, org2d, v1);
 	l2 = VectorLengthSquared(v1);
 	// if no intersection with the cylinder and the end point is at least an epsilon away
-	if (l1 >= Square(radius) && l2 > Square(radius+ tw->surfaceClipEpsilon)) {
+	if (l1 >= Square(radius) && l2 > Square(radius+SURFACE_CLIP_EPSILON)) {
 		return;
 	}
 	//
@@ -989,7 +984,7 @@ void CM_TraceBoundingBoxThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	VectorSet( tw->sphere.offset, 0, 0, size[1][2] - tw->sphere.radius );
 
 	// replace the capsule with the bounding box
-	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse, -1 );
+	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse);
 	// calculate collision
 	cmod = CM_ClipHandleToModel( h );
 	CM_TraceThroughLeaf( tw, &cmod->leaf );
@@ -1075,13 +1070,13 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 	if ( t1 < t2 ) {
 		idist = 1.0f/(t1-t2);
 		side = 1;
-		frac2 = (t1 + offset + tw->surfaceClipEpsilon)*idist;
-		frac = (t1 - offset + tw->surfaceClipEpsilon)*idist;
+		frac2 = (t1 + offset + SURFACE_CLIP_EPSILON)*idist;
+		frac = (t1 - offset + SURFACE_CLIP_EPSILON)*idist;
 	} else if (t1 > t2) {
 		idist = 1.0f/(t1-t2);
 		side = 0;
-		frac2 = (t1 - offset - tw->surfaceClipEpsilon)*idist;
-		frac = (t1 + offset + tw->surfaceClipEpsilon)*idist;
+		frac2 = (t1 - offset - SURFACE_CLIP_EPSILON)*idist;
+		frac = (t1 + offset + SURFACE_CLIP_EPSILON)*idist;
 	} else {
 		side = 0;
 		frac = 1;
@@ -1133,7 +1128,7 @@ CM_Trace
 */
 void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
-						  clipHandle_t model, const vec3_t origin, int brushmask, qboolean capsule, sphere_t *sphere, traceCustomization_t* traceCustomization) {
+						  clipHandle_t model, const vec3_t origin, int brushmask, qboolean capsule, sphere_t *sphere ) {
 	int			i;
 	traceWork_t	tw;
 	vec3_t		offset;
@@ -1147,8 +1142,6 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 
 	// fill in a default trace
 	Com_Memset( &tw, 0, sizeof(tw) );
-	tw.surfaceClipEpsilon = traceCustomization->customEpsilon ? traceCustomization->customEpsilonValue :( traceCustomization->nonEpsilon ? 0.0f : SURFACE_CLIP_EPSILON);	// we may wanna offer a precise trace where this is in fact 0
-	tw.traceCustomizationFlags = traceCustomization->traceCustomFlags;
 	tw.trace.fraction = 1;	// assume it goes the entire distance until shown otherwise
 	VectorCopy(origin, tw.modelOrigin);
 
@@ -1354,8 +1347,8 @@ CM_BoxTrace
 */
 void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
-						  clipHandle_t model, int brushmask, qboolean capsule, traceCustomization_t* traceCustomization) {
-	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, NULL, traceCustomization);
+						  clipHandle_t model, int brushmask, qboolean capsule ) {
+	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, NULL );
 }
 
 /*
@@ -1369,7 +1362,7 @@ rotating entities
 void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
 						  clipHandle_t model, int brushmask,
-						  const vec3_t origin, const vec3_t angles, qboolean capsule, traceCustomization_t* traceCustomization) {
+						  const vec3_t origin, const vec3_t angles, qboolean capsule ) {
 	trace_t		trace;
 	vec3_t		start_l, end_l;
 	qboolean	rotated;
@@ -1440,7 +1433,7 @@ void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t 
 	}
 
 	// sweep the box through the model
-	CM_Trace( &trace, start_l, end_l, symetricSize[0], symetricSize[1], model, origin, brushmask, capsule, &sphere, traceCustomization);
+	CM_Trace( &trace, start_l, end_l, symetricSize[0], symetricSize[1], model, origin, brushmask, capsule, &sphere );
 
 	// if the bmodel was rotated and there was a collision
 	if ( rotated && trace.fraction != 1.0f ) {

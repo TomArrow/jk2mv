@@ -2,17 +2,11 @@
 
 #include "tr_local.h"
 
-#include <algorithm>
-
 #ifndef DEDICATED
 #if !defined __TR_WORLDEFFECTS_H
 	#include "tr_WorldEffects.h"
 #endif
 #endif //!DEDICATED
-
-#if DORESHADE
-#include <reshade.hpp>
-#endif
 
 #include "tr_font.h"
 
@@ -126,28 +120,14 @@ cvar_t	*r_texturebitslm;
 cvar_t	*r_drawBuffer;
 cvar_t	*r_lightmap;
 cvar_t	*r_vertexLight;
-cvar_t	*r_styleOnly;
 cvar_t	*r_uiFullScreen;
 cvar_t	*r_shadows;
 cvar_t	*r_flares;
 cvar_t	*r_aspectratio;
 cvar_t	*r_nobind;
 cvar_t	*r_singleShader;
-cvar_t	*r_shaderHackLightmapFix;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
-
-// Cel shading ported from http://q3cellshading.sourceforge.net/
-// Next one added for cell shading algorithm selection
-cvar_t* r_celshadalgo;
-//. next one for enable/disable cel bordering all together.
-cvar_t* r_celoutline;
-// My own additions:
-cvar_t* r_celoutlineColor;
-cvar_t* r_celoutlineWidth;
-cvar_t* r_celTextureOutline;
-
-
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
 cvar_t	*r_shownormals;
@@ -162,21 +142,15 @@ cvar_t	*r_lockpvs;
 cvar_t	*r_noportals;
 cvar_t	*r_portalOnly;
 
-cvar_t* r_markSurfaceAnglesAbove;
-cvar_t* r_markSurfaceAnglesBelow;
-cvar_t* r_rampHelper;
-
 cvar_t	*r_subdivisions;
 cvar_t	*r_lodCurveError;
 
 cvar_t	*r_customaspect;
 
 cvar_t	*r_overBrightBits;
-cvar_t	*r_mapOverBrightBits;
 
 cvar_t	*r_debugSurface;
 cvar_t	*r_simpleMipMaps;
-cvar_t	*r_openglMipMaps;
 
 cvar_t	*r_showImages;
 
@@ -192,10 +166,6 @@ cvar_t	*r_maxpolyverts;
 int		max_polyverts;
 
 cvar_t	*r_modelpoolmegs;
-
-cvar_t	*r_drawAllAreas;
-cvar_t	*r_imageLoadLowMem;
-
 cvar_t *r_screenshotJpegQuality;
 
 cvar_t *r_convertModelBones;
@@ -224,18 +194,6 @@ cvar_t *r_textureLODBias;
 cvar_t *r_saberGlow;
 cvar_t *r_environmentMapping;
 cvar_t *r_printMissingModels;
-cvar_t *r_fixPlayerIconBrightness;
-cvar_t *r_newRemaps;
-cvar_t *r_newRemapsTmpFix;
-
-cvar_t *r_solidity;
-cvar_t *r_solidityTexture;
-cvar_t *r_solidityWaterShader;
-cvar_t *r_solidityHideTrisoup;
-
-cvar_t *r_imageLoadDotFix;
-
-cvar_t *r_reshadeFix;
 
 #ifndef DEDICATED
 PFNGLACTIVETEXTUREARBPROC qglActiveTextureARB;
@@ -664,16 +622,6 @@ static void GLimp_InitExtensions(void) {
 	}
 }
 
-static void GLimp_InitOpenGLVersion(void) {
-	glConfig.glVersion = QGL_VERSION_1_0;
-
-	if (strncmp(glConfig.version_string, "1.4", 3) >= 0)
-	{
-		glConfig.glVersion = QGL_VERSION_1_4;
-		Com_Printf("...OpenGL 1.4 available\n");
-	}
-}
-
 /*
 ** InitOpenGL
 **
@@ -701,9 +649,7 @@ static void InitOpenGL(void) {
 		qglGetIntegerv(GL_MAX_TEXTURE_SIZE, &glConfig.maxTextureSize);
 
 		// stubbed or broken drivers may have reported 0...
-		glConfig.maxTextureSize = std::max(0, glConfig.maxTextureSize);
-
-		GLimp_InitOpenGLVersion();
+		glConfig.maxTextureSize = max(0, glConfig.maxTextureSize);
 
 		// initialize extensions
 		GLimp_InitExtensions();
@@ -736,22 +682,22 @@ void GL_CheckErrors( void ) {
 	}
 	switch( err ) {
 		case GL_INVALID_ENUM:
-			Q_strncpyz( s, "GL_INVALID_ENUM", sizeof(s) );
+			strcpy( s, "GL_INVALID_ENUM" );
 			break;
 		case GL_INVALID_VALUE:
-			Q_strncpyz( s, "GL_INVALID_VALUE", sizeof(s));
+			strcpy( s, "GL_INVALID_VALUE" );
 			break;
 		case GL_INVALID_OPERATION:
-			Q_strncpyz( s, "GL_INVALID_OPERATION", sizeof(s));
+			strcpy( s, "GL_INVALID_OPERATION" );
 			break;
 		case GL_STACK_OVERFLOW:
-			Q_strncpyz( s, "GL_STACK_OVERFLOW", sizeof(s));
+			strcpy( s, "GL_STACK_OVERFLOW" );
 			break;
 		case GL_STACK_UNDERFLOW:
-			Q_strncpyz( s, "GL_STACK_UNDERFLOW", sizeof(s));
+			strcpy( s, "GL_STACK_UNDERFLOW" );
 			break;
 		case GL_OUT_OF_MEMORY:
-			Q_strncpyz( s, "GL_OUT_OF_MEMORY", sizeof(s));
+			strcpy( s, "GL_OUT_OF_MEMORY" );
 			break;
 		default:
 			Com_sprintf( s, sizeof(s), "0x%x", err);
@@ -871,7 +817,7 @@ void R_ScreenShotTGA_f (void) {
 
 	Q_strncpyz(tr.screenshotTGAName, checkname, sizeof(tr.screenshotTGAName));
 	tr.screenshotTGA = qtrue;
-	tr.screenshotTGASilent = (qboolean)(silent || com_silentScreenshots->integer);
+	tr.screenshotTGASilent = silent;
 }
 
 //jpeg  vession
@@ -923,7 +869,7 @@ void R_ScreenShot_f (void) {
 	Q_strncpyz(tr.screenshotJPEGName, checkname, sizeof(tr.screenshotJPEGName));
 	tr.screenshotJPEG = qtrue;
 	tr.screenshotJPEGQuality = r_screenshotJpegQuality->integer;
-	tr.screenshotJPEGSilent = (qboolean)(silent || com_silentScreenshots->integer);
+	tr.screenshotJPEGSilent = silent;
 }
 
 //============================================================================
@@ -1156,34 +1102,20 @@ void R_Register( void )
 	r_texturebits = ri.Cvar_Get("r_texturebits", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_texturebitslm = ri.Cvar_Get("r_texturebitslm", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_overBrightBits = ri.Cvar_Get("r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-	r_mapOverBrightBits = ri.Cvar_Get("r_mapOverBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_intensity = ri.Cvar_Get("r_intensity", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_aspectratio = ri.Cvar_Get("r_aspectratio", "-1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH); // screen resolutions
 	r_customaspect = ri.Cvar_Get("r_customaspect", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_simpleMipMaps = ri.Cvar_Get("r_simpleMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
-	r_openglMipMaps = ri.Cvar_Get("r_openglMipMaps", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_vertexLight = ri.Cvar_Get("r_vertexLight", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
-	r_styleOnly = ri.Cvar_Get("r_styleOnly", "-1", CVAR_TEMP);
 	r_uiFullScreen = ri.Cvar_Get( "r_uifullscreen", "0", 0);
 	r_subdivisions = ri.Cvar_Get("r_subdivisions", "4", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_ignoreFastPath = ri.Cvar_Get("r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
-	r_newRemapsTmpFix = ri.Cvar_Get("r_newRemapsTmpFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // TA: Since newremaps are kinda broken atm and i cba to fix it properly, but I also don't wanna entirely revert them, I do this temporary fix to make vanilla behavior work again (not missing texture rectangles all over the place)
-	r_imageLoadDotFix = ri.Cvar_Get("r_imageLoadDotFix", "1", CVAR_ARCHIVE | CVAR_LATCH); // more tolerant/logical image loading that will treat us better in case of images that have dots in their name outside of their extension
-	r_reshadeFix = ri.Cvar_Get("r_reshadeFix", "0", CVAR_ARCHIVE);
-	r_newRemaps = ri.Cvar_Get("r_newRemaps", "0", CVAR_CHEAT ); // Only used for testing. Classic remaps are supposed to remain fullbright,
-	                                                            // because that is how they have been used by maps and serverside mods for
-	                                                            // more than 20 years. Servers can set a configstring for "mvremap" now.
 
 	//
 	// temporary latched variables that can only change over a restart
 	//
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0 );
 	r_singleShader = ri.Cvar_Get ("r_singleShader", "0", CVAR_CHEAT | CVAR_LATCH );
-	r_shaderHackLightmapFix = ri.Cvar_Get ("r_shaderHackLightmapFix", "1", CVAR_ARCHIVE );
-
-	r_markSurfaceAnglesAbove = ri.Cvar_Get ("r_markSurfaceAnglesAbove", "0", CVAR_TEMP );
-	r_markSurfaceAnglesBelow = ri.Cvar_Get ("r_markSurfaceAnglesBelow", "0", CVAR_TEMP);
-	r_rampHelper = ri.Cvar_Get ("r_rampHelper", "0", CVAR_ARCHIVE);
 
 	//
 	// archived variables that can change at any time
@@ -1221,10 +1153,7 @@ void R_Register( void )
 
 	r_debugLight = ri.Cvar_Get( "r_debuglight", "0", CVAR_TEMP );
 	r_debugSort = ri.Cvar_Get( "r_debugSort", "0", CVAR_CHEAT );
-	r_drawAllAreas = ri.Cvar_Get("r_drawAllAreas", "0", CVAR_TEMP);
 	r_printShaders = ri.Cvar_Get( "r_printShaders", "0", 0 );
-
-	r_imageLoadLowMem = ri.Cvar_Get( "r_imageLoadLowMem", "0", CVAR_ARCHIVE );
 
 	r_surfaceSprites = ri.Cvar_Get ("r_surfaceSprites", "1", CVAR_TEMP);
 	r_surfaceWeather = ri.Cvar_Get ("r_surfaceWeather", "0", CVAR_TEMP);
@@ -1238,7 +1167,7 @@ void R_Register( void )
 	r_windPointY = ri.Cvar_Get ("r_windPointY", "0", 0);
 
 	r_nocurves = ri.Cvar_Get ("r_nocurves", "0", CVAR_CHEAT );
-	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", CVAR_TEMP);
+	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", CVAR_CHEAT );
 	r_lightmap = ri.Cvar_Get ("r_lightmap", "0", 0 );
 	r_portalOnly = ri.Cvar_Get ("r_portalOnly", "0", CVAR_CHEAT );
 
@@ -1251,38 +1180,30 @@ void R_Register( void )
 
 	r_measureOverdraw = ri.Cvar_Get( "r_measureOverdraw", "0", CVAR_CHEAT );
 	r_lodscale = ri.Cvar_Get( "r_lodscale", "5", 0 );
-	r_norefresh = ri.Cvar_Get ("r_norefresh", "0", CVAR_TEMP);
-	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", CVAR_TEMP);
+	r_norefresh = ri.Cvar_Get ("r_norefresh", "0", CVAR_CHEAT);
+	r_drawentities = ri.Cvar_Get ("r_drawentities", "1", CVAR_CHEAT );
 	r_ignore = ri.Cvar_Get( "r_ignore", "1", CVAR_CHEAT );
-	r_nocull = ri.Cvar_Get ("r_nocull", "0", CVAR_TEMP);
-	r_novis = ri.Cvar_Get ("r_novis", "0", CVAR_TEMP);
-	r_showcluster = ri.Cvar_Get ("r_showcluster", "0", CVAR_TEMP);
-	r_speeds = ri.Cvar_Get ("r_speeds", "0", CVAR_TEMP);
-	r_verbose = ri.Cvar_Get( "r_verbose", "0", CVAR_TEMP);
-	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_TEMP);
+	r_nocull = ri.Cvar_Get ("r_nocull", "0", CVAR_CHEAT);
+	r_novis = ri.Cvar_Get ("r_novis", "0", CVAR_CHEAT);
+	r_showcluster = ri.Cvar_Get ("r_showcluster", "0", CVAR_CHEAT);
+	r_speeds = ri.Cvar_Get ("r_speeds", "0", CVAR_CHEAT);
+	r_verbose = ri.Cvar_Get( "r_verbose", "0", CVAR_CHEAT );
+	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_CHEAT );
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
-	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_TEMP);
-	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_TEMP);
-	// for cell shading algorithm selection
-	r_celshadalgo = ri.Cvar_Get("r_celshadalgo", "0", CVAR_ARCHIVE | CVAR_LATCH);
-	// cel outline option
-	r_celoutline = ri.Cvar_Get("r_celoutline", "0", CVAR_ARCHIVE);
-	r_celoutlineWidth = ri.Cvar_Get("r_celoutlineWidth", "4.0", CVAR_ARCHIVE);
-	r_celoutlineColor = ri.Cvar_Get("r_celoutlineColor", "0.0 0.0 0.0 1.0", CVAR_ARCHIVE);
-	r_celTextureOutline = ri.Cvar_Get("r_celTextureOutline", "0", CVAR_ARCHIVE | CVAR_LATCH);
-	r_celoutlineColor->modified = qtrue;
-	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_TEMP);
-	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_TEMP);
-	r_clear = ri.Cvar_Get ("r_clear", "0", 0);
+	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
+	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
+	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
+	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);
+	r_clear = ri.Cvar_Get ("r_clear", "8", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_offsetFactor = ri.Cvar_Get( "r_offsetfactor", "-1", CVAR_CHEAT );
 	r_offsetUnits = ri.Cvar_Get( "r_offsetunits", "-2", CVAR_CHEAT );
 	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
-	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_TEMP);
-	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
+	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
+	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), CVAR_ARCHIVE | CVAR_LATCH);
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), CVAR_ARCHIVE | CVAR_LATCH);
+	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
+	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
 
 	r_convertModelBones = ri.Cvar_Get( "r_convertModelBones", "1", CVAR_ARCHIVE | CVAR_GLOBAL );
 	r_loadSkinsJKA = ri.Cvar_Get( "r_loadSkinsJKA", "1", CVAR_ARCHIVE | CVAR_GLOBAL );
@@ -1299,15 +1220,9 @@ Ghoul2 Insert End
 
 	r_modelpoolmegs = Cvar_Get("r_modelpoolmegs", "20", CVAR_ARCHIVE | CVAR_GLOBAL);
 
-	r_solidity = Cvar_Get("r_solidity", "0", CVAR_TEMP); // 1 = dont draw nonsolid surfaces, draw clips; 2 = override texture
-	r_solidityTexture = Cvar_Get("r_solidityTexture", "textures/yavin/brock1", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
-	r_solidityWaterShader = Cvar_Get("r_solidityWaterShader", "tcRenderShaderWater", CVAR_ARCHIVE|CVAR_LATCH); // shader to use with r_solidity 2/3
-	r_solidityHideTrisoup = Cvar_Get("r_solidityHideTrisoup", "0", CVAR_ARCHIVE); // shader to use with r_solidity 2/3
-
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
 #ifndef DEDICATED
-	ri.Cmd_AddCommand( "sqlposcube", R_SQLPosCube_f);// A little hacky thing to generate SQL queries based on current position x 2 to span a cube
 	ri.Cmd_AddCommand( "imagelist", R_ImageList_f );
 	ri.Cmd_AddCommand( "shaderlist", R_ShaderList_f );
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );
@@ -1332,37 +1247,10 @@ Ghoul2 Insert End
 	r_saberGlow = ri.Cvar_Get("r_saberGlow", "1", CVAR_ARCHIVE | CVAR_LATCH);
 	r_environmentMapping = ri.Cvar_Get("r_environmentMapping", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_printMissingModels = ri.Cvar_Get("r_printMissingModels", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
-	r_fixPlayerIconBrightness = ri.Cvar_Get("r_fixPlayerIconBrightness", "1", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
 }
 
 #ifdef G2_COLLISION_ENABLED
 #define G2_VERT_SPACE_SERVER_SIZE 256
-#endif
-
-#if DORESHADE
-reshade::api::effect_runtime* reshadeEffectRuntime = NULL;
-reshade::api::command_list* reshadeCommandList = NULL;
-reshade::api::resource_view reshadeResourceView;
-bool reshadeResourceViewSet = false;
-static void R_ReshadeCallbackEffectRuntime(reshade::api::effect_runtime* er) {
-	if (r_reshadeFix->integer || com_developer->integer > 1) {
-		Com_Printf("^3Reshade API: effect runtime initialized.\n");
-	}
-	reshadeEffectRuntime = er;
-}
-static void R_ReshadeCallbackCommandList(reshade::api::command_list* cl) {
-	if (r_reshadeFix->integer || com_developer->integer > 1) {
-		Com_Printf("^3Reshade API: command list initialized.\n");
-	}
-	reshadeCommandList = cl;
-}
-static void R_ReshadeCallbackResourceView(reshade::api::device* device, reshade::api::resource resource, reshade::api::resource_usage usage_type, const reshade::api::resource_view_desc& desc, reshade::api::resource_view view) {
-	if (r_reshadeFix->integer || com_developer->integer > 1) {
-		Com_Printf("^3Reshade API: resource view initialized.\n");
-	}
-	reshadeResourceView = view;
-	reshadeResourceViewSet = true;
-}
 #endif
 
 /*
@@ -1373,21 +1261,14 @@ R_Init
 void R_Init( void ) {
 	int i;
 	byte *ptr;
-	static bool reshadeInited = false;
 
-	ri.Printf( PRINT_DEVELOPER, "----- R_Init -----\n" );
+	ri.Printf( PRINT_ALL, "----- R_Init -----\n" );
 
 	// clear all our internal state
 	Com_Memset( &tr, 0, sizeof( tr ) );
 	Com_Memset( &backEnd, 0, sizeof( backEnd ) );
 #ifndef DEDICATED
 	Com_Memset( &tess, 0, sizeof( tess ) );
-#endif
-
-#if DORESHADE
-	reshade::register_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
-	reshade::register_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
-	reshade::register_event<reshade::addon_event::init_resource_view>(R_ReshadeCallbackResourceView);
 #endif
 
 //	Swap_Init();
@@ -1467,7 +1348,7 @@ void R_Init( void ) {
 
 	GL_CheckErrors();
 #endif
-	ri.Printf( PRINT_DEVELOPER, "----- finished R_Init -----\n" );
+	ri.Printf( PRINT_ALL, "----- finished R_Init -----\n" );
 }
 
 /*
@@ -1477,16 +1358,8 @@ RE_Shutdown
 */
 void RE_Shutdown( qboolean destroyWindow ) {
 
-	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
+	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
 
-#if DORESHADE
-	reshade::unregister_event<reshade::addon_event::init_effect_runtime>(R_ReshadeCallbackEffectRuntime);
-	reshade::unregister_event<reshade::addon_event::init_command_list>(R_ReshadeCallbackCommandList);
-	reshade::unregister_event<reshade::addon_event::init_resource_view>(R_ReshadeCallbackResourceView);
-	reshadeResourceViewSet = false;
-	reshadeEffectRuntime = NULL;
-	reshadeCommandList = NULL;
-#endif
 
 	ri.Cmd_RemoveCommand ("imagelist");
 	ri.Cmd_RemoveCommand ("shaderlist");
@@ -1604,16 +1477,11 @@ void RE_SetLightStyle(int style, int color)
 {
 	if ((unsigned)style >= (unsigned)MAX_LIGHT_STYLES)
 	{
-		ri.Error(ERR_FATAL, "RE_SetLightStyle: %d is out of range", (int)style);
+		ri.Error( ERR_FATAL, "RE_SetLightStyle: %d is out of range", (int)style );
 		return;
 	}
 
-	if (r_styleOnly->integer < 0 || r_styleOnly->integer == style) {
-		memcpy(styleColors[style], &color, 4);
-	}
-	else {
-		memset(styleColors[style], 0, 4);
-	}
+	memcpy(styleColors[style], &color, 4);
 }
 
 void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
@@ -1629,23 +1497,10 @@ void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 
 	glconfigOut->vidWidth = glConfig.vidWidth;
 	glconfigOut->vidHeight = glConfig.vidHeight;
-	if (r_allowResize->integer) {
-		glconfigOut->winWidth = glConfig.winWidth;
-		glconfigOut->winHeight = glConfig.winHeight;
-	}
 	glconfigOut->displayScale = glConfig.displayScale;
 }
 
 #endif //!DEDICATED
-
-static const orientation_t* RE_GetViewOrientation(void)
-{
-	static orientation_t ori;
-	VectorCopy(tr.viewParms.ori.origin,ori.origin);
-	memcpy(ori.axis, tr.viewParms.ori.axis, sizeof(ori.axis));
-	return &ori;
-}
-
 /*
 @@@@@@@@@@@@@@@@@@@@@
 GetRefAPI
@@ -1701,7 +1556,6 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	re.SetColor = RE_SetColor;
 	re.DrawStretchPic = RE_StretchPic;
-	re.DrawLine = RE_DrawLine;
 	re.DrawStretchRaw = RE_StretchRaw;
 	re.UploadCinematic = RE_UploadCinematic;
 
@@ -1715,8 +1569,6 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.AnyLanguage_ReadCharFromString = AnyLanguage_ReadCharFromString;
 
 	re.RemapShader = R_RemapShader;
-	re.RemapShaderAdvanced = R_RemapShaderAdvanced;
-	re.RemoveAdvancedRemaps = R_RemoveAdvancedRemaps;
 	re.GetEntityToken = R_GetEntityToken;
 	re.inPVS = R_inPVS;
 
@@ -1727,9 +1579,6 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	re.CaptureFrameRaw = RE_CaptureFrameRaw;
 	re.CaptureFrameJPEG = RE_CaptureFrameJPEG;
-
-	re.ext.GetViewOrientation = RE_GetViewOrientation;
-	re.ext.RegisterShader3D = RE_RegisterShader3D;
 #endif //!DEDICATED
 	return &re;
 }

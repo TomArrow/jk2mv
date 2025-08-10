@@ -597,13 +597,6 @@ void R_BuildCloudData( shaderCommands_t *input )
 	// set up for drawing
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
-	if (r_markSurfaceAnglesAbove->value || r_markSurfaceAnglesBelow->value) {
-		Com_Memset(tess.vertexIsMarked, 0, sizeof(tess.vertexIsMarked));
-	}
-	if (r_rampHelper->integer || r_solidity->integer > 2) {
-		Com_Memset(tess.vertexColorOverrides, 0, sizeof(tess.vertexColorOverrides));
-	}
-	tess.anyVertexColorOverrides = qfalse;
 
 	if ( input->shader->sky.cloudHeight )
 	{
@@ -798,7 +791,7 @@ void RB_StageIteratorSky( void ) {
 	// r_showsky will let all the sky blocks be drawn in
 	// front of everything to allow developers to see how
 	// much sky is getting sucked in
-	if ( r_showsky->integer && clRenderInfo.wallhackOk) {
+	if ( r_showsky->integer ) {
 		qglDepthRange( 0.0, 0.0 );
 	} else {
 		qglDepthRange( 1.0, 1.0 );

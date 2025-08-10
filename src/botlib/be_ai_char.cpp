@@ -163,7 +163,6 @@ void BotFreeCharacter(int handle)
 void BotDefaultCharacteristics(bot_character_t *ch, bot_character_t *defaultch)
 {
 	int i;
-	unsigned long allocSize;
 
 	for (i = 0; i < MAX_CHARACTERISTICS; i++)
 	{
@@ -182,9 +181,8 @@ void BotDefaultCharacteristics(bot_character_t *ch, bot_character_t *defaultch)
 		else if (defaultch->c[i].type == CT_STRING)
 		{
 			ch->c[i].type = CT_STRING;
-			allocSize = (unsigned long)strlen(defaultch->c[i].value.string) + 1;
-			ch->c[i].value.string = (char *)GetMemory(allocSize);
-			Q_strncpyz(ch->c[i].value.string, defaultch->c[i].value.string, allocSize);
+			ch->c[i].value.string = (char *)GetMemory((unsigned long)strlen(defaultch->c[i].value.string) + 1);
+			strcpy(ch->c[i].value.string, defaultch->c[i].value.string);
 		} //end else if
 	} //end for
 } //end of the function BotDefaultCharacteristics
@@ -200,7 +198,6 @@ bot_character_t *BotLoadCharacterFromFile(const char *charfile, int skill)
 	bot_character_t *ch;
 	source_t *source;
 	token_t token;
-	unsigned long allocSize;
 
 	foundcharacter = qfalse;
 	//a bot character is parsed in two phases
@@ -211,10 +208,9 @@ bot_character_t *BotLoadCharacterFromFile(const char *charfile, int skill)
 		botimport.Print(PRT_ERROR, "counldn't load %s\n", charfile);
 		return NULL;
 	} //end if
-	allocSize = sizeof(bot_character_t) +
-		MAX_CHARACTERISTICS * sizeof(bot_characteristic_t);
-	ch = (bot_character_t *) GetClearedMemory(allocSize);
-	Q_strncpyz(ch->filename, charfile, allocSize);
+	ch = (bot_character_t *) GetClearedMemory(sizeof(bot_character_t) +
+					MAX_CHARACTERISTICS * sizeof(bot_characteristic_t));
+	strcpy(ch->filename, charfile);
 	while(PC_ReadToken(source, &token))
 	{
 		if (!strcmp(token.string, "skill"))
@@ -289,9 +285,8 @@ bot_character_t *BotLoadCharacterFromFile(const char *charfile, int skill)
 					else if (token.type == TT_STRING)
 					{
 						StripDoubleQuotes(token.string);
-						allocSize = (unsigned long)strlen(token.string) + 1;
-						ch->c[index].value.string = (char *)GetMemory(allocSize);
-						Q_strncpyz(ch->c[index].value.string, token.string, allocSize);
+						ch->c[index].value.string = (char *)GetMemory((unsigned long)strlen(token.string) + 1);
+						strcpy(ch->c[index].value.string, token.string);
 						ch->c[index].type = CT_STRING;
 					} //end else if
 					else
@@ -506,7 +501,6 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill)
 	bot_character_t *ch1, *ch2, *out;
 	int i, handle;
 	float scale;
-	unsigned long allocSize;
 
 	ch1 = BotCharacterFromHandle(handle1);
 	ch2 = BotCharacterFromHandle(handle2);
@@ -518,11 +512,10 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill)
 		if (!botcharacters[handle]) break;
 	} //end for
 	if (handle > MAX_CLIENTS) return 0;
-	allocSize = sizeof(bot_character_t) +
-		MAX_CHARACTERISTICS * sizeof(bot_characteristic_t);
-	out = (bot_character_t *) GetClearedMemory(allocSize);
+	out = (bot_character_t *) GetClearedMemory(sizeof(bot_character_t) +
+					MAX_CHARACTERISTICS * sizeof(bot_characteristic_t));
 	out->skill = desiredskill;
-	Q_strncpyz(out->filename, ch1->filename, allocSize);
+	strcpy(out->filename, ch1->filename);
 	botcharacters[handle] = out;
 
 	scale = (float) (desiredskill - ch1->skill) / (ch2->skill - ch1->skill);
@@ -543,9 +536,8 @@ int BotInterpolateCharacters(int handle1, int handle2, float desiredskill)
 		else if (ch1->c[i].type == CT_STRING)
 		{
 			out->c[i].type = CT_STRING;
-			allocSize = (unsigned long)strlen(ch1->c[i].value.string) + 1;
-			out->c[i].value.string = (char *)GetMemory(allocSize);
-			Q_strncpyz(out->c[i].value.string, ch1->c[i].value.string, allocSize);
+			out->c[i].value.string = (char *)GetMemory((unsigned long)strlen(ch1->c[i].value.string) + 1);
+			strcpy(out->c[i].value.string, ch1->c[i].value.string);
 		} //end else if
 	} //end for
 	return handle;
@@ -749,7 +741,7 @@ void Characteristic_String(int character, int index, char *buf, int size)
 	//an integer will be converted to a float
 	if (ch->c[index].type == CT_STRING)
 	{
-		Q_strncpyz(buf, ch->c[index].value.string, size);
+		strncpy(buf, ch->c[index].value.string, size-1);
 		buf[size-1] = '\0';
 		return;
 	} //end if

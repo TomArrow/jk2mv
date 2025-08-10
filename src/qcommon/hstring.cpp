@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "hstring.h"
 
-//using namespace std;
+using namespace std;
 
 // mapPoolBlockCount is defined differently in the executable (sv_main.cpp) and the game dll (g_main.cpp) cuz
 //we likely don't need as many blocks in the executable as we do in the game
@@ -38,7 +38,7 @@ class CMapBlock
 	int			mLastNode;
 
 public:
-	CMapBlock(int id, std::vector <void *> &freeList) :
+	CMapBlock(int id,vector <void *> &freeList) :
 		mLastNode(0)
 	{
 		// Alloc node storage for MAPBLOCK_SIZE_NODES worth of nodes.
@@ -66,7 +66,7 @@ CMapPoolLow::CMapPoolLow()
 
 CMapPoolLow::~CMapPoolLow()
 {
-#ifdef DEBUG
+#if _DEBUG
 #if _GAME
 	if(mFreeList.size()<mMapBlocks.size()*MAPBLOCK_SIZE_NODES)
 	{
@@ -162,7 +162,7 @@ void CMapPoolLow::TouchMem()
 			HaHaOptimizer2+=memory[j];
 		}
 	}
-#ifdef DEBUG
+#ifdef _DEBUG
 //	Com_Printf("MapPool: Bytes touched %i\n",totSize);
 #endif
 }
@@ -245,7 +245,7 @@ public:
 		{
 			HaHaOptimizer2+=((unsigned char	*)mHashes)[i];
 		}
-#ifdef DEBUG
+#ifdef _DEBUG
 //		Com_Printf("Hash helper: Bytes touched %i\n",sizeof(mHashes));
 #endif
 	}
@@ -304,7 +304,7 @@ public:
 
 class CPool
 {
-	std::vector<CHSBlock *>	mBlockVec;
+	vector<CHSBlock *>	mBlockVec;
 
 public:
 	int					mNextStringId;
@@ -381,13 +381,13 @@ public:
 				HaHaOptimizer2+=memory[j];
 			}
 		}
-#ifdef DEBUG
+#ifdef _DEBUG
 //		Com_Printf("String Pool: Bytes touched %i\n",totSize);
 #endif
 	}
 };
 
-#ifdef DEBUG
+#ifdef _DEBUG
 CPool &TheDebugPool(void);
 CPool &ThePool(void);
 
@@ -404,7 +404,7 @@ public:
 			OutputDebugString("\n");
 		}
 #endif
-#ifdef DEBUG
+#if _DEBUG
 #if _GAME
 //		Com_Printf("[MEM][GAME]  String Pool %d unique strings, %dK\n",ThePool().mNextStringId,(ThePool().mLastBlockNum+1)*BLOCK_SIZE/1024);
 #elif _CGAME
@@ -467,7 +467,7 @@ void hstring::Init(const char *str)
 	char *raw=ThePool().Alloc(strlen(str),mId);
 	strcpy(raw,str);
 	HashHelper().Add(hash,mId);
-#ifdef DEBUG
+#ifdef _DEBUG
 	int test;
 	raw=TheDebugPool().Alloc(strlen(str),test);
 	assert(test==mId);
@@ -486,14 +486,14 @@ const char *hstring::c_str(void) const
 	return(gCharPtrs[mId]);
 }
 
-std::string hstring::str(void) const
+string hstring::str(void) const
 {
 	if(!mId)
 	{
-		return(std::string());
+		return(string());
 	}
 	assert(mId>0&&mId<ThePool().mNextStringId);
-	return std::string(gCharPtrs[mId]);
+	return string(gCharPtrs[mId]);
 }
 
 #endif // _DONETPROFILE_

@@ -17,24 +17,9 @@
 #include <unzip.h>	// minizip
 #include <mv_setup.h>
 
-#include "../qcommon/files_lzma.hpp"
-
 #if !defined(DEDICATED) && !defined(FINAL_BUILD)
 #include "../client/client.h"
 #endif
-
- // for rmdir
-#if defined (_MSC_VER)
-#include <direct.h>
-#else
-#include <unistd.h>
-#endif
-
-#include <vector>
-#include <string>
-#include <tuple>
-
-std::vector<std::tuple<std::string, std::string>> queuedRenames;
 
 /*
 =============================================================================
@@ -204,7 +189,7 @@ or configs will never get loaded from disk!
 #define MAX_FILEHASH_SIZE	1024
 
 typedef struct fileInPack_s {
-	const char				*name;		// name of the file
+	char					*name;		// name of the file
 	unsigned int			pos;		// file info position in zip
 	unsigned int			len;		// uncompress file size
 	struct	fileInPack_s*	next;		// next file in the hash
@@ -230,7 +215,6 @@ typedef struct {
 	int				hashSize;					// hash table size (power of 2)
 	fileInPack_t*	*hashTable;					// hash table
 	fileInPack_t*	buildBuffer;				// buffer with the filenames etc.
-	stringPool_t*	namesPool;					// buffer with filenames
 	int				gvc;						// game-version compatibility
 	qboolean		isJKA;						// jka assets
 } pack_t;
@@ -248,11 +232,7 @@ typedef struct searchpath_s {
 } searchpath_t;
 
 static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
-static	char		fs_cfglogdir[MAX_OSPATH];
 static	cvar_t		*fs_debug;
-//#ifndef PORTABLE
-static	cvar_t		*fs_portable;
-//#endif
 static	cvar_t		*fs_homepath;
 static	cvar_t		*fs_basepath;
 static	cvar_t		*fs_assetspath;
@@ -262,12 +242,7 @@ static	cvar_t		*fs_loadjka;
 static	cvar_t		*fs_basegame;
 static	cvar_t		*fs_copyfiles;
 static	cvar_t		*fs_gamedirvar;
-static	cvar_t		*fs_dlTommyTernalPk3;
-#ifndef DEDICATED
-static	cvar_t		*fs_globalcfg;
-#endif
 static	cvar_t		*fs_forcegame;
-static	cvar_t		*fs_cfgLogPath;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -276,7 +251,6 @@ static	int			fs_packFiles;			// total number of files in packs
 
 static int fs_fakeChkSum;
 static int fs_checksumFeed;
-static qboolean fs_checksumFeedSet;
 
 typedef union qfile_gus {
 	FILE*		o;
@@ -288,43 +262,9 @@ typedef struct qfile_us {
 	qboolean	unique;
 } qfile_ut;
 
-typedef struct compressedFileInfo_s {
-	fileCompressionScheme_t compression;
-
-	// For LZMA
-	qboolean readMode;
-	LZMAIncrementalCompressor* lzmaCompressor;
-	LZMADecompressor* lzmaDecompressor;
-}compressedFileInfo_t;
-
-typedef struct fileHandleData_s  {
-#ifdef ASYNCIO
-	fileHandleData_s() :
-		handleFiles({}),
-		handleSync(qfalse),
-		handleAsync(qfalse),
-		writerThread(nullptr),
-		closed(qfalse),
-		fileSize(0),
-		zipFilePos(0),
-		zipFileLen(0),
-		zipFile(qfalse),
-		module((module_t)0) {
-		ospath[0] = '\0';
-		name[0] = '\0';
-	}
-#endif
+typedef struct {
 	qfile_ut	handleFiles;
 	qboolean	handleSync;
-#ifdef ASYNCIO
-	qboolean	handleAsync;
-	std::thread* writerThread;
-	std::mutex	writeLock;
-	std::condition_variable	cv;
-	std::deque<std::vector<byte> > writes;
-	qboolean	closed;
-	char		ospath[MAX_OSPATH];
-#endif
 	int			baseOffset;
 	int			fileSize;
 	int			zipFilePos;
@@ -332,9 +272,6 @@ typedef struct fileHandleData_s  {
 	qboolean	zipFile;
 	module_t	module;
 	char		name[MAX_ZPATH];
-
-	// For LZMA compressed demos but could be used for other stuff too
-	compressedFileInfo_t compressedFileInfo;
 } fileHandleData_t;
 
 static fileHandleData_t	fsh[MAX_FILE_HANDLES];
@@ -349,63 +286,10 @@ static const char	*fs_serverPakNames[MAX_SEARCH_PATHS];			// pk3 names
 static int			fs_numServerReferencedPaks;
 static int			fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static const char	*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
-static qboolean		fs_referencedPaksChanged;
 
 // last valid game folder used
 char lastValidBase[MAX_OSPATH];
 char lastValidGame[MAX_OSPATH];
-
-#ifdef ASYNCIO
-static void FS_ResetFileHandleData(fileHandleData_t* f) {
-	f->handleFiles = {};
-	f->handleSync = qfalse;
-	f->handleAsync = qfalse;
-	f->writerThread = nullptr;
-	f->writes.clear();
-	f->closed = qfalse;
-	f->ospath[0] = '\0';
-	f->fileSize = 0;
-	f->zipFilePos = 0;
-	f->zipFileLen = 0;
-	f->zipFile = qfalse;
-	f->name[0] = '\0';
-	f->module = MODULE_MAIN; // 0
-	f->baseOffset = 0; // idk what this is tbh
-	Com_Memset(&f->compressedFileInfo, 0, sizeof(f->compressedFileInfo));
-}
-#endif
-
-
-const char* get_filename_ext(const char* filename) {
-	const char* dot = strrchr(filename, '.');
-	if (!dot || dot == filename) return "";
-	return dot + 1;
-}
-
-
-static char* logCfgExtensions[] = {
-	"log",
-	"cfg",
-};
-static int logCfgExtensionsAmount = sizeof(logCfgExtensions) / sizeof(logCfgExtensions[0]);
-
-static qboolean FS_LogCfgExtension(const char* ext) {
-	int i;
-
-	for (i = 0; i < logCfgExtensionsAmount; i++) {
-		if (!Q_stricmp(ext, logCfgExtensions[i]))
-			return qtrue;
-	}
-	return qfalse;
-}
-static const char* FS_GetWriteGameDir(const char* filename) {
-	if (fs_cfglogdir[0] && FS_LogCfgExtension(get_filename_ext(filename))) {
-		return fs_cfglogdir;
-	}
-	else {
-		return fs_gamedir;
-	}
-}
 
 qboolean FS_idPak(pack_t *pack);
 qboolean FS_IsInvalidWriteOSPath(const char *ospath);
@@ -520,13 +404,8 @@ static fileHandle_t	FS_HandleForFile(void) {
 	int		i;
 
 	for ( i = 1 ; i < MAX_FILE_HANDLES ; i++ ) {
-#ifdef ASYNCIO
-		if (fsh[i].handleAsync == qfalse && fsh[i].handleFiles.file.o == NULL) {
-			FS_ResetFileHandleData(&fsh[i]);
-#else
-		if (fsh[i].handleFiles.file.o == NULL) {
+		if ( fsh[i].handleFiles.file.o == NULL ) {
 			Com_Memset(&fsh[i], 0, sizeof(fsh[0]));
-#endif
 			return i;
 		}
 	}
@@ -551,53 +430,6 @@ static FILE	*FS_FileForHandle( fileHandle_t f, module_t module = MODULE_MAIN ) {
 	return fsh[f].handleFiles.file.o;
 }
 
-qboolean	FS_CheckQueuedRenames(fileHandleData_t* f) {
-	for (auto it = queuedRenames.begin(); it != queuedRenames.end(); it++) {
-		const char* queuedOsPath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(std::get<0>(*it).c_str()), std::get<0>(*it).c_str());
-		if (!Q_stricmp(f->ospath, queuedOsPath)) {
-			if (FS_Rename(std::get<0>(*it).c_str(), std::get<1>(*it).c_str())) {
-				if (fs_debug->integer) {
-					Com_Printf("FS_CheckQueuedRenames: Renamed %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
-				}
-			}
-			else {
-				if (fs_debug->integer) {
-					Com_Printf("FS_CheckQueuedRenames: Failed to rename %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
-				}
-			}
-			queuedRenames.erase(it);
-			return qtrue; // can't rename the same file twice after all.
-		}
-	}
-	return qfalse;
-}
-
-int		FS_CheckQueuedRenamesAll() {
-	int count = 0;
-recheck:
-	for (auto it = queuedRenames.begin(); it != queuedRenames.end(); it++) {
-		if (!FS_WeHaveFileOpen(std::get<0>(*it).c_str())) {
-			if (FS_Rename(std::get<0>(*it).c_str(), std::get<1>(*it).c_str())) {
-				if (fs_debug->integer) {
-					Com_Printf("FS_CheckQueuedRenamesAll: Renamed %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
-				}
-			}
-			else {
-				if (fs_debug->integer) {
-					Com_Printf("FS_CheckQueuedRenamesAll: Failed to rename %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
-				}
-			}
-			queuedRenames.erase(it);
-			count++;
-			goto recheck;
-		}
-		else if (fs_debug->integer > 1) {
-			Com_Printf("FS_CheckQueuedRenamesAll: File still open %s -> %s\n", std::get<0>(*it).c_str(), std::get<1>(*it).c_str());
-		}
-	}
-	return count;
-}
-
 void	FS_ForceFlush( fileHandle_t f, module_t module ) {
 	FILE *file;
 
@@ -619,28 +451,13 @@ int FS_filelength( fileHandle_t f, module_t module ) {
 	int		end;
 	FILE*	h;
 
-	if (!fsh[f].compressedFileInfo.compression || fsh[f].compressedFileInfo.compression == FILECOMPRESSION_RAW) {
-		h = FS_FileForHandle(f, module);
-		pos = ftell(h);
-		fseek(h, 0, SEEK_END);
-		end = ftell(h);
-		fseek(h, pos, SEEK_SET);
+	h = FS_FileForHandle(f, module);
+	pos = ftell (h);
+	fseek (h, 0, SEEK_END);
+	end = ftell (h);
+	fseek (h, pos, SEEK_SET);
 
-		return fsh[f].compressedFileInfo.compression == FILECOMPRESSION_RAW ? end - 4 : end;
-	}
-	else if (fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
-
-		if (fsh[f].compressedFileInfo.readMode) {
-
-			return fsh[f].compressedFileInfo.lzmaDecompressor->getDataSize();
-		}
-		else {
-			throw std::logic_error("Can't use FS_Filelength on LZMA files opened in write mode.");
-		}
-	}
-	else {
-		throw std::logic_error("can't use FS_filelength here");
-	}
+	return end;
 }
 
 /*
@@ -728,67 +545,6 @@ qboolean FS_CreatePath (char *OSPath) {
 }
 
 /*
-============
-COM_GetExtension
-============
-*/
-static const char* COM_GetExtension(const char* name)
-{
-	const char* dot = strrchr(name, '.'), * slash;
-	if (dot && (!(slash = strrchr(name, '/')) || slash < dot))
-		return dot + 1;
-	else
-		return "";
-}
-
-/*
-============
-COM_CompareExtension
-
-string compare the end of the strings and return qtrue if strings match
-============
-*/
-static qboolean COM_CompareExtension(const char* in, const char* ext)
-{
-	int inlen, extlen;
-
-	inlen = strlen(in);
-	extlen = strlen(ext);
-
-	if (extlen <= inlen)
-	{
-		in += inlen - extlen;
-
-		if (!Q_stricmp(in, ext))
-			return qtrue;
-	}
-
-	return qfalse;
-}
-
-/*
-=================
-FS_CheckFilenameIsMutable
-
-ERR_FATAL if trying to maniuplate a file with the platform library, or pk3 extension
-=================
-*/
-static void FS_CheckFilenameIsMutable(const char* filename, const char* function)
-{
-	// Check if the filename ends with the library, or pk3 extension
-	if (COM_CompareExtension(filename, ".dll")
-		|| COM_CompareExtension(filename, ".dylib")
-		|| COM_CompareExtension(filename, ".so")
-		|| COM_CompareExtension(filename, ".qvm")
-		|| COM_CompareExtension(filename, ".pk3")
-		)
-	{
-		Com_Error(ERR_FATAL, "%s: Not allowed to manipulate '%s' due "
-			"to %s extension", function, filename, COM_GetExtension(filename));
-	}
-}
-
-/*
 =================
 FS_CopyFile
 
@@ -797,12 +553,11 @@ check for restricted file names, extensions etc. Overwrites file if it
 exists.
 =================
 */
-qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t module ) {
+qboolean FS_CopyFile( const char *fromFile, const char *toFile, module_t module ) {
 	FILE *fo, *to;
 	char *fospath, *tospath;
 	int bytes;
 	char buffer[4096];
-	int errnum;
 
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
@@ -813,8 +568,8 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t mod
 		return qfalse;
 	}
 
-	fospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(fromFile), fromFile );
-	tospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(toFile), toFile );
+	fospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, fromFile );
+	tospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, toFile );
 
 	if ( FS_IsInvalidWriteOSPath( tospath ) ) {
 		Com_Error( ERR_DROP, "FS_CopyFile: blocked illegal write path\n" );
@@ -826,10 +581,6 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t mod
 
 	fo = fopen( fospath, "rb" );
 	if ( !fo ) {
-		errnum = errno;
-		if (fs_debug->integer && strerror(errnum)) {
-			Com_Printf("FS_CopyFile: %s\n", strerror(errnum));
-		}
 		return qfalse;
 	}
 
@@ -839,10 +590,6 @@ qboolean FS_CopyFile( const char *fromFile, const char *toFile){//, module_t mod
 
 	to = fopen( tospath, "wb" );
 	if ( !to ) {
-		errnum = errno;
-		if (fs_debug->integer && strerror(errnum)) {
-			Com_Printf("FS_CopyFile: %s\n", strerror(errnum));
-		}
 		fclose( fo );
 		return qfalse;
 	}
@@ -865,75 +612,7 @@ FS_HomeRemove
 */
 void FS_HomeRemove( const char *homePath ) {
 	remove( FS_BuildOSPath( fs_homepath->string,
-		FS_GetWriteGameDir(homePath), homePath ) );
-}
-
-/*
-===========
-FS_Remove
- uh, why did i have to add this back in?
-===========
-*/
-void FS_Remove(const char* osPath) {
-	int errnum;
-	FS_CheckFilenameIsMutable(osPath, __func__);
-	
-	if (remove(osPath)) {
-		errnum = errno;
-		if (fs_debug->integer && strerror(errnum)) {
-			Com_Printf("FS_Remove: %s\n", strerror(errnum));
-		}
-	}
-}
-
-/*
-===========
-FS_Rmdir
-
-Removes a directory, optionally deleting all files under it
-===========
-*/
-void FS_Rmdir(const char* osPath, qboolean recursive) {
-	FS_CheckFilenameIsMutable(osPath, __func__);
-
-	if (recursive) {
-		int numfiles;
-		int i;
-		const char** filesToRemove = Sys_ListFiles(osPath, "", NULL, &numfiles, qfalse);
-		for (i = 0; i < numfiles; i++) {
-			char fileOsPath[MAX_OSPATH];
-			Com_sprintf(fileOsPath, sizeof(fileOsPath), "%s/%s", osPath, filesToRemove[i]);
-			FS_Remove(fileOsPath);
-		}
-		FS_FreeFileList(filesToRemove);
-
-		const char** directoriesToRemove = Sys_ListFiles(osPath, "/", NULL, &numfiles, qfalse);
-		for (i = 0; i < numfiles; i++) {
-			if (!Q_stricmp(directoriesToRemove[i], ".") || !Q_stricmp(directoriesToRemove[i], "..")) {
-				continue;
-			}
-			char directoryOsPath[MAX_OSPATH];
-			Com_sprintf(directoryOsPath, sizeof(directoryOsPath), "%s/%s", osPath, directoriesToRemove[i]);
-			FS_Rmdir(directoryOsPath, qtrue);
-		}
-		FS_FreeFileList(directoriesToRemove);
-	}
-
-	rmdir(osPath);
-}
-
-/*
-===========
-FS_HomeRmdir
-
-Removes a directory, optionally deleting all files under it
-===========
-*/
-void FS_HomeRmdir(const char* homePath, qboolean recursive) {
-	FS_CheckFilenameIsMutable(homePath, __func__);
-
-	FS_Rmdir(FS_BuildOSPath(fs_homepath->string,
-		fs_gamedir, homePath), recursive);
+				fs_gamedir, homePath ) );
 }
 
 /*
@@ -951,7 +630,7 @@ qboolean FS_FileExists( const char *file )
 	FILE *f;
 	char *testpath;
 
-	testpath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(file), file );
+	testpath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, file );
 
 	f = fopen( testpath, "rb" );
 	if (f) {
@@ -1088,7 +767,6 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
-	fsh[f].compressedFileInfo = {};
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_FOpenFileWrite: %s\n", ospath );
@@ -1102,12 +780,8 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module ) {
 	fsh[f].handleFiles.file.o = fopen( ospath, "wb" );
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1131,12 +805,10 @@ fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
-	fsh[f].compressedFileInfo = {};
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	ospath = FS_BuildOSPath( fs_homepath->string, filename );
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_FOpenFileAppend: %s\n", ospath );
@@ -1148,9 +820,6 @@ fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module ) {
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "ab" );
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 
 	if (!fsh[f].handleFiles.file.o) {
 		return 0;
@@ -1177,7 +846,6 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
-	fsh[f].compressedFileInfo = {};
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
@@ -1186,8 +854,6 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 	// search homepath
 	ospath = FS_BuildOSPath( fs_homepath->string, filename, "" );
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
-
 	// remove trailing slash
 	ospath[strlen(ospath)-1] = '\0';
 
@@ -1197,9 +863,6 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "rb" );
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 	if (!fsh[f].handleFiles.file.o)
 	{
 		// NOTE TTimo on non *nix systems, fs_homepath == fs_basepath, might want to avoid
@@ -1216,9 +879,6 @@ int FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module
 
 			fsh[f].handleFiles.file.o = fopen( ospath, "rb" );
 			fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-			fsh[f].handleAsync = qfalse;
-#endif
 		}
 
 		if (!fsh[f].handleFiles.file.o) {
@@ -1266,36 +926,12 @@ void FS_SV_Rename( const char *from, const char *to ) {
 
 /*
 ===========
-FS_RenameOrQueue
-
-===========
-*/
-qboolean FS_RenameOrQueue( const char *from, const char *to ) {
-
-	if (!FS_WeHaveFileOpen(from)) {
-		FS_Rename(from, to);
-		return qtrue;
-	}
-	if (fs_debug->integer) {
-		Com_Printf("FS_RenameOrQueue: File still open, queuing. %s -> %s\n", from, to);
-	}
-	queuedRenames.push_back(std::move(std::make_tuple(std::move(std::string(from)), std::move(std::string(to)))));
-	return qfalse;
-}
-
-char* FS_BuildOSPathDefault(const char* path) {
-	return FS_BuildOSPath(fs_homepath->string, fs_gamedir, path);
-}
-
-/*
-===========
 FS_Rename
 
 ===========
 */
 qboolean FS_Rename( const char *from, const char *to ) {
-	char			from_ospath[MAX_OSPATH];
-	char			to_ospath[MAX_OSPATH];
+	char			*from_ospath, *to_ospath;
 
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
@@ -1304,81 +940,24 @@ qboolean FS_Rename( const char *from, const char *to ) {
 	// don't let sound stutter
 	S_ClearSoundBuffer();
 
-	Q_strncpyz(from_ospath,FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(from), from ),sizeof(from_ospath));
-	Q_strncpyz(to_ospath,FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(to), to),sizeof(to_ospath));
+	from_ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, from );
+	to_ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, to );
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_Rename: %s --> %s\n", from_ospath, to_ospath );
 	}
 
-	if (FS_CreatePath(to_ospath)) {
-		if (fs_debug->integer) {
-			Com_Printf("FS_Rename: Failed to create destination path %s.\n", to_ospath);
-		}
-	}
-
-	if (FS_FileExists(to)) {
-		if (fs_debug->integer) {
-			Com_Printf("FS_Rename: File already exists. Removing. %s.\n", to_ospath);
-		}
-		// rename() can fail if file already exists (implementation specific) and FS_CopyFile is slower. So avoid lag by just removing the old file first.
-		FS_Remove(to_ospath);
-	}
-
-	if ( rename( from_ospath, to_ospath ) ) { // can fail on some implementations if destination file already exists
+	if ( rename( from_ospath, to_ospath ) ) {
 		int errnum = errno;
 		if ( fs_debug->integer && strerror(errnum) ) {
 			Com_Printf( "FS_Rename: %s\n", strerror(errnum) );
 		}
-		// Failed, try copying it and deleting the original
-		if (!FS_CopyFile(from,to)) {
-			return qfalse;
-		}
-		FS_Remove(from_ospath); // even if it fails.. good enough?
-		return qtrue;
+
+		return qfalse;
 	}
 
 	return qtrue;
 }
-
-#ifdef ASYNCIO
-void FS_FCloseAio(int handle) {
-	fileHandle_t f = (fileHandle_t)handle;
-	if (!fsh[f].closed || !fsh[f].handleAsync) {
-		if (fs_debug->integer) {
-			// This can happen if we were forced to sync close a file, for example 
-			// if we started to record a demo and a demo with the same path was still not fully closed.
-			// This can happen presumably due to random hiccups/latencies in the IO process or threading or whatever.
-			// We don't really need to worry about this.
-			Com_Printf("FS_FCloseAio: NOTE: File is not async or not closed: handle %i (%s)\n", f, fsh[f].name ? fsh[f].name : "");
-		}
-		return;
-	}
-	if (f < 1 || f >= MAX_FILE_HANDLES) {
-		Com_Error(ERR_FATAL, "FCloseAio called with invalid handle %d\n", f);
-	}
-	if (com_developer->integer > 1) {
-		Com_Printf("waiting for async write thread to join ... ");
-	}
-	fsh[f].writerThread->join();
-	if (com_developer->integer > 1) {
-		Com_Printf("done, deleting writer thread ... ");
-	}
-	delete fsh[f].writerThread;
-	if (com_developer->integer > 1) {
-		Com_Printf("done, setting writer thread to nullptr ... ");
-	}
-	fsh[f].writerThread = nullptr;
-	if (com_developer->integer > 1) {
-		Com_Printf("done, resetting file handle data ... ");
-	}
-	if (fs_debug->integer) {
-		Com_Printf("FS_FCloseAio: %s closed.\n", fsh[f].name);
-	}
-	FS_CheckQueuedRenames(&fsh[f]);
-	FS_ResetFileHandleData(&fsh[f]);
-}
-#endif
 
 /*
 ==============
@@ -1391,8 +970,6 @@ on files returned by FS_FOpenFile...
 ==============
 */
 void FS_FCloseFile( fileHandle_t f, module_t module ) {
-
-	qboolean handleWasNull = qfalse;
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
 	}
@@ -1404,238 +981,15 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 		if ( fsh[f].handleFiles.unique ) {
 			unzClose( fsh[f].handleFiles.file.z );
 		}
-
-		FS_CheckQueuedRenames(&fsh[f]);
-#ifdef ASYNCIO
-		FS_ResetFileHandleData(&fsh[f]);
-#else
 		Com_Memset( &fsh[f], 0, sizeof( fsh[f] ) );
-#endif
 		return;
 	}
 
-	if (!fsh[f].handleFiles.file.o) {
-		handleWasNull = qtrue;
-		if (fs_debug->integer) {
-			Com_Printf("FS_FCloseFile: fsh[f].handleFiles.file.o is NULL (%s).\n", fsh[f].name);
-		}
-	}
-
-	if (fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
-		if (fsh[f].compressedFileInfo.readMode) {
-
-			delete fsh[f].compressedFileInfo.lzmaDecompressor; // Just a quick and dirty cleanup.
-			fsh[f].compressedFileInfo.lzmaDecompressor = NULL;
-		}
-	}
-
 	// we didn't find it as a pak, so close it as a unique file
-#ifdef ASYNCIO
-	if (!handleWasNull || fsh[f].handleAsync) {
-		// || fsh[f].handleAsync because we cannot merely check that file.io is not NULL, since 
-		// a race condition (although it is rare, happening maybe once every few hours at worst) 
-		// can result in it being NULL due to fopen() inside the writer thread
-		// not yet having returned the proper FILE* value. 
-		if (fsh[f].handleAsync) {
-			if (fs_debug->integer) {
-				if (handleWasNull) {
-					Com_Printf("FS_FCloseFile: Requesting async close of %s (handle was NULL, fopen not yet returned?).\n", fsh[f].name);
-				}
-				else {
-					Com_Printf("FS_FCloseFile: Requesting async close of %s.\n", fsh[f].name);
-				}
-			}
-			// queue the file to be closed after all pending operations are completed.
-			{
-				std::lock_guard<std::mutex> l(fsh[f].writeLock);
-				fsh[f].closed = qtrue;
-			}
-			fsh[f].cv.notify_one();
-			return;
-		}
-		else {
-			if (fs_debug->integer) {
-				Com_Printf("FS_FCloseFile: Sync closing %s.\n", fsh[f].name);
-			}
-			fclose(fsh[f].handleFiles.file.o);
-		}
-	}
-#else
 	if (fsh[f].handleFiles.file.o) {
-		fclose(fsh[f].handleFiles.file.o);
+		fclose (fsh[f].handleFiles.file.o);
 	}
-#endif
-
-	FS_CheckQueuedRenames(&fsh[f]);
-#ifdef ASYNCIO
-	FS_ResetFileHandleData(&fsh[f]);
-#else
 	Com_Memset( &fsh[f], 0, sizeof( fsh[f] ) );
-#endif
-}
-
-
-#ifdef ASYNCIO
-
-// Sometimes an async file may not yet be fully closed due to hiccups/latencies/threading issues or whatever.
-// When we know that this might happen (like when knowingly overwriting the same file over and over),
-// we should call this before re-opening the file to guarantee that it will actually be closed before we reopen it, 
-// which would cause a chain of other catastrophic events 
-void FS_AsyncAssureFileClosed(const char* ospath) {
-	int		i;
-
-	for (i = 1; i < MAX_FILE_HANDLES; i++) {
-		if (fsh[i].handleAsync == qtrue && fsh[i].closed == qtrue && !Q_stricmp(ospath, fsh[i].ospath)) {
-			if (fs_debug->integer) {
-				Com_Printf("FS_AsyncAssureFileClosed: Forcing sync close of handle %i (%s).\n", i, fsh[i].name);
-			}
-			FS_FCloseAio(i);
-		}
-	}
-}
-
-
-
-extern void Com_PushEvent(sysEvent_t* event);
-void FS_AsyncWriterThread(fileHandle_t h) {
-	qboolean fileOpenFailed = qfalse;
-	if (com_developer->integer > 1) {
-		Com_Printf("Async writer thread started ...");
-	}
-	fileHandleData_t* f = &fsh[h];
-	if (com_developer->integer > 1) {
-		Com_Printf("(async) Creating path ...");
-	}
-	if (!FS_CreatePath(f->ospath)) {
-		if (com_developer->integer > 1) {
-			Com_Printf("(async) Opening file ...");
-		}
-		if (fs_debug->integer) {
-			Com_Printf("FS_AsyncWriterThread: Opening %s.\n", f->name);
-		}
-		f->handleFiles.file.o = fopen(f->ospath, "wb");
-	}
-	if (com_developer->integer > 1) {
-		Com_Printf("File opened for async writing.\n");
-	}
-	if (f->handleFiles.file.o == nullptr) {
-		Com_Printf("Warning: failed to open file %s\n", f->name);
-		fileOpenFailed = qtrue;
-		//return;
-		// Don't return here, it's likely to cause issues.
-	}
-	while (qtrue) {
-		std::vector<byte> write;
-		{
-			std::unique_lock<std::mutex> l(f->writeLock);
-			while (f->writes.empty() && !f->closed) {
-				f->cv.wait(l);
-			}
-			//if (com_developer->integer > 1) {
-			//	Com_Printf("d ");
-			//}
-			if (f->closed && f->writes.empty()) {
-				if (com_developer->integer > 1) {
-					Com_Printf("Async writer thread: end of write detected, ending ...");
-				}
-				break;
-			}
-			//if (com_developer->integer > 1) {
-			//	Com_Printf("e ");
-			//}
-			write = std::move(f->writes.front());
-			//if (com_developer->integer > 1) {
-			//	Com_Printf("f ");
-			//}
-			f->writes.pop_front();
-			//if (com_developer->integer > 1) {
-			//	Com_Printf("g ");
-			//}
-		}
-		//if (com_developer->integer > 1) {
-		//	Com_Printf("h ");
-		//}
-		if (!fileOpenFailed) {
-			// This is pretty cringe but lest we want to fopen() synchronously and potentially hang
-			// gameplay, the demo writing code kinda just has to assume that fopen() was successful.
-			// So we have to kinda go through the motions here and pretend that everything is ok
-			// so that once the demo is "closing" we can clean up properly 
-			// and not cause a crash somehow.
-			// It's sad in that the game will assume the demo recording is working when it isn't.
-			// On the flipside, I'm not aware of this actually happening ever, so it's more of a hypothetical
-			// to begin with.
-			fwrite(&write[0], 1, write.size(), f->handleFiles.file.o);
-		}
-		//if (com_developer->integer > 1) {
-		//	Com_Printf("i ");
-		//}
-	}
-	if (com_developer->integer > 1) {
-		Com_Printf("Closing asnyc write handle ...");
-	}
-	if (!fileOpenFailed) {
-		fclose(f->handleFiles.file.o);
-	}
-	if (com_developer->integer > 1) {
-		Com_Printf("Done, queueing async file close cleanup event.\n");
-	}
-	sysEvent_t event;
-	Com_Memset(&event, 0, sizeof(event));
-	event.evType = SE_AIO_FCLOSE;
-	event.evValue = h;
-	Com_PushEvent(&event);
-}
-
-
-
-// Call with safe==qtrue to make sure the file isn't open in another async file handle anymore
-fileHandle_t FS_FOpenFileWriteAsync(const char* filename, qboolean safe) {
-	const char* ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
-
-	if (safe) {
-		FS_AsyncAssureFileClosed(ospath);
-	}
-	if (com_developer->integer > 1) {
-		Com_Printf("Opening file for async writing ... ");
-	}
-	fileHandle_t f = FS_HandleForFile();
-	if (com_developer->integer > 1) {
-		Com_Printf("Handle acquired, building path ... ");
-	}
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
-
-	if (fs_debug->integer) {
-		Com_Printf("FS_FOpenFileWriteAsync: %s\n", fsh[f].ospath);
-	}
-
-	Q_strncpyz(fsh[f].name, filename, sizeof(fsh[f].name));
-	fsh[f].handleAsync = qtrue;
-	if (com_developer->integer > 1) {
-		Com_Printf("Spawning writer thread ... ");
-	}
-	// spawn writer thread
-	fsh[f].writerThread = new std::thread(FS_AsyncWriterThread, f);
-	if (com_developer->integer > 1) {
-		Com_Printf("Writer thread spawned.\n");
-	}
-	return f;
-}
-#endif
-
-fileHandle_t FS_WeHaveFileOpen(const char* filename) {
-	const char* ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
-	int		i;
-
-	for (i = 1; i < MAX_FILE_HANDLES; i++) {
-		if ((
-#ifdef ASYNCIO // TODO idk if this define even used consistently anymore..
-			fsh[i].handleAsync ||
-#endif
-			fsh[i].handleFiles.file.o != NULL) && !Q_stricmp(ospath, fsh[i].ospath)) {
-			return i;
-		}
-	}
-	return 0;
 }
 
 /*
@@ -1655,9 +1009,8 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
-	fsh[f].compressedFileInfo = {};
 
-	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
+	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_FOpenFileWrite: %s\n", ospath );
@@ -1673,12 +1026,8 @@ fileHandle_t FS_FOpenFileWrite( const char *filename, module_t module ) {
 	fsh[f].handleFiles.file.o = fopen( ospath, "wb" );
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1696,7 +1045,6 @@ fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module) {
 	f = FS_HandleForFile();
 	fsh[f].module = module;
 	fsh[f].zipFile = qfalse;
-	fsh[f].compressedFileInfo = {};
 
 	ospath = FS_BuildOSPath(fs_homepath->string, "base", filename);
 
@@ -1714,12 +1062,8 @@ fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module) {
 	fsh[f].handleFiles.file.o = fopen(ospath, "wb");
 
 	Q_strncpyz(fsh[f].name, filename, sizeof(fsh[f].name));
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
 
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1749,9 +1093,7 @@ fileHandle_t FS_FOpenFileAppend( const char *filename, module_t module ) {
 	// don't let sound stutter
 	S_ClearSoundBuffer();
 
-	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
-
-	Q_strncpyz(fsh[f].ospath, ospath, MAX_OSPATH);
+	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_FOpenFileAppend: %s\n", ospath );
@@ -1763,9 +1105,6 @@ fileHandle_t FS_FOpenFileAppend( const char *filename, module_t module ) {
 
 	fsh[f].handleFiles.file.o = fopen( ospath, "ab" );
 	fsh[f].handleSync = qfalse;
-#ifdef ASYNCIO
-	fsh[f].handleAsync = qfalse;
-#endif
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
 	}
@@ -1791,7 +1130,7 @@ qboolean FS_IsFifo( const char *filename ) {
 	char *ospath;
 	struct stat f_stat;
 
-	ospath = FS_BuildOSPath( fs_homepath->string, FS_GetWriteGameDir(filename), filename );
+	ospath = FS_BuildOSPath( fs_homepath->string, fs_gamedir, filename );
 
 	if ( stat(ospath, &f_stat) == -1 ) {
 		return qfalse;
@@ -1850,6 +1189,11 @@ int FS_FilenameCompare( const char *s1, const char *s2 ) {
 	return 0;		// strings are equal
 }
 
+const char *get_filename_ext(const char *filename) {
+	const char *dot = strrchr(filename, '.');
+	if (!dot || dot == filename) return "";
+	return dot + 1;
+}
 
 /*
 ===========
@@ -1896,12 +1240,11 @@ separate file or a ZIP file.
 */
 extern qboolean		com_fullyInitialized;
 
-int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean compressedType, qboolean skipJKA) {
-	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module,compressedType, skipJKA);
+int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean skipJKA) {
+	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module, skipJKA);
 }
 
-int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean compressedType, qboolean skipJKA) {
-
+int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean skipJKA) {
 	bool			isLocalConfig;
 	searchpath_t	*search;
 	char			*netpath;
@@ -1911,7 +1254,6 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	int			hash;
 	int				l;
 	char demoExt[16];
-	char demoExtCompressed[16];
 
 	hash = 0;
 
@@ -1928,7 +1270,6 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	}
 
 	Com_sprintf (demoExt, sizeof(demoExt), ".dm_%d", MV_GetCurrentProtocol());
-	Com_sprintf (demoExtCompressed, sizeof(demoExtCompressed), ".dmc%d", MV_GetCurrentProtocol());
 	// qpaths are not supposed to have a leading slash
 	if ( filename[0] == '/' || filename[0] == '\\' ) {
 		filename++;
@@ -1954,8 +1295,6 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 	*file = FS_HandleForFile();
 	fsh[*file].module = module;
 	fsh[*file].handleFiles.unique = uniqueFILE;
-	fsh[*file].compressedFileInfo = {};
-	fsh[*file].compressedFileInfo.readMode = qtrue;
 
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		//
@@ -2058,7 +1397,6 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 						fsh[*file].handleFiles.file.z = pak->handle;
 
 					Q_strncpyz(fsh[*file].name, filename, sizeof(fsh[*file].name));
-					Q_strncpyz(fsh[*file].ospath, pak->pakFilename, MAX_OSPATH); // TODO can we do sth smarter here than just the pk3 file?
 					fsh[*file].zipFile = qtrue;
 
 					// set the file position in the zip file (also sets the current file info)
@@ -2114,7 +1452,6 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
 					&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
-					&& Q_stricmp( filename + l - strlen(demoExtCompressed), demoExtCompressed)	// menu files
 					&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 					continue;
 				}
@@ -2133,30 +1470,12 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 				&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 				&& Q_stricmp( filename + l - 5, ".game" )	// menu files
 				&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
-				&& Q_stricmp( filename + l - strlen(demoExtCompressed), demoExtCompressed)	// menu files
 				&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 				fs_fakeChkSum = qrandom();
 			}
 
 			Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
-			Q_strncpyz(fsh[*file].ospath, netpath, MAX_OSPATH);
 			fsh[*file].zipFile = qfalse;
-
-			if (compressedType) {
-				FS_Read(&fsh[*file].compressedFileInfo.compression, 4, *file,module);
-				fsh[*file].compressedFileInfo.compression = LittleLong(fsh[*file].compressedFileInfo.compression);
-			}
-			if (fsh[*file].compressedFileInfo.compression == FILECOMPRESSION_LZMA) {
-				int tmp = *file;
-				module_t moduleCaptured = module;
-				fsh[*file].compressedFileInfo.lzmaDecompressor = new LZMADecompressor(
-					[tmp,module](void* buf, size_t size) -> size_t {
-						return (size_t)FS_Read(buf, size, tmp, module,qtrue); // Last parameter qtrue (ignoreCompression) so the stuff is just written to the file regardless.
-					}
-				);
-			}
-			return FS_filelength(*file, module);
-
 			if ( fs_debug->integer ) {
 				Com_Printf( "FS_FOpenFileRead: %s (found in '%s/%s')\n", filename,
 					dir->path, dir->gamedir );
@@ -2199,7 +1518,7 @@ int FS_Read2( void *buffer, int len, fileHandle_t f, module_t module ) {
 	return FS_Read( buffer, len, f, module );
 }
 
-int FS_Read( void *buffer, int len, fileHandle_t f, module_t module, qboolean ignoreCompression) {
+int FS_Read( void *buffer, int len, fileHandle_t f, module_t module ) {
 	size_t		block, remaining;
 	size_t		read;
 	byte	*buf;
@@ -2210,16 +1529,6 @@ int FS_Read( void *buffer, int len, fileHandle_t f, module_t module, qboolean ig
 	}
 
 	FS_CHECKHANDLE(f, module, 0)
-
-	if (!ignoreCompression && fsh[f].compressedFileInfo.compression == FILECOMPRESSION_LZMA) { // Idk, I guess this should have better error handling or sth but there isn't much we can do tbh
-		if (fsh[f].compressedFileInfo.readMode) {
-
-			return fsh[f].compressedFileInfo.lzmaDecompressor->get((byte*)buffer, len);
-		}
-		else {
-			throw std::logic_error("Can't use FS_Read on LZMA stream that was opened for write.");
-		}
-	}
 
 	buf = (byte *)buffer;
 	fs_readCount += len;
@@ -2269,20 +1578,8 @@ int FS_Write( const void *buffer, int len, fileHandle_t h, module_t module ) {
 
 	FS_CHECKHANDLE(h, module, 0)
 
-	buf = (const byte*)buffer;
-
-#ifdef ASYNCIO
-	if (fsh[h].handleAsync) {
-		{
-			std::lock_guard<std::mutex> l(fsh[h].writeLock);
-			fsh[h].writes.emplace_back(buf, buf + len);
-		}
-		fsh[h].cv.notify_one();
-		return len;
-	}
-	else {
-#endif
 	f = FS_FileForHandle(h, module);
+	buf = (const byte *)buffer;
 
 	remaining = len;
 	tries = 0;
@@ -2301,9 +1598,6 @@ int FS_Write( const void *buffer, int len, fileHandle_t h, module_t module ) {
 		remaining -= written;
 		buf += written;
 	}
-#ifdef ASYNCIO
-	}
-#endif
 	if ( fsh[h].handleSync ) {
 		fflush( f );
 	}
@@ -2339,10 +1633,6 @@ int FS_Seek( fileHandle_t f, int offset, int origin, module_t module ) {
 
 	FS_CHECKHANDLE(f, module, -1)
 
-	if (fsh[f].compressedFileInfo.compression/* == FILECOMPRESSION_LZMA*/) {
-		Com_Error(ERR_FATAL, "Can't use FS_Seek on compressed files.");
-	}
-
 	if (fsh[f].zipFile == qtrue) {
 		if (offset == 0 && origin == FS_SEEK_SET) {
 			// set the file position in the zip file (also sets the current file info)
@@ -2375,7 +1665,6 @@ int FS_Seek( fileHandle_t f, int offset, int origin, module_t module ) {
 			Com_Error( ERR_FATAL, "Bad origin in FS_Seek" );
 			break;
 		}
-
 
 		return fseek( file, offset, _origin );
 	}
@@ -2527,7 +1816,7 @@ int FS_ReadFile_real( const char *qpath, void **buffer, qboolean skipJKA ) {
 	}
 
 	// look for it in the filesystem or pack files
-	len = FS_FOpenFileRead( qpath, &h, qfalse, MODULE_MAIN, qfalse, skipJKA );
+	len = FS_FOpenFileRead( qpath, &h, qfalse, MODULE_MAIN, skipJKA );
 	if ( h == 0 ) {
 		if ( buffer ) {
 			*buffer = NULL;
@@ -2671,7 +1960,6 @@ of a zip file.
 static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean assetsJKA )
 {
 	fileInPack_t	*buildBuffer;
-	stringPool_t	*namesPool;
 	pack_t			*pack;
 	unzFile			uf;
 	int				err;
@@ -2679,9 +1967,11 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 	char			filename_inzip[MAX_ZPATH];
 	unz_file_info	file_info;
 	ZPOS64_T		i;
+	size_t			len;
 	int			hash;
 	int				fs_numHeaderLongs;
 	int				*fs_headerLongs;
+	char			*namePtr;
 	int				strLength;
 
 	fs_numHeaderLongs = 0;
@@ -2694,8 +1984,27 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 
 	fs_packFiles += gi.number_entry;
 
-	buildBuffer = (struct fileInPack_s *)Z_Malloc((int)((gi.number_entry * sizeof(fileInPack_t))), TAG_FILESYS, qtrue);
-	namesPool = Z_StringPoolNew(gi.number_entry * 8, TAG_FILESYS);
+	len = 0;
+	unzGoToFirstFile(uf);
+	for (i = 0; i < gi.number_entry; i++)
+	{
+		err = unzGetCurrentFileInfo(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
+		if (err != UNZ_OK) {
+			break;
+		}
+		strLength = strlen(filename_inzip);
+		if ( assetsJKA ) {
+			// Ugly workaround: rename academy shader files to avoid collisions
+			if ( strLength > 7 && !Q_stricmp(filename_inzip + strLength - 7, ".shader") ) {
+				len += 4; // "_jka"
+			}
+		}
+		len += strLength + 1;
+		unzGoToNextFile(uf);
+	}
+
+	buildBuffer = (struct fileInPack_s *)Z_Malloc((int)((gi.number_entry * sizeof(fileInPack_t)) + len), TAG_FILESYS, qtrue);
+	namePtr = ((char *) buildBuffer) + gi.number_entry * sizeof( fileInPack_t );
 	fs_headerLongs = (int *)Z_Malloc( gi.number_entry * sizeof(int), TAG_FILESYS, qtrue );
 
 	// get the hash table size from the number of files in the zip
@@ -2735,19 +2044,17 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 			fs_headerLongs[fs_numHeaderLongs++] = LittleLong(file_info.crc);
 		}
 		if ( assetsJKA ) {
-			// Ugly workarounds:
-			//  - rename academy shader files to avoid collisions
-			//  - rename academy sounds.cfg files to prevent them from overriding sounds of jk2 models that don't have a sounds.cfg
+			// Ugly workaround: rename academy shader files to avoid collisions
 			strLength = strlen( filename_inzip );
 			if ( strLength > 7 && !Q_stricmp(filename_inzip + strLength - 7, ".shader") ) {
-				Q_strcat( filename_inzip, sizeof(filename_inzip), "_jka" );
-			} else if ( strLength > 15 && !Q_stricmpn(filename_inzip, "models/players/", 15) && !Q_stricmp(filename_inzip + strLength - 11, "/sounds.cfg") ) {
 				Q_strcat( filename_inzip, sizeof(filename_inzip), "_jka" );
 			}
 		}
 		Q_strlwr( filename_inzip );
 		hash = FS_HashFileName(filename_inzip, pack->hashSize);
-		buildBuffer[i].name = Z_StringPoolAdd(namesPool, filename_inzip);
+		buildBuffer[i].name = namePtr;
+		strcpy( buildBuffer[i].name, filename_inzip );
+		namePtr += strlen(filename_inzip) + 1;
 		// store the file position in the zip
 		buildBuffer[i].pos = unzGetOffset(uf);
 		buildBuffer[i].len = file_info.uncompressed_size;
@@ -2764,7 +2071,6 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 	Z_Free(fs_headerLongs);
 
 	pack->buildBuffer = buildBuffer;
-	pack->namesPool = namesPool;
 
 	// which versions does this pk3 support?
 
@@ -2815,113 +2121,6 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename, qboolean ass
 	}
 
 	return pack;
-}
-
-/*
-=================
-FS_SV_VerifyZipFile
-
-Verify zip data integrity with CRCs
-Calculate checksum for zip file the same way as in pack->checksum
-
-This is just a hash of CRCs from ZIP central directory
-It does not check the actual content and zip metadata
-=================
-*/
-qboolean FS_SV_VerifyZipFile( const char *zipfile, int *checksum )
-{
-	const char		*ospath;
-	unzFile			uf;
-	int				err;
-	unz_global_info gi;
-	unz_file_info	file_info;
-	ZPOS64_T		i;
-	int				fs_numHeaderLongs;
-	int				*fs_headerLongs = NULL;
-	int				chksum;
-	char			*read_buffer = NULL;
-	const int		read_buffer_size = 16384; // UNZ_BUFSIZE
-
-	if ( !fs_searchpaths ) {
-		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
-	}
-
-	ospath = FS_BuildOSPath( fs_homepath->string, zipfile );
-
-	uf = unzOpen(ospath);
-	if (uf == NULL)
-		goto unzip_error;
-
-	if (unzGetGlobalInfo(uf, &gi))
-		goto unzip_error;
-
-	fs_numHeaderLongs = 0;
-	fs_headerLongs = (int *)Hunk_AllocateTempMemory(gi.number_entry * sizeof(int));
-	read_buffer = (char *)Hunk_AllocateTempMemory(read_buffer_size);
-
-	if (unzGoToFirstFile(uf))
-		goto unzip_error;
-
-	for (i = 0; i < gi.number_entry; i++)
-	{
-		if (unzGetCurrentFileInfo(uf, &file_info, NULL, 0, NULL, 0, NULL, 0))
-			goto unzip_error;
-
-		if (file_info.uncompressed_size > 0) {
-			fs_headerLongs[fs_numHeaderLongs++] = LittleLong(file_info.crc);
-		}
-
-		if (unzOpenCurrentFile(uf))
-			goto unzip_error;
-
-		// read whole file to make minizip calculate CRC
-		do {
-			err = unzReadCurrentFile(uf, read_buffer, read_buffer_size);
-
-			if (err < 0) {
-				unzCloseCurrentFile(uf);
-				goto unzip_error;
-			}
-		} while (err != UNZ_EOF);
-
-		// decompression may fail early due to bitrot
-		// unzCloseCurrentFile() does not verify CRC unless unzeof() returns 1
-		if (unzeof(uf) != 1) {
-			unzCloseCurrentFile(uf);
-			goto unzip_error;
-		}
-
-		// returns UNZ_CRCERROR if CRC does not match
-		if (unzCloseCurrentFile(uf))
-			goto unzip_error;
-
-		unzGoToNextFile(uf);
-	}
-
-	if (checksum) {
-		chksum = Com_BlockChecksum( fs_headerLongs, 4 * fs_numHeaderLongs );
-		chksum = LittleLong( chksum );
-		*checksum = chksum;
-	}
-
-	unzClose(uf);
-
-	Hunk_FreeTempMemory(read_buffer);
-	Hunk_FreeTempMemory(fs_headerLongs);
-
-	return qfalse;
-
-unzip_error:
-	if (uf)
-		unzClose(uf);
-
-	if (read_buffer)
-		Hunk_FreeTempMemory(read_buffer);
-
-	if (fs_headerLongs)
-		Hunk_FreeTempMemory(fs_headerLongs);
-
-	return qtrue;
 }
 
 /*
@@ -3057,7 +2256,7 @@ static const char **FS_ListFilteredFiles( const char *path, const char *extensio
 			pak = search->pack;
 			buildBuffer = pak->buildBuffer;
 			for (i = 0; i < pak->numfiles; i++) {
-				const char	*name;
+				char	*name;
 				int		zpathLen, depth;
 
 				// check for directory match
@@ -3554,35 +2753,15 @@ FS_Path_f
 void FS_Path_f( void ) {
 	searchpath_t	*s;
 	int				i;
-	char packVersion[] = "unknown 1.02 1.03 1.04 JKA ";
 
 	Com_Printf ("Current search path:\n");
 	for (s = fs_searchpaths; s; s = s->next) {
 		if (s->pack) {
-			packVersion[0] = '\0';
-
-			if (s->pack->gvc & PACKGVC_1_02)
-			{
-				Q_strcat(packVersion, sizeof(packVersion), "1.02 ");
-			}
-			if (s->pack->gvc & PACKGVC_1_03)
-			{
-				Q_strcat(packVersion, sizeof(packVersion), "1.03 ");
-			}
-			if (s->pack->gvc & PACKGVC_1_04)
-			{
-				Q_strcat(packVersion, sizeof(packVersion), "1.04 ");
-			}
-			if (s->pack->isJKA == qtrue)
-			{
-				Q_strcat(packVersion, sizeof(packVersion), "JKA ");
-			}
-			if (packVersion[0] == '\0')
-			{
-				Q_strcat(packVersion, sizeof(packVersion), "unknown ");
-			}
-
-			Com_Printf("%s (%i files) [ %s]\n", s->pack->pakFilename, s->pack->numfiles, packVersion);
+			Com_Printf ("%s (%i files) [ %s%s%s%s]\n", s->pack->pakFilename, s->pack->numfiles,
+				s->pack->gvc == PACKGVC_UNKNOWN ? "unknown " : "",
+				s->pack->gvc & PACKGVC_1_02 ? "1.02 " : "",
+				s->pack->gvc & PACKGVC_1_03 ? "1.03 " : "",
+				s->pack->gvc & PACKGVC_1_04 ? "1.04 " : "");
 
 			if ( fs_numServerPaks ) {
 				if ( !FS_PakIsPure(s->pack) ) {
@@ -3861,7 +3040,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir, qboolean ass
 			if (!found) {
 				// server has no interest in the file
 				unzClose(pak->handle);
-				Z_StringPoolFree(pak->namesPool);
 				Z_Free(pak->buildBuffer);
 				Z_Free(pak);
 				continue;
@@ -3975,7 +3153,6 @@ qboolean FS_ComparePaks( char *neededpaks, int len, int *chksums, size_t maxchks
 	searchpath_t	*sp;
 	qboolean havepak, badchecksum, badname;
 	int i;
-	int paknum; // number of paks in neededpaks string (not counting dl_ duplicates)
 
 	if ( !fs_numServerReferencedPaks ) {
 		return qfalse; // Server didn't send any pack information along
@@ -3983,7 +3160,6 @@ qboolean FS_ComparePaks( char *neededpaks, int len, int *chksums, size_t maxchks
 
 	*neededpaks = 0;
 	badname = qfalse;
-	paknum = 0;
 
 	for ( i = 0 ; i < fs_numServerReferencedPaks ; i++ ) {
 		// Ok, see if we have this pak file
@@ -4059,14 +3235,11 @@ qboolean FS_ComparePaks( char *neededpaks, int len, int *chksums, size_t maxchks
 					break;
 				}
 
-				if (paknum + 1 >= (int)maxchksums) {
-					Com_Printf( S_COLOR_YELLOW "WARNING (FS_ComparePaks): referenced pk3 files cut off because there are too many\n" );
-					break;
-				}
-
 				Q_strcat( neededpaks, len, currentPak );
-				chksums[paknum] = fs_serverReferencedPaks[i];
-				paknum++;
+
+				if (chksums && i < (int)maxchksums) {
+					chksums[i] = fs_serverReferencedPaks[i];
+				}
 			} else {
 				char st[MAX_ZPATH];
 
@@ -4077,7 +3250,6 @@ qboolean FS_ComparePaks( char *neededpaks, int len, int *chksums, size_t maxchks
 				if ( FS_SV_FileExists(va("%s/dl_%s.pk3", moddir, filename)) ) {
 					Q_strcat( neededpaks, len, " (local file exists with wrong checksum)");
 				}
-
 				Q_strcat( neededpaks, len, "\n");
 			}
 		}
@@ -4119,7 +3291,6 @@ void FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles ) {
 
 		if ( p->pack ) {
 			unzClose(p->pack->handle);
-			Z_StringPoolFree( p->pack->namesPool );
 			Z_Free( p->pack->buildBuffer );
 			Z_Free( p->pack );
 		}
@@ -4161,30 +3332,10 @@ static void FS_Startup( const char *gameName ) {
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_copyfiles = Cvar_Get( "fs_copyfiles", "0", CVAR_INIT );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT | CVAR_VM_NOWRITE );
-//#ifndef PORTABLE
-	fs_portable = Cvar_Get("fs_portable", "1", CVAR_INIT|CVAR_VM_NOWRITE); //"Disable fs_homepath and use only one folder for all game files" 
-//#endif
+	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
 	fs_homepath = Cvar_Get ("fs_homepath", Sys_DefaultHomePath(), CVAR_INIT | CVAR_VM_NOWRITE );
-#ifndef DEDICATED
-	fs_basegame = Cvar_Get( "fs_basegame", "eternaljk2", CVAR_INIT );
-	fs_globalcfg = Cvar_Get( "fs_globalcfg", "1", CVAR_ARCHIVE/* | CVAR_LATCH*/ | CVAR_NORESTART );
-
-	if (fs_globalcfg->integer)
-		fs_gamedirvar = fs_basegame;
-	else
-		fs_gamedirvar = Cvar_Get( "fs_game", "", CVAR_INIT | CVAR_SYSTEMINFO );
-#else
-	fs_basegame = Cvar_Get( "fs_basegame", "", CVAR_INIT );
-	fs_gamedirvar = Cvar_Get( "fs_game", "", CVAR_INIT | CVAR_SYSTEMINFO );
-#endif
-
-	fs_dlTommyTernalPk3 = Cvar_Get("fs_dlTommyTernalPk3", "0", CVAR_LATCH | CVAR_ARCHIVE);
-	fs_forcegame = Cvar_Get("fs_forcegame", "", CVAR_INIT);
-#if DEDICATED
-	fs_cfgLogPath = Cvar_Get("fs_cfgLogPath", "", CVAR_INIT | CVAR_VM_NOWRITE);
-#else
-	fs_cfgLogPath = Cvar_Get("fs_cfgLogPath", "", CVAR_ROM);
-#endif
+	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	fs_forcegame = Cvar_Get ("fs_forcegame", "eternaljk2", CVAR_INIT );
 
 	assetsPath = Sys_DefaultAssetsPath();
 	fs_assetspath = Cvar_Get("fs_assetspath", assetsPath ? assetsPath : "", CVAR_INIT | CVAR_VM_NOWRITE);
@@ -4210,27 +3361,6 @@ static void FS_Startup( const char *gameName ) {
 #endif
 		return;
 	}
-
-	fs_cfglogdir[0] = '\0';
-#ifdef DEDICATED
-	// this is really just to be able to run multiple installs from the same folder while sharing demos/pk3s etc
-	if (fs_cfgLogPath->string[0] && Q_stricmp(fs_cfgLogPath->string, fs_gamedir)) {
-		if (fs_basepath->string[0]) {
-			FS_AddGameDirectory(fs_basepath->string, fs_cfgLogPath->string);
-		}
-		if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string, fs_basepath->string)) {
-			FS_AddGameDirectory(fs_homepath->string, fs_cfgLogPath->string);
-		}
-		if (!FS_CheckDirTraversal(fs_cfgLogPath->string))
-		{
-			Q_strncpyz(fs_cfglogdir, fs_cfgLogPath->string, sizeof(fs_cfglogdir));
-		}
-		else {
-			Com_Printf("fs_cfgLogPath: %s contains invalid patterns\n", fs_cfgLogPath->string);
-		}
-		Q_strncpyz(fs_cfglogdir, fs_cfgLogPath->string, sizeof(fs_cfglogdir));
-	}
-#endif
 
 	// Try to load JKA assets if a path has been specified
 	if ( fs_loadjka->integer && fs_basejka->string[0] ) {
@@ -4292,15 +3422,8 @@ static void FS_Startup( const char *gameName ) {
 				FS_AddGameDirectory(fs_homepath->string, fs_forcegame->string);
 			}
 		}
-		if (!FS_CheckDirTraversal(fs_forcegame->string))
-		{
-			Q_strncpyz(fs_gamedir, fs_forcegame->string, sizeof(fs_gamedir));
-		}
-		else {
-			Com_Printf("fs_forcegame: %s contains invalid patterns\n", fs_forcegame->string);
-		}
+		Q_strncpyz( fs_gamedir, fs_forcegame->string, sizeof( fs_gamedir ) );
 	}
-
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -4312,8 +3435,7 @@ static void FS_Startup( const char *gameName ) {
 	Cmd_AddCommand ("fs_restart", FS_Restart_f );
 
 	// print the current search paths
-	if (fs_debug->integer)
-		FS_Path_f();
+	FS_Path_f();
 
 	fs_gamedirvar->modified = qfalse; // We just loaded, it's not modified
 
@@ -4354,11 +3476,7 @@ static void FS_Startup( const char *gameName ) {
 			char packstr[MAX_QPATH];
 			Com_sprintf(packstr, sizeof(packstr), "\n%s/%s.pk3", search->pack->pakGamename, search->pack->pakBasename);
 
-			if (!fs_dlTommyTernalPk3->integer && (!Q_stricmp(packstr, "\nbase/jk2pro-assets.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-assets.pk3") || !Q_stricmp(packstr,"\nbase/jk2pro-bins.pk3") || !Q_stricmp(packstr, "\neternaljk2/jk2pro-bins.pk3"))) { // done in a shitty way i think, idk. this build system throws shit in random places depending on whether i build linux or windows, client or dedi etc. what a mess.
-				search->pack->noref = qtrue;
-				search->pack->referenced = 0;
-			} 
-			else if (f_w && !Q_stristr(mv_whitelist, packstr)) {
+			if (f_w && !Q_stristr(mv_whitelist, packstr)) {
 				search->pack->noref = qtrue;
 				search->pack->referenced = 0;
 			} else if (f_b && Q_stristr(mv_blacklist, packstr)) {
@@ -4697,7 +3815,6 @@ checksums to see if any pk3 files need to be auto-downloaded.
 */
 void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames ) {
 	int		i, c, d = 0;
-	int		tmp;
 
 	Cmd_TokenizeString( pakSums );
 
@@ -4707,11 +3824,7 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 	}
 
 	for ( i = 0 ; i < c ; i++ ) {
-		tmp = atoi(Cmd_Argv(i));
-		if (tmp != fs_serverReferencedPaks[i]) {
-			fs_referencedPaksChanged = qtrue;
-		}
-		fs_serverReferencedPaks[i] = tmp;
+		fs_serverReferencedPaks[i] = atoi( Cmd_Argv( i ) );
 	}
 
 	for ( i = 0 ; i < (int)ARRAY_LEN(fs_serverReferencedPakNames) ; i++ ) {
@@ -4736,11 +3849,7 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 		Com_Printf(S_COLOR_YELLOW "WARNING: Corrupted server pak references\n");
 	}
 
-	tmp = MIN(c, d);
-	if (tmp != fs_numServerReferencedPaks) {
-		fs_referencedPaksChanged = qtrue;
-	}
-	fs_numServerReferencedPaks = tmp;
+	fs_numServerReferencedPaks = MIN(c, d);
 }
 
 /*
@@ -4798,8 +3907,6 @@ void FS_Restart2( int checksumFeed, qboolean inPlace ) {
 
 	// set the checksum feed
 	fs_checksumFeed = checksumFeed;
-	fs_checksumFeedSet = qtrue;
-	fs_referencedPaksChanged = qfalse;
 
 	// clear pak references
 	FS_ClearPakReferences(0);
@@ -4854,7 +3961,7 @@ restart if necessary
 =================
 */
 qboolean FS_ConditionalRestart( int checksumFeed ) {
-	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed || !fs_checksumFeedSet || fs_referencedPaksChanged) {
+	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed ) {
 		FS_Restart( checksumFeed );
 		return qtrue;
 	}
@@ -4938,14 +4045,15 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 
 	// Only check the unresolved path for invalid characters, the os probably knows what it's doing
 	if ( FS_ContainsInvalidCharacters(qpath) ) {
-		Com_Printf( "FS_FOpenFileByMode: invalid filename (%s)\n", qpath );
+		if (fs_debug->integer)
+			Com_Printf( "FS_FOpenFileByMode: invalid filename (%s)\n", qpath );
 		*f = 0;
 		return -1;
 	}
 
 	// Prevent writing to files with some extensions to prevent bypassing several restrictions
 	if ( mode != FS_READ  &&
-		FS_IsInvalidWriteOSPath(FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(qpath), qpath)) ) {
+		FS_IsInvalidWriteOSPath(FS_BuildOSPath(fs_homepath->string, fs_gamedir, qpath)) ) {
 		Com_Error( ERR_DROP, "FS_FOpenFileByMode: blocked illegal write path\n" );
 	}
 
@@ -4982,9 +4090,6 @@ int FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, u
 		fsh[*f].fileSize = r;
 	}
 	fsh[*f].handleSync = sync;
-#ifdef ASYNCIO
-	fsh[*f].handleAsync = qfalse;
-#endif
 
 	return r;
 }
@@ -5027,7 +4132,15 @@ const char *FS_MV_VerifyDownloadPath(const char *pk3file) {
 				return NULL;
 
 			if (search->pack->referenced) {
-				return search->pack->pakFilename;
+				static char gameDataPath[MAX_OSPATH];
+				Q_strncpyz(gameDataPath, search->pack->pakFilename, sizeof(gameDataPath));
+
+				char *sp = strrchr(gameDataPath, PATH_SEP);
+				*sp = '\0';
+				sp = strrchr(gameDataPath, PATH_SEP);
+				*sp = '\0';
+
+				return gameDataPath;
 			}
 		}
 	}
@@ -5072,7 +4185,7 @@ void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt,
 			Q_strncpyz( filename, converted, sizeof( filename ) );
 		}
 
-		callback( filename, qfalse );
+		callback( filename );
 	}
 	FS_FreeFileList( filenames );
 
@@ -5166,129 +4279,3 @@ qboolean FS_DeleteDLFile(const char *qpath) {
 
 	return (qboolean)!!remove(ospath);
 }
-
-uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
-	fileHandle_t	f;
-	searchpath_t *search;
-
-	if (fileName == NULL || fileName[0] == '\0') {
-		return FILE_VERSION_UNKNOWN;
-	}
-
-	// qpaths are not supposed to have a leading slash
-	if (fileName[0] == '/' || fileName[0] == '\\') {
-		fileName++;
-	}
-
-	// make absolutely sure that it can't back up the path.
-	// The searchpaths do guarantee that something will always
-	// be prepended, so we don't need to worry about "c:" or "//limbo"
-	if (strstr(fileName, "..") || strstr(fileName, "::")) {
-		return FILE_VERSION_UNKNOWN;
-	}
-
-	FS_FOpenFileRead(fileName, &f, qfalse, module, qfalse, qfalse);
-
-	if (!f) {
-		return FILE_VERSION_UNKNOWN;
-	}
-
-	// find file that would be opened by FS_FOpenFileRead taking all
-	// its quirks and special cases into account
-	if (fsh[f].zipFile) {
-		for (search = fs_searchpaths; search; search = search->next) {
-			if (search->pack) {
-				pack_t *pak = search->pack;
-
-				if (fsh[f].handleFiles.file.z == pak->handle) {
-					// found it!
-
-					uint32_t returnValue = FILE_VERSION_UNKNOWN;
-
-					FS_FCloseFile(f, module);
-
-					if (pak->gvc & PACKGVC_1_02)
-						returnValue |= FILE_VERSION_1_02;
-					if (pak->gvc & PACKGVC_1_03)
-						returnValue |= FILE_VERSION_1_03;
-					if (pak->gvc & PACKGVC_1_04)
-						returnValue |= FILE_VERSION_1_04;
-					if (pak->isJKA)
-						returnValue |= FILE_VERSION_JKA;
-
-					return returnValue;
-				}
-			}
-		}
-	}
-
-	FS_FCloseFile(f, module);
-	return FILE_VERSION_UNKNOWN;
-}
-
-
-fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename) {
-	fileHandleData_t* fd;
-	fileHandle_t f;
-	char* ospath;
-
-	if (!fs_searchpaths) {
-		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
-	}
-
-	ospath = FS_BuildOSPath(fs_homepath->string, FS_GetWriteGameDir(filename), filename);
-
-	if (fs_debug->integer) {
-		Com_Printf("FS_PipeOpenWrite: %s\n", ospath);
-	}
-
-	//FS_CheckFilenameIsNotAllowed(ospath, __func__, qfalse);
-
-	f = FS_HandleForFile();
-	fd = &fsh[f];
-	//fd->pakIndex = -1;
-	//fs_lastPakIndex = -1;
-
-	if (FS_CreatePath(ospath)) {
-		return FS_INVALID_HANDLE;
-	}
-
-#ifdef _WIN32
-	fd->handleFiles.file.o = _popen(cmd, "wb");
-#else
-	fd->handleFiles.file.o = popen(cmd, "w");
-#endif
-
-	if (fd->handleFiles.file.o == NULL) {
-		return FS_INVALID_HANDLE;
-	}
-
-	Q_strncpyz(fd->name, filename, sizeof(fd->name));
-	fd->handleSync = qfalse;
-	fd->zipFile = qfalse;
-
-	return f;
-}
-
-
-void FS_PipeClose(fileHandle_t f)
-{
-	if (!fs_searchpaths)
-		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
-
-	if (fsh[f].zipFile)
-		return;
-
-	if (fsh[f].handleFiles.file.o) {
-#ifdef _WIN32
-		_pclose(fsh[f].handleFiles.file.o);
-#else
-		pclose(fsh[f].handleFiles.file.o);
-#endif
-	}
-
-	Com_Memset(&fsh[f], 0, sizeof(fsh[f]));
-}
-
-
-

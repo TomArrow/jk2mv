@@ -2204,6 +2204,9 @@ qboolean	trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *
 qboolean	trap_G2API_SetRootSurface(void *ghoul2, const int modelIndex, const char *surfaceName);
 qboolean	trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const int flags);
 qboolean	trap_G2API_SetNewOrigin(void *ghoul2, const int boltIndex);
+qboolean	trap_G2API_SetSkin( void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin );
+int			trap_G2API_GetSurfaceRenderStatus( void *ghoul2, const int modelIndex, const char *surfaceName );
+qboolean	trap_G2API_SkinlessModel( void *ghlInfo, int modelIndex );
 
 void		CG_Init_CG(void);
 void		CG_Init_CGents(void);

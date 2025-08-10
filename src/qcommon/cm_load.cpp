@@ -118,7 +118,6 @@ void CMod_LoadSubmodels( lump_t *l ) {
 	cm.capsuleModelHandle = MAX(254, count); // At least 254 (CAPSULE_MODEL_HANDLE) in case some legacy cgame module violates the api
 	cm.boxModelHandle = MAX(255, count + 1); // At least 255 (BOX_MODEL_HANDLE) in case some legacy cgame module violates the api
 
-
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
 		out = &cm.cmodels[i];
@@ -240,35 +239,6 @@ void CMod_LoadBrushes( lump_t *l ) {
 		CM_BoundBrush( out );
 	}
 
-}
-
-void CM_SetBrushModelContentFlags(int modelIndex, int flags, coolApiSetBModelCFlagsMode_t setMode) {
-
-	clipHandle_t	h;
-	cmodel_t*		cmodel;
-	cLeaf_t*		leaf;
-	cbrush_t*		b;
-	int k, brushnum;
-
-	h = CM_InlineModel(modelIndex);
-	cmodel = &cm.cmodels[h];
-	leaf = &cmodel->leaf;
-
-	for (k = 0; k < leaf->numLeafBrushes; k++) {
-		brushnum = cm.leafbrushes[leaf->firstLeafBrush + k];
-		b = &cm.brushes[brushnum];
-		switch (setMode) {
-			case COOLAPI_BMODELCFLAGS_ADD:
-				b->contents |= flags;
-				break;
-			case COOLAPI_BMODELCFLAGS_REMOVE:
-				b->contents &= ~flags;
-				break;
-			case COOLAPI_BMODELCFLAGS_SET:
-				b->contents = flags;
-				break;
-		}
-	}
 }
 
 /*
@@ -475,7 +445,7 @@ void CMod_LoadEntityString( lump_t *l, const char *name ) {
 		return;
 	}
 
-	cm.entityString = (char *)Hunk_Alloc( l->filelen+1, h_high ); // we need +1 so we have a zero terminator for files that dont come with one, when using com_hunkDynamic for some reason this problem happens on linux but not really on win? maybe win automatically adds a bit of extra 0? idk
+	cm.entityString = (char *)Hunk_Alloc( l->filelen, h_high );
 	cm.numEntityChars = l->filelen;
 	Com_Memcpy (cm.entityString, cmod_base + l->fileofs, l->filelen);
 }
@@ -790,12 +760,12 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 		return &box_model;
 	}
 	if ( handle < MAX_SUBMODELS ) {
-		//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",	cm.numSubModels, handle, MAX_SUBMODELS );
-		return &box_model;
+		Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i < %i < %i",
+			cm.numSubModels, handle, MAX_SUBMODELS );
 	}
-	//Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
-	return &box_model;
-	//return NULL;
+	Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
+
+	return NULL;
 
 }
 
@@ -902,21 +872,10 @@ BSP trees instead of being compared directly.
 Capsules are handled differently though.
 ===================
 */
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule, int entityContents ) {
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, qboolean capsule ) {
 
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );
-
-	if (entityContents != -1) { 
-		// if -1, it was a capsule later changed into a box, so we just keep the contents
-		// if 1, it's CONTENTS_SOLID but for example vanilla turrets have this but G_RunObject expects CONTENTS_BODY or objects block themselves (disgusting yea...)
-		// TODO let mod decide
-		box_brush->contents = entityContents ? entityContents : CONTENTS_BODY; // 0 = use default (CONTENTS_BODY)
-		if (box_brush->contents & CONTENTS_SOLID) {
-			box_brush->contents &= ~CONTENTS_SOLID;
-			box_brush->contents |= CONTENTS_BODY;
-		}
-	}
 
 	if ( capsule ) {
 		return cm.capsuleModelHandle;

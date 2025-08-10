@@ -46,14 +46,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdint.h>
 #include <sys/stat.h>
 #include <errno.h>
 
 #ifdef __cplusplus
-#define _HAS_STD_BYTE 0
 #	include <cstddef>
 #endif
 
@@ -252,10 +250,10 @@
 #error "Operating system not supported"
 #endif
 
-#ifdef DEBUG
-#define	PLATFORM_STRING	OS_STRING "-" ARCH_STRING "-debug"
-#else
+#ifdef NDEBUG
 #define	PLATFORM_STRING	OS_STRING "-" ARCH_STRING
+#else
+#define	PLATFORM_STRING	OS_STRING "-" ARCH_STRING "-debug"
 #endif
 
 //=============================================================
@@ -308,7 +306,6 @@ typedef int		g2handle_t;
 #define	BIG_INFO_KEY		  8192
 #define	BIG_INFO_VALUE		8192
 
-#define NET_ADDRSTRMAXLEN	48 // maximum length of an IPv6 address string including trailing '\0'
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
 #ifdef PATH_MAX
@@ -377,9 +374,6 @@ typedef enum
 	NUM_SABER_COLORS
 
 } saber_colors_t;
-
-#define DEFAULT_SABER1 "kyle"
-#define DEFAULT_SABER2 "none"
 
 typedef enum
 {
@@ -487,7 +481,7 @@ typedef enum {
 #define UI_INVERSE		0x00002000
 #define UI_PULSE		0x00004000
 
-#if defined(DEBUG) && !defined(BSPC)
+#if defined(_DEBUG) && !defined(BSPC)
 	#define HUNK_DEBUG
 #endif
 
@@ -712,26 +706,10 @@ extern const vec4_t		colorDkBlue;
 #define Q_COLOR_ESCAPE	'^'
 #define Q_COLOR_BITS 0x7
 
-
-qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
-
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString_1_02(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE ) // 1.02 ColorStrings
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
-
-// stealsies from jomme/nt mod :) thanks
-#define Q_IsColorStringNT(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= 0x7F && *((p)+1) >= '0' ) // changed from >= 0x00 to '0' compared to NT
-#define Q_IsColorCharNT(p)		( (p) <= 0x7F && (p) >= '0' ) // changed from >= 0x00 to '0' compared to NT
-#define ColorIndexNT(c)			( (c) & 127 )
-
-#define Q_IsColorStringHex(p) ((Q_IsColorStringHexY((p))) || (Q_IsColorStringHexy((p))) || (Q_IsColorStringHexX((p))) || (Q_IsColorStringHexx((p)) ))
-#define Q_IsColorStringHexY(p) (p) && *(p)=='Y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6)) && Q_IsHex((p+7)) && Q_IsHex((p+8))
-#define Q_IsColorStringHexy(p) (p) && *(p)=='y' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4))
-#define Q_IsColorStringHexX(p) (p) && *(p)=='X' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6))
-#define Q_IsColorStringHexx(p) (p) && *(p)=='x' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3))
-
-#define Q_IsHex(p) ((p) && ((*(p) >= '0' && *(p) <= '9') || (*(p) >= 'a' && *(p) <= 'f') || (*(p) >= 'A' && *(p) <= 'F')))
 
 // Default Colors
 #define COLOR_BLACK		'0'
@@ -753,7 +731,7 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define COLOR_JK2MV     'n' // Different in Debug/Release
 #define COLOR_LT_TRANSPARENT 'o'
 
-#ifdef DEBUG
+#if _DEBUG
 	#define COLOR_JK2MV_FALLBACK 1 // If the extended colors are not supported use this as fallback
 #else
 	#define COLOR_JK2MV_FALLBACK 5 // If the extended colors are not supported use this as fallback
@@ -783,8 +761,7 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define S_COLOR_JK2MV   "^n" // Different in Debug/Release
 #define S_COLOR_LT_TRANSPARENT "^o"
 
-extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT]; 
-extern vec4_t	g_color_table_nt[128];
+extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
@@ -916,10 +893,6 @@ ID_INLINE vec_t VectorLength( const vec3_t v ) {
 	return (vec_t)sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-ID_INLINE vec_t VectorLength2( const vec2_t v ) {
-	return (vec_t)sqrtf(v[0]*v[0] + v[1]*v[1]);
-}
-
 ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
 	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
@@ -997,7 +970,6 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 char	*COM_SkipPath( char *pathname );
 void	COM_StripExtension(const char *in, char *out, int destsize);
 void	COM_DefaultExtension( char *path, size_t maxSize, const char *extension );
-void	COM_AddExtension( char *path, size_t maxSize, const char *extension );
 void	COM_SanitizeExtension(char *path, size_t maxSize, const char *extension);
 
 void	COM_BeginParseSession( const char *name );
@@ -1073,14 +1045,6 @@ typedef enum {
 	FS_SEEK_SET
 } fsOrigin_t;
 
-typedef enum {
-	FILE_VERSION_UNKNOWN = 0,
-	FILE_VERSION_1_02 = (1 << 0),
-	FILE_VERSION_1_03 = (1 << 1),
-	FILE_VERSION_1_04 = (1 << 2),
-	FILE_VERSION_JKA = (1 << 3),
-} fs_file_version_t;
-
 //=============================================
 
 int Q_isprint( int c );
@@ -1105,19 +1069,18 @@ char	*Q_strrchr( const char* string, int c );
 
 // buffer size safe library replacements
 void	Q_strncpyz( char *dest, const char *src, int destsize );
-void	Q_strnncpyz(char* dest, const char* src, int charsToCopy, int destsize);
 void	Q_strcat( char *dest, int size, const char *src );
 int		Q_strlen(const char *s);
 
 // strlen that discounts Quake color sequences
-int Q_PrintStrlen( const char *string, qboolean use102color, qboolean ntModColors);
+int Q_PrintStrlen( const char *string, qboolean use102color );
 
-int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color, qboolean ntModColors);
-int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color, qboolean ntModColors);
-void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color, qboolean ntModColors);
+int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color);
+int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color);
+void Q_PrintStrCopy(char *dst, const char *src, int dstSize, int from, int len, qboolean use102color);
 // removes color sequences from string
-char *Q_CleanStr( char *string, qboolean use102color, qboolean ntModColors) ;
-void Q_StripColor(char *text, qboolean doHex=qfalse); //strips both colors
+char *Q_CleanStr( char *string, qboolean use102color ) ;
+void Q_StripColor(char *text); //strips both colors
 const char *Q_strchrs( const char *string, const char *search );
 void Q_strstrip( char *string, const char *strip, const char *repl );
 
@@ -2344,102 +2307,5 @@ typedef union byteAlias_u {
 #define STRING( a ) #a
 #define XSTRING( a ) STRING( a )
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
-
-typedef struct ezDemoEvent_s {
-	int serverTime;
-	byte clientNum;
-	byte clientNum2;
-	int duration;
-} ezDemoEvent_t;
-
-#define EZDEMO_MAX_EVENT_COUNT 20000
-typedef struct ezDemoBuffer_s {
-	ezDemoEvent_t events[EZDEMO_MAX_EVENT_COUNT];
-	int eventCount;
-} ezDemoBuffer_t;
-
-#define TRACECUSTOMFLAG_Q2STYLE (1<<0)
-
-#define COOL_APIFEATURE_SETPREDICTEDMOVEMENT (1<<0)
-#define COOL_APIFEATURE_GETTEMPORARYUSERCMD (1<<1)
-#define COOL_APIFEATURE_EXPANDEDSETUSERCMD (1<<2)
-#define COOL_APIFEATURE_EZDEMOCGAMEBUFFER (1<<3)
-#define COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED (1<<4)
-#define COOL_APIFEATURE_MARIADB (1<<5)
-#define COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK (1<<6)
-#define COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS (1<<7)
-#define COOL_APIFEATURE_G_USERCMDSTORE (1<<8)
-#define COOL_APIFEATURE_RESOLUTIONCHANGED (1<<9)
-#define COOL_APIFEATURE_NONEPSILONTRACE (1<<10)
-#define COOL_APIFEATURE_GAME_VMCALL_PHYSICSFPSUPDATE (1<<11)
-#define COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS (1<<12)
-#define COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED (1<<13)
-#define COOL_APIFEATURE_SETUSERANGLES (1<<14)
-#define COOL_APIFEATURE_VMCUSTOMFLAGS (1<<15)
-#define COOL_APIFEATURE_KEEPZOMBIE (1<<16)
-#define COOL_APIFEATURE_CUSTOMEPSILONTRACE (1<<17)
-#define COOL_APIFEATURE_ADDMEMECOMMAND (1<<18)
-#define COOL_APIFEATURE_JEDI_ACADEMY (1<<19)
-#define COOL_APIFEATURE_CROSS_SERVER_COMMANDS (1<<20)
-
-
-#define COOL_APIFEATURE_VMGAME_FLAG_SEGMENTEDREPLAY (1<<0)
-
-typedef enum coolApiSetBModelCFlagsMode_s{
-	COOLAPI_BMODELCFLAGS_SET,
-	COOLAPI_BMODELCFLAGS_ADD,
-	COOLAPI_BMODELCFLAGS_REMOVE,
-} coolApiSetBModelCFlagsMode_t;
-
-// This is a simplified playerState_t of sorts to communicate predicted playerstate stuff to the engine 
-typedef struct predictedMovement_s {
-	int			commandTime;	// cmd->serverTime of last executed command
-	int			pm_type;
-	int			pm_flags;		// ducked, jump_held, etc
-	int			pm_time;
-
-	vec3_t		origin;
-	vec3_t		velocity;
-
-	int			gravity;
-	int			speed;
-	int			basespeed; //used in prediction to know base server g_speed value when modifying speed between updates
-	int			delta_angles[3];	// add to command angles to get view direction
-									// changed by spawns, rotating objects, and teleporters
-
-
-	int			groundEntityNum;// ENTITYNUM_NONE = in air
-
-	int			movementDir;	// a number 0 to 7 that represents the reletive angle
-								// of movement to the view angle (axial and diagonals)
-								// when at rest, the value will remain unchanged
-								// used to twist the legs during strafing
-
-	int			eFlags;			// copied to entityState_t->eFlags
-
-
-	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
-
-	vec3_t		viewangles;		// for fixed views
-	int			viewheight;
-
-	int			jumppad_ent;	// jumppad entity hit this frame
-
-	forcedata_t	fd;
-} predictedMovement_t;
-
-
-
-
-
-typedef enum {
-	DBREQUESTTYPE_REQUEST,
-	DBREQUESTTYPE_BCRYPT, // this doesn't actuaally send any DB request, it just allows us to bcrypt a string on a separate thread
-} DBRequestType_t;
-
-
-int safeatoi(const char* nptr, char** endptr, int base, int* error);
-int clampedIntMult(int a, int b);
-int clampedIntAdd(int a, int b);
 
 #endif	// __Q_SHARED_H

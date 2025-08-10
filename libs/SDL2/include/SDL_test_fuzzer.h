@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -123,23 +123,23 @@ Uint64 SDLTest_RandomUint64(void);
  */
 Sint64 SDLTest_RandomSint64(void);
 
-/*
+/**
  * \returns a random float in range [0.0 - 1.0]
  */
 float SDLTest_RandomUnitFloat(void);
 
-/*
+/**
  * \returns a random double in range [0.0 - 1.0]
  */
 double SDLTest_RandomUnitDouble(void);
 
-/*
+/**
  * \returns a random float.
  *
  */
 float SDLTest_RandomFloat(void);
 
-/*
+/**
  * \returns a random double.
  *
  */
@@ -368,8 +368,7 @@ char * SDLTest_RandomAsciiStringWithMaximumLength(int maxLength);
  */
 char * SDLTest_RandomAsciiStringOfSize(int size);
 
-
-/*
+/**
  * Get the invocation count for the fuzzer since last ...FuzzerInit.
  *
  * \returns the invocation count.

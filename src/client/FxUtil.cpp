@@ -10,7 +10,7 @@
 
 #include <set>
 
-std::set<CCloud *> OutstandClouds;
+set<CCloud *> OutstandClouds;
 
 vec3_t	WHITE = {1.0f, 1.0f, 1.0f};
 
@@ -212,7 +212,7 @@ void FX_Add( void )
 
 	drawnFx = 0;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	theFxHelper.mMainRefs = theFxHelper.mMiniRefs = 0;
 #endif
 
@@ -253,7 +253,7 @@ void FX_Add( void )
 		}
 	}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 /*	if (theFxHelper.mMainRefs || theFxHelper.mMiniRefs)
 	{
 		cgi.OPrintf("Main Refs: %d    Mini Refs: %d\n", theFxHelper.mMainRefs, theFxHelper.mMiniRefs);

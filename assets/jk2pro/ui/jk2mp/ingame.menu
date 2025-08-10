@@ -638,6 +638,48 @@
 			}
 		}
 		
+		itemDef 
+		{
+			name				characterColorsButton
+			style				WINDOW_STYLE_SHADER
+			rect				302 464 67 16
+			background			"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+		}
+
+		itemDef 
+		{
+			name				characterColors
+			text				"Character colors"
+			type				1
+			style				WINDOW_STYLE_FILLED
+			rect				302 464 67 16
+			font				2
+			textscale			.7
+			textstyle			3
+			textalign			ITEM_ALIGN_CENTER
+			textalignx		 	25
+			textaligny			-2
+			forecolor			1 1 1 1
+			backcolor			0 0 0 0
+			visible				1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				open			ingame_character_colors
+			} 
+			mouseenter 
+			{ 
+				show			characterColorsButton
+			}
+			mouseexit 
+			{ 
+				hide			characterColorsButton
+			}
+		}
+		
 		/*itemDef 
 		{
 			name				strafeHelperButton

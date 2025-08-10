@@ -2,7 +2,6 @@
 #include "server.h"
 
 #include <mv_setup.h>
-#include "../qcommon/randombytes.h"
 
 #include "../qcommon/q_shared.h"
 
@@ -136,7 +135,7 @@ int SV_AddConfigstring (const char *name, int start, int max)
 
 	if (name[0] == '/' || name[0] == '\\')
 	{
-#ifdef DEBUG
+#if _DEBUG
 		Com_DPrintf( "WARNING: Leading slash on '%s'\n", name);
 #endif
 		name++;
@@ -276,12 +275,6 @@ void SV_Startup( void ) {
 		// we don't need nearly as many when playing locally
 		svs.numSnapshotEntities = sv_maxclients->integer * 4 * 64;
 	}
-
-	for (int i = 0; i < MAX_CLIENTS; i++) {
-		userMessages[i].clear();
-		userStoredUcmdCounts[i] = 0;
-	}
-
 	svs.initialized = qtrue;
 
 	Cvar_Set( "sv_running", "1" );
@@ -325,8 +318,6 @@ void SV_ChangeMaxClients( void ) {
 		}
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
-			userMessages[i].clear();
-			userStoredUcmdCounts[i] = 0;
 		}
 	}
 
@@ -406,11 +397,7 @@ void SV_SendMapChange(void)
 		{
 			if (svs.clients[i].state >= CS_CONNECTED)
 			{
-				if ( svs.clients[i].netchan.remoteAddress.type != NA_BOT 
-#ifdef SVDEMO
-					|| svs.clients[i].demo.demorecording
-#endif
-					)
+				if ( svs.clients[i].netchan.remoteAddress.type != NA_BOT )
 				{
 					SV_SendClientMapChange( &svs.clients[i] ) ;
 				}
@@ -420,8 +407,6 @@ void SV_SendMapChange(void)
 }
 
 void R_SVModelInit();
-
-extern void SV_SendClientGameState(client_t* client);
 
 /*
 ================
@@ -445,10 +430,6 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 	char		systemInfo[16384];
 	const char	*p;
 	qboolean	resetTime;
-
-#ifdef SVDEMO
-	SV_StopAutoRecordDemos();
-#endif
 
 	Com_Printf("------ Server Initialization ------\n");
 	Com_Printf("Server: %s\n", server);
@@ -591,7 +572,7 @@ Ghoul2 Insert End
 	}
 
 	// decide which serverversion to host
-	mv_serverversion = Cvar_Get("mv_serverversion", "1.02", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
+	mv_serverversion = Cvar_Get("mv_serverversion", "1.04", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
 	if (FS_AllPath_Base_FileExists("assets5.pk3") && (!strcmp(mv_serverversion->string, "auto") || !strcmp(mv_serverversion->string, "1.04"))) {
 		Com_Printf("serverversion set to 1.04\n");
 		MV_SetCurrentGameversion(VERSION_1_04);
@@ -629,18 +610,6 @@ Ghoul2 Insert End
 	sv.serverId = com_frameTime;
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
-
-	// make a random id for this server to avoid recursion with badly configured cross-server commands.
-	if (randombytes(&serverUniqueCrossServerCommandsId, 4)) {
-		// guess it failed. fall back to this.
-		serverUniqueCrossServerCommandsId = sv.serverId;
-	}
-	Cvar_Set("sv_serverUniqueCrossServerCommandsId", va("%i", serverUniqueCrossServerCommandsId));
-
-#ifdef SVDEMO
-	time(&sv.realMapTimeStarted);
-	sv.demosPruned = qfalse;
-#endif
 
 	// media configstring setting should be done during
 	// the loading stage, so connected clients don't have
@@ -708,7 +677,6 @@ Ghoul2 Insert End
 					client->gentity = ent;
 
 					client->deltaMessage = -1;
-					client->deltaMessageWarning = 0;
 					client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 
 					VM_Call( gvm, GAME_CLIENT_BEGIN, i );
@@ -771,19 +739,6 @@ Ghoul2 Insert End
 
 	Hunk_SetMark();
 
-#ifdef SVDEMO
-	for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
-		// bots will not request gamestate, so it must be manually sent
-		// cannot do this above where it says it will because mapname is not set at that time
-		if (client->netchan.remoteAddress.type == NA_BOT && client->demo.demorecording) {
-			SV_SendClientGameState(client);
-		}
-	}
-
-	SV_ClearAllDemoPreRecord();
-	SV_BeginAutoRecordDemos();
-#endif
-
 	/* MrE: 2000-09-13: now called in CL_DownloadsComplete
 	// don't call when running dedicated
 	if ( !com_dedicated->integer ) {
@@ -805,12 +760,6 @@ Ghoul2 Insert End
 			Com_Printf("HTTP Downloads: redirecting to %s\n", mv_httpserverport->string);
 		} else {
 			sv.http_port = NET_HTTP_StartServer(mv_httpserverport->integer);
-			// allow connected clients to use HTTP server
-			for (i = 0; i < sv_maxclients->integer; i++) {
-				if (svs.clients[i].state >= CS_CONNECTED) {
-					NET_HTTP_AllowClient(i, svs.clients[i].netchan.remoteAddress);
-				}
-			}
 		}
 	}
 
@@ -834,7 +783,7 @@ void SV_Init (void) {
 
 	Cvar_Get("JK2MV", JK2MV_VERSION, CVAR_SERVERINFO | CVAR_ROM);
 
-	mv_serverversion = Cvar_Get("mv_serverversion", "1.02", CVAR_ARCHIVE | CVAR_LATCH);
+	mv_serverversion = Cvar_Get("mv_serverversion", "1.04", CVAR_ARCHIVE | CVAR_LATCH);
 
 	mv_fixnamecrash = Cvar_Get("mv_fixnamecrash", "1", CVAR_ARCHIVE);
 	mv_fixforcecrash = Cvar_Get("mv_fixforcecrash", "1", CVAR_ARCHIVE);
@@ -857,7 +806,7 @@ void SV_Init (void) {
 	Cvar_Get ("g_maxHolocronCarry", "3", CVAR_SERVERINFO);
 	Cvar_Get ("g_privateDuel", "1", CVAR_SERVERINFO );
 	Cvar_Get ("g_saberLocking", "1", CVAR_SERVERINFO );
-	Cvar_Get ("g_maxForceRank", "500", CVAR_SERVERINFO );
+	Cvar_Get ("g_maxForceRank", "6", CVAR_SERVERINFO );
 	Cvar_Get ("duel_fraglimit", "10", CVAR_SERVERINFO);
 	Cvar_Get ("g_forceBasedTeams", "0", CVAR_SERVERINFO);
 	Cvar_Get ("g_duelWeaponDisable", "1", CVAR_SERVERINFO);
@@ -869,18 +818,15 @@ void SV_Init (void) {
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
-	sv_minSnaps = Cvar_Get("sv_minSnaps", "100", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
-	sv_minSnapsSpec = Cvar_Get("sv_minSnapsSpec", "1", CVAR_ARCHIVE);                // allow spectators more leeway
-	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "1000", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
+	sv_minSnaps = Cvar_Get("sv_minSnaps", "1", CVAR_ARCHIVE);                        // jk2ded hardcoded min: 1
+	sv_maxSnaps = Cvar_Get("sv_maxSnaps", "30", CVAR_ARCHIVE);                       // jk2ded hardcoded max: 30
 	sv_enforceSnaps = Cvar_Get("sv_enforceSnaps", "0", CVAR_ARCHIVE);                // 0: users choice (limited by min/max snaps); 1: sv_fps (limited by min/max snaps)	
-	sv_enforceSnapsDebug = Cvar_Get("sv_enforceSnapsDebug", "0", CVAR_ARCHIVE);      // 0: normal behavior; 1: generate snapshots and messages on EVERY server frame, but dont actually send them unless limit allows
-	sv_minRate = Cvar_Get("sv_minRate", "25000", CVAR_ARCHIVE | CVAR_SERVERINFO );    // jk2ded hardcoded min: 1000
+	sv_minRate = Cvar_Get("sv_minRate", "1000", CVAR_ARCHIVE | CVAR_SERVERINFO );    // jk2ded hardcoded min: 1000
 	sv_maxRate = Cvar_Get ("sv_maxRate", "90000", CVAR_ARCHIVE | CVAR_SERVERINFO );  // jk2ded hardcoded max: 90000
 	sv_maxOOBRate = Cvar_Get ("sv_maxOOBRate", "20", CVAR_ARCHIVE | CVAR_GLOBAL );
 	sv_minPing = Cvar_Get ("sv_minPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxPing = Cvar_Get ("sv_maxPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_floodProtect = Cvar_Get ("sv_floodProtect", "3", CVAR_ARCHIVE | CVAR_SERVERINFO );
-	sv_floodProtectSaveposRespos = Cvar_Get ("sv_floodProtectSaveposRespos", "20", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_allowAnonymous = Cvar_Get ("sv_allowAnonymous", "0", CVAR_SERVERINFO);
 
 	// systeminfo
@@ -896,16 +842,10 @@ void SV_Init (void) {
 	Cvar_Get ("sv_referencedPaks", "", CVAR_SYSTEMINFO | CVAR_ROM );
 	Cvar_Get ("sv_referencedPakNames", "", CVAR_SYSTEMINFO | CVAR_ROM );
 
-	// The mv_cs_remaps systeminfo cvar can be used by game module mods to
-	// announce the index of the configstring used for mvremaps. Registering the
-	// cvar here is not actually required. We just register it here to ensure
-	// the right flags are set on it.
-	Cvar_Get ("mv_cs_remaps", "", CVAR_SYSTEMINFO | CVAR_ROM | CVAR_INTERNAL );
-
 	// server vars
 	sv_rconPassword = Cvar_Get ("rconPassword", "", CVAR_TEMP );
 	sv_privatePassword = Cvar_Get ("sv_privatePassword", "", CVAR_TEMP );
-	sv_fps = Cvar_Get ("sv_fps", "100", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	sv_fps = Cvar_Get ("sv_fps", "20", CVAR_TEMP );
 	sv_timeout = Cvar_Get ("sv_timeout", "200", CVAR_TEMP );
 	sv_zombietime = Cvar_Get ("sv_zombietime", "2", CVAR_TEMP );
 	Cvar_Get ("nextmap", "", CVAR_TEMP );
@@ -928,33 +868,11 @@ void SV_Init (void) {
 	sv_killserver = Cvar_Get ("sv_killserver", "0", 0);
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
 
-#ifdef SVDEMO
-	sv_autoDemo = Cvar_Get("sv_autoDemo", "0", CVAR_ARCHIVE | CVAR_SERVERINFO); // , "Automatically take server-side demos"
-	sv_autoDemoBots = Cvar_Get("sv_autoDemoBots", "1", CVAR_ARCHIVE); // , "Record server-side demos for bots"
-	sv_autoDemoMaxMaps = Cvar_Get("sv_autoDemoMaxMaps", "0", CVAR_ARCHIVE);
-	sv_demoSpaceSaving = Cvar_Get("sv_demoSpaceSaving", "1", CVAR_ARCHIVE | CVAR_LATCH);// write separate, smaller messages (due to tighter deltas) for serverside demos
-	sv_demoPreRecord = Cvar_Get("sv_demoPreRecord", "1", CVAR_ARCHIVE);// , "Activate server demo pre-recording so demos can be retroactively recorded for duration sv_demoPreRecordTime (seconds)");
-	sv_demoPreRecordBots = Cvar_Get("sv_demoPreRecordBots", "0", CVAR_ARCHIVE);
-	sv_demoPreRecordTime = Cvar_Get("sv_demoPreRecordTime", "15", CVAR_ARCHIVE);// , "How many seconds of past packets should be stored for server demo pre-recording?");
-	sv_demoPreRecordKeyframeDistance = Cvar_Get("sv_demoPreRecordKeyframeDistance", "5", CVAR_ARCHIVE);// , "A demo can only start with a gamestate and full non-delta snapshot. How often should we save such a gamestate message? The shorter the distance, the more precisely the pre-record duration will be kept, but also the higher the RAM usage and regularity of non-delta frames being sent to the clients.");
-	sv_demoWriteMeta = Cvar_Get("sv_demoWriteMeta", "1", CVAR_ARCHIVE);// , "Enables writing metadata to demos, which can be set by the server/game. This is invisible to normal clients and can be used for storing information about when the demo was recorded, start of the recording, and so on.");
-#endif
-	sv_ucmdSendback = Cvar_Get("sv_ucmdSendback", "1", CVAR_ARCHIVE); // , "Automatically take server-side demos"
-	sv_ucmdSendbackMinCount = Cvar_Get("sv_ucmdSendbackMinCount", "64", CVAR_ARCHIVE); // , "Automatically take server-side demos"
-
-	sv_crossServerCommands = Cvar_Get("sv_crossServerCommands", "0", CVAR_ARCHIVE);
-	sv_crossServerCommandRemoteServer = Cvar_Get("sv_crossServerCommandRemoteServer", "", CVAR_ARCHIVE);
-	sv_crossServerCommandPassword = Cvar_Get("sv_crossServerCommandPassword", "", CVAR_ARCHIVE);
-	sv_crossServerCommandIdent = Cvar_Get("sv_crossServerCommandIdent", "", CVAR_ARCHIVE);
-
-	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
-
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 
 	sv_hibernateFps = Cvar_Get("sv_hibernateFps", "4", CVAR_ARCHIVE | CVAR_GLOBAL);
 	mv_apiConnectionless = Cvar_Get("mv_apiConnectionless", "1", CVAR_ARCHIVE | CVAR_INIT | CVAR_VM_NOWRITE);
 	sv_pingFix = Cvar_Get("sv_pingFix", "1", CVAR_ARCHIVE);
-	sv_maxPacketUserCmds = Cvar_Get("sv_maxPacketUserCmds", "128", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
 	sv_autoWhitelist = Cvar_Get("sv_autoWhitelist", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	sv_dynamicSnapshots = Cvar_Get("sv_dynamicSnapshots", "1", CVAR_ARCHIVE);
 
@@ -1046,11 +964,6 @@ Ghoul2 Insert Start
 
 	// free current level
 	SV_ClearServer();
-
-#ifdef SVDEMO
-	SV_StopAutoRecordDemos();
-	SV_ClearAllDemoPreRecord();
-#endif
 
 	// free server static data
 	if ( svs.clients ) {

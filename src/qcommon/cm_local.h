@@ -166,8 +166,6 @@ typedef struct {
 	qboolean	isPoint;	// optimized case
 	trace_t		trace;		// returned from trace call
 	sphere_t	sphere;		// sphere for oriendted capsule collision
-	float		surfaceClipEpsilon;	// this is normally a DEFINE but i wanna offer a precise trace without epsilon so we set it to 0 there.
-	int			traceCustomizationFlags;
 } traceWork_t;
 
 typedef struct leafList_s {
@@ -196,4 +194,3 @@ struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *p
 void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 void CM_ClearLevelPatches( void );
-

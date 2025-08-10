@@ -7,7 +7,7 @@
 
 #include <string>
 
-//using namespace std;
+using namespace std;
 #endif
 */
 
@@ -32,7 +32,7 @@ enum
 	SP_LANGUAGE_SPANISH,
 	SP_LANGUAGE_JAPANESE,
 	SP_LANGUAGE_10,
-	SP_LANGUAGE_MAX,
+	SP_LANGUGAGE_MAX,
 	SP_LANGUAGE_ALL = 255
 };
 
@@ -295,13 +295,11 @@ cStringsSingle			*SP_GetString(unsigned short ID);
 cStringsSingle			*SP_GetString(const char *Reference);
 const char				*SP_GetStringText(unsigned short ID);
 const char				*SP_GetStringTextString(const char *Reference);
-
-const char				*SP_GetLanguageStringFromNumber(int language);
+const qboolean			SP_VMGetStringText(const char *Reference, char *dst, size_t dstsize);
 
 // Initialization
 void					SP_Init(void);
 void					SP_Shutdown(void);
-void					SP_CheckForLanguageUpdates(void);
 
 #endif
 

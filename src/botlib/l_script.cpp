@@ -946,11 +946,11 @@ int PS_ExpectTokenType(script_t *script, int type, int subtype, token_t *token)
 
 	if (token->type != type)
 	{
-		if (type == TT_STRING) Q_strncpyz(str, "string",sizeof(str));
-		if (type == TT_LITERAL) Q_strncpyz(str, "literal", sizeof(str));
-		if (type == TT_NUMBER) Q_strncpyz(str, "number", sizeof(str));
-		if (type == TT_NAME) Q_strncpyz(str, "name", sizeof(str));
-		if (type == TT_PUNCTUATION) Q_strncpyz(str, "punctuation", sizeof(str));
+		if (type == TT_STRING) strcpy(str, "string");
+		if (type == TT_LITERAL) strcpy(str, "literal");
+		if (type == TT_NUMBER) strcpy(str, "number");
+		if (type == TT_NAME) strcpy(str, "name");
+		if (type == TT_PUNCTUATION) strcpy(str, "punctuation");
 		ScriptError(script, "expected a %s, found %s", str, token->string);
 		return 0;
 	} //end if
@@ -958,10 +958,10 @@ int PS_ExpectTokenType(script_t *script, int type, int subtype, token_t *token)
 	{
 		if ((token->subtype & subtype) != subtype)
 		{
-			if (subtype & TT_DECIMAL) Q_strncpyz(str, "decimal", sizeof(str));
-			if (subtype & TT_HEX) Q_strncpyz(str, "hex", sizeof(str));
-			if (subtype & TT_OCTAL) Q_strncpyz(str, "octal", sizeof(str));
-			if (subtype & TT_BINARY) Q_strncpyz(str, "binary", sizeof(str));
+			if (subtype & TT_DECIMAL) strcpy(str, "decimal");
+			if (subtype & TT_HEX) strcpy(str, "hex");
+			if (subtype & TT_OCTAL) strcpy(str, "octal");
+			if (subtype & TT_BINARY) strcpy(str, "binary");
 			if (subtype & TT_LONG) strcat(str, " long");
 			if (subtype & TT_UNSIGNED) strcat(str, " unsigned");
 			if (subtype & TT_FLOAT) strcat(str, " float");
@@ -1384,13 +1384,10 @@ int MV_MenuPatchFile(const char *in, unsigned long inhash, const char *patch, ch
 	}
 
 	*out = (char *)GetMemory(outlen + 1);
-	char *pout = *out;
-	for (auto it = menufile.begin(); it != menufile.end(); ++it) {
-		Com_Memcpy(pout, it->str.c_str(), it->str.size());
-		pout += it->str.size();
-		*pout++ = '\n';
+	for (size_t i = 0; i < menufile.size(); i++) {
+		strcat(*out, menufile.at(i).str.c_str());
+		strcat(*out, "\n");
 	}
-	assert(pout == &(*out)[outlen]);
 	(*out)[outlen] = 0;
 
 	return outlen;
@@ -1469,16 +1466,13 @@ script_t *LoadScriptFile(const char *filename) {
 		botimport.FS_Read(pbuffer, plength, h_patch);
 		botimport.FS_FCloseFile(h_patch);
 
-		//Com_Printf("patching menu file %s...\n", pathname);
-		botimport.Print(PRT_DEBUG,"patching menu file %s...\n", pathname);
+		Com_Printf("patching menu file %s...\n", pathname);
 		outlength = MV_MenuPatchFile(inbuffer, inhash, pbuffer, &outbuffer);
 		if (outlength < 0) {
 			if (outlength == ERROR_SYNTAX) {
-				//Com_Printf("patching failed: syntax error in patchfile\n");
-				botimport.Print(PRT_DEBUG, "patching failed: syntax error in patchfile\n");
+				Com_Printf("patching failed: syntax error in patchfile\n");
 			} else if (outlength == ERROR_HASH) {
-				//Com_Printf("patching skipped: hash mismatch\n");
-				botimport.Print(PRT_DEBUG, "patching skipped: hash mismatch\n");
+				Com_Printf("patching skipped: hash mismatch\n");
 			}
 
 			outbuffer = inbuffer;
@@ -1504,7 +1498,7 @@ script_t *LoadScriptFile(const char *filename) {
 
 	script = (script_t *)GetClearedMemory(sizeof(script_t) + outlength + 1);
 	Com_Memset(script, 0, sizeof(script_t));
-	Q_strncpyz(script->filename, filename,sizeof(script->filename));
+	strcpy(script->filename, filename);
 	script->buffer = (char *)script + sizeof(script_t);
 	script->buffer[outlength] = 0;
 	script->length = outlength;
@@ -1539,7 +1533,7 @@ script_t *LoadScriptMemory(const char *ptr, int length, const char *name)
 	buffer = GetClearedMemory(sizeof(script_t) + length + 1);
 	script = (script_t *) buffer;
 	Com_Memset(script, 0, sizeof(script_t));
-	Q_strncpyz(script->filename, name,sizeof(script->filename));
+	strcpy(script->filename, name);
 	script->buffer = (char *) buffer + sizeof(script_t);
 	script->buffer[length] = 0;
 	script->length = length;

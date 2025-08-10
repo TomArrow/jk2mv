@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-//using namespace std;
+using namespace std;
 
 
 inline int Round(float value)
@@ -20,8 +20,8 @@ inline int Round(float value)
 }
 
 int							fontIndex;	// entry 0 is reserved index for missing/invalid, else ++ with each new font registered
-std::vector<CFontInfo *>			fontArray;
-typedef std::map<std::string, int>	fontIndexMap_t;
+vector<CFontInfo *>			fontArray;
+typedef map<string, int>	fontIndexMap_t;
 							fontIndexMap_t fontIndexMap;
 //paletteRGBA_c				lastcolour;
 
@@ -376,15 +376,6 @@ CFontInfo::CFontInfo(const char *fontName)
 		mAsianHack = fontdat->mKoreanHack;
 		mbRoundCalcs = !!strstr(fontName,"ergo");
 
-		// cope with bad fontdat headers...
-		//
-		if (mHeight == 0)
-		{
-			mHeight = mPointSize;
-            mAscender = mPointSize - Round( ((float)mPointSize/10.0f)+2 );	// have to completely guess at the baseline... sigh.
-            mDescender = mHeight - mAscender;
-		}
-
 		ri.FS_FreeFile(buff);
 
 		mShader = RE_RegisterShaderNoMip(m_sFontName);
@@ -737,17 +728,11 @@ int RE_Font_StrLenPixels(const char *psText, const int iFontHandle, float fScale
 	char		parseText[8192];
 	float 		fTotalWidth = 0.0f;
 
-	if (psText == NULL)
-	{
-		Com_Error(ERR_DROP, "RE_Font_StrLenPixels: psText == NULL");
-		return 0;
-	}
-
 	//It gets confused about ^blah here too and reports an inaccurate length as a result
 	const char *pch = psText;
 	while (*pch && i < sizeof(parseText)-1) {
 #if 1
-		if (Q_IsColorString(pch) || (MV_USE102COLOR && Q_IsColorString_1_02(pch)) || Q_IsColorString_Extended(pch) || (serverIsTommyTernal && Q_IsColorStringNT(pch))) {
+		if (Q_IsColorString(pch) || (MV_USE102COLOR && Q_IsColorString_1_02(pch)) || Q_IsColorString_Extended(pch)) {
 			++pch;	//skip past ^
 			++pch;	//skip past the char after ^
 		}
@@ -854,16 +839,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 	const glyphInfo_t	*pLetter;
 	qhandle_t			hShader;
 	qboolean			qbThisCharCountsAsLetter;	// logic for this bool must be kept same in this function and RE_Font_StrLenChars()
-#ifdef DAGGOFONTCOLOR
 	bool				colorShadow = (MV_GetCurrentGameversion() == VERSION_1_02 || mv_coloredTextShadows->integer == 1) && mv_coloredTextShadows->integer;
 	int					colourChain = 0;
-#endif
-
-	if (psText == NULL)
-	{
-		Com_Error(ERR_DROP, "RE_Font_DrawString: psText == NULL");
-		return;
-	}
 
 	if(iFontHandle & STYLE_BLINK)
 	{
@@ -892,62 +869,14 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 
 	// Draw a dropshadow if required
 	if (iFontHandle & STYLE_DROPSHADOW) {
-
-#ifdef DAGGOFONTCOLOR
 		static const vec4_t v4DKGREY2 = {0.15f, 0.15f, 0.15f, 1};
 
 		offset = Round(curfont->GetPointSize() * fScale * 0.075f);
-#else
-		if ((MV_GetCurrentGameversion() == VERSION_1_02 || mv_coloredTextShadows->integer == 1) && mv_coloredTextShadows->integer) {
-			int i = 0, r = 0;
-			char dropShadowText[1024];
-			static const vec4_t v4DKGREY2 = { 0.15f, 0.15f, 0.15f, 1 };
-			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
 
-
-			//^blah stuff confuses shadows, so parse it out first
-			while (psText[i] && r < 1023) {
-				if (psText[i] == '^') {
-					if ((i < 1 || psText[i - 1] != '^') &&
-						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode
-						if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex(&psText[i + 1])) {
-							int skipCount = 0;
-							Q_parseColorHex(&psText[i + 1], 0, &skipCount);
-							i += 1 + skipCount;
-						}
-						else {
-							i += 2;
-						}
-					}
-				}
-
-				dropShadowText[r] = psText[i];
-				r++;
-				i++;
-			}
-			dropShadowText[r] = 0;
-
-			RE_Font_DrawString(ox + offset, oy + offset, dropShadowText, v4DKGREY2,
-				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
-		}
-		else
-		{
-			static const vec4_t v4DKGREY2 = { 0.15f, 0.15f, 0.15f, 1 };
-
-			offset = Round(curfont->GetPointSize() * fScale * 0.075f);
-
-			gbInShadow = qtrue;
-			RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
-				iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
-			gbInShadow = qfalse;
-		}
-#endif
-#ifdef DAGGOFONTCOLOR
 		gbInShadow = qtrue;
 		RE_Font_DrawString(ox + offset, oy + offset, psText, v4DKGREY2,
 			iFontHandle & SET_MASK, iCharLimit, fScale, xadjust, yadjust);
 		gbInShadow = qfalse;
-#endif
 	}
 
 	RE_SetColor( rgba );
@@ -969,23 +898,16 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 
 		switch( uiLetter )
 		{
-#if 0
 		case '^':
 			if ( !*psText ) break; // If we were given a string ending with '^'
 			colour = ColorIndex(*psText);
-
-#ifdef DAGGOFONTCOLOR
 			colourChain++; // Keep track of the amount of chained colors
 			if (!gbInShadow || (colorShadow && !(colourChain % 2)))
-#else
-			if (!gbInShadow)
-#endif
 			{ // For colored shadows (when enabled) every second color in a chain is applied to the shadow
 				RE_SetColor( g_color_table[colour] );
 			}
 			++psText;
 			break;
-#endif
 		case 10:						//linefeed
 			fx = fox;
 			foy += (float)curfont->GetPointSize() * fScale;
@@ -997,58 +919,7 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			pLetter = curfont->GetLetter(' ');
 			fx += (float)pLetter->horizAdvance * fScale;
 			break;
-#if 1
-		case '^':
-			if (!*psText) break; // If we were given a string ending with '^'
-			if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 &&  Q_IsColorStringHex(psText))
-			{
-				vec4_t color;
-				int skipCount;
-				if (Q_parseColorHex(psText, color, &skipCount)) {
-					psText += skipCount;
-#ifdef DAGGOFONTCOLOR
-					colourChain++; // Keep track of the amount of chained colors
-					if (!gbInShadow || (colorShadow && !(colourChain % 2)))
-#else
-					if (!gbInShadow)
-#endif
-					{
-						RE_SetColor(color);
-					}
-					break;
-				}
-			}
-			else if (serverIsTommyTernal && Q_IsColorStringNT(psText - 1))
-			{
-				colour = ColorIndexNT(*psText);
-#ifdef DAGGOFONTCOLOR
-				colourChain++; // Keep track of the amount of chained colors
-				if (!gbInShadow || (colorShadow && !(colourChain % 2)))
-#else
-				if (!gbInShadow)
-#endif
-				{
-					RE_SetColor(g_color_table_nt[colour]);
-				}
-				++psText;
-				break;
-			}
-			else if (Q_IsColorString(psText - 1) || (MV_USE102COLOR && Q_IsColorString_1_02(psText - 1)) || Q_IsColorString_Extended(psText - 1))
-			{
-				colour = ColorIndex(*psText); 
-#ifdef DAGGOFONTCOLOR
-				colourChain++; // Keep track of the amount of chained colors
-				if (!gbInShadow || (colorShadow && !(colourChain % 2)))
-#else
-				if (!gbInShadow)
-#endif
-				{
-					RE_SetColor(g_color_table[colour]);
-				}
-				++psText;
-				break;
-			}
-#endif
+
 		default:
 			qbThisCharCountsAsLetter = qtrue;
 			pLetter = curfont->GetLetter( uiLetter, &hShader );			// Description of pLetter
@@ -1079,10 +950,8 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 			break;
 		}
 
-#ifdef DAGGOFONTCOLOR
 		// Reset colourChain if we hit a non colorcode
 		if ( uiLetter != '^' ) colourChain = 0;
-#endif
 
 		if (qbThisCharCountsAsLetter && iCharLimit != -1)
 		{

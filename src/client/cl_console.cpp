@@ -17,7 +17,6 @@ cvar_t		*con_opacity;
 cvar_t		*con_skipNotifyKeyword;
 
 //EternalJK2MV
-cvar_t		*con_blackColorOverride;
 cvar_t		*con_notifywords;
 cvar_t		*con_notifyconnect;
 cvar_t		*con_notifyvote;
@@ -48,19 +47,8 @@ void Con_ToggleConsole_f (void) {
 
 	Field_Clear( &kg.g_consoleField );
 
-
 	Con_ClearNotify ();
 	cls.keyCatchers ^= KEYCATCH_CONSOLE;
-
-	if (Cmd_Argc() > 1 && !Q_stricmp(Cmd_Argv(1), "instant")) {
-		// If "instant" is used as argument for "toggleconsole", the transition is immediate.
-		if (cls.keyCatchers & KEYCATCH_CONSOLE) {
-			con.displayFrac = con_height->value;
-		}
-		else {
-			con.displayFrac = 0;
-		}
-	}
 }
 
 /*
@@ -71,8 +59,6 @@ Con_MessageMode_f
 void Con_MessageMode_f (void) {		//yell
 	chat_playerNum = -1;
 	chat_team = qfalse;
-	chat_demoMoment = qfalse;
-	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (16 * cls.cgxadj);
 
@@ -87,8 +73,6 @@ Con_MessageMode2_f
 void Con_MessageMode2_f (void) {	//team chat
 	chat_playerNum = -1;
 	chat_team = qtrue;
-	chat_demoMoment = qfalse;
-	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (25 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -111,8 +95,6 @@ void Con_MessageMode3_f (void) {	//target chat
 		return;
 	}
 	chat_team = qfalse;
-	chat_demoMoment = qfalse;
-	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (24 * cls.cgxadj);
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
@@ -130,50 +112,10 @@ void Con_MessageMode4_f (void) {	//attacker
 		return;
 	}
 	chat_team = qfalse;
-	chat_demoMoment = qfalse;
-	chat_crossServer = qfalse;
 	Field_Clear( &chatField );
 	chatField.widthInChars = 30 / cls.cgxadj;
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
 }
-
-/*
-================
-Con_MessageMode5_f (Demo moment)
-================
-*/
-void Con_MessageMode5_f (void) {	// We send a message to ourselves starting with [DEMOMOMENT] 
-	chat_playerNum = clc.clientNum; // Send to ourselves
-	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
-		chat_playerNum = -1;
-		return;
-	}
-	chat_team = qfalse;
-	chat_demoMoment = qtrue;
-	chat_crossServer = qfalse;
-	Field_Clear( &chatField );
-	chatField.widthInChars = 24 / cls.cgxadj; // Idk, just guessing
-	cls.keyCatchers ^= KEYCATCH_MESSAGE;
-}
-
-/*
-================
-Con_MessageMode6_f (cross-server)
-================
-*/
-void Con_MessageMode6_f(void) {		//yell
-	chat_playerNum = -1;
-	chat_team = qfalse;
-	chat_demoMoment = qfalse;
-	if (tommyTernalFlags & TTFLAGSSERVERINFO_HASCROSSSERVERCHAT) {
-		chat_crossServer = qtrue;
-	}
-	Field_Clear(&chatField);
-	chatField.widthInChars = SCREEN_WIDTH / (BIGCHAR_WIDTH * cls.cgxadj) - (16 * cls.cgxadj);
-
-	cls.keyCatchers ^= KEYCATCH_MESSAGE;
-}
-
 
 /*
 ================
@@ -273,11 +215,8 @@ void Con_Copy(void) {
 	Hunk_FreeTempMemory(savebuffer);
 }
 
-extern cvar_t* r_fullbright;
-
 void Con_CopyLink(void) {
-	size_t	l, i;
-	int x, pointDiff;
+	int l, x, i, pointDiff;
 	//short *line;
 	conChar_t *line;
 	char *buffer, n[] = "\0";
@@ -301,7 +240,7 @@ void Con_CopyLink(void) {
 			else
 				break;
 		}
-		Q_StripColor(buffer, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
+		Q_StripColor(buffer);
 		if ((link = Q_stristr(buffer, "://")) || (link = Q_stristr(buffer, "www."))) {
 			// Move link ptr back until it hits a space or first char of string
 			while (link != &buffer[0] && *(link - 1) != ' ') link--;
@@ -645,32 +584,22 @@ void Con_Init (void) {
 	con_speed = Cvar_Get ("con_speed", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_scale = Cvar_Get ("con_scale", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_timestamps = Cvar_Get ("con_timestamps", "1", CVAR_GLOBAL | CVAR_ARCHIVE);
+	con_opacity = Cvar_Get ("con_opacity", "1.0", CVAR_GLOBAL | CVAR_ARCHIVE);
+	con_skipNotifyKeyword = Cvar_Get ("con_skipNotifyKeyword", "[skipnotify]", CVAR_ARCHIVE); // NOT global, because it's made for compatibility with some mods
 
 	//EternalJK2MV
-	con_blackColorOverride = Cvar_Get("con_blackColorOverride", "11", CVAR_GLOBAL|CVAR_ARCHIVE);
-	con_opacity = Cvar_Get("con_opacity", "1.0", CVAR_GLOBAL|CVAR_ARCHIVE);
 	con_notifywords = Cvar_Get("con_notifywords", "0", CVAR_ARCHIVE); // "Notifies you when defined words are mentioned"
 	con_notifyconnect = Cvar_Get("con_notifyconnect", "1", CVAR_ARCHIVE); // "Notifies you when someone connects to the server"
 	con_notifyvote = Cvar_Get("con_notifyvote", "1", CVAR_ARCHIVE); // "Notifies you when someone calls a vote"
-	con_skipNotifyKeyword = Cvar_Get ("con_skipNotifyKeyword", "", CVAR_ARCHIVE); // NOT global, because it's made for compatibility with some mods
-
 
 	Field_Clear( &kg.g_consoleField );
 	kg.g_consoleField.widthInChars = DEFAULT_CONSOLE_WIDTH - 1; // Command prompt
 
 	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
 	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
-	Cmd_AddCommand ("messagemode_all", Con_MessageMode_f);
 	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
-	Cmd_AddCommand ("messagemode_team", Con_MessageMode2_f);
 	Cmd_AddCommand ("messagemode3", Con_MessageMode3_f);
-	Cmd_AddCommand ("messagemode_whisper", Con_MessageMode3_f);
 	Cmd_AddCommand ("messagemode4", Con_MessageMode4_f);
-	Cmd_AddCommand ("messagemode_lastattacker", Con_MessageMode4_f);
-	Cmd_AddCommand ("messagemode5", Con_MessageMode5_f);
-	Cmd_AddCommand ("messagemode_demomoment", Con_MessageMode5_f);
-	Cmd_AddCommand ("messagemode6", Con_MessageMode6_f);
-	Cmd_AddCommand ("messagemode_crossserver", Con_MessageMode6_f);
 	Cmd_AddCommand ("clear", Con_Clear_f);
 	Cmd_AddCommand ("condump", Con_Dump_f);
 	Cmd_SetCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
@@ -735,15 +664,6 @@ void Con_Linefeed ( qboolean skipNotify )
 	int		i;
 	int		line = (con.current % con.totallines) * con.rowwidth;
 
-	// mark time for transparent overlay
-	if (con.current >= 0)
-	{
-		if (skipNotify)
-			con.times[con.current & NUM_CON_TIMES] = 0;
-		else
-			con.times[con.current % NUM_CON_TIMES] = cls.realtime;
-	}
-
 	// print timestamp on the PREVIOUS line
 	{
 		qtime_t	time;
@@ -777,30 +697,6 @@ void Con_Linefeed ( qboolean skipNotify )
 	stampColor = COLOR_LT_TRANSPARENT;
 }
 
-// basically a faster version of !strcmpn(str, check, strlen(check))
-qboolean CL_StringStartsWith(const char* str, const char* check) {
-	if (!str || !check)
-		return qfalse;
-
-	while (*str) {
-		if (*check == 0)
-			return qtrue;
-
-		if (*str != *check)
-			return qfalse;
-
-		++str;
-		++check;
-	}
-
-	if (*check == 0)
-		return qtrue;
-
-	//str is shorter than check, so nope
-	return qfalse;
-}
-
-
 /*
 ================
 CL_ConsolePrint
@@ -814,9 +710,6 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	unsigned char	color;
 	char			c;
 	int				y;
-	qboolean		skipnotify = qfalse;
-	vec4_t			colorVec;
-	vec4_t			colorVecDiff;
 	int				prev;
 
 	if ( con_skipNotifyKeyword && con_skipNotifyKeyword->string && con_skipNotifyKeyword->string[0] ) {
@@ -828,15 +721,8 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	}
 
 	// for some demos we don't want to ever show anything on the console
-	if (cl_noprint && cl_noprint->integer) {
+	if ( cl_noprint && cl_noprint->integer ) {
 		return;
-	}
-
-	// TTimo - prefix for text that shows up in console but not in notify
-	// backported from RTCW
-	if (!Q_strncmp(txt, "[skipnotify]", 12)) {
-		skipnotify = qtrue;
-		txt += 12;
 	}
 
 	if (!con.initialized) {
@@ -848,32 +734,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && *txt == Q_COLOR_ESCAPE && Q_IsColorStringHex((unsigned char*)txt + 1)) {
-			int skipCount = 0;
-			Q_parseColorHex(txt + 1, colorVec, &skipCount);
-			txt += 1 + skipCount;
-			// Find closest color
-			// Just use the extended table who cares
-			float closestColorDistance = 999999999999.0f;
-			int chosenColor = 7;
-			for (int i = 0; i < (sizeof(g_color_table)/sizeof(g_color_table[0])); i++) {
-				VectorSubtract(g_color_table[i], colorVec, colorVecDiff);
-				float distanceHere = VectorLength(colorVecDiff);
-				if (distanceHere < closestColorDistance) {
-					closestColorDistance = distanceHere;
-					chosenColor = i;
-				}
-			}
-			color = chosenColor;
-			continue;
-		}
-		else if ((serverIsTommyTernal && Q_IsColorStringNT(txt)))
-		{
-			color = ColorIndexNT( *(txt+1) );
-			txt += 2;
-			continue;
-		}
-		else if ( Q_IsColorString( txt ) ||
+		if ( Q_IsColorString( txt ) ||
 			(extendedColors && Q_IsColorString_Extended( txt )) ||
 			( use102color && Q_IsColorString_1_02( txt ) ) )
 		{
@@ -881,17 +742,6 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 			else color = ColorIndex( *(txt+1) );
 			txt += 2;
 			continue;
-		}
-
-		if (serverIsTommyTernal) {
-			if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table_nt) / sizeof(g_color_table_nt[0]))) {
-				color = con_blackColorOverride->integer;
-			}
-		}
-		else {
-			if (con_blackColorOverride && con_blackColorOverride->integer && color == 0 && con_blackColorOverride->integer < (sizeof(g_color_table) / sizeof(g_color_table[0]))) {
-				color = con_blackColorOverride->integer;
-			}
 		}
 
 		txt++;
@@ -922,7 +772,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 
 	if (con.display >= con.current)
 	{
-		if (skipnotify) {
+		if (skipNotify) {
 			prev = con.current % NUM_CON_TIMES - 1;
 			if (prev < 0)
 				prev = NUM_CON_TIMES - 1;
@@ -995,8 +845,8 @@ void Con_DrawInput (void) {
 	if ( kg.g_consoleField.scroll > 0 )
 		SCR_DrawSmallChar( 0, y, CON_SCROLL_L_CHAR );
 
-	int len = Q_PrintStrlen( kg.g_consoleField.buffer, MV_USE102COLOR,serverIsTommyTernal );
-	int pos = Q_PrintStrLenTo( kg.g_consoleField.buffer, kg.g_consoleField.scroll, NULL, MV_USE102COLOR, serverIsTommyTernal);
+	int len = Q_PrintStrlen( kg.g_consoleField.buffer, MV_USE102COLOR );
+	int pos = Q_PrintStrLenTo( kg.g_consoleField.buffer, kg.g_consoleField.scroll, NULL, MV_USE102COLOR);
 	if ( pos + kg.g_consoleField.widthInChars < len )
 		SCR_DrawSmallChar( cls.glconfig.vidWidth - con.charWidth, y, CON_SCROLL_R_CHAR );
 }
@@ -1077,26 +927,15 @@ void Con_DrawNotify (void)
 			{
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						Q_strcat(sTemp, sizeof(sTemp), va("^%i", ColorIndexNT(currentColor)));
-					}
-					else {
-						Q_strcat(sTemp, sizeof(sTemp), va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
-					}
+					strcat(sTemp,va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor) ));
 				}
-				Q_strcat(sTemp, sizeof(sTemp), va("%c",text[x].f.character));
+				strcat(sTemp,va("%c",text[x].f.character));
 			}
 			//
 			// and print...
 			//
-			if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-				re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
-					g_color_table_nt[ColorIndexNT(currentColor)], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
-			}
-			else {
-				re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
-					g_color_table[currentColor], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
-			}
+			re.Font_DrawString(xOffset + con.charWidth, v, sTemp,
+				g_color_table[currentColor], iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
 
 			v +=  iPixelHeightToAdvance;
 		}
@@ -1108,12 +947,7 @@ void Con_DrawNotify (void)
 				}
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						re.SetColor(g_color_table_nt[ColorIndexNT(currentColor)]);
-					}
-					else {
-						re.SetColor(g_color_table[currentColor]);
-					}
+					re.SetColor( g_color_table[currentColor] );
 				}
 
 				SCR_DrawSmallChar( (int)(xOffset + (x+1)*con.charWidth), v, text[x].f.character );
@@ -1132,15 +966,7 @@ void Con_DrawNotify (void)
 	// draw the chat line
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
 	{
-		if (chat_crossServer) {
-			chattext = "Say cross-server:";
-			skip = 18;
-		} 
-		else if (chat_demoMoment) {
-			chattext = "Demo moment:";
-			skip = 13;
-		} 
-		else if (chat_playerNum != -1) {
+		if (chat_playerNum != -1) {
 			chattext = "Whisper:";
 			skip = 9;
 		}
@@ -1158,12 +984,6 @@ void Con_DrawNotify (void)
 		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v, qtrue );
 
 		v += BIGCHAR_HEIGHT;
-
-		if (Q_stristr(chatField.buffer, "login") || Q_stristr(chatField.buffer, "register") || Q_stristr(chatField.buffer, "password")) {
-			SCR_DrawBigString(SCREEN_WIDTH / 2-100, SCREEN_HEIGHT / 2- BIGCHAR_HEIGHT, "^1!!CAREFUL!!", 1.0f);
-			SCR_DrawBigString(150, SCREEN_HEIGHT / 2, "^1DON'T TYPE ACCOUNT/LOGIN", 1.0f);
-			SCR_DrawBigString(180, SCREEN_HEIGHT / 2+ BIGCHAR_HEIGHT, "^1CREDENTIALS IN CHAT!", 1.0f);
-		}
 	}
 
 }
@@ -1202,31 +1022,15 @@ void Con_DrawSolidConsole( float frac ) {
 		y = 0;
 	}
 	else {
-		// draw the background at full opacity only if fullscreen
-		if (frac < 1.0f)
-		{
-			vec4_t con_color;
-			MAKERGBA(con_color, 1.0f, 1.0f, 1.0f, Com_Clamp(0.0f, 1.0f, con_opacity->value));
-			re.SetColor(con_color);
-		}
-		else
-		{
-			re.SetColor(NULL);
-		}
+		static vec4_t consoleShaderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		consoleShaderColor[3] = Com_Clamp( 0.0f, 1.0f, con_opacity->value );
+		re.SetColor( consoleShaderColor );
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, (float) y, cls.consoleShader );
 	}
 
 	// draw the bottom bar and version number
 	re.SetColor( g_color_table[ColorIndex_Extended(COLOR_JK2MV)] );
 	SCR_DrawPic( 0, y, SCREEN_WIDTH, 2, cls.whiteShader );
-
-	if (cl.mapname[0]) {
-		i = (int)strlen(cl.mapname);
-		for (x = 0; x < i; x++) {
-			SCR_DrawSmallChar(cls.glconfig.vidWidth - (i - x + 1) * con.charWidth,
-				(lines - (con.charHeight * 3 + con.charHeight / 2)) + padding, cl.mapname[x]);
-		}
-	}
 
 #if 0
 	i = (int)strlen(Q3_VERSION);
@@ -1245,7 +1049,7 @@ void Con_DrawSolidConsole( float frac ) {
 	// Draw time and date
 	time(&rawtime);
 	newtime = localtime(&rawtime);
-	if (newtime->tm_hour >= 12) Q_strncpyz(am_pm, "PM",sizeof(am_pm));
+	if (newtime->tm_hour >= 12) strcpy(am_pm, "PM");
 	if (newtime->tm_hour > 12) newtime->tm_hour -= 12;
 	if (newtime->tm_hour == 0) newtime->tm_hour = 12;
 	Com_sprintf(ts, sizeof(ts), "%.19s %s ", asctime(newtime), am_pm);
@@ -1321,26 +1125,15 @@ void Con_DrawSolidConsole( float frac ) {
 			{
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						Q_strcat(sTemp,sizeof(sTemp), va("^%i", currentColor));
-					}
-					else {
-						Q_strcat(sTemp, sizeof(sTemp), va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));
-					}
+					strcat(sTemp,va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor) ));
 				}
-				Q_strcat(sTemp, sizeof(sTemp),va("%c",text[x].f.character));
+				strcat(sTemp,va("%c",text[x].f.character));
 			}
 			//
 			// and print...
 			//
-			if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-				re.Font_DrawString(con.charWidth, y, sTemp, g_color_table_nt[ColorIndexNT(currentColor)],
-					iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust); // am i doing this right? no idea.
-			}
-			else {
-				re.Font_DrawString(con.charWidth, y, sTemp, g_color_table[currentColor],
-					iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
-			}
+			re.Font_DrawString(con.charWidth, y, sTemp, g_color_table[currentColor],
+				iFontIndex, -1, fFontScale, cls.xadjust, cls.yadjust);
 		}
 		else
 		{
@@ -1351,12 +1144,7 @@ void Con_DrawSolidConsole( float frac ) {
 
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
-					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						re.SetColor(g_color_table_nt[ColorIndexNT(currentColor)]);
-					}
-					else {
-						re.SetColor(g_color_table[currentColor]);
-					}
+					re.SetColor( g_color_table[currentColor] );
 				}
 				SCR_DrawSmallChar( (x+1)*con.charWidth, y, text[x].f.character );
 			}
@@ -1467,5 +1255,4 @@ void Con_Close( void ) {
 	cls.keyCatchers &= ~KEYCATCH_CONSOLE;
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;
-	cls.fpsGuess.method3MeasuredGravitySamplesIndex = 0;
 }
