@@ -1,7 +1,7 @@
 code
 proc swapfunc 24 0
 file "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\bg_lib.c"
-line 78
+line 79
 ;1:// Copyright (C) 1999-2000 Id Software, Inc.
 ;2://
 ;3:// Copyright (C) 1999-2000 Id Software, Inc.
@@ -48,46 +48,47 @@ line 78
 ;44:#if defined(LIBC_SCCS) && !defined(lint)
 ;45:#if 0
 ;46:static char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
-;47:#endif
-;48:static const char rcsid[] =
-;49:	"$Id: bg_lib.c,v 1.23 2000/02/04 06:46:50 zoid Exp $";
-;50:#endif /* LIBC_SCCS and not lint */
-;51:
-;52:// bk001127 - needed for DLL's
-;53:#if !defined( Q3_VM )
-;54:typedef int		 cmp_t(const void *, const void *);
-;55:#endif
-;56:
-;57:static char* med3(char *, char *, char *, cmp_t *);
-;58:static void	 swapfunc(char *, char *, int, int);
-;59:
-;60:/*
-;61: * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
-;62: */
-;63:#define swapcode(TYPE, parmi, parmj, n) { 		\
-;64:	long i = (n) / sizeof (TYPE); 			\
-;65:	register TYPE *pi = (TYPE *) (parmi); 		\
-;66:	register TYPE *pj = (TYPE *) (parmj); 		\
-;67:	do { 						\
-;68:		register TYPE	t = *pi;		\
-;69:		*pi++ = *pj;				\
-;70:		*pj++ = t;				\
-;71:        } while (--i > 0);				\
-;72:}
-;73:
-;74:#define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(long) || \
-;75:	es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;
-;76:
-;77:static void swapfunc( char* a, char* b, int n, int swaptype)
-;78:{
-line 79
-;79:	if(swaptype <= 1)
+;47:/* end of Q3_VM guarded legacy C replacements */
+;48:#endif /* Q3_VM */
+;49:static const char rcsid[] =
+;50:	"$Id: bg_lib.c,v 1.23 2000/02/04 06:46:50 zoid Exp $";
+;51:#endif /* LIBC_SCCS and not lint */
+;52:
+;53:// bk001127 - needed for DLL's
+;54:#if !defined( Q3_VM )
+;55:typedef int		 cmp_t(const void *, const void *);
+;56:#endif
+;57:
+;58:static char* med3(char *, char *, char *, cmp_t *);
+;59:static void	 swapfunc(char *, char *, int, int);
+;60:
+;61:/*
+;62: * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
+;63: */
+;64:#define swapcode(TYPE, parmi, parmj, n) { 		\
+;65:	long i = (n) / sizeof (TYPE); 			\
+;66:	register TYPE *pi = (TYPE *) (parmi); 		\
+;67:	register TYPE *pj = (TYPE *) (parmj); 		\
+;68:	do { 						\
+;69:		register TYPE	t = *pi;		\
+;70:		*pi++ = *pj;				\
+;71:		*pj++ = t;				\
+;72:        } while (--i > 0);				\
+;73:}
+;74:
+;75:#define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(long) || \
+;76:	es % sizeof(long) ? 2 : es == sizeof(long)? 0 : 1;
+;77:
+;78:static void swapfunc( char* a, char* b, int n, int swaptype)
+;79:{
+line 80
+;80:	if(swaptype <= 1)
 ADDRFP4 12
 INDIRI4
 CNSTI4 1
 GTI4 $60
-line 80
-;80:		swapcode(long, a, b, n)
+line 81
+;81:		swapcode(long, a, b, n)
 ADDRLP4 8
 ADDRFP4 8
 INDIRI4
@@ -159,9 +160,9 @@ GTI4 $62
 ADDRGP4 $61
 JUMPV
 LABELV $60
-line 82
-;81:	else
-;82:		swapcode(char, a, b, n)
+line 83
+;82:	else
+;83:		swapcode(char, a, b, n)
 ADDRLP4 8
 ADDRFP4 8
 INDIRI4
@@ -229,27 +230,27 @@ INDIRI4
 CNSTI4 0
 GTI4 $65
 LABELV $61
-line 83
-;83:}
+line 84
+;84:}
 LABELV $59
 endproc swapfunc 24 0
 proc med3 40 8
-line 96
-;84:
-;85:#define swap(a, b)					\
-;86:	if (swaptype == 0) {				\
-;87:		long t = *(long *)(a);			\
-;88:		*(long *)(a) = *(long *)(b);		\
-;89:		*(long *)(b) = t;			\
-;90:	} else						\
-;91:		swapfunc(a, b, es, swaptype)
-;92:
-;93:#define vecswap(a, b, n) 	if ((n) > 0) swapfunc(a, b, n, swaptype)
-;94:
-;95:static char *med3(char* a, char* b, char* c, cmp_t* cmp)
-;96:{
 line 97
-;97:	return cmp(a, b) < 0 ?
+;85:
+;86:#define swap(a, b)					\
+;87:	if (swaptype == 0) {				\
+;88:		long t = *(long *)(a);			\
+;89:		*(long *)(a) = *(long *)(b);		\
+;90:		*(long *)(b) = t;			\
+;91:	} else						\
+;92:		swapfunc(a, b, es, swaptype)
+;93:
+;94:#define vecswap(a, b, n) 	if ((n) > 0) swapfunc(a, b, n, swaptype)
+;95:
+;96:static char *med3(char* a, char* b, char* c, cmp_t* cmp)
+;97:{
+line 98
+;98:	return cmp(a, b) < 0 ?
 ADDRFP4 0
 INDIRP4
 ARGP4
@@ -392,19 +393,19 @@ LABELV $68
 endproc med3 40 8
 export qsort
 proc qsort 104 16
-line 103
-;98:	       (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a ))
-;99:              :(cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c ));
-;100:}
-;101:
-;102:void qsort( void* a, size_t n, size_t es, cmp_t* cmp)
-;103:{
+line 104
+;99:	       (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a ))
+;100:              :(cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c ));
+;101:}
+;102:
+;103:void qsort( void* a, size_t n, size_t es, cmp_t* cmp)
+;104:{
 LABELV $85
-line 107
-;104:	char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
-;105:	int d, r, swaptype, swap_cnt;
-;106:
-;107:loop:	SWAPINIT(a, es);
+line 108
+;105:	char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
+;106:	int d, r, swaptype, swap_cnt;
+;107:
+;108:loop:	SWAPINIT(a, es);
 ADDRLP4 52
 CNSTU4 3
 ASGNU4
@@ -460,19 +461,19 @@ ADDRLP4 16
 ADDRLP4 44
 INDIRI4
 ASGNI4
-line 108
-;108:	swap_cnt = 0;
+line 109
+;109:	swap_cnt = 0;
 ADDRLP4 28
 CNSTI4 0
 ASGNI4
-line 109
-;109:	if (n < 7) {
+line 110
+;110:	if (n < 7) {
 ADDRFP4 4
 INDIRU4
 CNSTU4 7
 GEU4 $93
-line 110
-;110:		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
+line 111
+;111:		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
 ADDRLP4 32
 ADDRFP4 8
 INDIRU4
@@ -483,8 +484,8 @@ ASGNP4
 ADDRGP4 $98
 JUMPV
 LABELV $95
-line 111
-;111:			for (pl = pm; pl > (char *)a && cmp(pl - es, pl) > 0;
+line 112
+;112:			for (pl = pm; pl > (char *)a && cmp(pl - es, pl) > 0;
 ADDRLP4 0
 ADDRLP4 32
 INDIRP4
@@ -492,9 +493,9 @@ ASGNP4
 ADDRGP4 $102
 JUMPV
 LABELV $99
-line 113
-;112:			     pl -= es)
-;113:				swap(pl, pl - es);
+line 114
+;113:			     pl -= es)
+;114:				swap(pl, pl - es);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -549,7 +550,7 @@ CALLV
 pop
 LABELV $104
 LABELV $100
-line 112
+line 113
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
@@ -558,7 +559,7 @@ INDIRU4
 SUBP4
 ASGNP4
 LABELV $102
-line 111
+line 112
 ADDRLP4 0
 INDIRP4
 CVPU4 4
@@ -586,7 +587,7 @@ CNSTI4 0
 GTI4 $99
 LABELV $105
 LABELV $96
-line 110
+line 111
 ADDRLP4 32
 ADDRFP4 8
 INDIRU4
@@ -608,14 +609,14 @@ INDIRP4
 ADDP4
 CVPU4 4
 LTU4 $95
-line 114
-;114:		return;
+line 115
+;115:		return;
 ADDRGP4 $84
 JUMPV
 LABELV $93
-line 116
-;115:	}
-;116:	pm = (char *)a + (n / 2) * es;
+line 117
+;116:	}
+;117:	pm = (char *)a + (n / 2) * es;
 ADDRLP4 32
 ADDRFP4 4
 INDIRU4
@@ -628,20 +629,20 @@ ADDRFP4 0
 INDIRP4
 ADDP4
 ASGNP4
-line 117
-;117:	if (n > 7) {
+line 118
+;118:	if (n > 7) {
 ADDRFP4 4
 INDIRU4
 CNSTU4 7
 LEU4 $106
-line 118
-;118:		pl = a;
+line 119
+;119:		pl = a;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 ASGNP4
-line 119
-;119:		pn = (char *)a + (n - 1) * es;
+line 120
+;120:		pn = (char *)a + (n - 1) * es;
 ADDRLP4 36
 ADDRFP4 4
 INDIRU4
@@ -654,14 +655,14 @@ ADDRFP4 0
 INDIRP4
 ADDP4
 ASGNP4
-line 120
-;120:		if (n > 40) {
+line 121
+;121:		if (n > 40) {
 ADDRFP4 4
 INDIRU4
 CNSTU4 40
 LEU4 $108
-line 121
-;121:			d = (n / 8) * es;
+line 122
+;122:			d = (n / 8) * es;
 ADDRLP4 40
 ADDRFP4 4
 INDIRU4
@@ -672,8 +673,8 @@ INDIRU4
 MULU4
 CVUI4 4
 ASGNI4
-line 122
-;122:			pl = med3(pl, pl + d, pl + 2 * d, cmp);
+line 123
+;123:			pl = med3(pl, pl + d, pl + 2 * d, cmp);
 ADDRLP4 0
 INDIRP4
 ARGP4
@@ -704,42 +705,42 @@ CALLP4
 ASGNP4
 ADDRLP4 0
 ADDRLP4 68
-INDIRP4
-ASGNP4
-line 123
-;123:			pm = med3(pm - d, pm, pm + d, cmp);
-ADDRLP4 76
-ADDRLP4 40
-INDIRI4
-ASGNI4
-ADDRLP4 32
-INDIRP4
-ADDRLP4 76
-INDIRI4
-SUBP4
-ARGP4
-ADDRLP4 32
-INDIRP4
-ARGP4
-ADDRLP4 76
-INDIRI4
-ADDRLP4 32
-INDIRP4
-ADDP4
-ARGP4
-ADDRFP4 12
-INDIRP4
-ARGP4
-ADDRLP4 80
-ADDRGP4 med3
-CALLP4
-ASGNP4
-ADDRLP4 32
-ADDRLP4 80
 INDIRP4
 ASGNP4
 line 124
-;124:			pn = med3(pn - 2 * d, pn - d, pn, cmp);
+;124:			pm = med3(pm - d, pm, pm + d, cmp);
+ADDRLP4 76
+ADDRLP4 40
+INDIRI4
+ASGNI4
+ADDRLP4 32
+INDIRP4
+ADDRLP4 76
+INDIRI4
+SUBP4
+ARGP4
+ADDRLP4 32
+INDIRP4
+ARGP4
+ADDRLP4 76
+INDIRI4
+ADDRLP4 32
+INDIRP4
+ADDP4
+ARGP4
+ADDRFP4 12
+INDIRP4
+ARGP4
+ADDRLP4 80
+ADDRGP4 med3
+CALLP4
+ASGNP4
+ADDRLP4 32
+ADDRLP4 80
+INDIRP4
+ASGNP4
+line 125
+;125:			pn = med3(pn - 2 * d, pn - d, pn, cmp);
 ADDRLP4 88
 ADDRLP4 40
 INDIRI4
@@ -772,11 +773,11 @@ ADDRLP4 36
 ADDRLP4 92
 INDIRP4
 ASGNP4
-line 125
-;125:		}
-LABELV $108
 line 126
-;126:		pm = med3(pl, pm, pn, cmp);
+;126:		}
+LABELV $108
+line 127
+;127:		pm = med3(pl, pm, pn, cmp);
 ADDRLP4 0
 INDIRP4
 ARGP4
@@ -797,11 +798,11 @@ ADDRLP4 32
 ADDRLP4 60
 INDIRP4
 ASGNP4
-line 127
-;127:	}
-LABELV $106
 line 128
-;128:	swap(a, pm);
+;128:	}
+LABELV $106
+line 129
+;129:	swap(a, pm);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -842,8 +843,8 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $111
-line 129
-;129:	pa = pb = (char *)a + es;
+line 130
+;130:	pa = pb = (char *)a + es;
 ADDRLP4 60
 ADDRFP4 8
 INDIRU4
@@ -859,9 +860,9 @@ ADDRLP4 20
 ADDRLP4 60
 INDIRP4
 ASGNP4
-line 131
-;130:
-;131:	pc = pd = (char *)a + (n - 1) * es;
+line 132
+;131:
+;132:	pc = pd = (char *)a + (n - 1) * es;
 ADDRLP4 64
 ADDRFP4 4
 INDIRU4
@@ -882,26 +883,26 @@ ADDRLP4 8
 ADDRLP4 64
 INDIRP4
 ASGNP4
-line 132
-;132:	for (;;) {
+line 133
+;133:	for (;;) {
 ADDRGP4 $117
 JUMPV
 LABELV $116
-line 133
-;133:		while (pb <= pc && (r = cmp(pb, a)) <= 0) {
 line 134
-;134:			if (r == 0) {
+;134:		while (pb <= pc && (r = cmp(pb, a)) <= 0) {
+line 135
+;135:			if (r == 0) {
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
 NEI4 $119
-line 135
-;135:				swap_cnt = 1;
+line 136
+;136:				swap_cnt = 1;
 ADDRLP4 28
 CNSTI4 1
 ASGNI4
-line 136
-;136:				swap(pa, pb);
+line 137
+;137:				swap(pa, pb);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -942,20 +943,20 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $122
-line 137
-;137:				pa += es;
-ADDRLP4 20
-ADDRFP4 8
-INDIRU4
-ADDRLP4 20
-INDIRP4
-ADDP4
-ASGNP4
 line 138
-;138:			}
-LABELV $119
+;138:				pa += es;
+ADDRLP4 20
+ADDRFP4 8
+INDIRU4
+ADDRLP4 20
+INDIRP4
+ADDP4
+ASGNP4
 line 139
-;139:			pb += es;
+;139:			}
+LABELV $119
+line 140
+;140:			pb += es;
 ADDRLP4 4
 ADDRFP4 8
 INDIRU4
@@ -963,10 +964,10 @@ ADDRLP4 4
 INDIRP4
 ADDP4
 ASGNP4
-line 140
-;140:		}
+line 141
+;141:		}
 LABELV $117
-line 133
+line 134
 ADDRLP4 4
 INDIRP4
 CVPU4 4
@@ -997,21 +998,21 @@ LABELV $123
 ADDRGP4 $125
 JUMPV
 LABELV $124
-line 141
-;141:		while (pb <= pc && (r = cmp(pc, a)) >= 0) {
 line 142
-;142:			if (r == 0) {
+;142:		while (pb <= pc && (r = cmp(pc, a)) >= 0) {
+line 143
+;143:			if (r == 0) {
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
 NEI4 $127
-line 143
-;143:				swap_cnt = 1;
+line 144
+;144:				swap_cnt = 1;
 ADDRLP4 28
 CNSTI4 1
 ASGNI4
-line 144
-;144:				swap(pc, pd);
+line 145
+;145:				swap(pc, pd);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -1052,20 +1053,20 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $130
-line 145
-;145:				pd -= es;
-ADDRLP4 24
-ADDRLP4 24
-INDIRP4
-ADDRFP4 8
-INDIRU4
-SUBP4
-ASGNP4
 line 146
-;146:			}
-LABELV $127
+;146:				pd -= es;
+ADDRLP4 24
+ADDRLP4 24
+INDIRP4
+ADDRFP4 8
+INDIRU4
+SUBP4
+ASGNP4
 line 147
-;147:			pc -= es;
+;147:			}
+LABELV $127
+line 148
+;148:			pc -= es;
 ADDRLP4 8
 ADDRLP4 8
 INDIRP4
@@ -1073,10 +1074,10 @@ ADDRFP4 8
 INDIRU4
 SUBP4
 ASGNP4
-line 148
-;148:		}
+line 149
+;149:		}
 LABELV $125
-line 141
+line 142
 ADDRLP4 4
 INDIRP4
 CVPU4 4
@@ -1104,8 +1105,8 @@ INDIRI4
 CNSTI4 0
 GEI4 $124
 LABELV $131
-line 149
-;149:		if (pb > pc)
+line 150
+;150:		if (pb > pc)
 ADDRLP4 4
 INDIRP4
 CVPU4 4
@@ -1113,13 +1114,13 @@ ADDRLP4 8
 INDIRP4
 CVPU4 4
 LEU4 $132
-line 150
-;150:			break;
+line 151
+;151:			break;
 ADDRGP4 $114
 JUMPV
 LABELV $132
-line 151
-;151:		swap(pb, pc);
+line 152
+;152:		swap(pb, pc);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -1160,13 +1161,13 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $135
-line 152
-;152:		swap_cnt = 1;
+line 153
+;153:		swap_cnt = 1;
 ADDRLP4 28
 CNSTI4 1
 ASGNI4
-line 153
-;153:		pb += es;
+line 154
+;154:		pb += es;
 ADDRLP4 4
 ADDRFP4 8
 INDIRU4
@@ -1174,8 +1175,8 @@ ADDRLP4 4
 INDIRP4
 ADDP4
 ASGNP4
-line 154
-;154:		pc -= es;
+line 155
+;155:		pc -= es;
 ADDRLP4 8
 ADDRLP4 8
 INDIRP4
@@ -1183,20 +1184,20 @@ ADDRFP4 8
 INDIRU4
 SUBP4
 ASGNP4
-line 155
-;155:	}
-line 132
+line 156
+;156:	}
+line 133
 ADDRGP4 $117
 JUMPV
 LABELV $114
-line 156
-;156:	if (swap_cnt == 0) {  /* Switch to insertion sort */
+line 157
+;157:	if (swap_cnt == 0) {  /* Switch to insertion sort */
 ADDRLP4 28
 INDIRI4
 CNSTI4 0
 NEI4 $136
-line 157
-;157:		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
+line 158
+;158:		for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)
 ADDRLP4 32
 ADDRFP4 8
 INDIRU4
@@ -1207,8 +1208,8 @@ ASGNP4
 ADDRGP4 $141
 JUMPV
 LABELV $138
-line 158
-;158:			for (pl = pm; pl > (char *)a && cmp(pl - es, pl) > 0;
+line 159
+;159:			for (pl = pm; pl > (char *)a && cmp(pl - es, pl) > 0;
 ADDRLP4 0
 ADDRLP4 32
 INDIRP4
@@ -1216,9 +1217,9 @@ ASGNP4
 ADDRGP4 $145
 JUMPV
 LABELV $142
-line 160
-;159:			     pl -= es)
-;160:				swap(pl, pl - es);
+line 161
+;160:			     pl -= es)
+;161:				swap(pl, pl - es);
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
@@ -1273,7 +1274,7 @@ CALLV
 pop
 LABELV $147
 LABELV $143
-line 159
+line 160
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
@@ -1282,7 +1283,7 @@ INDIRU4
 SUBP4
 ASGNP4
 LABELV $145
-line 158
+line 159
 ADDRLP4 0
 INDIRP4
 CVPU4 4
@@ -1310,7 +1311,7 @@ CNSTI4 0
 GTI4 $142
 LABELV $148
 LABELV $139
-line 157
+line 158
 ADDRLP4 32
 ADDRFP4 8
 INDIRU4
@@ -1332,15 +1333,15 @@ INDIRP4
 ADDP4
 CVPU4 4
 LTU4 $138
-line 161
-;161:		return;
+line 162
+;162:		return;
 ADDRGP4 $84
 JUMPV
 LABELV $136
-line 164
-;162:	}
-;163:
-;164:	pn = (char *)a + n * es;
+line 165
+;163:	}
+;164:
+;165:	pn = (char *)a + n * es;
 ADDRLP4 36
 ADDRFP4 4
 INDIRU4
@@ -1351,8 +1352,8 @@ ADDRFP4 0
 INDIRP4
 ADDP4
 ASGNP4
-line 165
-;165:	r = MIN(pa - (char *)a, pb - pa);
+line 166
+;166:	r = MIN(pa - (char *)a, pb - pa);
 ADDRLP4 72
 ADDRLP4 20
 INDIRP4
@@ -1401,8 +1402,8 @@ ADDRLP4 12
 ADDRLP4 68
 INDIRI4
 ASGNI4
-line 166
-;166:	vecswap(a, pb - r, r);
+line 167
+;167:	vecswap(a, pb - r, r);
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
@@ -1426,8 +1427,8 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $152
-line 167
-;167:	r = MIN(pd - pc, pn - pd - es);
+line 168
+;168:	r = MIN(pd - pc, pn - pd - es);
 ADDRLP4 84
 ADDRLP4 24
 INDIRP4
@@ -1487,8 +1488,8 @@ ADDRLP4 80
 INDIRU4
 CVUI4 4
 ASGNI4
-line 168
-;168:	vecswap(pb, pn - r, r);
+line 169
+;169:	vecswap(pb, pn - r, r);
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
@@ -1512,8 +1513,8 @@ ADDRGP4 swapfunc
 CALLV
 pop
 LABELV $157
-line 169
-;169:	if ((r = pb - pa) > es)
+line 170
+;170:	if ((r = pb - pa) > es)
 ADDRLP4 92
 ADDRLP4 4
 INDIRP4
@@ -1534,8 +1535,8 @@ CVIU4 4
 ADDRFP4 8
 INDIRU4
 LEU4 $159
-line 170
-;170:		qsort(a, r / es, es, cmp);
+line 171
+;171:		qsort(a, r / es, es, cmp);
 ADDRFP4 0
 INDIRP4
 ARGP4
@@ -1560,8 +1561,8 @@ ADDRGP4 qsort
 CALLV
 pop
 LABELV $159
-line 171
-;171:	if ((r = pd - pc) > es) {
+line 172
+;172:	if ((r = pd - pc) > es) {
 ADDRLP4 100
 ADDRLP4 24
 INDIRP4
@@ -1582,9 +1583,9 @@ CVIU4 4
 ADDRFP4 8
 INDIRU4
 LEU4 $161
-line 173
-;172:		/* Iterate rather than recurse to save stack space */
-;173:		a = pn - r;
+line 174
+;173:		/* Iterate rather than recurse to save stack space */
+;174:		a = pn - r;
 ADDRFP4 0
 ADDRLP4 36
 INDIRP4
@@ -1592,8 +1593,8 @@ ADDRLP4 12
 INDIRI4
 SUBP4
 ASGNP4
-line 174
-;174:		n = r / es;
+line 175
+;175:		n = r / es;
 ADDRFP4 4
 ADDRLP4 12
 INDIRI4
@@ -1602,34 +1603,34 @@ ADDRFP4 8
 INDIRU4
 DIVU4
 ASGNU4
-line 175
-;175:		goto loop;
+line 176
+;176:		goto loop;
 ADDRGP4 $85
 JUMPV
 LABELV $161
-line 178
-;176:	}
-;177:/*		qsort(pn - r, r / es, es, cmp);*/
-;178:}
+line 179
+;177:	}
+;178:/*		qsort(pn - r, r / es, es, cmp);*/
+;179:}
 LABELV $84
 endproc qsort 104 16
 export strlen
 proc strlen 4 0
-line 188
-;179:
-;180://==================================================================================
-;181:
+line 189
+;180:
+;181://==================================================================================
 ;182:
-;183:// this file is excluded from release builds because of intrinsics
-;184:
-;185:// bk001211 - gcc errors on compiling strcpy:  parse error before `__extension__'
-;186:#if defined ( Q3_VM )
-;187:
-;188:size_t strlen( const char *string ) {
-line 191
-;189:	const char	*s;
-;190:
-;191:	s = string;
+;183:
+;184:// this file is excluded from release builds because of intrinsics
+;185:
+;186:// bk001211 - gcc errors on compiling strcpy:  parse error before `__extension__'
+;187:#if defined ( Q3_VM )
+;188:
+;189:size_t strlen( const char *string ) {
+line 192
+;190:	const char	*s;
+;191:
+;192:	s = string;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
@@ -1637,28 +1638,28 @@ ASGNP4
 ADDRGP4 $165
 JUMPV
 LABELV $164
-line 192
-;192:	while ( *s ) {
 line 193
-;193:		s++;
+;193:	while ( *s ) {
+line 194
+;194:		s++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 194
-;194:	}
+line 195
+;195:	}
 LABELV $165
-line 192
+line 193
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $164
-line 195
-;195:	return s - string;
+line 196
+;196:	return s - string;
 ADDRLP4 0
 INDIRP4
 CVPU4 4
@@ -1673,15 +1674,15 @@ LABELV $163
 endproc strlen 4 0
 export strcat
 proc strcat 16 0
-line 199
-;196:}
-;197:
+line 200
+;197:}
 ;198:
-;199:char *strcat( char *strDestination, const char *strSource ) {
-line 202
-;200:	char	*s;
-;201:
-;202:	s = strDestination;
+;199:
+;200:char *strcat( char *strDestination, const char *strSource ) {
+line 203
+;201:	char	*s;
+;202:
+;203:	s = strDestination;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
@@ -1689,20 +1690,20 @@ ASGNP4
 ADDRGP4 $169
 JUMPV
 LABELV $168
-line 203
-;203:	while ( *s ) {
 line 204
-;204:		s++;
+;204:	while ( *s ) {
+line 205
+;205:		s++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 205
-;205:	}
+line 206
+;206:	}
 LABELV $169
-line 203
+line 204
 ADDRLP4 0
 INDIRP4
 INDIRI1
@@ -1712,10 +1713,10 @@ NEI4 $168
 ADDRGP4 $172
 JUMPV
 LABELV $171
-line 206
-;206:	while ( *strSource ) {
 line 207
-;207:		*s++ = *strSource++;
+;207:	while ( *strSource ) {
+line 208
+;208:		*s++ = *strSource++;
 ADDRLP4 4
 ADDRLP4 0
 INDIRP4
@@ -1747,24 +1748,24 @@ ADDRLP4 8
 INDIRP4
 INDIRI1
 ASGNI1
-line 208
-;208:	}
+line 209
+;209:	}
 LABELV $172
-line 206
+line 207
 ADDRFP4 4
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $171
-line 209
-;209:	*s = 0;
+line 210
+;210:	*s = 0;
 ADDRLP4 0
 INDIRP4
 CNSTI1 0
 ASGNI1
-line 210
-;210:	return strDestination;
+line 211
+;211:	return strDestination;
 ADDRFP4 0
 INDIRP4
 RETP4
@@ -1772,14 +1773,14 @@ LABELV $167
 endproc strcat 16 0
 export strcpy
 proc strcpy 16 0
-line 213
-;211:}
-;212:
-;213:char *strcpy( char *strDestination, const char *strSource ) {
-line 216
-;214:	char *s;
-;215:
-;216:	s = strDestination;
+line 214
+;212:}
+;213:
+;214:char *strcpy( char *strDestination, const char *strSource ) {
+line 217
+;215:	char *s;
+;216:
+;217:	s = strDestination;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
@@ -1787,10 +1788,10 @@ ASGNP4
 ADDRGP4 $176
 JUMPV
 LABELV $175
-line 217
-;217:	while ( *strSource ) {
 line 218
-;218:		*s++ = *strSource++;
+;218:	while ( *strSource ) {
+line 219
+;219:		*s++ = *strSource++;
 ADDRLP4 4
 ADDRLP4 0
 INDIRP4
@@ -1822,24 +1823,24 @@ ADDRLP4 8
 INDIRP4
 INDIRI1
 ASGNI1
-line 219
-;219:	}
+line 220
+;220:	}
 LABELV $176
-line 217
+line 218
 ADDRFP4 4
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $175
-line 220
-;220:	*s = 0;
+line 221
+;221:	*s = 0;
 ADDRLP4 0
 INDIRP4
 CNSTI1 0
 ASGNI1
-line 221
-;221:	return strDestination;
+line 222
+;222:	return strDestination;
 ADDRFP4 0
 INDIRP4
 RETP4
@@ -1847,36 +1848,36 @@ LABELV $174
 endproc strcpy 16 0
 export strcmp
 proc strcmp 12 0
-line 225
-;222:}
-;223:
+line 226
+;223:}
 ;224:
-;225:int strcmp( const char *string1, const char *string2 ) {
+;225:
+;226:int strcmp( const char *string1, const char *string2 ) {
 ADDRGP4 $180
 JUMPV
 LABELV $179
-line 226
-;226:	while ( *string1 == *string2 && *string1 && *string2 ) {
 line 227
-;227:		string1++;
-ADDRFP4 0
-ADDRFP4 0
-INDIRP4
-CNSTI4 1
-ADDP4
-ASGNP4
+;227:	while ( *string1 == *string2 && *string1 && *string2 ) {
 line 228
-;228:		string2++;
-ADDRFP4 4
-ADDRFP4 4
+;228:		string1++;
+ADDRFP4 0
+ADDRFP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
 line 229
-;229:	}
+;229:		string2++;
+ADDRFP4 4
+ADDRFP4 4
+INDIRP4
+CNSTI4 1
+ADDP4
+ASGNP4
+line 230
+;230:	}
 LABELV $180
-line 226
+line 227
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
@@ -1908,8 +1909,8 @@ ADDRLP4 8
 INDIRI4
 NEI4 $179
 LABELV $183
-line 230
-;230:	return *string1 - *string2;
+line 231
+;231:	return *string1 - *string2;
 ADDRFP4 0
 INDIRP4
 INDIRI1
@@ -1924,18 +1925,18 @@ LABELV $178
 endproc strcmp 12 0
 export strchr
 proc strchr 0 0
-line 234
-;231:}
-;232:
+line 235
+;232:}
 ;233:
-;234:char *strchr( const char *string, int c ) {
+;234:
+;235:char *strchr( const char *string, int c ) {
 ADDRGP4 $186
 JUMPV
 LABELV $185
-line 235
-;235:	while ( *string ) {
 line 236
-;236:		if ( *string == c ) {
+;236:	while ( *string ) {
+line 237
+;237:		if ( *string == c ) {
 ADDRFP4 0
 INDIRP4
 INDIRI1
@@ -1943,62 +1944,62 @@ CVII4 1
 ADDRFP4 4
 INDIRI4
 NEI4 $188
-line 237
-;237:			return ( char * )string;
+line 238
+;238:			return ( char * )string;
 ADDRFP4 0
 INDIRP4
 RETP4
 ADDRGP4 $184
 JUMPV
 LABELV $188
-line 239
-;238:		}
-;239:		string++;
+line 240
+;239:		}
+;240:		string++;
 ADDRFP4 0
 ADDRFP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 240
-;240:	}
+line 241
+;241:	}
 LABELV $186
-line 235
+line 236
 ADDRFP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $185
-line 241
-;241:	return (char *)0;
+line 242
+;242:	return (char *)0;
 CNSTP4 0
 RETP4
 LABELV $184
 endproc strchr 0 0
 export strstr
 proc strstr 8 0
-line 244
-;242:}
-;243:
-;244:char *strstr( const char *string, const char *strCharSet ) {
+line 245
+;243:}
+;244:
+;245:char *strstr( const char *string, const char *strCharSet ) {
 ADDRGP4 $192
 JUMPV
 LABELV $191
-line 245
-;245:	while ( *string ) {
-line 248
-;246:		int		i;
-;247:
-;248:		for ( i = 0 ; strCharSet[i] ; i++ ) {
+line 246
+;246:	while ( *string ) {
+line 249
+;247:		int		i;
+;248:
+;249:		for ( i = 0 ; strCharSet[i] ; i++ ) {
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
 ADDRGP4 $197
 JUMPV
 LABELV $194
-line 249
-;249:			if ( string[i] != strCharSet[i] ) {
+line 250
+;250:			if ( string[i] != strCharSet[i] ) {
 ADDRLP4 0
 INDIRI4
 ADDRFP4 0
@@ -2014,16 +2015,16 @@ ADDP4
 INDIRI1
 CVII4 1
 EQI4 $198
-line 250
-;250:				break;
+line 251
+;251:				break;
 ADDRGP4 $196
 JUMPV
 LABELV $198
-line 252
-;251:			}
-;252:		}
+line 253
+;252:			}
+;253:		}
 LABELV $195
-line 248
+line 249
 ADDRLP4 0
 ADDRLP4 0
 INDIRI4
@@ -2041,8 +2042,8 @@ CVII4 1
 CNSTI4 0
 NEI4 $194
 LABELV $196
-line 253
-;253:		if ( !strCharSet[i] ) {
+line 254
+;254:		if ( !strCharSet[i] ) {
 ADDRLP4 0
 INDIRI4
 ADDRFP4 4
@@ -2052,47 +2053,47 @@ INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $200
-line 254
-;254:			return (char *)string;
+line 255
+;255:			return (char *)string;
 ADDRFP4 0
 INDIRP4
 RETP4
 ADDRGP4 $190
 JUMPV
 LABELV $200
-line 256
-;255:		}
-;256:		string++;
+line 257
+;256:		}
+;257:		string++;
 ADDRFP4 0
 ADDRFP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 257
-;257:	}
+line 258
+;258:	}
 LABELV $192
-line 245
+line 246
 ADDRFP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
 NEI4 $191
-line 258
-;258:	return (char *)0;
+line 259
+;259:	return (char *)0;
 CNSTP4 0
 RETP4
 LABELV $190
 endproc strstr 8 0
 export tolower
 proc tolower 4 0
-line 261
-;259:}
-;260:
-;261:int tolower( int c ) {
 line 262
-;262:	if ( c >= 'A' && c <= 'Z' ) {
+;260:}
+;261:
+;262:int tolower( int c ) {
+line 263
+;263:	if ( c >= 'A' && c <= 'Z' ) {
 ADDRLP4 0
 ADDRFP4 0
 INDIRI4
@@ -2105,19 +2106,19 @@ ADDRLP4 0
 INDIRI4
 CNSTI4 90
 GTI4 $203
-line 263
-;263:		c += 'a' - 'A';
+line 264
+;264:		c += 'a' - 'A';
 ADDRFP4 0
 ADDRFP4 0
 INDIRI4
 CNSTI4 32
 ADDI4
 ASGNI4
-line 264
-;264:	}
-LABELV $203
 line 265
-;265:	return c;
+;265:	}
+LABELV $203
+line 266
+;266:	return c;
 ADDRFP4 0
 INDIRI4
 RETI4
@@ -2125,13 +2126,13 @@ LABELV $202
 endproc tolower 4 0
 export toupper
 proc toupper 4 0
-line 269
-;266:}
-;267:
-;268:
-;269:int toupper( int c ) {
 line 270
-;270:	if ( c >= 'a' && c <= 'z' ) {
+;267:}
+;268:
+;269:
+;270:int toupper( int c ) {
+line 271
+;271:	if ( c >= 'a' && c <= 'z' ) {
 ADDRLP4 0
 ADDRFP4 0
 INDIRI4
@@ -2144,19 +2145,19 @@ ADDRLP4 0
 INDIRI4
 CNSTI4 122
 GTI4 $206
-line 271
-;271:		c += 'A' - 'a';
+line 272
+;272:		c += 'A' - 'a';
 ADDRFP4 0
 ADDRFP4 0
 INDIRI4
 CNSTI4 -32
 ADDI4
 ASGNI4
-line 272
-;272:	}
-LABELV $206
 line 273
-;273:	return c;
+;273:	}
+LABELV $206
+line 274
+;274:	return c;
 ADDRFP4 0
 INDIRI4
 RETI4
@@ -2164,14 +2165,14 @@ LABELV $205
 endproc toupper 4 0
 export memmove
 proc memmove 8 0
-line 276
-;274:}
-;275:
-;276:void *memmove( void *dest, const void *src, size_t count ) {
-line 279
-;277:	int		i;
-;278:
-;279:	if ( dest > src ) {
+line 277
+;275:}
+;276:
+;277:void *memmove( void *dest, const void *src, size_t count ) {
+line 280
+;278:	int		i;
+;279:
+;280:	if ( dest > src ) {
 ADDRFP4 0
 INDIRP4
 CVPU4 4
@@ -2179,8 +2180,8 @@ ADDRFP4 4
 INDIRP4
 CVPU4 4
 LEU4 $209
-line 280
-;280:		for ( i = count-1 ; i >= 0 ; i-- ) {
+line 281
+;281:		for ( i = count-1 ; i >= 0 ; i-- ) {
 ADDRLP4 0
 ADDRFP4 8
 INDIRU4
@@ -2191,8 +2192,8 @@ ASGNI4
 ADDRGP4 $214
 JUMPV
 LABELV $211
-line 281
-;281:			((char *)dest)[i] = ((char *)src)[i];
+line 282
+;282:			((char *)dest)[i] = ((char *)src)[i];
 ADDRLP4 0
 INDIRI4
 ADDRFP4 0
@@ -2205,10 +2206,10 @@ INDIRP4
 ADDP4
 INDIRI1
 ASGNI1
-line 282
-;282:		}
+line 283
+;283:		}
 LABELV $212
-line 280
+line 281
 ADDRLP4 0
 ADDRLP4 0
 INDIRI4
@@ -2220,21 +2221,21 @@ ADDRLP4 0
 INDIRI4
 CNSTI4 0
 GEI4 $211
-line 283
-;283:	} else {
+line 284
+;284:	} else {
 ADDRGP4 $210
 JUMPV
 LABELV $209
-line 284
-;284:		for ( i = 0 ; i < count ; i++ ) {
+line 285
+;285:		for ( i = 0 ; i < count ; i++ ) {
 ADDRLP4 0
 CNSTI4 0
 ASGNI4
 ADDRGP4 $218
 JUMPV
 LABELV $215
-line 285
-;285:			((char *)dest)[i] = ((char *)src)[i];
+line 286
+;286:			((char *)dest)[i] = ((char *)src)[i];
 ADDRLP4 0
 INDIRI4
 ADDRFP4 0
@@ -2247,10 +2248,10 @@ INDIRP4
 ADDP4
 INDIRI1
 ASGNI1
-line 286
-;286:		}
+line 287
+;287:		}
 LABELV $216
-line 284
+line 285
 ADDRLP4 0
 ADDRLP4 0
 INDIRI4
@@ -2264,11 +2265,11 @@ CVIU4 4
 ADDRFP4 8
 INDIRU4
 LTU4 $215
-line 287
-;287:	}
-LABELV $210
 line 288
-;288:	return dest;
+;288:	}
+LABELV $210
+line 289
+;289:	return dest;
 ADDRFP4 0
 INDIRP4
 RETP4
@@ -2277,224 +2278,223 @@ endproc memmove 8 0
 export tan
 proc tan 8 4
 line 747
-;289:}
-;290:
-;291:#endif // Q3_VM
-;292:
-;293:#if 0
-;294:
-;295:double floor( double x ) {
-;296:	return (int)(x + 0x40000000) - 0x40000000;
-;297:}
-;298:
-;299:void *memset( void *dest, int c, size_t count ) {
-;300:	while ( count-- ) {
-;301:		((char *)dest)[count] = c;
-;302:	}
-;303:	return dest;
-;304:}
-;305:
-;306:void *memcpy( void *dest, const void *src, size_t count ) {
-;307:	while ( count-- ) {
-;308:		((char *)dest)[count] = ((char *)src)[count];
-;309:	}
-;310:	return dest;
-;311:}
-;312:
-;313:char *strncpy( char *strDest, const char *strSource, size_t count ) {
-;314:	char	*s;
-;315:
-;316:	s = strDest;
-;317:	while ( *strSource && count ) {
-;318:		*s++ = *strSource++;
-;319:		count--;
-;320:	}
-;321:	while ( count-- ) {
-;322:		*s++ = 0;
-;323:	}
-;324:	return strDest;
-;325:}
-;326:
-;327:double sqrt( double x ) {
-;328:	float	y;
-;329:	float	delta;
-;330:	float	maxError;
-;331:
-;332:	if ( x <= 0 ) {
-;333:		return 0;
-;334:	}
-;335:
-;336:	// initial guess
-;337:	y = x / 2;
-;338:
-;339:	// refine
-;340:	maxError = x * 0.001;
-;341:
-;342:	do {
-;343:		delta = ( y * y ) - x;
-;344:		y -= delta / ( 2 * y );
-;345:	} while ( delta > maxError || delta < -maxError );
-;346:
-;347:	return y;
-;348:}
-;349:
+;290:}
+;291:
+;292:#endif // Q3_VM
+;293:
+;294:#if 0
+;295:
+;296:double floor( double x ) {
+;297:	return (int)(x + 0x40000000) - 0x40000000;
+;298:}
+;299:
+;300:void *memset( void *dest, int c, size_t count ) {
+;301:	while ( count-- ) {
+;302:		((char *)dest)[count] = c;
+;303:	}
+;304:	return dest;
+;305:}
+;306:
+;307:void *memcpy( void *dest, const void *src, size_t count ) {
+;308:	while ( count-- ) {
+;309:		((char *)dest)[count] = ((char *)src)[count];
+;310:	}
+;311:	return dest;
+;312:}
+;313:
+;314:char *strncpy( char *strDest, const char *strSource, size_t count ) {
+;315:	char	*s;
+;316:
+;317:	s = strDest;
+;318:	while ( *strSource && count ) {
+;319:		*s++ = *strSource++;
+;320:		count--;
+;321:	}
+;322:	while ( count-- ) {
+;323:		*s++ = 0;
+;324:	}
+;325:	return strDest;
+;326:}
+;327:
+;328:double sqrt( double x ) {
+;329:	float	y;
+;330:	float	delta;
+;331:	float	maxError;
+;332:
+;333:	if ( x <= 0 ) {
+;334:		return 0;
+;335:	}
+;336:
+;337:	// initial guess
+;338:	y = x / 2;
+;339:
+;340:	// refine
+;341:	maxError = x * 0.001;
+;342:
+;343:	do {
+;344:		delta = ( y * y ) - x;
+;345:		y -= delta / ( 2 * y );
+;346:	} while ( delta > maxError || delta < -maxError );
+;347:
+;348:	return y;
+;349:}
 ;350:
-;351:float sintable[1024] = {
-;352:0.000000,0.001534,0.003068,0.004602,0.006136,0.007670,0.009204,0.010738,
-;353:0.012272,0.013805,0.015339,0.016873,0.018407,0.019940,0.021474,0.023008,
-;354:0.024541,0.026075,0.027608,0.029142,0.030675,0.032208,0.033741,0.035274,
-;355:0.036807,0.038340,0.039873,0.041406,0.042938,0.044471,0.046003,0.047535,
-;356:0.049068,0.050600,0.052132,0.053664,0.055195,0.056727,0.058258,0.059790,
-;357:0.061321,0.062852,0.064383,0.065913,0.067444,0.068974,0.070505,0.072035,
-;358:0.073565,0.075094,0.076624,0.078153,0.079682,0.081211,0.082740,0.084269,
-;359:0.085797,0.087326,0.088854,0.090381,0.091909,0.093436,0.094963,0.096490,
-;360:0.098017,0.099544,0.101070,0.102596,0.104122,0.105647,0.107172,0.108697,
-;361:0.110222,0.111747,0.113271,0.114795,0.116319,0.117842,0.119365,0.120888,
-;362:0.122411,0.123933,0.125455,0.126977,0.128498,0.130019,0.131540,0.133061,
-;363:0.134581,0.136101,0.137620,0.139139,0.140658,0.142177,0.143695,0.145213,
-;364:0.146730,0.148248,0.149765,0.151281,0.152797,0.154313,0.155828,0.157343,
-;365:0.158858,0.160372,0.161886,0.163400,0.164913,0.166426,0.167938,0.169450,
-;366:0.170962,0.172473,0.173984,0.175494,0.177004,0.178514,0.180023,0.181532,
-;367:0.183040,0.184548,0.186055,0.187562,0.189069,0.190575,0.192080,0.193586,
-;368:0.195090,0.196595,0.198098,0.199602,0.201105,0.202607,0.204109,0.205610,
-;369:0.207111,0.208612,0.210112,0.211611,0.213110,0.214609,0.216107,0.217604,
-;370:0.219101,0.220598,0.222094,0.223589,0.225084,0.226578,0.228072,0.229565,
-;371:0.231058,0.232550,0.234042,0.235533,0.237024,0.238514,0.240003,0.241492,
-;372:0.242980,0.244468,0.245955,0.247442,0.248928,0.250413,0.251898,0.253382,
-;373:0.254866,0.256349,0.257831,0.259313,0.260794,0.262275,0.263755,0.265234,
-;374:0.266713,0.268191,0.269668,0.271145,0.272621,0.274097,0.275572,0.277046,
-;375:0.278520,0.279993,0.281465,0.282937,0.284408,0.285878,0.287347,0.288816,
-;376:0.290285,0.291752,0.293219,0.294685,0.296151,0.297616,0.299080,0.300543,
-;377:0.302006,0.303468,0.304929,0.306390,0.307850,0.309309,0.310767,0.312225,
-;378:0.313682,0.315138,0.316593,0.318048,0.319502,0.320955,0.322408,0.323859,
-;379:0.325310,0.326760,0.328210,0.329658,0.331106,0.332553,0.334000,0.335445,
-;380:0.336890,0.338334,0.339777,0.341219,0.342661,0.344101,0.345541,0.346980,
-;381:0.348419,0.349856,0.351293,0.352729,0.354164,0.355598,0.357031,0.358463,
-;382:0.359895,0.361326,0.362756,0.364185,0.365613,0.367040,0.368467,0.369892,
-;383:0.371317,0.372741,0.374164,0.375586,0.377007,0.378428,0.379847,0.381266,
-;384:0.382683,0.384100,0.385516,0.386931,0.388345,0.389758,0.391170,0.392582,
-;385:0.393992,0.395401,0.396810,0.398218,0.399624,0.401030,0.402435,0.403838,
-;386:0.405241,0.406643,0.408044,0.409444,0.410843,0.412241,0.413638,0.415034,
-;387:0.416430,0.417824,0.419217,0.420609,0.422000,0.423390,0.424780,0.426168,
-;388:0.427555,0.428941,0.430326,0.431711,0.433094,0.434476,0.435857,0.437237,
-;389:0.438616,0.439994,0.441371,0.442747,0.444122,0.445496,0.446869,0.448241,
-;390:0.449611,0.450981,0.452350,0.453717,0.455084,0.456449,0.457813,0.459177,
-;391:0.460539,0.461900,0.463260,0.464619,0.465976,0.467333,0.468689,0.470043,
-;392:0.471397,0.472749,0.474100,0.475450,0.476799,0.478147,0.479494,0.480839,
-;393:0.482184,0.483527,0.484869,0.486210,0.487550,0.488889,0.490226,0.491563,
-;394:0.492898,0.494232,0.495565,0.496897,0.498228,0.499557,0.500885,0.502212,
-;395:0.503538,0.504863,0.506187,0.507509,0.508830,0.510150,0.511469,0.512786,
-;396:0.514103,0.515418,0.516732,0.518045,0.519356,0.520666,0.521975,0.523283,
-;397:0.524590,0.525895,0.527199,0.528502,0.529804,0.531104,0.532403,0.533701,
-;398:0.534998,0.536293,0.537587,0.538880,0.540171,0.541462,0.542751,0.544039,
-;399:0.545325,0.546610,0.547894,0.549177,0.550458,0.551738,0.553017,0.554294,
-;400:0.555570,0.556845,0.558119,0.559391,0.560662,0.561931,0.563199,0.564466,
-;401:0.565732,0.566996,0.568259,0.569521,0.570781,0.572040,0.573297,0.574553,
-;402:0.575808,0.577062,0.578314,0.579565,0.580814,0.582062,0.583309,0.584554,
-;403:0.585798,0.587040,0.588282,0.589521,0.590760,0.591997,0.593232,0.594466,
-;404:0.595699,0.596931,0.598161,0.599389,0.600616,0.601842,0.603067,0.604290,
-;405:0.605511,0.606731,0.607950,0.609167,0.610383,0.611597,0.612810,0.614022,
-;406:0.615232,0.616440,0.617647,0.618853,0.620057,0.621260,0.622461,0.623661,
-;407:0.624859,0.626056,0.627252,0.628446,0.629638,0.630829,0.632019,0.633207,
-;408:0.634393,0.635578,0.636762,0.637944,0.639124,0.640303,0.641481,0.642657,
-;409:0.643832,0.645005,0.646176,0.647346,0.648514,0.649681,0.650847,0.652011,
-;410:0.653173,0.654334,0.655493,0.656651,0.657807,0.658961,0.660114,0.661266,
-;411:0.662416,0.663564,0.664711,0.665856,0.667000,0.668142,0.669283,0.670422,
-;412:0.671559,0.672695,0.673829,0.674962,0.676093,0.677222,0.678350,0.679476,
-;413:0.680601,0.681724,0.682846,0.683965,0.685084,0.686200,0.687315,0.688429,
-;414:0.689541,0.690651,0.691759,0.692866,0.693971,0.695075,0.696177,0.697278,
-;415:0.698376,0.699473,0.700569,0.701663,0.702755,0.703845,0.704934,0.706021,
-;416:0.707107,0.708191,0.709273,0.710353,0.711432,0.712509,0.713585,0.714659,
-;417:0.715731,0.716801,0.717870,0.718937,0.720003,0.721066,0.722128,0.723188,
-;418:0.724247,0.725304,0.726359,0.727413,0.728464,0.729514,0.730563,0.731609,
-;419:0.732654,0.733697,0.734739,0.735779,0.736817,0.737853,0.738887,0.739920,
-;420:0.740951,0.741980,0.743008,0.744034,0.745058,0.746080,0.747101,0.748119,
-;421:0.749136,0.750152,0.751165,0.752177,0.753187,0.754195,0.755201,0.756206,
-;422:0.757209,0.758210,0.759209,0.760207,0.761202,0.762196,0.763188,0.764179,
-;423:0.765167,0.766154,0.767139,0.768122,0.769103,0.770083,0.771061,0.772036,
-;424:0.773010,0.773983,0.774953,0.775922,0.776888,0.777853,0.778817,0.779778,
-;425:0.780737,0.781695,0.782651,0.783605,0.784557,0.785507,0.786455,0.787402,
-;426:0.788346,0.789289,0.790230,0.791169,0.792107,0.793042,0.793975,0.794907,
-;427:0.795837,0.796765,0.797691,0.798615,0.799537,0.800458,0.801376,0.802293,
-;428:0.803208,0.804120,0.805031,0.805940,0.806848,0.807753,0.808656,0.809558,
-;429:0.810457,0.811355,0.812251,0.813144,0.814036,0.814926,0.815814,0.816701,
-;430:0.817585,0.818467,0.819348,0.820226,0.821103,0.821977,0.822850,0.823721,
-;431:0.824589,0.825456,0.826321,0.827184,0.828045,0.828904,0.829761,0.830616,
-;432:0.831470,0.832321,0.833170,0.834018,0.834863,0.835706,0.836548,0.837387,
-;433:0.838225,0.839060,0.839894,0.840725,0.841555,0.842383,0.843208,0.844032,
-;434:0.844854,0.845673,0.846491,0.847307,0.848120,0.848932,0.849742,0.850549,
-;435:0.851355,0.852159,0.852961,0.853760,0.854558,0.855354,0.856147,0.856939,
-;436:0.857729,0.858516,0.859302,0.860085,0.860867,0.861646,0.862424,0.863199,
-;437:0.863973,0.864744,0.865514,0.866281,0.867046,0.867809,0.868571,0.869330,
-;438:0.870087,0.870842,0.871595,0.872346,0.873095,0.873842,0.874587,0.875329,
-;439:0.876070,0.876809,0.877545,0.878280,0.879012,0.879743,0.880471,0.881197,
-;440:0.881921,0.882643,0.883363,0.884081,0.884797,0.885511,0.886223,0.886932,
-;441:0.887640,0.888345,0.889048,0.889750,0.890449,0.891146,0.891841,0.892534,
-;442:0.893224,0.893913,0.894599,0.895284,0.895966,0.896646,0.897325,0.898001,
-;443:0.898674,0.899346,0.900016,0.900683,0.901349,0.902012,0.902673,0.903332,
-;444:0.903989,0.904644,0.905297,0.905947,0.906596,0.907242,0.907886,0.908528,
-;445:0.909168,0.909806,0.910441,0.911075,0.911706,0.912335,0.912962,0.913587,
-;446:0.914210,0.914830,0.915449,0.916065,0.916679,0.917291,0.917901,0.918508,
-;447:0.919114,0.919717,0.920318,0.920917,0.921514,0.922109,0.922701,0.923291,
-;448:0.923880,0.924465,0.925049,0.925631,0.926210,0.926787,0.927363,0.927935,
-;449:0.928506,0.929075,0.929641,0.930205,0.930767,0.931327,0.931884,0.932440,
-;450:0.932993,0.933544,0.934093,0.934639,0.935184,0.935726,0.936266,0.936803,
-;451:0.937339,0.937872,0.938404,0.938932,0.939459,0.939984,0.940506,0.941026,
-;452:0.941544,0.942060,0.942573,0.943084,0.943593,0.944100,0.944605,0.945107,
-;453:0.945607,0.946105,0.946601,0.947094,0.947586,0.948075,0.948561,0.949046,
-;454:0.949528,0.950008,0.950486,0.950962,0.951435,0.951906,0.952375,0.952842,
-;455:0.953306,0.953768,0.954228,0.954686,0.955141,0.955594,0.956045,0.956494,
-;456:0.956940,0.957385,0.957826,0.958266,0.958703,0.959139,0.959572,0.960002,
-;457:0.960431,0.960857,0.961280,0.961702,0.962121,0.962538,0.962953,0.963366,
-;458:0.963776,0.964184,0.964590,0.964993,0.965394,0.965793,0.966190,0.966584,
-;459:0.966976,0.967366,0.967754,0.968139,0.968522,0.968903,0.969281,0.969657,
-;460:0.970031,0.970403,0.970772,0.971139,0.971504,0.971866,0.972226,0.972584,
-;461:0.972940,0.973293,0.973644,0.973993,0.974339,0.974684,0.975025,0.975365,
-;462:0.975702,0.976037,0.976370,0.976700,0.977028,0.977354,0.977677,0.977999,
-;463:0.978317,0.978634,0.978948,0.979260,0.979570,0.979877,0.980182,0.980485,
-;464:0.980785,0.981083,0.981379,0.981673,0.981964,0.982253,0.982539,0.982824,
-;465:0.983105,0.983385,0.983662,0.983937,0.984210,0.984480,0.984749,0.985014,
-;466:0.985278,0.985539,0.985798,0.986054,0.986308,0.986560,0.986809,0.987057,
-;467:0.987301,0.987544,0.987784,0.988022,0.988258,0.988491,0.988722,0.988950,
-;468:0.989177,0.989400,0.989622,0.989841,0.990058,0.990273,0.990485,0.990695,
-;469:0.990903,0.991108,0.991311,0.991511,0.991710,0.991906,0.992099,0.992291,
-;470:0.992480,0.992666,0.992850,0.993032,0.993212,0.993389,0.993564,0.993737,
-;471:0.993907,0.994075,0.994240,0.994404,0.994565,0.994723,0.994879,0.995033,
-;472:0.995185,0.995334,0.995481,0.995625,0.995767,0.995907,0.996045,0.996180,
-;473:0.996313,0.996443,0.996571,0.996697,0.996820,0.996941,0.997060,0.997176,
-;474:0.997290,0.997402,0.997511,0.997618,0.997723,0.997825,0.997925,0.998023,
-;475:0.998118,0.998211,0.998302,0.998390,0.998476,0.998559,0.998640,0.998719,
-;476:0.998795,0.998870,0.998941,0.999011,0.999078,0.999142,0.999205,0.999265,
-;477:0.999322,0.999378,0.999431,0.999481,0.999529,0.999575,0.999619,0.999660,
-;478:0.999699,0.999735,0.999769,0.999801,0.999831,0.999858,0.999882,0.999905,
-;479:0.999925,0.999942,0.999958,0.999971,0.999981,0.999989,0.999995,0.999999
-;480:};
-;481:
-;482:double sin( double x ) {
-;483:	int	index;
-;484:	int	quad;
-;485:
-;486:	index = 1024 * x / (M_PI * 0.5);
-;487:	quad = ( index >> 10 ) & 3;
-;488:	index &= 1023;
-;489:	switch ( quad ) {
-;490:	case 0:
-;491:		return sintable[index];
-;492:	case 1:
-;493:		return sintable[1023-index];
-;494:	case 2:
-;495:		return -sintable[index];
-;496:	case 3:
-;497:		return -sintable[1023-index];
-;498:	}
-;499:	return 0;
-;500:}
-;501:
+;351:
+;352:float sintable[1024] = {
+;353:0.000000,0.001534,0.003068,0.004602,0.006136,0.007670,0.009204,0.010738,
+;354:0.012272,0.013805,0.015339,0.016873,0.018407,0.019940,0.021474,0.023008,
+;355:0.024541,0.026075,0.027608,0.029142,0.030675,0.032208,0.033741,0.035274,
+;356:0.036807,0.038340,0.039873,0.041406,0.042938,0.044471,0.046003,0.047535,
+;357:0.049068,0.050600,0.052132,0.053664,0.055195,0.056727,0.058258,0.059790,
+;358:0.061321,0.062852,0.064383,0.065913,0.067444,0.068974,0.070505,0.072035,
+;359:0.073565,0.075094,0.076624,0.078153,0.079682,0.081211,0.082740,0.084269,
+;360:0.085797,0.087326,0.088854,0.090381,0.091909,0.093436,0.094963,0.096490,
+;361:0.098017,0.099544,0.101070,0.102596,0.104122,0.105647,0.107172,0.108697,
+;362:0.110222,0.111747,0.113271,0.114795,0.116319,0.117842,0.119365,0.120888,
+;363:0.122411,0.123933,0.125455,0.126977,0.128498,0.130019,0.131540,0.133061,
+;364:0.134581,0.136101,0.137620,0.139139,0.140658,0.142177,0.143695,0.145213,
+;365:0.146730,0.148248,0.149765,0.151281,0.152797,0.154313,0.155828,0.157343,
+;366:0.158858,0.160372,0.161886,0.163400,0.164913,0.166426,0.167938,0.169450,
+;367:0.170962,0.172473,0.173984,0.175494,0.177004,0.178514,0.180023,0.181532,
+;368:0.183040,0.184548,0.186055,0.187562,0.189069,0.190575,0.192080,0.193586,
+;369:0.195090,0.196595,0.198098,0.199602,0.201105,0.202607,0.204109,0.205610,
+;370:0.207111,0.208612,0.210112,0.211611,0.213110,0.214609,0.216107,0.217604,
+;371:0.219101,0.220598,0.222094,0.223589,0.225084,0.226578,0.228072,0.229565,
+;372:0.231058,0.232550,0.234042,0.235533,0.237024,0.238514,0.240003,0.241492,
+;373:0.242980,0.244468,0.245955,0.247442,0.248928,0.250413,0.251898,0.253382,
+;374:0.254866,0.256349,0.257831,0.259313,0.260794,0.262275,0.263755,0.265234,
+;375:0.266713,0.268191,0.269668,0.271145,0.272621,0.274097,0.275572,0.277046,
+;376:0.278520,0.279993,0.281465,0.282937,0.284408,0.285878,0.287347,0.288816,
+;377:0.290285,0.291752,0.293219,0.294685,0.296151,0.297616,0.299080,0.300543,
+;378:0.302006,0.303468,0.304929,0.306390,0.307850,0.309309,0.310767,0.312225,
+;379:0.313682,0.315138,0.316593,0.318048,0.319502,0.320955,0.322408,0.323859,
+;380:0.325310,0.326760,0.328210,0.329658,0.331106,0.332553,0.334000,0.335445,
+;381:0.336890,0.338334,0.339777,0.341219,0.342661,0.344101,0.345541,0.346980,
+;382:0.348419,0.349856,0.351293,0.352729,0.354164,0.355598,0.357031,0.358463,
+;383:0.359895,0.361326,0.362756,0.364185,0.365613,0.367040,0.368467,0.369892,
+;384:0.371317,0.372741,0.374164,0.375586,0.377007,0.378428,0.379847,0.381266,
+;385:0.382683,0.384100,0.385516,0.386931,0.388345,0.389758,0.391170,0.392582,
+;386:0.393992,0.395401,0.396810,0.398218,0.399624,0.401030,0.402435,0.403838,
+;387:0.405241,0.406643,0.408044,0.409444,0.410843,0.412241,0.413638,0.415034,
+;388:0.416430,0.417824,0.419217,0.420609,0.422000,0.423390,0.424780,0.426168,
+;389:0.427555,0.428941,0.430326,0.431711,0.433094,0.434476,0.435857,0.437237,
+;390:0.438616,0.439994,0.441371,0.442747,0.444122,0.445496,0.446869,0.448241,
+;391:0.449611,0.450981,0.452350,0.453717,0.455084,0.456449,0.457813,0.459177,
+;392:0.460539,0.461900,0.463260,0.464619,0.465976,0.467333,0.468689,0.470043,
+;393:0.471397,0.472749,0.474100,0.475450,0.476799,0.478147,0.479494,0.480839,
+;394:0.482184,0.483527,0.484869,0.486210,0.487550,0.488889,0.490226,0.491563,
+;395:0.492898,0.494232,0.495565,0.496897,0.498228,0.499557,0.500885,0.502212,
+;396:0.503538,0.504863,0.506187,0.507509,0.508830,0.510150,0.511469,0.512786,
+;397:0.514103,0.515418,0.516732,0.518045,0.519356,0.520666,0.521975,0.523283,
+;398:0.524590,0.525895,0.527199,0.528502,0.529804,0.531104,0.532403,0.533701,
+;399:0.534998,0.536293,0.537587,0.538880,0.540171,0.541462,0.542751,0.544039,
+;400:0.545325,0.546610,0.547894,0.549177,0.550458,0.551738,0.553017,0.554294,
+;401:0.555570,0.556845,0.558119,0.559391,0.560662,0.561931,0.563199,0.564466,
+;402:0.565732,0.566996,0.568259,0.569521,0.570781,0.572040,0.573297,0.574553,
+;403:0.575808,0.577062,0.578314,0.579565,0.580814,0.582062,0.583309,0.584554,
+;404:0.585798,0.587040,0.588282,0.589521,0.590760,0.591997,0.593232,0.594466,
+;405:0.595699,0.596931,0.598161,0.599389,0.600616,0.601842,0.603067,0.604290,
+;406:0.605511,0.606731,0.607950,0.609167,0.610383,0.611597,0.612810,0.614022,
+;407:0.615232,0.616440,0.617647,0.618853,0.620057,0.621260,0.622461,0.623661,
+;408:0.624859,0.626056,0.627252,0.628446,0.629638,0.630829,0.632019,0.633207,
+;409:0.634393,0.635578,0.636762,0.637944,0.639124,0.640303,0.641481,0.642657,
+;410:0.643832,0.645005,0.646176,0.647346,0.648514,0.649681,0.650847,0.652011,
+;411:0.653173,0.654334,0.655493,0.656651,0.657807,0.658961,0.660114,0.661266,
+;412:0.662416,0.663564,0.664711,0.665856,0.667000,0.668142,0.669283,0.670422,
+;413:0.671559,0.672695,0.673829,0.674962,0.676093,0.677222,0.678350,0.679476,
+;414:0.680601,0.681724,0.682846,0.683965,0.685084,0.686200,0.687315,0.688429,
+;415:0.689541,0.690651,0.691759,0.692866,0.693971,0.695075,0.696177,0.697278,
+;416:0.698376,0.699473,0.700569,0.701663,0.702755,0.703845,0.704934,0.706021,
+;417:0.707107,0.708191,0.709273,0.710353,0.711432,0.712509,0.713585,0.714659,
+;418:0.715731,0.716801,0.717870,0.718937,0.720003,0.721066,0.722128,0.723188,
+;419:0.724247,0.725304,0.726359,0.727413,0.728464,0.729514,0.730563,0.731609,
+;420:0.732654,0.733697,0.734739,0.735779,0.736817,0.737853,0.738887,0.739920,
+;421:0.740951,0.741980,0.743008,0.744034,0.745058,0.746080,0.747101,0.748119,
+;422:0.749136,0.750152,0.751165,0.752177,0.753187,0.754195,0.755201,0.756206,
+;423:0.757209,0.758210,0.759209,0.760207,0.761202,0.762196,0.763188,0.764179,
+;424:0.765167,0.766154,0.767139,0.768122,0.769103,0.770083,0.771061,0.772036,
+;425:0.773010,0.773983,0.774953,0.775922,0.776888,0.777853,0.778817,0.779778,
+;426:0.780737,0.781695,0.782651,0.783605,0.784557,0.785507,0.786455,0.787402,
+;427:0.788346,0.789289,0.790230,0.791169,0.792107,0.793042,0.793975,0.794907,
+;428:0.795837,0.796765,0.797691,0.798615,0.799537,0.800458,0.801376,0.802293,
+;429:0.803208,0.804120,0.805031,0.805940,0.806848,0.807753,0.808656,0.809558,
+;430:0.810457,0.811355,0.812251,0.813144,0.814036,0.814926,0.815814,0.816701,
+;431:0.817585,0.818467,0.819348,0.820226,0.821103,0.821977,0.822850,0.823721,
+;432:0.824589,0.825456,0.826321,0.827184,0.828045,0.828904,0.829761,0.830616,
+;433:0.831470,0.832321,0.833170,0.834018,0.834863,0.835706,0.836548,0.837387,
+;434:0.838225,0.839060,0.839894,0.840725,0.841555,0.842383,0.843208,0.844032,
+;435:0.844854,0.845673,0.846491,0.847307,0.848120,0.848932,0.849742,0.850549,
+;436:0.851355,0.852159,0.852961,0.853760,0.854558,0.855354,0.856147,0.856939,
+;437:0.857729,0.858516,0.859302,0.860085,0.860867,0.861646,0.862424,0.863199,
+;438:0.863973,0.864744,0.865514,0.866281,0.867046,0.867809,0.868571,0.869330,
+;439:0.870087,0.870842,0.871595,0.872346,0.873095,0.873842,0.874587,0.875329,
+;440:0.876070,0.876809,0.877545,0.878280,0.879012,0.879743,0.880471,0.881197,
+;441:0.881921,0.882643,0.883363,0.884081,0.884797,0.885511,0.886223,0.886932,
+;442:0.887640,0.888345,0.889048,0.889750,0.890449,0.891146,0.891841,0.892534,
+;443:0.893224,0.893913,0.894599,0.895284,0.895966,0.896646,0.897325,0.898001,
+;444:0.898674,0.899346,0.900016,0.900683,0.901349,0.902012,0.902673,0.903332,
+;445:0.903989,0.904644,0.905297,0.905947,0.906596,0.907242,0.907886,0.908528,
+;446:0.909168,0.909806,0.910441,0.911075,0.911706,0.912335,0.912962,0.913587,
+;447:0.914210,0.914830,0.915449,0.916065,0.916679,0.917291,0.917901,0.918508,
+;448:0.919114,0.919717,0.920318,0.920917,0.921514,0.922109,0.922701,0.923291,
+;449:0.923880,0.924465,0.925049,0.925631,0.926210,0.926787,0.927363,0.927935,
+;450:0.928506,0.929075,0.929641,0.930205,0.930767,0.931327,0.931884,0.932440,
+;451:0.932993,0.933544,0.934093,0.934639,0.935184,0.935726,0.936266,0.936803,
+;452:0.937339,0.937872,0.938404,0.938932,0.939459,0.939984,0.940506,0.941026,
+;453:0.941544,0.942060,0.942573,0.943084,0.943593,0.944100,0.944605,0.945107,
+;454:0.945607,0.946105,0.946601,0.947094,0.947586,0.948075,0.948561,0.949046,
+;455:0.949528,0.950008,0.950486,0.950962,0.951435,0.951906,0.952375,0.952842,
+;456:0.953306,0.953768,0.954228,0.954686,0.955141,0.955594,0.956045,0.956494,
+;457:0.956940,0.957385,0.957826,0.958266,0.958703,0.959139,0.959572,0.960002,
+;458:0.960431,0.960857,0.961280,0.961702,0.962121,0.962538,0.962953,0.963366,
+;459:0.963776,0.964184,0.964590,0.964993,0.965394,0.965793,0.966190,0.966584,
+;460:0.966976,0.967366,0.967754,0.968139,0.968522,0.968903,0.969281,0.969657,
+;461:0.970031,0.970403,0.970772,0.971139,0.971504,0.971866,0.972226,0.972584,
+;462:0.972940,0.973293,0.973644,0.973993,0.974339,0.974684,0.975025,0.975365,
+;463:0.975702,0.976037,0.976370,0.976700,0.977028,0.977354,0.977677,0.977999,
+;464:0.978317,0.978634,0.978948,0.979260,0.979570,0.979877,0.980182,0.980485,
+;465:0.980785,0.981083,0.981379,0.981673,0.981964,0.982253,0.982539,0.982824,
+;466:0.983105,0.983385,0.983662,0.983937,0.984210,0.984480,0.984749,0.985014,
+;467:0.985278,0.985539,0.985798,0.986054,0.986308,0.986560,0.986809,0.987057,
+;468:0.987301,0.987544,0.987784,0.988022,0.988258,0.988491,0.988722,0.988950,
+;469:0.989177,0.989400,0.989622,0.989841,0.990058,0.990273,0.990485,0.990695,
+;470:0.990903,0.991108,0.991311,0.991511,0.991710,0.991906,0.992099,0.992291,
+;471:0.992480,0.992666,0.992850,0.993032,0.993212,0.993389,0.993564,0.993737,
+;472:0.993907,0.994075,0.994240,0.994404,0.994565,0.994723,0.994879,0.995033,
+;473:0.995185,0.995334,0.995481,0.995625,0.995767,0.995907,0.996045,0.996180,
+;474:0.996313,0.996443,0.996571,0.996697,0.996820,0.996941,0.997060,0.997176,
+;475:0.997290,0.997402,0.997511,0.997618,0.997723,0.997825,0.997925,0.998023,
+;476:0.998118,0.998211,0.998302,0.998390,0.998476,0.998559,0.998640,0.998719,
+;477:0.998795,0.998870,0.998941,0.999011,0.999078,0.999142,0.999205,0.999265,
+;478:0.999322,0.999378,0.999431,0.999481,0.999529,0.999575,0.999619,0.999660,
+;479:0.999699,0.999735,0.999769,0.999801,0.999831,0.999858,0.999882,0.999905,
+;480:0.999925,0.999942,0.999958,0.999971,0.999981,0.999989,0.999995,0.999999
+;481:};
+;482:
+;483:double sin( double x ) {
+;484:	int	index;
+;485:	int	quad;
+;486:
+;487:	index = 1024 * x / (M_PI * 0.5);
+;488:	quad = ( index >> 10 ) & 3;
+;489:	index &= 1023;
+;490:	switch ( quad ) {
+;491:	case 0:
+;492:		return sintable[index];
+;493:	case 1:
+;494:		return sintable[1023-index];
+;495:	case 2:
+;496:		return -sintable[index];
+;497:	case 3:
+;498:		return -sintable[1023-index];
+;499:	}
+;500:	return 0;
+;501:}
 ;502:
-;503:double cos( double x ) {
-;504:	int	index;
-;505:	int	quad;
-;506:
+;503:
+;504:double cos( double x ) {
+;505:	int	index;
+;506:	int	quad;
 ;507:	index = 1024 * x / (M_PI * 0.5);
 ;508:	quad = ( index >> 10 ) & 3;
 ;509:	index &= 1023;
@@ -3923,160 +3923,131 @@ INDIRI4
 RETI4
 LABELV $308
 endproc abs 4 0
-export fabs
-proc fabs 4 0
-line 1004
-;1002:}
-;1003:
-;1004:double fabs( double x ) {
-line 1005
-;1005:	return x < 0 ? -x : x;
-ADDRFP4 0
-INDIRF4
-CNSTF4 0
-GEF4 $314
-ADDRLP4 0
-ADDRFP4 0
-INDIRF4
-NEGF4
-ASGNF4
-ADDRGP4 $315
-JUMPV
-LABELV $314
-ADDRLP4 0
-ADDRFP4 0
-INDIRF4
-ASGNF4
-LABELV $315
-ADDRLP4 0
-INDIRF4
-RETF4
-LABELV $312
-endproc fabs 4 0
 export powf
 proc powf 8 4
-line 1124
-;1006:}
-;1007:
-;1008:// NOTE: frexpf moved to shared math shims below when building as VM; keep single definition.
-;1009:/*
-;1010:static const float expftable[192] = {
-;1011:	1.401298464e-45f, 5.605193857e-45f, 1.401298464e-44f, 3.783505854e-44f,
-;1012:	1.008934894e-43f, 2.746544990e-43f, 7.468920815e-43f, 2.030481475e-42f,
-;1013:	5.521115949e-42f, 1.500790655e-41f, 4.079600219e-41f, 1.108945566e-40f,
-;1014:	3.014403192e-40f, 8.194008692e-40f, 2.227363909e-39f, 6.054601485e-39f,
-;1015:	1.645811454e-38f, 4.473779311e-38f, 1.216099272e-37f, 3.305700520e-37f,
-;1016:	8.985826178e-37f, 2.442600708e-36f, 6.639676956e-36f, 1.804851329e-35f,
-;1017:	4.906094995e-35f, 1.333614871e-34f, 3.625141008e-34f, 9.854154449e-34f,
-;1018:	2.678636997e-33f, 7.281290454e-33f, 1.979259919e-32f, 5.380185922e-32f,
-;1019:	1.462486242e-31f, 3.975449954e-31f, 1.080639292e-30f, 2.937482142e-30f,
-;1020:	7.984904045e-30f, 2.170521994e-29f, 5.900090598e-29f, 1.603810939e-28f,
-;1021:	4.359610133e-28f, 1.185064850e-27f, 3.221340277e-27f, 8.756510893e-27f,
-;1022:	2.380266371e-26f, 6.470234679e-26f, 1.758792259e-25f, 4.780892995e-25f,
-;1023:	1.299581387e-24f, 3.532628391e-24f, 9.602679948e-24f, 2.610279046e-23f,
-;1024:	7.095474414e-23f, 1.928749893e-22f, 5.242885696e-22f, 1.425164038e-21f,
-;1025:	3.873997809e-21f, 1.053061747e-20f, 2.862518610e-20f, 7.781132280e-20f,
-;1026:	2.115131070e-19f, 5.749522024e-19f, 1.562882184e-18f, 4.248354131e-18f,
-;1027:	1.154822386e-17f, 3.139132888e-17f, 8.533047630e-17f, 2.319522699e-16f,
-;1028:	6.305116854e-16f, 1.713908382e-15f, 4.658886192e-15f, 1.266416578e-14f,
-;1029:	3.442477084e-14f, 9.357622912e-14f, 2.543665690e-13f, 6.914400151e-13f,
-;1030:	1.879528868e-12f, 5.109088933e-12f, 1.388794375e-11f, 3.775134372e-11f,
-;1031:	1.026187954e-10f, 2.789468101e-10f, 7.582560690e-10f, 2.061153692e-09f,
-;1032:	5.602796449e-09f, 1.522997906e-08f, 4.139937815e-08f, 1.125351758e-07f,
-;1033:	3.059023186e-07f, 8.315287232e-07f, 2.260329438e-06f, 6.144212421e-06f,
-;1034:	1.670170059e-05f, 4.539993097e-05f, 1.234098017e-04f, 3.354626242e-04f,
-;1035:	9.118819726e-04f, 2.478752285e-03f, 6.737946998e-03f, 1.831563935e-02f,
-;1036:	4.978706688e-02f, 1.353352815e-01f, 3.678794503e-01f, 1.000000000e+00f,
-;1037:	2.718281746e+00f, 7.389056206e+00f, 2.008553696e+01f, 5.459814835e+01f,
-;1038:	1.484131622e+02f, 4.034288025e+02f, 1.096633179e+03f, 2.980958008e+03f,
-;1039:	8.103083984e+03f, 2.202646484e+04f, 5.987414062e+04f, 1.627547969e+05f,
-;1040:	4.424134062e+05f, 1.202604250e+06f, 3.269017250e+06f, 8.886111000e+06f,
-;1041:	2.415495200e+07f, 6.565996800e+07f, 1.784823040e+08f, 4.851651840e+08f,
-;1042:	1.318815744e+09f, 3.584912896e+09f, 9.744803840e+09f, 2.648912282e+10f,
-;1043:	7.200490291e+10f, 1.957296046e+11f, 5.320482488e+11f, 1.446257099e+12f,
-;1044:	3.931334246e+12f, 1.068647422e+13f, 2.904884983e+13f, 7.896295696e+13f,
-;1045:	2.146435743e+14f, 5.834617106e+14f, 1.586013445e+15f, 4.311231532e+15f,
-;1046:	1.171914254e+16f, 3.185593135e+16f, 8.659340405e+16f, 2.353852703e+17f,
-;1047:	6.398434745e+17f, 1.739274975e+18f, 4.727839526e+18f, 1.285159988e+19f,
-;1048:	3.493427058e+19f, 9.496119530e+19f, 2.581312893e+20f, 7.016735587e+20f,
-;1049:	1.907346641e+21f, 5.184705458e+21f, 1.409349036e+22f, 3.831008190e+22f,
-;1050:	1.041375899e+23f, 2.830753218e+23f, 7.694785471e+23f, 2.091659449e+24f,
-;1051:	5.685720022e+24f, 1.545538893e+25f, 4.201210453e+25f, 1.142007396e+26f,
-;1052:	3.104297783e+26f, 8.438356823e+26f, 2.293783118e+27f, 6.235148842e+27f,
-;1053:	1.694889207e+28f, 4.607186548e+28f, 1.252363185e+29f, 3.404276173e+29f,
-;1054:	9.253781621e+29f, 2.515438700e+30f, 6.837671138e+30f, 1.858671706e+31f,
-;1055:	5.052393560e+31f, 1.373382962e+32f, 3.733241850e+32f, 1.014800419e+33f,
-;1056:	2.758513550e+33f, 7.498416982e+33f, 2.038281025e+34f, 5.540622485e+34f,
-;1057:	1.506097362e+35f, 4.093996852e+35f, 1.112863728e+36f, 3.025077342e+36f,
-;1058:	8.223013027e+36f, 2.235246529e+37f, 6.076030347e+37f, 1.651636266e+38f
-;1059:};
-;1060:
-;1061:float expf( float x )
-;1062:{
-;1063:    float		fracX;
-;1064:    float		result;
-;1065:	float		sum;
-;1066:	int			i;
-;1067:
-;1068:	if (x >= 0.0f) {
-;1069:		if (x >= 1.0f) {
-;1070:			int intX = x;
-;1071:			if (intX >= 89) {
-;1072:				// errno = ERANGE;
-;1073:				return HUGE_VALF;
-;1074:			}
-;1075:			result = expftable[intX + 103];
-;1076:			fracX = x - intX;
-;1077:		} else {
-;1078:			result = 1.0f;
-;1079:			fracX = x;
-;1080:		}
-;1081:	} else { // x < 0.0f
-;1082:		if (x <= -1.0f) {
-;1083:			int intX = x;
-;1084:			if (intX < -103) {
-;1085:				// errno = ERANGE;
-;1086:				return 0.0f;
-;1087:			}
-;1088:			result = expftable[intX + 103];
-;1089:			fracX = x - intX;
-;1090:		} else {
-;1091:			result = 1.0f;
-;1092:			fracX = x;
-;1093:		}
-;1094:	}
-;1095:
-;1096:	// 11 was found experimentally, gives 1 ULP error in [0, 1] range
-;1097:
-;1098:	
-;1099:	//sum = 1.0f;
-;1100:	//float power = 1.0f;
-;1101:	//for (i = 1; i < 12; i++) {
-;1102:	//	power *= fracX / i;
-;1103:	//	sum += power;
-;1104:	//}
-;1105:	
-;1106:
-;1107:	// optimization: Horner's scheme for computing Taylor series
-;1108:
-;1109:	sum = 0.0f;
+line 1121
+;1002:}
+;1003:/* fabs already defined earlier in file; do not redefine here for non-VM builds */
+;1004:
+;1005:// NOTE: frexpf moved to shared math shims below when building as VM; keep single definition.
+;1006:/*
+;1007:static const float expftable[192] = {
+;1008:	1.401298464e-45f, 5.605193857e-45f, 1.401298464e-44f, 3.783505854e-44f,
+;1009:	1.008934894e-43f, 2.746544990e-43f, 7.468920815e-43f, 2.030481475e-42f,
+;1010:	5.521115949e-42f, 1.500790655e-41f, 4.079600219e-41f, 1.108945566e-40f,
+;1011:	3.014403192e-40f, 8.194008692e-40f, 2.227363909e-39f, 6.054601485e-39f,
+;1012:	1.645811454e-38f, 4.473779311e-38f, 1.216099272e-37f, 3.305700520e-37f,
+;1013:	8.985826178e-37f, 2.442600708e-36f, 6.639676956e-36f, 1.804851329e-35f,
+;1014:	4.906094995e-35f, 1.333614871e-34f, 3.625141008e-34f, 9.854154449e-34f,
+;1015:	2.678636997e-33f, 7.281290454e-33f, 1.979259919e-32f, 5.380185922e-32f,
+;1016:	1.462486242e-31f, 3.975449954e-31f, 1.080639292e-30f, 2.937482142e-30f,
+;1017:	7.984904045e-30f, 2.170521994e-29f, 5.900090598e-29f, 1.603810939e-28f,
+;1018:	4.359610133e-28f, 1.185064850e-27f, 3.221340277e-27f, 8.756510893e-27f,
+;1019:	2.380266371e-26f, 6.470234679e-26f, 1.758792259e-25f, 4.780892995e-25f,
+;1020:	1.299581387e-24f, 3.532628391e-24f, 9.602679948e-24f, 2.610279046e-23f,
+;1021:	7.095474414e-23f, 1.928749893e-22f, 5.242885696e-22f, 1.425164038e-21f,
+;1022:	3.873997809e-21f, 1.053061747e-20f, 2.862518610e-20f, 7.781132280e-20f,
+;1023:	2.115131070e-19f, 5.749522024e-19f, 1.562882184e-18f, 4.248354131e-18f,
+;1024:	1.154822386e-17f, 3.139132888e-17f, 8.533047630e-17f, 2.319522699e-16f,
+;1025:	6.305116854e-16f, 1.713908382e-15f, 4.658886192e-15f, 1.266416578e-14f,
+;1026:	3.442477084e-14f, 9.357622912e-14f, 2.543665690e-13f, 6.914400151e-13f,
+;1027:	1.879528868e-12f, 5.109088933e-12f, 1.388794375e-11f, 3.775134372e-11f,
+;1028:	1.026187954e-10f, 2.789468101e-10f, 7.582560690e-10f, 2.061153692e-09f,
+;1029:	5.602796449e-09f, 1.522997906e-08f, 4.139937815e-08f, 1.125351758e-07f,
+;1030:	3.059023186e-07f, 8.315287232e-07f, 2.260329438e-06f, 6.144212421e-06f,
+;1031:	1.670170059e-05f, 4.539993097e-05f, 1.234098017e-04f, 3.354626242e-04f,
+;1032:	9.118819726e-04f, 2.478752285e-03f, 6.737946998e-03f, 1.831563935e-02f,
+;1033:	4.978706688e-02f, 1.353352815e-01f, 3.678794503e-01f, 1.000000000e+00f,
+;1034:	2.718281746e+00f, 7.389056206e+00f, 2.008553696e+01f, 5.459814835e+01f,
+;1035:	1.484131622e+02f, 4.034288025e+02f, 1.096633179e+03f, 2.980958008e+03f,
+;1036:	8.103083984e+03f, 2.202646484e+04f, 5.987414062e+04f, 1.627547969e+05f,
+;1037:	4.424134062e+05f, 1.202604250e+06f, 3.269017250e+06f, 8.886111000e+06f,
+;1038:	2.415495200e+07f, 6.565996800e+07f, 1.784823040e+08f, 4.851651840e+08f,
+;1039:	1.318815744e+09f, 3.584912896e+09f, 9.744803840e+09f, 2.648912282e+10f,
+;1040:	7.200490291e+10f, 1.957296046e+11f, 5.320482488e+11f, 1.446257099e+12f,
+;1041:	3.931334246e+12f, 1.068647422e+13f, 2.904884983e+13f, 7.896295696e+13f,
+;1042:	2.146435743e+14f, 5.834617106e+14f, 1.586013445e+15f, 4.311231532e+15f,
+;1043:	1.171914254e+16f, 3.185593135e+16f, 8.659340405e+16f, 2.353852703e+17f,
+;1044:	6.398434745e+17f, 1.739274975e+18f, 4.727839526e+18f, 1.285159988e+19f,
+;1045:	3.493427058e+19f, 9.496119530e+19f, 2.581312893e+20f, 7.016735587e+20f,
+;1046:	1.907346641e+21f, 5.184705458e+21f, 1.409349036e+22f, 3.831008190e+22f,
+;1047:	1.041375899e+23f, 2.830753218e+23f, 7.694785471e+23f, 2.091659449e+24f,
+;1048:	5.685720022e+24f, 1.545538893e+25f, 4.201210453e+25f, 1.142007396e+26f,
+;1049:	3.104297783e+26f, 8.438356823e+26f, 2.293783118e+27f, 6.235148842e+27f,
+;1050:	1.694889207e+28f, 4.607186548e+28f, 1.252363185e+29f, 3.404276173e+29f,
+;1051:	9.253781621e+29f, 2.515438700e+30f, 6.837671138e+30f, 1.858671706e+31f,
+;1052:	5.052393560e+31f, 1.373382962e+32f, 3.733241850e+32f, 1.014800419e+33f,
+;1053:	2.758513550e+33f, 7.498416982e+33f, 2.038281025e+34f, 5.540622485e+34f,
+;1054:	1.506097362e+35f, 4.093996852e+35f, 1.112863728e+36f, 3.025077342e+36f,
+;1055:	8.223013027e+36f, 2.235246529e+37f, 6.076030347e+37f, 1.651636266e+38f
+;1056:};
+;1057:
+;1058:float expf( float x )
+;1059:{
+;1060:    float		fracX;
+;1061:    float		result;
+;1062:	float		sum;
+;1063:	int			i;
+;1064:
+;1065:	if (x >= 0.0f) {
+;1066:		if (x >= 1.0f) {
+;1067:			int intX = x;
+;1068:			if (intX >= 89) {
+;1069:				// errno = ERANGE;
+;1070:				return HUGE_VALF;
+;1071:			}
+;1072:			result = expftable[intX + 103];
+;1073:			fracX = x - intX;
+;1074:		} else {
+;1075:			result = 1.0f;
+;1076:			fracX = x;
+;1077:		}
+;1078:	} else { // x < 0.0f
+;1079:		if (x <= -1.0f) {
+;1080:			int intX = x;
+;1081:			if (intX < -103) {
+;1082:				// errno = ERANGE;
+;1083:				return 0.0f;
+;1084:			}
+;1085:			result = expftable[intX + 103];
+;1086:			fracX = x - intX;
+;1087:		} else {
+;1088:			result = 1.0f;
+;1089:			fracX = x;
+;1090:		}
+;1091:	}
+;1092:
+;1093:	// 11 was found experimentally, gives 1 ULP error in [0, 1] range
+;1094:
+;1095:	
+;1096:	//sum = 1.0f;
+;1097:	//float power = 1.0f;
+;1098:	//for (i = 1; i < 12; i++) {
+;1099:	//	power *= fracX / i;
+;1100:	//	sum += power;
+;1101:	//}
+;1102:	
+;1103:
+;1104:	// optimization: Horner's scheme for computing Taylor series
+;1105:
+;1106:	sum = 0.0f;
+;1107:
+;1108:	for (i = 11; i > 0; i--)
+;1109:		sum = 1.0f + fracX * sum / i;
 ;1110:
-;1111:	for (i = 11; i > 0; i--)
-;1112:		sum = 1.0f + fracX * sum / i;
-;1113:
-;1114:    // result has 1 ULP accuracy too
-;1115:
-;1116:    result *= sum;
-;1117:
-;1118:    return result;
-;1119:}
-;1120:*/
-;1121:
-;1122:
-;1123:float powf( float x, float y )
-;1124:{
-line 1125
-;1125:	return expf(logf(x) * y);
+;1111:    // result has 1 ULP accuracy too
+;1112:
+;1113:    result *= sum;
+;1114:
+;1115:    return result;
+;1116:}
+;1117:*/
+;1118:
+;1119:
+;1120:float powf( float x, float y )
+;1121:{
+line 1122
+;1122:	return expf(logf(x) * y);
 ADDRFP4 0
 INDIRF4
 ARGF4
@@ -4097,412 +4068,219 @@ ASGNF4
 ADDRLP4 4
 INDIRF4
 RETF4
-LABELV $316
+LABELV $312
 endproc powf 8 4
-proc AddInt 60 0
-line 1147
-;1126:}
+proc AddInt 56 0
+line 1144
+;1123:}
+;1124:
+;1125://=========================================================
+;1126:
 ;1127:
-;1128://=========================================================
-;1129:
-;1130:
-;1131:#define ALT			0x00000001		/* alternate form */
-;1132:#define HEXPREFIX	0x00000002		/* add 0x or 0X prefix */
-;1133:#define LADJUST		0x00000004		/* left adjustment */
-;1134:#define LONGDBL		0x00000008		/* long double */
-;1135:#define LONGINT		0x00000010		/* long integer */
-;1136:#define QUADINT		0x00000020		/* quad integer */
-;1137:#define SHORTINT	0x00000040		/* short integer */
-;1138:#define ZEROPAD		0x00000080		/* zero (as opposed to blank) pad */
-;1139:#define FPT			0x00000100		/* floating point number */
-;1140:#define SIGN		0x00000200		/* always print +/- sign */
-;1141:
-;1142:#define to_digit(c)		((c) - '0')
-;1143:#define is_digit(c)		((unsigned)to_digit(c) <= 9)
-;1144:#define to_char(n)		((n) + '0')
-;1145:
-;1146:
-;1147:static void AddInt( char **buf_p, char * const buf_end, int val, int width, int flags ) {
+;1128:#define ALT			0x00000001		/* alternate form */
+;1129:#define HEXPREFIX	0x00000002		/* add 0x or 0X prefix */
+;1130:#define LADJUST		0x00000004		/* left adjustment */
+;1131:#define LONGDBL		0x00000008		/* long double */
+;1132:#define LONGINT		0x00000010		/* long integer */
+;1133:#define QUADINT		0x00000020		/* quad integer */
+;1134:#define SHORTINT	0x00000040		/* short integer */
+;1135:#define ZEROPAD		0x00000080		/* zero (as opposed to blank) pad */
+;1136:#define FPT			0x00000100		/* floating point number */
+;1137:#define SIGN		0x00000200		/* always print +/- sign */
+;1138:
+;1139:#define to_digit(c)		((c) - '0')
+;1140:#define is_digit(c)		((unsigned)to_digit(c) <= 9)
+;1141:#define to_char(n)		((n) + '0')
+;1142:
+;1143:
+;1144:static void AddInt( char **buf_p, char * const buf_end, int val, int width, int flags ) {
+ADDRGP4 $315
+JUMPV
+LABELV $314
+line 1152
+;1145:	char	text[32];
+;1146:	int		digits;
+;1147:	int		sign;
+;1148:	int		div;
+;1149:	char	*buf;
+;1150:	/* Removed duplicate fabs/frexpf block (handled earlier) */
+;1151:
+;1152:	while ( digits-- ) {
+line 1153
+;1153:		if ( buf < buf_end ) {
+ADDRLP4 0
+INDIRP4
+CVPU4 4
+ADDRFP4 4
+INDIRP4
+CVPU4 4
+GEU4 $317
 line 1154
-;1148:	char	text[32];
-;1149:	int		digits;
-;1150:	int		sign;
-;1151:	int		div;
-;1152:	char	*buf;
-;1153:
-;1154:	digits = 0;
+;1154:			*buf = text[digits];
+ADDRLP4 0
+INDIRP4
 ADDRLP4 4
-CNSTI4 0
-ASGNI4
-line 1155
-;1155:	sign = ( val >= 0 ) ? 1 : -1;
-ADDRFP4 8
 INDIRI4
-CNSTI4 0
-LTI4 $319
-ADDRLP4 48
-CNSTI4 1
-ASGNI4
-ADDRGP4 $320
-JUMPV
-LABELV $319
-ADDRLP4 48
-CNSTI4 -1
-ASGNI4
-LABELV $320
-ADDRLP4 44
-ADDRLP4 48
-INDIRI4
-ASGNI4
-LABELV $321
-line 1157
-;1156:
-;1157:	do {
-line 1158
-;1158:		div = val / 10;
 ADDRLP4 8
-ADDRFP4 8
-INDIRI4
-CNSTI4 10
-DIVI4
-ASGNI4
-line 1159
-;1159:		text[digits++] = '0' + sign * (val - div * 10);
-ADDRLP4 52
-ADDRLP4 4
-INDIRI4
-ASGNI4
-ADDRLP4 4
-ADDRLP4 52
-INDIRI4
-CNSTI4 1
-ADDI4
-ASGNI4
-ADDRLP4 52
-INDIRI4
-ADDRLP4 12
-ADDP4
-ADDRLP4 44
-INDIRI4
-ADDRFP4 8
-INDIRI4
-CNSTI4 10
-ADDRLP4 8
-INDIRI4
-MULI4
-SUBI4
-MULI4
-CNSTI4 48
-ADDI4
-CVII1 4
-ASGNI1
-line 1160
-;1160:		val = div;
-ADDRFP4 8
-ADDRLP4 8
-INDIRI4
-ASGNI4
-line 1161
-;1161:	} while ( val );
-LABELV $322
-ADDRFP4 8
-INDIRI4
-CNSTI4 0
-NEI4 $321
-line 1163
-;1162:
-;1163:	if ( sign < 0 ) {
-ADDRLP4 44
-INDIRI4
-CNSTI4 0
-GEI4 $324
-line 1164
-;1164:		text[digits++] = '-';
-ADDRLP4 52
-ADDRLP4 4
-INDIRI4
-ASGNI4
-ADDRLP4 4
-ADDRLP4 52
-INDIRI4
-CNSTI4 1
-ADDI4
-ASGNI4
-ADDRLP4 52
-INDIRI4
-ADDRLP4 12
-ADDP4
-CNSTI1 45
-ASGNI1
-line 1165
-;1165:	}
-LABELV $324
-line 1167
-;1166:
-;1167:	buf = *buf_p;
-ADDRLP4 0
-ADDRFP4 0
-INDIRP4
-INDIRP4
-ASGNP4
-line 1169
-;1168:
-;1169:	if( !( flags & LADJUST ) ) {
-ADDRFP4 16
-INDIRI4
-CNSTI4 4
-BANDI4
-CNSTI4 0
-NEI4 $337
-ADDRGP4 $329
-JUMPV
-LABELV $328
-line 1170
-;1170:		while ( digits < width ) {
-line 1171
-;1171:			if ( buf < buf_end ) {
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-ADDRFP4 4
-INDIRP4
-CVPU4 4
-GEU4 $331
-line 1172
-;1172:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
-ADDRFP4 16
-INDIRI4
-CNSTI4 128
-BANDI4
-CNSTI4 0
-EQI4 $334
-ADDRLP4 52
-CNSTI4 48
-ASGNI4
-ADDRGP4 $335
-JUMPV
-LABELV $334
-ADDRLP4 52
-CNSTI4 32
-ASGNI4
-LABELV $335
-ADDRLP4 0
-INDIRP4
-ADDRLP4 52
-INDIRI4
-CVII1 4
-ASGNI1
-line 1173
-;1173:			}
-LABELV $331
-line 1174
-;1174:			buf++;
-ADDRLP4 0
-ADDRLP4 0
-INDIRP4
-CNSTI4 1
-ADDP4
-ASGNP4
-line 1175
-;1175:			width--;
-ADDRFP4 12
-ADDRFP4 12
-INDIRI4
-CNSTI4 1
-SUBI4
-ASGNI4
-line 1176
-;1176:		}
-LABELV $329
-line 1170
-ADDRLP4 4
-INDIRI4
-ADDRFP4 12
-INDIRI4
-LTI4 $328
-line 1177
-;1177:	}
-ADDRGP4 $337
-JUMPV
-LABELV $336
-line 1179
-;1178:
-;1179:	while ( digits-- ) {
-line 1180
-;1180:		if ( buf < buf_end ) {
-ADDRLP4 0
-INDIRP4
-CVPU4 4
-ADDRFP4 4
-INDIRP4
-CVPU4 4
-GEU4 $339
-line 1181
-;1181:			*buf = text[digits];
-ADDRLP4 0
-INDIRP4
-ADDRLP4 4
-INDIRI4
-ADDRLP4 12
 ADDP4
 INDIRI1
 ASGNI1
-line 1182
-;1182:		}
-LABELV $339
-line 1183
-;1183:		buf++;
+line 1155
+;1155:		}
+LABELV $317
+line 1156
+;1156:		buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1184
-;1184:		width--;
+line 1157
+;1157:		width--;
 ADDRFP4 12
 ADDRFP4 12
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-line 1185
-;1185:	}
-LABELV $337
-line 1179
-ADDRLP4 52
+line 1158
+;1158:	}
+LABELV $315
+line 1152
+ADDRLP4 48
 ADDRLP4 4
 INDIRI4
 ASGNI4
 ADDRLP4 4
-ADDRLP4 52
+ADDRLP4 48
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-ADDRLP4 52
+ADDRLP4 48
 INDIRI4
 CNSTI4 0
-NEI4 $336
-line 1187
-;1186:
-;1187:	if( flags & LADJUST ) {
+NEI4 $314
+line 1160
+;1159:
+;1160:	if( flags & LADJUST ) {
 ADDRFP4 16
 INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-EQI4 $341
-ADDRGP4 $344
+EQI4 $319
+ADDRGP4 $322
 JUMPV
-LABELV $343
-line 1188
-;1188:		while ( width-- ) {
-line 1189
-;1189:			if ( buf < buf_end ) {
+LABELV $321
+line 1161
+;1161:		while ( width-- ) {
+line 1162
+;1162:			if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $346
-line 1190
-;1190:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
+GEU4 $324
+line 1163
+;1163:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
 ADDRFP4 16
 INDIRI4
 CNSTI4 128
 BANDI4
 CNSTI4 0
-EQI4 $349
-ADDRLP4 56
+EQI4 $327
+ADDRLP4 52
 CNSTI4 48
 ASGNI4
-ADDRGP4 $350
+ADDRGP4 $328
 JUMPV
-LABELV $349
-ADDRLP4 56
+LABELV $327
+ADDRLP4 52
 CNSTI4 32
 ASGNI4
-LABELV $350
+LABELV $328
 ADDRLP4 0
 INDIRP4
-ADDRLP4 56
+ADDRLP4 52
 INDIRI4
 CVII1 4
 ASGNI1
-line 1191
-;1191:			}
-LABELV $346
-line 1192
-;1192:			buf++;
+line 1164
+;1164:			}
+LABELV $324
+line 1165
+;1165:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1193
-;1193:		}
-LABELV $344
-line 1188
-ADDRLP4 56
+line 1166
+;1166:		}
+LABELV $322
+line 1161
+ADDRLP4 52
 ADDRFP4 12
 INDIRI4
 ASGNI4
 ADDRFP4 12
-ADDRLP4 56
+ADDRLP4 52
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-ADDRLP4 56
+ADDRLP4 52
 INDIRI4
 CNSTI4 0
-NEI4 $343
-line 1194
-;1194:	}
-LABELV $341
-line 1196
-;1195:
-;1196:	*buf_p = buf;
+NEI4 $321
+line 1167
+;1167:	}
+LABELV $319
+line 1169
+;1168:
+;1169:	*buf_p = buf;
 ADDRFP4 0
 INDIRP4
 ADDRLP4 0
 INDIRP4
 ASGNP4
-line 1197
-;1197:}
-LABELV $317
-endproc AddInt 60 0
+line 1170
+;1170:}
+LABELV $313
+endproc AddInt 56 0
 proc AddUInt 52 0
-line 1199
-;1198:
-;1199:static void AddUInt( char **buf_p, char * const buf_end, unsigned int val, int width, int flags ) {
-line 1205
-;1200:	char	text[32];
-;1201:	int		digits;
-;1202:	unsigned int		div;
-;1203:	char	*buf;
-;1204:
-;1205:	digits = 0;
+line 1172
+;1171:
+;1172:static void AddUInt( char **buf_p, char * const buf_end, unsigned int val, int width, int flags ) {
+line 1178
+;1173:	char	text[32];
+;1174:	int		digits;
+;1175:	unsigned int		div;
+;1176:	char	*buf;
+;1177:
+;1178:	digits = 0;
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-LABELV $352
-line 1207
-;1206:
-;1207:	do {
-line 1208
-;1208:		div = val / 10;
+LABELV $330
+line 1180
+;1179:
+;1180:	do {
+line 1181
+;1181:		div = val / 10;
 ADDRLP4 8
 ADDRFP4 8
 INDIRU4
 CNSTU4 10
 DIVU4
 ASGNU4
-line 1209
-;1209:		text[digits++] = '0' + (val - div * 10);
+line 1182
+;1182:		text[digits++] = '0' + (val - div * 10);
 ADDRLP4 44
 ADDRLP4 4
 INDIRI4
@@ -4529,122 +4307,122 @@ ADDU4
 CVUI4 4
 CVII1 4
 ASGNI1
-line 1210
-;1210:		val = div;
+line 1183
+;1183:		val = div;
 ADDRFP4 8
 ADDRLP4 8
 INDIRU4
 ASGNU4
-line 1211
-;1211:	} while ( val );
-LABELV $353
+line 1184
+;1184:	} while ( val );
+LABELV $331
 ADDRFP4 8
 INDIRU4
 CNSTU4 0
-NEU4 $352
-line 1214
-;1212:
-;1213:
-;1214:	buf = *buf_p;
+NEU4 $330
+line 1187
+;1185:
+;1186:
+;1187:	buf = *buf_p;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 INDIRP4
 ASGNP4
-line 1216
-;1215:
-;1216:	if( !( flags & LADJUST ) ) {
+line 1189
+;1188:
+;1189:	if( !( flags & LADJUST ) ) {
 ADDRFP4 16
 INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-NEI4 $366
-ADDRGP4 $358
+NEI4 $344
+ADDRGP4 $336
 JUMPV
-LABELV $357
-line 1217
-;1217:		while ( digits < width ) {
-line 1218
-;1218:			if ( buf < buf_end ) {
+LABELV $335
+line 1190
+;1190:		while ( digits < width ) {
+line 1191
+;1191:			if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $360
-line 1219
-;1219:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
+GEU4 $338
+line 1192
+;1192:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
 ADDRFP4 16
 INDIRI4
 CNSTI4 128
 BANDI4
 CNSTI4 0
-EQI4 $363
+EQI4 $341
 ADDRLP4 44
 CNSTI4 48
 ASGNI4
-ADDRGP4 $364
+ADDRGP4 $342
 JUMPV
-LABELV $363
+LABELV $341
 ADDRLP4 44
 CNSTI4 32
 ASGNI4
-LABELV $364
+LABELV $342
 ADDRLP4 0
 INDIRP4
 ADDRLP4 44
 INDIRI4
 CVII1 4
 ASGNI1
-line 1220
-;1220:			}
-LABELV $360
-line 1221
-;1221:			buf++;
+line 1193
+;1193:			}
+LABELV $338
+line 1194
+;1194:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1222
-;1222:			width--;
+line 1195
+;1195:			width--;
 ADDRFP4 12
 ADDRFP4 12
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-line 1223
-;1223:		}
-LABELV $358
-line 1217
+line 1196
+;1196:		}
+LABELV $336
+line 1190
 ADDRLP4 4
 INDIRI4
 ADDRFP4 12
 INDIRI4
-LTI4 $357
-line 1224
-;1224:	}
-ADDRGP4 $366
+LTI4 $335
+line 1197
+;1197:	}
+ADDRGP4 $344
 JUMPV
-LABELV $365
-line 1226
-;1225:
-;1226:	while ( digits-- ) {
-line 1227
-;1227:		if ( buf < buf_end ) {
+LABELV $343
+line 1199
+;1198:
+;1199:	while ( digits-- ) {
+line 1200
+;1200:		if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $368
-line 1228
-;1228:			*buf = text[digits];
+GEU4 $346
+line 1201
+;1201:			*buf = text[digits];
 ADDRLP4 0
 INDIRP4
 ADDRLP4 4
@@ -4653,29 +4431,29 @@ ADDRLP4 12
 ADDP4
 INDIRI1
 ASGNI1
-line 1229
-;1229:		}
-LABELV $368
-line 1230
-;1230:		buf++;
+line 1202
+;1202:		}
+LABELV $346
+line 1203
+;1203:		buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1231
-;1231:		width--;
+line 1204
+;1204:		width--;
 ADDRFP4 12
 ADDRFP4 12
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-line 1232
-;1232:	}
-LABELV $366
-line 1226
+line 1205
+;1205:	}
+LABELV $344
+line 1199
 ADDRLP4 44
 ADDRLP4 4
 INDIRI4
@@ -4689,69 +4467,69 @@ ASGNI4
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-NEI4 $365
-line 1234
-;1233:
-;1234:	if( flags & LADJUST ) {
+NEI4 $343
+line 1207
+;1206:
+;1207:	if( flags & LADJUST ) {
 ADDRFP4 16
 INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-EQI4 $370
-ADDRGP4 $373
+EQI4 $348
+ADDRGP4 $351
 JUMPV
-LABELV $372
-line 1235
-;1235:		while ( width-- ) {
-line 1236
-;1236:			if ( buf < buf_end ) {
+LABELV $350
+line 1208
+;1208:		while ( width-- ) {
+line 1209
+;1209:			if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $375
-line 1237
-;1237:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
+GEU4 $353
+line 1210
+;1210:				*buf = ( flags & ZEROPAD ) ? '0' : ' ';
 ADDRFP4 16
 INDIRI4
 CNSTI4 128
 BANDI4
 CNSTI4 0
-EQI4 $378
+EQI4 $356
 ADDRLP4 48
 CNSTI4 48
 ASGNI4
-ADDRGP4 $379
+ADDRGP4 $357
 JUMPV
-LABELV $378
+LABELV $356
 ADDRLP4 48
 CNSTI4 32
 ASGNI4
-LABELV $379
+LABELV $357
 ADDRLP4 0
 INDIRP4
 ADDRLP4 48
 INDIRI4
 CVII1 4
 ASGNI1
-line 1238
-;1238:			}
-LABELV $375
-line 1239
-;1239:			buf++;
+line 1211
+;1211:			}
+LABELV $353
+line 1212
+;1212:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1240
-;1240:		}
-LABELV $373
-line 1235
+line 1213
+;1213:		}
+LABELV $351
+line 1208
 ADDRLP4 48
 ADDRFP4 12
 INDIRI4
@@ -4765,33 +4543,33 @@ ASGNI4
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-NEI4 $372
-line 1241
-;1241:	}
-LABELV $370
-line 1243
-;1242:
-;1243:	*buf_p = buf;
+NEI4 $350
+line 1214
+;1214:	}
+LABELV $348
+line 1216
+;1215:
+;1216:	*buf_p = buf;
 ADDRFP4 0
 INDIRP4
 ADDRLP4 0
 INDIRP4
 ASGNP4
-line 1244
-;1244:}
-LABELV $351
+line 1217
+;1217:}
+LABELV $329
 endproc AddUInt 52 0
 proc AddFloat 84 4
-line 1246
-;1245:
-;1246:static void AddFloat( char **buf_p, char * const buf_end, float fval, int width, int prec, int flags ) {
-line 1252
-;1247:	char	text[32];
-;1248:	int		digits;
-;1249:	float	signedVal;
-;1250:	char	*buf;
-;1251:	int		val;
-;1252:	qboolean	isNaN = (qboolean)(fpclassify(fval) == FP_NAN);
+line 1219
+;1218:
+;1219:static void AddFloat( char **buf_p, char * const buf_end, float fval, int width, int prec, int flags ) {
+line 1225
+;1220:	char	text[32];
+;1221:	int		digits;
+;1222:	float	signedVal;
+;1223:	char	*buf;
+;1224:	int		val;
+;1225:	qboolean	isNaN = (qboolean)(fpclassify(fval) == FP_NAN);
 ADDRFP4 8
 INDIRF4
 ARGF4
@@ -4802,23 +4580,23 @@ ASGNI4
 ADDRLP4 60
 INDIRI4
 CNSTI4 0
-NEI4 $382
+NEI4 $360
 ADDRLP4 56
 CNSTI4 1
 ASGNI4
-ADDRGP4 $383
+ADDRGP4 $361
 JUMPV
-LABELV $382
+LABELV $360
 ADDRLP4 56
 CNSTI4 0
 ASGNI4
-LABELV $383
+LABELV $361
 ADDRLP4 44
 ADDRLP4 56
 INDIRI4
 ASGNI4
-line 1253
-;1253:	qboolean	isInfinite = (qboolean)(fpclassify(fval) == FP_INFINITE);
+line 1226
+;1226:	qboolean	isInfinite = (qboolean)(fpclassify(fval) == FP_INFINITE);
 ADDRFP4 8
 INDIRF4
 ARGF4
@@ -4829,35 +4607,35 @@ ASGNI4
 ADDRLP4 68
 INDIRI4
 CNSTI4 1
-NEI4 $385
+NEI4 $363
 ADDRLP4 64
 CNSTI4 1
 ASGNI4
-ADDRGP4 $386
+ADDRGP4 $364
 JUMPV
-LABELV $385
+LABELV $363
 ADDRLP4 64
 CNSTI4 0
 ASGNI4
-LABELV $386
+LABELV $364
 ADDRLP4 48
 ADDRLP4 64
 INDIRI4
 ASGNI4
-line 1255
-;1254:
-;1255:	digits = 0;
+line 1228
+;1227:
+;1228:	digits = 0;
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-line 1256
-;1256:	if(isNaN){
+line 1229
+;1229:	if(isNaN){
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-EQI4 $387
-line 1257
-;1257:		text[digits++] = 'n';
+EQI4 $365
+line 1230
+;1230:		text[digits++] = 'n';
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -4874,8 +4652,8 @@ ADDRLP4 12
 ADDP4
 CNSTI1 110
 ASGNI1
-line 1258
-;1258:		text[digits++] = 'a';
+line 1231
+;1231:		text[digits++] = 'a';
 ADDRLP4 76
 ADDRLP4 4
 INDIRI4
@@ -4892,8 +4670,8 @@ ADDRLP4 12
 ADDP4
 CNSTI1 97
 ASGNI1
-line 1259
-;1259:		text[digits++] = 'n';
+line 1232
+;1232:		text[digits++] = 'n';
 ADDRLP4 80
 ADDRLP4 4
 INDIRI4
@@ -4910,23 +4688,23 @@ ADDRLP4 12
 ADDP4
 CNSTI1 110
 ASGNI1
-line 1260
-;1260:	} else if(isInfinite){
-ADDRGP4 $388
+line 1233
+;1233:	} else if(isInfinite){
+ADDRGP4 $366
 JUMPV
-LABELV $387
+LABELV $365
 ADDRLP4 48
 INDIRI4
 CNSTI4 0
-EQI4 $389
-line 1261
-;1261:		if ( fval < 0 ) {
+EQI4 $367
+line 1234
+;1234:		if ( fval < 0 ) {
 ADDRFP4 8
 INDIRF4
 CNSTF4 0
-GEF4 $391
-line 1262
-;1262:			text[digits++] = '-';
+GEF4 $369
+line 1235
+;1235:			text[digits++] = '-';
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -4943,11 +4721,11 @@ ADDRLP4 12
 ADDP4
 CNSTI1 45
 ASGNI1
-line 1263
-;1263:		}
-LABELV $391
-line 1264
-;1264:		text[digits++] = 'i';
+line 1236
+;1236:		}
+LABELV $369
+line 1237
+;1237:		text[digits++] = 'i';
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -4964,8 +4742,8 @@ ADDRLP4 12
 ADDP4
 CNSTI1 105
 ASGNI1
-line 1265
-;1265:		text[digits++] = 'n';
+line 1238
+;1238:		text[digits++] = 'n';
 ADDRLP4 76
 ADDRLP4 4
 INDIRI4
@@ -4982,8 +4760,8 @@ ADDRLP4 12
 ADDP4
 CNSTI1 110
 ASGNI1
-line 1266
-;1266:		text[digits++] = 'f';
+line 1239
+;1239:		text[digits++] = 'f';
 ADDRLP4 80
 ADDRLP4 4
 INDIRI4
@@ -5000,48 +4778,48 @@ ADDRLP4 12
 ADDP4
 CNSTI1 102
 ASGNI1
-line 1267
-;1267:	} else {
-ADDRGP4 $390
+line 1240
+;1240:	} else {
+ADDRGP4 $368
 JUMPV
-LABELV $389
-line 1269
-;1268:		// get the sign
-;1269:		signedVal = fval;
+LABELV $367
+line 1242
+;1241:		// get the sign
+;1242:		signedVal = fval;
 ADDRLP4 52
 ADDRFP4 8
 INDIRF4
 ASGNF4
-line 1270
-;1270:		if ( fval < 0 ) {
+line 1243
+;1243:		if ( fval < 0 ) {
 ADDRFP4 8
 INDIRF4
 CNSTF4 0
-GEF4 $393
-line 1271
-;1271:			fval = -fval;
+GEF4 $371
+line 1244
+;1244:			fval = -fval;
 ADDRFP4 8
 ADDRFP4 8
 INDIRF4
 NEGF4
 ASGNF4
-line 1272
-;1272:		}
-LABELV $393
-line 1275
-;1273:
-;1274:		// write the float number
-;1275:		val = (int)fval;
+line 1245
+;1245:		}
+LABELV $371
+line 1248
+;1246:
+;1247:		// write the float number
+;1248:		val = (int)fval;
 ADDRLP4 8
 ADDRFP4 8
 INDIRF4
 CVFI4 4
 ASGNI4
-LABELV $395
-line 1276
-;1276:		do {
-line 1277
-;1277:			text[digits++] = '0' + val % 10;
+LABELV $373
+line 1249
+;1249:		do {
+line 1250
+;1250:			text[digits++] = '0' + val % 10;
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -5064,30 +4842,30 @@ CNSTI4 48
 ADDI4
 CVII1 4
 ASGNI1
-line 1278
-;1278:			val /= 10;
+line 1251
+;1251:			val /= 10;
 ADDRLP4 8
 ADDRLP4 8
 INDIRI4
 CNSTI4 10
 DIVI4
 ASGNI4
-line 1279
-;1279:		} while ( val );
-LABELV $396
+line 1252
+;1252:		} while ( val );
+LABELV $374
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-NEI4 $395
-line 1281
-;1280:
-;1281:		if ( signedVal < 0 ) {
+NEI4 $373
+line 1254
+;1253:
+;1254:		if ( signedVal < 0 ) {
 ADDRLP4 52
 INDIRF4
 CNSTF4 0
-GEF4 $398
-line 1282
-;1282:			text[digits++] = '-';
+GEF4 $376
+line 1255
+;1255:			text[digits++] = '-';
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -5104,19 +4882,19 @@ ADDRLP4 12
 ADDP4
 CNSTI1 45
 ASGNI1
-line 1283
-;1283:		} else if ( flags & SIGN ) {
-ADDRGP4 $399
+line 1256
+;1256:		} else if ( flags & SIGN ) {
+ADDRGP4 $377
 JUMPV
-LABELV $398
+LABELV $376
 ADDRFP4 20
 INDIRI4
 CNSTI4 512
 BANDI4
 CNSTI4 0
-EQI4 $400
-line 1284
-;1284:			text[digits++] = '+';
+EQI4 $378
+line 1257
+;1257:			text[digits++] = '+';
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -5133,88 +4911,88 @@ ADDRLP4 12
 ADDP4
 CNSTI1 43
 ASGNI1
-line 1285
-;1285:		}
-LABELV $400
-LABELV $399
-line 1286
-;1286:	}
-LABELV $390
-LABELV $388
-line 1288
-;1287:
-;1288:	buf = *buf_p;
+line 1258
+;1258:		}
+LABELV $378
+LABELV $377
+line 1259
+;1259:	}
+LABELV $368
+LABELV $366
+line 1261
+;1260:
+;1261:	buf = *buf_p;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 INDIRP4
 ASGNP4
-ADDRGP4 $403
+ADDRGP4 $381
 JUMPV
-LABELV $402
-line 1290
-;1289:
-;1290:	while ( digits < width ) {
-line 1291
-;1291:		if ( buf < buf_end ) {
+LABELV $380
+line 1263
+;1262:
+;1263:	while ( digits < width ) {
+line 1264
+;1264:		if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $405
-line 1292
-;1292:			*buf = ' ';
+GEU4 $383
+line 1265
+;1265:			*buf = ' ';
 ADDRLP4 0
 INDIRP4
 CNSTI1 32
 ASGNI1
-line 1293
-;1293:		}
-LABELV $405
-line 1294
-;1294:		buf++;
+line 1266
+;1266:		}
+LABELV $383
+line 1267
+;1267:		buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1295
-;1295:		width--;
+line 1268
+;1268:		width--;
 ADDRFP4 12
 ADDRFP4 12
 INDIRI4
 CNSTI4 1
 SUBI4
 ASGNI4
-line 1296
-;1296:	}
-LABELV $403
-line 1290
+line 1269
+;1269:	}
+LABELV $381
+line 1263
 ADDRLP4 4
 INDIRI4
 ADDRFP4 12
 INDIRI4
-LTI4 $402
-ADDRGP4 $408
+LTI4 $380
+ADDRGP4 $386
 JUMPV
-LABELV $407
-line 1298
-;1297:
-;1298:	while ( digits-- ) {
-line 1299
-;1299:		if ( buf < buf_end ) {
+LABELV $385
+line 1271
+;1270:
+;1271:	while ( digits-- ) {
+line 1272
+;1272:		if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $410
-line 1300
-;1300:			*buf = text[digits];
+GEU4 $388
+line 1273
+;1273:			*buf = text[digits];
 ADDRLP4 0
 INDIRP4
 ADDRLP4 4
@@ -5223,21 +5001,21 @@ ADDRLP4 12
 ADDP4
 INDIRI1
 ASGNI1
-line 1301
-;1301:		}
-LABELV $410
-line 1302
-;1302:		buf++;
+line 1274
+;1274:		}
+LABELV $388
+line 1275
+;1275:		buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1303
-;1303:	}
-LABELV $408
-line 1298
+line 1276
+;1276:	}
+LABELV $386
+line 1271
 ADDRLP4 72
 ADDRLP4 4
 INDIRI4
@@ -5251,39 +5029,39 @@ ASGNI4
 ADDRLP4 72
 INDIRI4
 CNSTI4 0
-NEI4 $407
-line 1305
-;1304:
-;1305:	if(!isNaN){
+NEI4 $385
+line 1278
+;1277:
+;1278:	if(!isNaN){
 ADDRLP4 44
 INDIRI4
 CNSTI4 0
-NEI4 $412
-line 1306
-;1306:		if (prec < 0)
+NEI4 $390
+line 1279
+;1279:		if (prec < 0)
 ADDRFP4 16
 INDIRI4
 CNSTI4 0
-GEI4 $414
-line 1307
-;1307:			prec = 6;
+GEI4 $392
+line 1280
+;1280:			prec = 6;
 ADDRFP4 16
 CNSTI4 6
 ASGNI4
-LABELV $414
-line 1309
-;1308:		// write the fraction
-;1309:		digits = 0;
+LABELV $392
+line 1282
+;1281:		// write the fraction
+;1282:		digits = 0;
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $417
+ADDRGP4 $395
 JUMPV
-LABELV $416
-line 1310
-;1310:		while (digits < prec) {
-line 1311
-;1311:			fval -= (int) fval;
+LABELV $394
+line 1283
+;1283:		while (digits < prec) {
+line 1284
+;1284:			fval -= (int) fval;
 ADDRLP4 76
 ADDRFP4 8
 INDIRF4
@@ -5297,23 +5075,23 @@ CVFI4 4
 CVIF4 4
 SUBF4
 ASGNF4
-line 1312
-;1312:			fval *= 10.0;
+line 1285
+;1285:			fval *= 10.0;
 ADDRFP4 8
 CNSTF4 1092616192
 ADDRFP4 8
 INDIRF4
 MULF4
 ASGNF4
-line 1313
-;1313:			val = (int) fval;
+line 1286
+;1286:			val = (int) fval;
 ADDRLP4 8
 ADDRFP4 8
 INDIRF4
 CVFI4 4
 ASGNI4
-line 1314
-;1314:			text[digits++] = '0' + val % 10;
+line 1287
+;1287:			text[digits++] = '0' + val % 10;
 ADDRLP4 80
 ADDRLP4 4
 INDIRI4
@@ -5336,68 +5114,68 @@ CNSTI4 48
 ADDI4
 CVII1 4
 ASGNI1
-line 1315
-;1315:		}
-LABELV $417
-line 1310
+line 1288
+;1288:		}
+LABELV $395
+line 1283
 ADDRLP4 4
 INDIRI4
 ADDRFP4 16
 INDIRI4
-LTI4 $416
-line 1317
-;1316:
-;1317:		if (digits > 0) {
+LTI4 $394
+line 1290
+;1289:
+;1290:		if (digits > 0) {
 ADDRLP4 4
 INDIRI4
 CNSTI4 0
-LEI4 $419
-line 1318
-;1318:			if (buf < buf_end) {
+LEI4 $397
+line 1291
+;1291:			if (buf < buf_end) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $421
-line 1319
-;1319:				*buf = '.';
+GEU4 $399
+line 1292
+;1292:				*buf = '.';
 ADDRLP4 0
 INDIRP4
 CNSTI1 46
 ASGNI1
-line 1320
-;1320:			}
-LABELV $421
-line 1321
-;1321:			buf++;
+line 1293
+;1293:			}
+LABELV $399
+line 1294
+;1294:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1323
-;1322:
-;1323:			for (prec = 0; prec < digits; prec++) {
+line 1296
+;1295:
+;1296:			for (prec = 0; prec < digits; prec++) {
 ADDRFP4 16
 CNSTI4 0
 ASGNI4
-ADDRGP4 $426
+ADDRGP4 $404
 JUMPV
-LABELV $423
-line 1324
-;1324:				if (buf < buf_end) {
+LABELV $401
+line 1297
+;1297:				if (buf < buf_end) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $427
-line 1325
-;1325:					*buf = text[prec];
+GEU4 $405
+line 1298
+;1298:					*buf = text[prec];
 ADDRLP4 0
 INDIRP4
 ADDRFP4 16
@@ -5406,104 +5184,104 @@ ADDRLP4 12
 ADDP4
 INDIRI1
 ASGNI1
-line 1326
-;1326:				}
-LABELV $427
-line 1327
-;1327:				buf++;
+line 1299
+;1299:				}
+LABELV $405
+line 1300
+;1300:				buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1328
-;1328:			}
-LABELV $424
-line 1323
+line 1301
+;1301:			}
+LABELV $402
+line 1296
 ADDRFP4 16
 ADDRFP4 16
 INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $426
+LABELV $404
 ADDRFP4 16
 INDIRI4
 ADDRLP4 4
 INDIRI4
-LTI4 $423
-line 1329
-;1329:		}
-LABELV $419
-line 1330
-;1330:	}
-LABELV $412
-line 1332
-;1331:
-;1332:	*buf_p = buf;
+LTI4 $401
+line 1302
+;1302:		}
+LABELV $397
+line 1303
+;1303:	}
+LABELV $390
+line 1305
+;1304:
+;1305:	*buf_p = buf;
 ADDRFP4 0
 INDIRP4
 ADDRLP4 0
 INDIRP4
 ASGNP4
-line 1333
-;1333:}
-LABELV $380
+line 1306
+;1306:}
+LABELV $358
 endproc AddFloat 84 4
 proc AddString 16 4
-line 1336
-;1334:
-;1335:
-;1336:static void AddString( char **buf_p, char * const buf_end, const char *string, int width, int prec, int flags ) {
-line 1340
-;1337:	int		size;
-;1338:	char	*buf;
-;1339:
-;1340:	buf = *buf_p;
+line 1309
+;1307:
+;1308:
+;1309:static void AddString( char **buf_p, char * const buf_end, const char *string, int width, int prec, int flags ) {
+line 1313
+;1310:	int		size;
+;1311:	char	*buf;
+;1312:
+;1313:	buf = *buf_p;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 INDIRP4
 ASGNP4
-line 1342
-;1341:
-;1342:	if ( string == NULL ) {
+line 1315
+;1314:
+;1315:	if ( string == NULL ) {
 ADDRFP4 8
 INDIRP4
 CVPU4 4
 CNSTU4 0
-NEU4 $430
-line 1343
-;1343:		string = "(null)";
+NEU4 $408
+line 1316
+;1316:		string = "(null)";
 ADDRFP4 8
-ADDRGP4 $432
+ADDRGP4 $410
 ASGNP4
-line 1344
-;1344:		prec = -1;
+line 1317
+;1317:		prec = -1;
 ADDRFP4 16
 CNSTI4 -1
 ASGNI4
-line 1345
-;1345:	}
-LABELV $430
-line 1347
-;1346:
-;1347:	if ( prec >= 0 ) {
+line 1318
+;1318:	}
+LABELV $408
+line 1320
+;1319:
+;1320:	if ( prec >= 0 ) {
 ADDRFP4 16
 INDIRI4
 CNSTI4 0
-LTI4 $433
-line 1348
-;1348:		for( size = 0; size < prec; size++ ) {
+LTI4 $411
+line 1321
+;1321:		for( size = 0; size < prec; size++ ) {
 ADDRLP4 4
 CNSTI4 0
 ASGNI4
-ADDRGP4 $438
+ADDRGP4 $416
 JUMPV
-LABELV $435
-line 1349
-;1349:			if( string[size] == '\0' ) {
+LABELV $413
+line 1322
+;1322:			if( string[size] == '\0' ) {
 ADDRLP4 4
 INDIRI4
 ADDRFP4 8
@@ -5512,38 +5290,38 @@ ADDP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $439
-line 1350
-;1350:				break;
-ADDRGP4 $434
+NEI4 $417
+line 1323
+;1323:				break;
+ADDRGP4 $412
 JUMPV
-LABELV $439
-line 1352
-;1351:			}
-;1352:		}
-LABELV $436
-line 1348
+LABELV $417
+line 1325
+;1324:			}
+;1325:		}
+LABELV $414
+line 1321
 ADDRLP4 4
 ADDRLP4 4
 INDIRI4
 CNSTI4 1
 ADDI4
 ASGNI4
-LABELV $438
+LABELV $416
 ADDRLP4 4
 INDIRI4
 ADDRFP4 16
 INDIRI4
-LTI4 $435
-line 1353
-;1353:	}
-ADDRGP4 $434
+LTI4 $413
+line 1326
+;1326:	}
+ADDRGP4 $412
 JUMPV
-LABELV $433
-line 1354
-;1354:	else {
-line 1355
-;1355:		size = strlen( string );
+LABELV $411
+line 1327
+;1327:	else {
+line 1328
+;1328:		size = strlen( string );
 ADDRFP4 8
 INDIRP4
 ARGP4
@@ -5556,12 +5334,12 @@ ADDRLP4 8
 INDIRU4
 CVUI4 4
 ASGNI4
-line 1356
-;1356:	}
-LABELV $434
-line 1358
-;1357:
-;1358:	width -= size;
+line 1329
+;1329:	}
+LABELV $412
+line 1331
+;1330:
+;1331:	width -= size;
 ADDRFP4 12
 ADDRFP4 12
 INDIRI4
@@ -5569,50 +5347,50 @@ ADDRLP4 4
 INDIRI4
 SUBI4
 ASGNI4
-line 1360
-;1359:
-;1360:	if ( !(flags & LADJUST) ) {
+line 1333
+;1332:
+;1333:	if ( !(flags & LADJUST) ) {
 ADDRFP4 20
 INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-NEI4 $449
-ADDRGP4 $444
+NEI4 $427
+ADDRGP4 $422
 JUMPV
-LABELV $443
-line 1361
-;1361:		while( width-- > 0 ) {
-line 1362
-;1362:			if ( buf < buf_end ) {
+LABELV $421
+line 1334
+;1334:		while( width-- > 0 ) {
+line 1335
+;1335:			if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $446
-line 1363
-;1363:				*buf = ' ';
+GEU4 $424
+line 1336
+;1336:				*buf = ' ';
 ADDRLP4 0
 INDIRP4
 CNSTI1 32
 ASGNI1
-line 1364
-;1364:			}
-LABELV $446
-line 1365
-;1365:			buf++;
+line 1337
+;1337:			}
+LABELV $424
+line 1338
+;1338:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1366
-;1366:		}
-LABELV $444
-line 1361
+line 1339
+;1339:		}
+LABELV $422
+line 1334
 ADDRLP4 8
 ADDRFP4 12
 INDIRI4
@@ -5626,26 +5404,26 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-GTI4 $443
-line 1367
-;1367:	}
-ADDRGP4 $449
+GTI4 $421
+line 1340
+;1340:	}
+ADDRGP4 $427
 JUMPV
-LABELV $448
-line 1369
-;1368:
-;1369:	while( size-- ) {
-line 1370
-;1370:		if ( buf < buf_end ) {
+LABELV $426
+line 1342
+;1341:
+;1342:	while( size-- ) {
+line 1343
+;1343:		if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $451
-line 1371
-;1371:			*buf = *string++;
+GEU4 $429
+line 1344
+;1344:			*buf = *string++;
 ADDRLP4 8
 ADDRFP4 8
 INDIRP4
@@ -5662,21 +5440,21 @@ ADDRLP4 8
 INDIRP4
 INDIRI1
 ASGNI1
-line 1372
-;1372:		}
-LABELV $451
-line 1373
-;1373:		buf++;
+line 1345
+;1345:		}
+LABELV $429
+line 1346
+;1346:		buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1374
-;1374:	}
-LABELV $449
-line 1369
+line 1347
+;1347:	}
+LABELV $427
+line 1342
 ADDRLP4 8
 ADDRLP4 4
 INDIRI4
@@ -5690,51 +5468,51 @@ ASGNI4
 ADDRLP4 8
 INDIRI4
 CNSTI4 0
-NEI4 $448
-line 1376
-;1375:
-;1376:	if ( flags & LADJUST ) {
+NEI4 $426
+line 1349
+;1348:
+;1349:	if ( flags & LADJUST ) {
 ADDRFP4 20
 INDIRI4
 CNSTI4 4
 BANDI4
 CNSTI4 0
-EQI4 $453
-ADDRGP4 $456
+EQI4 $431
+ADDRGP4 $434
 JUMPV
-LABELV $455
-line 1377
-;1377:		while( width-- > 0 ) {
-line 1378
-;1378:			if ( buf < buf_end ) {
+LABELV $433
+line 1350
+;1350:		while( width-- > 0 ) {
+line 1351
+;1351:			if ( buf < buf_end ) {
 ADDRLP4 0
 INDIRP4
 CVPU4 4
 ADDRFP4 4
 INDIRP4
 CVPU4 4
-GEU4 $458
-line 1379
-;1379:				*buf = ' ';
+GEU4 $436
+line 1352
+;1352:				*buf = ' ';
 ADDRLP4 0
 INDIRP4
 CNSTI1 32
 ASGNI1
-line 1380
-;1380:			}
-LABELV $458
-line 1381
-;1381:			buf++;
+line 1353
+;1353:			}
+LABELV $436
+line 1354
+;1354:			buf++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1382
-;1382:		}
-LABELV $456
-line 1377
+line 1355
+;1355:		}
+LABELV $434
+line 1350
 ADDRLP4 12
 ADDRFP4 12
 INDIRI4
@@ -5748,43 +5526,43 @@ ASGNI4
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-GTI4 $455
-line 1383
-;1383:	}
-LABELV $453
-line 1385
-;1384:
-;1385:	*buf_p = buf;
+GTI4 $433
+line 1356
+;1356:	}
+LABELV $431
+line 1358
+;1357:
+;1358:	*buf_p = buf;
 ADDRFP4 0
 INDIRP4
 ADDRLP4 0
 INDIRP4
 ASGNP4
-line 1386
-;1386:}
-LABELV $429
+line 1359
+;1359:}
+LABELV $407
 endproc AddString 16 4
 export vsnprintf
 proc vsnprintf 80 24
-line 1396
-;1387:
-;1388:/*
-;1389:vsnprintf
-;1390:
-;1391:I'm not going to support a bunch of the more arcane stuff in here
-;1392:just to keep it simpler.  For example, the '*' and '$' are not
-;1393:currently supported.  I've tried to make it so that it will just
-;1394:parse and ignore formats we don't support.
-;1395:*/
-;1396:int vsnprintf( char *buffer, size_t size, const char *fmt, va_list ap ) {
-line 1403
-;1397:	char	*buf_p;
-;1398:	char	ch;
-;1399:	int		flags;
-;1400:	int		width;
-;1401:	int		prec;
-;1402:	int		n;
-;1403:	char	* const buf_end = buffer + size - 1;
+line 1369
+;1360:
+;1361:/*
+;1362:vsnprintf
+;1363:
+;1364:I'm not going to support a bunch of the more arcane stuff in here
+;1365:just to keep it simpler.  For example, the '*' and '$' are not
+;1366:currently supported.  I've tried to make it so that it will just
+;1367:parse and ignore formats we don't support.
+;1368:*/
+;1369:int vsnprintf( char *buffer, size_t size, const char *fmt, va_list ap ) {
+line 1376
+;1370:	char	*buf_p;
+;1371:	char	ch;
+;1372:	int		flags;
+;1373:	int		width;
+;1374:	int		prec;
+;1375:	int		n;
+;1376:	char	* const buf_end = buffer + size - 1;
 ADDRLP4 8
 ADDRFP4 4
 INDIRU4
@@ -5794,24 +5572,24 @@ ADDP4
 CNSTI4 -1
 ADDP4
 ASGNP4
-line 1405
-;1404:
-;1405:	buf_p = buffer;
+line 1378
+;1377:
+;1378:	buf_p = buffer;
 ADDRLP4 4
 ADDRFP4 0
 INDIRP4
 ASGNP4
-ADDRGP4 $462
+ADDRGP4 $440
 JUMPV
-line 1407
-;1406:
-;1407:	while( 1 ) {
-LABELV $464
-line 1409
-;1408:		// run through the format string until we hit a '%' or '\0'
-;1409:		while ( 1 ) {
-line 1410
-;1410:			ch = *fmt++;
+line 1380
+;1379:
+;1380:	while( 1 ) {
+LABELV $442
+line 1382
+;1381:		// run through the format string until we hit a '%' or '\0'
+;1382:		while ( 1 ) {
+line 1383
+;1383:			ch = *fmt++;
 ADDRLP4 28
 ADDRFP4 8
 INDIRP4
@@ -5827,89 +5605,89 @@ ADDRLP4 28
 INDIRP4
 INDIRI1
 ASGNI1
-line 1412
-;1411:
-;1412:			if ( ch == '\0' ) {
+line 1385
+;1384:
+;1385:			if ( ch == '\0' ) {
 ADDRLP4 0
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $467
-line 1413
-;1413:				goto done;
-ADDRGP4 $469
+NEI4 $445
+line 1386
+;1386:				goto done;
+ADDRGP4 $447
 JUMPV
-LABELV $467
-line 1414
-;1414:			} else if ( ch == '%' ) {
+LABELV $445
+line 1387
+;1387:			} else if ( ch == '%' ) {
 ADDRLP4 0
 INDIRI1
 CVII4 1
 CNSTI4 37
-NEI4 $470
-line 1415
-;1415:				break;
-ADDRGP4 $466
+NEI4 $448
+line 1388
+;1388:				break;
+ADDRGP4 $444
 JUMPV
-LABELV $470
-line 1417
-;1416:			}
-;1417:			if ( buf_p < buf_end ) {
+LABELV $448
+line 1390
+;1389:			}
+;1390:			if ( buf_p < buf_end ) {
 ADDRLP4 4
 INDIRP4
 CVPU4 4
 ADDRLP4 8
 INDIRP4
 CVPU4 4
-GEU4 $472
-line 1418
-;1418:				*buf_p = ch;
+GEU4 $450
+line 1391
+;1391:				*buf_p = ch;
 ADDRLP4 4
 INDIRP4
 ADDRLP4 0
 INDIRI1
 ASGNI1
-line 1419
-;1419:			}
-LABELV $472
-line 1421
-;1420:
-;1421:			buf_p++;
+line 1392
+;1392:			}
+LABELV $450
+line 1394
+;1393:
+;1394:			buf_p++;
 ADDRLP4 4
 ADDRLP4 4
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1422
-;1422:		}
-LABELV $465
-line 1409
-ADDRGP4 $464
+line 1395
+;1395:		}
+LABELV $443
+line 1382
+ADDRGP4 $442
 JUMPV
-LABELV $466
-line 1425
-;1423:
-;1424:		// reset formatting state
-;1425:		flags = 0;
+LABELV $444
+line 1398
+;1396:
+;1397:		// reset formatting state
+;1398:		flags = 0;
 ADDRLP4 16
 CNSTI4 0
 ASGNI4
-line 1426
-;1426:		width = 0;
+line 1399
+;1399:		width = 0;
 ADDRLP4 20
 CNSTI4 0
 ASGNI4
-line 1427
-;1427:		prec = -1;
+line 1400
+;1400:		prec = -1;
 ADDRLP4 24
 CNSTI4 -1
 ASGNI4
-LABELV $474
-line 1430
-;1428:
-;1429:rflag:
-;1430:		ch = *fmt++;
+LABELV $452
+line 1403
+;1401:
+;1402:rflag:
+;1403:		ch = *fmt++;
 ADDRLP4 28
 ADDRFP4 8
 INDIRP4
@@ -5925,10 +5703,10 @@ ADDRLP4 28
 INDIRP4
 INDIRI1
 ASGNI1
-LABELV $475
-line 1432
-;1431:reswitch:
-;1432:		switch( ch ) {
+LABELV $453
+line 1405
+;1404:reswitch:
+;1405:		switch( ch ) {
 ADDRLP4 32
 ADDRLP4 0
 INDIRI1
@@ -5937,135 +5715,135 @@ ASGNI4
 ADDRLP4 32
 INDIRI4
 CNSTI4 37
-LTI4 $504
+LTI4 $482
 ADDRLP4 32
 INDIRI4
 CNSTI4 57
-GTI4 $505
+GTI4 $483
 ADDRLP4 32
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $506-148
+ADDRGP4 $484-148
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $506
-address $498
+LABELV $484
 address $476
-address $476
-address $476
-address $476
-address $476
-address $481
-address $476
-address $480
-address $482
-address $476
-address $489
-address $490
-address $490
-address $490
-address $490
-address $490
-address $490
-address $490
-address $490
-address $490
+address $454
+address $454
+address $454
+address $454
+address $454
+address $459
+address $454
+address $458
+address $460
+address $454
+address $467
+address $468
+address $468
+address $468
+address $468
+address $468
+address $468
+address $468
+address $468
+address $468
 code
-LABELV $504
+LABELV $482
 ADDRLP4 32
 INDIRI4
 CNSTI4 0
-EQI4 $469
-ADDRGP4 $476
+EQI4 $447
+ADDRGP4 $454
 JUMPV
-LABELV $505
+LABELV $483
 ADDRLP4 32
 INDIRI4
 CNSTI4 99
-LTI4 $476
+LTI4 $454
 ADDRLP4 32
 INDIRI4
 CNSTI4 105
-GTI4 $508
+GTI4 $486
 ADDRLP4 32
 INDIRI4
 CNSTI4 2
 LSHI4
-ADDRGP4 $509-396
+ADDRGP4 $487-396
 ADDP4
 INDIRP4
 JUMPV
 lit
 align 4
-LABELV $509
-address $501
-address $494
-address $476
-address $496
-address $476
-address $476
-address $494
+LABELV $487
+address $479
+address $472
+address $454
+address $474
+address $454
+address $454
+address $472
 code
-LABELV $508
+LABELV $486
 ADDRLP4 32
 INDIRI4
 CNSTI4 115
-EQI4 $497
+EQI4 $475
 ADDRLP4 32
 INDIRI4
 CNSTI4 117
-EQI4 $495
-ADDRGP4 $476
+EQI4 $473
+ADDRGP4 $454
 JUMPV
-line 1434
-;1433:		case '\0':
-;1434:			goto done;
-LABELV $480
-line 1436
-;1435:		case '-':
-;1436:			flags |= LADJUST;
+line 1407
+;1406:		case '\0':
+;1407:			goto done;
+LABELV $458
+line 1409
+;1408:		case '-':
+;1409:			flags |= LADJUST;
 ADDRLP4 16
 ADDRLP4 16
 INDIRI4
 CNSTI4 4
 BORI4
 ASGNI4
-line 1437
-;1437:			goto rflag;
-ADDRGP4 $474
+line 1410
+;1410:			goto rflag;
+ADDRGP4 $452
 JUMPV
-LABELV $481
-line 1439
-;1438:		case '+':
-;1439:			flags |= SIGN;
+LABELV $459
+line 1412
+;1411:		case '+':
+;1412:			flags |= SIGN;
 ADDRLP4 16
 ADDRLP4 16
 INDIRI4
 CNSTI4 512
 BORI4
 ASGNI4
-line 1440
-;1440:			goto rflag;
-ADDRGP4 $474
+line 1413
+;1413:			goto rflag;
+ADDRGP4 $452
 JUMPV
-LABELV $482
-line 1442
-;1441:		case '.':
-;1442:			n = 0;
+LABELV $460
+line 1415
+;1414:		case '.':
+;1415:			n = 0;
 ADDRLP4 12
 CNSTI4 0
 ASGNI4
-ADDRGP4 $484
+ADDRGP4 $462
 JUMPV
-LABELV $483
-line 1443
-;1443:			while( is_digit( ( ch = *fmt++ ) ) ) {
-line 1444
-;1444:				n = 10 * n + ( ch - '0' );
+LABELV $461
+line 1416
+;1416:			while( is_digit( ( ch = *fmt++ ) ) ) {
+line 1417
+;1417:				n = 10 * n + ( ch - '0' );
 ADDRLP4 12
 CNSTI4 10
 ADDRLP4 12
@@ -6078,10 +5856,10 @@ CNSTI4 48
 SUBI4
 ADDI4
 ASGNI4
-line 1445
-;1445:			}
-LABELV $484
-line 1443
+line 1418
+;1418:			}
+LABELV $462
+line 1416
 ADDRLP4 48
 ADDRFP4 8
 INDIRP4
@@ -6108,66 +5886,66 @@ CNSTI4 48
 SUBI4
 CVIU4 4
 CNSTU4 9
-LEU4 $483
-line 1446
-;1446:			prec = n < 0 ? -1 : n;
+LEU4 $461
+line 1419
+;1419:			prec = n < 0 ? -1 : n;
 ADDRLP4 12
 INDIRI4
 CNSTI4 0
-GEI4 $487
+GEI4 $465
 ADDRLP4 56
 CNSTI4 -1
 ASGNI4
-ADDRGP4 $488
+ADDRGP4 $466
 JUMPV
-LABELV $487
+LABELV $465
 ADDRLP4 56
 ADDRLP4 12
 INDIRI4
 ASGNI4
-LABELV $488
+LABELV $466
 ADDRLP4 24
 ADDRLP4 56
 INDIRI4
 ASGNI4
-line 1447
-;1447:			goto reswitch;
-ADDRGP4 $475
+line 1420
+;1420:			goto reswitch;
+ADDRGP4 $453
 JUMPV
-LABELV $489
-line 1449
-;1448:		case '0':
-;1449:			flags |= ZEROPAD;
+LABELV $467
+line 1422
+;1421:		case '0':
+;1422:			flags |= ZEROPAD;
 ADDRLP4 16
 ADDRLP4 16
 INDIRI4
 CNSTI4 128
 BORI4
 ASGNI4
-line 1450
-;1450:			goto rflag;
-ADDRGP4 $474
+line 1423
+;1423:			goto rflag;
+ADDRGP4 $452
 JUMPV
-LABELV $490
-line 1460
-;1451:		case '1':
-;1452:		case '2':
-;1453:		case '3':
-;1454:		case '4':
-;1455:		case '5':
-;1456:		case '6':
-;1457:		case '7':
-;1458:		case '8':
-;1459:		case '9':
-;1460:			n = 0;
+LABELV $468
+line 1433
+;1424:		case '1':
+;1425:		case '2':
+;1426:		case '3':
+;1427:		case '4':
+;1428:		case '5':
+;1429:		case '6':
+;1430:		case '7':
+;1431:		case '8':
+;1432:		case '9':
+;1433:			n = 0;
 ADDRLP4 12
 CNSTI4 0
 ASGNI4
-LABELV $491
-line 1461
-;1461:			do {
-line 1462
-;1462:				n = 10 * n + ( ch - '0' );
+LABELV $469
+line 1434
+;1434:			do {
+line 1435
+;1435:				n = 10 * n + ( ch - '0' );
 ADDRLP4 12
 CNSTI4 10
 ADDRLP4 12
@@ -6180,8 +5958,8 @@ CNSTI4 48
 SUBI4
 ADDI4
 ASGNI4
-line 1463
-;1463:				ch = *fmt++;
+line 1436
+;1436:				ch = *fmt++;
 ADDRLP4 60
 ADDRFP4 8
 INDIRP4
@@ -6197,9 +5975,9 @@ ADDRLP4 60
 INDIRP4
 INDIRI1
 ASGNI1
-line 1464
-;1464:			} while( is_digit( ch ) );
-LABELV $492
+line 1437
+;1437:			} while( is_digit( ch ) );
+LABELV $470
 ADDRLP4 0
 INDIRI1
 CVII4 1
@@ -6207,22 +5985,22 @@ CNSTI4 48
 SUBI4
 CVIU4 4
 CNSTU4 9
-LEU4 $491
-line 1465
-;1465:			width = n;
+LEU4 $469
+line 1438
+;1438:			width = n;
 ADDRLP4 20
 ADDRLP4 12
 INDIRI4
 ASGNI4
-line 1466
-;1466:			goto reswitch;
-ADDRGP4 $475
+line 1439
+;1439:			goto reswitch;
+ADDRGP4 $453
 JUMPV
-LABELV $494
-line 1469
-;1467:		case 'd':
-;1468:		case 'i':
-;1469:			AddInt( &buf_p, buf_end, va_arg(ap, int), width, flags );
+LABELV $472
+line 1442
+;1440:		case 'd':
+;1441:		case 'i':
+;1442:			AddInt( &buf_p, buf_end, va_arg(ap, int), width, flags );
 ADDRLP4 4
 ARGP4
 ADDRLP4 8
@@ -6253,14 +6031,14 @@ ARGI4
 ADDRGP4 AddInt
 CALLV
 pop
-line 1470
-;1470:			break;
-ADDRGP4 $477
+line 1443
+;1443:			break;
+ADDRGP4 $455
 JUMPV
-LABELV $495
-line 1472
-;1471:		case 'u':
-;1472:			AddUInt( &buf_p, buf_end, va_arg(ap, unsigned int), width, flags );
+LABELV $473
+line 1445
+;1444:		case 'u':
+;1445:			AddUInt( &buf_p, buf_end, va_arg(ap, unsigned int), width, flags );
 ADDRLP4 4
 ARGP4
 ADDRLP4 8
@@ -6291,14 +6069,14 @@ ARGI4
 ADDRGP4 AddUInt
 CALLV
 pop
-line 1473
-;1473:			break;
-ADDRGP4 $477
+line 1446
+;1446:			break;
+ADDRGP4 $455
 JUMPV
-LABELV $496
-line 1475
-;1474:		case 'f':
-;1475:			AddFloat( &buf_p, buf_end, va_arg(ap, double), width, prec, flags );
+LABELV $474
+line 1448
+;1447:		case 'f':
+;1448:			AddFloat( &buf_p, buf_end, va_arg(ap, double), width, prec, flags );
 ADDRLP4 4
 ARGP4
 ADDRLP4 8
@@ -6332,14 +6110,14 @@ ARGI4
 ADDRGP4 AddFloat
 CALLV
 pop
-line 1476
-;1476:			break;
-ADDRGP4 $477
+line 1449
+;1449:			break;
+ADDRGP4 $455
 JUMPV
-LABELV $497
-line 1478
-;1477:		case 's':
-;1478:			AddString( &buf_p, buf_end, va_arg(ap, char *), width, prec, flags );
+LABELV $475
+line 1451
+;1450:		case 's':
+;1451:			AddString( &buf_p, buf_end, va_arg(ap, char *), width, prec, flags );
 ADDRLP4 4
 ARGP4
 ADDRLP4 8
@@ -6373,49 +6151,49 @@ ARGI4
 ADDRGP4 AddString
 CALLV
 pop
-line 1479
-;1479:			break;
-ADDRGP4 $477
+line 1452
+;1452:			break;
+ADDRGP4 $455
 JUMPV
-LABELV $498
-line 1481
-;1480:		case '%':
-;1481:			if ( buf_p < buf_end ) {
+LABELV $476
+line 1454
+;1453:		case '%':
+;1454:			if ( buf_p < buf_end ) {
 ADDRLP4 4
 INDIRP4
 CVPU4 4
 ADDRLP4 8
 INDIRP4
 CVPU4 4
-GEU4 $499
-line 1482
-;1482:				*buf_p = ch;
+GEU4 $477
+line 1455
+;1455:				*buf_p = ch;
 ADDRLP4 4
 INDIRP4
 ADDRLP4 0
 INDIRI1
 ASGNI1
-line 1483
-;1483:			}
-LABELV $499
-line 1484
-;1484:			buf_p++;
+line 1456
+;1456:			}
+LABELV $477
+line 1457
+;1457:			buf_p++;
 ADDRLP4 4
 ADDRLP4 4
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1485
-;1485:			break;
-ADDRGP4 $477
+line 1458
+;1458:			break;
+ADDRGP4 $455
 JUMPV
-LABELV $501
-LABELV $476
-line 1488
-;1486:		case 'c':
-;1487:		default:
-;1488:			ch = va_arg(ap, char);
+LABELV $479
+LABELV $454
+line 1461
+;1459:		case 'c':
+;1460:		default:
+;1461:			ch = va_arg(ap, char);
 ADDRLP4 76
 ADDRFP4 12
 INDIRP4
@@ -6433,78 +6211,78 @@ CNSTI4 -4
 ADDP4
 INDIRI1
 ASGNI1
-line 1489
-;1489:			if ( buf_p < buf_end ) {
+line 1462
+;1462:			if ( buf_p < buf_end ) {
 ADDRLP4 4
 INDIRP4
 CVPU4 4
 ADDRLP4 8
 INDIRP4
 CVPU4 4
-GEU4 $502
-line 1490
-;1490:				*buf_p = ch;
+GEU4 $480
+line 1463
+;1463:				*buf_p = ch;
 ADDRLP4 4
 INDIRP4
 ADDRLP4 0
 INDIRI1
 ASGNI1
-line 1491
-;1491:			}
-LABELV $502
-line 1492
-;1492:			buf_p++;
+line 1464
+;1464:			}
+LABELV $480
+line 1465
+;1465:			buf_p++;
 ADDRLP4 4
 ADDRLP4 4
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1493
-;1493:			break;
-LABELV $477
-line 1495
-;1494:		}
-;1495:	}
-LABELV $462
-line 1407
-ADDRGP4 $465
+line 1466
+;1466:			break;
+LABELV $455
+line 1468
+;1467:		}
+;1468:	}
+LABELV $440
+line 1380
+ADDRGP4 $443
 JUMPV
-LABELV $469
-line 1498
-;1496:
-;1497:done:
-;1498:	if ( buf_p < buf_end )
+LABELV $447
+line 1471
+;1469:
+;1470:done:
+;1471:	if ( buf_p < buf_end )
 ADDRLP4 4
 INDIRP4
 CVPU4 4
 ADDRLP4 8
 INDIRP4
 CVPU4 4
-GEU4 $511
-line 1499
-;1499:		*buf_p = '\0';
+GEU4 $489
+line 1472
+;1472:		*buf_p = '\0';
 ADDRLP4 4
 INDIRP4
 CNSTI1 0
 ASGNI1
-ADDRGP4 $512
+ADDRGP4 $490
 JUMPV
-LABELV $511
-line 1501
-;1500:	else
-;1501:		*buf_end = '\0';
+LABELV $489
+line 1474
+;1473:	else
+;1474:		*buf_end = '\0';
 ADDRLP4 8
 INDIRP4
 CNSTI1 0
 ASGNI1
-LABELV $512
-line 1503
-;1502:
-;1503:	assert( buf_p <= buf_end );
-line 1505
-;1504:
-;1505:	return buf_p - buffer;
+LABELV $490
+line 1476
+;1475:
+;1476:	assert( buf_p <= buf_end );
+line 1478
+;1477:
+;1478:	return buf_p - buffer;
 ADDRLP4 4
 INDIRP4
 CVPU4 4
@@ -6514,116 +6292,116 @@ CVPU4 4
 SUBU4
 CVUI4 4
 RETI4
-LABELV $460
+LABELV $438
 endproc vsnprintf 80 24
 proc sscanf_stringparse 20 0
-line 1509
-;1506:}
-;1507:
-;1508:
-;1509:static void sscanf_stringparse( const char **stringPtr,char *out ) {
-line 1513
-;1510:	const char	*string;
-;1511:	float sign;
-;1512:	float value;
-;1513:	int		c = '0'; // bk001211 - uninitialized use possible
+line 1482
+;1479:}
+;1480:
+;1481:
+;1482:static void sscanf_stringparse( const char **stringPtr,char *out ) {
+line 1486
+;1483:	const char	*string;
+;1484:	float sign;
+;1485:	float value;
+;1486:	int		c = '0'; // bk001211 - uninitialized use possible
 ADDRLP4 4
 CNSTI4 48
 ASGNI4
-line 1515
-;1514:
-;1515:	string = *stringPtr;
+line 1488
+;1487:
+;1488:	string = *stringPtr;
 ADDRLP4 0
 ADDRFP4 0
 INDIRP4
 INDIRP4
 ASGNP4
-ADDRGP4 $515
+ADDRGP4 $493
 JUMPV
-LABELV $514
-line 1518
-;1516:
-;1517:	// skip whitespace
-;1518:	while ( *string <= ' ' ) {
-line 1519
-;1519:		if ( !*string ) {
+LABELV $492
+line 1491
+;1489:
+;1490:	// skip whitespace
+;1491:	while ( *string <= ' ' ) {
+line 1492
+;1492:		if ( !*string ) {
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $517
-line 1520
-;1520:			*stringPtr = string;
+NEI4 $495
+line 1493
+;1493:			*stringPtr = string;
 ADDRFP4 0
 INDIRP4
 ADDRLP4 0
 INDIRP4
 ASGNP4
-line 1521
-;1521:			*out = '\0';
+line 1494
+;1494:			*out = '\0';
 ADDRFP4 4
 INDIRP4
 CNSTI1 0
 ASGNI1
-line 1522
-;1522:			return;
-ADDRGP4 $513
+line 1495
+;1495:			return;
+ADDRGP4 $491
 JUMPV
-LABELV $517
-line 1524
-;1523:		}
-;1524:		string++;
+LABELV $495
+line 1497
+;1496:		}
+;1497:		string++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1525
-;1525:	}
-LABELV $515
-line 1518
+line 1498
+;1498:	}
+LABELV $493
+line 1491
 ADDRLP4 0
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 32
-LEI4 $514
-ADDRGP4 $520
+LEI4 $492
+ADDRGP4 $498
 JUMPV
-LABELV $519
-line 1527
-;1526:
-;1527:	while(*string != ' ' && *string != '\0'){
-line 1528
-;1528:		*out = *string;
+LABELV $497
+line 1500
+;1499:
+;1500:	while(*string != ' ' && *string != '\0'){
+line 1501
+;1501:		*out = *string;
 ADDRFP4 4
 INDIRP4
 ADDRLP4 0
 INDIRP4
 INDIRI1
 ASGNI1
-line 1529
-;1529:		out++;
+line 1502
+;1502:		out++;
 ADDRFP4 4
 ADDRFP4 4
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1530
-;1530:		string++;
+line 1503
+;1503:		string++;
 ADDRLP4 0
 ADDRLP4 0
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1531
-;1531:	}
-LABELV $520
-line 1527
+line 1504
+;1504:	}
+LABELV $498
+line 1500
 ADDRLP4 16
 ADDRLP4 0
 INDIRP4
@@ -6633,75 +6411,75 @@ ASGNI4
 ADDRLP4 16
 INDIRI4
 CNSTI4 32
-EQI4 $522
+EQI4 $500
 ADDRLP4 16
 INDIRI4
 CNSTI4 0
-NEI4 $519
-LABELV $522
-line 1532
-;1532:	*out = '\0';
+NEI4 $497
+LABELV $500
+line 1505
+;1505:	*out = '\0';
 ADDRFP4 4
 INDIRP4
 CNSTI1 0
 ASGNI1
-line 1533
-;1533:}
-LABELV $513
+line 1506
+;1506:}
+LABELV $491
 endproc sscanf_stringparse 20 0
 export sscanf
 proc sscanf 32 8
-line 1538
-;1534:
-;1535:
-;1536:
-;1537:/* this is really crappy */
-;1538:int sscanf( const char *buffer, const char *fmt, ... ) {
-line 1543
-;1539:	int		cmd;
-;1540:	int		**arg;
-;1541:	int		count;
-;1542:
-;1543:	arg = (int **)&fmt + 1;
+line 1511
+;1507:
+;1508:
+;1509:
+;1510:/* this is really crappy */
+;1511:int sscanf( const char *buffer, const char *fmt, ... ) {
+line 1516
+;1512:	int		cmd;
+;1513:	int		**arg;
+;1514:	int		count;
+;1515:
+;1516:	arg = (int **)&fmt + 1;
 ADDRLP4 4
 ADDRFP4 4+4
 ASGNP4
-line 1544
-;1544:	count = 0;
+line 1517
+;1517:	count = 0;
 ADDRLP4 8
 CNSTI4 0
 ASGNI4
-ADDRGP4 $526
+ADDRGP4 $504
 JUMPV
-LABELV $525
-line 1546
-;1545:
-;1546:	while ( *fmt ) {
-line 1547
-;1547:		if ( fmt[0] != '%' ) {
+LABELV $503
+line 1519
+;1518:
+;1519:	while ( *fmt ) {
+line 1520
+;1520:		if ( fmt[0] != '%' ) {
 ADDRFP4 4
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 37
-EQI4 $528
-line 1548
-;1548:			fmt++;
+EQI4 $506
+line 1521
+;1521:			fmt++;
 ADDRFP4 4
 ADDRFP4 4
 INDIRP4
 CNSTI4 1
 ADDP4
 ASGNP4
-line 1549
-;1549:			continue;
-ADDRGP4 $526
+line 1522
+;1522:			continue;
+ADDRGP4 $504
 JUMPV
-LABELV $528
-line 1552
-;1550:		}
-;1551:
-;1552:		cmd = fmt[1];
+LABELV $506
+line 1525
+;1523:		}
+;1524:
+;1525:		cmd = fmt[1];
 ADDRLP4 0
 ADDRFP4 4
 INDIRP4
@@ -6710,17 +6488,17 @@ ADDP4
 INDIRI1
 CVII4 1
 ASGNI4
-line 1553
-;1553:		fmt += 2;
+line 1526
+;1526:		fmt += 2;
 ADDRFP4 4
 ADDRFP4 4
 INDIRP4
 CNSTI4 2
 ADDP4
 ASGNP4
-line 1555
-;1554:
-;1555:		switch ( cmd ) {
+line 1528
+;1527:
+;1528:		switch ( cmd ) {
 ADDRLP4 16
 CNSTI4 100
 ASGNI4
@@ -6728,37 +6506,37 @@ ADDRLP4 0
 INDIRI4
 ADDRLP4 16
 INDIRI4
-EQI4 $532
+EQI4 $510
 ADDRLP4 0
 INDIRI4
 CNSTI4 102
-EQI4 $534
+EQI4 $512
 ADDRLP4 0
 INDIRI4
 CNSTI4 105
-EQI4 $532
+EQI4 $510
 ADDRLP4 0
 INDIRI4
 ADDRLP4 16
 INDIRI4
-LTI4 $530
-LABELV $535
+LTI4 $508
+LABELV $513
 ADDRLP4 0
 INDIRI4
 CNSTI4 115
-EQI4 $533
+EQI4 $511
 ADDRLP4 0
 INDIRI4
 CNSTI4 117
-EQI4 $532
-ADDRGP4 $530
+EQI4 $510
+ADDRGP4 $508
 JUMPV
-LABELV $532
-line 1559
-;1556:		case 'i':
-;1557:		case 'd':
-;1558:		case 'u':
-;1559:			**arg = _atoi( &buffer );
+LABELV $510
+line 1532
+;1529:		case 'i':
+;1530:		case 'd':
+;1531:		case 'u':
+;1532:			**arg = _atoi( &buffer );
 ADDRFP4 0
 ARGP4
 ADDRLP4 24
@@ -6771,14 +6549,14 @@ INDIRP4
 ADDRLP4 24
 INDIRI4
 ASGNI4
-line 1560
-;1560:			break;
-ADDRGP4 $531
+line 1533
+;1533:			break;
+ADDRGP4 $509
 JUMPV
-LABELV $533
-line 1562
-;1561:		case 's':
-;1562:			sscanf_stringparse( &buffer,(char*)*arg ); // lol
+LABELV $511
+line 1535
+;1534:		case 's':
+;1535:			sscanf_stringparse( &buffer,(char*)*arg ); // lol
 ADDRFP4 0
 ARGP4
 ADDRLP4 4
@@ -6788,14 +6566,14 @@ ARGP4
 ADDRGP4 sscanf_stringparse
 CALLV
 pop
-line 1563
-;1563:			break;
-ADDRGP4 $531
+line 1536
+;1536:			break;
+ADDRGP4 $509
 JUMPV
-LABELV $534
-line 1565
-;1564:		case 'f':
-;1565:			*(float *)*arg = _atof( &buffer );
+LABELV $512
+line 1538
+;1537:		case 'f':
+;1538:			*(float *)*arg = _atof( &buffer );
 ADDRFP4 0
 ARGP4
 ADDRLP4 28
@@ -6808,115 +6586,115 @@ INDIRP4
 ADDRLP4 28
 INDIRF4
 ASGNF4
-line 1566
-;1566:			break;
-LABELV $530
-LABELV $531
-line 1568
-;1567:		}
-;1568:		arg++;
+line 1539
+;1539:			break;
+LABELV $508
+LABELV $509
+line 1541
+;1540:		}
+;1541:		arg++;
 ADDRLP4 4
 ADDRLP4 4
 INDIRP4
 CNSTI4 4
 ADDP4
 ASGNP4
-line 1569
-;1569:	}
-LABELV $526
-line 1546
+line 1542
+;1542:	}
+LABELV $504
+line 1519
 ADDRFP4 4
 INDIRP4
 INDIRI1
 CVII4 1
 CNSTI4 0
-NEI4 $525
-line 1571
-;1570:
-;1571:	return count;
+NEI4 $503
+line 1544
+;1543:
+;1544:	return count;
 ADDRLP4 8
 INDIRI4
 RETI4
-LABELV $523
+LABELV $501
 endproc sscanf 32 8
 export roundf
 proc roundf 0 0
-line 1574
-;1572:}
-;1573:
-;1574:float roundf( float x ) {
-line 1575
-;1575:	if (x >= 0.0f)
+line 1547
+;1545:}
+;1546:
+;1547:float roundf( float x ) {
+line 1548
+;1548:	if (x >= 0.0f)
 ADDRFP4 0
 INDIRF4
 CNSTF4 0
-LTF4 $537
-line 1576
-;1576:		x += 0.5f;
+LTF4 $515
+line 1549
+;1549:		x += 0.5f;
 ADDRFP4 0
 ADDRFP4 0
 INDIRF4
 CNSTF4 1056964608
 ADDF4
 ASGNF4
-ADDRGP4 $538
+ADDRGP4 $516
 JUMPV
-LABELV $537
-line 1578
-;1577:	else
-;1578:		x -= 0.5f;
+LABELV $515
+line 1551
+;1550:	else
+;1551:		x -= 0.5f;
 ADDRFP4 0
 ADDRFP4 0
 INDIRF4
 CNSTF4 1056964608
 SUBF4
 ASGNF4
-LABELV $538
-line 1580
-;1579:
-;1580:	return (int) x;
+LABELV $516
+line 1553
+;1552:
+;1553:	return (int) x;
 ADDRFP4 0
 INDIRF4
 CVFI4 4
 CVIF4 4
 RETF4
-LABELV $536
+LABELV $514
 endproc roundf 0 0
 export fpclassify
 proc fpclassify 28 0
-line 1607
-;1581:}
+line 1580
+;1554:}
+;1555:
+;1556:#endif
+;1557:
+;1558:
+;1559:// adapted from newlib
+;1560:
+;1561:typedef union
+;1562:{
+;1563:  float value;
+;1564:  unsigned int word;
+;1565:} ieee_float_shape_type;
+;1566:
+;1567:/* Get a 32 bit int from a float.  */
+;1568:
+;1569:#define GET_FLOAT_WORD(i,d)					\
+;1570:do {								\
+;1571:  ieee_float_shape_type gf_u;					\
+;1572:  gf_u.value = (d);						\
+;1573:  (i) = gf_u.word;						\
+;1574:} while (0)
+;1575:
+;1576:
+;1577:
+;1578:int
+;1579:fpclassify (float x)
+;1580:{
+LABELV $519
+line 1583
+;1581:  unsigned int w;
 ;1582:
-;1583:#endif
-;1584:
-;1585:
-;1586:// adapted from newlib
-;1587:
-;1588:typedef union
-;1589:{
-;1590:  float value;
-;1591:  unsigned int word;
-;1592:} ieee_float_shape_type;
-;1593:
-;1594:/* Get a 32 bit int from a float.  */
-;1595:
-;1596:#define GET_FLOAT_WORD(i,d)					\
-;1597:do {								\
-;1598:  ieee_float_shape_type gf_u;					\
-;1599:  gf_u.value = (d);						\
-;1600:  (i) = gf_u.word;						\
-;1601:} while (0)
-;1602:
-;1603:
-;1604:
-;1605:int
-;1606:fpclassify (float x)
-;1607:{
-LABELV $541
-line 1610
-;1608:  unsigned int w;
-;1609:
-;1610:  GET_FLOAT_WORD(w,x);
+;1583:  GET_FLOAT_WORD(w,x);
 ADDRLP4 4
 ADDRFP4 0
 INDIRF4
@@ -6925,125 +6703,578 @@ ADDRLP4 0
 ADDRLP4 4
 INDIRU4
 ASGNU4
-LABELV $542
-line 1612
-;1611:  
-;1612:  if (w == 0x00000000 || w == 0x80000000)
+LABELV $520
+line 1585
+;1584:  
+;1585:  if (w == 0x00000000 || w == 0x80000000)
 ADDRLP4 0
 INDIRU4
 CNSTU4 0
-EQU4 $546
+EQU4 $524
 ADDRLP4 0
 INDIRU4
 CNSTU4 2147483648
-NEU4 $544
-LABELV $546
-line 1613
-;1613:    return FP_ZERO;
+NEU4 $522
+LABELV $524
+line 1586
+;1586:    return FP_ZERO;
 CNSTI4 2
 RETI4
-ADDRGP4 $540
+ADDRGP4 $518
 JUMPV
-LABELV $544
-line 1614
-;1614:  else if ((w >= 0x00800000 && w <= 0x7f7fffff) ||
+LABELV $522
+line 1587
+;1587:  else if ((w >= 0x00800000 && w <= 0x7f7fffff) ||
 ADDRLP4 0
 INDIRU4
 CNSTU4 8388608
-LTU4 $550
+LTU4 $528
 ADDRLP4 0
 INDIRU4
 CNSTU4 2139095039
-LEU4 $549
-LABELV $550
+LEU4 $527
+LABELV $528
 ADDRLP4 0
 INDIRU4
 CNSTU4 2155872256
-LTU4 $547
+LTU4 $525
 ADDRLP4 0
 INDIRU4
 CNSTU4 4286578687
-GTU4 $547
-LABELV $549
-line 1616
-;1615:           (w >= 0x80800000 && w <= 0xff7fffff))
-;1616:    return FP_NORMAL;
+GTU4 $525
+LABELV $527
+line 1589
+;1588:           (w >= 0x80800000 && w <= 0xff7fffff))
+;1589:    return FP_NORMAL;
 CNSTI4 4
 RETI4
-ADDRGP4 $540
+ADDRGP4 $518
 JUMPV
-LABELV $547
-line 1617
-;1617:  else if ((w >= 0x00000001 && w <= 0x007fffff) ||
+LABELV $525
+line 1590
+;1590:  else if ((w >= 0x00000001 && w <= 0x007fffff) ||
 ADDRLP4 0
 INDIRU4
 CNSTU4 1
-LTU4 $554
+LTU4 $532
 ADDRLP4 0
 INDIRU4
 CNSTU4 8388607
-LEU4 $553
-LABELV $554
+LEU4 $531
+LABELV $532
 ADDRLP4 0
 INDIRU4
 CNSTU4 2147483649
-LTU4 $551
+LTU4 $529
 ADDRLP4 0
 INDIRU4
 CNSTU4 2155872255
-GTU4 $551
-LABELV $553
-line 1619
-;1618:           (w >= 0x80000001 && w <= 0x807fffff))
-;1619:    return FP_SUBNORMAL;
+GTU4 $529
+LABELV $531
+line 1592
+;1591:           (w >= 0x80000001 && w <= 0x807fffff))
+;1592:    return FP_SUBNORMAL;
 CNSTI4 3
 RETI4
-ADDRGP4 $540
+ADDRGP4 $518
 JUMPV
-LABELV $551
-line 1620
-;1620:  else if (w == 0x7f800000 || w == 0xff800000)
+LABELV $529
+line 1593
+;1593:  else if (w == 0x7f800000 || w == 0xff800000)
 ADDRLP4 0
 INDIRU4
 CNSTU4 2139095040
-EQU4 $557
+EQU4 $535
 ADDRLP4 0
 INDIRU4
 CNSTU4 4286578688
-NEU4 $555
-LABELV $557
-line 1621
-;1621:    return FP_INFINITE;
+NEU4 $533
+LABELV $535
+line 1594
+;1594:    return FP_INFINITE;
 CNSTI4 1
 RETI4
-ADDRGP4 $540
+ADDRGP4 $518
 JUMPV
-LABELV $555
-line 1623
-;1622:  else
-;1623:    return FP_NAN;
+LABELV $533
+line 1596
+;1595:  else
+;1596:    return FP_NAN;
 CNSTI4 0
 RETI4
-LABELV $540
+LABELV $518
 endproc fpclassify 28 0
-export fabs
-proc fabs 0 0
-endproc fabs 0 0
 export copysignf
-proc copysignf 0 0
-endproc copysignf 0 0
-export sqrt
-proc sqrt 0 0
-endproc sqrt 0 0
+proc copysignf 12 0
+line 1613
+;1597:}
+;1598:
+;1599:/*
+;1600:============================================================
+;1601:VM Fallbacks (MSVC / LCC bytecode build)
+;1602:Self‑contained single precision math helpers for the VM toolchain.
+;1603:They intentionally avoid calling host lib symbols (log/exp/copysign)
+;1604:to prevent unresolved references during q3asm linking.
+;1605:Accuracy is intentionally limited but sufficient for gameplay logic
+;1606:that only uses these for diagnostics / minor calculations.
+;1607:============================================================
+;1608:*/
+;1609:#ifdef Q3_VM
+;1610:#ifndef HAVE_VM_FLOAT_MATH_SHIMS
+;1611:#define HAVE_VM_FLOAT_MATH_SHIMS 1
+;1612:/* Minimal VM-only helpers. fabs/sqrt already provided via macros -> host doubles. */
+;1613:float copysignf(float x, float y){ return (y < 0) ? ((x < 0) ? x : -x) : ((x < 0) ? -x : x); }
+ADDRFP4 4
+INDIRF4
+CNSTF4 0
+GEF4 $540
+ADDRFP4 0
+INDIRF4
+CNSTF4 0
+GEF4 $542
+ADDRLP4 4
+ADDRFP4 0
+INDIRF4
+ASGNF4
+ADDRGP4 $543
+JUMPV
+LABELV $542
+ADDRLP4 4
+ADDRFP4 0
+INDIRF4
+NEGF4
+ASGNF4
+LABELV $543
+ADDRLP4 0
+ADDRLP4 4
+INDIRF4
+ASGNF4
+ADDRGP4 $541
+JUMPV
+LABELV $540
+ADDRFP4 0
+INDIRF4
+CNSTF4 0
+GEF4 $544
+ADDRLP4 8
+ADDRFP4 0
+INDIRF4
+NEGF4
+ASGNF4
+ADDRGP4 $545
+JUMPV
+LABELV $544
+ADDRLP4 8
+ADDRFP4 0
+INDIRF4
+ASGNF4
+LABELV $545
+ADDRLP4 0
+ADDRLP4 8
+INDIRF4
+ASGNF4
+LABELV $541
+ADDRLP4 0
+INDIRF4
+RETF4
+LABELV $536
+endproc copysignf 12 0
 export logf
-proc logf 0 0
-endproc logf 0 0
+proc logf 28 0
+line 1614
+;1614:float logf(float x){
+line 1615
+;1615:	int k; float y, term, sum; int n; const float LN2 = 0.69314718056f;
+ADDRLP4 20
+CNSTF4 1060205080
+ASGNF4
+line 1616
+;1616:	if(x <= 0) return 0; /* crude */
+ADDRFP4 0
+INDIRF4
+CNSTF4 0
+GTF4 $547
+CNSTF4 0
+RETF4
+ADDRGP4 $546
+JUMPV
+LABELV $547
+line 1617
+;1617:	k = 0; 
+ADDRLP4 4
+CNSTI4 0
+ASGNI4
+ADDRGP4 $550
+JUMPV
+LABELV $549
+line 1618
+;1618:	while(x > 2.0f){ x *= 0.5f; k++; }
+ADDRFP4 0
+CNSTF4 1056964608
+ADDRFP4 0
+INDIRF4
+MULF4
+ASGNF4
+ADDRLP4 4
+ADDRLP4 4
+INDIRI4
+CNSTI4 1
+ADDI4
+ASGNI4
+LABELV $550
+ADDRFP4 0
+INDIRF4
+CNSTF4 1073741824
+GTF4 $549
+ADDRGP4 $553
+JUMPV
+LABELV $552
+line 1619
+;1619:	while(x < 1.0f){ x *= 2.0f; k--; }
+ADDRFP4 0
+CNSTF4 1073741824
+ADDRFP4 0
+INDIRF4
+MULF4
+ASGNF4
+ADDRLP4 4
+ADDRLP4 4
+INDIRI4
+CNSTI4 1
+SUBI4
+ASGNI4
+LABELV $553
+ADDRFP4 0
+INDIRF4
+CNSTF4 1065353216
+LTF4 $552
+line 1620
+;1620:	y = x - 1.0f; /* x in [1,2) */
+ADDRLP4 12
+ADDRFP4 0
+INDIRF4
+CNSTF4 1065353216
+SUBF4
+ASGNF4
+line 1621
+;1621:	term = y; sum = 0.0f;
+ADDRLP4 8
+ADDRLP4 12
+INDIRF4
+ASGNF4
+ADDRLP4 16
+CNSTF4 0
+ASGNF4
+line 1622
+;1622:	for(n=1;n<=6;n++){ /* truncated alternating series */
+ADDRLP4 0
+CNSTI4 1
+ASGNI4
+LABELV $555
+line 1623
+;1623:		if(n==1) term = y; else term *= -y*(n-1)/n; 
+ADDRLP4 0
+INDIRI4
+CNSTI4 1
+NEI4 $559
+ADDRLP4 8
+ADDRLP4 12
+INDIRF4
+ASGNF4
+ADDRGP4 $560
+JUMPV
+LABELV $559
+ADDRLP4 8
+ADDRLP4 8
+INDIRF4
+ADDRLP4 12
+INDIRF4
+NEGF4
+ADDRLP4 0
+INDIRI4
+CNSTI4 1
+SUBI4
+CVIF4 4
+MULF4
+ADDRLP4 0
+INDIRI4
+CVIF4 4
+DIVF4
+MULF4
+ASGNF4
+LABELV $560
+line 1624
+;1624:		sum += term; 
+ADDRLP4 16
+ADDRLP4 16
+INDIRF4
+ADDRLP4 8
+INDIRF4
+ADDF4
+ASGNF4
+line 1625
+;1625:	}
+LABELV $556
+line 1622
+ADDRLP4 0
+ADDRLP4 0
+INDIRI4
+CNSTI4 1
+ADDI4
+ASGNI4
+ADDRLP4 0
+INDIRI4
+CNSTI4 6
+LEI4 $555
+line 1626
+;1626:	return sum + k * LN2;
+ADDRLP4 16
+INDIRF4
+ADDRLP4 4
+INDIRI4
+CVIF4 4
+ADDRLP4 20
+INDIRF4
+MULF4
+ADDF4
+RETF4
+LABELV $546
+endproc logf 28 0
 export expf
-proc expf 0 0
-endproc expf 0 0
+proc expf 28 0
+line 1628
+;1627:}
+;1628:float expf(float x){
+line 1629
+;1629:	int k; float r, term, sum; int n; const float LN2 = 0.69314718056f;
+ADDRLP4 20
+CNSTF4 1060205080
+ASGNF4
+line 1630
+;1630:	k = (int)(x / LN2); /* scale by ln2 */
+ADDRLP4 12
+ADDRFP4 0
+INDIRF4
+ADDRLP4 20
+INDIRF4
+DIVF4
+CVFI4 4
+ASGNI4
+line 1631
+;1631:	r = x - k * LN2;
+ADDRLP4 16
+ADDRFP4 0
+INDIRF4
+ADDRLP4 12
+INDIRI4
+CVIF4 4
+ADDRLP4 20
+INDIRF4
+MULF4
+SUBF4
+ASGNF4
+line 1632
+;1632:	term = 1.0f; sum = 1.0f;
+ADDRLP4 8
+CNSTF4 1065353216
+ASGNF4
+ADDRLP4 4
+CNSTF4 1065353216
+ASGNF4
+line 1633
+;1633:	for(n=1;n<=6;n++){ term *= r / n; sum += term; }
+ADDRLP4 0
+CNSTI4 1
+ASGNI4
+LABELV $562
+ADDRLP4 8
+ADDRLP4 8
+INDIRF4
+ADDRLP4 16
+INDIRF4
+ADDRLP4 0
+INDIRI4
+CVIF4 4
+DIVF4
+MULF4
+ASGNF4
+ADDRLP4 4
+ADDRLP4 4
+INDIRF4
+ADDRLP4 8
+INDIRF4
+ADDF4
+ASGNF4
+LABELV $563
+ADDRLP4 0
+ADDRLP4 0
+INDIRI4
+CNSTI4 1
+ADDI4
+ASGNI4
+ADDRLP4 0
+INDIRI4
+CNSTI4 6
+LEI4 $562
+line 1634
+;1634:	if(k>0){ while(k--) sum *= 2.0f; } else { while(k++) sum *= 0.5f; }
+ADDRLP4 12
+INDIRI4
+CNSTI4 0
+LEI4 $572
+ADDRGP4 $569
+JUMPV
+LABELV $568
+ADDRLP4 4
+CNSTF4 1073741824
+ADDRLP4 4
+INDIRF4
+MULF4
+ASGNF4
+LABELV $569
+ADDRLP4 24
+ADDRLP4 12
+INDIRI4
+ASGNI4
+ADDRLP4 12
+ADDRLP4 24
+INDIRI4
+CNSTI4 1
+SUBI4
+ASGNI4
+ADDRLP4 24
+INDIRI4
+CNSTI4 0
+NEI4 $568
+ADDRGP4 $567
+JUMPV
+LABELV $571
+ADDRLP4 4
+CNSTF4 1056964608
+ADDRLP4 4
+INDIRF4
+MULF4
+ASGNF4
+LABELV $572
+ADDRLP4 24
+ADDRLP4 12
+INDIRI4
+ASGNI4
+ADDRLP4 12
+ADDRLP4 24
+INDIRI4
+CNSTI4 1
+ADDI4
+ASGNI4
+ADDRLP4 24
+INDIRI4
+CNSTI4 0
+NEI4 $571
+LABELV $567
+line 1635
+;1635:	return sum;
+ADDRLP4 4
+INDIRF4
+RETF4
+LABELV $561
+endproc expf 28 0
 export memcmp
-proc memcmp 0 0
-endproc memcmp 0 0
+proc memcmp 12 0
+line 1650
+;1636:}
+;1637:#endif /* HAVE_VM_FLOAT_MATH_SHIMS */
+;1638:#endif /* Q3_VM */
+;1639:
+;1640:/* UINT32_C / INT32_C are needed by fp16.c when compiling for the VM */
+;1641:#ifndef UINT32_C
+;1642:#define UINT32_C(val) val##U
+;1643:#endif
+;1644:#ifndef INT32_C
+;1645:#define INT32_C(val) val
+;1646:#endif
+;1647:
+;1648:#ifndef HAVE_VM_MEMCMP_SHIM
+;1649:#define HAVE_VM_MEMCMP_SHIM 1
+;1650:int memcmp(const void *s1, const void *s2, size_t n) {
+line 1651
+;1651:	const unsigned char *a = (const unsigned char*)s1;
+ADDRLP4 0
+ADDRFP4 0
+INDIRP4
+ASGNP4
+line 1652
+;1652:	const unsigned char *b = (const unsigned char*)s2;
+ADDRLP4 4
+ADDRFP4 4
+INDIRP4
+ASGNP4
+ADDRGP4 $576
+JUMPV
+LABELV $575
+line 1653
+;1653:	while(n--) {
+line 1654
+;1654:		if(*a != *b) return *a - *b;
+ADDRLP4 0
+INDIRP4
+INDIRU1
+CVUI4 1
+ADDRLP4 4
+INDIRP4
+INDIRU1
+CVUI4 1
+EQI4 $578
+ADDRLP4 0
+INDIRP4
+INDIRU1
+CVUI4 1
+ADDRLP4 4
+INDIRP4
+INDIRU1
+CVUI4 1
+SUBI4
+RETI4
+ADDRGP4 $574
+JUMPV
+LABELV $578
+line 1655
+;1655:		++a; ++b;
+ADDRLP4 0
+ADDRLP4 0
+INDIRP4
+CNSTI4 1
+ADDP4
+ASGNP4
+ADDRLP4 4
+ADDRLP4 4
+INDIRP4
+CNSTI4 1
+ADDP4
+ASGNP4
+line 1656
+;1656:	}
+LABELV $576
+line 1653
+ADDRLP4 8
+ADDRFP4 8
+INDIRU4
+ASGNU4
+ADDRFP4 8
+ADDRLP4 8
+INDIRU4
+CNSTU4 1
+SUBU4
+ASGNU4
+ADDRLP4 8
+INDIRU4
+CNSTU4 0
+NEU4 $575
+line 1657
+;1657:	return 0;
+CNSTI4 0
+RETI4
+LABELV $574
+endproc memcmp 12 0
 import clampedIntAdd
 import clampedIntMult
 import parseHex
@@ -7200,9 +7431,11 @@ import bsearch
 import frexpf
 import asin
 import acos
+import fabs
 import atan2
 import cos
 import sin
+import sqrt
 import floor
 import ceil
 import memcpy
@@ -7210,7 +7443,7 @@ import memset
 import strncpy
 lit
 align 1
-LABELV $432
+LABELV $410
 byte 1 40
 byte 1 110
 byte 1 117
