@@ -212,15 +212,14 @@ if (BuildMVMP OR BuildMVDED)
 
 	if(MSVC)
 		set(MVMPDEDWIN32Files
-			"${LIBDir}/StackWalker/include/StackWalker.h"
-
 			"${LIBDir}/StackWalker/StackWalker.cpp"
-
 			"win32/q3asm.asm"
 		)
+		set(MVMPDEDWin32Headers "${LIBDir}/StackWalker/include/StackWalker.h")
 		source_group("win32" FILES ${MVMPDEDWIN32Files})
+		source_group("win32" FILES ${MVMPDEDWin32Headers})
 		set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} "${LIBDir}/StackWalker/include")
-		set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDWIN32Files})
+		set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDWIN32Files} ${MVMPDEDWin32Headers})
 	endif()
 
 	if(NOT WIN32)

@@ -1,0 +1,323 @@
+MSBuild version 17.14.18+a338add32 for .NET Framework
+Build started 8/10/2025 6:18:36 PM.
+
+     1>Project "D:\Workspace\jk2mv-tom\EternalJK2.sln" on node 1 (cgame_x64 target(s)).
+     1>ValidateSolutionConfiguration:
+         Building solution configuration "Release|x64".
+       ValidateProjects:
+         The project "INSTALL" is not selected for building in solution configuration "Release|x64".
+         The project "PACKAGE" is not selected for building in solution configuration "Release|x64".
+         The project "assets-jk2pro" is not selected for building in solution configuration "Release|x64".
+         The project "assetsmv" is not selected for building in solution configuration "Release|x64".
+         The project "build-assets" is not selected for building in solution configuration "Release|x64".
+     1>Project "D:\Workspace\jk2mv-tom\EternalJK2.sln" (1) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     1>Project "D:\Workspace\jk2mv-tom\EternalJK2.sln" (1) is building "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) on node 1 (cgame_x64 target(s)).
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_x64.vcxproj.metaproj" (23) on node 1 (cgame_x64 target(s)).
+    23>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_x64.vcxproj.metaproj" (23) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:2) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\jk2mpgame_x64.vcxproj.metaproj" (22) on node 1 (cgame_x64 target(s)).
+    22>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\jk2mpgame_x64.vcxproj.metaproj" (22) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:3) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    23>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_x64.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+    22>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\jk2mpgame_x64.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (17) on node 1 (cgame_x64 target(s)).
+    17>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (17) is building "D:\Workspace\jk2mv-tom\libs\libpng\libpng.vcxproj.metaproj" (21) on node 1 (cgame_x64 target(s)).
+    21>Project "D:\Workspace\jk2mv-tom\libs\libpng\libpng.vcxproj.metaproj" (21) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:4) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    21>Done Building Project "D:\Workspace\jk2mv-tom\libs\libpng\libpng.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+    17>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (17) is building "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (18) on node 1 (cgame_x64 target(s)).
+    18>Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (18) is building "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg16-static.vcxproj.metaproj" (20) on node 1 (cgame_x64 target(s)).
+    20>Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg16-static.vcxproj.metaproj" (20) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:5) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    20>Done Building Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg16-static.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+    18>Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (18) is building "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg12-static.vcxproj.metaproj" (19) on node 1 (cgame_x64 target(s)).
+    19>Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg12-static.vcxproj.metaproj" (19) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:6) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    19>Done Building Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg12-static.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+    18>Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (18) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:7) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    18>Done Building Project "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+    17>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (17) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:8) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\eternaljk2mvmenu_x64.vcxproj.metaproj" (16) on node 1 (cgame_x64 target(s)).
+    16>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmenu_x64.vcxproj.metaproj" (16) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:9) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    16>Done Building Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmenu_x64.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) on node 1 (cgame_x64 target(s)).
+     4>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) is building "D:\Workspace\jk2mv-tom\libs\zlib\zlib.vcxproj.metaproj" (15) on node 1 (cgame_x64 target(s)).
+    15>Project "D:\Workspace\jk2mv-tom\libs\zlib\zlib.vcxproj.metaproj" (15) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:10) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    15>Done Building Project "D:\Workspace\jk2mv-tom\libs\zlib\zlib.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     4>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (7) on node 1 (cgame_x64 target(s)).
+     7>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (7) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\bins-jk2pro.vcxproj.metaproj" (14) on node 1 (cgame_x64 target(s)).
+    14>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\bins-jk2pro.vcxproj.metaproj" (14) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:11) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     7>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (7) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (8) on node 1 (cgame_x64 target(s)).
+     8>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (8) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) on node 1 (cgame_x64 target(s)).
+     9>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) is building "D:\Workspace\jk2mv-tom\src\mvsdk\tools\rcc\q3rcc.vcxproj.metaproj" (13) on node 1 (cgame_x64 target(s)).
+    13>Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\rcc\q3rcc.vcxproj.metaproj" (13) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:12) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    13>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\rcc\q3rcc.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     9>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) is building "D:\Workspace\jk2mv-tom\src\mvsdk\tools\lcc\q3lcc.vcxproj.metaproj" (12) on node 1 (cgame_x64 target(s)).
+    12>Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\lcc\q3lcc.vcxproj.metaproj" (12) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:13) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    12>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\lcc\q3lcc.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     9>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) is building "D:\Workspace\jk2mv-tom\src\mvsdk\tools\cpp\q3cpp.vcxproj.metaproj" (11) on node 1 (cgame_x64 target(s)).
+    11>Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\cpp\q3cpp.vcxproj.metaproj" (11) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:14) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    11>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\cpp\q3cpp.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     9>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) is building "D:\Workspace\jk2mv-tom\src\mvsdk\tools\asm\q3asm.vcxproj.metaproj" (10) on node 1 (cgame_x64 target(s)).
+    10>Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\asm\q3asm.vcxproj.metaproj" (10) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:15) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    10>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\tools\asm\q3asm.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     9>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (9) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:16) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     9>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     8>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (8) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:17) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    14>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\bins-jk2pro.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     8>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     7>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (7) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:18) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     7>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     4>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) is building "D:\Workspace\jk2mv-tom\libs\mongoose\mongoose.vcxproj.metaproj" (6) on node 1 (cgame_x64 target(s)).
+     6>Project "D:\Workspace\jk2mv-tom\libs\mongoose\mongoose.vcxproj.metaproj" (6) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:19) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     6>Done Building Project "D:\Workspace\jk2mv-tom\libs\mongoose\mongoose.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     4>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) is building "D:\Workspace\jk2mv-tom\libs\minizip\minizip.vcxproj.metaproj" (5) on node 1 (cgame_x64 target(s)).
+     5>Project "D:\Workspace\jk2mv-tom\libs\minizip\minizip.vcxproj.metaproj" (5) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:20) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     5>Done Building Project "D:\Workspace\jk2mv-tom\libs\minizip\minizip.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     4>Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (4) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:21) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+    17>Done Building Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     4>Done Building Project "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cgame_x64.vcxproj.metaproj" (3) on node 1 (cgame_x64 target(s)).
+     3>Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cgame_x64.vcxproj.metaproj" (3) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:22) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     3>Done Building Project "D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cgame_x64.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     2>Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (2) is building "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (24:23) on node 2 (cgame_x64 target(s)).
+    24>D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+    24>Done Building Project "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target(s)) -- FAILED.
+     2>Done Building Project "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target(s)) -- FAILED.
+     1>Done Building Project "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target(s)) -- FAILED.
+
+Build FAILED.
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\ui\ui_x64.vcxproj.metaproj" (cgame_x64 target) (23) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:2) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\game\jk2mpgame_x64.vcxproj.metaproj" (cgame_x64 target) (22) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:3) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target) (17) ->
+       "D:\Workspace\jk2mv-tom\libs\libpng\libpng.vcxproj.metaproj" (cgame_x64 target) (21) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:4) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target) (17) ->
+       "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (cgame_x64 target) (18) ->
+       "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg16-static.vcxproj.metaproj" (cgame_x64 target) (20) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:5) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target) (17) ->
+       "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (cgame_x64 target) (18) ->
+       "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg12-static.vcxproj.metaproj" (cgame_x64 target) (19) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:6) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target) (17) ->
+       "D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\jpeg-static.vcxproj.metaproj" (cgame_x64 target) (18) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:7) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmp.vcxproj.metaproj" (cgame_x64 target) (17) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:8) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvmenu_x64.vcxproj.metaproj" (cgame_x64 target) (16) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:9) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\libs\zlib\zlib.vcxproj.metaproj" (cgame_x64 target) (15) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:10) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\bins-jk2pro.vcxproj.metaproj" (cgame_x64 target) (14) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:11) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target) (9) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\tools\rcc\q3rcc.vcxproj.metaproj" (cgame_x64 target) (13) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:12) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target) (9) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\tools\lcc\q3lcc.vcxproj.metaproj" (cgame_x64 target) (12) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:13) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target) (9) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\tools\cpp\q3cpp.vcxproj.metaproj" (cgame_x64 target) (11) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:14) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target) (9) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\tools\asm\q3asm.vcxproj.metaproj" (cgame_x64 target) (10) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:15) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\qvms.vcxproj.metaproj" (cgame_x64 target) (9) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:16) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\assetsmv2.vcxproj.metaproj" (cgame_x64 target) (8) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:17) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\mv-assets.vcxproj.metaproj" (cgame_x64 target) (7) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:18) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\libs\mongoose\mongoose.vcxproj.metaproj" (cgame_x64 target) (6) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:19) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\libs\minizip\minizip.vcxproj.metaproj" (cgame_x64 target) (5) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:20) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\eternaljk2mvded.vcxproj.metaproj" (cgame_x64 target) (4) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:21) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\src\mvsdk\code\cgame\cgame_x64.vcxproj.metaproj" (cgame_x64 target) (3) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:22) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+
+       "D:\Workspace\jk2mv-tom\EternalJK2.sln" (cgame_x64 target) (1) ->
+       "D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj.metaproj" (cgame_x64 target) (2) ->
+       "D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj" (cgame_x64 target) (24:23) ->
+         D:\Workspace\jk2mv-tom\ZERO_CHECK.vcxproj : error MSB4057: The target "cgame_x64" does not exist in the project.
+
+    0 Warning(s)
+    23 Error(s)
+
+Time Elapsed 00:00:00.26

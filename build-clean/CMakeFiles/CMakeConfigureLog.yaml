@@ -1,0 +1,3138 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The system is: Windows - 10.0.26100 - AMD64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 17.14.18+a338add32 for .NET Framework
+      Build started 8/10/2025 6:32:41 PM.
+      
+      Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "Debug\\".
+        Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+        Creating directory "Debug\\CompilerIdC.tlog\\".
+      InitializeBuildStatus:
+        Creating "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        Touching "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc143.pdb" /external:W0 /Gd /TC /FC /errorReport:queue CMakeCCompilerId.c
+        CMakeCCompilerId.c
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
+        CompilerIdC.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdC\\CompilerIdC.exe
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_C_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        Deleting file "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
+        Touching "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate".
+      Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:00.33
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
+      
+      The C compiler identification is MSVC, found in:
+        D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdC/CompilerIdC.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:103 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link"
+      - "C:/Python313/Scripts/lld-link.com"
+      - "C:/Python313/Scripts/lld-link.exe"
+      - "C:/Python313/Scripts/lld-link"
+      - "C:/Python313/lld-link.com"
+      - "C:/Python313/lld-link.exe"
+      - "C:/Python313/lld-link"
+      - "C:/Program Files/Python312/Scripts/lld-link.com"
+      - "C:/Program Files/Python312/Scripts/lld-link.exe"
+      - "C:/Program Files/Python312/Scripts/lld-link"
+      - "C:/Program Files/Python312/lld-link.com"
+      - "C:/Program Files/Python312/lld-link.exe"
+      - "C:/Program Files/Python312/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files/GitHub CLI/lld-link.com"
+      - "C:/Program Files/GitHub CLI/lld-link.exe"
+      - "C:/Program Files/GitHub CLI/lld-link"
+      - "C:/ProgramData/chocolatey/bin/lld-link.com"
+      - "C:/ProgramData/chocolatey/bin/lld-link.exe"
+      - "C:/ProgramData/chocolatey/bin/lld-link"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/nodejs/lld-link.com"
+      - "C:/Program Files/nodejs/lld-link.exe"
+      - "C:/Program Files/nodejs/lld-link"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link.com"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link"
+      - "C:/Program Files/PowerShell/7/lld-link.com"
+      - "C:/Program Files/PowerShell/7/lld-link.exe"
+      - "C:/Program Files/PowerShell/7/lld-link"
+      - "C:/Program Files (x86)/Incredibuild/lld-link.com"
+      - "C:/Program Files (x86)/Incredibuild/lld-link.exe"
+      - "C:/Program Files (x86)/Incredibuild/lld-link"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link"
+      - "C:/Program Files/Python311/lld-link.com"
+      - "C:/Program Files/Python311/lld-link.exe"
+      - "C:/Program Files/Python311/lld-link"
+      - "C:/Program Files/Python311/Scripts/lld-link.com"
+      - "C:/Program Files/Python311/Scripts/lld-link.exe"
+      - "C:/Program Files/Python311/Scripts/lld-link"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/david/.dotnet/tools/lld-link.com"
+      - "C:/Users/david/.dotnet/tools/lld-link.exe"
+      - "C:/Users/david/.dotnet/tools/lld-link"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link.com"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link.exe"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_MT"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mt"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/mt.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/mt.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/mt"
+      - "C:/Python313/Scripts/mt.com"
+      - "C:/Python313/Scripts/mt.exe"
+      - "C:/Python313/Scripts/mt"
+      - "C:/Python313/mt.com"
+      - "C:/Python313/mt.exe"
+      - "C:/Python313/mt"
+      - "C:/Program Files/Python312/Scripts/mt.com"
+      - "C:/Program Files/Python312/Scripts/mt.exe"
+      - "C:/Program Files/Python312/Scripts/mt"
+      - "C:/Program Files/Python312/mt.com"
+      - "C:/Program Files/Python312/mt.exe"
+      - "C:/Program Files/Python312/mt"
+      - "C:/Windows/System32/mt.com"
+      - "C:/Windows/System32/mt.exe"
+      - "C:/Windows/System32/mt"
+      - "C:/Windows/mt.com"
+      - "C:/Windows/mt.exe"
+      - "C:/Windows/mt"
+      - "C:/Windows/System32/wbem/mt.com"
+      - "C:/Windows/System32/wbem/mt.exe"
+      - "C:/Windows/System32/wbem/mt"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt"
+      - "C:/Windows/System32/OpenSSH/mt.com"
+      - "C:/Windows/System32/OpenSSH/mt.exe"
+      - "C:/Windows/System32/OpenSSH/mt"
+      - "C:/Program Files/GitHub CLI/mt.com"
+      - "C:/Program Files/GitHub CLI/mt.exe"
+      - "C:/Program Files/GitHub CLI/mt"
+      - "C:/ProgramData/chocolatey/bin/mt.com"
+      - "C:/ProgramData/chocolatey/bin/mt.exe"
+      - "C:/ProgramData/chocolatey/bin/mt"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/mt.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/mt.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/mt"
+      - "C:/Program Files/Git/cmd/mt.com"
+      - "C:/Program Files/Git/cmd/mt.exe"
+      - "C:/Program Files/Git/cmd/mt"
+      - "C:/Program Files/CMake/bin/mt.com"
+      - "C:/Program Files/CMake/bin/mt.exe"
+      - "C:/Program Files/CMake/bin/mt"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt"
+      - "C:/Program Files/nodejs/mt.com"
+      - "C:/Program Files/nodejs/mt.exe"
+      - "C:/Program Files/nodejs/mt"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt"
+      - "C:/Program Files (x86)/GnuPG/bin/mt.com"
+      - "C:/Program Files (x86)/GnuPG/bin/mt.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/mt"
+      - "C:/Program Files/dotnet/mt.com"
+      - "C:/Program Files/dotnet/mt.exe"
+      - "C:/Program Files/dotnet/mt"
+      - "C:/Program Files/Docker/Docker/resources/bin/mt.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/mt.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/mt"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/mt"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/mt.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/mt.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/mt"
+      - "C:/Program Files/PowerShell/7/mt.com"
+      - "C:/Program Files/PowerShell/7/mt.exe"
+      - "C:/Program Files/PowerShell/7/mt"
+      - "C:/Program Files (x86)/Incredibuild/mt.com"
+      - "C:/Program Files (x86)/Incredibuild/mt.exe"
+      - "C:/Program Files (x86)/Incredibuild/mt"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/mt.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/mt.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/mt"
+      - "C:/Program Files/Python311/mt.com"
+      - "C:/Program Files/Python311/mt.exe"
+      - "C:/Program Files/Python311/mt"
+      - "C:/Program Files/Python311/Scripts/mt.com"
+      - "C:/Program Files/Python311/Scripts/mt.exe"
+      - "C:/Program Files/Python311/Scripts/mt"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/mt.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/mt.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/mt"
+      - "C:/Users/david/.dotnet/tools/mt.com"
+      - "C:/Users/david/.dotnet/tools/mt.exe"
+      - "C:/Users/david/.dotnet/tools/mt"
+      - "C:/ProgramData/david/GitHubDesktop/bin/mt.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/mt.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/mt"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/mt.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/mt.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/mt"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/mt.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/mt.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/mt"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/mt.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/mt.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/mt"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/mt.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/mt.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/mt"
+      - "C:/Users/david/AppData/Roaming/npm/mt.com"
+      - "C:/Users/david/AppData/Roaming/npm/mt.exe"
+      - "C:/Users/david/AppData/Roaming/npm/mt"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lib"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.com"
+    found: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 17.14.18+a338add32 for .NET Framework
+      Build started 8/10/2025 6:32:42 PM.
+      
+      Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "Debug\\".
+        Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+        Creating directory "Debug\\CompilerIdCXX.tlog\\".
+      InitializeBuildStatus:
+        Creating "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        Touching "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc143.pdb" /external:W0 /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
+        CMakeCXXCompilerId.cpp
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
+        CompilerIdCXX.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdCXX\\CompilerIdCXX.exe
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_CXX_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+        Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
+      Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\4.1.0-rc1\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:00.33
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+      
+      The CXX compiler identification is MSVC, found in:
+        D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdCXX/CompilerIdCXX.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/lld-link"
+      - "C:/Python313/Scripts/lld-link.com"
+      - "C:/Python313/Scripts/lld-link.exe"
+      - "C:/Python313/Scripts/lld-link"
+      - "C:/Python313/lld-link.com"
+      - "C:/Python313/lld-link.exe"
+      - "C:/Python313/lld-link"
+      - "C:/Program Files/Python312/Scripts/lld-link.com"
+      - "C:/Program Files/Python312/Scripts/lld-link.exe"
+      - "C:/Program Files/Python312/Scripts/lld-link"
+      - "C:/Program Files/Python312/lld-link.com"
+      - "C:/Program Files/Python312/lld-link.exe"
+      - "C:/Program Files/Python312/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files/GitHub CLI/lld-link.com"
+      - "C:/Program Files/GitHub CLI/lld-link.exe"
+      - "C:/Program Files/GitHub CLI/lld-link"
+      - "C:/ProgramData/chocolatey/bin/lld-link.com"
+      - "C:/ProgramData/chocolatey/bin/lld-link.exe"
+      - "C:/ProgramData/chocolatey/bin/lld-link"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/nodejs/lld-link.com"
+      - "C:/Program Files/nodejs/lld-link.exe"
+      - "C:/Program Files/nodejs/lld-link"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link.com"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/lld-link"
+      - "C:/Program Files/PowerShell/7/lld-link.com"
+      - "C:/Program Files/PowerShell/7/lld-link.exe"
+      - "C:/Program Files/PowerShell/7/lld-link"
+      - "C:/Program Files (x86)/Incredibuild/lld-link.com"
+      - "C:/Program Files (x86)/Incredibuild/lld-link.exe"
+      - "C:/Program Files (x86)/Incredibuild/lld-link"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/lld-link"
+      - "C:/Program Files/Python311/lld-link.com"
+      - "C:/Program Files/Python311/lld-link.exe"
+      - "C:/Program Files/Python311/lld-link"
+      - "C:/Program Files/Python311/Scripts/lld-link.com"
+      - "C:/Program Files/Python311/Scripts/lld-link.exe"
+      - "C:/Program Files/Python311/Scripts/lld-link"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/david/.dotnet/tools/lld-link.com"
+      - "C:/Users/david/.dotnet/tools/lld-link.exe"
+      - "C:/Users/david/.dotnet/tools/lld-link"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/lld-link"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/lld-link"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/lld-link"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link.com"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link.exe"
+      - "C:/Users/david/AppData/Roaming/npm/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineRCCompiler.cmake:40 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Platform/Windows-MSVC.cmake:573 (enable_language)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Platform/Windows-MSVC.cmake:546 (__windows_compiler_msvc_enable_rc)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Platform/Windows-MSVC-C.cmake:5 (__windows_compiler_msvc)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeCInformation.cmake:48 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_RC_COMPILER"
+    description: "RC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "rc"
+    candidate_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files/EternalJK2/bin/"
+      - "C:/Program Files/EternalJK2/sbin/"
+      - "C:/Program Files/EternalJK2/"
+    searched_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/rc.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/rc.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/rc"
+      - "C:/Python313/Scripts/rc.com"
+      - "C:/Python313/Scripts/rc.exe"
+      - "C:/Python313/Scripts/rc"
+      - "C:/Python313/rc.com"
+      - "C:/Python313/rc.exe"
+      - "C:/Python313/rc"
+      - "C:/Program Files/Python312/Scripts/rc.com"
+      - "C:/Program Files/Python312/Scripts/rc.exe"
+      - "C:/Program Files/Python312/Scripts/rc"
+      - "C:/Program Files/Python312/rc.com"
+      - "C:/Program Files/Python312/rc.exe"
+      - "C:/Program Files/Python312/rc"
+      - "C:/Windows/System32/rc.com"
+      - "C:/Windows/System32/rc.exe"
+      - "C:/Windows/System32/rc"
+      - "C:/Windows/rc.com"
+      - "C:/Windows/rc.exe"
+      - "C:/Windows/rc"
+      - "C:/Windows/System32/wbem/rc.com"
+      - "C:/Windows/System32/wbem/rc.exe"
+      - "C:/Windows/System32/wbem/rc"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc"
+      - "C:/Windows/System32/OpenSSH/rc.com"
+      - "C:/Windows/System32/OpenSSH/rc.exe"
+      - "C:/Windows/System32/OpenSSH/rc"
+      - "C:/Program Files/GitHub CLI/rc.com"
+      - "C:/Program Files/GitHub CLI/rc.exe"
+      - "C:/Program Files/GitHub CLI/rc"
+      - "C:/ProgramData/chocolatey/bin/rc.com"
+      - "C:/ProgramData/chocolatey/bin/rc.exe"
+      - "C:/ProgramData/chocolatey/bin/rc"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/rc.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/rc.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/rc"
+      - "C:/Program Files/Git/cmd/rc.com"
+      - "C:/Program Files/Git/cmd/rc.exe"
+      - "C:/Program Files/Git/cmd/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc"
+      - "C:/Program Files/nodejs/rc.com"
+      - "C:/Program Files/nodejs/rc.exe"
+      - "C:/Program Files/nodejs/rc"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc"
+      - "C:/Program Files (x86)/GnuPG/bin/rc.com"
+      - "C:/Program Files (x86)/GnuPG/bin/rc.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/rc"
+      - "C:/Program Files/dotnet/rc.com"
+      - "C:/Program Files/dotnet/rc.exe"
+      - "C:/Program Files/dotnet/rc"
+      - "C:/Program Files/Docker/Docker/resources/bin/rc.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/rc.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/rc"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/rc"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/rc.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/rc.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/rc"
+      - "C:/Program Files/PowerShell/7/rc.com"
+      - "C:/Program Files/PowerShell/7/rc.exe"
+      - "C:/Program Files/PowerShell/7/rc"
+      - "C:/Program Files (x86)/Incredibuild/rc.com"
+      - "C:/Program Files (x86)/Incredibuild/rc.exe"
+      - "C:/Program Files (x86)/Incredibuild/rc"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/rc.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/rc.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/rc"
+      - "C:/Program Files/Python311/rc.com"
+      - "C:/Program Files/Python311/rc.exe"
+      - "C:/Program Files/Python311/rc"
+      - "C:/Program Files/Python311/Scripts/rc.com"
+      - "C:/Program Files/Python311/Scripts/rc.exe"
+      - "C:/Program Files/Python311/Scripts/rc"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/rc.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/rc.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/rc"
+      - "C:/Users/david/.dotnet/tools/rc.com"
+      - "C:/Users/david/.dotnet/tools/rc.exe"
+      - "C:/Users/david/.dotnet/tools/rc"
+      - "C:/ProgramData/david/GitHubDesktop/bin/rc.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/rc.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/rc"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/rc.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/rc.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/rc"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/rc.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/rc.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/rc"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/rc.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/rc.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/rc"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/rc.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/rc.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/rc"
+      - "C:/Users/david/AppData/Roaming/npm/rc.com"
+      - "C:/Users/david/AppData/Roaming/npm/rc.exe"
+      - "C:/Users/david/AppData/Roaming/npm/rc"
+      - "C:/Program Files/bin/rc.com"
+      - "C:/Program Files/bin/rc.exe"
+      - "C:/Program Files/bin/rc"
+      - "C:/Program Files/sbin/rc.com"
+      - "C:/Program Files/sbin/rc.exe"
+      - "C:/Program Files/sbin/rc"
+      - "C:/Program Files/rc.com"
+      - "C:/Program Files/rc.exe"
+      - "C:/Program Files/rc"
+      - "C:/Program Files (x86)/bin/rc.com"
+      - "C:/Program Files (x86)/bin/rc.exe"
+      - "C:/Program Files (x86)/bin/rc"
+      - "C:/Program Files (x86)/sbin/rc.com"
+      - "C:/Program Files (x86)/sbin/rc.exe"
+      - "C:/Program Files (x86)/sbin/rc"
+      - "C:/Program Files (x86)/rc.com"
+      - "C:/Program Files (x86)/rc.exe"
+      - "C:/Program Files (x86)/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/CMake/sbin/rc.com"
+      - "C:/Program Files/CMake/sbin/rc.exe"
+      - "C:/Program Files/CMake/sbin/rc"
+      - "C:/Program Files/CMake/rc.com"
+      - "C:/Program Files/CMake/rc.exe"
+      - "C:/Program Files/CMake/rc"
+      - "C:/Program Files/EternalJK2/bin/rc.com"
+      - "C:/Program Files/EternalJK2/bin/rc.exe"
+      - "C:/Program Files/EternalJK2/bin/rc"
+      - "C:/Program Files/EternalJK2/sbin/rc.com"
+      - "C:/Program Files/EternalJK2/sbin/rc.exe"
+      - "C:/Program Files/EternalJK2/sbin/rc"
+      - "C:/Program Files/EternalJK2/rc.com"
+      - "C:/Program Files/EternalJK2/rc.exe"
+      - "C:/Program Files/EternalJK2/rc"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/EternalJK2"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/EternalJK2"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-hldw84"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-hldw84"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-hldw84'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_17a57.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:42 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-hldw84\\cmTC_17a57.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_17a57.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-hldw84\\Debug\\".
+          Creating directory "cmTC_17a57.dir\\Debug\\cmTC_17a57.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_17a57.dir\\Debug\\cmTC_17a57.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_17a57.dir\\Debug\\cmTC_17a57.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_17a57.dir\\Debug\\\\" /Fd"cmTC_17a57.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_17a57.dir\\Debug\\\\" /Fd"cmTC_17a57.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+          CMakeCCompilerABI.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-hldw84\\Debug\\cmTC_17a57.exe" /INCREMENTAL /ILK:"cmTC_17a57.dir\\Debug\\cmTC_17a57.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-hldw84/Debug/cmTC_17a57.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-hldw84/Debug/cmTC_17a57.lib" /MACHINE:X64  /machine:x64 cmTC_17a57.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_17a57.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-hldw84\\Debug\\cmTC_17a57.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_17a57.dir\\Debug\\cmTC_17a57.tlog\\unsuccessfulbuild".
+          Touching "cmTC_17a57.dir\\Debug\\cmTC_17a57.tlog\\cmTC_17a57.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-hldw84\\cmTC_17a57.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.31
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'C': C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Internal/CMakeDetermineLinkerId.cmake:36 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Running the C compiler's linker: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.44.35214.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-gq5k9h"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-gq5k9h"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-gq5k9h'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4f83e.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:43 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-gq5k9h\\cmTC_4f83e.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_4f83e.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-gq5k9h\\Debug\\".
+          Creating directory "cmTC_4f83e.dir\\Debug\\cmTC_4f83e.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_4f83e.dir\\Debug\\cmTC_4f83e.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_4f83e.dir\\Debug\\cmTC_4f83e.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_4f83e.dir\\Debug\\\\" /Fd"cmTC_4f83e.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_4f83e.dir\\Debug\\\\" /Fd"cmTC_4f83e.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+          CMakeCXXCompilerABI.cpp
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-gq5k9h\\Debug\\cmTC_4f83e.exe" /INCREMENTAL /ILK:"cmTC_4f83e.dir\\Debug\\cmTC_4f83e.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-gq5k9h/Debug/cmTC_4f83e.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-gq5k9h/Debug/cmTC_4f83e.lib" /MACHINE:X64  /machine:x64 cmTC_4f83e.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_4f83e.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-gq5k9h\\Debug\\cmTC_4f83e.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_4f83e.dir\\Debug\\cmTC_4f83e.tlog\\unsuccessfulbuild".
+          Touching "cmTC_4f83e.dir\\Debug\\cmTC_4f83e.tlog\\cmTC_4f83e.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-gq5k9h\\cmTC_4f83e.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.32
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Internal/CMakeDetermineLinkerId.cmake:36 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Running the CXX compiler's linker: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.44.35214.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "find-v1"
+    backtrace:
+      - "CMakeLists.txt:27 (find_program)"
+    mode: "program"
+    variable: "NASM_EXECUTABLE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nasm"
+    candidate_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files/EternalJK2/bin/"
+      - "C:/Program Files/EternalJK2/sbin/"
+      - "C:/Program Files/EternalJK2/"
+    searched_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/nasm.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/nasm.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/nasm"
+      - "C:/Python313/Scripts/nasm.com"
+      - "C:/Python313/Scripts/nasm.exe"
+      - "C:/Python313/Scripts/nasm"
+      - "C:/Python313/nasm.com"
+      - "C:/Python313/nasm.exe"
+      - "C:/Python313/nasm"
+      - "C:/Program Files/Python312/Scripts/nasm.com"
+      - "C:/Program Files/Python312/Scripts/nasm.exe"
+      - "C:/Program Files/Python312/Scripts/nasm"
+      - "C:/Program Files/Python312/nasm.com"
+      - "C:/Program Files/Python312/nasm.exe"
+      - "C:/Program Files/Python312/nasm"
+      - "C:/Windows/System32/nasm.com"
+      - "C:/Windows/System32/nasm.exe"
+      - "C:/Windows/System32/nasm"
+      - "C:/Windows/nasm.com"
+      - "C:/Windows/nasm.exe"
+      - "C:/Windows/nasm"
+      - "C:/Windows/System32/wbem/nasm.com"
+      - "C:/Windows/System32/wbem/nasm.exe"
+      - "C:/Windows/System32/wbem/nasm"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/nasm.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/nasm.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/nasm"
+      - "C:/Windows/System32/OpenSSH/nasm.com"
+      - "C:/Windows/System32/OpenSSH/nasm.exe"
+      - "C:/Windows/System32/OpenSSH/nasm"
+      - "C:/Program Files/GitHub CLI/nasm.com"
+      - "C:/Program Files/GitHub CLI/nasm.exe"
+      - "C:/Program Files/GitHub CLI/nasm"
+      - "C:/ProgramData/chocolatey/bin/nasm.com"
+      - "C:/ProgramData/chocolatey/bin/nasm.exe"
+      - "C:/ProgramData/chocolatey/bin/nasm"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/nasm.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/nasm.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/nasm"
+      - "C:/Program Files/Git/cmd/nasm.com"
+      - "C:/Program Files/Git/cmd/nasm.exe"
+      - "C:/Program Files/Git/cmd/nasm"
+      - "C:/Program Files/CMake/bin/nasm.com"
+      - "C:/Program Files/CMake/bin/nasm.exe"
+      - "C:/Program Files/CMake/bin/nasm"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/nasm.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/nasm.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/nasm"
+      - "C:/Program Files/nodejs/nasm.com"
+      - "C:/Program Files/nodejs/nasm.exe"
+      - "C:/Program Files/nodejs/nasm"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/nasm.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/nasm.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/nasm"
+      - "C:/Program Files (x86)/GnuPG/bin/nasm.com"
+      - "C:/Program Files (x86)/GnuPG/bin/nasm.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/nasm"
+      - "C:/Program Files/dotnet/nasm.com"
+      - "C:/Program Files/dotnet/nasm.exe"
+      - "C:/Program Files/dotnet/nasm"
+      - "C:/Program Files/Docker/Docker/resources/bin/nasm.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/nasm.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/nasm"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/nasm.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/nasm.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/nasm"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/nasm.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/nasm.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/nasm"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/nasm.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/nasm.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/nasm"
+      - "C:/Program Files/PowerShell/7/nasm.com"
+      - "C:/Program Files/PowerShell/7/nasm.exe"
+      - "C:/Program Files/PowerShell/7/nasm"
+      - "C:/Program Files (x86)/Incredibuild/nasm.com"
+      - "C:/Program Files (x86)/Incredibuild/nasm.exe"
+      - "C:/Program Files (x86)/Incredibuild/nasm"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/nasm.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/nasm.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/nasm"
+      - "C:/Program Files/Python311/nasm.com"
+      - "C:/Program Files/Python311/nasm.exe"
+      - "C:/Program Files/Python311/nasm"
+      - "C:/Program Files/Python311/Scripts/nasm.com"
+      - "C:/Program Files/Python311/Scripts/nasm.exe"
+      - "C:/Program Files/Python311/Scripts/nasm"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/nasm.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/nasm.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/nasm"
+      - "C:/Users/david/.dotnet/tools/nasm.com"
+      - "C:/Users/david/.dotnet/tools/nasm.exe"
+      - "C:/Users/david/.dotnet/tools/nasm"
+      - "C:/ProgramData/david/GitHubDesktop/bin/nasm.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/nasm.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/nasm"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/nasm.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/nasm.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/nasm"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/nasm.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/nasm.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/nasm"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/nasm.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/nasm.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/nasm"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/nasm.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/nasm.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/nasm"
+      - "C:/Users/david/AppData/Roaming/npm/nasm.com"
+      - "C:/Users/david/AppData/Roaming/npm/nasm.exe"
+      - "C:/Users/david/AppData/Roaming/npm/nasm"
+      - "C:/Program Files/bin/nasm.com"
+      - "C:/Program Files/bin/nasm.exe"
+      - "C:/Program Files/bin/nasm"
+      - "C:/Program Files/sbin/nasm.com"
+      - "C:/Program Files/sbin/nasm.exe"
+      - "C:/Program Files/sbin/nasm"
+      - "C:/Program Files/nasm.com"
+      - "C:/Program Files/nasm.exe"
+      - "C:/Program Files/nasm"
+      - "C:/Program Files (x86)/bin/nasm.com"
+      - "C:/Program Files (x86)/bin/nasm.exe"
+      - "C:/Program Files (x86)/bin/nasm"
+      - "C:/Program Files (x86)/sbin/nasm.com"
+      - "C:/Program Files (x86)/sbin/nasm.exe"
+      - "C:/Program Files (x86)/sbin/nasm"
+      - "C:/Program Files (x86)/nasm.com"
+      - "C:/Program Files (x86)/nasm.exe"
+      - "C:/Program Files (x86)/nasm"
+      - "C:/Program Files/CMake/bin/nasm.com"
+      - "C:/Program Files/CMake/bin/nasm.exe"
+      - "C:/Program Files/CMake/bin/nasm"
+      - "C:/Program Files/CMake/sbin/nasm.com"
+      - "C:/Program Files/CMake/sbin/nasm.exe"
+      - "C:/Program Files/CMake/sbin/nasm"
+      - "C:/Program Files/CMake/nasm.com"
+      - "C:/Program Files/CMake/nasm.exe"
+      - "C:/Program Files/CMake/nasm"
+      - "C:/Program Files/EternalJK2/bin/nasm.com"
+      - "C:/Program Files/EternalJK2/bin/nasm.exe"
+      - "C:/Program Files/EternalJK2/bin/nasm"
+      - "C:/Program Files/EternalJK2/sbin/nasm.com"
+      - "C:/Program Files/EternalJK2/sbin/nasm.exe"
+      - "C:/Program Files/EternalJK2/sbin/nasm"
+      - "C:/Program Files/EternalJK2/nasm.com"
+      - "C:/Program Files/EternalJK2/nasm.exe"
+      - "C:/Program Files/EternalJK2/nasm"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/EternalJK2"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/EternalJK2"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFile.cmake:165 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:343 (check_include_file)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:122 (check_type_size)"
+    checks:
+      - "Looking for sys/types.h"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-6n20zk"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-6n20zk"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_SYS_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-6n20zk'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d4b4d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:43 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\cmTC_d4b4d.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_d4b4d.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\Debug\\".
+          Creating directory "cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_d4b4d.dir\\Debug\\\\" /Fd"cmTC_d4b4d.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\CheckIncludeFile.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_d4b4d.dir\\Debug\\\\" /Fd"cmTC_d4b4d.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\Debug\\cmTC_d4b4d.exe" /INCREMENTAL /ILK:"cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-6n20zk/Debug/cmTC_d4b4d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-6n20zk/Debug/cmTC_d4b4d.lib" /MACHINE:X64  /machine:x64 cmTC_d4b4d.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_d4b4d.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\Debug\\cmTC_d4b4d.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.tlog\\unsuccessfulbuild".
+          Touching "cmTC_d4b4d.dir\\Debug\\cmTC_d4b4d.tlog\\cmTC_d4b4d.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-6n20zk\\cmTC_d4b4d.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.33
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFile.cmake:165 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:344 (check_include_file)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:122 (check_type_size)"
+    checks:
+      - "Looking for stdint.h"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-ynnui3"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-ynnui3"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_STDINT_H"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-ynnui3'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_009fc.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:44 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\cmTC_009fc.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_009fc.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\Debug\\".
+          Creating directory "cmTC_009fc.dir\\Debug\\cmTC_009fc.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_009fc.dir\\Debug\\cmTC_009fc.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_009fc.dir\\Debug\\cmTC_009fc.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_009fc.dir\\Debug\\\\" /Fd"cmTC_009fc.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\CheckIncludeFile.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_009fc.dir\\Debug\\\\" /Fd"cmTC_009fc.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\Debug\\cmTC_009fc.exe" /INCREMENTAL /ILK:"cmTC_009fc.dir\\Debug\\cmTC_009fc.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-ynnui3/Debug/cmTC_009fc.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-ynnui3/Debug/cmTC_009fc.lib" /MACHINE:X64  /machine:x64 cmTC_009fc.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_009fc.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\Debug\\cmTC_009fc.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_009fc.dir\\Debug\\cmTC_009fc.tlog\\unsuccessfulbuild".
+          Touching "cmTC_009fc.dir\\Debug\\cmTC_009fc.tlog\\cmTC_009fc.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-ynnui3\\cmTC_009fc.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.31
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFile.cmake:165 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:345 (check_include_file)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:122 (check_type_size)"
+    checks:
+      - "Looking for stddef.h"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-m1gr5s"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-m1gr5s"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_STDDEF_H"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-m1gr5s'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_de2fa.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:44 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\cmTC_de2fa.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_de2fa.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\Debug\\".
+          Creating directory "cmTC_de2fa.dir\\Debug\\cmTC_de2fa.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_de2fa.dir\\Debug\\cmTC_de2fa.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_de2fa.dir\\Debug\\cmTC_de2fa.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_de2fa.dir\\Debug\\\\" /Fd"cmTC_de2fa.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\CheckIncludeFile.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_de2fa.dir\\Debug\\\\" /Fd"cmTC_de2fa.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\CheckIncludeFile.c"
+          CheckIncludeFile.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\Debug\\cmTC_de2fa.exe" /INCREMENTAL /ILK:"cmTC_de2fa.dir\\Debug\\cmTC_de2fa.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-m1gr5s/Debug/cmTC_de2fa.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-m1gr5s/Debug/cmTC_de2fa.lib" /MACHINE:X64  /machine:x64 cmTC_de2fa.dir\\Debug\\CheckIncludeFile.obj
+          cmTC_de2fa.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\Debug\\cmTC_de2fa.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_de2fa.dir\\Debug\\cmTC_de2fa.tlog\\unsuccessfulbuild".
+          Touching "cmTC_de2fa.dir\\Debug\\cmTC_de2fa.tlog\\cmTC_de2fa.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-m1gr5s\\cmTC_de2fa.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.32
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:237 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:364 (__check_type_size_impl)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:122 (check_type_size)"
+    checks:
+      - "Check size of size_t"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1nv5u8"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1nv5u8"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_SIZE_T"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1nv5u8'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_69116.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:45 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\cmTC_69116.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_69116.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\Debug\\".
+          Creating directory "cmTC_69116.dir\\Debug\\cmTC_69116.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_69116.dir\\Debug\\cmTC_69116.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_69116.dir\\Debug\\cmTC_69116.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_69116.dir\\Debug\\\\" /Fd"cmTC_69116.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\SIZE_T.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_69116.dir\\Debug\\\\" /Fd"cmTC_69116.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\SIZE_T.c"
+          SIZE_T.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\Debug\\cmTC_69116.exe" /INCREMENTAL /ILK:"cmTC_69116.dir\\Debug\\cmTC_69116.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1nv5u8/Debug/cmTC_69116.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1nv5u8/Debug/cmTC_69116.lib" /MACHINE:X64  /machine:x64 cmTC_69116.dir\\Debug\\SIZE_T.obj
+          cmTC_69116.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\Debug\\cmTC_69116.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_69116.dir\\Debug\\cmTC_69116.tlog\\unsuccessfulbuild".
+          Touching "cmTC_69116.dir\\Debug\\cmTC_69116.tlog\\cmTC_69116.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1nv5u8\\cmTC_69116.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.31
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:237 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckTypeSize.cmake:364 (__check_type_size_impl)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:123 (check_type_size)"
+    checks:
+      - "Check size of unsigned long"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-crf0jl"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-crf0jl"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_UNSIGNED_LONG"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-crf0jl'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d172d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:45 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\cmTC_d172d.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_d172d.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\Debug\\".
+          Creating directory "cmTC_d172d.dir\\Debug\\cmTC_d172d.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_d172d.dir\\Debug\\cmTC_d172d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_d172d.dir\\Debug\\cmTC_d172d.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_d172d.dir\\Debug\\\\" /Fd"cmTC_d172d.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\UNSIGNED_LONG.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_d172d.dir\\Debug\\\\" /Fd"cmTC_d172d.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\UNSIGNED_LONG.c"
+          UNSIGNED_LONG.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\Debug\\cmTC_d172d.exe" /INCREMENTAL /ILK:"cmTC_d172d.dir\\Debug\\cmTC_d172d.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-crf0jl/Debug/cmTC_d172d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-crf0jl/Debug/cmTC_d172d.lib" /MACHINE:X64  /machine:x64 cmTC_d172d.dir\\Debug\\UNSIGNED_LONG.obj
+          cmTC_d172d.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\Debug\\cmTC_d172d.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_d172d.dir\\Debug\\cmTC_d172d.tlog\\unsuccessfulbuild".
+          Touching "cmTC_d172d.dir\\Debug\\cmTC_d172d.tlog\\cmTC_d172d.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-crf0jl\\cmTC_d172d.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.33
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckIncludeFiles.cmake:195 (try_compile)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:130 (check_include_files)"
+    checks:
+      - "Looking for include file intrin.h"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-37hku6"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-37hku6"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_INTRIN_H"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-37hku6'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_404a2.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:46 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\cmTC_404a2.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_404a2.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\Debug\\".
+          Creating directory "cmTC_404a2.dir\\Debug\\cmTC_404a2.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_404a2.dir\\Debug\\cmTC_404a2.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_404a2.dir\\Debug\\cmTC_404a2.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_404a2.dir\\Debug\\\\" /Fd"cmTC_404a2.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\HAVE_INTRIN_H.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_404a2.dir\\Debug\\\\" /Fd"cmTC_404a2.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\HAVE_INTRIN_H.c"
+          HAVE_INTRIN_H.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\Debug\\cmTC_404a2.exe" /INCREMENTAL /ILK:"cmTC_404a2.dir\\Debug\\cmTC_404a2.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-37hku6/Debug/cmTC_404a2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-37hku6/Debug/cmTC_404a2.lib" /MACHINE:X64  /machine:x64 cmTC_404a2.dir\\Debug\\HAVE_INTRIN_H.obj
+          cmTC_404a2.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\Debug\\cmTC_404a2.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_404a2.dir\\Debug\\cmTC_404a2.tlog\\unsuccessfulbuild".
+          Touching "cmTC_404a2.dir\\Debug\\cmTC_404a2.tlog\\cmTC_404a2.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-37hku6\\cmTC_404a2.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.38
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:183 (check_c_source_compiles)"
+    checks:
+      - "Performing Test INLINE_WORKS"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-kyb35q"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-kyb35q"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "INLINE_WORKS"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-kyb35q'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_78755.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:46 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\cmTC_78755.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_78755.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\Debug\\".
+          Creating directory "cmTC_78755.dir\\Debug\\cmTC_78755.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_78755.dir\\Debug\\cmTC_78755.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_78755.dir\\Debug\\cmTC_78755.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D INLINE_WORKS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_78755.dir\\Debug\\\\" /Fd"cmTC_78755.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D INLINE_WORKS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_78755.dir\\Debug\\\\" /Fd"cmTC_78755.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\src.c"
+          src.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\Debug\\cmTC_78755.exe" /INCREMENTAL /ILK:"cmTC_78755.dir\\Debug\\cmTC_78755.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-kyb35q/Debug/cmTC_78755.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-kyb35q/Debug/cmTC_78755.lib" /MACHINE:X64  /machine:x64 cmTC_78755.dir\\Debug\\src.obj
+          cmTC_78755.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\Debug\\cmTC_78755.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_78755.dir\\Debug\\cmTC_78755.tlog\\unsuccessfulbuild".
+          Touching "cmTC_78755.dir\\Debug\\cmTC_78755.tlog\\cmTC_78755.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-kyb35q\\cmTC_78755.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.31
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "libs/libjpeg-turbo/CMakeLists.txt:200 (check_c_source_compiles)"
+    checks:
+      - "Performing Test HAVE_THREAD_LOCAL"
+    directories:
+      source: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1fy6ka"
+      binary: "D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1fy6ka"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /wd4244 /wd4996 /wd4267"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "D:/Workspace/jk2mv-tom/res;D:/Workspace/jk2mv-tom/tools"
+    buildResult:
+      variable: "HAVE_THREAD_LOCAL"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1fy6ka'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_33c0b.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.18+a338add32 for .NET Framework
+        Build started 8/10/2025 6:32:46 PM.
+        
+        Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\cmTC_33c0b.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_33c0b.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\Debug\\".
+          Creating directory "cmTC_33c0b.dir\\Debug\\cmTC_33c0b.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_33c0b.dir\\Debug\\cmTC_33c0b.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_33c0b.dir\\Debug\\cmTC_33c0b.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_THREAD_LOCAL /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_33c0b.dir\\Debug\\\\" /Fd"cmTC_33c0b.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35214 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D HAVE_THREAD_LOCAL /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_33c0b.dir\\Debug\\\\" /Fd"cmTC_33c0b.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /wd4244 /wd4996 /wd4267 /errorReport:queue "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\src.c"
+          src.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\Debug\\cmTC_33c0b.exe" /INCREMENTAL /ILK:"cmTC_33c0b.dir\\Debug\\cmTC_33c0b.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1fy6ka/Debug/cmTC_33c0b.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/CMakeScratch/TryCompile-1fy6ka/Debug/cmTC_33c0b.lib" /MACHINE:X64  /machine:x64 cmTC_33c0b.dir\\Debug\\src.obj
+          cmTC_33c0b.vcxproj -> D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\Debug\\cmTC_33c0b.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_33c0b.dir\\Debug\\cmTC_33c0b.tlog\\unsuccessfulbuild".
+          Touching "cmTC_33c0b.dir\\Debug\\cmTC_33c0b.tlog\\cmTC_33c0b.lastbuildstate".
+        Done Building Project "D:\\Workspace\\jk2mv-tom\\build-clean\\CMakeFiles\\CMakeScratch\\TryCompile-1fy6ka\\cmTC_33c0b.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.32
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/CheckLanguage.cmake:164 (message)"
+      - "libs/libjpeg-turbo/simd/CMakeLists.txt:46 (check_language)"
+    checks:
+      - "Looking for a ASM_NASM compiler"
+    message: |
+      Looking for a ASM_NASM compiler failed with the following output:
+      -- The ASM_NASM compiler identification is unknown
+      -- Didn't find assembler
+      CMake Error at CMakeLists.txt:17 (project):
+        No CMAKE_ASM_NASM_COMPILER could be found.
+      
+      
+      
+      -- Configuring incomplete, errors occurred!
+      
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.1/Modules/FindGit.cmake:86 (find_program)"
+      - "src/mvsdk/cmake/GetGitRevisionDescription.cmake:85 (find_package)"
+      - "src/mvsdk/CMakeLists.txt:23 (git_describe)"
+    mode: "program"
+    variable: "GIT_EXECUTABLE"
+    description: "Git command line client"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "git.cmd"
+      - "git"
+    candidate_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/"
+      - "C:/Python313/Scripts/"
+      - "C:/Python313/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files (x86)/GnuPG/bin/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/Docker/Docker/resources/bin/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/"
+      - "C:/Program Files/PowerShell/7/"
+      - "C:/Program Files (x86)/Incredibuild/"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/"
+      - "C:/Program Files/Python311/"
+      - "C:/Program Files/Python311/Scripts/"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/david/.dotnet/tools/"
+      - "C:/ProgramData/david/GitHubDesktop/bin/"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/Users/david/AppData/Roaming/npm/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files/EternalJK2/bin/"
+      - "C:/Program Files/EternalJK2/sbin/"
+      - "C:/Program Files/EternalJK2/"
+      - "C:/Users/david/AppData/Local/Atlassian/SourceTree/git_local/bin/"
+    searched_directories:
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git.cmd.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git.cmd.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git.cmd"
+      - "C:/Python313/Scripts/git.cmd.com"
+      - "C:/Python313/Scripts/git.cmd.exe"
+      - "C:/Python313/Scripts/git.cmd"
+      - "C:/Python313/git.cmd.com"
+      - "C:/Python313/git.cmd.exe"
+      - "C:/Python313/git.cmd"
+      - "C:/Program Files/Python312/Scripts/git.cmd.com"
+      - "C:/Program Files/Python312/Scripts/git.cmd.exe"
+      - "C:/Program Files/Python312/Scripts/git.cmd"
+      - "C:/Program Files/Python312/git.cmd.com"
+      - "C:/Program Files/Python312/git.cmd.exe"
+      - "C:/Program Files/Python312/git.cmd"
+      - "C:/Windows/System32/git.cmd.com"
+      - "C:/Windows/System32/git.cmd.exe"
+      - "C:/Windows/System32/git.cmd"
+      - "C:/Windows/git.cmd.com"
+      - "C:/Windows/git.cmd.exe"
+      - "C:/Windows/git.cmd"
+      - "C:/Windows/System32/wbem/git.cmd.com"
+      - "C:/Windows/System32/wbem/git.cmd.exe"
+      - "C:/Windows/System32/wbem/git.cmd"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd"
+      - "C:/Windows/System32/OpenSSH/git.cmd.com"
+      - "C:/Windows/System32/OpenSSH/git.cmd.exe"
+      - "C:/Windows/System32/OpenSSH/git.cmd"
+      - "C:/Program Files/GitHub CLI/git.cmd.com"
+      - "C:/Program Files/GitHub CLI/git.cmd.exe"
+      - "C:/Program Files/GitHub CLI/git.cmd"
+      - "C:/ProgramData/chocolatey/bin/git.cmd.com"
+      - "C:/ProgramData/chocolatey/bin/git.cmd.exe"
+      - "C:/ProgramData/chocolatey/bin/git.cmd"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git.cmd.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git.cmd.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git.cmd"
+      - "C:/Program Files/Git/cmd/git.cmd.com"
+      - "C:/Program Files/Git/cmd/git.cmd.exe"
+      - "C:/Program Files/Git/cmd/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd"
+      - "C:/Program Files/nodejs/git.cmd.com"
+      - "C:/Program Files/nodejs/git.cmd.exe"
+      - "C:/Program Files/nodejs/git.cmd"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd"
+      - "C:/Program Files (x86)/GnuPG/bin/git.cmd.com"
+      - "C:/Program Files (x86)/GnuPG/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/GnuPG/bin/git.cmd"
+      - "C:/Program Files/dotnet/git.cmd.com"
+      - "C:/Program Files/dotnet/git.cmd.exe"
+      - "C:/Program Files/dotnet/git.cmd"
+      - "C:/Program Files/Docker/Docker/resources/bin/git.cmd.com"
+      - "C:/Program Files/Docker/Docker/resources/bin/git.cmd.exe"
+      - "C:/Program Files/Docker/Docker/resources/bin/git.cmd"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/git.cmd.com"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/git.cmd.exe"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/git.cmd"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/git.cmd.com"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/git.cmd.exe"
+      - "C:/Users/david/AppData/Local/Programs/Python/Python311/git.cmd"
+      - "C:/Program Files/PowerShell/7/git.cmd.com"
+      - "C:/Program Files/PowerShell/7/git.cmd.exe"
+      - "C:/Program Files/PowerShell/7/git.cmd"
+      - "C:/Program Files (x86)/Incredibuild/git.cmd.com"
+      - "C:/Program Files (x86)/Incredibuild/git.cmd.exe"
+      - "C:/Program Files (x86)/Incredibuild/git.cmd"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/git.cmd.com"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/git.cmd.exe"
+      - "C:/Users/david/Downloads/ai-mastery-system/.venv312/Scripts/git.cmd"
+      - "C:/Program Files/Python311/git.cmd.com"
+      - "C:/Program Files/Python311/git.cmd.exe"
+      - "C:/Program Files/Python311/git.cmd"
+      - "C:/Program Files/Python311/Scripts/git.cmd.com"
+      - "C:/Program Files/Python311/Scripts/git.cmd.exe"
+      - "C:/Program Files/Python311/Scripts/git.cmd"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/git.cmd.com"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/git.cmd.exe"
+      - "C:/Users/david/AppData/Local/Microsoft/WindowsApps/git.cmd"
+      - "C:/Users/david/.dotnet/tools/git.cmd.com"
+      - "C:/Users/david/.dotnet/tools/git.cmd.exe"
+      - "C:/Users/david/.dotnet/tools/git.cmd"
+      - "C:/ProgramData/david/GitHubDesktop/bin/git.cmd.com"
+      - "C:/ProgramData/david/GitHubDesktop/bin/git.cmd.exe"
+      - "C:/ProgramData/david/GitHubDesktop/bin/git.cmd"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/git.cmd.com"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/git.cmd.exe"
+      - "C:/Users/david/AppData/Local/GitHubDesktop/bin/git.cmd"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/git.cmd.com"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/git.cmd.exe"
+      - "C:/Users/david/.vscode/extensions/ms-python.debugpy-2025.8.0-win32-x64/bundled/scripts/noConfigScripts/git.cmd"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/git.cmd.com"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/git.cmd.exe"
+      - "C:/Users/david/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/git.cmd"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd.com"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd.exe"
+      - "C:/Users/david/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd"
+      - "C:/Users/david/AppData/Roaming/npm/git.cmd.com"
+      - "C:/Users/david/AppData/Roaming/npm/git.cmd.exe"
+      - "C:/Users/david/AppData/Roaming/npm/git.cmd"
+      - "C:/Program Files/bin/git.cmd.com"
+      - "C:/Program Files/bin/git.cmd.exe"
+      - "C:/Program Files/bin/git.cmd"
+      - "C:/Program Files/sbin/git.cmd.com"
+      - "C:/Program Files/sbin/git.cmd.exe"
+      - "C:/Program Files/sbin/git.cmd"
+      - "C:/Program Files/git.cmd.com"
+      - "C:/Program Files/git.cmd.exe"
+      - "C:/Program Files/git.cmd"
+      - "C:/Program Files (x86)/bin/git.cmd.com"
+      - "C:/Program Files (x86)/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/bin/git.cmd"
+      - "C:/Program Files (x86)/sbin/git.cmd.com"
+      - "C:/Program Files (x86)/sbin/git.cmd.exe"
+      - "C:/Program Files (x86)/sbin/git.cmd"
+      - "C:/Program Files (x86)/git.cmd.com"
+      - "C:/Program Files (x86)/git.cmd.exe"
+      - "C:/Program Files (x86)/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Program Files/CMake/sbin/git.cmd.com"
+      - "C:/Program Files/CMake/sbin/git.cmd.exe"
+      - "C:/Program Files/CMake/sbin/git.cmd"
+      - "C:/Program Files/CMake/git.cmd.com"
+      - "C:/Program Files/CMake/git.cmd.exe"
+      - "C:/Program Files/CMake/git.cmd"
+      - "C:/Program Files/EternalJK2/bin/git.cmd.com"
+      - "C:/Program Files/EternalJK2/bin/git.cmd.exe"
+      - "C:/Program Files/EternalJK2/bin/git.cmd"
+      - "C:/Program Files/EternalJK2/sbin/git.cmd.com"
+      - "C:/Program Files/EternalJK2/sbin/git.cmd.exe"
+      - "C:/Program Files/EternalJK2/sbin/git.cmd"
+      - "C:/Program Files/EternalJK2/git.cmd.com"
+      - "C:/Program Files/EternalJK2/git.cmd.exe"
+      - "C:/Program Files/EternalJK2/git.cmd"
+      - "C:/Users/david/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.com"
+      - "C:/Users/david/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.exe"
+      - "C:/Users/david/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git.com"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git.exe"
+      - "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe/git"
+      - "C:/Python313/Scripts/git.com"
+      - "C:/Python313/Scripts/git.exe"
+      - "C:/Python313/Scripts/git"
+      - "C:/Python313/git.com"
+      - "C:/Python313/git.exe"
+      - "C:/Python313/git"
+      - "C:/Program Files/Python312/Scripts/git.com"
+      - "C:/Program Files/Python312/Scripts/git.exe"
+      - "C:/Program Files/Python312/Scripts/git"
+      - "C:/Program Files/Python312/git.com"
+      - "C:/Program Files/Python312/git.exe"
+      - "C:/Program Files/Python312/git"
+      - "C:/Windows/System32/git.com"
+      - "C:/Windows/System32/git.exe"
+      - "C:/Windows/System32/git"
+      - "C:/Windows/git.com"
+      - "C:/Windows/git.exe"
+      - "C:/Windows/git"
+      - "C:/Windows/System32/wbem/git.com"
+      - "C:/Windows/System32/wbem/git.exe"
+      - "C:/Windows/System32/wbem/git"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git"
+      - "C:/Windows/System32/OpenSSH/git.com"
+      - "C:/Windows/System32/OpenSSH/git.exe"
+      - "C:/Windows/System32/OpenSSH/git"
+      - "C:/Program Files/GitHub CLI/git.com"
+      - "C:/Program Files/GitHub CLI/git.exe"
+      - "C:/Program Files/GitHub CLI/git"
+      - "C:/ProgramData/chocolatey/bin/git.com"
+      - "C:/ProgramData/chocolatey/bin/git.exe"
+      - "C:/ProgramData/chocolatey/bin/git"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git.com"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git.exe"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/git"
+      - "C:/Program Files/Git/cmd/git.com"
+    found: "C:/Program Files/Git/cmd/git.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.5.2.0_x64__8wekyb3d8bbwe"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files (x86)\\Gpg4win\\..\\GnuPG\\bin"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Python\\Python311"
+        - "C:\\Users\\david\\Downloads\\ai-mastery-system\\.venv312\\Scripts"
+        - "C:\\Program Files\\Python311"
+        - "C:\\Program Files\\Python311\\Scripts"
+        - "C:\\Program Files\\PowerShell\\7"
+        - "C:\\Python313\\Scripts\\"
+        - "C:\\Python313\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\Incredibuild"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\PowerShell\\7\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "C:\\ProgramData\\david\\GitHubDesktop\\bin"
+        - "C:\\Users\\david\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\david\\.vscode\\extensions\\ms-python.debugpy-2025.8.0-win32-x64\\bundled\\scripts\\noConfigScripts"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\david\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\david\\AppData\\Roaming\\npm"
+        - "C:\\Users\\david\\.dotnet\\tools"
+        - "c:\\Users\\david\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/EternalJK2"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/EternalJK2"
+...

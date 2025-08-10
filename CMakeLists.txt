@@ -1,210 +1,33 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.16)
+project(EternalJK2 C CXX)
 
-# Adopt all CMake policies up to 4.1 as NEW for consistent behavior.
-cmake_policy(VERSION 4.1)
-
-# Adopt all policies up to 4.1 so subdirectories share a consistent baseline
-cmake_policy(VERSION 4.1)
-
-# OpenGL policy: use NEW behavior (prefer GLVND when available)
+# Policies
 if(POLICY CMP0072)
-	cmake_policy(SET CMP0072 NEW)
+	cmake_policy(SET CMP0072 NEW) # OpenGL find behavior
 endif()
 
-# For checks in subdirectories
-set(InMV TRUE)
-
 # Paths
-set(LIBDir "${CMAKE_SOURCE_DIR}/libs")
 set(RESDir "${CMAKE_SOURCE_DIR}/res")
-
-# Custom CMake Modules
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/tools")
 list(INSERT CMAKE_MODULE_PATH 0 "${RESDir}")
 
-# Project & Versioning
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
+# Project metadata variables retained for downstream logic
 set(ProjectName "EternalJK2" CACHE STRING "Project Name")
 set(ProjectURL "https://jk2mv.org")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# Early Windows toolchain sanity check before project()
-if(WIN32)
-	option(FORCE_MINGW "Force using a MinGW GCC toolchain instead of MSVC" OFF)
-	option(SKIP_MSVC_ENV_CHECK "Skip MSVC environment validation (use at your own risk)" OFF)
-	
-	# Check if user wants to use MinGW
-	if(FORCE_MINGW)
-		# User explicitly wants MinGW; ensure compilers are discoverable before project()
-		if(NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
-			find_program(CMAKE_C_COMPILER NAMES gcc)
-			find_program(CMAKE_CXX_COMPILER NAMES g++)
-		endif()
-		if(NOT CMAKE_C_COMPILER OR NOT CMAKE_CXX_COMPILER)
-			message(FATAL_ERROR "FORCE_MINGW=ON but gcc/g++ not found in PATH.")
-		else()
-			message(STATUS "FORCE_MINGW enabled; using gcc at ${CMAKE_C_COMPILER}. Specify -G \"MinGW Makefiles\" when invoking CMake if not already.")
-		endif()
-	elseif(CMAKE_GENERATOR MATCHES "Visual Studio|MSBuild|NMake|Ninja")
-		# Using MSVC toolchain - check environment is properly initialized
-		if(NOT DEFINED ENV{VCTargetsPath} AND NOT DEFINED ENV{VSINSTALLDIR} AND NOT DEFINED ENV{VCToolsInstallDir})
-			# Additional check: try to find vcvarsall.bat which can be used to initialize the environment
-		elseif(CMAKE_GENERATOR MATCHES "Visual Studio|MSBuild|NMake|Ninja")
-		# Using MSVC toolchain - check environment is properly initialized (unless skipped)
-		if(NOT SKIP_MSVC_ENV_CHECK)
-			# Validate presence of Microsoft.Cpp.Default.props (not just env vars).
-		set(_MSVC_ENV_OK FALSE)
-		if(DEFINED ENV{VCTargetsPath} AND EXISTS "$ENV{VCTargetsPath}/Microsoft.Cpp.Default.props")
-			set(_MSVC_ENV_OK TRUE)
-		else()
-			# Try to locate the props file under a VS install dir if provided.
-			if(DEFINED ENV{VSINSTALLDIR})
-				find_file(_MSVC_PROPS Microsoft.Cpp.Default.props
-					HINTS
-						"$ENV{VSINSTALLDIR}/MSBuild/Microsoft/VC/v170"
-						"$ENV{VSINSTALLDIR}/MSBuild/Microsoft/VC/v160"
-						"$ENV{VSINSTALLDIR}/MSBuild/Microsoft/VC/v150"
-						"$ENV{VSINSTALLDIR}/MSBuild/Microsoft/VC/v140"
-						"$ENV{VSINSTALLDIR}/MSBuild/Microsoft/VC"
-				)
-				if(_MSVC_PROPS)
-					set(_MSVC_ENV_OK TRUE)
-					get_filename_component(_MSVC_PROPS_DIR "${_MSVC_PROPS}" DIRECTORY)
-					if(NOT DEFINED ENV{VCTargetsPath})
-						# Ensure trailing slash so MSBuild concatenations like $(VCTargetsPath)Platforms work.
-						set(ENV{VCTargetsPath} "${_MSVC_PROPS_DIR}/")
-						message(STATUS "Inferred VCTargetsPath=$ENV{VCTargetsPath}")
-					endif()
-				endif()
-			endif()
-		endif()
-		if(NOT _MSVC_ENV_OK)
-			# Fallback: search for vcvarsall.bat to guide user.
-			set(_VS_SEARCH_PATHS
-				"C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2022/BuildTools/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2019/Professional/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build"
-				"C:/Program Files/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build"
-				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build"
-				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Professional/VC/Auxiliary/Build"
-				"C:/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC/Auxiliary/Build"
-				"C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build"
-				"C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
-			)
-			set(_VCVARSALL_FOUND FALSE)
-			foreach(_PATH ${_VS_SEARCH_PATHS})
-				if(EXISTS "${_PATH}/vcvarsall.bat")
-					set(_VCVARSALL_FOUND TRUE)
-					set(_VCVARSALL_PATH "${_PATH}/vcvarsall.bat")
-					break()
-				endif()
-			endforeach()
-			find_program(_MINGW_GCC NAMES gcc)
-			if(_VCVARSALL_FOUND)
-				# Build optional MinGW hint only if gcc was found (avoids confusing _MINGW_GCC-NOTFOUND? output)
-				set(_MINGW_HINT "")
-				if(_MINGW_GCC)
-					set(_MINGW_HINT "Detected MinGW gcc at '${_MINGW_GCC}'. You may instead run:\n  cmake -G \"MinGW Makefiles\" -DFORCE_MINGW=ON ..\n")
-				endif()
-				# Modified: Only hard-fail for non-Visual Studio generators. VS generator can usually recover by itself.
-				if(CMAKE_GENERATOR MATCHES "Visual Studio")
-					message(WARNING
-						"MSVC environment heuristics did not find Microsoft.Cpp.Default.props yet.\n"
-						"Continuing because the Visual Studio generator typically supplies the correct MSBuild paths.\n"
-						"If the later build fails, open a 'x64 Native Tools Command Prompt for VS' or install the C++ workload.\n"
-						"${_MINGW_HINT}"
-					)
-				else()
-					message(FATAL_ERROR
-						"MSVC environment incomplete (Microsoft.Cpp.Default.props not found).\n"
-						"Run the proper Developer Command Prompt first:\n"
-						"  \"${_VCVARSALL_PATH}\" x64\n"
-						"Then re-run CMake (same build dir), or install the C++ workload.\n"
-						"${_MINGW_HINT}"
-					)
-				endif()
-			elseif(_MINGW_GCC)
-				message(FATAL_ERROR
-					"MSVC environment not detected; Microsoft.Cpp.Default.props missing.\n"
-					"MinGW detected at ${_MINGW_GCC}.\n"
-					"Re-run with: -DFORCE_MINGW=ON -G \"MinGW Makefiles\"  (or initialize MSVC environment).")
-			else()
-				message(FATAL_ERROR
-					"MSVC environment not detected; Microsoft.Cpp.Default.props missing and no MinGW found.\n"
-					"Install Visual Studio (Desktop development with C++) or MinGW, then re-run CMake.")
-			endif()
-		endif()
-		unset(_MSVC_ENV_OK)
- 		
- 		# Even if VCTargetsPath is defined, ensure the key props file actually exists to avoid cryptic MSBuild errors later.
- 		if(NOT SKIP_MSVC_ENV_CHECK AND DEFINED ENV{VCTargetsPath})
- 			if(NOT EXISTS "$ENV{VCTargetsPath}/Microsoft.Cpp.Default.props")
- 				message(FATAL_ERROR
- 					"Detected VCTargetsPath ('$ENV{VCTargetsPath}') but Microsoft.Cpp.Default.props is missing.\n"
- 					"This usually means the MSVC build tools are not fully installed or the environment is incomplete.\n"
- 					"Generator: ${CMAKE_GENERATOR}\n"
- 					"Fix:\n"
- 					"  * Open a 'x64 Native Tools Command Prompt for VS' (or appropriate) then rerun CMake, OR\n"
- 					"  * Install the 'Desktop development with C++' workload, OR\n"
- 					"  * Use MinGW: cmake -G \"MinGW Makefiles\" -DFORCE_MINGW=ON ..\n"
- 					"Note: Ninja with MSVC also requires an initialized Developer Command Prompt.")
- 			endif()
- 		endif()
-		endif() # SKIP_MSVC_ENV_CHECK
-		
-		# Even if VCTargetsPath is defined, ensure the key props file actually exists to avoid cryptic MSBuild errors later.
-		if(DEFINED ENV{VCTargetsPath})
-			if(NOT EXISTS "$ENV{VCTargetsPath}/Microsoft.Cpp.Default.props")
-				message(FATAL_ERROR
-					"Detected VCTargetsPath ('$ENV{VCTargetsPath}') but Microsoft.Cpp.Default.props is missing.\n"
-					"This usually means the MSVC build tools are not fully installed or the environment is incomplete.\n"
-					"Generator: ${CMAKE_GENERATOR}\n"
-					"Fix:\n"
-					"  * Open a 'x64 Native Tools Command Prompt for VS' (or appropriate) then rerun CMake, OR\n"
-					"  * Install the 'Desktop development with C++' workload, OR\n"
-					"  * Use MinGW: cmake -G \"MinGW Makefiles\" -DFORCE_MINGW=ON ..\n"
-					"Note: Ninja with MSVC also requires an initialized Developer Command Prompt.")
-			endif()
-		endif()
+# Flags consumed by subdirectory CMake scripts (original project expectation)
+set(InMV TRUE)
+set(InMVSDK ${BuildMVSDK})
+
+# Basic MSVC environment heuristic (stripped down from previous conflicted block)
+option(SKIP_MSVC_ENV_CHECK "Skip MSVC environment validation (heuristic)" OFF)
+if(WIN32 AND MSVC AND NOT SKIP_MSVC_ENV_CHECK)
+	if(NOT DEFINED ENV{VCTargetsPath} OR NOT EXISTS "$ENV{VCTargetsPath}/Microsoft.Cpp.Default.props")
+		message(STATUS "Warning: Could not confirm Microsoft.Cpp.Default.props via VCTargetsPath; relying on generator to supply build environment.")
 	endif()
 endif()
 
-# Normalize any user-provided VCTargetsPath (must end with / or \ for MSBuild platform import logic)
-if(WIN32 AND NOT FORCE_MINGW AND DEFINED ENV{VCTargetsPath})
-	# Convert to CMake-style, check, then restore native style
-	file(TO_CMAKE_PATH "$ENV{VCTargetsPath}" _vct_norm)
-	if(NOT _vct_norm MATCHES ".*/$")
-		set(_vct_norm "${_vct_norm}/")
-		file(TO_NATIVE_PATH "${_vct_norm}" _vct_native)
-		set(ENV{VCTargetsPath} "${_vct_native}")
-		message(STATUS "Normalized VCTargetsPath to '$ENV{VCTargetsPath}' (added trailing slash).")
-	endif()
-	unset(_vct_norm)
-	unset(_vct_native)
-endif()
-
-project(${ProjectName} LANGUAGES C CXX)
-
-include(GetGitRevisionDescription)
-git_describe(MV_VERSION --tags)
-if(NOT MV_VERSION OR MV_VERSION STREQUAL "GIT-NOTFOUND" OR MV_VERSION STREQUAL "HEAD-HASH-NOTFOUND")
-	set(MV_VERSION "1.4.1")
-	message(WARNING "Could not find git or git repository. Install git and make sure you actually cloned the repository (Directory named .git must exist) for correct versioning.")
-endif()
-
-message(STATUS "${ProjectName} Version: ${MV_VERSION}")
-
-# Languages
-enable_language(C CXX)
-if(MSVC)
-	enable_language(ASM_MASM)
-endif()
-
-# Optional NASM (for libjpeg-turbo SIMD); purely informational here.
 find_program(NASM_EXECUTABLE nasm)
 if(NASM_EXECUTABLE)
 	message(STATUS "Found NASM: ${NASM_EXECUTABLE}")
