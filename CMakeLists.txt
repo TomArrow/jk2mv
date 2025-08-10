@@ -43,7 +43,7 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Customizable options
-option(BuildPortableVersion "Build portable version (does not read or write files from your user/home directory" ON)
+option(BuildPortableVersion "Build portable version (does not read or write files from your user/home directory)" ON)
 option(BuildMVMP "Whether to create targets for the client (eternaljk2mvmp & eternaljk2mvmenu)" ON)
 option(BuildMVDED "Whether to create targets for the dedicated server (eternaljk2mvded)" ON)
 option(BuildMVSDK "Whether to build and integrate the mvsdk modules" ON)
