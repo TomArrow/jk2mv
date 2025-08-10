@@ -44,7 +44,7 @@ if(WIN32)
 		else()
 			message(STATUS "FORCE_MINGW enabled; using gcc at ${CMAKE_C_COMPILER}. Specify -G \"MinGW Makefiles\" when invoking CMake if not already.")
 		endif()
-	elseif(CMAKE_GENERATOR MATCHES "Visual Studio" OR CMAKE_GENERATOR MATCHES "MSBuild" OR CMAKE_GENERATOR MATCHES "NMake")
+	elseif(CMAKE_GENERATOR MATCHES "Visual Studio|MSBuild|NMake|Ninja")
 		# Using MSVC toolchain - check environment is properly initialized
 		if(NOT DEFINED ENV{VCTargetsPath} AND NOT DEFINED ENV{VSINSTALLDIR} AND NOT DEFINED ENV{VCToolsInstallDir})
 			# Additional check: try to find vcvarsall.bat which can be used to initialize the environment
@@ -100,6 +100,21 @@ if(WIN32)
 						"If using Visual Studio, run CMake from a Developer Command Prompt.\n"
 						"If using MinGW, add -DFORCE_MINGW=ON -G \"MinGW Makefiles\" to your CMake command.")
 				endif()
+			endif()
+		endif()
+		
+		# Even if VCTargetsPath is defined, ensure the key props file actually exists to avoid cryptic MSBuild errors later.
+		if(DEFINED ENV{VCTargetsPath})
+			if(NOT EXISTS "$ENV{VCTargetsPath}/Microsoft.Cpp.Default.props")
+				message(FATAL_ERROR
+					"Detected VCTargetsPath ('$ENV{VCTargetsPath}') but Microsoft.Cpp.Default.props is missing.\n"
+					"This usually means the MSVC build tools are not fully installed or the environment is incomplete.\n"
+					"Generator: ${CMAKE_GENERATOR}\n"
+					"Fix:\n"
+					"  * Open a 'x64 Native Tools Command Prompt for VS' (or appropriate) then rerun CMake, OR\n"
+					"  * Install the 'Desktop development with C++' workload, OR\n"
+					"  * Use MinGW: cmake -G \"MinGW Makefiles\" -DFORCE_MINGW=ON ..\n"
+					"Note: Ninja with MSVC also requires an initialized Developer Command Prompt.")
 			endif()
 		endif()
 	endif()
