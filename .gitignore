@@ -12,6 +12,7 @@
 *_i.c
 *_p.c
 *.ilk
+*.log
 *.meta
 *.obj
 *.pch
@@ -23,6 +24,7 @@
 *.tlb
 *.tli
 *.tlh
+*.tlog
 *.tmp
 *.vspscc
 .builds
