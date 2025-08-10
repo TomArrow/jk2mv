@@ -335,6 +335,11 @@ if(UseInternalJPEG)
 	set(JPEG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/libjpeg-turbo CACHE PATH "Internal JPEG include path")
 endif()
 
+# Warn if old jpeg-9e directory is still present (should be removed after migration to libjpeg-turbo).
+if(EXISTS "${CMAKE_SOURCE_DIR}/libs/jpeg-9e/CMakeLists.txt")
+	message(WARNING "Found legacy libs/jpeg-9e; it is ignored because libjpeg-turbo is in use. You can delete libs/jpeg-9e to clean up.")
+endif()
+
 if(UseInternalPNG)
 	set(GlobalDefines ${GlobalDefines} "INTERNAL_PNG")
 	add_subdirectory(libs/libpng)
