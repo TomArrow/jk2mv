@@ -294,7 +294,7 @@ CONC_WITH_EXTERNAL_ZLIB:BOOL=ON
 //enables character set conversion
 CONC_WITH_ICONV:BOOL=OFF
 
-//Build MSI installation package
+//Disable MSI packaging (alt var)
 CONC_WITH_MSI:BOOL=OFF
 
 //enables run time checks for debug builds
@@ -306,7 +306,7 @@ CONC_WITH_SIGNCODE:BOOL=OFF
 //Enables use of TLS/SSL library
 CONC_WITH_SSL:BOOL=ON
 
-//Build C/C unit tests
+//Disable MariaDB connector unit tests (alt var)
 CONC_WITH_UNIT_TESTS:BOOL=OFF
 
 //Enable to build 7-Zip source packages
@@ -318,8 +318,8 @@ CPACK_SOURCE_ZIP:BOOL=ON
 //The directory containing a CMake configuration file for CURL.
 CURL_DIR:PATH=CURL_DIR-NOTFOUND
 
-//Path to a file.
-CURL_INCLUDE_DIR:PATH=C:/curl-8.15.0/include
+//No help, variable specified on the command line.
+CURL_INCLUDE_DIR:UNINITIALIZED=C:/curl-8.15.0/include
 
 //No help, variable specified on the command line.
 CURL_LIBRARY:UNINITIALIZED=C:/curl-8.15.0/lib/libcurl.lib
@@ -513,7 +513,7 @@ WITH_JPEG8:BOOL=OFF
 //Enable memory sanitizer
 WITH_MSAN:BOOL=OFF
 
-//Build MSI installation package
+//Disable MSI packaging
 WITH_MSI:BOOL=OFF
 
 //Digitally sign files
@@ -531,7 +531,7 @@ WITH_TURBOJPEG:BOOL=ON
 //Enable undefined behavior sanitizer
 WITH_UBSAN:BOOL=OFF
 
-//Build test suite
+//Disable MariaDB connector unit tests
 WITH_UNIT_TESTS:BOOL=OFF
 
 //Pretend zlib already found to MariaDB connector
@@ -543,11 +543,11 @@ ZLIB_INCLUDE_DIR:PATH=D:/Workspace/jk2mv-tom/libs/zlib
 //zlib include dir
 ZLIB_INCLUDE_DIRS:PATH=D:/Workspace/jk2mv-tom/libs/zlib
 
-//Path to a file.
-ZSTD_INCLUDE_DIRS:PATH=C:/zstd-v1.5.7-win64/include
+//No help, variable specified on the command line.
+ZSTD_INCLUDE_DIRS:UNINITIALIZED=C:/zstd-v1.5.7-win64/include
 
-//Path to a library.
-ZSTD_LIBRARIES:FILEPATH=C:/zstd-v1.5.7-win64/static/libzstd_static.lib
+//No help, variable specified on the command line.
+ZSTD_LIBRARIES:UNINITIALIZED=C:/zstd-v1.5.7-win64/static/libzstd_static.lib
 
 //Root folder of a local zstd build (expects include/ and possibly
 // lib/ or static/ with libzstd*.lib)
@@ -701,7 +701,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=27
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=10
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
