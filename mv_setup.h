@@ -1,7 +1,7 @@
 #ifndef MV_SETUP_H
 #define MV_SETUP_H
 
-#define JK2MV_VERSION "latest-postxp-75-g787fb5b2"
+#define JK2MV_VERSION ""
 #define Q3_VERSION "JK2MV: v" JK2MV_VERSION
 
 #define JK2MV_MENU_VM "eternaljk2mvmenu"

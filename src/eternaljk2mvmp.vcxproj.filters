@@ -689,9 +689,9 @@
     <CustomBuild Include="D:\Workspace\jk2mv-tom\src\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="D:\Workspace\jk2mv-tom\src\win32\q3asm.asm">
+    <None Include="D:\Workspace\jk2mv-tom\src\win32\q3asm.asm">
       <Filter>win32</Filter>
-    </MASM>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D:\Workspace\jk2mv-tom\src\win32\mv.rc">

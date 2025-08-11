@@ -34,18 +34,33 @@ BuildMVSDK:BOOL=ON
 BuildPortableVersion:BOOL=ON
 
 //Path to a program.
-CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx86/x64/lib.exe
+CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.exe
 
 //ASM_NASM compiler
-CMAKE_ASM_NASM_COMPILER:FILEPATH=NOTFOUND
+CMAKE_ASM_NASM_COMPILER:STRING=D:/Workspace/jk2mv-tom/tools/Release/q3asm.exe
 
-//No help, variable specified on the command line.
-CMAKE_BUILD_TYPE:STRING=Release
+//Flags used by the ASM_NASM compiler during all build types.
+CMAKE_ASM_NASM_FLAGS:STRING=D:/Workspace/jk2mv-tom/tools/nasm
+
+//Flags used by the ASM_NASM compiler during DEBUG builds.
+CMAKE_ASM_NASM_FLAGS_DEBUG:STRING=-g
+
+//Flags used by the ASM_NASM compiler during MINSIZEREL builds.
+CMAKE_ASM_NASM_FLAGS_MINSIZEREL:STRING=
+
+//Flags used by the ASM_NASM compiler during RELEASE builds.
+CMAKE_ASM_NASM_FLAGS_RELEASE:STRING=D:\Workspace\jk2mv-tom\tools\Release
+
+//Flags used by the ASM_NASM compiler during RELWITHDEBINFO builds.
+CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO:STRING=-g
 
 //Semicolon separated list of supported configuration types, only
 // supports Debug, Release, MinSizeRel, and RelWithDebInfo, anything
 // else will be ignored.
 CMAKE_CONFIGURATION_TYPES:STRING=Debug;Release;MinSizeRel;RelWithDebInfo
+
+//CXX compiler.
+CMAKE_CXX_COMPILER:FILEPATH=D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdCXX/CompilerIdCXX.exe
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=/DWIN32 /D_WINDOWS /GR /EHsc
@@ -64,6 +79,9 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=/Zi /O2 /Ob1 /DNDEBUG
 
 //Libraries linked by default with all C++ applications.
 CMAKE_CXX_STANDARD_LIBRARIES:STRING=kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+
+//C compiler.
+CMAKE_C_COMPILER:FILEPATH=D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdC/CompilerIdC.exe
 
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=/DWIN32 /D_WINDOWS
@@ -98,17 +116,17 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=/INCREMENTAL:NO
 //Flags used by the linker during RELWITHDEBINFO builds.
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
-//No help, variable specified on the command line.
-CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
-
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=D:/Workspace/jk2mv-tom/build/CMakeFiles/pkgRedirects
+
+//Fortran compiler.
+CMAKE_Fortran_COMPILER:FILEPATH=C:/Program Files/CMake/share/cmake-4.1/Modules/Compiler/Intel-Fortran.cmake
 
 //Install path prefix, prepended onto install directories.
 CMAKE_INSTALL_PREFIX:PATH=C:/Program Files/EternalJK2
 
 //Path to a program.
-CMAKE_LINKER:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx86/x64/link.exe
+CMAKE_LINKER:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -200,10 +218,10 @@ CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
 //If set, runtime paths are not added when installing shared libraries,
 // but are added when building.
-CMAKE_SKIP_INSTALL_RPATH:BOOL=NO
+CMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
 
 //If set, runtime paths are not added when using shared libraries.
-CMAKE_SKIP_RPATH:BOOL=NO
+CMAKE_SKIP_RPATH:BOOL=OFF
 
 //Flags used by the archiver during the creation of static libraries
 // during all build types.
@@ -229,7 +247,7 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 // .SILENT directive, and all commands will be echoed to the console
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
-CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+CMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 //Enable to build 7-Zip source packages
 CPACK_SOURCE_7Z:BOOL=ON
@@ -250,7 +268,7 @@ EternalJK2_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //NASM assembler available
-HAVE_NASM:BOOL=FALSE
+HAVE_NASM:BOOL=ON
 
 //Internal JPEG include path
 JPEG_INCLUDE_DIR:PATH=D:/Workspace/jk2mv-tom/libs/libjpeg-turbo
@@ -263,7 +281,7 @@ LegacyHTTPDownloads:BOOL=OFF
 MVSDK_ALLOW_NO_GIT:BOOL=ON
 
 //Path to a program.
-NASM_EXECUTABLE:FILEPATH=NASM_EXECUTABLE-NOTFOUND
+NASM_EXECUTABLE:FILEPATH=D:/Workspace/jk2mv-tom/tools/nasm/nasm.exe
 
 //Disable loading of NT-Mod pk3 files to prevent crashing the game
 NTClientWorkaround:BOOL=ON
@@ -292,6 +310,17 @@ SystemProcessor:STRING=AMD64
 CMAKE_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_ASM_NASM_COMPILER
 CMAKE_ASM_NASM_COMPILER-ADVANCED:INTERNAL=1
+CMAKE_ASM_NASM_COMPILER_WORKS:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS
+CMAKE_ASM_NASM_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_DEBUG
+CMAKE_ASM_NASM_FLAGS_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_MINSIZEREL
+CMAKE_ASM_NASM_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_RELEASE
+CMAKE_ASM_NASM_FLAGS_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO
+CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=d:/Workspace/jk2mv-tom/build
 //Major version of cmake used to create the current loaded cache
@@ -351,7 +380,7 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files/Microsoft Visual Studio/2022/
 //Name of generator platform.
 CMAKE_GENERATOR_PLATFORM:INTERNAL=x64
 //Name of generator toolset.
-CMAKE_GENERATOR_TOOLSET:INTERNAL=host=x86
+CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=D:/Workspace/jk2mv-tom
