@@ -86,10 +86,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4244;4996;4267</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
@@ -103,16 +103,16 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;DEBUG;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;DEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;DEBUG;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;DEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -141,7 +141,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>..\out\Debug\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\Debug\jpeg-static.lib;..\out\Debug\libpng.lib;..\out\Debug\minizip.lib;..\out\Debug\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\out\Debug\mongoose.lib;winmm.lib;ws2_32.lib;..\out\Debug\mariadbcpp-static.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\Debug\jpeg-static.lib;..\out\Debug\libpng.lib;..\out\Debug\minizip.lib;..\out\Debug\zlib.lib;..\out\Debug\mariadbclient.lib;ws2_32.lib;advapi32.lib;kernel32.lib;shlwapi.lib;crypt32.lib;secur32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -163,7 +163,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4244;4996;4267</DisableSpecificWarnings>
@@ -182,18 +182,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;FINAL_BUILD;NDEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;FINAL_BUILD;NDEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -222,7 +222,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>..\out\Release\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\Release\jpeg-static.lib;..\out\Release\libpng.lib;..\out\Release\minizip.lib;..\out\Release\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\out\Release\mongoose.lib;winmm.lib;ws2_32.lib;..\out\Release\mariadbcpp-static.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\Release\jpeg-static.lib;..\out\Release\libpng.lib;..\out\Release\minizip.lib;..\out\Release\zlib.lib;..\out\Release\mariadbclient.lib;ws2_32.lib;advapi32.lib;kernel32.lib;shlwapi.lib;crypt32.lib;secur32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -244,7 +244,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4244;4996;4267</DisableSpecificWarnings>
@@ -260,18 +260,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;MARIADB_STATIC_LINK;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;MARIADB_STATIC_LINK;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -300,7 +300,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>..\out\MinSizeRel\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\MinSizeRel\jpeg-static.lib;..\out\MinSizeRel\libpng.lib;..\out\MinSizeRel\minizip.lib;..\out\MinSizeRel\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\out\MinSizeRel\mongoose.lib;winmm.lib;ws2_32.lib;..\out\MinSizeRel\mariadbcpp-static.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\MinSizeRel\jpeg-static.lib;..\out\MinSizeRel\libpng.lib;..\out\MinSizeRel\minizip.lib;..\out\MinSizeRel\zlib.lib;..\out\MinSizeRel\mariadbclient.lib;ws2_32.lib;advapi32.lib;kernel32.lib;shlwapi.lib;crypt32.lib;secur32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -322,7 +322,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -342,16 +342,16 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;FINAL_BUILD;NDEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;FINAL_BUILD;NDEBUG;MARIADB_STATIC_LINK;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib\include;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;D:\Workspace\jk2mv-tom\libs\mongoose\include;D:\Workspace\jk2mv-tom\libs\zlib;D:\Workspace\jk2mv-tom\libs\minizip\include\minizip;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\include\conncpp;D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\src;D:\Workspace\jk2mv-tom\libs\StackWalker\include;D:\Workspace\jk2mv-tom\libs\OpenAL\include;D:\Workspace\jk2mv-tom\libs\SDL2\include;D:\Workspace\jk2mv-tom\libs\eax;D:\Workspace\jk2mv-tom\libs\libjpeg-turbo\include;D:\Workspace\jk2mv-tom\libs\libpng\include;D:\Workspace\jk2mv-tom\libs\mp3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -380,7 +380,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>..\out\RelWithDebInfo\mongoose.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\RelWithDebInfo\jpeg-static.lib;..\out\RelWithDebInfo\libpng.lib;..\out\RelWithDebInfo\minizip.lib;..\out\RelWithDebInfo\zlib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\out\RelWithDebInfo\mongoose.lib;winmm.lib;ws2_32.lib;..\out\RelWithDebInfo\mariadbcpp-static.lib;opengl32.lib;glu32.lib;..\libs\OpenAL\lib\x64\OpenAL32.lib;..\libs\SDL2\lib\x64\SDL2main.lib;..\libs\SDL2\lib\x64\SDL2.lib;..\out\RelWithDebInfo\jpeg-static.lib;..\out\RelWithDebInfo\libpng.lib;..\out\RelWithDebInfo\minizip.lib;..\out\RelWithDebInfo\zlib.lib;..\out\RelWithDebInfo\mariadbclient.lib;ws2_32.lib;advapi32.lib;kernel32.lib;shlwapi.lib;crypt32.lib;secur32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -708,6 +708,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="D:\Workspace\jk2mv-tom\libs\libpng\libpng.vcxproj">
       <Project>{628E8323-445F-3F09-849F-78ADED2FACED}</Project>
       <Name>libpng</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\libmariadb\libmariadb\mariadbclient.vcxproj">
+      <Project>{B68CD31F-7419-31E8-8E50-AEFECB9DE52D}</Project>
+      <Name>mariadbclient</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\mariadbcpp-static.vcxproj">
+      <Project>{21AB0033-AB08-39E6-81FF-FBA0C920AA41}</Project>
+      <Name>mariadbcpp-static</Name>
     </ProjectReference>
     <ProjectReference Include="D:\Workspace\jk2mv-tom\libs\minizip\minizip.vcxproj">
       <Project>{53AD64C8-FF8C-3542-BD03-20E8518D3A2B}</Project>

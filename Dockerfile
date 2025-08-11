@@ -27,4 +27,3 @@ RUN curl -L https://github.com/Kitware/CMake/releases/download/v3.29.2/cmake-3.2
 
 # Enable CCache by default
 RUN echo 'export PATH="/usr/lib/ccache:$PATH"' >> /etc/profile.d/ccache.sh
-

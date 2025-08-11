@@ -340,6 +340,12 @@ ENABLED_LOCAL_INFILE:STRING=AUTO
 //Build 12-bit and 16-bit precision JPEG object variants
 ENABLE_JPEG_EXT_PRECISION:BOOL=OFF
 
+//Build shared libraries
+ENABLE_SHARED:BOOL=ON
+
+//Build static libraries
+ENABLE_STATIC:BOOL=ON
+
 //Build and link the bundled MariaDB Connector/C++ (enables database
 // features)
 EnableMariaDB:BOOL=ON
@@ -352,6 +358,29 @@ EternalJK2_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 EternalJK2_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom
+
+//The type of floating point math used by the 12-bit-per-sample
+// floating point DCT/IDCT algorithms.  This tells the testing
+// system which numerical results it should expect from those tests.
+//  [sse = libjpeg-turbo x86/x86-64 SIMD extensions, no-fp-contract
+// = generic FPU with floating point expression contraction disabled,
+// fp-contract = generic FPU with floating point expression contraction
+// enabled, 387 = 387 FPU, msvc = 32-bit Visual Studio] (default
+// = no-fp-contract)
+FLOATTEST12:STRING=no-fp-contract
+
+//The type of floating point math used by the 8-bit-per-sample
+// floating point DCT/IDCT algorithms.  This tells the testing
+// system which numerical results it should expect from those tests.
+//  [sse = libjpeg-turbo x86/x86-64 SIMD extensions, no-fp-contract
+// = generic FPU with floating point expression contraction disabled,
+// fp-contract = generic FPU with floating point expression contraction
+// enabled, 387 = 387 FPU, msvc = 32-bit Visual Studio] (default
+// = no-fp-contract)
+FLOATTEST8:STRING=no-fp-contract
+
+//Force function inlining
+FORCE_INLINE:BOOL=ON
 
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
@@ -400,6 +429,25 @@ OPENGL_gl_LIBRARY:STRING=opengl32
 //GLU library for win32
 OPENGL_glu_LIBRARY:STRING=glu32
 
+//E-mail of project maintainer to be included in distribution package
+// descriptions (default: information@EternalJK2.org
+PKGEMAIL:STRING=information@EternalJK2.org
+
+//Globally unique package identifier (reverse DNS notation) (default:
+// com.EternalJK2.EternalJK2)
+PKGID:STRING=com.EternalJK2.EternalJK2
+
+//Distribution package name (default: EternalJK2)
+PKGNAME:STRING=EternalJK2
+
+//URL of project web site to be included in distribution package
+// descriptions (default: https://EternalJK2.org)
+PKGURL:STRING=https://EternalJK2.org
+
+//Vendor name to be included in distribution package descriptions
+// (default: The EternalJK2 Project)
+PKGVENDOR:STRING=The EternalJK2 Project
+
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=
 
@@ -409,8 +457,18 @@ PKG_CONFIG_EXECUTABLE:FILEPATH=PKG_CONFIG_EXECUTABLE-NOTFOUND
 //Project Name
 ProjectName:STRING=EternalJK2
 
+//Generate a fatal error if SIMD extensions are not available for
+// this platform (default is to fall back to a non-SIMD build)
+REQUIRE_SIMD:BOOL=OFF
+
 //Skip MSVC environment validation (heuristic)
 SKIP_MSVC_ENV_CHECK:BOOL=OFF
+
+//Major version of the libjpeg API shared library (default: 62)
+SO_MAJOR_VERSION:STRING=62
+
+//Minor version of the libjpeg API shared library (default: 0)
+SO_MINOR_VERSION:STRING=0
 
 //Option to override CMAKE_SYSTEM_PROCESSOR
 SystemProcessor:STRING=AMD64
@@ -418,11 +476,39 @@ SystemProcessor:STRING=AMD64
 //Use installed in the system C/C library and do not build one
 USE_SYSTEM_INSTALLED_LIB:BOOL=OFF
 
+//Include arithmetic decoding support when emulating the libjpeg
+// v6b API/ABI
+WITH_ARITH_DEC:BOOL=ON
+
+//Include arithmetic encoding support when emulating the libjpeg
+// v6b API/ABI
+WITH_ARITH_ENC:BOOL=ON
+
 //Compile with ASAN
 WITH_ASAN:BOOL=OFF
 
+//Link all EternalJK2 libraries and executables with the C run-time
+// DLL (msvcr*.dll) instead of the static C run-time library (libcmt*.lib.)
+//  The default is to use the C run-time DLL only with the libraries
+// and executables that need it.
+WITH_CRT_DLL:BOOL=OFF
+
 //Use external (top-level) zlib
 WITH_EXTERNAL_ZLIB:BOOL=ON
+
+//Build fuzz targets
+WITH_FUZZ:BOOL=OFF
+
+//Build Java wrapper for the TurboJPEG API library (implies ENABLE_SHARED=1)
+WITH_JAVA:BOOL=OFF
+
+//Emulate libjpeg v7 API/ABI (this makes EternalJK2 backward-incompatible
+// with libjpeg v6b)
+WITH_JPEG7:BOOL=OFF
+
+//Emulate libjpeg v8 API/ABI (this makes EternalJK2 backward-incompatible
+// with libjpeg v6b)
+WITH_JPEG8:BOOL=OFF
 
 //Enable memory sanitizer
 WITH_MSAN:BOOL=OFF
@@ -433,8 +519,14 @@ WITH_MSI:BOOL=OFF
 //Digitally sign files
 WITH_SIGNCODE:BOOL=OFF
 
+//Include SIMD extensions, if available for this platform
+WITH_SIMD:BOOL=ON
+
 //Enables use of TLS/SSL library
 WITH_SSL:BOOL=ON
+
+//Include the TurboJPEG API library and associated test programs
+WITH_TURBOJPEG:BOOL=ON
 
 //Enable undefined behavior sanitizer
 WITH_UBSAN:BOOL=OFF
@@ -460,6 +552,15 @@ ZSTD_LIBRARIES:FILEPATH=C:/zstd-v1.5.7-win64/static/libzstd_static.lib
 //Root folder of a local zstd build (expects include/ and possibly
 // lib/ or static/ with libzstd*.lib)
 ZSTD_ROOT:PATH=C:/zstd-v1.5.7-win64
+
+//Value Computed by CMake
+libjpeg-turbo_BINARY_DIR:STATIC=D:/Workspace/jk2mv-tom/build/libs/libjpeg-turbo
+
+//Value Computed by CMake
+libjpeg-turbo_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+libjpeg-turbo_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom/libs/libjpeg-turbo
 
 //Value Computed by CMake
 mariadb-connector-c_BINARY_DIR:STATIC=D:/Workspace/jk2mv-tom/build/libs/mariadb-connector-cpp/libmariadb
@@ -552,19 +653,19 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=D:/Workspace/jk2mv-tom
 //ADVANCED property for variable: CMAKE_INSTALL_BINDIR
-CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=1
+CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=0
 //ADVANCED property for variable: CMAKE_INSTALL_DATADIR
 CMAKE_INSTALL_DATADIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_INSTALL_DATAROOTDIR
-CMAKE_INSTALL_DATAROOTDIR-ADVANCED:INTERNAL=1
+CMAKE_INSTALL_DATAROOTDIR-ADVANCED:INTERNAL=0
 //ADVANCED property for variable: CMAKE_INSTALL_DOCDIR
-CMAKE_INSTALL_DOCDIR-ADVANCED:INTERNAL=1
+CMAKE_INSTALL_DOCDIR-ADVANCED:INTERNAL=0
 //ADVANCED property for variable: CMAKE_INSTALL_INCLUDEDIR
-CMAKE_INSTALL_INCLUDEDIR-ADVANCED:INTERNAL=1
+CMAKE_INSTALL_INCLUDEDIR-ADVANCED:INTERNAL=0
 //ADVANCED property for variable: CMAKE_INSTALL_INFODIR
 CMAKE_INSTALL_INFODIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_INSTALL_LIBDIR
-CMAKE_INSTALL_LIBDIR-ADVANCED:INTERNAL=1
+CMAKE_INSTALL_LIBDIR-ADVANCED:INTERNAL=0
 //ADVANCED property for variable: CMAKE_INSTALL_LIBEXECDIR
 CMAKE_INSTALL_LIBEXECDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_INSTALL_LOCALEDIR
@@ -600,7 +701,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=25
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=27
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
@@ -822,12 +923,75 @@ SIZEOF_USHORT:INTERNAL=
 SIZE_T:INTERNAL=8
 //CHECK_TYPE_SIZE: sizeof(unsigned long)
 UNSIGNED_LONG:INTERNAL=4
+WITH_JPEG7_INT:INTERNAL=0
+WITH_JPEG8_INT:INTERNAL=0
+WITH_SIMD_INT:INTERNAL=0
 //ADVANCED property for variable: ZLIB_INCLUDE_DIRS
 ZLIB_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ZSTD_INCLUDE_DIRS
 ZSTD_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ZSTD_LIBRARIES
 ZSTD_LIBRARIES-ADVANCED:INTERNAL=1
+//CMAKE_INSTALL_BINDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_BINDIR:INTERNAL=bin
+//CMAKE_INSTALL_DATADIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DATADIR:INTERNAL=
+//CMAKE_INSTALL_DATAROOTDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DATAROOTDIR:INTERNAL=share
+//CMAKE_INSTALL_DEFAULT_BINDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_BINDIR:INTERNAL=bin
+//CMAKE_INSTALL_DEFAULT_DATADIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_DATADIR:INTERNAL=<CMAKE_INSTALL_DATAROOTDIR>
+//CMAKE_INSTALL_DEFAULT_DATAROOTDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_DATAROOTDIR:INTERNAL=share
+//CMAKE_INSTALL_DEFAULT_DOCDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_DOCDIR:INTERNAL=<CMAKE_INSTALL_DATAROOTDIR>/doc/libjpeg-turbo
+//CMAKE_INSTALL_DEFAULT_INCLUDEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_INCLUDEDIR:INTERNAL=include
+//CMAKE_INSTALL_DEFAULT_INFODIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_INFODIR:INTERNAL=<CMAKE_INSTALL_DATAROOTDIR>/info
+//CMAKE_INSTALL_DEFAULT_LIBDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_LIBDIR:INTERNAL=lib
+//CMAKE_INSTALL_DEFAULT_LIBEXECDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_LIBEXECDIR:INTERNAL=libexec
+//CMAKE_INSTALL_DEFAULT_LOCALEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_LOCALEDIR:INTERNAL=<CMAKE_INSTALL_DATAROOTDIR>/locale
+//CMAKE_INSTALL_DEFAULT_LOCALSTATEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_LOCALSTATEDIR:INTERNAL=var
+//CMAKE_INSTALL_DEFAULT_MANDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_MANDIR:INTERNAL=<CMAKE_INSTALL_DATAROOTDIR>/man
+//CMAKE_INSTALL_DEFAULT_OLDINCLUDEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_OLDINCLUDEDIR:INTERNAL=/usr/include
+//CMAKE_INSTALL_DEFAULT_SBINDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_SBINDIR:INTERNAL=sbin
+//CMAKE_INSTALL_DEFAULT_SHAREDSTATEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_SHAREDSTATEDIR:INTERNAL=com
+//CMAKE_INSTALL_DEFAULT_SYSCONFDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DEFAULT_SYSCONFDIR:INTERNAL=etc
+//CMAKE_INSTALL_DOCDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_DOCDIR:INTERNAL=
+//CMAKE_INSTALL_INCLUDEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_INCLUDEDIR:INTERNAL=include
+//CMAKE_INSTALL_INFODIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_INFODIR:INTERNAL=
+//CMAKE_INSTALL_LIBDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_LIBDIR:INTERNAL=lib
+//CMAKE_INSTALL_LIBEXECDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_LIBEXECDIR:INTERNAL=libexec
+//CMAKE_INSTALL_LOCALEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_LOCALEDIR:INTERNAL=
+//CMAKE_INSTALL_LOCALSTATEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_LOCALSTATEDIR:INTERNAL=var
+//CMAKE_INSTALL_MANDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_MANDIR:INTERNAL=
+//CMAKE_INSTALL_OLDINCLUDEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_OLDINCLUDEDIR:INTERNAL=/usr/include
+//CMAKE_INSTALL_SBINDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_SBINDIR:INTERNAL=sbin
+//CMAKE_INSTALL_SHAREDSTATEDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_SHAREDSTATEDIR:INTERNAL=com
+//CMAKE_INSTALL_SYSCONFDIR during last run
+_GNUInstallDirs_CMAKE_INSTALL_LAST_SYSCONFDIR:INTERNAL=etc
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files/EternalJK2
 __msg1_INSTALL_BINDIR:INTERNAL=dfd6f0a9d273acbd07e5e0306e4d9faa

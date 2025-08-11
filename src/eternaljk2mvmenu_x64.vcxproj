@@ -90,7 +90,7 @@
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4244;4996;4267</DisableSpecificWarnings>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -104,12 +104,12 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;DEBUG;CMAKE_INTDIR="Debug";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;DEBUG;CMAKE_INTDIR="Debug";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;DEBUG;CMAKE_INTDIR=\"Debug\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;DEBUG;CMAKE_INTDIR=\"Debug\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -159,14 +159,14 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="Release";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="Release";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"Release\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"Release\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -213,14 +213,14 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;CMAKE_INTDIR="MinSizeRel";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;CMAKE_INTDIR="MinSizeRel";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;CMAKE_INTDIR=\"MinSizeRel\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;CMAKE_INTDIR=\"MinSizeRel\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -271,12 +271,12 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ARCH_X86_64;WIN64;BOTLIB;_JK2;UNICODE;_UNICODE;NTCLIENT_WORKAROUND;PORTABLE;INTERNAL_ZLIB;INTERNAL_MINIZIP;INTERNAL_JPEG;INTERNAL_PNG;WITH_MARIADB;JK2MV_MENU;FINAL_BUILD;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";eternaljk2mvmenu_x64_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\Workspace\jk2mv-tom;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>

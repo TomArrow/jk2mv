@@ -12,7 +12,7 @@
 
 set(CPACK_BUILD_SOURCE_DIRS "D:/Workspace/jk2mv-tom;D:/Workspace/jk2mv-tom/build")
 set(CPACK_CMAKE_GENERATOR "Visual Studio 17 2022")
-set(CPACK_COMPONENTS_ALL "ClientPlugins;ConCLib;ConCPlugins;Debuginfo;Development;SharedLibraries")
+set(CPACK_COMPONENTS_ALL "ClientPlugins;ConCLib;ConCPlugins;Debuginfo;Development;SharedLibraries;bin;include;lib")
 set(CPACK_COMPONENT_UNSPECIFIED_HIDDEN "TRUE")
 set(CPACK_COMPONENT_UNSPECIFIED_REQUIRED "TRUE")
 set(CPACK_DEFAULT_PACKAGE_DESCRIPTION_FILE "C:/Program Files/CMake/share/cmake-4.1/Templates/CPack.GenericDescription.txt")

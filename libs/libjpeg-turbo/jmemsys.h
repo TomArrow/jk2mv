@@ -19,6 +19,33 @@
  */
 
 
+/*
+ * NOTE (local patch): Some compilation units in this codebase appear to
+ * include jmemsys.h before jpeglib.h (which normally provides the legacy
+ * prototype helper macros JPP() and JMETHOD(), plus core type definitions
+ * like j_common_ptr). Upstream libjpeg-turbo expects jmemsys.h to be
+ * included only after jpeglib.h. When that order was reversed we observed
+ * massive syntax errors (undefined identifiers in prototypes).
+ *
+ * Strategy: (1) opportunistically include jpeglib.h if the primary include
+ * guard for it (JPEGLIB_H) is not yet defined; and (2) provide lightweight
+ * fallback macro definitions in case a trimmed-down header inclusion path
+ * is in use. This yields compatibility without altering upstream semantics
+ * when normal include order is respected.
+ */
+
+#ifndef JPEGLIB_H
+#include "jpeglib.h"
+#endif
+
+#ifndef JPP
+#define JPP(arglist) arglist
+#endif
+
+#ifndef JMETHOD
+#define JMETHOD(type,methodname,arglist) type (*methodname) arglist
+#endif
+
 /* Short forms of external names for systems with brain-damaged linkers. */
 
 #ifdef NEED_SHORT_EXTERNAL_NAMES

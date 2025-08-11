@@ -196,7 +196,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="D:\Workspace\jk2mv-tom\ALL_BUILD.vcxproj">
+    <ProjectReference Include="D:\Workspace\jk2mv-tom\libs\mariadb-connector-cpp\ALL_BUILD.vcxproj">
       <Project>{5BB58822-29B9-3DA5-B263-2716FC6A1A37}</Project>
       <Name>ALL_BUILD</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
