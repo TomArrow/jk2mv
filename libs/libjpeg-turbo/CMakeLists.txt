@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 4.1)
 
-set(JPEG_LIB_VERSION 62)
+# Upstream libjpeg-turbo 3.x corresponds to JPEG_LIB_VERSION 80 (feature set
+# matching IJG libjpeg v8). The sources in this fork reference struct fields
+# and macros gated behind `#if JPEG_LIB_VERSION >= 70` and `>= 80`, but the
+# version was incorrectly left at 62 (v6b era), causing those members to be
+# omitted from the public structs and leading to widespread compile errors
+# (missing members: min_DCT_v_scaled_size, block_size, natural_order, etc.).
+# Bump to 80 so headers expose the expected fields.
+set(JPEG_LIB_VERSION 90)
 set(ENABLE_STATIC 1)
 set(FORCE_INLINE 1)
 set(WITH_SIMD 1)
@@ -8,6 +15,11 @@ set(REQUIRE_SIMD 0)
 set(NEON_INTRINSICS 1)
 set(WITH_ARITH_ENC 0)
 set(WITH_ARITH_DEC 0)
+
+# Extended precision sample depths (12/16-bit) are optional for our project and currently
+# trigger compile errors with this fork/version on MSVC due to struct layout/API differences.
+# Provide an option to disable them (default OFF) so we can build the standard 8-bit library cleanly.
+option(ENABLE_JPEG_EXT_PRECISION "Build 12-bit and 16-bit precision JPEG object variants" OFF)
 
 set(CMAKE_PROJECT_NAME lijbpeg-turbo)
 set(VERSION 3.0.3)
@@ -265,17 +277,18 @@ if(WITH_SIMD)
 endif()
 
 if(ENABLE_STATIC)
-  # Compile a separate version of these source files with 12-bit and 16-bit
-  # data precision.
-  add_library(jpeg12-static OBJECT ${JPEG12_SOURCES})
-  set_property(TARGET jpeg12-static PROPERTY COMPILE_FLAGS
-    "-DBITS_IN_JSAMPLE=12")
-  add_library(jpeg16-static OBJECT ${JPEG16_SOURCES})
-  set_property(TARGET jpeg16-static PROPERTY COMPILE_FLAGS
-    "-DBITS_IN_JSAMPLE=16")
-  add_library(jpeg-static STATIC ${JPEG_SOURCES} ${SIMD_TARGET_OBJECTS}
-    ${SIMD_OBJS} $<TARGET_OBJECTS:jpeg12-static>
-    $<TARGET_OBJECTS:jpeg16-static>)
+  if(ENABLE_JPEG_EXT_PRECISION)
+    # Compile separate 12-bit and 16-bit precision object variants and include them
+    # in the final static library.
+    add_library(jpeg12-static OBJECT ${JPEG12_SOURCES})
+    set_property(TARGET jpeg12-static PROPERTY COMPILE_FLAGS "-DBITS_IN_JSAMPLE=12")
+    add_library(jpeg16-static OBJECT ${JPEG16_SOURCES})
+    set_property(TARGET jpeg16-static PROPERTY COMPILE_FLAGS "-DBITS_IN_JSAMPLE=16")
+    set(_JPEG_EXT_OBJS $<TARGET_OBJECTS:jpeg12-static> $<TARGET_OBJECTS:jpeg16-static>)
+  else()
+    message(STATUS "Extended JPEG 12/16-bit precision disabled (ENABLE_JPEG_EXT_PRECISION=OFF)")
+  endif()
+  add_library(jpeg-static STATIC ${JPEG_SOURCES} ${SIMD_TARGET_OBJECTS} ${SIMD_OBJS} ${_JPEG_EXT_OBJS})
   if(NOT MSVC)
     set_target_properties(jpeg-static PROPERTIES OUTPUT_NAME jpeg)
   endif()
@@ -296,10 +309,10 @@ set(JPEG_FOUND TRUE PARENT_SCOPE)
 
 set_property(TARGET jpeg-static PROPERTY FOLDER "libs/libjpeg-turbo")
 if(TARGET jpeg12-static)
-	set_property(TARGET jpeg12-static PROPERTY FOLDER "libs/libjpeg-turbo")
+  set_property(TARGET jpeg12-static PROPERTY FOLDER "libs/libjpeg-turbo")
 endif()
 if(TARGET jpeg16-static)
-	set_property(TARGET jpeg16-static PROPERTY FOLDER "libs/libjpeg-turbo")
+  set_property(TARGET jpeg16-static PROPERTY FOLDER "libs/libjpeg-turbo")
 endif()
 if(TARGET jsimdcfg)
 	set_property(TARGET jsimdcfg PROPERTY FOLDER "libs/libjpeg-turbo")

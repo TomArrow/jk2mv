@@ -1,0 +1,6 @@
+services:
+  jk2mvtom:
+    image: jk2mvtom
+    build:
+      context: .
+      dockerfile: ./Dockerfile

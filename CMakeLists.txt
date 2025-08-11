@@ -47,6 +47,11 @@ option(BuildPortableVersion "Build portable version (does not read or write file
 option(BuildMVMP "Whether to create targets for the client (eternaljk2mvmp & eternaljk2mvmenu)" ON)
 option(BuildMVDED "Whether to create targets for the dedicated server (eternaljk2mvded)" ON)
 option(BuildMVSDK "Whether to build and integrate the mvsdk modules" ON)
+option(EnableMariaDB "Build and link the bundled MariaDB Connector/C++ (enables database features)" ON)
+
+# Optional third-party root hints (Windows manual installs)
+set(CURL_ROOT "" CACHE PATH "Root folder of a local cURL build (expects include/ and lib/ under it)")
+set(ZSTD_ROOT "" CACHE PATH "Root folder of a local zstd build (expects include/ and possibly lib/ or static/ with libzstd*.lib)")
 
 set(SystemProcessor "${CMAKE_SYSTEM_PROCESSOR}" CACHE STRING "Option to override CMAKE_SYSTEM_PROCESSOR")
 
@@ -339,6 +344,66 @@ if(UseInternalPNG)
 endif()
 
 add_subdirectory(libs/mongoose)
+
+# MariaDB Connector/C++ integration (trim tests & extras). If disabled, code wrapped in WITH_MARIADB is skipped.
+if(EnableMariaDB)
+	set(GlobalDefines ${GlobalDefines} "WITH_MARIADB")
+	# Resolve curl if user supplied CURL_ROOT (helps FindCURL / connector optional plugin)
+	if(CURL_ROOT AND EXISTS "${CURL_ROOT}")
+		if(NOT CURL_INCLUDE_DIR AND EXISTS "${CURL_ROOT}/include")
+			set(CURL_INCLUDE_DIR "${CURL_ROOT}/include" CACHE PATH "Curl include override" FORCE)
+		endif()
+		if(NOT CURL_LIBRARY)
+			file(GLOB _curl_lib_candidates
+				"${CURL_ROOT}/lib/*curl*.lib"
+				"${CURL_ROOT}/lib/*libcurl*.lib"
+				"${CURL_ROOT}/*curl*.lib"
+			)
+			list(LENGTH _curl_lib_candidates _curl_lib_count)
+			if(_curl_lib_count GREATER 0)
+				list(GET _curl_lib_candidates 0 _curl_pick)
+				set(CURL_LIBRARY "${_curl_pick}" CACHE FILEPATH "Curl library override" FORCE)
+			endif()
+		endif()
+	endif()
+
+	# Resolve zstd if user supplied ZSTD_ROOT (for compression plugin)
+	if(ZSTD_ROOT AND EXISTS "${ZSTD_ROOT}")
+		if(NOT ZSTD_INCLUDE_DIRS AND EXISTS "${ZSTD_ROOT}/include")
+			set(ZSTD_INCLUDE_DIRS "${ZSTD_ROOT}/include" CACHE PATH "zstd include override" FORCE)
+		endif()
+		if(NOT ZSTD_LIBRARIES)
+			file(GLOB _zstd_lib_candidates
+				"${ZSTD_ROOT}/lib/*zstd*.lib"
+				"${ZSTD_ROOT}/static/*zstd*.lib"
+				"${ZSTD_ROOT}/*zstd*.lib"
+			)
+			list(LENGTH _zstd_lib_candidates _zstd_lib_count)
+			if(_zstd_lib_count GREATER 0)
+				list(GET _zstd_lib_candidates 0 _zstd_pick)
+				set(ZSTD_LIBRARIES "${_zstd_pick}" CACHE FILEPATH "zstd library override" FORCE)
+			endif()
+		endif()
+	endif()
+	# Silence connector optional components we don't need to speed up configure/build.
+	set(WITH_UNIT_TESTS OFF CACHE BOOL "Disable MariaDB connector unit tests" FORCE)
+	set(CONC_WITH_UNIT_TESTS OFF CACHE BOOL "Disable MariaDB connector unit tests (alt var)" FORCE)
+	# Force using the already defined top-level zlib target to prevent duplicate 'zlib' target creation inside the connector.
+	set(WITH_EXTERNAL_ZLIB ON CACHE BOOL "Use external (top-level) zlib" FORCE)
+	set(MARIADB_FORCE_EXTERNAL_ZLIB ON CACHE BOOL "Force MariaDB to use external zlib target" FORCE)
+	set(ZLIB_FOUND TRUE CACHE BOOL "Pretend zlib already found to MariaDB connector")
+	if(TARGET zlib)
+		# Provide legacy variable names the connector checks.
+		set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/libs/zlib CACHE PATH "zlib include dir")
+		set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/zlib CACHE PATH "zlib include dir (single)")
+	endif()
+	set(WITH_MSI OFF CACHE BOOL "Disable MSI packaging" FORCE)
+	set(CONC_WITH_MSI OFF CACHE BOOL "Disable MSI packaging (alt var)" FORCE)
+	add_subdirectory(libs/mariadb-connector-cpp)
+	# Expose interface variables for downstream linking
+	set(MARIADB_CONNECTOR_LIB mariadbcpp CACHE STRING "MariaDB dynamic library target")
+	set(MARIADB_CONNECTOR_STATIC_LIB mariadbcpp-static CACHE STRING "MariaDB static library target")
+endif()
 
 # Package
 set(CPACK_PACKAGE_NAME ${ProjectName})

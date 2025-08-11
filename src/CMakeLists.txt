@@ -39,6 +39,21 @@ if (BuildMVMP OR BuildMVDED)
 		endif()
 	endif()
 	set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${MINIZIP_INCLUDE_DIRS})
+
+	# MariaDB connector (optional)
+	if(EnableMariaDB)
+		# connector exports modern C++ API; use static for simplicity on Windows, prefer shared elsewhere
+		if(TARGET ${MARIADB_CONNECTOR_STATIC_LIB})
+			set(MARIADB_CONNECTOR_TARGET ${MARIADB_CONNECTOR_STATIC_LIB})
+		elseif(TARGET ${MARIADB_CONNECTOR_LIB})
+			set(MARIADB_CONNECTOR_TARGET ${MARIADB_CONNECTOR_LIB})
+		endif()
+		if(MARIADB_CONNECTOR_TARGET)
+			get_target_property(_maria_inc ${MARIADB_CONNECTOR_TARGET} INCLUDE_DIRECTORIES)
+			set(MVMPDEDIncludeDirs ${MVMPDEDIncludeDirs} ${_maria_inc})
+			set(MVMPDEDLibraries ${MVMPDEDLibraries} ${MARIADB_CONNECTOR_TARGET})
+		endif()
+	endif()
 	
 	# Source
 	set(BotlibFiles

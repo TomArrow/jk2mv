@@ -14,11 +14,17 @@
 # EXTERNAL cache entries
 ########################
 
+//Compile all plugins in, i.e. make them static
+ALL_PLUGINS_STATIC:BOOL=OFF
+
 //Build string (default: 20250810)
 BUILD:STRING=20250810
 
 //Build legacy jk2pro-bins.pk3 alongside assetsmv2.pk3
 BUILD_LEGACY_BINS_PK3:BOOL=ON
+
+//Build only tests and nothing else
+BUILD_TESTS_ONLY:BOOL=OFF
 
 //Whether to create targets for the dedicated server (eternaljk2mvded)
 BuildMVDED:BOOL=ON
@@ -37,66 +43,48 @@ BuildPortableVersion:BOOL=ON
 CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.exe
 
 //ASM_NASM compiler
-CMAKE_ASM_NASM_COMPILER:STRING=D:/Workspace/jk2mv-tom/tools/Release/q3asm.exe
+CMAKE_ASM_NASM_COMPILER:FILEPATH=NOTFOUND
 
-//Flags used by the ASM_NASM compiler during all build types.
-CMAKE_ASM_NASM_FLAGS:STRING=D:/Workspace/jk2mv-tom/tools/nasm
-
-//Flags used by the ASM_NASM compiler during DEBUG builds.
-CMAKE_ASM_NASM_FLAGS_DEBUG:STRING=-g
-
-//Flags used by the ASM_NASM compiler during MINSIZEREL builds.
-CMAKE_ASM_NASM_FLAGS_MINSIZEREL:STRING=
-
-//Flags used by the ASM_NASM compiler during RELEASE builds.
-CMAKE_ASM_NASM_FLAGS_RELEASE:STRING=D:\Workspace\jk2mv-tom\tools\Release
-
-//Flags used by the ASM_NASM compiler during RELWITHDEBINFO builds.
-CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO:STRING=-g
+//No help, variable specified on the command line.
+CMAKE_BUILD_TYPE:UNINITIALIZED=Release
 
 //Semicolon separated list of supported configuration types, only
 // supports Debug, Release, MinSizeRel, and RelWithDebInfo, anything
 // else will be ignored.
 CMAKE_CONFIGURATION_TYPES:STRING=Debug;Release;MinSizeRel;RelWithDebInfo
 
-//CXX compiler.
-CMAKE_CXX_COMPILER:FILEPATH=D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdCXX/CompilerIdCXX.exe
-
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=/DWIN32 /D_WINDOWS /GR /EHsc
 
-//Flags used by the CXX compiler during DEBUG builds.
-CMAKE_CXX_FLAGS_DEBUG:STRING=/Zi /Ob0 /Od /RTC1
+//Overwritten by mariadb-cpp
+CMAKE_CXX_FLAGS_DEBUG:STRING=/ZI /Ob0 /Od /RTC1
 
-//Flags used by the CXX compiler during MINSIZEREL builds.
+//Overwritten by mariadb-cpp
 CMAKE_CXX_FLAGS_MINSIZEREL:STRING=/O1 /Ob1 /DNDEBUG
 
-//Flags used by the CXX compiler during RELEASE builds.
-CMAKE_CXX_FLAGS_RELEASE:STRING=/O2 /Ob2 /DNDEBUG
+//Overwritten by mariadb-cpp
+CMAKE_CXX_FLAGS_RELEASE:STRING=/MT /MP /O2 /Oi /Ot /Ob2
 
-//Flags used by the CXX compiler during RELWITHDEBINFO builds.
-CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=/Zi /O2 /Ob1 /DNDEBUG
+//Overwritten by mariadb-cpp
+CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=/MT /MP /O2 /Oi /Ot /Ob2 /ZI
 
 //Libraries linked by default with all C++ applications.
 CMAKE_CXX_STANDARD_LIBRARIES:STRING=kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
 
-//C compiler.
-CMAKE_C_COMPILER:FILEPATH=D:/Workspace/jk2mv-tom/build-clean/CMakeFiles/4.1.0-rc1/CompilerIdC/CompilerIdC.exe
-
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=/DWIN32 /D_WINDOWS
 
-//Flags used by the C compiler during DEBUG builds.
-CMAKE_C_FLAGS_DEBUG:STRING=/Zi /Ob0 /Od /RTC1
+//Overwritten by mariadb-cpp
+CMAKE_C_FLAGS_DEBUG:STRING=/ZI /Ob0 /Od /RTC1
 
-//Flags used by the C compiler during MINSIZEREL builds.
+//Overwritten by mariadb-cpp
 CMAKE_C_FLAGS_MINSIZEREL:STRING=/O1 /Ob1 /DNDEBUG
 
-//Flags used by the C compiler during RELEASE builds.
-CMAKE_C_FLAGS_RELEASE:STRING=/O2 /Ob2 /DNDEBUG
+//Overwritten by mariadb-cpp
+CMAKE_C_FLAGS_RELEASE:STRING=/MT /MP /O2 /Oi /Ot /Ob2
 
-//Flags used by the C compiler during RELWITHDEBINFO builds.
-CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=/Zi /O2 /Ob1 /DNDEBUG
+//Overwritten by mariadb-cpp
+CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=/MT /MP /O2 /Oi /Ot /Ob2 /ZI
 
 //Libraries linked by default with all C applications.
 CMAKE_C_STANDARD_LIBRARIES:STRING=kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -119,11 +107,56 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=D:/Workspace/jk2mv-tom/build/CMakeFiles/pkgRedirects
 
-//Fortran compiler.
-CMAKE_Fortran_COMPILER:FILEPATH=C:/Program Files/CMake/share/cmake-4.1/Modules/Compiler/Intel-Fortran.cmake
+//User executables (bin)
+CMAKE_INSTALL_BINDIR:PATH=bin
+
+//Read-only architecture-independent data (DATAROOTDIR)
+CMAKE_INSTALL_DATADIR:PATH=
+
+//Read-only architecture-independent data root (share)
+CMAKE_INSTALL_DATAROOTDIR:PATH=share
+
+//Documentation root (DATAROOTDIR/doc/PROJECT_NAME)
+CMAKE_INSTALL_DOCDIR:PATH=
+
+//C header files (include)
+CMAKE_INSTALL_INCLUDEDIR:PATH=include
+
+//Info documentation (DATAROOTDIR/info)
+CMAKE_INSTALL_INFODIR:PATH=
+
+//Object code libraries (lib)
+CMAKE_INSTALL_LIBDIR:PATH=lib
+
+//Program executables (libexec)
+CMAKE_INSTALL_LIBEXECDIR:PATH=libexec
+
+//Locale-dependent data (DATAROOTDIR/locale)
+CMAKE_INSTALL_LOCALEDIR:PATH=
+
+//Modifiable single-machine data (var)
+CMAKE_INSTALL_LOCALSTATEDIR:PATH=var
+
+//Man documentation (DATAROOTDIR/man)
+CMAKE_INSTALL_MANDIR:PATH=
+
+//C header files for non-gcc (/usr/include)
+CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
 
 //Install path prefix, prepended onto install directories.
 CMAKE_INSTALL_PREFIX:PATH=C:/Program Files/EternalJK2
+
+//Run-time variable data (LOCALSTATEDIR/run)
+CMAKE_INSTALL_RUNSTATEDIR:PATH=
+
+//System admin executables (sbin)
+CMAKE_INSTALL_SBINDIR:PATH=sbin
+
+//Modifiable architecture-independent data (com)
+CMAKE_INSTALL_SHAREDSTATEDIR:PATH=com
+
+//Read-only single-machine data (etc)
+CMAKE_INSTALL_SYSCONFDIR:PATH=etc
 
 //Path to a program.
 CMAKE_LINKER:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe
@@ -218,10 +251,10 @@ CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:STRING=/debug /INCREMENTAL
 
 //If set, runtime paths are not added when installing shared libraries,
 // but are added when building.
-CMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
+CMAKE_SKIP_INSTALL_RPATH:BOOL=NO
 
 //If set, runtime paths are not added when using shared libraries.
-CMAKE_SKIP_RPATH:BOOL=OFF
+CMAKE_SKIP_RPATH:BOOL=NO
 
 //Flags used by the archiver during the creation of static libraries
 // during all build types.
@@ -247,13 +280,69 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 // .SILENT directive, and all commands will be echoed to the console
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
-CMAKE_VERBOSE_MAKEFILE:BOOL=ON
+CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+
+//Ignore packaging (when subproject and such)
+CONC_IGNORE_PACKAGING:BOOL=OFF
+
+//Enables support of dynamic columns
+CONC_WITH_DYNCOL:BOOL=ON
+
+//Enables use of external zlib
+CONC_WITH_EXTERNAL_ZLIB:BOOL=ON
+
+//enables character set conversion
+CONC_WITH_ICONV:BOOL=OFF
+
+//Build MSI installation package
+CONC_WITH_MSI:BOOL=OFF
+
+//enables run time checks for debug builds
+CONC_WITH_RTC:BOOL=OFF
+
+//digitally sign files
+CONC_WITH_SIGNCODE:BOOL=OFF
+
+//Enables use of TLS/SSL library
+CONC_WITH_SSL:BOOL=ON
+
+//Build C/C unit tests
+CONC_WITH_UNIT_TESTS:BOOL=OFF
 
 //Enable to build 7-Zip source packages
 CPACK_SOURCE_7Z:BOOL=ON
 
 //Enable to build ZIP source packages
 CPACK_SOURCE_ZIP:BOOL=ON
+
+//The directory containing a CMake configuration file for CURL.
+CURL_DIR:PATH=CURL_DIR-NOTFOUND
+
+//Path to a file.
+CURL_INCLUDE_DIR:PATH=C:/curl-8.15.0/include
+
+//No help, variable specified on the command line.
+CURL_LIBRARY:UNINITIALIZED=C:/curl-8.15.0/lib/libcurl.lib
+
+//Path to a library.
+CURL_LIBRARY_DEBUG:FILEPATH=CURL_LIBRARY_DEBUG-NOTFOUND
+
+//Path to a library.
+CURL_LIBRARY_RELEASE:FILEPATH=CURL_LIBRARY_RELEASE-NOTFOUND
+
+//Root folder of a local cURL build (expects include/ and lib/
+// under it)
+CURL_ROOT:PATH=C:/curl-8.15.0
+
+//If we should should enable LOAD DATA LOCAL by default (OFF/ON/AUTO)
+ENABLED_LOCAL_INFILE:STRING=AUTO
+
+//Build 12-bit and 16-bit precision JPEG object variants
+ENABLE_JPEG_EXT_PRECISION:BOOL=OFF
+
+//Build and link the bundled MariaDB Connector/C++ (enables database
+// features)
+EnableMariaDB:BOOL=ON
 
 //Value Computed by CMake
 EternalJK2_BINARY_DIR:STATIC=D:/Workspace/jk2mv-tom/build
@@ -268,7 +357,14 @@ EternalJK2_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //NASM assembler available
-HAVE_NASM:BOOL=ON
+HAVE_NASM:BOOL=FALSE
+
+//Ignore packaging (when subproject and such)
+IGNORE_PACKAGING:BOOL=OFF
+
+//Installation layout. Currently supported options are DEFAULT
+// (tar.gz and zip), DEB, RPM and PKG
+INSTALL_LAYOUT:STRING=DEFAULT
 
 //Internal JPEG include path
 JPEG_INCLUDE_DIR:PATH=D:/Workspace/jk2mv-tom/libs/libjpeg-turbo
@@ -277,11 +373,23 @@ JPEG_INCLUDE_DIR:PATH=D:/Workspace/jk2mv-tom/libs/libjpeg-turbo
 // bad implementation in jk2mf
 LegacyHTTPDownloads:BOOL=OFF
 
+//MariaDB dynamic library target
+MARIADB_CONNECTOR_LIB:STRING=mariadbcpp
+
+//MariaDB static library target
+MARIADB_CONNECTOR_STATIC_LIB:STRING=mariadbcpp-static
+
+//Force MariaDB to use external zlib target
+MARIADB_FORCE_EXTERNAL_ZLIB:BOOL=ON
+
+//Link Connector/C library dynamically
+MARIADB_LINK_DYNAMIC:BOOL=OFF
+
 //Suppress warning when git metadata missing
 MVSDK_ALLOW_NO_GIT:BOOL=ON
 
 //Path to a program.
-NASM_EXECUTABLE:FILEPATH=D:/Workspace/jk2mv-tom/tools/nasm/nasm.exe
+NASM_EXECUTABLE:FILEPATH=NASM_EXECUTABLE-NOTFOUND
 
 //Disable loading of NT-Mod pk3 files to prevent crashing the game
 NTClientWorkaround:BOOL=ON
@@ -292,6 +400,12 @@ OPENGL_gl_LIBRARY:STRING=opengl32
 //GLU library for win32
 OPENGL_glu_LIBRARY:STRING=glu32
 
+//Arguments to supply to pkg-config
+PKG_CONFIG_ARGN:STRING=
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=PKG_CONFIG_EXECUTABLE-NOTFOUND
+
 //Project Name
 ProjectName:STRING=EternalJK2
 
@@ -300,6 +414,70 @@ SKIP_MSVC_ENV_CHECK:BOOL=OFF
 
 //Option to override CMAKE_SYSTEM_PROCESSOR
 SystemProcessor:STRING=AMD64
+
+//Use installed in the system C/C library and do not build one
+USE_SYSTEM_INSTALLED_LIB:BOOL=OFF
+
+//Compile with ASAN
+WITH_ASAN:BOOL=OFF
+
+//Use external (top-level) zlib
+WITH_EXTERNAL_ZLIB:BOOL=ON
+
+//Enable memory sanitizer
+WITH_MSAN:BOOL=OFF
+
+//Build MSI installation package
+WITH_MSI:BOOL=OFF
+
+//Digitally sign files
+WITH_SIGNCODE:BOOL=OFF
+
+//Enables use of TLS/SSL library
+WITH_SSL:BOOL=ON
+
+//Enable undefined behavior sanitizer
+WITH_UBSAN:BOOL=OFF
+
+//Build test suite
+WITH_UNIT_TESTS:BOOL=OFF
+
+//Pretend zlib already found to MariaDB connector
+ZLIB_FOUND:BOOL=TRUE
+
+//zlib include dir (single)
+ZLIB_INCLUDE_DIR:PATH=D:/Workspace/jk2mv-tom/libs/zlib
+
+//zlib include dir
+ZLIB_INCLUDE_DIRS:PATH=D:/Workspace/jk2mv-tom/libs/zlib
+
+//Path to a file.
+ZSTD_INCLUDE_DIRS:PATH=C:/zstd-v1.5.7-win64/include
+
+//Path to a library.
+ZSTD_LIBRARIES:FILEPATH=C:/zstd-v1.5.7-win64/static/libzstd_static.lib
+
+//Root folder of a local zstd build (expects include/ and possibly
+// lib/ or static/ with libzstd*.lib)
+ZSTD_ROOT:PATH=C:/zstd-v1.5.7-win64
+
+//Value Computed by CMake
+mariadb-connector-c_BINARY_DIR:STATIC=D:/Workspace/jk2mv-tom/build/libs/mariadb-connector-cpp/libmariadb
+
+//Value Computed by CMake
+mariadb-connector-c_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+mariadb-connector-c_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom/libs/mariadb-connector-cpp/libmariadb
+
+//Value Computed by CMake
+mariadb_connector_cpp_BINARY_DIR:STATIC=D:/Workspace/jk2mv-tom/build/libs/mariadb-connector-cpp
+
+//Value Computed by CMake
+mariadb_connector_cpp_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+mariadb_connector_cpp_SOURCE_DIR:STATIC=D:/Workspace/jk2mv-tom/libs/mariadb-connector-cpp
 
 
 ########################
@@ -310,17 +488,6 @@ SystemProcessor:STRING=AMD64
 CMAKE_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_ASM_NASM_COMPILER
 CMAKE_ASM_NASM_COMPILER-ADVANCED:INTERNAL=1
-CMAKE_ASM_NASM_COMPILER_WORKS:INTERNAL=1
-//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS
-CMAKE_ASM_NASM_FLAGS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_DEBUG
-CMAKE_ASM_NASM_FLAGS_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_MINSIZEREL
-CMAKE_ASM_NASM_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_RELEASE
-CMAKE_ASM_NASM_FLAGS_RELEASE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO
-CMAKE_ASM_NASM_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=d:/Workspace/jk2mv-tom/build
 //Major version of cmake used to create the current loaded cache
@@ -384,6 +551,38 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=D:/Workspace/jk2mv-tom
+//ADVANCED property for variable: CMAKE_INSTALL_BINDIR
+CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_DATADIR
+CMAKE_INSTALL_DATADIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_DATAROOTDIR
+CMAKE_INSTALL_DATAROOTDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_DOCDIR
+CMAKE_INSTALL_DOCDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_INCLUDEDIR
+CMAKE_INSTALL_INCLUDEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_INFODIR
+CMAKE_INSTALL_INFODIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_LIBDIR
+CMAKE_INSTALL_LIBDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_LIBEXECDIR
+CMAKE_INSTALL_LIBEXECDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_LOCALEDIR
+CMAKE_INSTALL_LOCALEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_LOCALSTATEDIR
+CMAKE_INSTALL_LOCALSTATEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_MANDIR
+CMAKE_INSTALL_MANDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_OLDINCLUDEDIR
+CMAKE_INSTALL_OLDINCLUDEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_RUNSTATEDIR
+CMAKE_INSTALL_RUNSTATEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_SBINDIR
+CMAKE_INSTALL_SBINDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_SHAREDSTATEDIR
+CMAKE_INSTALL_SHAREDSTATEDIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_INSTALL_SYSCONFDIR
+CMAKE_INSTALL_SYSCONFDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //Name of CMakeLists files to read
@@ -401,7 +600,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=21
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=25
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
@@ -451,32 +650,197 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 CPACK_SOURCE_7Z-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CPACK_SOURCE_ZIP
 CPACK_SOURCE_ZIP-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURL_DIR
+CURL_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURL_INCLUDE_DIR
+CURL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURL_LIBRARY_DEBUG
+CURL_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURL_LIBRARY_RELEASE
+CURL_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ENABLED_LOCAL_INFILE
+ENABLED_LOCAL_INFILE-ADVANCED:INTERNAL=1
+//Details about finding CURL
+FIND_PACKAGE_MESSAGE_DETAILS_CURL:INTERNAL=[C:/curl-8.15.0/lib/libcurl.lib][C:/curl-8.15.0/include][ ][v8.15.0()]
+//Details about finding Git
+FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Program Files/Git/cmd/git.exe][v2.50.1.windows.1()]
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[opengl32][ ][v()]
+//Details about finding ZSTD
+FIND_PACKAGE_MESSAGE_DETAILS_ZSTD:INTERNAL=[C:/zstd-v1.5.7-win64/static/libzstd_static.lib][C:/zstd-v1.5.7-win64/include][v()]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
+//Have function alloca
+HAVE_ALLOCA:INTERNAL=
+//Have includes alloca.h
+HAVE_ALLOCA_H:INTERNAL=
+//Have function cuserid
+HAVE_CUSERID:INTERNAL=
+//Have function dlerror
+HAVE_DLERROR:INTERNAL=
+//Have includes dlfcn.h
+HAVE_DLFCN_H:INTERNAL=
+//Have function dlopen
+HAVE_DLOPEN:INTERNAL=
+//Have function fcntl
+HAVE_FCNTL:INTERNAL=
+//Have include fcntl.h
+HAVE_FCNTL_H:INTERNAL=1
+//Have includes ucontext.h
+HAVE_FILE_UCONTEXT_H:INTERNAL=
+//Have include float.h
+HAVE_FLOAT_H:INTERNAL=1
+//Have function getpwuid
+HAVE_GETPWUID:INTERNAL=
 //Have include intrin.h
 HAVE_INTRIN_H:INTERNAL=1
+//Have include limits.h
+HAVE_LIMITS_H:INTERNAL=1
+//Have includes linux/limits.h
+HAVE_LINUX_LIMITS_H:INTERNAL=
+//Have function memcpy
+HAVE_MEMCPY:INTERNAL=1
+//Have function nl_langinfo
+HAVE_NL_LANGINFO:INTERNAL=
+//Have function poll
+HAVE_POLL:INTERNAL=
+//Have includes pwd.h
+HAVE_PWD_H:INTERNAL=
+//Have includes select.h
+HAVE_SELECT_H:INTERNAL=
+//Have function setlocale
+HAVE_SETLOCALE:INTERNAL=1
+//Result of TRY_COMPILE
+HAVE_SIZEOF_CHARP:INTERNAL=TRUE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_INT:INTERNAL=TRUE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_INT16:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_INT32:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_INT64:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_INT8:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_LONG:INTERNAL=TRUE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_LONG_LONG:INTERNAL=TRUE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_SIZE_T:INTERNAL=TRUE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_SOCKLEN_T:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_UINT:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_UINT16:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_UINT32:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_UINT64:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_UINT8:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_ULONG:INTERNAL=FALSE
+//Result of TRY_COMPILE
+HAVE_SIZEOF_USHORT:INTERNAL=FALSE
 //Result of TRY_COMPILE
 HAVE_SIZE_T:INTERNAL=TRUE
 //Have include stddef.h
 HAVE_STDDEF_H:INTERNAL=1
 //Have include stdint.h
 HAVE_STDINT_H:INTERNAL=1
+//Have include stdlib.h
+HAVE_STDLIB_H:INTERNAL=1
+//Have include string.h
+HAVE_STRING_H:INTERNAL=1
+//Have includes sys/ioctl.h
+HAVE_SYS_IOCTL_H:INTERNAL=
+//Have includes sys/select.h
+HAVE_SYS_SELECT_H:INTERNAL=
+//Have includes sys/socket.h
+HAVE_SYS_SOCKET_H:INTERNAL=
+//Have include sys/stat.h
+HAVE_SYS_STAT_H:INTERNAL=1
 //Have include sys/types.h
 HAVE_SYS_TYPES_H:INTERNAL=1
+//Have includes sys/un.h
+HAVE_SYS_UN_H:INTERNAL=
 //Test HAVE_THREAD_LOCAL
 HAVE_THREAD_LOCAL:INTERNAL=1
+//Have includes unistd.h
+HAVE_UNISTD_H:INTERNAL=
 //Result of TRY_COMPILE
 HAVE_UNSIGNED_LONG:INTERNAL=TRUE
+//Have include signal.h
+INCLUDE_SIGNAL:INTERNAL=1
 //Test INLINE_WORKS
 INLINE_WORKS:INTERNAL=1
 //ADVANCED property for variable: OPENGL_gl_LIBRARY
 OPENGL_gl_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_glu_LIBRARY
 OPENGL_glu_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_ARGN
+PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+//CHECK_TYPE_SIZE: sizeof(char *)
+SIZEOF_CHARP:INTERNAL=8
+//CHECK_TYPE_SIZE: sizeof(int)
+SIZEOF_INT:INTERNAL=4
+//CHECK_TYPE_SIZE: int16 unknown
+SIZEOF_INT16:INTERNAL=
+//CHECK_TYPE_SIZE: int32 unknown
+SIZEOF_INT32:INTERNAL=
+//CHECK_TYPE_SIZE: int64 unknown
+SIZEOF_INT64:INTERNAL=
+//CHECK_TYPE_SIZE: int8 unknown
+SIZEOF_INT8:INTERNAL=
+//CHECK_TYPE_SIZE: sizeof(long)
+SIZEOF_LONG:INTERNAL=4
+//CHECK_TYPE_SIZE: sizeof(long long)
+SIZEOF_LONG_LONG:INTERNAL=8
+//CHECK_TYPE_SIZE: sizeof(size_t)
+SIZEOF_SIZE_T:INTERNAL=8
+//CHECK_TYPE_SIZE: socklen_t unknown
+SIZEOF_SOCKLEN_T:INTERNAL=
+//CHECK_TYPE_SIZE: uint unknown
+SIZEOF_UINT:INTERNAL=
+//CHECK_TYPE_SIZE: uint16 unknown
+SIZEOF_UINT16:INTERNAL=
+//CHECK_TYPE_SIZE: uint32 unknown
+SIZEOF_UINT32:INTERNAL=
+//CHECK_TYPE_SIZE: uint64 unknown
+SIZEOF_UINT64:INTERNAL=
+//CHECK_TYPE_SIZE: uint8 unknown
+SIZEOF_UINT8:INTERNAL=
+//CHECK_TYPE_SIZE: ulong unknown
+SIZEOF_ULONG:INTERNAL=
+//CHECK_TYPE_SIZE: uint unknown
+SIZEOF_USHORT:INTERNAL=
 //CHECK_TYPE_SIZE: sizeof(size_t)
 SIZE_T:INTERNAL=8
 //CHECK_TYPE_SIZE: sizeof(unsigned long)
 UNSIGNED_LONG:INTERNAL=4
+//ADVANCED property for variable: ZLIB_INCLUDE_DIRS
+ZLIB_INCLUDE_DIRS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ZSTD_INCLUDE_DIRS
+ZSTD_INCLUDE_DIRS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ZSTD_LIBRARIES
+ZSTD_LIBRARIES-ADVANCED:INTERNAL=1
+//CMAKE_INSTALL_PREFIX during last run
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files/EternalJK2
+__msg1_INSTALL_BINDIR:INTERNAL=dfd6f0a9d273acbd07e5e0306e4d9faa
+__msg1_INSTALL_DOCSDIR:INTERNAL=6d181d02c53d61d4ab47e175de553443
+__msg1_INSTALL_INCLUDEDIR:INTERNAL=fe72891ce81809792431949904ffc20d
+__msg1_INSTALL_LIBDIR:INTERNAL=2ab74e06146817dfcbe66e9a0c85dcf0
+__msg1_INSTALL_MANDIR:INTERNAL=a05d5c18bc28b18be370bacc73f1be8a
+__msg1_INSTALL_PCDIR:INTERNAL=9ea9ff0052fa070e10292cc66dc77587
+__msg1_INSTALL_PLUGINDIR:INTERNAL=f8eff3f6a0ef4b32f21652cb49d90b10
+__msg1_LIBMARIADB_STATIC_NAME:INTERNAL=6b64eed19659918011c2c879faff6434
+__msg1_STATUS:INTERNAL=67e66368afa1800c4b60ff1e215e1c43
+__msg1_SYSTEM_LIBS:INTERNAL=00cb6353acf3ad2ce593bf8322b01f33
+__msg1_SYSTEM_PROCESSOR:INTERNAL=a14907d37b569eaf7fc7e85628062ceb
+__msg1_TLS_LIBRARY_VERSION:INTERNAL=c394253a5963fbc88b423a625a0e7d3b
+__msg1_WITH_DYNCOL:INTERNAL=9308b93ca92c0e283b2f085df959b5a0
 
