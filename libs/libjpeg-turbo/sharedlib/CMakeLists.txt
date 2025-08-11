@@ -44,8 +44,6 @@ if(WIN32)
   set(DEFFILE ../win/jpeg${SO_MAJOR_VERSION}.def)
 endif()
 if(MSVC_LIKE)
-  configure_file(${CMAKE_SOURCE_DIR}/win/jpeg.rc.in
-    ${CMAKE_BINARY_DIR}/win/jpeg.rc)
   set(JPEG_SRCS ${JPEG_SRCS} ${CMAKE_BINARY_DIR}/win/jpeg.rc)
 endif()
 add_library(jpeg SHARED ${JPEG_SRCS} ${DEFFILE} ${SIMD_TARGET_OBJECTS}
