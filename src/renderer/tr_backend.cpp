@@ -891,7 +891,7 @@ const void *RB_StretchPic ( const void *data ) {
 	}
 
 	shader = cmd->shader;
-	if ( shader != tess.shader ) {
+	if (!RB_TessShaderSame(shader,tess.shader) ) {
 		if ( tess.numIndexes ) {
 			RB_EndSurface();
 		}
@@ -968,7 +968,7 @@ const void * RB_DrawLine( const void *data ) {
 	}
 
 	shader = cmd->shader;
-	if ( shader != tess.shader ) {
+	if (!RB_TessShaderSame( shader , tess.shader) ) {
 		if ( tess.numIndexes ) {
 			RB_EndSurface();
 		}
@@ -1051,7 +1051,7 @@ const void *RB_TransformPic ( const void *data ) {
 	}
 
 	shader = cmd->shader;
-	if ( shader != tess.shader ) {
+	if (!RB_TessShaderSame(shader ,tess.shader) ) {
 		if ( tess.numIndexes ) {
 			RB_EndSurface();
 		}

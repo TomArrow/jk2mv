@@ -1634,6 +1634,16 @@ extern	const float			s_flipMatrix[16];
 #endif
 extern	color4ub_t	styleColors[MAX_LIGHT_STYLES];
 
+inline bool RB_TessShaderSame(shader_t* shader, shader_t* tessShader) {
+
+	shader_t* state = (shader->remappedShaderAdvanced ? shader->remappedShaderAdvanced : (shader->remappedShader ? shader->remappedShader : shader));
+	if (!r_newRemapsTmpFix->integer) {
+		if (state->defaultShader) state = tr.defaultShader;
+	}
+
+	return tessShader == state;
+
+}
 void RB_BeginSurface(shader_t *shader, int fogNum );
 void RB_EndSurface(void);
 void RB_CheckOverflow( int verts, int indexes );
