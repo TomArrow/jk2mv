@@ -83,17 +83,17 @@ static bool				triggers_were_sorted = false;
 static bool				clips_were_sorted = false;
 static bool				slicks_were_sorted = false;
 
-static visBrushNode_t** trigger_sortlist;
-static visBrushNode_t** clip_sortlist;
-static visBrushNode_t** slick_sortlist;
+static visBrushNode_t** trigger_sortlist = NULL;
+static visBrushNode_t** clip_sortlist = NULL;
+static visBrushNode_t** slick_sortlist = NULL;
 
 /* needed for winding_cmp */
 static vec3_t w_center, w_normal, w_ref_vec;
 static float w_ref_vec_len;
 
-cvar_t *triggers_draw;
-cvar_t *clips_draw;
-cvar_t *slicks_draw;
+cvar_t *triggers_draw = NULL;
+cvar_t *clips_draw = NULL;
+cvar_t *slicks_draw = NULL;
 
 static cvar_t *draw_maxfaces;
 #if OVERCOMPLICATED_OPTIMIZATIONS
