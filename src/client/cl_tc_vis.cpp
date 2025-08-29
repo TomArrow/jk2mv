@@ -16,6 +16,7 @@
 
 #define OVERCOMPLICATED_OPTIMIZATIONS 0
 
+#define STUPIDFUCKINGDEBUGSHIT 0
 
 // if you dare to exceed this...
 #define MAX_FACE_VERTS 64
@@ -132,9 +133,11 @@ static void init_sortlist(visBrushNode_t* head, visBrushNode_t** sortlist) {
 }
 
 void tc_vis_init(void) {
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: resetting vars\n");
 	}
+#endif
 	free_vis_brushes(trigger_head); trigger_count =trigger_count_faces = 0; if (trigger_sortlist) { delete[] trigger_sortlist; }
 	free_vis_brushes(clip_head); clip_count =clip_count_faces = 0; if (clip_sortlist) { delete[] clip_sortlist; }
 	free_vis_brushes(slick_head); slick_count = slick_count_faces = 0; if (slick_sortlist) { delete[] slick_sortlist; }
@@ -147,10 +150,11 @@ void tc_vis_init(void) {
 	triggers_were_sorted = false;
 	clips_were_sorted = false;
 	slicks_were_sorted = false;
-
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: getting cvars\n");
 	}
+#endif
 	triggers_draw = Cvar_Get("r_renderTriggerBrushes", "0", CVAR_ARCHIVE);
 	clips_draw = Cvar_Get("r_renderClipBrushes", "0", CVAR_ARCHIVE);
 	slicks_draw = Cvar_Get("r_renderSlickSurfaces", "0", CVAR_ARCHIVE);
@@ -164,9 +168,11 @@ void tc_vis_init(void) {
 	clip_shader_setting = Cvar_Get("r_renderClipBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 	slick_shader_setting = Cvar_Get("r_renderSlickSurfacesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: registering shaders\n");
 	}
+#endif
 	trigger_shader = re.RegisterShader(trigger_shader_setting->string);
 	clip_shader = re.RegisterShader(clip_shader_setting->string);
 	clip_shader_solidity = re.ext.RegisterShader3D(r_solidityTexture->string);
@@ -181,22 +187,30 @@ void tc_vis_init(void) {
 		slick_shader = re.RegisterShader("white");
 	}
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: adding triggers\n");
 	}
+#endif
 	add_triggers();
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: adding clips\n");
 	}
+#endif
 	add_clips();
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: adding slicks\n");
 	}
+#endif
 	add_slicks();
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: initing sortlist\n");
 	}
+#endif
 	if (trigger_count > 0) {
 		trigger_sortlist = new visBrushNode_t*[trigger_count];
 		init_sortlist(trigger_head, trigger_sortlist);
@@ -277,9 +291,11 @@ void tc_vis_render(void) {
 // ripped from breadsticks
 static void add_triggers(void) {
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 1) {
 		Com_Printf("tc_vis_init: adding triggers 2\n");
 	}
+#endif
 	const char *entities = cm.entityString;
 	for (;; ) {
 		bool is_trigger = false;
@@ -309,9 +325,11 @@ static void add_triggers(void) {
 			if (!Q_stricmp(token, "classname")) {
 				token = COM_Parse(&entities);
 
+#if STUPIDFUCKINGDEBUGSHIT
 				if (com_developer->integer > 2) {
 					Com_Printf("tc_vis_init: processing classname %s\n", token);
 				}
+#endif
 				is_trigger = !!Q_stristr(token, "trigger");
 			}
 
@@ -325,10 +343,13 @@ static void add_triggers(void) {
 
 		if (is_trigger && model > 0) {
 			cLeaf_t *leaf = &cm.cmodels[model].leaf;
+#if STUPIDFUCKINGDEBUGSHIT
 			if (com_developer->integer > 2) {
 				Com_Printf("tc_vis_init: adding trigger brushes, numLeafBrushes: %d, model: %d \n", leaf->numLeafBrushes, model);
 			}
+#endif
 			for (int i = 0; i < leaf->numLeafBrushes; i++) {
+#if STUPIDFUCKINGDEBUGSHIT
 				if (com_developer->integer > 2) {
 					Com_Printf("tc_vis_init: adding trigger brush, i: %d \n", i);
 				}
@@ -338,6 +359,7 @@ static void add_triggers(void) {
 				if (com_developer->integer > 2) {
 					Com_Printf("tc_vis_init: leafbrushes: %d leaf->firstLeafBrush %d\n", (int)(size_t)cm.leafbrushes, leaf->firstLeafBrush);
 				}
+#endif
 				gen_visible_brush(cm.leafbrushes[leaf->firstLeafBrush + i], origin, TRIGGER_BRUSH, &trigger_color);
 			}
 		}
@@ -374,17 +396,21 @@ static void add_slicks(void) {
 
 static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, color4u_t* color) {
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: brushnum %d\n", brushnum);
 	}
+#endif
 	cbrush_t *brush = &cm.brushes[brushnum];
 	visBrushNode_t *node = (visBrushNode_t*)malloc(sizeof(visBrushNode_t));
 	int	verts = 0;
 	vec3_t center = { 0,0,0 };
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: 2 brushnum %d\n", brushnum);
 	}
+#endif
 	node->numFaces = brush->numsides;
 	node->faces = (visFace_t*)malloc(node->numFaces * sizeof(visFace_t));
 	for (int i = 0; i < node->numFaces; i++) {
@@ -392,9 +418,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		node->faces[i].verts = (polyVert_t*)malloc(MAX_FACE_VERTS * sizeof(polyVert_t));
 	}
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: looping sides\n", brushnum);
 	}
+#endif
 	for (int i = 0; i < brush->numsides; i++) {
 		cplane_t *p1 = brush->sides[i].plane;
 		for (int j = i+1; j < brush->numsides; j++) {
@@ -442,9 +470,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		}
 	}
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: winding\n", brushnum);
 	}
+#endif
 	// winding
 	for (int i = 0; i < brush->numsides; i++) {
 		visFace_t *face = &node->faces[i];
@@ -490,9 +520,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		VectorCopy(center,node->center);
 	}
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: add to head\n", brushnum);
 	}
+#endif
 	visBrushNode_t **head = NULL;
 	switch (type)
 	{
@@ -518,9 +550,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 
 	//
 
+#if STUPIDFUCKINGDEBUGSHIT
 	if (com_developer->integer > 2) {
 		Com_Printf("gen_visible_brush: added to head\n", brushnum);
 	}
+#endif
 
 	assert(head);
 	node->next = *head;
