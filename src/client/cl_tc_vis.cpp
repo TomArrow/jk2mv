@@ -284,7 +284,7 @@ static void add_triggers(void) {
 	for (;; ) {
 		bool is_trigger = false;
 		int model = -1;
-		vec3_t origin;
+		vec3_t origin = { 0,0,0 };
 		VectorCopy(vec3_origin, origin);
 
 		char *token = COM_Parse(&entities);
