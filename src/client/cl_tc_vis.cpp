@@ -89,7 +89,7 @@ static visBrushNode_t** slick_sortlist = NULL;
 
 /* needed for winding_cmp */
 static vec3_t w_center, w_normal, w_ref_vec;
-static float w_ref_vec_len;
+static float w_ref_vec_len = 0;
 
 cvar_t *triggers_draw = NULL;
 cvar_t *clips_draw = NULL;
@@ -101,18 +101,18 @@ static cvar_t *draw_earlycull;
 static cvar_t *draw_earlydistcull;
 #endif
 
-extern cvar_t *r_nocull;
-extern cvar_t *r_solidity;
-extern cvar_t *r_solidityTexture;
+extern cvar_t *r_nocull = NULL;
+extern cvar_t *r_solidity = NULL;
+extern cvar_t *r_solidityTexture = NULL;
 
-static cvar_t *trigger_shader_setting;
-static cvar_t *clip_shader_setting;
-static cvar_t *slick_shader_setting;
+static cvar_t *trigger_shader_setting = NULL;
+static cvar_t *clip_shader_setting = NULL;
+static cvar_t *slick_shader_setting = NULL;
 
-static qhandle_t trigger_shader;
-static qhandle_t clip_shader;
-static qhandle_t slick_shader;
-static qhandle_t clip_shader_solidity;
+static qhandle_t trigger_shader = 0;
+static qhandle_t clip_shader = 0;
+static qhandle_t slick_shader = 0;
+static qhandle_t clip_shader_solidity = 0;
 
 static color4u_t trigger_color = { 0, 128, 0, 255 };
 static color4u_t clip_color = { 128, 0, 0, 255 };
@@ -132,6 +132,9 @@ static void init_sortlist(visBrushNode_t* head, visBrushNode_t** sortlist) {
 }
 
 void tc_vis_init(void) {
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: resetting vars\n");
+	}
 	free_vis_brushes(trigger_head); trigger_count =trigger_count_faces = 0; if (trigger_sortlist) { delete[] trigger_sortlist; }
 	free_vis_brushes(clip_head); clip_count =clip_count_faces = 0; if (clip_sortlist) { delete[] clip_sortlist; }
 	free_vis_brushes(slick_head); slick_count = slick_count_faces = 0; if (slick_sortlist) { delete[] slick_sortlist; }
@@ -145,6 +148,9 @@ void tc_vis_init(void) {
 	clips_were_sorted = false;
 	slicks_were_sorted = false;
 
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: getting cvars\n");
+	}
 	triggers_draw = Cvar_Get("r_renderTriggerBrushes", "0", CVAR_ARCHIVE);
 	clips_draw = Cvar_Get("r_renderClipBrushes", "0", CVAR_ARCHIVE);
 	slicks_draw = Cvar_Get("r_renderSlickSurfaces", "0", CVAR_ARCHIVE);
@@ -158,6 +164,9 @@ void tc_vis_init(void) {
 	clip_shader_setting = Cvar_Get("r_renderClipBrushesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 	slick_shader_setting = Cvar_Get("r_renderSlickSurfacesShader", "tcRenderShader", CVAR_LATCH | CVAR_ARCHIVE);
 
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: registering shaders\n");
+	}
 	trigger_shader = re.RegisterShader(trigger_shader_setting->string);
 	clip_shader = re.RegisterShader(clip_shader_setting->string);
 	clip_shader_solidity = re.ext.RegisterShader3D(r_solidityTexture->string);
@@ -172,10 +181,22 @@ void tc_vis_init(void) {
 		slick_shader = re.RegisterShader("white");
 	}
 
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: adding triggers\n");
+	}
 	add_triggers();
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: adding clips\n");
+	}
 	add_clips();
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: adding slicks\n");
+	}
 	add_slicks();
 
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: initing sortlist\n");
+	}
 	if (trigger_count > 0) {
 		trigger_sortlist = new visBrushNode_t*[trigger_count];
 		init_sortlist(trigger_head, trigger_sortlist);
