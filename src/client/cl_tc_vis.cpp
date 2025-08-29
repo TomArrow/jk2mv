@@ -101,9 +101,9 @@ static cvar_t *draw_earlycull;
 static cvar_t *draw_earlydistcull;
 #endif
 
-extern cvar_t *r_nocull = NULL;
-extern cvar_t *r_solidity = NULL;
-extern cvar_t *r_solidityTexture = NULL;
+extern cvar_t *r_nocull;
+extern cvar_t *r_solidity;
+extern cvar_t *r_solidityTexture;
 
 static cvar_t *trigger_shader_setting = NULL;
 static cvar_t *clip_shader_setting = NULL;
