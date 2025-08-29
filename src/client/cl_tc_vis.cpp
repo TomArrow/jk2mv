@@ -277,6 +277,9 @@ void tc_vis_render(void) {
 // ripped from breadsticks
 static void add_triggers(void) {
 
+	if (com_developer->integer > 1) {
+		Com_Printf("tc_vis_init: adding triggers 2\n");
+	}
 	const char *entities = cm.entityString;
 	for (;; ) {
 		bool is_trigger = false;
@@ -305,6 +308,10 @@ static void add_triggers(void) {
 
 			if (!Q_stricmp(token, "classname")) {
 				token = COM_Parse(&entities);
+
+				if (com_developer->integer > 2) {
+					Com_Printf("tc_vis_init: processing classname %s\n", token);
+				}
 				is_trigger = !!Q_stristr(token, "trigger");
 			}
 
@@ -318,6 +325,9 @@ static void add_triggers(void) {
 
 		if (is_trigger && model > 0) {
 			cLeaf_t *leaf = &cm.cmodels[model].leaf;
+			if (com_developer->integer > 2) {
+				Com_Printf("tc_vis_init: adding trigger brushes\n", token);
+			}
 			for (int i = 0; i < leaf->numLeafBrushes; i++) {
 				gen_visible_brush(cm.leafbrushes[leaf->firstLeafBrush + i], origin, TRIGGER_BRUSH, &trigger_color);
 			}
