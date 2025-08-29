@@ -267,7 +267,7 @@ jobs:
     #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
 
     - uses: 'actions/upload-artifact@v4'
-      if: ${{ matrix.build_type == 'Release' }}
+      #if: ${{ matrix.build_type == 'Release' }}
       with:
         name: macOS Package (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
         path: |
@@ -276,7 +276,7 @@ jobs:
 
     # As actions/upload-release-asset seems to demand exact filenames and content types we use a script instead
     - name: Upload Release
-      if: ${{ github.event_name == 'release' && matrix.build_type == 'Release' }}
+      #if: ${{ github.event_name == 'release' && matrix.build_type == 'Release' }}
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}

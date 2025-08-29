@@ -335,6 +335,9 @@ static void add_triggers(void) {
 				if (com_developer->integer > 2) {
 					Com_Printf("tc_vis_init: color: %d %d %d %d, ptr: %d \n", (int)trigger_color.b[0], (int)trigger_color.b[1], (int)trigger_color.b[2], (int)trigger_color.b[3],(int)(size_t)&trigger_color);
 				}
+				if (com_developer->integer > 2) {
+					Com_Printf("tc_vis_init: leafbrushes: %d leaf->firstLeafBrush %d\n", (int)(size_t)cm.leafbrushes, leaf->firstLeafBrush);
+				}
 				gen_visible_brush(cm.leafbrushes[leaf->firstLeafBrush + i], origin, TRIGGER_BRUSH, &trigger_color);
 			}
 		}

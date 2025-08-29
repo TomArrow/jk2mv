@@ -376,8 +376,16 @@ void CMod_LoadLeafBrushes (lump_t *l)
 		Com_Error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
 	count = l->filelen / sizeof(*in);
 
+	if (com_developer->integer > 2) {
+		Com_Printf("CMod_LoadLeafBrushes: count: %d\n", count);
+	}
+
 	cm.leafbrushes = (int *)Hunk_Alloc( (count + BOX_BRUSHES) * sizeof( *cm.leafbrushes ), h_high );
 	cm.numLeafBrushes = count;
+
+	if (com_developer->integer > 2) {
+		Com_Printf("CMod_LoadLeafBrushes: count: %d cm.leafbrushes %d\n", count,(int)(size_t)cm.leafbrushes);
+	}
 
 	out = cm.leafbrushes;
 
