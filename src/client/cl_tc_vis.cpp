@@ -370,13 +370,17 @@ static void add_slicks(void) {
 }
 
 static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t type, color4u_t* color) {
+
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: brushnum %d\n", brushnum);
+	}
 	cbrush_t *brush = &cm.brushes[brushnum];
 	visBrushNode_t *node = (visBrushNode_t*)malloc(sizeof(visBrushNode_t));
 	int	verts = 0;
 	vec3_t center = { 0,0,0 };
 
 	if (com_developer->integer > 2) {
-		Com_Printf("gen_visible_brush: brushnum %d\n", brushnum);
+		Com_Printf("gen_visible_brush: 2 brushnum %d\n", brushnum);
 	}
 	node->numFaces = brush->numsides;
 	node->faces = (visFace_t*)malloc(node->numFaces * sizeof(visFace_t));
