@@ -110,6 +110,10 @@ void CMod_LoadSubmodels( lump_t *l ) {
 		Com_Error (ERR_DROP, "CMod_LoadSubmodels: funny lump size");
 	count = l->filelen / sizeof(*in);
 
+	if (com_developer->integer > 1) {
+		Com_Printf("CMod_LoadSubmodels: count %d", count);
+	}
+
 	if (count < 1)
 		Com_Error (ERR_DROP, "Map with no models");
 	cm.cmodels = (struct cmodel_s *)Hunk_Alloc( count * sizeof( *cm.cmodels ), h_high );
@@ -117,7 +121,6 @@ void CMod_LoadSubmodels( lump_t *l ) {
 
 	cm.capsuleModelHandle = MAX(254, count); // At least 254 (CAPSULE_MODEL_HANDLE) in case some legacy cgame module violates the api
 	cm.boxModelHandle = MAX(255, count + 1); // At least 255 (BOX_MODEL_HANDLE) in case some legacy cgame module violates the api
-
 
 	for ( i=0 ; i<count ; i++, in++, out++)
 	{
