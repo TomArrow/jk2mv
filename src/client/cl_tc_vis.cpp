@@ -326,7 +326,7 @@ static void add_triggers(void) {
 		if (is_trigger && model > 0) {
 			cLeaf_t *leaf = &cm.cmodels[model].leaf;
 			if (com_developer->integer > 2) {
-				Com_Printf("tc_vis_init: adding trigger brushes, numLeafBrushes: %d \n", leaf->numLeafBrushes);
+				Com_Printf("tc_vis_init: adding trigger brushes, numLeafBrushes: %d, model: %d \n", leaf->numLeafBrushes, model);
 			}
 			for (int i = 0; i < leaf->numLeafBrushes; i++) {
 				if (com_developer->integer > 2) {
