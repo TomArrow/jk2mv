@@ -368,6 +368,10 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 	visBrushNode_t *node = (visBrushNode_t*)malloc(sizeof(visBrushNode_t));
 	int	verts = 0;
 	vec3_t center = { 0,0,0 };
+
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: brushnum %d\n", brushnum);
+	}
 	node->numFaces = brush->numsides;
 	node->faces = (visFace_t*)malloc(node->numFaces * sizeof(visFace_t));
 	for (int i = 0; i < node->numFaces; i++) {
@@ -375,6 +379,9 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		node->faces[i].verts = (polyVert_t*)malloc(MAX_FACE_VERTS * sizeof(polyVert_t));
 	}
 
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: looping sides\n", brushnum);
+	}
 	for (int i = 0; i < brush->numsides; i++) {
 		cplane_t *p1 = brush->sides[i].plane;
 		for (int j = i+1; j < brush->numsides; j++) {
@@ -422,6 +429,9 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		}
 	}
 
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: winding\n", brushnum);
+	}
 	// winding
 	for (int i = 0; i < brush->numsides; i++) {
 		visFace_t *face = &node->faces[i];
@@ -467,6 +477,9 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 		VectorCopy(center,node->center);
 	}
 
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: add to head\n", brushnum);
+	}
 	visBrushNode_t **head = NULL;
 	switch (type)
 	{
@@ -491,7 +504,11 @@ static void gen_visible_brush(int brushnum, const vec3_t origin, visBrushType_t 
 	};
 
 	//
-	
+
+	if (com_developer->integer > 2) {
+		Com_Printf("gen_visible_brush: added to head\n", brushnum);
+	}
+
 	assert(head);
 	node->next = *head;
 #if OVERCOMPLICATED_OPTIMIZATIONS
