@@ -214,6 +214,116 @@ jobs:
               );
             }
           }
+          
+          
+  vs2022_xp:
+    name: Build VS 2022 (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, RelWithDebInfo]
+        arch: [Win32]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install Windows XP Support for Visual Studio
+      run: |
+        Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+        $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+        $componentsToAdd = @(
+          "Microsoft.VisualStudio.Component.WinXP"
+        )
+        [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+        $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+        $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+        if ($process.ExitCode -eq 0)
+        {
+            Write-Host "components have been successfully added"
+            Get-ChildItem C:\ProgramData\Microsoft\VisualStudio\Packages\Microsoft.Windows.XPSupport.*
+        }
+        else
+        {
+            Write-Host "components were not installed"
+            exit 1
+        }
+
+    - name: Add msbuild to PATH
+      shell: pwsh
+      run: |
+        $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vsPath = & $vsWhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+        
+        if ($vsPath) {
+          Write-Host "Found Visual Studio at: $vsPath"
+        
+          $msBuildPath = Get-ChildItem -Path "$vsPath\MSBuild\Current\Bin\MSBuild.exe" -ErrorAction SilentlyContinue |
+                         Select-Object -First 1 -ExpandProperty Directory
+        
+          if ($msBuildPath) {
+            Write-Host "Found MSBuild at: $msBuildPath"
+            echo "$msBuildPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        
+            $env:PATH = "$msBuildPath;$env:PATH"
+          } else {
+            throw "MSBuild not found in VS installation"
+          }
+        } else {
+          throw "Visual Studio installation not found"
+        }
+
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build/actions
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build/actions
+      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/actions
+      shell: cmd
+      run: msbuild /m /p:Configuration=${{ matrix.build_type }} PACKAGE.vcxproj
+
+    #- uses: 'actions/upload-artifact@v4'
+    #  with:
+    #    name: Windows Binaries (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
+    #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
+
+    - uses: 'actions/upload-artifact@v4'
+      if: ${{ matrix.build_type == 'RelWithDebInfo' }}
+      with:
+        name: Windows Package (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
+        path: ${{github.workspace}}/build/actions/out/*.zip
+
+    # As actions/upload-release-asset seems to demand exact filenames and content types we use a script instead
+    - name: Upload Release
+      if: ${{ github.event_name == 'release' && matrix.build_type == 'RelWithDebInfo' }}
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs').promises;
+          for ( let filename of await fs.readdir(String.raw`${{github.workspace}}/build/actions/out/`) )
+          {
+            if ( filename.endsWith('.zip') )
+            {
+              await github.rest.repos.uploadReleaseAsset(
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: ${{ github.event.release.id }},
+                  name: filename.split('.').slice(0, -1).join('.') + "-winxp.zip",
+                  data: await fs.readFile( String.raw`${{github.workspace}}/build/actions/out/` + filename )
+                }
+              );
+            }
+          }
 
   macos:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
