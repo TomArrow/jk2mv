@@ -299,6 +299,90 @@ jobs:
             }
           }
 
+  macos-arm:
+    name: Build macOS ARM (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+        portable: [Portable, Non-Portable]
+        arch: [arm64]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Set CMake parameters
+      id: cmakeargs
+      shell: bash
+      run: |
+        if [ "${{ matrix.portable }}" == "Portable" ]; then
+          echo 'PORTABLE=-DBuildPortableVersion=ON' >> $GITHUB_OUTPUT
+        else
+          echo 'PORTABLE=-DBuildPortableVersion=OFF' >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Build Environment
+      run: |
+        brew install sdl2
+        mkdir -p ${{github.workspace}}/build/actions
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build/actions
+      run: cmake -G "Unix Makefiles" -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -DUseInternalLibs=ON ${{ steps.cmakeargs.outputs.PORTABLE }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $GITHUB_WORKSPACE
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/actions
+      shell: bash
+      run: make
+
+    - name: Package
+      working-directory: ${{github.workspace}}/build/actions
+      shell: bash
+      run: make package
+
+    #- uses: 'actions/upload-artifact@v4'
+    #  with:
+    #    name: macOS Binaries (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
+    #    path: ${{github.workspace}}/build/actions/out/${{ matrix.build_type }}/*
+
+    - uses: 'actions/upload-artifact@v4'
+      #if: ${{ matrix.build_type == 'Release' }}
+      with:
+        name: macOS Package (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
+        path: |
+          ${{github.workspace}}/build/actions/out/*.tar.gz
+          ${{github.workspace}}/build/actions/out/*.dmg
+
+    # As actions/upload-release-asset seems to demand exact filenames and content types we use a script instead
+    - name: Upload Release
+      #if: ${{ github.event_name == 'release' && matrix.build_type == 'Release' }}
+      if: ${{ github.event_name == 'release'}}
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs').promises;
+          for ( let filename of await fs.readdir('${{github.workspace}}/build/actions/out/') )
+          {
+            if ( filename.endsWith('.tar.gz') || filename.endsWith('.dmg') )
+            {
+              await github.rest.repos.uploadReleaseAsset(
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: ${{ github.event.release.id }},
+                  name: filename,
+                  data: await fs.readFile( "${{github.workspace}}/build/actions/out/" + filename )
+                }
+              );
+            }
+          }
+
   linux:
     name: Build Linux (${{ matrix.portable }} - ${{ matrix.container_image }}), ${{ matrix.build_type }}
     runs-on: ubuntu-22.04
