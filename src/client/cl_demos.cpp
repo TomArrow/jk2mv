@@ -12,7 +12,7 @@ demo_t demo;
 static entityState_t	demoNullEntityState;
 static playerState_t	demoNullPlayerState;
 
-static const char *demoHeader = Q3_VERSION " Demo";
+static const char *demoHeader = Q3_VERSION " Demo.meta";
 
 static void demoFrameAddString( demoString_t *string, int num, const char *newString) {
 	int			dataLeft, len;
@@ -254,9 +254,44 @@ static void demoFrameInterpolate( demoFrame_t frames[], int frameCount, int inde
 	}
 }
 
+const char postEOFMetadataMarker[] = { "HIDDENMETA" };
+
+const char* demoCutReadPossibleMetadata(msg_t* msg) {
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	const int metaMarkerLength = sizeof(postEOFMetadataMarker) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	const int maxBytePerByteSaved = 2;
+	const int metaMarkerPresenceMinimumByteLengthExtra = metaMarkerLength * maxBytePerByteSaved;
+
+	const int requiredCursize = msg->readcount + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	if (msg->cursize < requiredCursize) {
+		return NULL;
+	}
+
+	for (int i = 0; i < metaMarkerLength; i++) {
+		if (msg->cursize < msg->readcount + maxBytePerByteSaved)
+		{
+			return NULL;
+		}
+		if (MSG_ReadByte(msg) != postEOFMetadataMarker[i]) {
+			return NULL;
+		}
+	}
+	return MSG_ReadBigString(msg);
+}
+
+
+
 void demoConvert( const char *oldName, const char *newBaseName, qboolean smoothen ) {
 	fileHandle_t	oldHandle = 0;
 	fileHandle_t	newHandle = 0;
+	fileHandle_t	metaDataHandle = 0;
 	int				temp;
 	int				oldSize;
 	int				msgSequence;
@@ -274,6 +309,9 @@ void demoConvert( const char *oldName, const char *newBaseName, qboolean smoothe
 	clSnapshot_t	*newSnap;
 	int				levelCount = 0;
 	char			newName[MAX_OSPATH];
+	char			metaDataFileName[MAX_OSPATH];
+	qboolean		wasFirstCommandByte = qfalse;
+	qboolean		firstCommandByteRead = qfalse;
 
 	oldSize = FS_FOpenFileRead( oldName, &oldHandle, qtrue );
 	if (!oldHandle) {
@@ -319,7 +357,35 @@ void demoConvert( const char *oldName, const char *newBaseName, qboolean smoothe
 				goto conversionerror;
 			}
             cmd = MSG_ReadByte( &oldMsg );
+
+			wasFirstCommandByte = (qboolean)!firstCommandByteRead;
+			firstCommandByteRead = qtrue;
+
 			if ( cmd == svc_EOF) {
+				if (wasFirstCommandByte) {
+					// check for hidden meta content
+					const char* maybeMeta = demoCutReadPossibleMetadata(&oldMsg);
+					if (maybeMeta) {
+
+						Com_Printf("Demo metadata found: %s.\n", maybeMeta);
+						if (levelCount) {
+							demo.firstPack = qtrue;
+							Com_sprintf(metaDataFileName, sizeof(newName), "%s.%d.meta", newBaseName, levelCount);
+						}
+						else {
+							Com_sprintf(metaDataFileName, sizeof(newName), "%s.meta", newBaseName);
+						}
+						metaDataHandle = FS_FOpenFileWrite(metaDataFileName);
+						if (!metaDataHandle) {
+							Com_Printf("Failed to open %s for saving metadata.\n", newName);
+							goto conversionerror;
+						}
+						else {
+							FS_Write(maybeMeta, strlen(maybeMeta), metaDataHandle);
+						}
+						FS_FCloseFile(metaDataHandle);
+					}
+				}
                 break;
 			}
 			workFrame = &convert->frames[ convert->frameIndex % DEMOCONVERTFRAMES ];
