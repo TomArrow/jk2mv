@@ -515,7 +515,7 @@ void _UI_Refresh( int realtime )
 
 	// draw cursor
 	UI_SetColor( NULL );
-	if (Menu_Count() > 0) {
+	if ((trap_Key_GetCatcher() & KEYCATCH_UI) && Menu_Count() > 0) {
 		UI_DrawHandlePic( uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory, 48*uiInfo.uiDC.widthRatioCoef, 48, uiInfo.uiDC.Assets.cursor);
 	}
 
