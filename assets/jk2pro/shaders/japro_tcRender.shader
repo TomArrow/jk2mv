@@ -2,6 +2,7 @@
 tcRenderShader
 {
 	polygonOffset
+	entityMergable
 	nopicmip
 	{
 		map gfx/misc/tcRenderShader.jpg
@@ -13,6 +14,7 @@ tcRenderShader
 tcRenderShader_nocull
 {
 	nopicmip
+	entityMergable
 	cull none
 	{
 		map gfx/misc/tcRenderShader.jpg
@@ -25,6 +27,7 @@ tcRenderShaderWater
 {
 	polygonOffset
 	nopicmip
+	entityMergable
 	{
 		map $whiteimage
 		blendFunc GL_ONE GL_ONE
