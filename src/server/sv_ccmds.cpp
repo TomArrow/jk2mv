@@ -1068,6 +1068,12 @@ stop recording a demo
 void SV_StopRecord_f(void) {
 	int		i;
 
+	if (!svs.clients) {
+		// this can happen if server calls SV_Shutdown and game requests to stop demo recording but at the point that the game command is actually executed in Com_Frame in Cbuf_Execute, svs.clients was already purged.
+		Com_Printf("^3SV_StopRecord_f: Can't stop demo recording. svs.clients is NULL. Probably server soft-crashed (time wrap or similar).\n");
+		return;
+	}
+
 	client_t* cl = NULL;
 	if (Cmd_Argc() == 2) {
 		int clIndex = atoi(Cmd_Argv(1));
