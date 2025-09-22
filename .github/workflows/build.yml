@@ -359,7 +359,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{github.workspace}}/build/actions
-      run: cmake -G "Unix Makefiles" -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -DUseInternalLibs=ON ${{ steps.cmakeargs.outputs.PORTABLE }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $GITHUB_WORKSPACE
+      run: cmake -G "Unix Makefiles" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -DUseInternalLibs=ON ${{ steps.cmakeargs.outputs.PORTABLE }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $GITHUB_WORKSPACE
 
     - name: Build
       working-directory: ${{github.workspace}}/build/actions
@@ -443,7 +443,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{github.workspace}}/build/actions
-      run: cmake -G "Unix Makefiles" -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -DUseInternalLibs=ON ${{ steps.cmakeargs.outputs.PORTABLE }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $GITHUB_WORKSPACE
+      run: cmake -G "Unix Makefiles" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -DUseInternalLibs=ON ${{ steps.cmakeargs.outputs.PORTABLE }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $GITHUB_WORKSPACE
 
     - name: Build
       working-directory: ${{github.workspace}}/build/actions
