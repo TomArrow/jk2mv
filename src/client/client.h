@@ -81,7 +81,8 @@ typedef struct {
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original
-#define	MAX_PARSE_ENTITIES	4096
+//#define	MAX_PARSE_ENTITIES	4096
+#define	MAX_PARSE_ENTITIES	16384
 #define SERVERTIME_DELTA_SMOOTH_SAMPLES	100 // samples used for averaging
 //#define	MAX_PARSE_ENTITIES	32768
 
