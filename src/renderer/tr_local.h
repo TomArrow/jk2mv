@@ -581,7 +581,6 @@ typedef struct {
 	struct drawSurf_s	*drawSurfs;
 
 	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
-
 } trRefdef_t;
 
 
@@ -629,6 +628,10 @@ typedef struct {
 	cplane_t	frustum[4];
 	vec3_t		visBounds[2];
 	float		zFar;
+
+	// track whether we need to use stencil for skies
+	int			lastSkyShader;
+	qboolean	renderingMultipleSkies;
 } viewParms_t;
 
 
@@ -889,6 +892,8 @@ typedef struct {
 
 	char		*entityString;
 	const char	*entityParsePoint;
+
+	qboolean	wantsStencilSkies;
 } world_t;
 
 //======================================================================
@@ -1184,7 +1189,6 @@ typedef struct {
 	struct {
 		vec3_t lastPos;
 	}sqlPosHelper;
-
 } trGlobals_t;
 
 
@@ -1328,6 +1332,7 @@ extern	cvar_t	*r_shownormals;					// draws wireframe normals
 extern	cvar_t	*r_clear;						// force screen clear every frame
 
 extern	cvar_t	*r_shadows;						// controls shadows: 0 = none, 1 = blur, 2 = stencil, 3 = black planar projection
+extern	cvar_t	*r_stencilSky;					// use stencils to allow drawing multiple skies without overlap issues
 extern	cvar_t	*r_flares;						// light flares
 
 extern	cvar_t	*r_intensity;

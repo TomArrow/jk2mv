@@ -1084,6 +1084,12 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
+	if (shader->isSky) {
+		if (tr.viewParms.lastSkyShader != -1 && tr.viewParms.lastSkyShader != shader->sortedIndex) {
+			tr.viewParms.renderingMultipleSkies = qtrue;
+		}
+		tr.viewParms.lastSkyShader = shader->sortedIndex;
+	}
 }
 
 /*
@@ -1360,6 +1366,8 @@ void R_RenderView (viewParms_t *parms) {
 	tr.viewParms = *parms;
 	tr.viewParms.frameSceneNum = tr.frameSceneNum;
 	tr.viewParms.frameCount = tr.frameCount;
+	tr.viewParms.renderingMultipleSkies = qfalse;
+	tr.viewParms.lastSkyShader = -1;
 
 	firstDrawSurf = tr.refdef.numDrawSurfs;
 

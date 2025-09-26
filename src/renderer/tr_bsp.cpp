@@ -1993,6 +1993,8 @@ void R_LoadEntities( lump_t *l ) {
 	w->lightGridSize[1] = 64;
 	w->lightGridSize[2] = 128;
 
+	w->wantsStencilSkies = qfalse;
+
 	p = (const char *)(fileBase + l->fileofs);
 
 	// store for reference by the cgame
@@ -2060,6 +2062,12 @@ void R_LoadEntities( lump_t *l ) {
 				w->lightGridSize[1] = gridSize[1];
 				w->lightGridSize[2] = gridSize[2];
 			}
+			continue;
+		}
+
+		// check for a different grid size
+		if (!Q_stricmp(keyname, "stencilsky") || !Q_stricmp(keyname, "_stencilsky")) {
+			w->wantsStencilSkies = (qboolean)atoi(value);
 			continue;
 		}
 	}

@@ -8,6 +8,7 @@ static float s_cloudTexCoords[6][SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1][2];
 static float s_cloudTexP[6][SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
 
 extern bool g_bRenderGlowingObjects;
+extern bool g_bRenderStencilTestedSky;
 
 /*
 ===================================================================================
@@ -772,7 +773,7 @@ void RB_DrawSun( void ) {
 
 
 
-
+void R_DrawElements(int numIndexes, const glIndex_t* indexes);
 /*
 ================
 RB_StageIteratorSky
@@ -783,11 +784,43 @@ Other things could be stuck in here, like birds in the sky, etc
 ================
 */
 void RB_StageIteratorSky( void ) {
+	bool mustClearStencil = false;
 	if ( g_bRenderGlowingObjects )
 		return;
 
 	if ( r_fastsky->integer ) {
 		return;
+	}
+
+
+	if (r_stencilSky->integer && (backEnd.viewParms.renderingMultipleSkies || tr.world && tr.world->wantsStencilSkies) || r_stencilSky->integer == 2 || r_stencilSky->integer == 4) {
+		GL_State(GLS_DEPTHMASK_TRUE);
+		qglEnable(GL_STENCIL_TEST);
+		qglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		qglStencilMask(1);
+		qglStencilFunc(GL_ALWAYS, 1, 1);
+		qglStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+		// draw the polys
+		GL_SelectTexture(0);
+		GL_Bind(tr.whiteImage); // just random texture, it's not like anything is actually drawn. maybe we can skip this altogether?
+		qglVertexPointer(3, GL_FLOAT, sizeof(tess.xyz[0]), tess.xyz);
+		qglDisableClientState(GL_COLOR_ARRAY);
+		qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		R_DrawElements(tess.numIndexes, tess.indexes);
+
+		qglColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		qglStencilMask(1); 
+		qglStencilFunc(GL_EQUAL, 1, 1);
+		if (!tess.xstages[0]) {
+			qglStencilOp(GL_ZERO, GL_ZERO, GL_ZERO); // reset it again for the next sky :) works fine as long as all the actual polys are correctly being drawn over by the sky poly stuff
+		}
+		else {
+			qglStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); // if we have multiple stages, setting to 0 will break being able to draw them all
+			mustClearStencil = true;
+		}
+
+		g_bRenderStencilTestedSky = true; // let GL_State know to always set GLS_DEPTHTEST_DISABLE while we're doing this.
 	}
 
 	// go through all the polygons and project them onto
@@ -830,6 +863,15 @@ void RB_StageIteratorSky( void ) {
 
 	// back to normal depth range
 	qglDepthRange( 0.0, 1.0 );
+
+	if (g_bRenderStencilTestedSky) {
+		qglDisable(GL_STENCIL_TEST);
+		qglClearStencil(0U);
+		if (mustClearStencil) {
+			qglClear(GL_STENCIL_BUFFER_BIT); // seems to work ok without since we do GL_ZERO above. But with multiple stages this is the only option.
+		}
+		g_bRenderStencilTestedSky = false;
+	}
 
 	// note that sky was drawn so we will draw a sun later
 	backEnd.skyRenderedThisView = qtrue;
