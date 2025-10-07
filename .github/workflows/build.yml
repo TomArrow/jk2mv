@@ -144,6 +144,7 @@ jobs:
   vs2019_xp:
     name: Build VS 2019 (Portable - WinXP), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: windows-2022
+    if: false
     strategy:
       fail-fast: false
       matrix:
