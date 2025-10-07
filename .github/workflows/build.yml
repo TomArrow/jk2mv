@@ -337,7 +337,7 @@ jobs:
 
     steps:
     
-    - name: Install cmake
+    - name: Downgrade CMake
       uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '3.31.6'
@@ -427,7 +427,7 @@ jobs:
 
     steps:
     
-    - name: Install cmake
+    - name: Downgrade CMake
       uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '3.31.6'
@@ -599,8 +599,8 @@ jobs:
 
   create-latest:
     if: github.event_name == 'push' && github.ref == 'refs/heads/everything'
-    #needs: [vs2022-installer,vs2022,macos,macos-arm,linux,vs2022_xp]
-    needs: [vs2022-installer,vs2022,linux]
+    needs: [vs2022-installer,vs2022,macos,macos-arm,linux,vs2022_xp]
+    #needs: [vs2022-installer,vs2022,linux]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
