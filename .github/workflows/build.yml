@@ -336,6 +336,12 @@ jobs:
         arch: [x86_64]
 
     steps:
+    
+    - name: Install cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+      
     - uses: actions/checkout@v3
       with:
         submodules: recursive
@@ -420,6 +426,12 @@ jobs:
         arch: [arm64]
 
     steps:
+    
+    - name: Install cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+        
     - uses: actions/checkout@v3
       with:
         submodules: recursive
