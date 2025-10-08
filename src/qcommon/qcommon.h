@@ -783,6 +783,7 @@ void	FS_SV_Rename( const char *from, const char *to );
 
 int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
 int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
+int		FS_WhichPack_f(fileHandle_t f); // returns checksum
 
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call

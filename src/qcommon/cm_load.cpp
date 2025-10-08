@@ -43,6 +43,10 @@ cvar_t		*cm_noCurves;
 cvar_t		*cm_playerCurveClip;
 #endif
 
+// shitty "API" for game module.
+cvar_t		*cm_checksumBsp;
+cvar_t		*cm_checksumPak;
+
 cmodel_t	box_model;
 cplane_t	*box_planes;
 cbrush_t	*box_brush;
@@ -662,6 +666,8 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 	cm_noCurves = Cvar_Get ("cm_noCurves", "0", CVAR_CHEAT);
 	cm_playerCurveClip = Cvar_Get ("cm_playerCurveClip", "1", CVAR_ARCHIVE|CVAR_CHEAT );
 #endif
+	cm_checksumBsp = Cvar_Get("cm_checksumBsp", "0", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_NORESTART);
+	cm_checksumPak = Cvar_Get("cm_checksumPak", "0", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_NORESTART);
 	Com_DPrintf( "CM_LoadMap( %s, %i )\n", name, clientload );
 
 	if ( !strcmp( cm.name, name ) && clientload ) {
@@ -703,6 +709,10 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 	{
 		gpvCachedMapDiskImage = Z_Malloc( iBSPLen, TAG_BSP_DISKIMAGE );
 		FS_Read( gpvCachedMapDiskImage, iBSPLen, h);
+
+		int pakChecksum = FS_WhichPack_f(h);
+		Cvar_Set("cm_checksumPak", va("%d", pakChecksum));
+
 		FS_FCloseFile( h );
 
 		buf = (int*) gpvCachedMapDiskImage;	// so the rest of the code works as normal
@@ -720,6 +730,8 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 
 	last_checksum = LittleLong (Com_BlockChecksum (buf, iBSPLen));
 	*checksum = last_checksum;
+
+	Cvar_Set("cm_checksumBsp",va("%d",(int)last_checksum));
 
 	header = *(dheader_t *)buf;
 	for (size_t i = 0 ; i < sizeof(dheader_t) / 4 ; i++) {

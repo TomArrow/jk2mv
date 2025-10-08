@@ -3709,6 +3709,62 @@ static void FS_Which_f( void ) {
 
 /*
 ============
+FS_WhichPack_f
+============
+*/
+int FS_WhichPack_f( fileHandle_t f ) {
+	searchpath_t	*search;
+	char			*filename;
+
+	if ( !f ) {
+		// caller is an idiot
+		return NULL;
+	}
+
+	// find file that would be opened by FS_FOpenFileRead taking all
+	// its quirks and special cases into account
+	if ( fsh[f].zipFile ) {
+		for ( search=fs_searchpaths; search; search=search->next ) {
+			if ( search->pack ) {
+				pack_t* pak = search->pack;
+
+				if ( fsh[f].handleFiles.file.z == pak->handle ) {
+					// found it!
+					return pak->checksum;
+				}
+			}
+		}
+		assert( 0 );
+	}
+
+	return NULL;
+	/*
+	// if it's not in pack, find any match outside of it
+	for ( search=fs_searchpaths; search; search=search->next ) {
+		if (search->dir) {
+			directory_t* dir = search->dir;
+
+			char* netpath = FS_BuildOSPath( dir->path, dir->gamedir, filename );
+			FILE* filep = fopen(netpath, "rb");
+
+			if ( filep ) {
+				fclose( filep );
+
+				char buf[MAX_OSPATH];
+				Com_sprintf( buf, sizeof( buf ), "%s%c%s", dir->path, PATH_SEP, dir->gamedir );
+				FS_ReplaceSeparators( buf );
+				Com_Printf( "File \"%s\" found at \"%s\"\n", filename, buf );
+				return;
+			}
+		}
+	}
+
+	assert( 0 );
+	Com_Printf( "File not found: \"%s\"\n", filename );*/
+}
+
+/*
+============
 FS_Flush_f
 ============
 */
