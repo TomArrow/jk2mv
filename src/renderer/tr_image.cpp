@@ -2672,9 +2672,9 @@ void R_SetColorMappings( void ) {
 		tr.overbrightBits = 0;
 	}
 
-	if ( tr.overbrightBits > 1 ) {
-		tr.overbrightBits = 1;
-	}
+	//if ( tr.overbrightBits > 1 ) {
+	//	tr.overbrightBits = 1;
+	//}
 
 	if ( tr.overbrightBits < 0 ) {
 		tr.overbrightBits = 0;
