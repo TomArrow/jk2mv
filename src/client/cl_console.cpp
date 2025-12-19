@@ -848,7 +848,7 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && *txt == Q_COLOR_ESCAPE && Q_IsColorStringHex((unsigned char*)txt + 1)) {
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt)) {
 			int skipCount = 0;
 			Q_parseColorHex(txt + 1, colorVec, &skipCount);
 			txt += 1 + skipCount;
