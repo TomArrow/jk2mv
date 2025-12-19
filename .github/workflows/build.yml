@@ -328,7 +328,7 @@ jobs:
 
   macos:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
-    runs-on: macos-14
+    runs-on: macos-15-intel
     strategy:
       fail-fast: false
       matrix:
@@ -357,14 +357,6 @@ jobs:
         else
           echo 'PORTABLE=-DBuildPortableVersion=OFF' >> $GITHUB_OUTPUT
         fi
-
-    - name: Force x64, number 1
-      run: |
-        export ARCHFLAGS="-arch x86_64"
-        
-    - name: Force x64, number 2
-      run: |
-        arch -x86_64 brew reinstall openssl@3
 
     - name: Create Build Environment
       run: |
