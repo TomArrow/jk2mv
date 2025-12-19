@@ -358,6 +358,14 @@ jobs:
           echo 'PORTABLE=-DBuildPortableVersion=OFF' >> $GITHUB_OUTPUT
         fi
 
+    - name: Force x64, number 1
+      run: |
+        export ARCHFLAGS="-arch x86_64"
+        
+    - name: Force x64, number 2
+      run: |
+        arch -x86_64 brew install openssl@3
+
     - name: Create Build Environment
       run: |
         brew install sdl2
