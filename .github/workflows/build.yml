@@ -600,7 +600,7 @@ jobs:
 
   create-latest:
     if: github.event_name == 'push' && github.ref == 'refs/heads/everything'
-    needs: [vs2022-installer,vs2022,macos,macos-arm,linux,vs2022_xp]
+    needs: [vs2022-installer,vs2022,macos-arm,linux,vs2022_xp]
     #needs: [vs2022-installer,vs2022,linux]
     runs-on: ubuntu-22.04
     steps:
