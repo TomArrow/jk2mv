@@ -611,7 +611,7 @@ qboolean Cvar_Command( void ) {
 	}
 	else
 	{
-		Cvar_Set2 (v->name, value, qfalse);// set the value if forcing isn't required
+		Cvar_Set2 (v->name, Cmd_ArgsFrom(1), qfalse);// set the value if forcing isn't required
 	}
 
 	return qtrue;
