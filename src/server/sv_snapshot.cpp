@@ -62,14 +62,14 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 		if ( newindex >= to->num_entities ) {
 			newnum = 9999;
 		} else {
-			newent = &svs.snapshotEntities[(to->first_entity+newindex) % svs.numSnapshotEntities];
+			newent = &svs.snapshotEntities[(to->first_entity+(int64_t)newindex) % svs.numSnapshotEntities];
 			newnum = newent->number;
 		}
 
 		if ( oldindex >= from_num_entities ) {
 			oldnum = 9999;
 		} else {
-			oldent = &svs.snapshotEntities[(from->first_entity+oldindex) % svs.numSnapshotEntities];
+			oldent = &svs.snapshotEntities[(from->first_entity+(int64_t)oldindex) % svs.numSnapshotEntities];
 			oldnum = oldent->number;
 		}
 
@@ -715,7 +715,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		*state = ent->s;
 		svs.nextSnapshotEntities++;
 		// this should never hit, map should always be restarted first in SV_Frame
-		if (svs.nextSnapshotEntities >= 0x7FFFFFFE) {
+		if (svs.nextSnapshotEntities >= 0x7FFFFFFFFFFFFFFE) {
 			Com_Error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
 		}
 		frame->num_entities++;
