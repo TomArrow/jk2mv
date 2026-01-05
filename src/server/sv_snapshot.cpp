@@ -1225,7 +1225,7 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 
 void SV_CheckInvalidUserInfoValues(client_t* cl) {
 	const char* warning = NULL;
-	int timeout = 120000;
+	int64_t timeout = 120000;
 	bool critical = false;
 	if (cl->invalidValues & (1 << (int)CHECKEDTYPE_RATE)) {
 		warning = "^1Your 'rate' value is invalid. Please check it and set a proper value.";

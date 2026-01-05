@@ -653,7 +653,7 @@ static void SV_Status_f( void )
 			state,
 			displayName,
 			spaces,
-			svs.time - cl->lastPacketTime,
+			(int)(svs.time - cl->lastPacketTime), // do we prefer a different modifier here for the impossible case where its outside int?
 			s,
 			cl->netchan.qport,
 			SV_ClientRate(cl)

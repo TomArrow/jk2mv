@@ -21,8 +21,8 @@ challenge, they must give a valid IP address.
 void SV_GetChallenge( netadr_t from ) {
 	int		i;
 	int		oldest;
-	int		oldestTime;
-	int		oldestClientTime;
+	int64_t	oldestTime;
+	int64_t	oldestClientTime;
 	int		clientChallenge;
 	challenge_t	*challenge;
 	qboolean wasfound = qfalse;
@@ -62,7 +62,7 @@ void SV_GetChallenge( netadr_t from ) {
 	}
 
 	// always generate a new challenge number, so the client cannot circumvent sv_maxping
-	challenge->challenge = ((rand() << 16) ^ rand()) ^ svs.time;
+	challenge->challenge = ((rand() << 16) ^ rand()) ^ (svs.time & 0xFFFFFFFFULL) ^ (svs.time >> 32);
 	challenge->wasrefused = qfalse;
 	challenge->time = svs.time;
 	challenge->pingTime = svs.time;
@@ -115,7 +115,7 @@ void SV_DirectConnect( netadr_t from ) {
 			&& ( cl->netchan.qport == qport
 			|| from.port == cl->netchan.remoteAddress.port ) ) {
 			if (( svs.time - cl->lastConnectTime)
-				< (sv_reconnectlimit->integer * 1000)) {
+				< (int64_t)(sv_reconnectlimit->integer * 1000)) {
 				Com_DPrintf ("%s:reconnect rejected : too soon\n", NET_AdrToString (from));
 				return;
 			}

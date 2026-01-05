@@ -89,6 +89,8 @@ typedef struct {
 	qboolean		demosPruned; // whether or not existing demos were cleaned up already
 
 	qboolean		submodelBypass;
+
+	qboolean		svsTimeWrapped;		// can happen, unluck
 } server_t;
 
 typedef struct {
@@ -97,6 +99,20 @@ typedef struct {
 	playerState_t	ps;
 	int				num_entities;
 	int64_t			first_entity;		// into the circular sv_packet_entities[]
+										// the entities MUST be in increasing state number
+										// order, otherwise the delta compression will fail
+	int64_t			messageSent;		// time the message was transmitted
+	int64_t			messageAcked;		// time the message was acked
+	int				messageSize;		// used to rate drop packets
+} clientSnapshot_t;
+
+/* do we need this for anything? original ones from the code
+typedef struct {
+	int				areabytes;
+	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
+	playerState_t	ps;
+	int				num_entities;
+	int				first_entity;		// into the circular sv_packet_entities[]
 										// the entities MUST be in increasing state number
 										// order, otherwise the delta compression will fail
 	int				messageSent;		// time the message was transmitted
@@ -116,6 +132,7 @@ typedef struct {
 	int				messageAcked;		// time the message was acked
 	int				messageSize;		// used to rate drop packets
 } clientSnapshot15_t;
+*/
 
 typedef enum {
 	CS_FREE,		// can be reused for a new connection
@@ -158,7 +175,7 @@ typedef std::vector<std::unique_ptr<bufferedMessageContainer_t>>::iterator demoP
 #endif
 
 typedef struct leakyBucket_s {
-	int					lastTime;
+	int64_t				lastTime;
 	unsigned short		burst;
 } leakyBucket_t;
 
@@ -200,15 +217,15 @@ typedef struct client_s {
 	unsigned char	*downloadBlocks[MAX_DOWNLOAD_WINDOW];	// the buffers for the download blocks
 	int				downloadBlockSize[MAX_DOWNLOAD_WINDOW];
 	qboolean		downloadEOF;		// We have sent the EOF block
-	int				downloadSendTime;	// time we last got an ack from the client
+	int64_t			downloadSendTime;	// svs.time we last got an ack from the client
 
 	int				deltaMessage;		// frame last client usercmd message
 	int				deltaMessageWarning;	// for debugging: avoid spamming "delta request from out of date blahblah". 1= out of date packet. 2=out of date entities. reset when deltamessage changes
-	int				deltaMessageWarningLast;	// svs.time of last such warning
-	int				nextReliableTime;	// svs.time when another reliable command will be allowed
-	int				lastPacketTime;		// svs.time when packet was last received
-	int				lastConnectTime;	// svs.time when connection started
-	int				nextSnapshotTime;	// send another snapshot when svs.time >= nextSnapshotTime
+	int64_t			deltaMessageWarningLast;	// svs.time of last such warning
+	int64_t			nextReliableTime;	// svs.time when another reliable command will be allowed
+	int64_t			lastPacketTime;		// svs.time when packet was last received
+	int64_t			lastConnectTime;	// svs.time when connection started
+	int64_t			nextSnapshotTime;	// send another snapshot when svs.time >= nextSnapshotTime
 	qboolean		rateDelayed;		// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int				timeoutCount;		// must timeout a few frames in a row so debugging doesn't break
 	clientSnapshot_t	frames[PACKET_BACKUP];	// updates can be delta'd from here
@@ -223,11 +240,11 @@ typedef struct client_s {
 	leakyBucket_t	cmdBucket;			// for command flood protection
 	leakyBucket_t	cmdBucketSaveposRespos;			// for command flood protection of respos/savepos
 
-	int				lastUserInfoChange; //if > svs.time && count > x, deny change -rww
+	int64_t			lastUserInfoChange; //if > svs.time && count > x, deny change -rww
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
 
 	int				invalidValues;		// checkedNumberType_t
-	int				lastInvalidValuesWarning; // svs.time of last invalid values warning
+	int64_t			lastInvalidValuesWarning; // svs.time of last invalid values warning
 
 #ifdef SVDEMO
 	demoInfo_t		demo;
@@ -252,8 +269,8 @@ typedef struct challenge_s {
 	netadr_t	adr;
 	int			challenge;
 	int			clientChallenge;		// challenge number coming from the client
-	int			time;				// time the last packet was sent to the autherize server
-	int			pingTime;			// time the challenge response was sent to client
+	int64_t		time;				// time the last packet was sent to the autherize server
+	int64_t			pingTime;			// time the challenge response was sent to client
 	qboolean	wasrefused;
 	qboolean	connected;
 } challenge_t;
@@ -266,7 +283,7 @@ typedef struct challenge_s {
 typedef struct {
 	qboolean	initialized;				// sv_init has completed
 
-	int			time;						// will be strictly increasing across level changes
+	int64_t		time;						// will be strictly increasing across level changes
 
 	int			snapFlagServerBit;			// ^= SNAPFLAG_SERVERCOUNT every SV_SpawnServer()
 
@@ -274,13 +291,13 @@ typedef struct {
 	int64_t		numSnapshotEntities;		// sv_maxclients->integer*PACKET_BACKUP*MAX_PACKET_ENTITIES
 	int64_t		nextSnapshotEntities;		// next snapshotEntities to use
 	entityState_t	*snapshotEntities;		// [numSnapshotEntities]
-	int			nextHeartbeatTime;
+	int64_t		nextHeartbeatTime;
 	challenge_t	challenges[MAX_CHALLENGES];	// to prevent invalid IPs from connecting
 	netadr_t	redirectAddress;			// for rcon return messages
 
 	struct {
 		bool enabled;
-		int disableUntil;
+		int64_t disableUntil;
 	} hibernation;							// handle hibernation mode data
 } serverStatic_t;
 
@@ -393,7 +410,7 @@ qboolean MVAPI_SendConnectionlessPacket(const mvaddr_t *addr, const char *messag
 qboolean MVAPI_DisableStructConversion(qboolean disable);
 extern qboolean mvStructConversionDisabled;
 
-qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period, int now);
+qboolean SVC_RateLimit(leakyBucket_t *bucket, int64_t burst, int64_t period, int64_t now);
 void SVC_LoadWhitelist( void );
 void SVC_WhitelistAdr( netadr_t adr );
 extern int serverUniqueCrossServerCommandsId;

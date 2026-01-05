@@ -390,11 +390,11 @@ SVC_RateLimit
 Allows one packet per period msec with bucket size of burst
 ================
 */
-qboolean SVC_RateLimit(leakyBucket_t *bucket, int burst, int period, int now) {
+qboolean SVC_RateLimit(leakyBucket_t *bucket, int64_t burst, int64_t period, int64_t now) {
 	if (bucket != NULL) {
-		int interval = now - bucket->lastTime;
-		int expired = interval / period;
-		int expiredRemainder = interval % period;
+		int64_t interval = now - bucket->lastTime;
+		int64_t expired = interval / period;
+		int64_t expiredRemainder = interval % period;
 
 		if (expired > bucket->burst || interval < 0) {
 			bucket->burst = 0;
@@ -1174,8 +1174,8 @@ if necessary
 void SV_CheckTimeouts( void ) {
 	int		i;
 	client_t	*cl;
-	int			droppoint;
-	int			zombiepoint;
+	int64_t		droppoint;
+	int64_t		zombiepoint;
 
 	droppoint = svs.time - 1000 * MAX(10,sv_timeout->integer); // in case someone sets 9999999999 by accident and overflows to negative
 	zombiepoint = svs.time - 1000 * sv_zombietime->integer;
@@ -1423,7 +1423,64 @@ void SV_Frame( int msec ) {
 	// and clear sv.time, rather
 	// than checking for negative time wraparound everywhere.
 	// 2giga-milliseconds = 23 days, so it won't be too often
-	if ( svs.time > 0x70000000 ) {
+	if ( sv.svsTimeWrapped ) {
+		// ok in this case we actually couldn't reset time so we need a proper shutdown and restart.
+		SV_Shutdown( "^1Restarting server due to time wrapping, SORRY" ); 
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
+		return;
+	}
+	else if ( sv.time > 0x70000000) {
+		//SV_Shutdown( "Restarting server due to time wrapping" ); // sv.time resets on every map change now so we can safely just restart the map
+		SV_SendServerCommand(NULL,"print \"^1Restarting map due to time wrapping, SORRY\n\"");
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
+		return;
+	}
+	else if ( sv.time > (0x70000000 - 24 * 3600000) && !players) { // 24 hours in advance, if nobody's here, just restart it :)
+		SV_SendServerCommand(NULL,"print \"^3Safely restarting map due to time wrapping and no players present.\n\"");
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
+		return;
+	}
+	else if(sv.time > (0x70000000 - 10 * 3600000)) {
+		// early warning system
+		static int oldSvTime = 0;
+		int compareTime;
+		qboolean hit = qfalse;
+		if (oldSvTime > sv.time) {
+			oldSvTime = 0;
+		}
+		for (int i = 1; i < 16 && !hit; i++) {
+			compareTime = 0x70000000 - i * 1000;
+			if (sv.time >= compareTime && oldSvTime < compareTime) {
+				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d seconds\n\"",i));
+				hit = qtrue;
+			}
+		}
+		for (int i = 1; i < 10 && !hit; i++) {
+			compareTime = 0x70000000 - i * 60000;
+			if (sv.time >= compareTime && oldSvTime < compareTime) {
+				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i));
+				hit = qtrue;
+			}
+		}
+		for (int i = 1; i < 6 && !hit; i++) {
+			compareTime = 0x70000000 - i * 600000;
+			if (sv.time >= compareTime && oldSvTime < compareTime) {
+				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i*10));
+				hit = qtrue;
+			}
+		}
+		for (int i = 1; i < 10 && !hit; i++) {
+			compareTime = 0x70000000 - i * 3600000;
+			if (sv.time >= compareTime && oldSvTime < compareTime) {
+				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d hours\n\"",i*10));
+				hit = qtrue;
+			}
+		}
+		oldSvTime = sv.time;
+	}
+	// for svs.time, we switched to 64 bit. this time isn't communicated to clients so it's safe
+	// sv.time above still has this check, but it gets reset on map changes so it's not that bad
+	if ( svs.time > 0x7FFFFFFFF0000000) {
 		SV_Shutdown( "Restarting server due to time wrapping" );
 		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
 		return;

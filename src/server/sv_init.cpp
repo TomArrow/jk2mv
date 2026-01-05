@@ -586,8 +586,18 @@ Ghoul2 Insert End
 	}
 
 	if (!resetTime) {
-		// Keep old game module time as original engine did
-		sv.time = svs.time;
+		if (svs.time > 0x70000000) {
+			// i turned svs.time into int64_t
+			// but not every mod or setting supporots resetting sv.time on map changes
+			// if this should change at an unlucky time at runtime (unlikely but possible)
+			// the assignment could cause a wrap and we wouldn't notice because the wrap could
+			// cause sv.time to be in a safe zone again, but on a totally wrong value
+			sv.svsTimeWrapped = qtrue;
+		}
+		else {
+			// Keep old game module time as original engine did
+			sv.time = svs.time;
+		}
 	}
 
 	// decide which serverversion to host
