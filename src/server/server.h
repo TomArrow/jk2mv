@@ -227,7 +227,7 @@ typedef struct client_s {
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
 
 	int				invalidValues;		// checkedNumberType_t
-	int				lastInvalidValuesWarning;
+	int				lastInvalidValuesWarning; // svs.time of last invalid values warning
 
 #ifdef SVDEMO
 	demoInfo_t		demo;
