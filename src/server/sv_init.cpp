@@ -538,7 +538,11 @@ Ghoul2 Insert Start
 */
 	// allocate the snapshot entities on the hunk
 //	svs.snapshotEntities = (struct entityState_s *)Hunk_Alloc( sizeof(entityState_t)*svs.numSnapshotEntities, h_high );
+#if _DEBUG
+	svs.nextSnapshotEntities = (int64_t)UINT32_MAX - svs.numSnapshotEntities * 10; //0x7FFFFFFE - svs.numSnapshotEntities * 10;
+#else
 	svs.nextSnapshotEntities = 0;
+#endif
 
 	// allocate the snapshot entities
 	svs.snapshotEntities = new entityState_s[svs.numSnapshotEntities];
@@ -840,6 +844,10 @@ Only called at main exe startup, not for each game
 void SV_BotInitBotLib(void);
 
 void SV_Init (void) {
+#if _DEBUG
+	svs.time = (int64_t)UINT32_MAX - 20000;
+#endif
+
 	SV_AddOperatorCommands ();
 
 	Cvar_Get("JK2MV", JK2MV_VERSION, CVAR_SERVERINFO | CVAR_ROM);
@@ -1067,6 +1075,10 @@ Ghoul2 Insert Start
 		Z_Free( svs.clients );
 	}
 	Com_Memset( &svs, 0, sizeof( svs ) );
+
+#if _DEBUG
+	svs.time = (int64_t)UINT32_MAX - 20000;
+#endif
 
 	Cvar_Set( "sv_running", "0" );
 	Cvar_Set("ui_singlePlayerActive", "0");
