@@ -7,7 +7,7 @@ cvar_t		*cvar_vars;
 cvar_t		*cvar_cheats;
 int			cvar_modifiedFlags;
 
-#define	MAX_CVARS	2048 // increased in jk2mv
+#define	MAX_CVARS	4096 // increased in jk2mv
 cvar_t		cvar_indexes[MAX_CVARS];
 int			cvar_numIndexes;
 
