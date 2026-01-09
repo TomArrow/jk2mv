@@ -81,6 +81,11 @@ set(AssetsFiles
 	"sound/chars/mothma/misc/40MOM053.mp3"
 	"sound/chars/tavion/misc/jump1.mp3"
 	"sound/common/warning.wav"
+	"sound/effects/hitsound.wav"
+	"sound/effects/hitsound2.wav"
+	"sound/effects/hitsound3.wav"
+	"sound/effects/hitsound4.wav"
+	"sound/effects/hitsoundteam.wav"
 
 	"ui/jk2mp/ingame.menu"
 	"ui/jk2mp/ingame_camera.menu"
