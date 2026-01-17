@@ -1264,7 +1264,7 @@ CL_ParseDownload
 A UDP download message has been received from the server
 =====================
 */
-void CL_ParseUDPDownload ( msg_t *msg ) {
+qboolean CL_ParseUDPDownload ( msg_t *msg ) {
 	int		size;
 	static unsigned char data[MAX_MSGLEN];
 	uint16_t block;
@@ -1272,7 +1272,7 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 	if (!*clc.downloadTempName) {
 		Com_Printf("^3WARNING: Server sending download, but no download was requested\n");
 		CL_AddReliableCommand("stopdl");
-		return;
+		return qfalse;
 	}
 
 	// read the data
@@ -1289,21 +1289,21 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 		{
 			Com_Error(ERR_DROP, "%s", MSG_ReadString(msg));
 			CL_DownloadsComplete();
-			return;
+			return qtrue;
 		}
 	}
 
 	size = MSG_ReadShort(msg);
 	if ((unsigned)size > sizeof(data)) {
 		Com_Error(ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk", size);
-		return;
+		return qtrue;
 	}
 
 	MSG_ReadData(msg, data, size);
 
 	if (clc.downloadBlock != block) {
 		Com_DPrintf( "CL_ParseDownload: Expected block %d, got %d\n", clc.downloadBlock, block);
-		return;
+		return qtrue;
 	}
 
 	// open the file if not opened yet
@@ -1315,7 +1315,7 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 			Com_Printf( "Could not create %s\n", clc.downloadTempName );
 			CL_AddReliableCommand( "stopdl" );
 			CL_NextDownload();
-			return;
+			return qtrue;
 		}
 	}
 
@@ -1359,6 +1359,7 @@ void CL_ParseUDPDownload ( msg_t *msg ) {
 		// get another file if needed
 		CL_NextDownload ();
 	}
+	return qtrue;
 }
 
 /*
@@ -1571,6 +1572,7 @@ CL_ParseServerMessage
 */
 void CL_ParseServerMessage( msg_t *msg ) {
 	int			cmd;
+	qboolean	forceEnd = qfalse;
 
 	if ( cl_shownet->integer == 1 ) {
 		Com_Printf ("%i ",msg->cursize);
@@ -1628,7 +1630,9 @@ void CL_ParseServerMessage( msg_t *msg ) {
 			CL_ParseSnapshot( msg );
 			break;
 		case svc_download:
-			CL_ParseUDPDownload( msg );
+			if (!CL_ParseUDPDownload(msg)) {
+				forceEnd = qtrue;
+			}
 			break;
 		case svc_mapchange:
 			CL_KillDownload();
@@ -1637,6 +1641,9 @@ void CL_ParseServerMessage( msg_t *msg ) {
 			{
 				VM_Call( cgvm, CG_MAP_CHANGE );
 			}
+			break;
+		}
+		if (forceEnd) {
 			break;
 		}
 	}
