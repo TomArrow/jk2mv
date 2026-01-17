@@ -1278,7 +1278,7 @@ qboolean CL_ParseUDPDownload ( msg_t *msg ) {
 	// read the data
 	block = MSG_ReadShort(msg);
 
-	if ( !block && !clc.downloadBlock)
+	if ( !block ) //  && !clc.downloadBlock // don't add this extra check. it prevents the ReadLong, leading to a crash if packet 0 comes multiple times..
 	{
 		// block zero is special, contains file size
 		clc.downloadSize = MSG_ReadLong ( msg );
