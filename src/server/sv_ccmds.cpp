@@ -4,6 +4,7 @@
 #include "../qcommon/strip.h"
 
 #include <sstream>
+#include <inttypes.h>
 #include <ctime>
 
 #ifdef SVDEMO
@@ -297,6 +298,7 @@ static void SV_MapRestart_f( void ) {
 	sv.restartedServerId = sv.serverId;
 	sv.serverId = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
+	Cvar_Set("sv_gameStartUnixTime", va("%" PRId64 "\n", (int64_t)std::time(nullptr)));
 
 #ifdef SVDEMO
 	time(&sv.realMapTimeStarted);

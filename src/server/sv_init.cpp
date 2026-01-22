@@ -6,6 +6,9 @@
 
 #include "../qcommon/q_shared.h"
 
+#include <inttypes.h>
+#include <ctime>
+
 /*
 Ghoul2 Insert Start
 */
@@ -643,6 +646,7 @@ Ghoul2 Insert End
 	sv.serverId = com_frameTime;
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
+	Cvar_Set( "sv_gameStartUnixTime", va("%" PRId64 "\n", (int64_t)std::time(nullptr)) );
 
 	// make a random id for this server to avoid recursion with badly configured cross-server commands.
 	if (randombytes(&serverUniqueCrossServerCommandsId, 4)) {
@@ -904,6 +908,7 @@ void SV_Init (void) {
 	// systeminfo
 	Cvar_Get ("sv_cheats", "0", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
+	sv_gameStartUnixTime = Cvar_Get ("sv_gameStartUnixTime", "0", CVAR_SYSTEMINFO | CVAR_ROM );
 #ifndef DLL_ONLY // bk010216 - for DLL-only servers
 	sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO );
 #else

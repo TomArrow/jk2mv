@@ -329,6 +329,7 @@ extern	cvar_t	*sv_killserver;
 extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
+extern	cvar_t	*sv_gameStartUnixTime;
 extern	cvar_t	*sv_minSnaps;
 extern	cvar_t	*sv_minSnapsSpec;
 extern	cvar_t	*sv_maxSnaps;

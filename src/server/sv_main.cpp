@@ -24,6 +24,7 @@ cvar_t	*sv_killserver;			// menu system can set to 1 to shut server down
 cvar_t	*sv_mapname;
 cvar_t	*sv_mapChecksum;
 cvar_t	*sv_serverid;
+cvar_t	*sv_gameStartUnixTime;
 cvar_t	*sv_minSnaps;			// minimum snapshots/sec a client can request, also limited by sv_maxSnaps
 cvar_t	*sv_minSnapsSpec;		// minimum snapshots/sec a spectator client can request, also limited by sv_maxSnaps
 cvar_t	*sv_maxSnaps;			// maximum snapshots/sec a client can request, also limited by sv_fps
