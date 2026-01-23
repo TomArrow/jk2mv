@@ -33,6 +33,7 @@ void FS_PipeClose(fileHandle_t f);
 #define TTFLAGSSERVERINFO_HASCROSSSERVERCHAT	(1<<3)
 
 extern qboolean serverIsTommyTernal;
+extern qboolean serverIsNWH;
 extern int tommyTernalFlags;
 
 //For determining whether to allow 1.02 color codes:

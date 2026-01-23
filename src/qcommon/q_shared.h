@@ -713,7 +713,7 @@ extern const vec4_t		colorDkBlue;
 #define Q_COLOR_BITS 0x7
 
 
-qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
+qboolean Q_parseColorHex(const char* p, float* color, int* skipCount, bool lenient);
 
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
 #define Q_IsColorString(p)	( (p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
@@ -731,7 +731,17 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount);
 #define Q_IsColorStringHexX(p) ((p)+6) && (p) && *(p)=='X' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3)) && Q_IsHex((p+4)) && Q_IsHex((p+5)) && Q_IsHex((p+6))
 #define Q_IsColorStringHexx(p) ((p)+3) && (p) && *(p)=='x' && Q_IsHex((p+1)) && Q_IsHex((p+2)) && Q_IsHex((p+3))
 #define Q_IsColorStringHexRest(p) ( (Q_IsColorStringHexY((p))) || (Q_IsColorStringHexy((p))) || (Q_IsColorStringHexX((p))) || (Q_IsColorStringHexx((p)) ) )
-#define Q_IsColorStringHex(p) ((p) && *(p) == Q_COLOR_ESCAPE && Q_IsColorStringHexRest((p)+1) )
+#define Q_IsColorStringHexStrict(p) ((p) && *(p) == Q_COLOR_ESCAPE && Q_IsColorStringHexRest((p)+1) )
+
+#define Q_IsHexLenient(p) ( (p) && *(p) )
+#define Q_IsColorStringHexYLenient(p) ((p)+8) && (p) && *(p)=='Y' && Q_IsHexLenient((p+1)) && Q_IsHexLenient((p+2)) && Q_IsHexLenient((p+3)) && Q_IsHexLenient((p+4)) && Q_IsHexLenient((p+5)) && Q_IsHexLenient((p+6)) && Q_IsHexLenient((p+7)) && Q_IsHexLenient((p+8))
+#define Q_IsColorStringHexyLenient(p) ((p)+4) && (p) && *(p)=='y' && Q_IsHexLenient((p+1)) && Q_IsHexLenient((p+2)) && Q_IsHexLenient((p+3)) && Q_IsHexLenient((p+4))
+#define Q_IsColorStringHexXLenient(p) ((p)+6) && (p) && *(p)=='X' && Q_IsHexLenient((p+1)) && Q_IsHexLenient((p+2)) && Q_IsHexLenient((p+3)) && Q_IsHexLenient((p+4)) && Q_IsHexLenient((p+5)) && Q_IsHexLenient((p+6))
+#define Q_IsColorStringHexxLenient(p) ((p)+3) && (p) && *(p)=='x' && Q_IsHexLenient((p+1)) && Q_IsHexLenient((p+2)) && Q_IsHexLenient((p+3))
+#define Q_IsColorStringHexRestLenient(p) ( (Q_IsColorStringHexYLenient((p))) || (Q_IsColorStringHexyLenient((p))) || (Q_IsColorStringHexXLenient((p))) || (Q_IsColorStringHexxLenient((p)) ) )
+#define Q_IsColorStringHexLenient(p) ((p) && *(p) == Q_COLOR_ESCAPE && Q_IsColorStringHexRestLenient((p)+1) )
+
+#define Q_IsColorStringHex(p,lenient) ( !(lenient) && Q_IsColorStringHexStrict((p)) || (lenient) && Q_IsColorStringHexLenient((p))   )
 
 // Default Colors
 #define COLOR_BLACK		'0'

@@ -848,9 +848,9 @@ void CL_ConsolePrint( const char *txt, qboolean extendedColors, qboolean skipNot
 	color = ColorIndex(COLOR_WHITE);
 
 	while ( (c = *txt) != 0 ) {
-		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt)) {
+		if (r_fullbright && r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex((unsigned char*)txt,serverIsNWH)) {
 			int skipCount = 0;
-			Q_parseColorHex(txt + 1, colorVec, &skipCount);
+			Q_parseColorHex(txt + 1, colorVec, &skipCount, serverIsNWH);
 			txt += 1 + skipCount;
 			// Find closest color
 			// Just use the extended table who cares

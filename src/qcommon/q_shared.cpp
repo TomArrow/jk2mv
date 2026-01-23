@@ -824,7 +824,7 @@ int Q_stricmp(const char *s1, const char *s2) {
 }
 
 
-qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
+qboolean Q_parseColorHex(const char* p, float* color, int* skipCount, bool lenient) {
 	char c = *p++;
 	int i;
 	int val = 0;
@@ -860,6 +860,7 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
 	for (i = 0; i < countToParse; i++) {
 		int readHex;
 		c = p[i];
+
 		if (c >= '0' && c <= '9') {
 			readHex = c - '0';
 		}
@@ -870,10 +871,15 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount) {
 			readHex = 0xa + c - 'A';
 		}
 		else {
-			if (color) {
-				color[0] = color[1] = color[2] = color[3] = 1.0f;
+			if (lenient) {
+				readHex = 0x0; // based on echoing all possible chars as hexcolor values, it would appear that any nonvalid ones are just set to 0
 			}
-			return qfalse;
+			else {
+				if (color) {
+					color[0] = color[1] = color[2] = color[3] = 1.0f;
+				}
+				return qfalse;
+			}
 		}
 		if (doWrite) {
 
@@ -1081,6 +1087,7 @@ This function modifies INPUT (is mutable)
 (Also strips ^8 and ^9)
 ==================
 */
+extern qboolean serverIsNWH; // cringe
 void Q_StripColor(char *text,qboolean doHex)
 {
 	qboolean doPass = qtrue;
@@ -1093,9 +1100,9 @@ void Q_StripColor(char *text,qboolean doHex)
 		read = write = text;
 		while ( *read )
 		{
-			if (doHex && Q_IsColorStringHex(read)) {
+			if (doHex && Q_IsColorStringHex(read, serverIsNWH)) {
 				int skipCount = 0;
-				Q_parseColorHex(read + 1, 0, &skipCount);
+				Q_parseColorHex(read + 1, 0, &skipCount, serverIsNWH);
 				read += 1 + skipCount;
 			}
 			else if ( Q_IsColorString(read) || Q_IsColorString_1_02(read) )

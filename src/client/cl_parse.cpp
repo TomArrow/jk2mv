@@ -1192,13 +1192,20 @@ void CL_ParseGamestate( msg_t *msg ) {
 				if (i == CS_SERVERINFO) {
 					CL_CheckWallhackAllowed(s);
 				}
-				if (!Q_stricmpn(Info_ValueForKey(s, "gamename"), "tommyternal", 11)) { // is it dumb to make it dependent on mvsdk instead of server engine? idk
+				const char* gameName = Info_ValueForKey(s, "gamename");
+				if (!Q_stricmpn(gameName, "tommyternal", 11)) { // is it dumb to make it dependent on mvsdk instead of server engine? idk
 					serverIsTommyTernal = qtrue;
 					tommyTernalFlags = atoi(Info_ValueForKey(s, "ttFlags"));
 				}
 				else {
 					serverIsTommyTernal = qfalse;
 					tommyTernalFlags = 0;
+				}
+				if (strstr(gameName, "NWH v")) {
+					serverIsNWH = qtrue;
+				}
+				else {
+					serverIsNWH = qfalse;
 				}
 			}
 

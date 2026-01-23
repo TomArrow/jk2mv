@@ -910,9 +910,9 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 				if (psText[i] == '^') {
 					if ((i < 1 || psText[i - 1] != '^') &&
 						(!psText[i + 1] || psText[i + 1] != '^')) { //If char before or after ^ is ^ then it prints ^ instead of accepting a colorcode
-						if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex(&psText[i])) {
+						if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 && Q_IsColorStringHex(&psText[i], serverIsNWH)) {
 							int skipCount = 0;
-							Q_parseColorHex(&psText[i + 1], 0, &skipCount);
+							Q_parseColorHex(&psText[i + 1], 0, &skipCount, serverIsNWH);
 							i += 1 + skipCount;
 						}
 						else {
@@ -1000,11 +1000,11 @@ void RE_Font_DrawString(int ox, int oy, const char *psText, const vec4_t rgba, i
 #if 1
 		case '^':
 			if (!*psText) break; // If we were given a string ending with '^'
-			if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 &&  Q_IsColorStringHex(psText - 1))
+			if (r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001 &&  Q_IsColorStringHex(psText - 1, serverIsNWH))
 			{
 				vec4_t color;
 				int skipCount;
-				if (Q_parseColorHex(psText, color, &skipCount)) {
+				if (Q_parseColorHex(psText, color, &skipCount, serverIsNWH)) {
 					psText += skipCount;
 #ifdef DAGGOFONTCOLOR
 					colourChain++; // Keep track of the amount of chained colors
