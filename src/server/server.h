@@ -315,6 +315,7 @@ extern	cvar_t	*com_coolApi_supported_game_vmflags;
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_gameFps;
 extern	cvar_t	*sv_gameFpsAllowIrregular;
+extern	cvar_t	*sv_gameFpsSpecFix; // bitmask: 1 = call game spectator run frame if supported. 2 = hack update followers serverside.
 //extern	cvar_t	*sv_botFps;
 //extern	cvar_t	*sv_botFpsAllowIrregular;
 extern	cvar_t	*sv_timeout;

@@ -678,7 +678,7 @@ Ghoul2 Insert End
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
-		VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+		VM_Call( gvm, GAME_RUN_FRAME, sv.time, 0 );
 		SV_BotFrame( sv.time );
 		sv.time += 100;
 		svs.time += 100;
@@ -736,7 +736,7 @@ Ghoul2 Insert End
 	}
 
 	// run another frame to allow things to look at all the players
-	VM_Call( gvm, GAME_RUN_FRAME, sv.time );
+	VM_Call( gvm, GAME_RUN_FRAME, sv.time, 0 );
 	SV_BotFrame( sv.time );
 	sv.time += 100;
 	svs.time += 100;
@@ -931,6 +931,7 @@ void SV_Init (void) {
 	sv_fps = Cvar_Get ("sv_fps", "100", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_gameFps = Cvar_Get ("sv_gameFps", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_gameFpsAllowIrregular = Cvar_Get ("sv_gameFpsAllowIrregular", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	sv_gameFpsSpecFix = Cvar_Get ("sv_gameFpsSpecFix", "3", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	//sv_botFps = Cvar_Get ("sv_botFps", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	//sv_botFpsAllowIrregular = Cvar_Get ("sv_botFpsAllowIrregular", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_timeout = Cvar_Get ("sv_timeout", "200", CVAR_TEMP );

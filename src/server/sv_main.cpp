@@ -8,6 +8,7 @@ vm_t			*gvm = NULL;				// game virtual machine // bk001212 init
 cvar_t	*sv_fps;				// time rate for running non-clients
 cvar_t	*sv_gameFps;			// time rate for running non-clients (while allowing higher snaps rate with higher sv_fps). TRY to make this a clean fraction of sv_fps please.
 cvar_t	*sv_gameFpsAllowIrregular; // Allows game fps to reach its intended fps even if it isn't a clean fraction of sv_fps. Who knows how well that's gonna go though
+cvar_t	*sv_gameFpsSpecFix; // Fixes spectator smoothness when using gamefps
 //cvar_t	*sv_botFps;				// time rate for running bots (while allowing higher snaps rate with higher sv_fps). TRY to make this a clean fraction of sv_fps please.
 //cvar_t	*sv_botFpsAllowIrregular; // Allows bot fps to reach its intended fps even if it isn't a clean fraction of sv_fps. Who knows how well that's gonna go though
 cvar_t	*sv_timeout;			// seconds without any message
@@ -1370,6 +1371,36 @@ static void MV_FixSaberStealing( void )
 	}
 }
 
+// kinda serverside hack to imitate spectatorendframe or whatever its called
+static void SV_UpdateFollowers() {
+	playerState_t* ps, *psOther;
+	int				i;
+
+	for (i = 0; i < sv_maxclients->integer; i++) {
+		if (svs.clients[i].state == CS_ACTIVE) {
+
+			ps = SV_GameClientNum(i);
+
+			if ((ps->pm_flags & PMF_FOLLOW) && ps->clientNum != i && svs.clients[ps->clientNum].state == CS_ACTIVE) {
+				int		clientNum, flags;
+				int		savedPing;
+
+				// this guy is a spectator, update him
+				psOther = SV_GameClientNum(ps->clientNum);
+				flags = (psOther->eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ps->eFlags & (EF_VOTED | EF_TEAMVOTED));
+				savedPing = ps->ping;
+				*ps = *psOther;
+				ps->ping = savedPing;
+				// let's not overwrite ps ping, let that be the real one. but still overwrite this one to replicate old behavior
+				// this is ok because ps->ping isn't networked anyway so we can just handle it differently internally
+				//ent->client->pers.normalFollowerPing = cl->ps.ping;
+				ps->pm_flags |= PMF_FOLLOW;
+				ps->eFlags = flags;
+			}
+		}
+	}
+}
+
 /*
 ==================
 SV_Frame
@@ -1384,6 +1415,7 @@ void SV_Frame( int msec ) {
 	//int		frameMsecBot;
 	int		startTime;
 	qboolean	gameFpsDiffers;
+	qboolean	ranGame = qfalse;
 	//qboolean	botFpsDiffers;
 #define frameMsecBot frameMsecGame
 #define botFpsDiffers gameFpsDiffers
@@ -1594,14 +1626,26 @@ void SV_Frame( int msec ) {
 
 		if (sv.gameTimeResidual >= frameMsecGame || !gameFpsDiffers) {
 			// let everything in the world think and move
-			VM_Call(gvm, GAME_RUN_FRAME, sv.time);
+			VM_Call(gvm, GAME_RUN_FRAME, sv.time, 0);
 			MV_FixSaberStealing();
+			ranGame = qtrue;
 			if (sv_gameFpsAllowIrregular->integer && gameFpsDiffers) {
 				sv.gameTimeResidual -= frameMsecGame;
 			}
 			else {
 				sv.gameTimeResidual = 0;
 			}
+		}
+	}
+
+	if (!ranGame && sv_gameFpsSpecFix->integer) {
+		if ((com_coolApi_supported_game->integer & COOL_APIFEATURE_G_UPDATESPECTATORS) && (sv_gameFpsSpecFix->integer & 1)) {
+			VM_Call(gvm, GAME_RUN_FRAME, sv.time, 1); // 1 = only update spectators.
+			MV_FixSaberStealing();
+		}
+		else if (sv_gameFpsSpecFix->integer & 2) {
+			SV_UpdateFollowers(); // dumb :)
+			MV_FixSaberStealing();
 		}
 	}
 
