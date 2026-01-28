@@ -724,7 +724,7 @@ bool SVC_CrossServerCommand( netadr_t from ) {
 			return false;
 		}
 		else if(!Q_stricmp("c", Cmd_Argv(4))) {
-			const char* forward = va("csc \"%s\" c %d %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, Cmd_ArgsFromQuoted(3));
+			const char* forward = va("csc \"%s\" %d %d c %s", sv_crossServerCommandPassword->string, serverUniqueCrossServerCommandsId, cscForwardingUniqueServerId, Cmd_ArgsFromQuoted(4));
 			Cmd_DropArg(4);
 			Cmd_DropArg(3);
 			Cmd_DropArg(2);
