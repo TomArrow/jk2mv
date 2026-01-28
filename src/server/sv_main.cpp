@@ -6,6 +6,10 @@ server_t		sv;					// local server
 vm_t			*gvm = NULL;				// game virtual machine // bk001212 init
 
 cvar_t	*sv_fps;				// time rate for running non-clients
+cvar_t	*sv_gameFps;			// time rate for running non-clients (while allowing higher snaps rate with higher sv_fps). TRY to make this a clean fraction of sv_fps please.
+cvar_t	*sv_gameFpsAllowIrregular; // Allows game fps to reach its intended fps even if it isn't a clean fraction of sv_fps. Who knows how well that's gonna go though
+//cvar_t	*sv_botFps;				// time rate for running bots (while allowing higher snaps rate with higher sv_fps). TRY to make this a clean fraction of sv_fps please.
+//cvar_t	*sv_botFpsAllowIrregular; // Allows bot fps to reach its intended fps even if it isn't a clean fraction of sv_fps. Who knows how well that's gonna go though
 cvar_t	*sv_timeout;			// seconds without any message
 cvar_t	*sv_zombietime;			// seconds to sink messages after disconnect
 cvar_t	*sv_rconPassword;		// password for remote server commands
@@ -1376,7 +1380,14 @@ happen before SV_Frame is called
 */
 void SV_Frame( int msec ) {
 	int		frameMsec;
+	int		frameMsecGame;
+	//int		frameMsecBot;
 	int		startTime;
+	qboolean	gameFpsDiffers;
+	//qboolean	botFpsDiffers;
+#define frameMsecBot frameMsecGame
+#define botFpsDiffers gameFpsDiffers
+#define sv_botFpsAllowIrregular sv_gameFpsAllowIrregular
 
 	// the menu kills the server with this cvar
 	if ( sv_killserver->integer ) {
@@ -1400,7 +1411,28 @@ void SV_Frame( int msec ) {
 	}
 	frameMsec = 1000 / sv_fps->integer ;
 
+	// this is the fps for running game frames. So we can enjoy a high snaps rate without compromising some aspects of gameplay
+	if (sv_gameFps->integer < 0 ) {
+		Cvar_Set( "sv_gameFps", "0" );
+	}
+	if (sv_gameFps->integer > sv_fps->integer) { // sv_gamefps must always be equal or lower than sv_fps.
+		Cvar_Set( "sv_gameFps", va("%d",sv_fps->integer));
+	}
+	frameMsecGame = sv_gameFps->integer ? (1000 / sv_gameFps->integer) : frameMsec;
+	gameFpsDiffers = (qboolean)(frameMsec != frameMsecGame);
+
+	// this is the fps for running bot fra
+	//if (sv_botFps->integer < 0 ) {
+	//	Cvar_Set( "sv_botFps", "0" );
+	//}
+	//if (sv_botFps->integer > sv_fps->integer) { // sv_gamefps must always be equal or lower than sv_fps.
+	//	Cvar_Set( "sv_botFps", va("%d",sv_fps->integer));
+	//}
+	//frameMsecBot = sv_botFps->integer ? (1000 / sv_botFps->integer) : frameMsec;
+	//botFpsDiffers = (qboolean)(frameMsec != frameMsecBot);
+
 	sv.timeResidual += msec;
+	//sv.gameTimeResidualBot += msec;
 
 	// Check for hibernation mode
 	int players = 0;
@@ -1418,7 +1450,20 @@ void SV_Frame( int msec ) {
 		Com_Printf("Server restored from hibernation\n");
 	}
 
-	if (!com_dedicated->integer) SV_BotFrame( sv.time + sv.timeResidual );
+	if (!com_dedicated->integer) {
+		// estimate whether a game frame will be run on this server frame.
+		if (sv.gameTimeResidual + (sv.timeResidual / frameMsec * frameMsec) >= frameMsecGame || !botFpsDiffers) {
+		//if (sv.gameTimeResidualBot >= frameMsecBot || !botFpsDiffers) {
+			SV_BotFrame(sv.time + sv.timeResidual); // hmm what do i actually have to add here?
+			// a bit cringe too have this separate from sv.gameTimeResidual. Could this potentially lead to desync?
+			//if (sv_botFpsAllowIrregular->integer && botFpsDiffers) {
+			//	sv.gameTimeResidualBot -= frameMsecBot;
+			//}
+			//else {
+			//	sv.gameTimeResidualBot = 0;
+			//}
+		}
+	}
 
 	// if time is about to hit the 32nd bit, kick all clients
 	// and clear sv.time, rather
@@ -1520,7 +1565,20 @@ void SV_Frame( int msec ) {
 
 	SVC_CrossServerCommandsMaintenance();
 
-	if (com_dedicated->integer) SV_BotFrame( sv.time );
+	if (com_dedicated->integer) {
+		// estimate whether a game frame will be run on this server frame.
+		if (sv.gameTimeResidual + (sv.timeResidual / frameMsec * frameMsec) >= frameMsecGame || !botFpsDiffers) {
+			//if (sv.gameTimeResidualBot >= frameMsecBot || !botFpsDiffers) {
+			SV_BotFrame(sv.time); // hmm what do i actually have to add here?
+			// a bit cringe too have this separate from sv.gameTimeResidual. Could this potentially lead to desync?
+			//if (sv_botFpsAllowIrregular->integer && botFpsDiffers) {
+			//	sv.gameTimeResidualBot -= frameMsecBot;
+			//}
+			//else {
+			//	sv.gameTimeResidualBot = 0;
+			//}
+		}
+	}
 
 	if (sv.saberBlockTime < sv.time) {
 		sv.saberBlockCounter = 0;
@@ -1530,12 +1588,21 @@ void SV_Frame( int msec ) {
 	// run the game simulation in chunks
 	while ( sv.timeResidual >= frameMsec ) {
 		sv.timeResidual -= frameMsec;
+		sv.gameTimeResidual += frameMsec;
 		sv.time += frameMsec;
 		svs.time += frameMsec;
 
-		// let everything in the world think and move
-		VM_Call( gvm, GAME_RUN_FRAME, sv.time );
-		MV_FixSaberStealing();
+		if (sv.gameTimeResidual >= frameMsecGame || !gameFpsDiffers) {
+			// let everything in the world think and move
+			VM_Call(gvm, GAME_RUN_FRAME, sv.time);
+			MV_FixSaberStealing();
+			if (sv_gameFpsAllowIrregular->integer && gameFpsDiffers) {
+				sv.gameTimeResidual -= frameMsecGame;
+			}
+			else {
+				sv.gameTimeResidual = 0;
+			}
+		}
 	}
 
 	if ( com_speeds->integer ) {

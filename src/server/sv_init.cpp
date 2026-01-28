@@ -929,6 +929,10 @@ void SV_Init (void) {
 	sv_rconPassword = Cvar_Get ("rconPassword", "", CVAR_TEMP );
 	sv_privatePassword = Cvar_Get ("sv_privatePassword", "", CVAR_TEMP );
 	sv_fps = Cvar_Get ("sv_fps", "100", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	sv_gameFps = Cvar_Get ("sv_gameFps", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	sv_gameFpsAllowIrregular = Cvar_Get ("sv_gameFpsAllowIrregular", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	//sv_botFps = Cvar_Get ("sv_botFps", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
+	//sv_botFpsAllowIrregular = Cvar_Get ("sv_botFpsAllowIrregular", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_timeout = Cvar_Get ("sv_timeout", "200", CVAR_TEMP );
 	sv_zombietime = Cvar_Get ("sv_zombietime", "2", CVAR_TEMP );
 	Cvar_Get ("nextmap", "", CVAR_TEMP );

@@ -55,6 +55,8 @@ typedef struct {
 	int				checksumFeed;		//
 	int				snapshotCounter;	// incremented for each snapshot built
 	int				timeResidual;		// <= 1000 / sv_frame->value
+	int				gameTimeResidual;	// related to sv_gameFps
+	//int				gameTimeResidualBot;// related to sv_gameFps
 	int				nextFrameTime;		// when time > nextFrameTime, process world
 	struct cmodel_s	*models[MAX_MODELS];
 	const char		*configstrings[MAX_CONFIGSTRINGS];
@@ -311,6 +313,10 @@ extern	cvar_t	*com_coolApi_supported_game_userCmdStoreVersion;
 extern	cvar_t	*com_coolApi_supported_game;
 extern	cvar_t	*com_coolApi_supported_game_vmflags;
 extern	cvar_t	*sv_fps;
+extern	cvar_t	*sv_gameFps;
+extern	cvar_t	*sv_gameFpsAllowIrregular;
+//extern	cvar_t	*sv_botFps;
+//extern	cvar_t	*sv_botFpsAllowIrregular;
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
 extern	cvar_t	*sv_rconPassword;
