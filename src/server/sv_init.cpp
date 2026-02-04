@@ -24,6 +24,19 @@ Ghoul2 Insert Start
 
 #include "../qcommon/strip.h"
 
+
+qboolean SV_NeedResetTime() {
+	if (sv.resetServerTime) {
+		return (qboolean)(sv.resetServerTime == 1);
+	}
+	else if (mv_resetServerTime->integer == 1) {
+		return (qboolean)(sv_gametype->integer != GT_TOURNAMENT);
+	}
+	else {
+		return (qboolean)(mv_resetServerTime->integer == 2);
+	}
+}
+
 /*
 ===============
 SV_SetConfigstring
@@ -578,13 +591,7 @@ Ghoul2 Insert End
 	}
 
 	// check sv.resetServerTime before clearing sv struct
-	if (sv.resetServerTime) {
-		resetTime = (qboolean)(sv.resetServerTime == 1);
-	} else if (mv_resetServerTime->integer == 1) {
-		resetTime = (qboolean)(sv_gametype->integer != GT_TOURNAMENT);
-	} else {
-		resetTime = (qboolean)(mv_resetServerTime->integer == 2);
-	}
+	resetTime = SV_NeedResetTime();
 
 	// wipe the entire per-level structure
 	SV_ClearServer();
@@ -848,9 +855,6 @@ Only called at main exe startup, not for each game
 void SV_BotInitBotLib(void);
 
 void SV_Init (void) {
-#if _DEBUG
-	svs.time = (int64_t)UINT32_MAX - 20000;
-#endif
 
 	SV_AddOperatorCommands ();
 
@@ -986,6 +990,13 @@ void SV_Init (void) {
 	sv_autoWhitelist = Cvar_Get("sv_autoWhitelist", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	sv_dynamicSnapshots = Cvar_Get("sv_dynamicSnapshots", "1", CVAR_ARCHIVE);
 
+
+#if _DEBUG
+	if (SV_NeedResetTime()) {
+		svs.time = (int64_t)UINT32_MAX - 20000;
+	}
+#endif
+
 	SP_Register("str_server",SP_REGISTER_REQUIRED);
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
@@ -1087,7 +1098,9 @@ Ghoul2 Insert Start
 	Com_Memset( &svs, 0, sizeof( svs ) );
 
 #if _DEBUG
-	svs.time = (int64_t)UINT32_MAX - 20000;
+	if (SV_NeedResetTime()) {
+		svs.time = (int64_t)UINT32_MAX - 20000;
+	}
 #endif
 
 	Cvar_Set( "sv_running", "0" );
