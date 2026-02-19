@@ -614,6 +614,7 @@ void R_BuildCloudData( shaderCommands_t *input )
 				break;
 			}
 			FillCloudBox( input->shader, i );
+			break; // only the first time emits vertices anyway, why bother calling it over and over?
 		}
 	}
 }
