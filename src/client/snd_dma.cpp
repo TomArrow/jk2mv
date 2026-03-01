@@ -1939,7 +1939,7 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 	float	scale;
 	int		intVolume;
 
-	if ( !s_soundStarted || s_soundMuted || SNDDMA_ConditionallyMuted()) {
+	if ( !s_soundStarted || s_soundMuted) {
 		return;
 	}
 
@@ -1951,6 +1951,26 @@ void S_RawSamples( int samples, int rate, int width, int s_channels, const byte 
 	}
 
 	scale = (float)rate / dma.speed;
+
+	if (SNDDMA_ConditionallyMuted()) {
+		// prevent infinite loop when minimized, update s_rawend. Thanks to Lomtik for realizing the cause of the problem (s_musicvolume not being 0)
+		if (scale == 1.0f)
+		{	// optimized case
+			s_rawend += samples;
+		}
+		else
+		{
+			// TODO spend 5 minutes thinking about how to just set s_rawend to the right value instead of looping
+			for (i = 0; ; i++)
+			{
+				src = i * scale;
+				if (src >= samples)
+					break;
+				s_rawend++;
+			}
+		}
+		return;
+	}
 
 //Com_Printf ("%i < %i < %i\n", s_soundtime, s_paintedtime, s_rawend);
 	if (s_channels == 2 && width == 2)
