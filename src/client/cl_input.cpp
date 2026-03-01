@@ -1217,6 +1217,8 @@ CL_CreateNewCommands
 Create a new usercmd_t structure for this frame
 =================
 */
+extern int			cmd_waitphysical;
+extern qboolean		cmd_waitphysicalprecise;
 void CL_CreateNewCommands( void ) {
 	int			cmdNum;
 	int			sentPacketNum, availableCmdCount;
@@ -1230,6 +1232,7 @@ void CL_CreateNewCommands( void ) {
 
 	// no need to create usercmds until we have a gamestate
 	if ( cls.state < CA_PRIMED ) {
+		Cmd_DecrementWaitPhysical();
 		return;
 	}
 
@@ -1314,9 +1317,20 @@ void CL_CreateNewCommands( void ) {
 					
 				}
 
+				if (cmd_waitphysicalprecise && cmd_waitphysical) { // precise mode ("waitpr") decrement once on each usercmd (there can be multiple per frame, especially on a slow pc)
+					Cmd_DecrementWaitPhysical();
+					if (!cmd_waitphysical) {
+						// we decremented 1 frame and now the next cmd is ready to execute. so wait with further usercmds until that cmd is executed.
+						break;
+					}
+				}
+
 				newClServerTime += desiredPhysicsMsec;
 			}
 
+			if (!cmd_waitphysicalprecise) {
+				Cmd_DecrementWaitPhysical();
+			}
 		}
 		else {
 
@@ -1382,6 +1396,8 @@ void CL_CreateNewCommands( void ) {
 			CL_DeadRampCMDFix(&cl.cmds[cmdNum], &cl.cmds[(cl.cmdNumber - 1) % EFFECTIVE_CMD_BACKUP], &predictedMovementCopy);
 			
 		}
+
+		Cmd_DecrementWaitPhysical();
 	}
 
 }
@@ -1647,6 +1663,7 @@ Called every frame to builds and sends a command packet to the server.
 void CL_SendCmd( void ) {
 	// don't send any message if not connected
 	if ( cls.state < CA_CONNECTED ) {
+		Cmd_DecrementWaitPhysical();
 		return;
 	}
 	cycledThisframe = 0;
@@ -1661,6 +1678,7 @@ void CL_SendCmd( void ) {
 	}
 	// don't send commands if paused
 	if ( com_sv_running->integer && sv_paused->integer && cl_paused->integer ) {
+		Cmd_DecrementWaitPhysical();
 		return;
 	}
 

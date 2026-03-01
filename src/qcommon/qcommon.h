@@ -90,6 +90,7 @@ void Cmd_CompleteArgument( const char *command, char *args, int argNum );
 void Cmd_CompleteCfgName( char *args, int argNum );
 void Cmd_CompleteTxtName( char *args, int argNum );
 void Cmd_SetCommandCompletionFunc( const char *command, completionFunc_t complete );
+void Cmd_DecrementWaitPhysical();
 
 // cvar.cpp
 void Cvar_CompleteCvarName( char *args, int argNum );

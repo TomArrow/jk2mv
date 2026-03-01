@@ -13,6 +13,8 @@ typedef struct {
 } cmd_t;
 
 int			cmd_wait;
+int			cmd_waitphysical; // "waitp" command when using com_physicsfps
+qboolean	cmd_waitphysicalprecise;
 cmd_t		cmd_text;
 char		cmd_text_buf[MAX_CMD_BUFFER];
 
@@ -35,6 +37,53 @@ void Cmd_Wait_f( void ) {
 		cmd_wait = 1;
 	}
 }
+
+#if !DEDICATED
+/*
+============
+Cmd_WaitPhysical_f
+
+Causes execution of the remainder of the command buffer to be delayed until
+another usercommand has been generated.  This allows commands like:
+bind g "cmd use rocket ; +attack ; waitp ; -attack ; cmd use blaster"
+============
+*/
+void Cmd_WaitPhysical_f( void ) {
+	if (com_dedicated->integer || !com_cl_running->integer) {
+		Com_Printf("^3waitp command is not supported on a dedicated server or inactive client state.");
+		Cmd_Wait_f();
+		return;
+	}
+	if ( Cmd_Argc() == 2 ) {
+		cmd_waitphysical = atoi( Cmd_Argv( 1 ) );
+	} else {
+		cmd_waitphysical = 1;
+	}
+}
+/*
+============
+Cmd_WaitPhysicalPrecise_f
+
+Causes execution of the remainder of the command buffer to be delayed until
+another usercommand has been generated. Decrements once per usercommand and waits with further usercommands if countdown runs out.
+This allows commands like:
+bind g "cmd use rocket ; +attack ; waitpr ; -attack ; cmd use blaster"
+============
+*/
+void Cmd_WaitPhysicalPrecise_f( void ) {
+	if (com_dedicated->integer || !com_cl_running->integer) {
+		Com_Printf("^3waitpr command is not supported on a dedicated server or inactive client state.");
+		Cmd_Wait_f();
+		return;
+	}
+	if ( Cmd_Argc() == 2 ) {
+		cmd_waitphysical = atoi( Cmd_Argv( 1 ) );
+	} else {
+		cmd_waitphysical = 1;
+	}
+	cmd_waitphysicalprecise = qtrue;
+}
+#endif
 
 
 /*
@@ -138,6 +187,20 @@ void Cbuf_ExecuteText (cbufExec_t exec_when, const char *text)
 
 /*
 ============
+Cmd_DecrementWaitPhysical()
+============
+*/
+void Cmd_DecrementWaitPhysical(void) {
+	if (cmd_waitphysical) {
+		// we have run something that counts as a client frame. decrement.
+		cmd_waitphysical--;
+		if (!cmd_waitphysical) {
+			cmd_waitphysicalprecise = qfalse;
+		}
+	}
+}
+/*
+============
 Cbuf_Execute
 ============
 */
@@ -154,6 +217,12 @@ void Cbuf_Execute (void)
 			// skip out while text still remains in buffer, leaving it
 			// for next frame
 			cmd_wait--;
+			break;
+		}
+
+		if ( cmd_waitphysical && !com_dedicated->integer && com_cl_running->integer )	{
+			// skip out while text still remains in buffer, leaving it
+			// for until the next usercommand has been generated
 			break;
 		}
 
@@ -669,6 +738,13 @@ void Cmd_Init (void) {
 	Cmd_SetCommandCompletionFunc( "vstr", Cvar_CompleteCvarName );
 	Cmd_AddCommand ("echo",Cmd_Echo_f);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
+#if DEDICATED
+	Cmd_AddCommand("waitp", Cmd_Wait_f);
+	Cmd_AddCommand("waitpr", Cmd_Wait_f);
+#else
+	Cmd_AddCommand("waitp", Cmd_WaitPhysical_f);
+	Cmd_AddCommand("waitpr", Cmd_WaitPhysicalPrecise_f);
+#endif
 }
 
 // for auto-complete (copied from OpenJK)

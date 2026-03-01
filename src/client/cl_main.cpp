@@ -2967,6 +2967,7 @@ void CL_Frame ( int msec ) {
 	qboolean render = qfalse;
 
 	if ( !com_cl_running->integer ) {
+		Cmd_DecrementWaitPhysical();
 		return;
 	}
 

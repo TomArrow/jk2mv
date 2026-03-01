@@ -3286,6 +3286,7 @@ void Com_Frame( qboolean noDelay) {
 		if ( com_speeds->integer ) {
 			timeAfter = timeBeforeEvents = timeBeforeClient = Sys_Milliseconds();
 		}
+		Cmd_DecrementWaitPhysical();
 	}
 
 	//
