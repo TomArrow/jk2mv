@@ -253,6 +253,8 @@ extern	cvar_t	*sv_hibernateFps;
 extern	cvar_t	*mv_apiConnectionless;
 extern	cvar_t	*sv_pingFix;
 
+extern	cvar_t* sv_specAllEnts;
+
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
 extern	cvar_t	*mv_fixforcecrash;

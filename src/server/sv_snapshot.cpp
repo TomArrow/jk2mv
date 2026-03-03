@@ -364,6 +364,14 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			continue;
 		}
 
+		// If server has sv_specAllEnts set, spectators receive all entities.
+		if (sv_specAllEnts->integer && (frame->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
+			(frame->ps.pm_flags & PMF_FOLLOW)))
+		{
+			SV_AddEntToSnapshot(svEnt, ent, eNums);
+			continue;
+		}
+
 		// ignore if not touching a PV leaf
 		// check area
 		if ( !CM_AreasConnected( clientarea, svEnt->areanum ) ) {
