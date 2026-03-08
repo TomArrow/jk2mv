@@ -513,7 +513,7 @@ jobs:
       fail-fast: false
       matrix:
         #arch: [x86, x86_64]
-        container_image: ["ubuntu:18.04","ubuntu:22.04"] #, "i386/ubuntu:22.04"]
+        container_image: ["ubuntu:18.04","ubuntu:20.04","ubuntu:22.04"] #, "i386/ubuntu:22.04"]
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
 
@@ -544,7 +544,7 @@ jobs:
         podman pull docker.io/${{ matrix.container_image }}
         podman run --name buildenv -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
         podman exec buildenv apt-get update
-        podman exec buildenv apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file
+        podman exec buildenv bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file"
         mkdir -p ${{github.workspace}}/build/actions
 
     - name: Configure CMake
