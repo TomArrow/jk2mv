@@ -513,7 +513,7 @@ jobs:
       fail-fast: false
       matrix:
         #arch: [x86, x86_64]
-        container_image: ["ubuntu:22.04"] #, "i386/ubuntu:22.04"]
+        container_image: ["ubuntu:20.04"] #, "i386/ubuntu:22.04"]
         build_type: [Debug, Release]
         portable: [Portable, Non-Portable]
 
