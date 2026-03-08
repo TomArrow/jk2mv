@@ -564,6 +564,7 @@ extern	cvar_t	* cl_showMouseVelocityExp;
 extern	cvar_t	* cl_showMouseVelocityLog;
 extern	cvar_t	* cl_fpsGuess;
 extern	cvar_t	* cl_drawPS;
+extern	cvar_t	* cl_drawPSHeight;
 extern	cvar_t	* cl_fpsGuessMode;
 extern	cvar_t	* cl_fpsGuessMethod2DisplayMode;
 extern	cvar_t	* cl_fpsGuessMethod2DebugRandMod;
