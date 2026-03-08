@@ -543,8 +543,8 @@ jobs:
       run: |
         podman pull docker.io/${{ matrix.container_image }}
         podman run --name buildenv -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
-        podman exec buildenv -e DEBIAN_FRONTEND=noninteractive -e TZ=Etc/UTC apt-get update
-        podman exec buildenv -e DEBIAN_FRONTEND=noninteractive -e TZ=Etc/UTC apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file
+        podman exec buildenv DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update
+        podman exec buildenv DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev libminizip-dev cmake rpm file
         mkdir -p ${{github.workspace}}/build/actions
 
     - name: Configure CMake
