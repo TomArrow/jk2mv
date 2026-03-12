@@ -613,6 +613,8 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	} else {
 		SVC_WhitelistAdr( from );
 
+		Cmd_DropArg(1);
+		Cmd_DropArg(0);
 		Cmd_Execute ();
 	}
 
