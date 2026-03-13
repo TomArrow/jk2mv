@@ -265,6 +265,36 @@ void SV_BoundMaxClients( int minimum ) {
 	}
 }
 
+/*
+===============
+SV_BoundMaxClients
+
+===============
+*/
+void SV_BoundSnapShotPacketEntitiesBackup( int minimumPacket, int minimumEntities ) {
+	// get the current maxclients value
+	Cvar_Get( "sv_snapShotEntitiesBackup", "64", 0 );
+
+	sv_snapShotEntitiesBackup->modified = qfalse;
+
+	if (sv_snapShotEntitiesBackup->integer < minimumEntities) {
+		Cvar_Set( "sv_snapShotEntitiesBackup", va("%i", minimumEntities) );
+	} else if (sv_snapShotEntitiesBackup->integer > 1024 ) {
+		Cvar_Set( "sv_snapShotEntitiesBackup", va("%i", 1024) );
+	}
+
+	// get the current maxclients value
+	Cvar_Get( "sv_snapShotPacketBackup", "64", 0 );
+
+	sv_snapShotPacketBackup->modified = qfalse;
+
+	if (sv_snapShotPacketBackup->integer < minimumPacket) {
+		Cvar_Set( "sv_snapShotPacketBackup", va("%i", minimumPacket) );
+	} else if (sv_snapShotPacketBackup->integer > 1024 ) {
+		Cvar_Set( "sv_snapShotPacketBackup", va("%i", 1024) );
+	}
+}
+
 
 /*
 ===============
@@ -281,16 +311,17 @@ void SV_Startup( void ) {
 		Com_Error( ERR_FATAL, "SV_Startup: svs.initialized" );
 	}
 	SV_BoundMaxClients( 1 );
+	SV_BoundSnapShotPacketEntitiesBackup( 1, 1 );
 
 	svs.clients = (struct client_s *)Z_Malloc (sizeof(client_t) * sv_maxclients->integer, TAG_CLIENTS, qtrue );
 	if ( com_dedicated->integer ) {
-		svs.numSnapshotEntities = sv_maxclients->integer * PACKET_BACKUP * MAX_SNAPSHOT_ENTITIES_SERVER;
+		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
 		Cvar_Set( "r_ghoul2animsmooth", "0");
 		Cvar_Set( "r_ghoul2unsqashaftersmooth", "0");
 
 	} else {
 		// we don't need nearly as many when playing locally
-		svs.numSnapshotEntities = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES_SERVER;
+		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
 	}
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -310,7 +341,7 @@ SV_ChangeMaxClients
 ==================
 */
 void SV_ChangeMaxClients( void ) {
-	int		oldMaxClients;
+	int		oldMaxClients, oldPacketBackup, oldEntityBackup;
 	int		i;
 	client_t	*oldClients;
 	int		count;
@@ -326,10 +357,13 @@ void SV_ChangeMaxClients( void ) {
 	count++;
 
 	oldMaxClients = sv_maxclients->integer;
+	oldPacketBackup = sv_snapShotPacketBackup->integer;
+	oldEntityBackup = sv_snapShotEntitiesBackup->integer;
 	// never go below the highest client number in use
 	SV_BoundMaxClients( count );
+	SV_BoundSnapShotPacketEntitiesBackup( 1, 1 );
 	// if still the same
-	if ( sv_maxclients->integer == oldMaxClients ) {
+	if ( sv_maxclients->integer == oldMaxClients && oldPacketBackup == sv_snapShotPacketBackup->integer && oldEntityBackup == sv_snapShotEntitiesBackup->integer) {
 		return;
 	}
 
@@ -365,10 +399,10 @@ void SV_ChangeMaxClients( void ) {
 
 	// allocate new snapshot entities
 	if ( com_dedicated->integer ) {
-		svs.numSnapshotEntities = sv_maxclients->integer * PACKET_BACKUP * MAX_SNAPSHOT_ENTITIES_SERVER;
+		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
 	} else {
 		// we don't need nearly as many when playing locally
-		svs.numSnapshotEntities = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES_SERVER;
+		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
 	}
 }
 
@@ -539,7 +573,7 @@ Ghoul2 Insert Start
 		SV_Startup();
 	} else {
 		// check for maxclients change
-		if ( sv_maxclients->modified ) {
+		if ( sv_maxclients->modified || sv_snapShotEntitiesBackup->modified || sv_snapShotPacketBackup->modified) {
 			SV_ChangeMaxClients();
 		}
 	}
@@ -989,6 +1023,8 @@ void SV_Init (void) {
 	sv_maxPacketUserCmds = Cvar_Get("sv_maxPacketUserCmds", "128", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
 	sv_autoWhitelist = Cvar_Get("sv_autoWhitelist", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	sv_dynamicSnapshots = Cvar_Get("sv_dynamicSnapshots", "1", CVAR_ARCHIVE);
+	sv_snapShotPacketBackup = Cvar_Get("sv_snapShotPacketBackup", QUOTEME(PACKET_BACKUP), CVAR_ARCHIVE | CVAR_LATCH);
+	sv_snapShotEntitiesBackup = Cvar_Get("sv_snapShotEntitiesBackup", "64", CVAR_ARCHIVE | CVAR_LATCH);
 
 
 #if _DEBUG

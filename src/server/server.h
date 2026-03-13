@@ -363,6 +363,8 @@ extern	cvar_t	*sv_pingFix;
 extern	cvar_t	*sv_maxPacketUserCmds;
 extern	cvar_t	*sv_autoWhitelist;
 extern	cvar_t	*sv_dynamicSnapshots;
+extern	cvar_t	*sv_snapShotPacketBackup;
+extern	cvar_t	*sv_snapShotEntitiesBackup;
 
 #ifdef SVDEMO
 extern	cvar_t* sv_autoDemo;

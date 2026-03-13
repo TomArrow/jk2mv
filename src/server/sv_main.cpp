@@ -53,6 +53,8 @@ cvar_t	*sv_pingFix;
 cvar_t	*sv_maxPacketUserCmds;
 cvar_t	*sv_autoWhitelist;
 cvar_t	*sv_dynamicSnapshots;
+cvar_t	*sv_snapShotPacketBackup;
+cvar_t	*sv_snapShotEntitiesBackup;
 
 #ifdef SVDEMO
 cvar_t* sv_autoDemo;
