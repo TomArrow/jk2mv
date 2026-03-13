@@ -370,12 +370,66 @@ Build a client snapshot structure
 
 =============================================================================
 */
+typedef enum snapshotEntityPriority_s {
+	SSPRIO_BROADCAST,
+	SSPRIO_MVSNAPSHOTENFORCE,
+	SSPRIO_MVSNAPSHOTENFORCEREAL,
+	SSPRIO_PORTAL,
+	SSPRIO_VISIBLE,
+	SSPRIO_AUTODEMOSPECTATOR, // might wanna apply the same distinctions as with specall? since it seems to be basically the same thing
+	SSPRIO_SPECALLPLAYER,
+	SSPRIO_SPECALLPLAYEREVENT,
+	SSPRIO_SPECALLG2ENT,
+	SSPRIO_SPECALLMOVER,
+	SSPRIO_SPECALL,
+	SSPRIO_SPECALLFX,
+	SSPRIO_SPECALLSPEAKER,
+	SSPRIO_SPECALLTRIGGER,
+} snapshotEntityPriority_t;
 
-#define	MAX_SNAPSHOT_ENTITIES	1024
+typedef struct snapshotEntity_s {
+	int							number;
+	snapshotEntityPriority_t	priority; // during filtering: lower priority: more likely to stay
+	float						distance;
+} snapshotEntity_t;
+
+//#define	MAX_SNAPSHOT_ENTITIES	256
 typedef struct {
-	int		numSnapshotEntities;
-	int		snapshotEntities[MAX_SNAPSHOT_ENTITIES];
+	int					numSnapshotEntities;
+	snapshotEntity_t	snapshotEntitiesRaw[MAX_SNAPSHOT_ENTITIES_SERVER]; // will get filtered to snapshotEntities
+	int					snapshotEntities[MAX_SNAPSHOT_ENTITIES_SERVER];
 } snapshotEntityNumbers_t;
+
+
+
+
+/*
+=======================
+SV_QsortSnapshotEntitiesByPriority
+=======================
+*/
+static int QDECL SV_QsortSnapshotEntitiesByPriority(const void* a, const void* b) {
+	snapshotEntity_t* ea, * eb;
+
+	ea = (snapshotEntity_t*)a;
+	eb = (snapshotEntity_t*)b;
+
+	if (ea->priority == eb->priority) {
+		if (ea->distance == eb->distance) {
+			return 0;
+		}
+		if (ea->distance < eb->distance) {
+			return -1;
+		}
+		return 1;
+	}
+
+	if (ea->priority < eb->priority) {
+		return -1;
+	}
+
+	return 1;
+}
 
 /*
 =======================
@@ -405,7 +459,7 @@ static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
 SV_AddEntToSnapshot
 ===============
 */
-static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums ) {
+static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums, snapshotEntityPriority_t priority, float distance) {
 	// if we have already added this entity to this snapshot, don't add again
 	if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
 		return;
@@ -413,11 +467,13 @@ static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapsh
 	svEnt->snapshotCounter = sv.snapshotCounter;
 
 	// if we are full, silently discard entities
-	if ( eNums->numSnapshotEntities == MAX_SNAPSHOT_ENTITIES ) {
+	if ( eNums->numSnapshotEntities == MAX_SNAPSHOT_ENTITIES_SERVER ) {
 		return;
 	}
 
-	eNums->snapshotEntities[ eNums->numSnapshotEntities ] = gEnt->s.number;
+	eNums->snapshotEntitiesRaw[eNums->numSnapshotEntities].number = gEnt->s.number;
+	eNums->snapshotEntitiesRaw[eNums->numSnapshotEntities].priority = priority;
+	eNums->snapshotEntitiesRaw[eNums->numSnapshotEntities].distance = distance;
 	eNums->numSnapshotEntities++;
 }
 
@@ -437,6 +493,8 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 	int		c_fullsend;
 	byte	*clientpvs;
 	byte	*bitvector;
+	vec3_t	difference;
+	float	length, radius, distance;
 
 	// during an error shutdown message we may need to transmit
 	// the shutdown message after the server has shutdown, so
@@ -469,6 +527,15 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			ent->s.number = e;
 		}
 
+		// calculate the distance (for priority sorting)
+		VectorAdd(ent->r.absmax, ent->r.absmin, difference);
+		VectorScale(difference, 0.5f, difference);
+		VectorSubtract(origin, difference, difference);
+		length = VectorLength(difference);
+		VectorSubtract(ent->r.absmax, ent->r.absmin, difference);
+		radius = VectorLength(difference);
+		distance = length - radius;
+
 		svEnt = SV_SvEntityForGentity( ent );
 
 		if ( sv.gentitiesMV != NULL && sv.gentitySizeMV > 0 )
@@ -496,7 +563,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			if ( mvEnt->snapshotIgnore[frame->ps.clientNum] ) continue;
 			else if ( mvEnt->snapshotEnforce[frame->ps.clientNum] )
 			{
-				SV_AddEntToSnapshot( svEnt, ent, eNums );
+				SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCE, distance);
 				continue;
 			}
 
@@ -504,7 +571,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 				if (mvEnt->snapshotIgnoreRealClient[realClientNum]) continue;
 				else if (mvEnt->snapshotEnforceRealClient[realClientNum])
 				{
-					SV_AddEntToSnapshot(svEnt, ent, eNums);
+					SV_AddEntToSnapshot(svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCEREAL, distance);
 					continue;
 				}
 			}
@@ -536,7 +603,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// broadcast entities are always sent, and so is the main player so we don't see noclip weirdness
 		if ( ent->r.svFlags & SVF_BROADCAST || (e == frame->ps.clientNum) || (ent->r.broadcastClients[frame->ps.clientNum/32] & (1<<(frame->ps.clientNum%32))))
 		{
-			SV_AddEntToSnapshot( svEnt, ent, eNums );
+			SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_BROADCAST, distance);
 			continue;
 		}
 
@@ -546,19 +613,12 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			sharedEntity_t* ent2;
 			ent2 = SV_GentityNum(frame->ps.clientNum);
 			if (ent2->r.svFlags & SVF_BOT && /* ent2->playerState->*/frame->ps.pm_type == PM_SPECTATOR) {
-				SV_AddEntToSnapshot(svEnt, ent, eNums);
+				SV_AddEntToSnapshot(svEnt, ent, eNums, SSPRIO_AUTODEMOSPECTATOR, distance);
 				continue;
 			}
 		}
 #endif
 		
-		// If server has sv_specAllEnts set, spectators receive all entities.
-		if (sv_specAllEnts->integer && (frame->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
-			(frame->ps.pm_flags & PMF_FOLLOW)))
-		{
-			SV_AddEntToSnapshot(svEnt, ent, eNums);
-			continue;
-		}
 
 		// ignore if not touching a PV leaf
 		// check area
@@ -566,7 +626,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			// doors can legally straddle two areas, so
 			// we may need to check another one
 			if ( !CM_AreasConnected( clientarea, svEnt->areanum2 ) ) {
-				continue;		// blocked by a door
+				goto vischeckfailed;		// blocked by a door
 			}
 		}
 
@@ -574,7 +634,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 
 		// check individual leafs
 		if ( !svEnt->numClusters ) {
-			continue;
+			goto vischeckfailed;
 		}
 		l = 0;
 		for ( i=0 ; i < svEnt->numClusters ; i++ ) {
@@ -594,15 +654,15 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 					}
 				}
 				if ( l == svEnt->lastCluster ) {
-					continue;	// not visible
+					goto vischeckfailed;	// not visible
 				}
 			} else {
-				continue;
+				goto vischeckfailed;
 			}
 		}
 
 		// add it
-		SV_AddEntToSnapshot( svEnt, ent, eNums );
+		SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_VISIBLE, distance);
 
 		// if its a portal entity, add everything visible from its camera position
 		if ( ent->r.svFlags & SVF_PORTAL ) {
@@ -614,6 +674,35 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 				}
 			}
 			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, qtrue, realClientNum );
+		}
+
+		vischeckfailed:
+
+		// If server has sv_specAllEnts set, spectators receive all entities.
+		if (sv_specAllEnts->integer && (frame->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
+			(frame->ps.pm_flags & PMF_FOLLOW)))
+		{
+			snapshotEntityPriority_t priority = SSPRIO_SPECALL;
+			if (ent->s.eType == ET_PLAYER) {
+				priority = SSPRIO_SPECALLPLAYER; // players are higher priority
+			}
+			else if (ent->s.eType == ET_GRAPPLE) {
+				priority = SSPRIO_SPECALLG2ENT; // player g2 ents are higher priority
+			}
+			else if (ent->s.eFlags & EF_PLAYER_EVENT) {
+				priority = SSPRIO_SPECALLPLAYEREVENT;
+			}
+			else if (ent->s.eType == ET_MOVER) {
+				priority = SSPRIO_SPECALLMOVER; // movers should be visible, so decently high priority
+			}
+			else if (ent->s.eType == ET_SPEAKER) {
+				priority = SSPRIO_SPECALLSPEAKER; // movers should be visible, so decently high priority
+			}
+			else if (ent->s.eType == ET_PUSH_TRIGGER || ent->s.eType == ET_TELEPORT_TRIGGER) {
+				priority = SSPRIO_SPECALLTRIGGER; // triggers have lower priority (not visible in spec anyway)
+			}
+			SV_AddEntToSnapshot(svEnt, ent, eNums, priority, distance);
+			continue;
 		}
 
 	}
@@ -636,7 +725,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	vec3_t						org;
 	clientSnapshot_t			*frame;
 	snapshotEntityNumbers_t		entityNumbers;
-	int							i;
+	int							i, maxSnapEnts;
 	sharedEntity_t				*ent;
 	entityState_t				*state;
 	svEntity_t					*svEnt;
@@ -693,10 +782,25 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	// may include portal entities that merge other viewpoints
 	SV_AddEntitiesVisibleFromPoint(org, frame, &entityNumbers, qfalse, client - svs.clients);
 
+	maxSnapEnts = client->customSnapEntCount ? client->customSnapEntCount : MAX_SNAPSHOT_ENTITIES_SERVER;
+	if (entityNumbers.numSnapshotEntities > maxSnapEnts) {
+		// this is a normal client who would rather not receive more than the usual vanilla 256 ents per snapshot.
+		// pre-sort by priority
+		qsort(entityNumbers.snapshotEntitiesRaw, entityNumbers.numSnapshotEntities,
+			sizeof(entityNumbers.snapshotEntitiesRaw[0]), SV_QsortSnapshotEntitiesByPriority);
+		// then limit
+		entityNumbers.numSnapshotEntities = maxSnapEnts;
+	}
+
+	for (i = 0; i < entityNumbers.numSnapshotEntities; i++) {
+		entityNumbers.snapshotEntities[i] = entityNumbers.snapshotEntitiesRaw[i].number;
+	}
+
 	// if there were portals visible, there may be out of order entities
 	// in the list which will need to be resorted for the delta compression
 	// to work correctly.  This also catches the error condition
 	// of an entity being included twice.
+	// TA: this is needed now anyway since we pre-sort by priority.
 	qsort(entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities,
 		sizeof(entityNumbers.snapshotEntities[0]), SV_QsortEntityNumbers);
 

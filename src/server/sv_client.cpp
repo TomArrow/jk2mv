@@ -1317,7 +1317,17 @@ void SV_UserinfoChanged( client_t *cl ) {
 			}
 		}
 	}
-	
+
+	// TA: Allow client to unlimit snaps entities count
+	val = Info_ValueForKey(cl->userinfo, "csnec");
+	cl->customSnapEntCount = atoi(val);
+	if (cl->customSnapEntCount < 0) {
+		cl->customSnapEntCount = 0;
+	}
+	if (cl->customSnapEntCount > MAX_SNAPSHOT_ENTITIES_SERVER) {
+		cl->customSnapEntCount = MAX_SNAPSHOT_ENTITIES_SERVER;
+	}
+
 	// TTimo
 	// maintain the IP information
 	// the banning code relies on this being consistently present
