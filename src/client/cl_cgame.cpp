@@ -50,6 +50,11 @@ extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 void FX_FeedTrail(const effectTrailArgStruct_t *a);
 
+
+void CL_ResetSnapLagSmoothing() {
+	memset(&cl.serverTimeDeltaSmooth, 0, sizeof(cl.serverTimeDeltaSmooth));
+}
+
 /*
 ====================
 CL_GetGameState
@@ -667,6 +672,7 @@ rescan:
 		// clear notify lines and outgoing commands before passing
 		// the restart to the cgame
 		Con_ClearNotify();
+		CL_ResetSnapLagSmoothing();
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
 	
 		if (cl_autoDemo->integer && !clc.demoplaying ) {

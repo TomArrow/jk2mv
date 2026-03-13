@@ -803,6 +803,7 @@ void CIN_CloseAllVideos(void);
 //
 // cl_cgame.c
 //
+void CL_ResetSnapLagSmoothing();
 void CL_InitCGame( void );
 void CL_ShutdownCGame( void );
 qboolean CL_GameCommand( void );
