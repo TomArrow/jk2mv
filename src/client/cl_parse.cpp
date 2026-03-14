@@ -76,12 +76,14 @@ static void Ezdemo_HandleEvent(entityState_t state);
 #define EZDEMO_CAPTURES			4
 #define EZDEMO_FLAGSTEALS		8
 #define EZDEMO_CHATS			16
+#define EZDEMO_NWHAC			32 //nwh anticheat
 
 #define EZDEMO_PREDICTEDCLIENT			1337
 
 int 			ezdemoPlayerstateClientNum = -1;
 static int 		ezdemoFragOptions = 0;
 static int 		ezdemoBitOptions = 0;
+static int 		ezdemoLastNWHAC = 0;
 static int 		ezdemoEventCount = 0;
 static float 	ezdemoMinimumSpeed = 0;
 static int 		ezdemoShowOnlyKillsOn = -1;
@@ -1479,7 +1481,13 @@ void CL_ParseCommandString( msg_t *msg ) {
 
 		cmd = Cmd_Argv(0);
 
-		if (ezdemoBitOptions == EZDEMO_CHATS) {
+		if ((ezdemoBitOptions & EZDEMO_NWHAC) && !strcmp(cmd, "print") && !Q_stricmpn("[NWH-AC]:", Cmd_Argv(1),9)) {
+			if ((cl.snap.serverTime - ezdemoLastNWHAC) >= 1000) {
+				Ezdemo_AddEvent(ezdemoPlayerstateClientNum, 0);
+			}
+			ezdemoLastNWHAC = cl.snap.serverTime;
+		}
+		if (ezdemoBitOptions & EZDEMO_CHATS) {
 
 			if (!strcmp(cmd, "chat") || !strcmp(cmd, "tchat"))
 				Com_Printf("%s\n", Cmd_ArgsFrom(1));
@@ -1820,6 +1828,7 @@ void CL_Ezdemo_f(void) {
 		Com_Printf("   bluebs - show blue bs frags       [  can be combined\n");
 		Com_Printf("   lunge  - show blue uppercut frags [\n");
 		Com_Printf("   dfa    - show dfa frags           [\n");
+		Com_Printf("   nwhac  - nwh anticheat detections           [\n");
 		Com_Printf("   by <clientnum or \"me\">    - show only frags/events by this client\n");
 		Com_Printf("   on <clientnum or \"me\">    - show only frags on this client\n");
 		Com_Printf("   ret                       - show only frags on flag carriers\n");
@@ -1834,6 +1843,7 @@ void CL_Ezdemo_f(void) {
 
 	ezdemoFragOptions = 0;
 	ezdemoBitOptions = 0;
+	ezdemoLastNWHAC = 0;
 	ezdemoMinimumSpeed = 0;
 	ezdemoShowOnlyKillsOn = -1;
 	ezdemoShowOnlyKillsBy = -1;
@@ -1850,6 +1860,10 @@ void CL_Ezdemo_f(void) {
 
 		if (!Q_stricmpn(buf, "chat", 4)) {
 			ezdemoBitOptions = EZDEMO_CHATS;
+			break;
+		}
+		else if (!Q_stricmpn(buf, "nwhac", 4)) {
+			ezdemoBitOptions |= EZDEMO_NWHAC;
 			break;
 		}
 #ifdef XDEVELOPER
