@@ -851,6 +851,10 @@ void CL_StopRecord_f( void ) {
 		CL_WriteBufferedDemoMessages(qtrue); // Flush all messages into the demo file.
 	}
 
+	if (cl_ucmdDemoSave->integer) {
+		CL_WriteClientUcmdDemoSaveback(qtrue, clc.demoLastWrittenSequenceNumber); // flush remaining usercmds
+	}
+
 	// finish up
 	len = -1;
 	FS_Write (&len, 4, clc.demofile);
