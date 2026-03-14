@@ -287,6 +287,7 @@ qboolean Netchan_Process(netchan_t *chan, msg_t *msg, int* sequenceNumber, qbool
 	// dropped packets don't keep the message from being used
 	//
 	chan->dropped = sequence - (chan->incomingSequence + 1);
+	chan->droppedSinceClear += chan->dropped;
 	if (chan->dropped > 0) {
 		if (showdrop->integer || showpackets->integer) {
 			Com_Printf("%s:Dropped %i packets at %i\n"

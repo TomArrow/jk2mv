@@ -1509,11 +1509,25 @@ void CL_WritePacket( void ) {
 	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
 	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
 	bool		commandTimeBasedUserCmds = cl_dynamicUserPacket->integer && cl.playerCommandTimeValid && cl.playerCommandTime < cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
+	userMessage_t* umsg = NULL;
+	int			umsgLastUcmd = -1;
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
 		return;
 	}
+
+	if (cl_ucmdDemoSave->integer && clc.demorecording && !clc.demowaiting) {
+		umsg = new userMessage_t();
+		umsg->serverTime = cl.snap.serverTime;
+		umsg->droppedPackets = clc.netchan.droppedSinceClear;
+		umsg->clientNum = clc.clientNum;
+		oldPacketNum = (clc.netchan.outgoingSequence-1) & PACKET_MASK;
+		umsgLastUcmd = oldPacketNum < 0 ? -1 : cl.outPackets[oldPacketNum].p_cmdNumber;
+		//umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
+		umsg->pingKnown = qfalse;
+	}
+	clc.netchan.droppedSinceClear = 0;
 
 	MAX_PACKET_USERCMDS = MAX(MAX_PACKET_USERCMDS_MIN, MIN(cl.serverMaxPacketUserCmds, MAX_PACKET_USERCMDS)); // server must support more than 32 to send more than 32
 
@@ -1625,6 +1639,11 @@ void CL_WritePacket( void ) {
 		for ( i = 0 ; i < count ; i++ ) {
 			j = (cl.cmdNumber - count + i + 1) % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
 			cmd = &cl.cmds[j];
+			if (umsg && (cl.cmdNumber - count + i + 1) > umsgLastUcmd) { // save this for saving to demo
+				std::unique_ptr<usercmd_t> tmp = std::make_unique<usercmd_t>();
+				*tmp = *cmd;
+				umsg->cmds.push_back(std::move(tmp));
+			}
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;
 		}
@@ -1644,6 +1663,11 @@ void CL_WritePacket( void ) {
 	}
 
 	CL_Netchan_Transmit (&clc.netchan, &buf);
+
+	if (umsg) {
+		// for usercommand saving to demos
+		CL_AddUserMessage(umsg);
+	}
 
 	// clients never really should have messages large enough
 	// to fragment, but in case they do, fire them all off

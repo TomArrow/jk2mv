@@ -629,6 +629,10 @@ extern	cvar_t	*mv_menuOverride;
 extern	cvar_t	*cl_autoDemo;
 extern	cvar_t	*cl_autoDemoFormat;
 
+extern	cvar_t	*cl_ucmdDemoSave;
+extern	cvar_t	*cl_ucmdDemoSaveMinCount;
+extern	cvar_t	*cl_demoWriteMeta;
+
 extern	cvar_t	*cl_numpadNumberBinds;
 
 //=================================================
@@ -642,6 +646,7 @@ void CL_FlushMemory( qboolean disconnecting );
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
 void CL_ConfigstringModified(void);
+void CL_AddUserMessage(userMessage_t* umsg);
 
 #define CL_EZDEMO
 

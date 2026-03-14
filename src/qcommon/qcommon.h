@@ -333,6 +333,7 @@ typedef struct {
 	netsrc_t	sock;
 
 	int			dropped;			// between last packet and previous
+	int			droppedSinceClear;			// for clientside usercmd recording. refers to serverpackets then.
 
 	netadr_t	remoteAddress;
 	int			qport;				// qport value to write when transmitting

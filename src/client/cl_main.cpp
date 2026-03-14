@@ -7,6 +7,7 @@
 #include "snd_local.h"
 #include <mv_setup.h>
 #include <memory>
+#include <sstream>
 
 #if !defined(G2_H_INC)
 	#include "../ghoul2/G2_local.h"
@@ -23,6 +24,9 @@
 #endif
 
 clientRendererInfo_t	clRenderInfo;
+
+std::vector<std::unique_ptr<userMessage_t>> clUserMessages;
+int userStoredUcmdCount = 0;
 
 //#define NOCONNECT
 
@@ -116,6 +120,10 @@ cvar_t	*cl_downloadSize;
 cvar_t	*cl_downloadCount;
 cvar_t	*cl_downloadTime;
 cvar_t	*cl_downloadProtocol;
+
+cvar_t	*cl_ucmdDemoSave;
+cvar_t	*cl_ucmdDemoSaveMinCount;
+cvar_t	*cl_demoWriteMeta;
 
 vec3_t cl_windVec;
 
@@ -544,6 +552,234 @@ void CL_WriteDemoMessage ( msg_t *msg, int headerBytes, int sequenceNumber ) {
 	FS_Write ( msg->data + headerBytes, len, clc.demofile );
 }
 
+constexpr char postEOFUcmdMarkerCL[] = "HIDDCLUCMD";
+constexpr char postEOFMetadataMarkerCL[] = "HIDDENMETA"; // naming it something else than in server so the variables dont unpredictably conflict during linking
+
+// Write an empty message at start of demo with metadata.
+// Metadata must be in JSON format to maintain compatibility for this format,
+// that way every demo writing tool/client/server can read/write different parameters
+// without conflicting.
+// But the JSON is not verified in this function, so just be good.
+// "lastClientCommand" is client->lastClientCommand, but if you are pre-recording,
+// you should get the older value
+// "messageNum" is the messageNum of the metadata messsage.
+// Normally the first message in a demo is the "header" or gamestate message with first message num -1
+// With metadata, this becomes sthe first message instead. So it's first demo message num - 2
+void CL_WriteEmptyMessageWithMetadata(int lastClientCommand, fileHandle_t f, const char* metaData, int messageNum) {
+	static byte		bufData[MAX_MSGLEN];
+	msg_t			buf;
+	int				i;
+	int				len;
+	entityState_t* ent;
+	entityState_t	nullstate;
+	char* s;
+
+
+	MSG_Init(&buf, bufData, sizeof(bufData));
+	MSG_Bitstream(&buf);
+	// NOTE, MRE: all server->client messages now acknowledge
+	MSG_WriteLong(&buf, lastClientCommand);
+	MSG_WriteByte(&buf, svc_EOF);
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	constexpr int metaMarkerLength = sizeof(postEOFMetadataMarkerCL) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	constexpr int maxBytePerByteSaved = 2;
+	constexpr int metaMarkerPresenceMinimumByteLengthExtra = metaMarkerLength * maxBytePerByteSaved;
+
+	const int requiredCursize = buf.cursize + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	for (int i = 0; i < metaMarkerLength; i++) {
+		MSG_WriteByte(&buf, postEOFMetadataMarkerCL[i]);
+	}
+	MSG_WriteBigString(&buf, metaData);
+
+
+	MSG_WriteByte(&buf, svc_EOF); // Done. Not really needed but whatever.
+
+	if (buf.cursize < requiredCursize) {
+		buf.cursize = requiredCursize;
+	}
+
+	// write it to the demo file
+	len = LittleLong(messageNum);
+	FS_Write(&len, 4, f);
+	len = LittleLong(buf.cursize);
+	FS_Write(&len, 4, f);
+
+	FS_Write(buf.data, buf.cursize, f);
+}
+
+void CL_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet) {
+	int				i;
+	int				len;
+	entityState_t* ent;
+	entityState_t	nullstate;
+	char* s;
+
+
+	MSG_WriteByte(buf, svc_EOF);
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	constexpr int metaMarkerLength = sizeof(postEOFUcmdMarkerCL) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	constexpr int maxBytePerByteSaved = 2;
+	constexpr int metaMarkerPresenceMinimumByteLengthExtra = metaMarkerLength * maxBytePerByteSaved;
+
+	const int requiredCursize = buf->cursize + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	if (requiredCurSizeRet) {
+		*requiredCurSizeRet = requiredCursize;
+	}
+
+	for (int i = 0; i < metaMarkerLength; i++) {
+		MSG_WriteByte(buf, postEOFUcmdMarkerCL[i]);
+	}
+}
+
+void CL_WriteClientUcmdDemoSaveback(qboolean force, int sequenceNumber) {
+
+	static byte		msg_buf[MAX_MSGLEN];
+	msg_t			msgBak;
+	msg_t			msg;
+
+	// must be before SV_BuildClientSnapshot because otherwise stuff gets confused with outgoingsequence
+	//if (sv_ucmdSendback->integer && userMessages[client - svs.clients].size() > MAX(1,sv_ucmdSendbackMinCount->integer)) {
+	if (cl_ucmdDemoSave->integer &&
+		(
+			(MAX(clUserMessages.size(), userStoredUcmdCount) > MAX(1, cl_ucmdDemoSaveMinCount->integer))
+			|| force
+			)
+		) {
+		int minCurSize = 0;
+		usercmd_t	nullcmd;
+		usercmd_t* cmd, * oldcmd;
+		int sentbackCount = 0, sentbackBackup = 0;
+		msg_t		msgBak2;
+
+		// prepend message with client commands (so demos have that info)
+		MSG_Init(&msg, msg_buf, sizeof(msg_buf));
+		msg.allowoverflow = qtrue;
+
+		// NOTE, MRE: all server->client messages now acknowledge
+		// let the client know which reliable clientCommands we have received
+		MSG_WriteLong(&msg, clc.reliableAcknowledge);
+
+		CL_WriteEOFAndHiddenUcmdMarker(&msg, &minCurSize);
+
+		MSG_WriteShort(&msg, 2); // version of this sorta ucmd sendback protocol
+		// v1 was first working prototype
+		// v2 does the delta across all ucmds in this whole message
+
+		Com_Memset(&nullcmd, 0, sizeof(nullcmd));
+
+		oldcmd = &nullcmd;
+		auto it = clUserMessages.begin();
+		for (; it != clUserMessages.end(); it++) {
+
+			// Backup the msg state in case the snapshot would overflow it
+			memcpy(&msgBak, &msg, sizeof(msgBak));
+			sentbackBackup = sentbackCount;
+
+			MSG_WriteBits(&msg, 1, 1); // new client message
+
+			MSG_WriteByte(&msg, (*it)->clientNum); // clientnum
+
+			//MSG_WriteLong(&msg, (*it)->serverTime);
+			//nullcmd.serverTime = (*it)->serverTime; // make em all relative to this. that way we get to keep the real servertime and delta from it
+			// nvm cant do this because the efficient delta compression here works only in one direction and timenudge can fudge it either way
+
+			if ((*it)->cmds.size() > 0) {
+				MSG_WriteBits(&msg, 1, 1); // yes we know servertime offset
+				MSG_WriteBits(&msg, MAX(-32768, MIN(32767, (*it)->serverTime - (*it)->cmds[0]->serverTime)), -16); // servertime offset of first cmd. can i actually use whole short range safely?
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+			if ((*it)->pingKnown) { // ping is known
+				MSG_WriteBits(&msg, 1, 1);
+				MSG_WriteBits(&msg, MAX(-32768, MIN(32767, (*it)->ping)), -16); // ping should logically always be positive. is it? uh. well technically it doesnt even matter for the encoding. but if someone is hacking ping, it could be fun to see? wait no it wouldnt. meh.
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+			if ((*it)->droppedPackets > 0) {
+				MSG_WriteBits(&msg, 1, 1);
+				MSG_WriteByte(&msg, MIN(255, (*it)->droppedPackets));
+			}
+			else {
+				MSG_WriteBits(&msg, 0, 1);
+			}
+
+			auto cmdit = (*it)->cmds.begin();
+			//oldcmd = &nullcmd;
+			for (; cmdit != (*it)->cmds.end(); cmdit++) {
+				MSG_WriteBits(&msg, 1, 1);
+				cmd = cmdit->get();
+				MSG_WriteDeltaUsercmdKey(&msg, 0, oldcmd, cmd, qtrue);
+				sentbackCount++;
+				oldcmd = cmd;
+			}
+			MSG_WriteBits(&msg, 0, 1);
+
+			//if (sv_dynamicSnapshots->integer && (msg.overflowed || (msg.maxsize - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+			//if ((msg.overflowed || /*(msg.maxsize - msg.cursize) < 8 || */ (FRAGMENT_SIZE - msg.cursize) < 8) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+			if ((msg.overflowed || (msg.maxsize - msg.cursize) < 8 /*|| (FRAGMENT_SIZE - msg.cursize) < 8 */) && !msgBak.overflowed) { // (msg.maxsize - msg.cursize) < 8 is like a softer overflow detect. we still need to cram that one "no more usermessages" bit in there and also svc_EOF, so don't go quite up to the limit of it "overflowing" (overflow checks for 4 bytes)
+				// actually i'm being even more strict now. this ucmd sendback MUST fit into a single fragment, otherwise the directly following snapshot will stomp it.
+				// nvm im reversing that policy since i think i fixed the underlying netcode that caused that to be a problem.
+				memcpy(&msg, &msgBak, sizeof(msg));
+				sentbackCount = sentbackBackup;
+				break;
+			}
+		}
+		clUserMessages.erase(clUserMessages.begin(), it);
+		userStoredUcmdCount -= sentbackCount;
+		if (userStoredUcmdCount < 0) {
+			Com_Printf("^1userStoredUcmdCounts ended up smaller than 0!!! WEIRD! Should not happen! It's %d\n", userStoredUcmdCount);
+			userStoredUcmdCount = 0;
+		}
+		else if ((userStoredUcmdCount == 0) != (clUserMessages.size() == 0)) {
+			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d\n", userStoredUcmdCount, clUserMessages.size());
+			userStoredUcmdCount = 0;
+		}
+
+		MSG_WriteBits(&msg, 0, 1);
+		MSG_WriteByte(&msg, svc_EOF);
+
+		if (/*sv_dynamicSnapshots->integer&&*/  msg.overflowed) {
+			//if (msg.overflowed || (FRAGMENT_SIZE - msg.cursize) < 4) {
+				// rare one broken by the last bit. shouldn't happen
+			Com_Printf("^sv_dynamicSnapshots: Message overflowed for ucmdSendBack. WHY?!?!! Data loss. Size is %d, maxsize %d\n", msg.cursize, msg.maxsize);
+		}
+		else {
+			if (msg.cursize < minCurSize) {
+				msg.cursize = minCurSize;
+			}
+			CL_WriteDemoMessage(&msg,0,sequenceNumber);
+		}
+
+	}
+}
+
+void CL_AddUserMessage(userMessage_t* umsg) {
+	playerState_t* myps = &cl.snap.ps;
+	if (myps->clientNum == clc.clientNum || cl_ucmdDemoSave->integer == 2) {
+		userStoredUcmdCount += umsg->cmds.size();
+		clUserMessages.push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
+	}
+	else {
+		delete umsg;
+	}
+}
+
 /*
 ====================
 CL_WriteBufferedDemoMessages
@@ -565,6 +801,7 @@ void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
 		// While we have all the messages without any gaps, we can just dump them all into the demo file.
 		MSG_FromBuffered(&tmpMsg, &bufferedDemoMessages[clc.demoLastWrittenSequenceNumber + 1].get()->msg);
 		CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount, clc.demoLastWrittenSequenceNumber + 1);
+		CL_WriteClientUcmdDemoSaveback(qfalse, clc.demoLastWrittenSequenceNumber + 1);
 		clc.demoLastWrittenSequenceNumber = clc.demoLastWrittenSequenceNumber + 1;
 		bufferedDemoMessages.erase(clc.demoLastWrittenSequenceNumber);
 	}
@@ -582,6 +819,7 @@ void CL_WriteBufferedDemoMessages(qboolean forceWriteAll = qfalse) {
 		if (forceWriteAll || tmpIt->second.get()->time + cl_demoRecordBufferedReorderTimeout->integer < Com_RealTime(NULL)) {
 			MSG_FromBuffered(&tmpMsg, &tmpIt->second.get()->msg);
 			CL_WriteDemoMessage(&tmpMsg, tmpMsg.readcount,tmpIt->first);
+			CL_WriteClientUcmdDemoSaveback(qfalse, tmpIt->first);
 			clc.demoLastWrittenSequenceNumber = tmpIt->first;
 			bufferedDemoMessages.erase(tmpIt);
 		}
@@ -658,6 +896,7 @@ void CL_Record_f( void ) {
 	entityState_t	nullstate;
 	char		*s;
 	char		demoName[MAX_OSPATH];	//bufsize was MAX_QPATH, but it should be MAX_OSPATH since this is the assumed buffersize in CL_DemoFilename
+	std::stringstream ssMeta; // JSON metadata
 
 	if ( Cmd_Argc() > 2 ) {
 		Com_Printf ("record <demoname>\n");
@@ -714,6 +953,44 @@ void CL_Record_f( void ) {
 	  clc.spDemoRecording = qfalse;
 	}
 
+	// Save metadata message if desired
+	if (cl_demoWriteMeta->integer || cl_ucmdDemoSave->integer) {
+		if (com_developer->integer > 1) {
+			Com_Printf("Preparing demo metadata ... ");
+		}
+		int i;
+		ssMeta << "{";
+		ssMeta << "\"wr\":\"TommyTernal_Client\""; // Writer (keyword used by other tools too to identify origin of demo)
+		if (cl_ucmdDemoSave->integer) {
+			ssMeta << "\"clucmdsv\":\"" << cl_ucmdDemoSave->integer << "\"";
+		}
+
+		// Go through manually set metadata and add it.
+		/*for (auto it = demoMetaData[cl - svs.clients].begin(); it != demoMetaData[cl - svs.clients].end(); it++) {
+			if (it->first != "wr" && it->first != "ost" && it->first != "prso") { // Can't overwrite default parameters (writer, original start time, pre-record start offset)
+
+				ssMeta << ",\"" << it->first << "\":"; // JSON Key
+
+				// Check if value is number
+				bool isNumber = true;
+				for (int i = 0; i < it->second.size(); i++) {
+					if (!((it->second[i] >= '0' && it->second[i] <= '9') || (it->second[i] == '.'))) { // Allow floating point numbers too
+						isNumber = false;
+						break;
+					}
+				}
+
+				if (isNumber) {
+					ssMeta << it->second; // JSON Number value (no quotes)
+				}
+				else {
+					ssMeta << "\"" << it->second << "\""; // JSON String value (with quotes)
+				}
+			}
+		}*/
+		//ssMeta << "}"; // Don't end the json array here, we want to add extra info in the case of pre-recording
+	}
+
 
 	Q_strncpyz( clc.demoName, demoName, sizeof( clc.demoName ) );
 
@@ -756,6 +1033,20 @@ void CL_Record_f( void ) {
 
 	MSG_WriteByte( &buf, svc_EOF );
 
+
+	if (cl_demoWriteMeta->integer) {
+		// Write metadata first
+		ssMeta << ",\"ost\":" << (int64_t)std::time(nullptr); // Original start time. When was demo recording started?
+		ssMeta << "}"; // End JSON object
+		if (com_developer->integer > 1) {
+			Com_Printf("Writing demo metadata (default) ... ");
+		}
+		CL_WriteEmptyMessageWithMetadata(clc.reliableSequence, clc.demofile, ssMeta.str().c_str(), clc.serverMessageSequence - 2);
+		if (com_developer->integer > 1) {
+			Com_Printf("done, writing gamestate ... ");
+		}
+	}
+
 	// finished writing the gamestate stuff
 
 	// write the client num
@@ -776,6 +1067,8 @@ void CL_Record_f( void ) {
 
 	// the rest of the demo file will be copied from net messages
 }
+
+
 
 /*
 =======================================================================
@@ -2823,6 +3116,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 		else {
 			CL_WriteBufferedDemoMessages(qtrue); // Flush all messages (if any) in case cl_demoRecordBufferedReorder was deactivated and there's still something in the queue. Otherwise we might lose vital messages.
 			CL_WriteDemoMessage(msg, headerBytes, sequenceNumber);
+			CL_WriteClientUcmdDemoSaveback(qfalse, sequenceNumber);
 			clc.demoLastWrittenSequenceNumber = sequenceNumber;
 		}
 	}
@@ -3523,6 +3817,10 @@ void CL_Init( void ) {
 	// autorecord
 	cl_autoDemo = Cvar_Get ("cl_autoDemo", "0", CVAR_ARCHIVE | CVAR_GLOBAL );
 	cl_autoDemoFormat = Cvar_Get ("cl_autoDemoFormat", "%d_%t_%m", CVAR_ARCHIVE | CVAR_GLOBAL );
+
+	cl_ucmdDemoSave = Cvar_Get ("cl_ucmdDemoSave", "2", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
+	cl_ucmdDemoSaveMinCount = Cvar_Get ("cl_ucmdDemoSaveMinCount", "64", CVAR_ARCHIVE | CVAR_GLOBAL );
+	cl_demoWriteMeta = Cvar_Get ("cl_demoWriteMeta", "1", CVAR_ARCHIVE | CVAR_GLOBAL );
 
 	// mv cvars
 	mv_slowrefresh = Cvar_Get("mv_slowrefresh", "3", CVAR_ARCHIVE | CVAR_GLOBAL);
