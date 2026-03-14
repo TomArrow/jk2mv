@@ -963,7 +963,7 @@ void CL_Record_f( void ) {
 		ssMeta << "{";
 		ssMeta << "\"wr\":\"TommyTernal_Client\""; // Writer (keyword used by other tools too to identify origin of demo)
 		if (cl_ucmdDemoSave->integer) {
-			ssMeta << ",\"clucmdsv\":\"" << cl_ucmdDemoSave->integer << "\"";
+			ssMeta << ",\"clucmdsv\":" << cl_ucmdDemoSave->integer;
 		}
 
 		// Go through manually set metadata and add it.
