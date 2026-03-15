@@ -76,6 +76,7 @@ typedef struct {
 	int		p_cmdNumber;		// cl.cmdNumber when packet was sent
 	int		p_serverTime;		// usercmd->serverTime when packet was sent
 	int		p_realtime;			// cls.realtime when packet was sent
+	int		p_reliableSequence;	// clc.reliableSequence when packet was sent
 } outPacket_t;
 
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
@@ -188,6 +189,15 @@ typedef struct {
 		int lastDeltaTime; // we save a sample once every 1/10 s. So 10 seconds will fill up our sample buffer
 		int medianValue;
 	} serverTimeDeltaSmooth;
+	
+	// for clientside usercmd writing to demos
+	struct {
+#define PINGCONSUMER_CLUCMDDEMOWRITE 1
+		int			have;		// bitmask. we may wanna use the ping value only once, so each consumer can unset the relevant bit for itself
+		int			val;		// value
+		int			src;		// 1 = snapshot, 2 = cmd acknowledge
+		int			realtimegot;// when we got this info
+	} pingInfo;
 } clientActive_t;
 
 extern	clientActive_t		cl;

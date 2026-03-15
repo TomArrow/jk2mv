@@ -1001,6 +1001,13 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;
 		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime ) {
 			cl.snap.ping = cls.realtime - cl.outPackets[ packetNum ].p_realtime;
+			if (cl.playerCommandTimeValid) {
+				cl.pingInfo.have = ~0; // set all bits
+				cl.pingInfo.val = cls.realtime - cl.outPackets[packetNum].p_realtime;
+				cl.pingInfo.realtimegot = cls.realtime;
+				cl.pingInfo.src = 1;
+				//Com_Printf("ping from snapshot: %d\n",cl.pingInfo.val);
+			}
 			break;
 		}
 	}
@@ -1588,6 +1595,7 @@ CL_ParseServerMessage
 void CL_ParseServerMessage( msg_t *msg ) {
 	int			cmd;
 	qboolean	forceEnd = qfalse;
+	int			reliableAcknowledge;
 
 	if ( cl_shownet->integer == 1 ) {
 		Com_Printf ("%i ",msg->cursize);
@@ -1598,7 +1606,32 @@ void CL_ParseServerMessage( msg_t *msg ) {
 	MSG_Bitstream(msg);
 
 	// get the reliable sequence acknowledge number
-	clc.reliableAcknowledge = MSG_ReadLong( msg );
+	reliableAcknowledge = MSG_ReadLong(msg);
+	if (clc.reliableAcknowledge != reliableAcknowledge) {
+		int			i, packetNum;
+		// got an update
+		// calculate ping time
+		// because snapshot ping is only accurate if we aren't following anyone.
+		for (i = 0; i < PACKET_BACKUP; i++) {
+			packetNum = (clc.netchan.outgoingSequence - PACKET_BACKUP + i) & PACKET_MASK;
+			if (cl.outPackets[packetNum].p_reliableSequence == reliableAcknowledge) {
+				if (i == 0) {
+					break; // correct number, however it's at the far end of the circular buffer, so it may have already been sent earlier. Hence we can't make use of it.
+				}
+				else {
+					cl.pingInfo.have = ~0; // set all bits
+					cl.pingInfo.val = cls.realtime - cl.outPackets[packetNum].p_realtime;
+					cl.pingInfo.realtimegot = cls.realtime;
+					cl.pingInfo.src = 2;
+					//Com_Printf("ping from cmd: %d\n", cl.pingInfo.val);
+					break;
+				}
+			}
+		}
+	}
+	clc.reliableAcknowledge = reliableAcknowledge;
+
+
 	//
 	if ( clc.reliableAcknowledge < clc.reliableSequence - MAX_RELIABLE_COMMANDS ) {
 		clc.reliableAcknowledge = clc.reliableSequence;

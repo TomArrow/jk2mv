@@ -1524,8 +1524,16 @@ void CL_WritePacket( void ) {
 		umsg->clientNum = clc.clientNum;
 		oldPacketNum = (clc.netchan.outgoingSequence-1) & PACKET_MASK;
 		umsgLastUcmd = oldPacketNum < 0 ? -1 : cl.outPackets[oldPacketNum].p_cmdNumber;
-		//umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
-		umsg->pingKnown = qfalse;
+		if (cl.pingInfo.have & PINGCONSUMER_CLUCMDDEMOWRITE) {
+			if ((cls.realtime - cl.pingInfo.realtimegot) < 10000) { // don't use totally outdated info?
+				umsg->pingKnown = qtrue;
+				umsg->ping = cl.pingInfo.val;
+			}
+			cl.pingInfo.have &= ~PINGCONSUMER_CLUCMDDEMOWRITE; // we only wanna use each value once. why waste space
+		}
+		else {
+			umsg->pingKnown = qfalse;
+		}
 	}
 	clc.netchan.droppedSinceClear = 0;
 
@@ -1656,6 +1664,7 @@ void CL_WritePacket( void ) {
 	cl.outPackets[ packetNum ].p_realtime = cls.realtime;
 	cl.outPackets[ packetNum ].p_serverTime = oldcmd->serverTime;
 	cl.outPackets[ packetNum ].p_cmdNumber = cl.cmdNumber;
+	cl.outPackets[ packetNum ].p_reliableSequence = clc.reliableSequence;
 	clc.lastPacketSentTime = cls.realtime;
 
 	if ( cl_showSend->integer ) {
