@@ -77,7 +77,7 @@ extern cvar_t *com_deadRampFix;
 extern cvar_t *com_deadRampFixedCount;
 extern cvar_t * com_placebo;
 
-#if defined(_WIN32) && !defined(DEDICATED)
+#if defined(_WIN32) && !defined(DEDICATED) && !defined(FOR_WINXP)
 #define MONITORSTATUS_MAYBE_KNOWABLE 1
 #endif
 

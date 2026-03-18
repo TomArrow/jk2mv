@@ -174,7 +174,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{github.workspace}}/build/actions
-      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF
+      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF -DFOR_WINXP=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build/actions
@@ -284,7 +284,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{github.workspace}}/build/actions
-      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF
+      run: cmake $GITHUB_WORKSPACE -A ${{ matrix.arch }} -T v141_xp -DBuildPortableVersion=ON -DWITH_MARIADB=OFF -DWITH_BCRYPT=OFF -DFOR_WINXP=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build/actions

@@ -45,6 +45,7 @@ endif()
 # Customizable options
 option(WITH_MARIADB "Include MariaDB support (doesn't work on WinXP)" ON)
 option(WITH_BCRYPT "Use Windows Bcrypt API (doesn't work on WinXP)" ON)
+option(FOR_WINXP "Disable all features that Windows XP doesn't provide'" OFF)
 option(BuildPortableVersion "Build portable version (does not read or write files from your user/home directory" ON)
 option(BuildMVMP "Whether to create targets for the client (eternaljk2mvmp & eternaljk2mvmenu)" ON)
 option(BuildMVDED "Whether to create targets for the dedicated server (eternaljk2mvded)" ON)
@@ -377,12 +378,16 @@ endif()
 
 add_subdirectory(libs/mongoose)
 
-if(WITH_BCRYPT)
+if(WITH_BCRYPT AND NOT FOR_WINXP)
 	set(GlobalDefines ${GlobalDefines} "WITH_BCRYPT")
 endif()
 
+if(FOR_WINXP)
+	set(GlobalDefines ${GlobalDefines} "FOR_WINXP")
+endif()
+
 # MariaDB
-if(WITH_MARIADB)
+if(WITH_MARIADB AND NOT FOR_WINXP)
 	#options to override option definitions inside
 	option(IGNORE_PACKAGING "" ON) # dont let mariadb packaging interferre with our own
 	option(ALL_PLUGINS_STATIC "" ON)
