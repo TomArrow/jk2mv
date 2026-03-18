@@ -96,6 +96,8 @@ cvar_t	*cl_framerate;
 cvar_t	*cl_logChat;
 cvar_t	*cl_idrive; //JAPRO ENGINE
 
+cvar_t	*cl_mirror;
+
 cvar_t *cl_colorString;
 cvar_t *cl_colorStringCount;
 cvar_t *cl_colorStringRandom;
@@ -3846,6 +3848,8 @@ void CL_Init( void ) {
 	cl_colorStringRandom = Cvar_Get("cl_colorStringRandom", "2", CVAR_ARCHIVE|CVAR_GLOBAL/*, "Randomness of the colors changing, higher numbers are less random"*/);
 
 	cl_logChat = Cvar_Get("cl_logChat", "1", CVAR_ARCHIVE|CVAR_GLOBAL);
+
+	cl_mirror = Cvar_Get("cl_mirror", "0", CVAR_TEMP); // cvar_userinfo so we can see what the player sees
 
 	// Update cl flags userinfo
 	MV_UpdateClFlags();

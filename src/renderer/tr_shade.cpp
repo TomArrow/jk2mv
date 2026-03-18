@@ -1771,6 +1771,10 @@ void RB_EndSurface( void ) {
 		backEnd.pc.c_totalIndexes += tess.numIndexes;
 	}
 
+	if (backEnd.refdef.mirroredGameplay) {
+		qglFrontFace(GL_CW);
+	}
+
 	//
 	// call off to shader specific tess end function
 	//
@@ -1787,6 +1791,8 @@ void RB_EndSurface( void ) {
 	}
 	// clear shader so we can tell we don't have any unclosed surfaces
 	tess.numIndexes = 0;
+
+	qglFrontFace(GL_CCW);
 
 	GLimp_LogComment( "----------\n" );
 }

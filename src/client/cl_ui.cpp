@@ -879,7 +879,7 @@ intptr_t CL_UISystemCalls(intptr_t *args) {
 		return 0;
 
 	case UI_R_RENDERSCENE:
-		re.RenderScene( VMAV(1, const refdef_t) );
+		re.RenderScene( VMAV(1, const refdef_t), qfalse);
 		return 0;
 
 	case UI_R_SETCOLOR:

@@ -468,8 +468,8 @@ void CL_AdjustAngles( qboolean temporaryViewAnglesOnly = qfalse) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right, temporaryViewAnglesOnly);
-		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left, temporaryViewAnglesOnly);
+		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right, temporaryViewAnglesOnly)*(cl_mirror->integer ? -1.0f:1.0f);
+		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left, temporaryViewAnglesOnly)*(cl_mirror->integer ? -1.0f : 1.0f);
 	}
 
 	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup, temporaryViewAnglesOnly);
@@ -652,7 +652,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE];
+		cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE]*(cl_mirror->integer ? -1.0f : 1.0f);
 	} else {
 		cmd->rightmove = ClampChar( cmd->rightmove + cl.joystickAxis[AXIS_SIDE] );
 	}
@@ -711,7 +711,7 @@ void CL_MouseMove( usercmd_t *cmd, qboolean temporaryViewAnglesOnly = qfalse) {
 	if ( in_strafe.active ) {
 		cmd->rightmove = ClampChar( cmd->rightmove + m_side->value * mx );
 	} else {
-		cl.viewangles[YAW] -= m_yaw->value * mx;
+		cl.viewangles[YAW] -= m_yaw->value * mx * (cl_mirror->integer ? -1.0f : 1.0f);
 	}
 
 	if ( (in_mlooking || cl_freelook->integer) && !in_strafe.active ) {
@@ -946,6 +946,10 @@ usercmd_t CL_CreateCmdReal(qboolean temporaryViewAnglesOnly = qfalse) {
 
 		// Just doing a temporary cmd for view angles, restore everything to old state.
 		VectorCopy(oldAngles, cl.viewangles);
+	}
+
+	if (cl_mirror->integer) {
+		cmd.rightmove = -cmd.rightmove;
 	}
 
 	return cmd;

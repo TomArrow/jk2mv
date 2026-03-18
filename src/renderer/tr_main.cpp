@@ -520,6 +520,10 @@ void R_SetupProjection( void ) {
 	tr.viewParms.projectionMatrix[7] = 0;
 	tr.viewParms.projectionMatrix[11] = -1;
 	tr.viewParms.projectionMatrix[15] = 0;
+
+	if (tr.refdef.mirroredGameplay) {
+		tr.viewParms.projectionMatrix[0] = -tr.viewParms.projectionMatrix[0];
+	}
 }
 
 /*

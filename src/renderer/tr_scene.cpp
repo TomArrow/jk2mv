@@ -402,7 +402,7 @@ Rendering a scene may require multiple views to be rendered
 to handle mirrors,
 @@@@@@@@@@@@@@@@@@@@@
 */
-void RE_RenderScene( const refdef_t *fd ) {
+void RE_RenderScene( const refdef_t *fd, qboolean mirror ) {
 	viewParms_t		parms;
 	int				startTime;
 	float			xscale, yscale;
@@ -436,6 +436,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 	tr.refdef.height = (int)roundf(fd->height * yscale);
 	tr.refdef.fov_x = fd->fov_x;
 	tr.refdef.fov_y = fd->fov_y;
+	tr.refdef.mirroredGameplay = mirror;
 
 	VectorCopy( fd->vieworg, tr.refdef.vieworg );
 	VectorCopy( fd->viewaxis[0], tr.refdef.viewaxis[0] );

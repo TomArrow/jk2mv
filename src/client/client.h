@@ -621,6 +621,8 @@ extern	cvar_t	*cl_logChat;
 extern	cvar_t	*cl_idrive;//JAPRO ENGINE
 extern	cvar_t	*cl_commandsize;//JAPRO ENGINE
 
+extern	cvar_t	*cl_mirror;
+
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
 extern	cvar_t	*cl_aviMotionJpeg;

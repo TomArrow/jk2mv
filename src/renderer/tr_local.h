@@ -581,6 +581,8 @@ typedef struct {
 	struct drawSurf_s	*drawSurfs;
 
 	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
+
+	qboolean	mirroredGameplay; // we are mirroring the display
 } trRefdef_t;
 
 
@@ -1781,7 +1783,7 @@ void RE_AddMiniRefEntityToScene( const miniRefEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
-void RE_RenderScene( const refdef_t *fd );
+void RE_RenderScene( const refdef_t *fd, qboolean mirror);
 
 /*
 =============================================================

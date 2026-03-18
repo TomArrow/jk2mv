@@ -1119,7 +1119,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		re.AddAdditiveLightToScene( VMAP(1, const vec_t, 3), VMF(2), VMF(3), VMF(4), VMF(5) );
 		return 0;
 	case CG_R_RENDERSCENE:
-		re.RenderScene( VMAV(1, const refdef_t) );
+		re.RenderScene( VMAV(1, const refdef_t), (qboolean)(cl_mirror->integer));
 		return 0;
 	case CG_R_SETCOLOR:
 		re.SetColor( VMAP(1, vec_t, 4) );
