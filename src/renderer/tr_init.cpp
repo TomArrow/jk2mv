@@ -927,6 +927,10 @@ void R_ScreenShot_f (void) {
 	tr.screenshotJPEGSilent = (qboolean)(silent || com_silentScreenshots->integer);
 }
 
+void R_DumpVerts_f (void) {
+	tr.dumpVerts = 2;
+}
+
 //============================================================================
 
 /*
@@ -1315,6 +1319,7 @@ Ghoul2 Insert End
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );
 	ri.Cmd_AddCommand( "screenshot_tga", R_ScreenShotTGA_f );
+	ri.Cmd_AddCommand( "dumpverts", R_DumpVerts_f);
 	ri.Cmd_AddCommand( "gfxinfo", GfxInfo_f );
 	ri.Cmd_AddCommand("r_we", R_WorldEffect_f);
 	ri.Cmd_AddCommand( "imagecacheinfo", RE_RegisterImages_Info_f);

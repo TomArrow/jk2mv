@@ -572,6 +572,10 @@ void RE_SwapBuffers( int *frontEndMsec, int *backEndMsec ) {
 		RE_TakeLevelshot(tr.levelshotName);
 	}
 
+	if (tr.dumpVerts > 0) {
+		tr.dumpVerts--;
+	}
+
 	cmd = (swapBuffersCommand_t *)R_GetCommandBufferReserved( sizeof( *cmd ), 0 );
 	if (!cmd) {
 		return;

@@ -1759,6 +1759,19 @@ void RB_EndSurface( void ) {
 		return;
 	}
 
+	if (tr.dumpVerts) {
+		int i;
+		Com_Printf("Shader: %s, %d indexes, %d verts\n",tess.shader->name,tess.numIndexes,tess.numVertexes);
+		Com_Printf("Indexes: \n");
+		for (i = 0; i < tess.numIndexes; i++) {
+			Com_Printf("Index %d: vert %d, xyz %f %f %f \n", i,tess.indexes[i], tess.xyz[tess.indexes[i]][0], tess.xyz[tess.indexes[i]][1], tess.xyz[tess.indexes[i]][2]);
+		}
+		Com_Printf("Vertices: \n");
+		for (i = 0; i < tess.numVertexes; i++) {
+			Com_Printf("Vert %d: xyz %f %f %f \n", i, tess.xyz[i][0], tess.xyz[i][1], tess.xyz[i][2]);
+		}
+	}
+
 	//
 	// update performance counters
 	//

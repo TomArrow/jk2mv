@@ -1173,6 +1173,8 @@ typedef struct {
 	char					screenshotJPEGName[MAX_OSPATH];
 	int						screenshotJPEGQuality;
 
+	int						dumpVerts;
+
 	qboolean				levelshot;
 	char					levelshotName[MAX_OSPATH];
 
