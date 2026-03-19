@@ -474,6 +474,9 @@ void RB_BeginSurface( shader_t *shader, int fogNum ) {
 		tess.shaderTime = tess.shader->clampTime;
 	}
 
+	if (tr.dumpVerts) {
+		Com_Printf("Shader begin: %s\n", tess.shader->name);
+	}
 
 }
 

@@ -1474,6 +1474,9 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 
 	for ( i = 0, v = surf->points[0], ndx = tess.numVertexes; i < numPoints; i++, v += VERTEXSIZE, ndx++ )
 	{
+		if (tr.dumpVerts) {
+			Com_Printf("RB_SurfaceFace VertIndex %d Vert %f %f %f\n", i, v[0], v[1], v[2]);
+		}
 		VectorCopy( v, tess.xyz[ndx]);
 		tess.texCoords[0][ndx][0] = v[3];
 		tess.texCoords[0][ndx][1] = v[4];
