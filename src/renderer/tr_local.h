@@ -747,11 +747,11 @@ typedef struct {
 	int			numPoints;
 	int			numIndices;
 	int			ofsIndices;
+	int			flags;
+	int			contents;
 	float		points[1][VERTEXSIZE];	// variable sized
 										// there is a variable length list of indices here also
 
-	int			flags;
-	int			contents;
 } srfSurfaceFace_t;
 
 
