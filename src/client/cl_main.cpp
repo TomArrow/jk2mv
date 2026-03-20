@@ -92,6 +92,8 @@ cvar_t	*cl_serverStatusResendTime;
 cvar_t	*cl_trn;
 cvar_t	*cl_framerate;
 
+cvar_t	*cl_traceBenchmark;
+
 //EternalJK2MV
 cvar_t	*cl_logChat;
 cvar_t	*cl_idrive; //JAPRO ENGINE
@@ -3752,6 +3754,8 @@ void CL_Init( void ) {
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 	cl_framerate	= Cvar_Get ("cl_framerate", "0", CVAR_TEMP);
 	mv_allowDownload = Cvar_Get("mv_allowDownload", "1", CVAR_ARCHIVE | CVAR_GLOBAL); // renamed so old configs do not override
+
+	cl_traceBenchmark = Cvar_Get("cl_traceBenchmark", "0", CVAR_TEMP);
 
 	cl_autolodscale = Cvar_Get("cl_autolodscale", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 

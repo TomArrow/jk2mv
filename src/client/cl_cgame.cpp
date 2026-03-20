@@ -1,7 +1,7 @@
 // cl_cgame.c  -- client system interaction with client game
 
 #include "client.h"
-
+#include <chrono>
 #include "../game/botlib.h"
 
 #if !defined(FX_EXPORT_H_INC)
@@ -785,6 +785,49 @@ static void CL_CloseLog(fileHandle_t *f) {
 	*f = ((fileHandle_t)0); //NULL_FILE;
 }
 
+#define BENCH_TRACES_PER_ITER 100
+static void CL_TraceBenchMark(const refdef_t* fd) { 
+
+	traceCustomization_t custom = { };
+	trace_t trace;
+	vec3_t org,to,orgVar;
+	VectorCopy(fd->vieworg,org);
+
+	VectorMA(org, 99999.0f, fd->viewaxis[0], to);
+	
+	// find target
+	CM_BoxTrace(&trace,org,to,NULL,NULL,0,MASK_SOLID,qfalse,&custom);
+
+	VectorCopy(trace.endpos,to);
+
+	Com_Printf("Tracing from %f %f %f to %f %f %f: ",org[0],org[1],org[2],to[0],to[1],to[2]);
+
+	double totalTime = 0;
+	size_t totalTraces = 0;
+	auto start = std::chrono::high_resolution_clock::now();
+	do {
+		auto now = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < BENCH_TRACES_PER_ITER; i++) {
+			VectorCopy(org, orgVar);
+			org[0] += i % 3; // random, to have variation
+			org[1] += i % 5;
+			org[2] += i % 7;
+			CM_BoxTrace(&trace, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
+		}
+		totalTraces += BENCH_TRACES_PER_ITER;
+		std::chrono::duration<double, std::milli> ms = now-start;
+		if (ms.count() > (double)cl_traceBenchmark->value) {
+			totalTime = ms.count();
+			break;
+		}
+	} while (1);
+
+	double tracesPerMs = (double)totalTraces / totalTime;
+	Com_Printf("%f traces per ms\n",(float)tracesPerMs);
+
+}
+
 /*
 ====================
 CL_CM_LoadMap
@@ -1119,6 +1162,9 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		re.AddAdditiveLightToScene( VMAP(1, const vec_t, 3), VMF(2), VMF(3), VMF(4), VMF(5) );
 		return 0;
 	case CG_R_RENDERSCENE:
+		if (cl_traceBenchmark->value != 0.0f) {
+			CL_TraceBenchMark(VMAV(1, const refdef_t));
+		}
 		re.RenderScene( VMAV(1, const refdef_t), (qboolean)(cl_mirror->integer));
 		return 0;
 	case CG_R_SETCOLOR:
