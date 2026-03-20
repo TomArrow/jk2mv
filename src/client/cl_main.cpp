@@ -93,6 +93,7 @@ cvar_t	*cl_trn;
 cvar_t	*cl_framerate;
 
 cvar_t	*cl_traceBenchmark;
+cvar_t	*cl_traceBenchmarkTimeLimitMs;
 
 //EternalJK2MV
 cvar_t	*cl_logChat;
@@ -3756,6 +3757,7 @@ void CL_Init( void ) {
 	mv_allowDownload = Cvar_Get("mv_allowDownload", "1", CVAR_ARCHIVE | CVAR_GLOBAL); // renamed so old configs do not override
 
 	cl_traceBenchmark = Cvar_Get("cl_traceBenchmark", "0", CVAR_TEMP);
+	cl_traceBenchmarkTimeLimitMs = Cvar_Get("cl_traceBenchmarkTimeLimitMs", "1.0", CVAR_TEMP);
 
 	cl_autolodscale = Cvar_Get("cl_autolodscale", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 

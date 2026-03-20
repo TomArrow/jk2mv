@@ -648,6 +648,7 @@ extern	cvar_t	*cl_demoWriteMeta;
 extern	cvar_t	*cl_numpadNumberBinds;
 
 extern	cvar_t	*cl_traceBenchmark;
+extern	cvar_t	*cl_traceBenchmarkTimeLimitMs;
 
 //=================================================
 

@@ -795,8 +795,20 @@ static void CL_TraceBenchMark(const refdef_t* fd) {
 
 	VectorMA(org, 99999.0f, fd->viewaxis[0], to);
 	
+
+
 	// find target
-	CM_BoxTrace(&trace,org,to,NULL,NULL,0,MASK_SOLID,qfalse,&custom);
+	CM_BoxTrace(&trace, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
+	VectorCopy(trace.endpos, to);
+
+	if (cl_traceBenchmark->integer == 2) {
+		vec3_t mins = {-100,-100,-100};
+		vec3_t maxs = {100,100,100};
+		custom.traceCustomFlags |= TRACECUSTOMFLAG_MARKBRUSHES;
+		CM_BoxTrace(&trace, org, to, mins, maxs, 0, MASK_SOLID, qfalse, &custom);
+		custom.traceCustomFlags &= ~TRACECUSTOMFLAG_MARKBRUSHES;
+		custom.traceCustomFlags |= TRACECUSTOMFLAG_WALKBRUSHES;
+	}
 
 	VectorCopy(trace.endpos,to);
 
@@ -810,14 +822,14 @@ static void CL_TraceBenchMark(const refdef_t* fd) {
 
 		for (int i = 0; i < BENCH_TRACES_PER_ITER; i++) {
 			VectorCopy(org, orgVar);
-			org[0] += i % 3; // random, to have variation
-			org[1] += i % 5;
-			org[2] += i % 7;
+			org[0] += 10*(i % 3); // random, to have variation
+			org[1] += 10*(i % 5);
+			org[2] += 10*(i % 7);
 			CM_BoxTrace(&trace, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
 		}
 		totalTraces += BENCH_TRACES_PER_ITER;
 		std::chrono::duration<double, std::milli> ms = now-start;
-		if (ms.count() > (double)cl_traceBenchmark->value) {
+		if (ms.count() > (double)cl_traceBenchmarkTimeLimitMs->value) {
 			totalTime = ms.count();
 			break;
 		}
@@ -1162,7 +1174,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		re.AddAdditiveLightToScene( VMAP(1, const vec_t, 3), VMF(2), VMF(3), VMF(4), VMF(5) );
 		return 0;
 	case CG_R_RENDERSCENE:
-		if (cl_traceBenchmark->value != 0.0f) {
+		if (cl_traceBenchmark->integer) {
 			CL_TraceBenchMark(VMAV(1, const refdef_t));
 		}
 		re.RenderScene( VMAV(1, const refdef_t), (qboolean)(cl_mirror->integer));

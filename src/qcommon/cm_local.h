@@ -34,13 +34,14 @@ typedef struct {
 	int			damage;
 } cbrushside_t;
 
-typedef struct {
+typedef struct cbrush_s {
 	int			shaderNum;		// the shader that determined the contents
 	int			contents;
 	vec3_t		bounds[2];
 	int			numsides;
 	cbrushside_t	*sides;
 	int			checkcount;		// to avoid repeated testings
+	struct cbrush_s* nextMarkedBrush;
 } cbrush_t;
 
 class CCMShader
@@ -128,6 +129,9 @@ typedef struct {
 
 	int			boxModelHandle;
 	int			capsuleModelHandle;
+
+	int			numMarkedBrushes;
+	cbrush_t*	markedBrushes;
 } clipMap_t;
 
 

@@ -209,6 +209,13 @@ void CM_TestBoxInBrush( traceWork_t *tw, cbrush_t *brush ) {
 		}
 	}
 
+   if (tw->traceCustomizationFlags & TRACECUSTOMFLAG_MARKBRUSHES) {
+	   brush->nextMarkedBrush = cm.markedBrushes;
+	   cm.markedBrushes = brush;
+	   cm.numMarkedBrushes++;
+	   return;
+   }
+
 	// inside this brush
 	tw->trace.startsolid = tw->trace.allsolid = qtrue;
 	tw->trace.fraction = 0;
@@ -619,6 +626,12 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 	// completely outside the brush
 	//
 	if (!startout) {	// original point was inside brush
+		if (tw->traceCustomizationFlags & TRACECUSTOMFLAG_MARKBRUSHES) {
+			brush->nextMarkedBrush = cm.markedBrushes;
+			cm.markedBrushes = brush;
+			cm.numMarkedBrushes++;
+			return;
+		}
 		tw->trace.startsolid = qtrue;
 		if (!getout) {
 			tw->trace.allsolid = qtrue;
@@ -630,6 +643,12 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 
 	if (enterFrac < leaveFrac) {
 		if (enterFrac > -1 && enterFrac < tw->trace.fraction) {
+			if (tw->traceCustomizationFlags & TRACECUSTOMFLAG_MARKBRUSHES) {
+				brush->nextMarkedBrush = cm.markedBrushes;
+				cm.markedBrushes = brush;
+				cm.numMarkedBrushes++;
+				return;
+			}
 			if (enterFrac < 0) {
 				enterFrac = 0;
 			}
@@ -1152,6 +1171,11 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 	tw.trace.fraction = 1;	// assume it goes the entire distance until shown otherwise
 	VectorCopy(origin, tw.modelOrigin);
 
+	if (!(traceCustomization->traceCustomFlags & TRACECUSTOMFLAG_WALKBRUSHES) || (traceCustomization->traceCustomFlags & TRACECUSTOMFLAG_MARKBRUSHES)) {
+		cm.markedBrushes = NULL;
+		cm.numMarkedBrushes = 0;
+	}
+
 	if (!cm.numNodes) {
 		*results = tw.trace;
 
@@ -1252,6 +1276,37 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 		}
 	}
 
+	// quick trace through marked brushes - EXPERIMENTAL
+	if (traceCustomization->traceCustomFlags & TRACECUSTOMFLAG_WALKBRUSHES) {
+		if (start[0] == end[0] && start[1] == end[1] && start[2] == end[2]) {
+			cbrush_t* nextTest = cm.markedBrushes;
+			while (nextTest) {
+				CM_TestBoxInBrush(&tw,nextTest);
+				nextTest->checkcount = cm.checkcount;
+				nextTest = nextTest->nextMarkedBrush;
+			}
+		}
+		else {
+			if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0) {
+				tw.isPoint = qtrue;
+				VectorClear(tw.extents);
+			}
+			else {
+				tw.isPoint = qfalse;
+				tw.extents[0] = tw.size[1][0];
+				tw.extents[1] = tw.size[1][1];
+				tw.extents[2] = tw.size[1][2];
+			}
+			cbrush_t* nextTest = cm.markedBrushes;
+			while (nextTest) {
+				CM_TraceThroughBrush(&tw, nextTest);
+				nextTest->checkcount = cm.checkcount;
+				nextTest = nextTest->nextMarkedBrush;
+			}
+		}
+		goto tracedone;
+	}
+
 	//
 	// check for position test special case
 	//
@@ -1328,6 +1383,8 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 			CM_TraceThroughTree( &tw, 0, 0, 1, tw.start, tw.end );
 		}
 	}
+
+	tracedone:
 
 	// generate endpos from the original, unmodified start/end
 	if ( tw.trace.fraction == 1 ) {
