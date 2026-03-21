@@ -704,8 +704,8 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 	}
 
 	colorBits = r_colorbits->integer;
-	if ((!colorBits) || (colorBits >= 32))
-		colorBits = 24;
+	if ((!colorBits) || (colorBits >= 32 && colorBits != 36))
+		colorBits = 30;
 
 	if (!r_depthbits->integer)
 		depthBits = 24;
@@ -717,7 +717,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 
 	if ( windowDesc->api == GRAPHICS_API_OPENGL )
 	{
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < 6*4; i++)
 		{
 			int testColorBits, testDepthBits, testStencilBits;
 
@@ -731,7 +731,13 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 				switch (i / 4)
 				{
 					case 2 :
-						if (colorBits == 24)
+					case 3 :
+					case 4 :
+						if (colorBits == 36)
+							colorBits = 30;
+						else if (colorBits == 30)
+							colorBits = 24;
+						else if (colorBits == 24)
 							colorBits = 16;
 						break;
 					case 1 :
@@ -739,7 +745,7 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 							depthBits = 16;
 						else if (depthBits == 16)
 							depthBits = 8;
-					case 3 :
+					case 5 :
 						if (stencilBits == 24)
 							stencilBits = 16;
 						else if (stencilBits == 16)
@@ -753,7 +759,11 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 
 			if ((i % 4) == 3)
 			{ // reduce colorBits
-				if (testColorBits == 24)
+				if (testColorBits == 36)
+					testColorBits = 30;
+				else if (testColorBits == 30)
+					testColorBits = 24;
+				else if (testColorBits == 24)
 					testColorBits = 16;
 			}
 
@@ -775,7 +785,11 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 					testStencilBits = 0;
 			}
 
-			if (testColorBits == 24)
+			if (testColorBits == 36)
+				perChannelColorBits = 12;
+			else if (testColorBits == 30)
+				perChannelColorBits = 10;
+			else if (testColorBits == 24)
 				perChannelColorBits = 8;
 			else
 				perChannelColorBits = 4;

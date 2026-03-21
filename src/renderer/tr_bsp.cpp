@@ -121,6 +121,52 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	out[2] = b;
 }
 
+static	void R_ColorShiftLightingBytes3( const byte in[3], unsigned short out[3] ) {
+	int		shift=0;
+	int64_t	r, g, b;
+
+	// should NOT do it if overbrightBits is 0
+	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
+
+	if (!shift)
+	{
+		out[0] = (unsigned short)in[0] << 8;
+		out[1] = (unsigned short)in[1] << 8;
+		out[2] = (unsigned short)in[2] << 8;
+		return;
+	}
+
+	shift += 8;
+
+	// shift the data based on overbright range
+	if (shift < 0) {
+		shift = -shift;
+		r = (int)in[0] >> shift;
+		g = (int)in[1] >> shift;
+		b = (int)in[2] >> shift;
+	}
+	else {
+		r = (int)in[0] << shift;
+		g = (int)in[1] << shift;
+		b = (int)in[2] << shift;
+	}
+
+	// normalize by color instead of saturating to white
+	if ( ( r | g | b ) > 65535 ) {
+		int		max;
+
+		max = r > g ? r : g;
+		max = max > b ? max : b;
+		r = r * 65535 / max;
+		g = g * 65535 / max;
+		b = b * 65535 / max;
+	}
+
+	out[0] = r;
+	out[1] = g;
+	out[2] = b;
+}
+
 static	void R_ColorShiftLightingBytes( const byte in[4], byte out[4] ) {
 	R_ColorShiftLightingBytes3(in, out);
 	out[3] = in[3];
@@ -190,9 +236,9 @@ R_LoadLightmaps
 
 static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 	const byte		*buf, *buf_p;
-	int			len;
-	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*3];
-	int			i, j;
+	int				len;
+	unsigned short	image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*3];
+	int				i, j;
 	float maxIntensity = 0;
 	double sumIntensity = 0;
 
@@ -230,7 +276,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 	// create empty lightmap atlases
 	int numberOfAtlases = ceil(tr.numLightmaps / (float)LIGHTMAPS_PER_ATLAS);
 	byte *emptyAtlas = (byte*)ri.Hunk_AllocateTempMemory(LIGHTMAP_ATLAS_SIZE * LIGHTMAP_ATLAS_SIZE * 3);
-	for (i = 0; i < numberOfAtlases; i++)
+	for (i = 0; i < numberOfAtlases; i++) {
 		tr.lightmaps[i] = R_CreateImage(
 			va("*%s/lmAtlas%d", sMapName, i),
 			emptyAtlas,
@@ -240,6 +286,17 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			(qboolean)!!r_ext_compressed_lightmaps->integer,
 			GL_CLAMP,
 			PXF_RGB);
+		if (glConfig.colorBits == 36) {
+			// reallocate as a 12 bit texture for nicer overbrights
+			GL_Bind(tr.lightmaps[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB12, LIGHTMAP_ATLAS_SIZE, LIGHTMAP_ATLAS_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		}
+		else if (glConfig.colorBits == 30) {
+			// reallocate as a 10 bit texture for nicer overbrights
+			GL_Bind(tr.lightmaps[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10, LIGHTMAP_ATLAS_SIZE, LIGHTMAP_ATLAS_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		}
+	}
 	ri.Hunk_FreeTempMemory(emptyAtlas);
 
 	for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
@@ -267,9 +324,9 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 
 				HSVtoRGB( intensity, 1.00, 0.50, out );
 
-				image[j*3+0] = out[0] * 255;
-				image[j*3+1] = out[1] * 255;
-				image[j*3+2] = out[2] * 255;
+				image[j*3+0] = out[0] * 65535;
+				image[j*3+1] = out[1] * 65535;
+				image[j*3+2] = out[2] * 65535;
 
 				sumIntensity += intensity;
 			}
@@ -296,7 +353,7 @@ static	void R_LoadLightmaps( lump_t *l, const char *psMapName ) {
 			LIGHTMAP_SIZE,
 			LIGHTMAP_SIZE,
 			GL_RGB,
-			GL_UNSIGNED_BYTE,
+			GL_UNSIGNED_SHORT,
 			image
 		);
 	}

@@ -1436,7 +1436,7 @@ const void *RB_GammaCorrection( const void *data )
 	GL_SelectTexture(0);
 	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
 	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, tr.sceneImage);
-	qglCopyTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, 0, 0, glConfig.vidWidth, glConfig.vidHeight, 0);
+	qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
 
 	GL_SelectTexture(1);
