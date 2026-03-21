@@ -704,8 +704,8 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 	}
 
 	colorBits = r_colorbits->integer;
-	if ((!colorBits) || (colorBits >= 32 && colorBits != 36))
-		colorBits = 30;
+	if ((!colorBits) || (colorBits >= 32 && colorBits != 30 && colorBits != 36))
+		colorBits = 24;
 
 	if (!r_depthbits->integer)
 		depthBits = 24;
