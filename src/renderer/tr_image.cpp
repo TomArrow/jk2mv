@@ -3693,6 +3693,7 @@ void R_SetColorMappings( void ) {
 		tr.overbrightBits = 0;
 	}
 
+	tr.overbrightBitsMultiplier = 1 << tr.overbrightBits;
 	tr.identityLight = 1.0f / ( 1 << tr.overbrightBits );
 	tr.identityLightByte = 255 * tr.identityLight;
 
@@ -3780,7 +3781,7 @@ R_InitImages
 */
 void	R_InitImages( void ) {
 	// gamma render target
-	if (r_gammamethod->integer == GAMMA_POSTPROCESSING && !r_gammabypass->integer) {
+	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
 		int gammaPostProcessingPrecision = MAX(2, MIN(r_gammaPostprocessingPrecision->integer, GAMMA_POSTPROCESSING_PRECISION_MAX));
 		qglEnable(GL_TEXTURE_3D);
 		tr.gammaLUTImage = 1024 + giTextureBindNum++;

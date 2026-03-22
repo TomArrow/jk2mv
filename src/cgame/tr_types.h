@@ -376,6 +376,7 @@ typedef struct {
 
 	// gamma correction
 	qboolean				deviceSupportsPostprocessingGamma;
+	qboolean				deviceSupportsPostprocessingGammaHDR;
 
 	//
 	// following variables can change every frame!

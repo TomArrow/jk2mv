@@ -4309,6 +4309,50 @@ const char *g_GammaPixelShaderARB = {
 	"END"
 };
 
+const char *g_HDRPixelShaderARB = {
+	"!!ARBfp1.0" "\n"
+	"PARAM c[7] = { program.local[0]," "\n"
+	"		{ 0.040449999, 0.055, 0.94786733, 2.4000001 }," "\n"
+	"		{ 0.077399381, 0.0099999998, 0.15930176, 18.851563 }," "\n"
+	"		{ 0.62744135, 0.32929745, 0.04335146, 0.8359375 }," "\n"
+	"		{ 0.069027618, 0.91958064, 0.011361423, 18.6875 }," "\n"
+	"		{ 0.016364235, 0.088017166, 0.89556497, 1 }," "\n"
+	"		{ 78.84375 } };" "\n"
+	"TEMP R0;" "\n"
+	"TEMP R1;" "\n"
+	"TEMP R2;" "\n"
+	"TEX R0.xyz, fragment.texcoord[0], texture[0], RECT;" "\n"
+	"MUL R1.xyz, R0, c[0].x;" "\n"
+	"ADD R0.xyz, R1, c[1].y;" "\n"
+	"MUL R2.xyz, R0, c[1].z;" "\n"
+	"ADD R0.xyz, R1, -c[1].x;" "\n"
+	"MUL R1.xyz, R1, c[2].x;" "\n"
+	"POW R2.x, R2.x, c[1].w;" "\n"
+	"POW R2.y, R2.y, c[1].w;" "\n"
+	"POW R2.z, R2.z, c[1].w;" "\n"
+	"CMP R0.xyz, -R0, R2, R1;" "\n"
+	"MUL R0.xyz, R0, c[2].y;" "\n"
+	"DP3 R0.w, R0, c[3];" "\n"
+	"POW R1.x, R0.w, c[2].z;" "\n"
+	"DP3 R0.w, R0, c[5];" "\n"
+	"DP3 R0.x, R0, c[4];" "\n"
+	"POW R1.y, R0.x, c[2].z;" "\n"
+	"POW R1.z, R0.w, c[2].z;" "\n"
+	"MUL R0.xyz, R1, c[4].w;" "\n"
+	"ADD R0.xyz, R0, c[5].w;" "\n"
+	"MUL R1.xyz, R1, c[2].w;" "\n"
+	"ADD R1.xyz, R1, c[3].w;" "\n"
+	"RCP R0.x, R0.x;" "\n"
+	"RCP R0.z, R0.z;" "\n"
+	"RCP R0.y, R0.y;" "\n"
+	"MUL R0.xyz, R1, R0;" "\n"
+	"POW result.color.x, R0.x, c[6].x;" "\n"
+	"POW result.color.y, R0.y, c[6].x;" "\n"
+	"POW result.color.z, R0.z, c[6].x;" "\n"
+	"MOV result.color.w, c[5];" "\n"
+	"END"
+};
+
 qboolean MV_GammaGenerateProgram() {
 	int err = 0;
 	assert(qglGenProgramsARB);
@@ -4326,6 +4370,21 @@ qboolean MV_GammaGenerateProgram() {
 	qglGenProgramsARB(1, &tr.gammaPixelShader);
 	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
 	qglProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, (int)strlen(g_GammaPixelShaderARB), g_GammaPixelShaderARB);
+	qglGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &err);
+	if (err != -1) {
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+qboolean R_GammaGenerateHDRProgram() {
+	int err = 0;
+
+	// pixel shader
+	qglGenProgramsARB(1, &tr.hdrPixelShader);
+	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.hdrPixelShader);
+	qglProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, (int)strlen(g_HDRPixelShaderARB), g_HDRPixelShaderARB);
 	qglGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &err);
 	if (err != -1) {
 		return qtrue;
@@ -4450,6 +4509,10 @@ static void CreateInternalShaders( void ) {
 			ri.Printf(PRINT_WARNING, "WARNING: failed initializing gamma program... falling back to hardware gamma correction\n");
 			glConfig.deviceSupportsPostprocessingGamma = qfalse;
 			r_gammamethod->integer = GAMMA_HARDWARE; // temporary fallback to hardware gamma
+		}
+		else if (R_GammaGenerateHDRProgram()) {
+			ri.Printf(PRINT_WARNING, "WARNING: failed initializing hdr program... HDR converstion won't be available\n");
+			glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
 		}
 	}
 #endif

@@ -1122,6 +1122,7 @@ typedef struct {
 	float					identityLight;		// 1.0 / ( 1 << overbrightBits )
 	int						identityLightByte;	// identityLight * 255
 	int						overbrightBits;		// r_overbrightBits->integer, but set to 0 if no hw gamma
+	int						overbrightBitsMultiplier;		// when doing HDR output, this will normalize brightness for us
 
 	orientationr_t			ori;					// for current entity
 
@@ -1179,7 +1180,7 @@ typedef struct {
 	char					levelshotName[MAX_OSPATH];
 
 	// gamma correction
-	GLuint gammaVertexShader, gammaPixelShader;
+	GLuint gammaVertexShader, gammaPixelShader, hdrPixelShader;
 	GLuint gammaLUTImage;
 
 	int						dynamicGlowWidth;
@@ -1279,6 +1280,7 @@ extern cvar_t	*r_allowResize;
 extern cvar_t	*r_gamma;
 extern cvar_t	*r_gammamethod;			// gamma correction
 extern cvar_t	*r_gammaPostprocessingPrecision;			// gamma correction precision (default jk2mv has 64)
+extern cvar_t	*r_gammaHDR;
 extern cvar_t	*r_gammabypass;			// bypass gamma rendering for HDR shenanigans
 extern cvar_t	*r_displayRefresh;		// optional display refresh option
 

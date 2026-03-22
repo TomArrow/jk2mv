@@ -538,7 +538,7 @@ This must be called when drawing is done after RE_BeginFrame
 =============
 */
 void RE_EndFrame( void ) {
-	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
+	if (r_gammamethod->integer == GAMMA_POSTPROCESSING && !r_gammabypass->integer) {
 		RE_GammaCorrection();
 	}
 }

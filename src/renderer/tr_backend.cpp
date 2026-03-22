@@ -1417,6 +1417,7 @@ RB_GammaCorrection
 */
 const void *RB_GammaCorrection( const void *data )
 {
+	bool doingHDR = r_gammaHDR->value != 0.0f && glConfig.deviceSupportsPostprocessingGammaHDR;
 	const gammaCorrectionCommand_t	*cmd;
 
 	cmd = (const gammaCorrectionCommand_t *)data;
@@ -1431,7 +1432,14 @@ const void *RB_GammaCorrection( const void *data )
 	qglEnable(GL_VERTEX_PROGRAM_ARB);
 	qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, tr.gammaVertexShader);
 	qglEnable(GL_FRAGMENT_PROGRAM_ARB);
-	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
+	if (doingHDR) {
+		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.hdrPixelShader);
+		float obbMult[4] = { tr.overbrightBitsMultiplier* r_gammaHDR->value, 0, 0, 0 };
+		qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, obbMult);
+	}
+	else {
+		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
+	}
 
 	GL_SelectTexture(0);
 	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
@@ -1439,9 +1447,11 @@ const void *RB_GammaCorrection( const void *data )
 	qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
 
-	GL_SelectTexture(1);
-	qglEnable(GL_TEXTURE_3D);
-	qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
+	if (!doingHDR) {
+		GL_SelectTexture(1);
+		qglEnable(GL_TEXTURE_3D);
+		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
+	}
 
 	qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	qglClear(GL_COLOR_BUFFER_BIT);
@@ -1463,8 +1473,10 @@ const void *RB_GammaCorrection( const void *data )
 	qglDisable(GL_VERTEX_PROGRAM_ARB);
 	qglDisable(GL_FRAGMENT_PROGRAM_ARB);
 
-	qglDisable(GL_TEXTURE_3D);
-	GL_SelectTexture(0);
+	if (!doingHDR) {
+		qglDisable(GL_TEXTURE_3D);
+		GL_SelectTexture(0);
+	}
 
 	return (const void *)(cmd + 1);
 }

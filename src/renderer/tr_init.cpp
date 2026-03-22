@@ -651,8 +651,10 @@ static void GLimp_InitExtensions(void) {
 		qglTexSubImage3D = (PFNGLTEXSUBIMAGE3DPROC)WIN_GL_GetProcAddress("glTexSubImage3D");
 #endif
 		glConfig.deviceSupportsPostprocessingGamma = qtrue;
+		glConfig.deviceSupportsPostprocessingGammaHDR = qtrue;
 	} else {
 		glConfig.deviceSupportsPostprocessingGamma = qfalse;
+		glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
 	}
 
 	// GL_EXT_texture_lod_bias
