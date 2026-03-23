@@ -496,6 +496,31 @@ if (BuildMVMP)
 			"${LIBDir}/SDL2/bin/${Architecture}/SDL2.dll"
 			$<TARGET_FILE_DIR:${MVMP}>
 		)
+	elseif(MINGW)
+		# copy over openal & sdl dll from sysroot
+		find_file(OPENAL32_DLL NAMES OpenAL32.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+		find_file(SDL2_DLL NAMES SDL2.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+		if(OPENAL32_DLL)
+			add_custom_command(TARGET ${MVMP} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"${OPENAL32_DLL}"
+				$<TARGET_FILE_DIR:${MVMP}>
+			)
+		endif()
+		if(SDL2_DLL)
+			add_custom_command(TARGET ${MVMP} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"${SDL2_DLL}"
+				$<TARGET_FILE_DIR:${MVMP}>
+			)
+		endif()
+		if(WINPTHREAD_DLL)
+			add_custom_command(TARGET ${MVMP} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"${WINPTHREAD_DLL}"
+				$<TARGET_FILE_DIR:${MVMP}>
+			)
+		endif()
 	endif()
 
 	target_compile_definitions(${MVMP}
@@ -518,6 +543,21 @@ if (BuildMVMP)
 		install(FILES "${LIBDir}/SDL2/bin/${Architecture}/SDL2.dll" DESTINATION ".")
 		if(NOT BuildPortableVersion)
 			install(FILES "${RESDir}/mv.ico" DESTINATION ".")
+		endif()
+	elseif(MINGW)
+		install(TARGETS ${MVMP} RUNTIME DESTINATION ".")
+		# Install OpenAL32.dll, SDL2.dll, and libwinpthread-1.dll from the cross-compilation sysroot
+		find_file(OPENAL32_DLL NAMES OpenAL32.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+		find_file(SDL2_DLL NAMES SDL2.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+		find_file(WINPTHREAD_DLL NAMES libwinpthread-1.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+		if(OPENAL32_DLL)
+			install(FILES "${OPENAL32_DLL}" DESTINATION ".")
+		endif()
+		if(SDL2_DLL)
+			install(FILES "${SDL2_DLL}" DESTINATION ".")
+		endif()
+		if(WINPTHREAD_DLL)
+			install(FILES "${WINPTHREAD_DLL}" DESTINATION ".")
 		endif()
 	elseif(APPLE AND NOT BuildPortableVersion)
 		install(TARGETS ${MVMP} BUNDLE DESTINATION ".")
@@ -615,7 +655,9 @@ if (BuildMVMP)
 	else()
 		if(WIN32)
 			install(TARGETS ${MVMENU} RUNTIME DESTINATION ".")
-			install(FILES $<TARGET_PDB_FILE:${MVMENU}> DESTINATION "." OPTIONAL)
+			if(MSVC)
+				install(FILES $<TARGET_PDB_FILE:${MVMENU}> DESTINATION "." OPTIONAL)
+			endif()
 		elseif(APPLE)
 			install(TARGETS ${MVMENU} LIBRARY DESTINATION "${MVMP}.app/Contents/MacOS")
 		else()
@@ -669,8 +711,13 @@ if (BuildMVDED)
 	# installation
 	if(WIN32 OR APPLE OR BuildPortableVersion)
 		install(TARGETS ${MVDED} RUNTIME DESTINATION ".")
-		if (WIN32)
+		if (MSVC)
 			install(FILES $<TARGET_PDB_FILE:${MVDED}> DESTINATION "." OPTIONAL)
+		elseif(MINGW)
+			find_file(WINPTHREAD_DLL NAMES libwinpthread-1.dll PATHS "${CMAKE_FIND_ROOT_PATH}/bin" NO_DEFAULT_PATH)
+			if(WINPTHREAD_DLL)
+				install(FILES "${WINPTHREAD_DLL}" DESTINATION ".")
+			endif()
 		endif()
 	else()
 		install(TARGETS ${MVDED} RUNTIME DESTINATION "bin")

@@ -326,6 +326,164 @@ jobs:
             }
           }
 
+
+  
+  mingw_xp: # thanks to nasty and his ai; in that breath, TODO this entry needs thorough review and cleanups, it's AI slop and might have hardcoded stuff that should be handled elsewhere, or have other issues
+    name: Build MinGW (Portable - WinXP), ${{ matrix.build_type }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install MinGW-w64 and dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64-tools nasm cmake zip
+        sudo update-alternatives --set i686-w64-mingw32-gcc /usr/bin/i686-w64-mingw32-gcc-posix
+        sudo update-alternatives --set i686-w64-mingw32-g++ /usr/bin/i686-w64-mingw32-g++-posix
+
+    - name: Download SDL2 MinGW development libraries
+      run: |
+        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.24.2/SDL2-devel-2.24.2-mingw.tar.gz
+        tar xzf SDL2-devel-2.24.2-mingw.tar.gz
+        sudo cp -r SDL2-2.24.2/i686-w64-mingw32/* /usr/i686-w64-mingw32/
+
+    - name: Install OpenAL for MinGW (bundled XP-compatible version)
+      run: |
+        sudo mkdir -p /usr/i686-w64-mingw32/include/AL /usr/i686-w64-mingw32/lib /usr/i686-w64-mingw32/bin
+        sudo cp libs/OpenAL/include/AL/* /usr/i686-w64-mingw32/include/AL/
+        sudo cp libs/OpenAL/bin/x86/OpenAL32.dll /usr/i686-w64-mingw32/bin/OpenAL32.dll
+        cd libs/OpenAL/bin/x86
+        gendef OpenAL32.dll
+        i686-w64-mingw32-dlltool -d OpenAL32.def -l libOpenAL32.dll.a -D OpenAL32.dll
+        sudo cp libOpenAL32.dll.a /usr/i686-w64-mingw32/lib/
+
+    - name: Copy MinGW runtime DLLs to sysroot
+      run: |
+        # Copy libwinpthread-1.dll so it gets bundled with the package
+        # Must find the i686 (32-bit) version specifically
+        WINPTHREAD=$(find /usr -name 'libwinpthread-1.dll' -path '*i686*' 2>/dev/null | head -1)
+        if [ -z "$WINPTHREAD" ]; then
+          # Fallback: look in the lib32 or mingw posix directory
+          WINPTHREAD=$(find /usr/lib/gcc/i686-w64-mingw32 -name 'libwinpthread-1.dll' 2>/dev/null | head -1)
+        fi
+        if [ -n "$WINPTHREAD" ]; then
+          echo "Found libwinpthread-1.dll at: $WINPTHREAD"
+          file "$WINPTHREAD"
+          sudo cp "$WINPTHREAD" /usr/i686-w64-mingw32/bin/
+        else
+          echo "WARNING: Could not find i686 libwinpthread-1.dll"
+          exit 1
+        fi
+
+    - name: Create Build Environment
+      run: mkdir -p ${{github.workspace}}/build/actions
+
+    - name: Patch submodule for MinGW compatibility
+      run: |
+        for f in src/mvsdk/code/ui/CMakeLists.txt src/mvsdk/code/cgame/CMakeLists.txt src/mvsdk/code/game/CMakeLists.txt; do
+          sed -i '/TARGET_PDB_FILE/d' "$f"
+        done
+
+    - name: Build QVMs using mvsdk
+      run: |
+        mkdir -p build/qvm-build
+        cd build/qvm-build
+        cmake -G "Unix Makefiles" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBuildQVMs=ON \
+          $GITHUB_WORKSPACE/src/mvsdk
+        make -j$(nproc) qvms
+
+    - name: Disable QVMs in cross-compile
+      run: |
+        # QVMs were built natively above; disable in cross-compile to avoid building .exe tools
+        sed -i 's/set(BuildQVMs ON)/set(BuildQVMs OFF)/' src/mvsdk/CMakeLists.txt
+
+    - name: Configure CMake
+      working-directory: ${{github.workspace}}/build/actions
+      run: |
+        cmake -G "Unix Makefiles" \
+          -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/tools/mingw-w64-i686.cmake \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBuildPortableVersion=ON \
+          -DWITH_MARIADB=OFF \
+          -DWITH_BCRYPT=OFF \
+          -DFOR_WINXP=ON \
+          -DUseInternalLibs=ON \
+          -DSDL2_INCLUDE_DIR=/usr/i686-w64-mingw32/include/SDL2 \
+          -DOPENAL_INCLUDE_DIR=/usr/i686-w64-mingw32/include \
+          $GITHUB_WORKSPACE
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/actions
+      run: make -j$(nproc)
+
+    - name: Package
+      working-directory: ${{github.workspace}}/build/actions
+      run: make package
+
+    - name: Add QVMs to package
+      working-directory: ${{github.workspace}}/build/actions
+      run: |
+        # Create jk2pro-bins.pk3 with QVMs from mvsdk build
+        mkdir -p /tmp/pk3build/vm
+        cp $GITHUB_WORKSPACE/build/qvm-build/code/vm/*.qvm /tmp/pk3build/vm/
+        cp $GITHUB_WORKSPACE/src/mvsdk/code/mv.info /tmp/pk3build/mv.info
+        cd /tmp/pk3build
+        zip -r jk2pro-bins.pk3 vm/*.qvm mv.info
+        cd $GITHUB_WORKSPACE/build/actions
+        # Add jk2pro-bins.pk3 into the existing CPack ZIP under eternaljk2/
+        for zipfile in out/*.zip; do
+          if [ -f "$zipfile" ]; then
+            TOPDIR=$(unzip -l "$zipfile" | awk 'NR>3 && /\/$/ {print $4; exit}' | cut -d/ -f1)
+            mkdir -p "/tmp/pk3inject/$TOPDIR/eternaljk2"
+            cp /tmp/pk3build/jk2pro-bins.pk3 "/tmp/pk3inject/$TOPDIR/eternaljk2/"
+            cd /tmp/pk3inject
+            zip -r "$GITHUB_WORKSPACE/build/actions/$zipfile" "$TOPDIR/eternaljk2/jk2pro-bins.pk3"
+            cd $GITHUB_WORKSPACE/build/actions
+            rm -rf /tmp/pk3inject
+          fi
+        done
+        rm -rf /tmp/pk3build
+
+    - uses: 'actions/upload-artifact@v4'
+      if: ${{ matrix.build_type == 'Release' }}
+      with:
+        name: Windows Package (Portable - WinXP MinGW), ${{ matrix.build_type }}
+        path: ${{github.workspace}}/build/actions/out/*.zip
+
+    - name: Upload Release
+      if: ${{ github.event_name == 'release' && matrix.build_type == 'Release' }}
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs').promises;
+          for ( let filename of await fs.readdir('${{github.workspace}}/build/actions/out/') )
+          {
+            if ( filename.endsWith('.zip') )
+            {
+              await github.rest.repos.uploadReleaseAsset(
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: ${{ github.event.release.id }},
+                  name: filename.split('.').slice(0, -1).join('.') + "-winxp.zip",
+                  data: await fs.readFile( '${{github.workspace}}/build/actions/out/' + filename )
+                }
+              );
+            }
+          }
+
+
   macos:
     name: Build macOS (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
     runs-on: macos-15-intel
@@ -604,7 +762,7 @@ jobs:
 
   create-latest:
     if: github.event_name == 'push' && github.ref == 'refs/heads/everything'
-    needs: [vs2022-installer,vs2022,macos,macos-arm,linux,vs2022_xp]
+    needs: [vs2022-installer,vs2022,macos,macos-arm,linux,vs2022_xp,mingw_xp]
     #needs: [vs2022-installer,vs2022,linux]
     runs-on: ubuntu-22.04
     steps:

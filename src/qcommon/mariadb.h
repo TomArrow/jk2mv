@@ -11,6 +11,7 @@
 #include "qcommon.h"
 #include <queue>
 #include <chrono>
+#include <stdexcept>
 
 extern cvar_t* db_enabled;
 
@@ -440,6 +441,7 @@ public:
 	std::queue<DBRequestResultSet> results; // multi-statements can return multiple results. ALWAYS MUST HAVE AT LEAST ONE
 	int currentResponseRow = -1;
 
+#ifdef USE_MARIADB
 	template<class STATEMENTTYPE>
 	inline void digestResults(STATEMENTTYPE* stmnt, bool wasResultSet) {
 		{
@@ -472,6 +474,7 @@ public:
 			this->results.push(std::move(result2));
 		}
 	}
+#endif
 };
 
 

@@ -3,7 +3,9 @@
 #include <float.h>
 #include <io.h>
 #include <shlobj.h>
-#include <Shobjidl.h>
+#ifndef __MINGW32__
+#include <shobjidl.h>
+#endif
 #include <mv_setup.h>
 #include <signal.h>
 #include <string>
@@ -141,7 +143,7 @@ static const char *GetErrorString( DWORD error ) {
 			NULL, error, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&lpMsgBuf, 0, NULL );
 		if ( bufLen ) {
 			LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
-			Q_strncpyz( buf, lpMsgStr, min( (size_t)(lpMsgStr + bufLen), sizeof(buf) ) );
+			Q_strncpyz( buf, lpMsgStr, MIN( (size_t)(bufLen), sizeof(buf) ) );
 			LocalFree( lpMsgBuf );
 		}
 	}
@@ -555,7 +557,9 @@ int Sys_Milliseconds2(void) {
 
 static UINT timerResolution = 0;
 
+#ifndef __MINGW32__
 ITaskbarList3 *win_taskbar;
+#endif
 
 // Max open file descriptors. Mostly used by pk3 files with
 // MAX_SEARCH_PATHS limit.
@@ -593,7 +597,7 @@ void Sys_PlatformInit(int argc, char *argv[]) {
 		Com_Printf("Warning: Failed to increase open file limit. %s\n", strerror(errno));
 	}
 
-#ifndef DEDICATED
+#if !defined(DEDICATED) && !defined(__MINGW32__)
 	// Win7+ Taskbar features
 	CoInitialize(NULL);
 	CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList3, (void **)&win_taskbar);
@@ -601,6 +605,7 @@ void Sys_PlatformInit(int argc, char *argv[]) {
 }
 
 void Sys_SetTaskbarState(void *win_handle, tbstate_t state, uint64_t current, uint64_t total) {
+#ifndef __MINGW32__
 	if (!win_taskbar) return;
 
 	HWND hwnd = (HWND)win_handle;
@@ -624,6 +629,7 @@ void Sys_SetTaskbarState(void *win_handle, tbstate_t state, uint64_t current, ui
 		FlashWindow(hwnd, FALSE);
 		break;
 	}
+#endif
 }
 
 int Sys_FLock(int fd, flockCmd_t cmd, qboolean nb) {
