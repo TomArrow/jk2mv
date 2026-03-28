@@ -40,11 +40,13 @@ void GL_Bind( image_t *image ) {
 
 	texnum = image->texnum;
 
-	if ( glState.currenttextures[glState.currenttmu] != texnum || glState.rectangletex[glState.currenttmu]) {
-		qglDisable(GL_TEXTURE_RECTANGLE_ARB);
+	if (glState.rectangletex[glState.currenttmu]) {
+		R_DeActivateHackPortalTex();
+	}
+
+	if ( glState.currenttextures[glState.currenttmu] != texnum) {
 		image->frameUsed = tr.frameCount;
 		glState.currenttextures[glState.currenttmu] = texnum;
-		glState.rectangletex[glState.currenttmu] = qfalse;
 		qglBindTexture (GL_TEXTURE_2D, texnum);
 	}
 }
