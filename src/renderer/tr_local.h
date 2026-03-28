@@ -373,6 +373,7 @@ typedef struct {
 	byte			isVideoMap;
 
 	qboolean		isWorldBundle; // HAHAHAHAHAHAHA i suck
+	qboolean		isRenderedPortal;
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -523,6 +524,8 @@ Ghoul2 Insert End
 
 	qboolean isWorldShader; // UGLY hack.
 	int solidity; // 0 = undefined. 1 = playerclip. -1 = nonsolid
+
+	qboolean		hasRenderedPortal;	// this is a special hacky portal (tommyternal feature), to allow additive portals and shenanigans like that
 } shader_t;
 
 /*
@@ -579,6 +582,9 @@ typedef struct {
 
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
+
+	int			numHackPortalDrawSurfs;
+	struct drawSurf_s	*hackPortalDrawSurfs;
 
 	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
 
@@ -961,8 +967,10 @@ extern	refimport_t		ri;
 #define	MAX_SKINS				1024
 
 
-#define	MAX_DRAWSURFS			0x10000
-#define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
+#define	MAX_DRAWSURFS				0x10000
+#define	MAX_DRAWSURFS_HACKPORTAL	0x10
+#define	DRAWSURF_MASK				(MAX_DRAWSURFS-1)
+#define	DRAWSURF_HACKPORTAL_MASK	(MAX_DRAWSURFS_HACKPORTAL-1)
 
 /*
 
@@ -1004,6 +1012,7 @@ typedef struct {
 // the renderer front end should never modify glstate_t
 typedef struct {
 	int			currenttextures[2];
+	qboolean	rectangletex[2];
 	int			currenttmu;
 	qboolean	finishCalled;
 	int			texEnv[2];
@@ -1961,6 +1970,11 @@ typedef struct {
 	GLenum	format;
 } readPixelsCommand_t;
 
+typedef struct {
+	int		commandId;
+	GLuint	glImage;
+} captureHackPortalsCommand_t;
+
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
@@ -1973,6 +1987,7 @@ typedef enum {
 	RC_GAMMA_CORRECTION,
 	RC_READ_PIXELS,
 	RC_DRAW_LINE,
+	RC_CAPTURE_HACKPORTALS,
 } renderCommand_t;
 
 
@@ -1988,6 +2003,7 @@ typedef enum {
 // on an SMP machine
 typedef struct {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
+	drawSurf_t	drawSurfsHackPortal[MAX_DRAWSURFS_HACKPORTAL];
 	dlight_t	dlights[MAX_DLIGHTS];
 	trRefEntity_t	entities[MAX_ENTITIES];
 	trMiniRefEntity_t	miniEntities[MAX_MINI_ENTITIES];
@@ -2011,6 +2027,7 @@ void R_SyncRenderThread(void);
 void RB_ExecuteRenderCommands( const void *data );
 
 void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
+void R_AddCaptureHackPortalsCmd(GLuint glImage);
 
 void RE_SetColor( const vec4_t rgba );
 void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,

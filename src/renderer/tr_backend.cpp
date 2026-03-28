@@ -40,9 +40,11 @@ void GL_Bind( image_t *image ) {
 
 	texnum = image->texnum;
 
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) {
+	if ( glState.currenttextures[glState.currenttmu] != texnum || glState.rectangletex[glState.currenttmu]) {
+		qglDisable(GL_TEXTURE_RECTANGLE_ARB);
 		image->frameUsed = tr.frameCount;
 		glState.currenttextures[glState.currenttmu] = texnum;
+		glState.rectangletex[glState.currenttmu] = qfalse;
 		qglBindTexture (GL_TEXTURE_2D, texnum);
 	}
 }
@@ -1512,6 +1514,29 @@ const void *RB_ReadPixels( const void *data )
 }
 
 /*
+==================
+RB_ReadPixels
+==================
+*/
+const void *RB_CaptureHackPortals( const void *data )
+{
+	const captureHackPortalsCommand_t *cmd;
+	int		memcount;
+
+	cmd = (const captureHackPortalsCommand_t*)data;
+
+	// copy the current rendered image into a texture
+	// TODO check if gpu supports this feature?
+	GL_SelectTexture(0);
+	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
+	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, cmd->glImage);
+	qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
+	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+	return (const void *)(cmd + 1);
+}
+
+/*
 ====================
 RB_ExecuteRenderCommands
 
@@ -1557,6 +1582,9 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			break;
 		case RC_READ_PIXELS:
 			data = RB_ReadPixels( data );
+			break;
+		case RC_CAPTURE_HACKPORTALS:
+			data = RB_CaptureHackPortals( data );
 			break;
 		case RC_END_OF_LIST:
 			// stop rendering

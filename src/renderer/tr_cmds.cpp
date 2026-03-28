@@ -172,6 +172,24 @@ void	R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	cmd->viewParms = tr.viewParms;
 }
 
+/*
+=============
+R_AddCaptureHackPortalsCmd
+
+=============
+*/
+void	R_AddCaptureHackPortalsCmd( GLuint glImage ) {
+	captureHackPortalsCommand_t	*cmd;
+
+	cmd = (captureHackPortalsCommand_t*)R_GetCommandBuffer( sizeof( *cmd ) );
+	if ( !cmd ) {
+		return;
+	}
+	cmd->commandId = RC_CAPTURE_HACKPORTALS;
+
+	cmd->glImage = glImage;
+}
+
 
 /*
 =============

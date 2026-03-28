@@ -1306,6 +1306,14 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				stage->bundle[0].image[0] = tr.whiteImage;
 				continue;
 			}
+			else if ( !Q_stricmp( token, "$portal" ) )
+			{
+				// special hack portal to allow using portals more flexibly (like additive)
+				stage->bundle[0].image[0] = tr.whiteImage; // really we're gonnna be using tr.sceneImage but this expects image_t so whatever.
+				stage->bundle[0].isRenderedPortal = qtrue;
+				shader.hasRenderedPortal = qtrue;
+				continue;
+			}
 			else if ( !Q_stricmp( token, "$lightmap" ) )
 			{
 				stage->bundle[0].isLightmap = qtrue;

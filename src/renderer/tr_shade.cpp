@@ -302,7 +302,17 @@ R_BindAnimatedImage
 void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	int64_t		index;
 
-	if ( bundle->isVideoMap ) {
+	if ( bundle->isRenderedPortal ) {
+		if (!glState.rectangletex[glState.currenttmu] || glState.currenttextures[glState.currenttmu] != tr.sceneImage) { // this is a bit ugly... should find a way to turn it into a proper image_t?
+			//image->frameUsed = tr.frameCount;
+			glState.currenttextures[glState.currenttmu] = tr.sceneImage;
+			glState.rectangletex[glState.currenttmu] = qtrue;
+			qglEnable(GL_TEXTURE_RECTANGLE_ARB);
+			qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, tr.sceneImage);
+		}
+		return;
+	}
+	else if ( bundle->isVideoMap ) {
 		ri.CIN_RunCinematic(bundle->videoMapHandle);
 		ri.CIN_UploadCinematic(bundle->videoMapHandle);
 		return;
