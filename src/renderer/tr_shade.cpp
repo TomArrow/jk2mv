@@ -335,7 +335,6 @@ void R_ActivateHackPortalTex() {
 	qglLoadMatrixf(bias);
 	qglMultMatrixf(backEnd.viewParms.projectionMatrix);
 	qglMatrixMode(GL_MODELVIEW);
-
 }
 void R_DeActivateHackPortalTex() {
 	// disable rectangle tex
@@ -364,7 +363,7 @@ R_BindAnimatedImage
 void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	int64_t		index;
 
-	if ( bundle->isRenderedPortal ) {
+	if ( bundle->isHackPortal ) {
 		if (!glState.rectangletex[glState.currenttmu] || glState.currenttextures[glState.currenttmu] != tr.sceneImage) { // this is a bit ugly... should find a way to turn it into a proper image_t?
 			R_ActivateHackPortalTex();
 		}

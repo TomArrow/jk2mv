@@ -62,6 +62,7 @@ cvar_t	*r_measureOverdraw;
 
 cvar_t	*r_inGameVideo;
 cvar_t	*r_fastsky;
+cvar_t	*r_fastHackPortalMultisample;
 cvar_t	*r_drawSun;
 cvar_t	*r_dynamiclight;
 cvar_t	*r_dlightBacks;
@@ -415,6 +416,7 @@ static void GLimp_InitExtensions(void) {
 	if (!r_allowExtensions->integer) {
 		Com_Printf("*** IGNORING OPENGL EXTENSIONS ***\n");
 		g_bDynamicGlowSupported = false;
+		glConfig.deviceSupportsHackPortals = qfalse;
 		ri.Cvar_Set("r_DynamicGlow", "0");
 		return;
 	}
@@ -633,6 +635,13 @@ static void GLimp_InitExtensions(void) {
 	if (bNVRegisterCombiners)
 		qglGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &iNumGeneralCombiners);
 
+	if (bTexRectSupported && qglActiveTextureARB) {
+		glConfig.deviceSupportsHackPortals = qtrue;
+	}
+	else {
+		glConfig.deviceSupportsHackPortals = qfalse;
+	}
+
 	// Only allow dynamic glows/flares if they have the hardware
 	if (bTexRectSupported && bARBVertexProgram && qglActiveTextureARB && glConfig.maxActiveTextures >= 4 &&
 		((bNVRegisterCombiners && iNumGeneralCombiners >= 2) || bARBFragmentProgram)) {
@@ -652,9 +661,11 @@ static void GLimp_InitExtensions(void) {
 #endif
 		glConfig.deviceSupportsPostprocessingGamma = qtrue;
 		glConfig.deviceSupportsPostprocessingGammaHDR = qtrue;
+		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qtrue;
 	} else {
 		glConfig.deviceSupportsPostprocessingGamma = qfalse;
 		glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
+		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qfalse;
 	}
 
 	// GL_EXT_texture_lod_bias
@@ -1204,6 +1215,7 @@ void R_Register( void )
 	AssertCvarRange( r_znear, 0.001f, 200, qtrue );
 	r_ignoreGLErrors = ri.Cvar_Get("r_ignoreGLErrors", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_fastsky = ri.Cvar_Get("r_fastsky", "0", CVAR_GLOBAL);
+	r_fastHackPortalMultisample = ri.Cvar_Get("r_fastHackPortalMultisample", "0", CVAR_GLOBAL | CVAR_ARCHIVE);
 	r_inGameVideo = ri.Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_drawSun = ri.Cvar_Get("r_drawSun", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_dynamiclight = ri.Cvar_Get("r_dynamiclight", "1", CVAR_ARCHIVE | CVAR_GLOBAL);

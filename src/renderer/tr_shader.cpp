@@ -1306,14 +1306,6 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				stage->bundle[0].image[0] = tr.whiteImage;
 				continue;
 			}
-			else if ( !Q_stricmp( token, "$portal" ) )
-			{
-				// special hack portal to allow using portals more flexibly (like additive)
-				stage->bundle[0].image[0] = tr.whiteImage; // really we're gonnna be using tr.sceneImage but this expects image_t so whatever.
-				stage->bundle[0].isRenderedPortal = qtrue;
-				shader.hasRenderedPortal = qtrue;
-				continue;
-			}
 			else if ( !Q_stricmp( token, "$lightmap" ) )
 			{
 				stage->bundle[0].isLightmap = qtrue;
@@ -1682,6 +1674,21 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 			else if ( !Q_stricmp( token, "texture" ) || !Q_stricmp( token, "base" ) )
 			{
 				stage->bundle[0].tcGen = TCGEN_TEXTURE;
+			}
+			else if (!Q_stricmp(token, "hackPortal"))
+			{
+				// special hack portal to allow using portals more flexibly (like additive)
+				// 
+				// incompatible clients will simply throw a warning at not knowing "tcGen hackportal" and draw
+				// the stage with the normal map/animmap/whatever
+				// but this client will insert the portal drawing instead.
+#ifndef DEDICATED
+				if (glConfig.deviceSupportsHackPortals) {
+					stage->bundle[0].isHackPortal = qtrue;
+					shader.hasHackPortal = qtrue;
+					stage->hasHackPortal = qtrue;
+				}
+#endif
 			}
 			else if ( !Q_stricmp( token, "vector" ) )
 			{
@@ -4361,6 +4368,18 @@ const char *g_HDRPixelShaderARB = {
 	"END"
 };
 
+const char *g_alphaUnPremultiplyPixelShaderARB = {
+	"!!ARBfp1.0" "\n"
+	"TEMP R0;" "\n"
+	"TEMP R1;" "\n"
+	"TEX R0, fragment.texcoord[0], texture[0], RECT;" "\n"
+	"RCP R1.x, R0.w;" "\n"
+	"MUL R1.xyz, R0, R1.x;" "\n"
+	"CMP result.color.xyz, -R0.w, R1, R0;" "\n"
+	"MOV result.color.w, R0;" "\n"
+	"END"
+};
+
 qboolean MV_GammaGenerateProgram() {
 	int err = 0;
 	assert(qglGenProgramsARB);
@@ -4393,6 +4412,21 @@ qboolean R_GammaGenerateHDRProgram() {
 	qglGenProgramsARB(1, &tr.hdrPixelShader);
 	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.hdrPixelShader);
 	qglProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, (int)strlen(g_HDRPixelShaderARB), g_HDRPixelShaderARB);
+	qglGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &err);
+	if (err != -1) {
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+qboolean R_GenerateAlphaUnPremultiplyProgram() {
+	int err = 0;
+
+	// pixel shader
+	qglGenProgramsARB(1, &tr.alphaUnPremultiplyPixelShader);
+	qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.alphaUnPremultiplyPixelShader);
+	qglProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, (int)strlen(g_alphaUnPremultiplyPixelShaderARB), g_alphaUnPremultiplyPixelShaderARB);
 	qglGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &err);
 	if (err != -1) {
 		return qtrue;
@@ -4522,6 +4556,10 @@ static void CreateInternalShaders( void ) {
 			ri.Printf(PRINT_WARNING, "WARNING: failed initializing hdr program... HDR converstion won't be available\n");
 			glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
 		}
+	}
+	if (R_GenerateAlphaUnPremultiplyProgram()) {
+		ri.Printf(PRINT_WARNING, "WARNING: failed initializing alpha unpremultiply program ... hackportals might have seams when using multisampling\n");
+		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qfalse;
 	}
 #endif
 }

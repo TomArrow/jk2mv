@@ -373,7 +373,7 @@ typedef struct {
 	byte			isVideoMap;
 
 	qboolean		isWorldBundle; // HAHAHAHAHAHAHA i suck
-	qboolean		isRenderedPortal;
+	qboolean		isHackPortal;
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -404,6 +404,7 @@ typedef struct {
 
 	// Whether this object emits a glow or not.
 	qboolean		glow;
+	qboolean		hasHackPortal;
 } shaderStage_t;
 
 struct shaderCommands_s;
@@ -525,7 +526,7 @@ Ghoul2 Insert End
 	qboolean isWorldShader; // UGLY hack.
 	int solidity; // 0 = undefined. 1 = playerclip. -1 = nonsolid
 
-	qboolean		hasRenderedPortal;	// this is a special hacky portal (tommyternal feature), to allow additive portals and shenanigans like that
+	qboolean		hasHackPortal;	// this is a special hacky portal (tommyternal feature), to allow additive portals and shenanigans like that
 } shader_t;
 
 /*
@@ -626,6 +627,7 @@ typedef struct {
 	orientationr_t	world;
 	vec3_t		pvsOrigin;			// may be different than or.origin for portals
 	qboolean	isPortal;			// true if this view is through a portal
+	qboolean	isFirstHackPortal;	// true if this view is the first hack portal (wanna clear to black so we can alpha unpremultiply)
 	qboolean	isMirror;			// the portal is a mirror, invert the face culling
 	int			frameSceneNum;		// copied from tr.frameSceneNum
 	int			frameCount;			// copied from tr.frameCount
@@ -1102,7 +1104,7 @@ typedef struct {
 	// Image the glowing objects are rendered to. - AReis
 	GLuint					screenGlow;
 
-	// A rectangular texture representing the normally rendered scene.
+	// A rectangular texture representing the normally rendered scene. Also used for hackportals
 	GLuint					sceneImage;
 
 	// Image used to downsample and blur scene to.	- AReis
@@ -1189,7 +1191,7 @@ typedef struct {
 	char					levelshotName[MAX_OSPATH];
 
 	// gamma correction
-	GLuint gammaVertexShader, gammaPixelShader, hdrPixelShader;
+	GLuint gammaVertexShader, gammaPixelShader, hdrPixelShader, alphaUnPremultiplyPixelShader;
 	GLuint gammaLUTImage;
 
 	int						dynamicGlowWidth;
@@ -1255,6 +1257,7 @@ extern cvar_t	*r_primitives;			// "0" = based on compiled vertex array existance
 
 extern cvar_t	*r_inGameVideo;				// controls whether in game video should be draw
 extern cvar_t	*r_fastsky;				// controls whether sky should be cleared or drawn
+extern cvar_t	*r_fastHackPortalMultisample; // skip alpha unpremultiply for hackportals
 extern cvar_t	*r_drawSun;				// controls drawing of sun quad
 extern cvar_t	*r_dynamiclight;		// dynamic lights enabled/disabled
 extern cvar_t	*r_dlightBacks;			// dlight non-facing surfaces for continuity

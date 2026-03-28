@@ -720,7 +720,9 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 	{
 		for (i = 0; i < 6*4; i++)
 		{
-			int testColorBits, testDepthBits, testStencilBits;
+			int testColorBits, testDepthBits, testStencilBits, testSamples;
+
+			testSamples = samples;
 
 			// 0 - default
 			// 1 - minus colorBits
@@ -801,8 +803,8 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 			SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, testDepthBits );
 			SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, testStencilBits );
 
-			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, samples ? 1 : 0 );
-			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, samples );
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, testSamples ? 1 : 0 );
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, testSamples);
 
 			if ( windowDesc->gl.majorVersion )
 			{
@@ -856,7 +858,8 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 			if( ( screen = SDL_CreateWindow( windowTitle, x, y,
 					winWidth, winHeight, flags ) ) == NULL )
 			{
-				if ( samples > 0 ) {
+				if ( testSamples > 0 ) {
+					testSamples = 0;
 					SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
 					SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, 0 );
 
@@ -916,9 +919,10 @@ static rserr_t GLimp_SetMode(glconfig_t *glConfig, const windowDesc_t *windowDes
 			glConfig->colorBits = testColorBits;
 			glConfig->depthBits = testDepthBits;
 			glConfig->stencilBits = testStencilBits;
+			glConfig->samples = testSamples;
 
-			Com_Printf( "Using %d color bits, %d depth, %d stencil display.\n",
-					glConfig->colorBits, glConfig->depthBits, glConfig->stencilBits );
+			Com_Printf( "Using %d color bits, %d depth, %d stencil, %d samples display.\n",
+					glConfig->colorBits, glConfig->depthBits, glConfig->stencilBits, glConfig->samples );
 			break;
 		}
 

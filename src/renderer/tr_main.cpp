@@ -940,7 +940,7 @@ R_MirrorViewBySurface
 Returns qtrue if another view has been rendered
 ========================
 */
-qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
+qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, qboolean firstHackPortal) {
 	vec4_t			clipDest[128];
 	viewParms_t		newParms;
 	viewParms_t		oldParms;
@@ -966,6 +966,7 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 
 	newParms = tr.viewParms;
 	newParms.isPortal = qtrue;
+	newParms.isFirstHackPortal = firstHackPortal;
 	if ( !R_GetPortalOrientations( drawSurf, entityNum, &surface, &camera,
 		newParms.pvsOrigin, &newParms.isMirror ) ) {
 		return qfalse;		// bad portal, no portalentity
@@ -1094,7 +1095,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 		}
 		tr.viewParms.lastSkyShader = shader->sortedIndex;
 	}
-	if (shader->hasRenderedPortal) {
+	if (shader->hasHackPortal) {
 		// special tommyternal hack portal to allow additive portals and such.
 		index = tr.refdef.numHackPortalDrawSurfs & DRAWSURF_HACKPORTAL_MASK;
 		tr.refdef.hackPortalDrawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT)
@@ -1145,7 +1146,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackP
 		R_DecomposeSort((hackPortalDrawSurfs + i)->sort, &entityNum, &shader, &fogNum, &dlighted);
 
 		// if the mirror was completely clipped away, we may need to check another surface
-		if (R_MirrorViewBySurface((hackPortalDrawSurfs + i), entityNum)) {
+		if (R_MirrorViewBySurface((hackPortalDrawSurfs + i), entityNum, (qboolean)(portalRenderCount == 0))) {
 			portalRenderCount++;
 			break;		// only one mirror view at a time
 		}
@@ -1171,7 +1172,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackP
 		}
 
 		// if the mirror was completely clipped away, we may need to check another surface
-		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
+		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum, qfalse) ) {
 			portalRenderCount++;
 			// this is a debug option to see exactly what is being mirrored
 			if ( r_portalOnly->integer ) {

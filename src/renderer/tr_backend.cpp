@@ -498,6 +498,11 @@ void RB_BeginDrawingView (void) {
 		}
 	}
 
+	if (glConfig.deviceSupportsHackPortalAlphaUnPremultiply && glConfig.samples > 0 && r_fastHackPortalMultisample->integer != 2 && backEnd.viewParms.isFirstHackPortal) {
+		clearBits |= GL_COLOR_BUFFER_BIT;
+		qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
 	// If this pass is to just render the glowing objects, don't clear the depth buffer since
 	// we're sharing it with the main scene (since the main scene has already been rendered). -AReis
 	if ( g_bRenderGlowingObjects )
@@ -1457,6 +1462,7 @@ const void *RB_GammaCorrection( const void *data )
 		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
 	}
 
+	// wait do we really need to clear? we're just drawing back, why do we care?
 	qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	qglClear(GL_COLOR_BUFFER_BIT);
 
@@ -1527,12 +1533,56 @@ const void *RB_CaptureHackPortals( const void *data )
 
 	cmd = (const captureHackPortalsCommand_t*)data;
 
+	// finish any 2D drawing if needed
+	if (tess.numIndexes) {
+		RB_EndSurface();
+	}
+
 	// copy the current rendered image into a texture
 	// TODO check if gpu supports this feature?
 	GL_SelectTexture(0);
 	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
 	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, cmd->glImage);
 	qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
+
+	// if needed & possible, do an alpha unpremultiply, so we dont get seams at the edges with multisampling
+	// sadly this is very inefficient. we need to clear the scene, draw it back into the scene, and copy it back to the texture again, sigh.
+	// TODO add r_fastHackPortals to skip this and for debugging.
+	if (glConfig.deviceSupportsHackPortalAlphaUnPremultiply && glConfig.samples > 0 && !tess.shader->multitextureEnv && !r_fastHackPortalMultisample->integer) {
+		RB_SetGL2D();
+
+		qglEnable(GL_VERTEX_PROGRAM_ARB);
+		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, tr.gammaVertexShader);
+		qglEnable(GL_FRAGMENT_PROGRAM_ARB);
+		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.alphaUnPremultiplyPixelShader);
+
+		GL_State(GLS_DEFAULT);
+
+		// wait do we really need to clear? we're just drawing back, why do we care?
+		qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		qglClear(GL_COLOR_BUFFER_BIT);
+
+		qglBegin(GL_QUADS);
+		qglTexCoord2f(0.0f, 0.0f);
+		qglVertex2f(-1.0f, -1.0f);
+
+		qglTexCoord2f(0.0f, (float)glConfig.vidHeight);
+		qglVertex2f(-1.0f, 1.0f);
+
+		qglTexCoord2f((float)glConfig.vidWidth, (float)glConfig.vidHeight);
+		qglVertex2f(1.0f, 1.0f);
+
+		qglTexCoord2f((float)glConfig.vidWidth, 0.0f);
+		qglVertex2f(1.0f, -1.0f);
+		qglEnd();
+
+		qglDisable(GL_VERTEX_PROGRAM_ARB);
+		qglDisable(GL_FRAGMENT_PROGRAM_ARB);
+
+		// and copy it back :P
+		qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
+	}
+
 	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
 
 	return (const void *)(cmd + 1);
