@@ -1482,6 +1482,10 @@ void	GL_Cull( int cullType );
 
 #define GLS_POLYMODE_LINE						0x00001000
 
+//#define GLS_RECTANGLE_TEX						0x00002000 // for hack portal images (they are GL_TEXTURE_RECTANGLE_ARB, not GL_TEXTURE_2D)
+
+//#define GLS_TEXGEN_EYEPROJ					0x00004000 // for hack portal images. does a projection of the texture from the eye.
+
 #define GLS_DEPTHTEST_DISABLE					0x00010000
 #define GLS_DEPTHFUNC_EQUAL						0x00020000
 

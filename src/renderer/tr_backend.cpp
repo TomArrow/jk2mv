@@ -339,6 +339,32 @@ void GL_State( unsigned int stateBits )
 	}
 
 	//
+	// tommyternal: hackportal related
+	//
+	//  actually, cant do it here since we could be using multitexture and need separate settings per texture.
+	/*if (diff & GLS_TEXGEN_EYEPROJ) // eye texture coord projection
+	{
+		if (stateBits & GLS_TEXGEN_EYEPROJ)
+		{
+		}
+		else
+		{
+		}
+	}
+	if (diff & GLS_RECTANGLE_TEX) // use rectangle texture mode?
+	{
+		GL_SelectTexture(0);
+		if (stateBits & GLS_RECTANGLE_TEX)
+		{
+			qglEnable(GL_TEXTURE_RECTANGLE_ARB);
+		}
+		else
+		{
+			qglDisable(GL_TEXTURE_RECTANGLE_ARB);
+		}
+	}*/
+
+	//
 	// depthtest
 	//
 	if ( diff & GLS_DEPTHTEST_DISABLE )

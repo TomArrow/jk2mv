@@ -1271,7 +1271,7 @@ ParseStage
 static qboolean ParseStage( shaderStage_t *stage, const char **text )
 {
 	char *token;
-	int depthMaskBits = GLS_DEPTHMASK_TRUE, blendSrcBits = 0, blendDstBits = 0, atestBits = 0, depthFuncBits = 0;
+	int depthMaskBits = GLS_DEPTHMASK_TRUE, blendSrcBits = 0, blendDstBits = 0, atestBits = 0, depthFuncBits = 0, extraBits = 0;
 	qboolean depthMaskExplicit = qfalse;
 
 	stage->active = qtrue;
@@ -1312,6 +1312,7 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 				stage->bundle[0].image[0] = tr.whiteImage; // really we're gonnna be using tr.sceneImage but this expects image_t so whatever.
 				stage->bundle[0].isRenderedPortal = qtrue;
 				shader.hasRenderedPortal = qtrue;
+				//extraBits |= GLS_TEXGEN_EYEPROJ;// J | GLS_RECTANGLE_TEX;
 				continue;
 			}
 			else if ( !Q_stricmp( token, "$lightmap" ) )
@@ -1835,7 +1836,7 @@ static qboolean ParseStage( shaderStage_t *stage, const char **text )
 	stage->stateBits = depthMaskBits |
 					   blendSrcBits | blendDstBits |
 					   atestBits |
-					   depthFuncBits;
+					   depthFuncBits | extraBits;
 
 	return qtrue;
 }
