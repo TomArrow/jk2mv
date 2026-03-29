@@ -62,6 +62,7 @@ cvar_t	*cl_timedemo;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_aviMotionJpegQuality;
+cvar_t	*cl_aviTimeFraction;
 cvar_t	*cl_forceavidemo;
 cvar_t	*cl_aviPipeFormat;
 cvar_t	*cl_aviPipeExtension;
@@ -3301,11 +3302,16 @@ void CL_Frame ( int msec ) {
 			frameTime += overflow;
 
 			msec = floor(frameTime);
-			if (msec == 0)
-				msec = 1;
+			if (msec < 0)
+				msec = 0;
 
 			overflow = frameTime - msec;
+
+			Cvar_Set("cl_aviTimeFraction", va("%f",overflow));
 		}
+	}
+	else {
+		Cvar_Set("cl_aviTimeFraction", "0");
 	}
 
 	if (cl_autoDemo->integer && !clc.demoplaying) {
@@ -3728,6 +3734,7 @@ void CL_Init( void ) {
 	cl_aviFrameRate = Cvar_Get ("cl_aviFrameRate", "30", CVAR_ARCHIVE);
 	cl_aviMotionJpeg = Cvar_Get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
 	cl_aviMotionJpegQuality = Cvar_Get("cl_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
+	cl_aviTimeFraction = Cvar_Get("cl_aviTimeFraction", "0", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_INTERNAL);
 	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
 
 	cl_aviPipeFormat = Cvar_Get("cl_aviPipeFormat",
