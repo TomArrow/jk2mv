@@ -519,6 +519,14 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 		r_celoutlineColor->modified = qfalse;
 	}
 
+	if (r_stencilShadowColor->modified) {
+		const char* stencilShadowColorTextPointer = r_stencilShadowColor->string;
+		if (!parseVec4(stencilShadowColorTextPointer,tr.stencilShadowColor)) {
+			Vector4Set(tr.stencilShadowColor,0.6f,0.6f,0.6f,1.0f);
+		}
+		r_stencilShadowColor->modified = qfalse;
+	}
+
 	//
 	// draw buffer stuff
 	//

@@ -627,7 +627,7 @@ typedef struct {
 	orientationr_t	world;
 	vec3_t		pvsOrigin;			// may be different than or.origin for portals
 	qboolean	isPortal;			// true if this view is through a portal
-	qboolean	isFirstHackPortal;	// true if this view is the first hack portal (wanna clear to black so we can alpha unpremultiply)
+	int			hackPortalNum;		// true if this view is the first hack portal (wanna clear to black so we can alpha unpremultiply)
 	qboolean	isMirror;			// the portal is a mirror, invert the face culling
 	int			frameSceneNum;		// copied from tr.frameSceneNum
 	int			frameCount;			// copied from tr.frameCount
@@ -1200,6 +1200,8 @@ typedef struct {
 	vec4_t					celLineColor;
 	qboolean				celLineColorIsSet;
 
+	vec4_t					stencilShadowColor;
+
 
 	//SQL position cube query helper
 	struct {
@@ -1351,6 +1353,7 @@ extern	cvar_t	*r_clear;						// force screen clear every frame
 
 extern	cvar_t	*r_shadows;						// controls shadows: 0 = none, 1 = blur, 2 = stencil, 3 = black planar projection
 extern	cvar_t	*r_stencilSky;					// use stencils to allow drawing multiple skies without overlap issues
+extern	cvar_t	*r_stencilShadowColor;			// color of stencil shadows
 extern	cvar_t	*r_flares;						// light flares
 
 extern	cvar_t	*r_intensity;
@@ -1671,7 +1674,7 @@ inline bool RB_TessShaderSame(shader_t* shader, shader_t* tessShader) {
 void RB_BeginSurface(shader_t *shader, int fogNum );
 void RB_EndSurface(void);
 void RB_CheckOverflow( int verts, int indexes );
-#define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
+#define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES/2 && tess.shader == tr.shadowShader || tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
 
 void RB_StageIteratorGeneric( void );
 void RB_StageIteratorSky( void );

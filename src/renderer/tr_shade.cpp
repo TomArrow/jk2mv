@@ -363,7 +363,7 @@ R_BindAnimatedImage
 void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	int64_t		index;
 
-	if ( bundle->isHackPortal ) {
+	if ( bundle->isHackPortal && !backEnd.viewParms.hackPortalNum && !backEnd.viewParms.isPortal) {
 		if (!glState.rectangletex[glState.currenttmu] || glState.currenttextures[glState.currenttmu] != tr.sceneImage) { // this is a bit ugly... should find a way to turn it into a proper image_t?
 			R_ActivateHackPortalTex();
 		}
@@ -1800,6 +1800,27 @@ void RB_StageIteratorLightmappedMultitexture( void ) {
 	}
 }
 
+void RB_HackPortalSurfaceTessEnd() {
+	GL_State(GLS_DEPTHMASK_TRUE);
+	qglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	GL_Cull(CT_FRONT_SIDED);
+	GL_SelectTexture(0);
+	GL_Bind(tr.whiteImage); // just random texture, it's not like anything is actually drawn. maybe we can skip this altogether?
+	qglDepthFunc(GL_ALWAYS);
+	qglVertexPointer(3, GL_FLOAT, sizeof(tess.xyz[0]), tess.xyz);
+	qglDisableClientState(GL_COLOR_ARRAY);
+	qglDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	qglDepthRange(1.0, 1.0);
+	// draw the polys
+	R_DrawElements(tess.numIndexes, tess.indexes);
+
+	qglColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	qglDepthRange(0.0, 1.0);
+
+	qglDepthFunc(GL_LEQUAL);
+	tess.numIndexes = 0; 
+}
+
 /*
 ** RB_EndSurface
 */
@@ -1812,6 +1833,10 @@ void RB_EndSurface( void ) {
 		return;
 	}
 
+	if (backEnd.refdef.mirroredGameplay) {
+		qglFrontFace(GL_CW);
+	}
+
 	if (input->indexes[SHADER_MAX_INDEXES-1] != 0) {
 		ri.Error (ERR_DROP, "RB_EndSurface() - SHADER_MAX_INDEXES hit");
 	}
@@ -1819,13 +1844,23 @@ void RB_EndSurface( void ) {
 		ri.Error (ERR_DROP, "RB_EndSurface() - SHADER_MAX_VERTEXES hit");
 	}
 
+	if ( backEnd.viewParms.hackPortalNum < 0 ) {
+		// we just quickly draw the surface to set depth at a fixed 1.0 (we cleared at 0.0)
+		// before drawing the actual portal contents
+		RB_HackPortalSurfaceTessEnd();
+		qglFrontFace(GL_CCW);
+		return;
+	}
+
 	if ( tess.shader == tr.shadowShader ) {
 		RB_ShadowTessEnd();
+		qglFrontFace(GL_CCW);
 		return;
 	}
 
 	// for debugging of sort order issues, stop rendering after a given sort value
 	if ( r_debugSort->integer && r_debugSort->integer < tess.shader->sort ) {
+		qglFrontFace(GL_CCW);
 		return;
 	}
 
@@ -1852,10 +1887,6 @@ void RB_EndSurface( void ) {
 	if (tess.fogNum && tess.shader->fogPass > FP_NONE && tess.shader->fogPass < FP_GLFOG)// && r_drawfog->value)
 	{
 		backEnd.pc.c_totalIndexes += tess.numIndexes;
-	}
-
-	if (backEnd.refdef.mirroredGameplay) {
-		qglFrontFace(GL_CW);
 	}
 
 	//

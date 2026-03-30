@@ -131,6 +131,7 @@ cvar_t	*r_styleOnly;
 cvar_t	*r_uiFullScreen;
 cvar_t	*r_shadows;
 cvar_t	*r_stencilSky;
+cvar_t	*r_stencilShadowColor;
 cvar_t	*r_flares;
 cvar_t	*r_aspectratio;
 cvar_t	*r_nobind;
@@ -964,10 +965,12 @@ void GL_SetDefaultState( void )
 		GL_TextureMode( r_textureMode->string );
 		GL_TexEnv( GL_MODULATE );
 		qglDisable( GL_TEXTURE_2D );
+		qglDisable( GL_TEXTURE_RECTANGLE_ARB );
 		GL_SelectTexture( 0 );
 	}
 
 	qglEnable(GL_TEXTURE_2D);
+	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
 	GL_TextureMode( r_textureMode->string );
 	GL_TexEnv( GL_MODULATE );
 
@@ -1300,6 +1303,8 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 	r_stencilSky = ri.Cvar_Get( "r_stencilSky", "1", CVAR_ARCHIVE );
+	r_stencilShadowColor = ri.Cvar_Get( "r_stencilShadowColor", "0.6", CVAR_ARCHIVE );
+	r_stencilShadowColor->modified = qtrue;
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), CVAR_ARCHIVE | CVAR_LATCH);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), CVAR_ARCHIVE | CVAR_LATCH);

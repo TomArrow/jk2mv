@@ -940,7 +940,7 @@ R_MirrorViewBySurface
 Returns qtrue if another view has been rendered
 ========================
 */
-qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, qboolean firstHackPortal) {
+qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, int hackPortalNum) {
 	vec4_t			clipDest[128];
 	viewParms_t		newParms;
 	viewParms_t		oldParms;
@@ -966,7 +966,7 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, qboolean fi
 
 	newParms = tr.viewParms;
 	newParms.isPortal = qtrue;
-	newParms.isFirstHackPortal = firstHackPortal;
+	newParms.hackPortalNum = hackPortalNum;
 	if ( !R_GetPortalOrientations( drawSurf, entityNum, &surface, &camera,
 		newParms.pvsOrigin, &newParms.isMirror ) ) {
 		return qfalse;		// bad portal, no portalentity
@@ -982,6 +982,13 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, qboolean fi
 	R_MirrorVector (oldParms.ori.axis[2], &surface, &camera, newParms.ori.axis[2]);
 
 	// OPTIMIZE: restrict the viewport on the mirrored view
+	if (hackPortalNum) {
+		viewParms_t	surfacePreDrawParms = oldParms;
+		surfacePreDrawParms.hackPortalNum = -hackPortalNum;
+		tr.viewParms = surfacePreDrawParms;
+		R_AddDrawSurfCmd(drawSurf, 1); // we just draw this one surface to limit drawing to the actual area of the portal surface
+		tr.viewParms = oldParms;
+	}
 
 	// render the mirror view
 	R_RenderView (&newParms);
@@ -1141,14 +1148,12 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackP
 	// sort the drawsurfs by sort type, then orientation, then shader
 	R_RadixSort(drawSurfs, numDrawSurfs);
 
-
 	for (i = 0; i < numHackPortalDrawSurfs; i++) {
 		R_DecomposeSort((hackPortalDrawSurfs + i)->sort, &entityNum, &shader, &fogNum, &dlighted);
 
 		// if the mirror was completely clipped away, we may need to check another surface
-		if (R_MirrorViewBySurface((hackPortalDrawSurfs + i), entityNum, (qboolean)(portalRenderCount == 0))) {
+		if (R_MirrorViewBySurface((hackPortalDrawSurfs + i), entityNum, portalRenderCount + 1)) {
 			portalRenderCount++;
-			break;		// only one mirror view at a time
 		}
 	}
 
@@ -1176,6 +1181,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackP
 			portalRenderCount++;
 			// this is a debug option to see exactly what is being mirrored
 			if ( r_portalOnly->integer ) {
+				R_AddDrawSurfCmd(drawSurfs, 0); // just draw with 0, so it doesn't mess up state for 2d
 				return;
 			}
 			break;		// only one mirror view at a time
@@ -1183,6 +1189,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackP
 	}
 
 	if (portalRenderCount && r_portalOnly->integer) {
+		R_AddDrawSurfCmd(drawSurfs, 0); // just draw with 0, so it doesn't mess up state for 2d
 		return;
 	}
 
