@@ -1463,8 +1463,9 @@ const void *RB_GammaCorrection( const void *data )
 	qglEnable(GL_FRAGMENT_PROGRAM_ARB);
 	if (doingHDR) {
 		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.hdrPixelShader);
-		float obbMult[4] = { tr.overbrightBitsMultiplier* r_gammaHDR->value, 0, 0, 0 };
+		float obbMult[5] = { tr.overbrightBitsMultiplier, r_gammaHDR->value, 0, 0, 0 };
 		qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, obbMult);
+		qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, obbMult+1);
 	}
 	else {
 		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.gammaPixelShader);
