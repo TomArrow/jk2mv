@@ -40,7 +40,11 @@ void GL_Bind( image_t *image ) {
 
 	texnum = image->texnum;
 
-	if ( glState.currenttextures[glState.currenttmu] != texnum ) {
+	if (glState.rectangletex[glState.currenttmu]) {
+		R_DeActivateHackPortalTex();
+	}
+
+	if ( glState.currenttextures[glState.currenttmu] != texnum) {
 		image->frameUsed = tr.frameCount;
 		glState.currenttextures[glState.currenttmu] = texnum;
 		qglBindTexture (GL_TEXTURE_2D, texnum);
@@ -444,7 +448,7 @@ void RB_BeginDrawingView (void) {
 
 	if (!com_developer->integer && r_shadows->integer == 2)
 	{
-		Cvar_Set("cg_shadows", "1");
+		//Cvar_Set("cg_shadows", "1"); //TA: why?
 	}
 
 	// we will need to change the projection matrix before drawing
@@ -494,14 +498,27 @@ void RB_BeginDrawingView (void) {
 		}
 	}
 
+	if (glConfig.deviceSupportsHackPortalAlphaUnPremultiply && glConfig.samples > 0 && r_fastHackPortalMultisample->integer != 2 && backEnd.viewParms.hackPortalNum == 1) {
+		clearBits |= GL_COLOR_BUFFER_BIT;
+		qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
 	// If this pass is to just render the glowing objects, don't clear the depth buffer since
 	// we're sharing it with the main scene (since the main scene has already been rendered). -AReis
-	if ( g_bRenderGlowingObjects )
+	if ( g_bRenderGlowingObjects || backEnd.viewParms.hackPortalNum > 0 ) // for hackportals, we pre-drew some depth to limit drawing of the actual portal contents
 	{
 		clearBits &= ~GL_DEPTH_BUFFER_BIT;
 	}
 
+	if (backEnd.viewParms.hackPortalNum < 0){
+		// we clear the hackportal to 0, and then we draw the portal surface at depth 1
+		// that way we limit where portal contents are drawn without having to abuse stencils or other stuff
+		qglClearDepth(0.0f);
+	}
+
 	qglClear( clearBits );
+
+	qglClearDepth(1.0f);
 
 	if ( ( backEnd.refdef.rdflags & RDF_HYPERSPACE ) )
 	{
@@ -561,13 +578,17 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	double			originalTime;
 	bool			didShadowPass = false;
 
-	if (g_bRenderGlowingObjects)
+	if (g_bRenderGlowingObjects || backEnd.viewParms.hackPortalNum < 0)
 	{ //only shadow on initial passes
 		didShadowPass = true;
 	}
 
 	// save original time for entity shader offsets
 	originalTime = backEnd.refdef.floatTime;
+
+	if (tess.numIndexes > 0) {
+		RB_EndSurface();
+	}
 
 	// clear the z buffer, set the modelview, etc
 	RB_BeginDrawingView ();
@@ -676,6 +697,10 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				R_TransformDlights( backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.ori );
 			}
 
+			if ( backEnd.viewParms.hackPortalNum < 0 ) {
+				depthRange = 3;
+			}
+
 			qglLoadMatrixf( backEnd.ori.modelMatrix );
 
 			//
@@ -694,6 +719,10 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 					case 2:
 						qglDepthRange (0, 0);
+						break;
+
+					case 3:
+						qglDepthRange (1, 1);
 						break;
 				}
 
@@ -732,7 +761,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	}
 
 	// darken down any stencil shadows
-	RB_ShadowFinish();
+	//RB_ShadowFinish();
 
 	// add light flares on lights that aren't obscured
 
@@ -1150,7 +1179,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 	RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
-	if ( !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && g_bDynamicGlowSupported && r_DynamicGlow->integer )
+	if ( !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && g_bDynamicGlowSupported && r_DynamicGlow->integer && backEnd.viewParms.hackPortalNum >= 0 )
 	{
 		// Copy the normal scene to texture.
 		qglDisable( GL_TEXTURE_2D );
@@ -1453,6 +1482,7 @@ const void *RB_GammaCorrection( const void *data )
 		qglBindTexture(GL_TEXTURE_3D, tr.gammaLUTImage);
 	}
 
+	// wait do we really need to clear? we're just drawing back, why do we care?
 	qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	qglClear(GL_COLOR_BUFFER_BIT);
 
@@ -1512,6 +1542,74 @@ const void *RB_ReadPixels( const void *data )
 }
 
 /*
+==================
+RB_ReadPixels
+==================
+*/
+const void *RB_CaptureHackPortals( const void *data )
+{
+	const captureHackPortalsCommand_t *cmd;
+	int		memcount;
+
+	cmd = (const captureHackPortalsCommand_t*)data;
+
+	// finish any 2D drawing if needed
+	if (tess.numIndexes) {
+		RB_EndSurface();
+	}
+
+	// copy the current rendered image into a texture
+	// TODO check if gpu supports this feature?
+	GL_SelectTexture(0);
+	qglEnable(GL_TEXTURE_RECTANGLE_ARB);
+	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, cmd->glImage);
+	qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
+
+	// if needed & possible, do an alpha unpremultiply, so we dont get seams at the edges with multisampling
+	// sadly this is very inefficient. we need to clear the scene, draw it back into the scene, and copy it back to the texture again, sigh.
+	// TODO add r_fastHackPortals to skip this and for debugging.
+	if (glConfig.deviceSupportsHackPortalAlphaUnPremultiply && glConfig.samples > 0 && !r_fastHackPortalMultisample->integer) {
+
+		RB_SetGL2D();
+		qglEnable(GL_VERTEX_PROGRAM_ARB);
+		qglBindProgramARB(GL_VERTEX_PROGRAM_ARB, tr.gammaVertexShader);
+		qglEnable(GL_FRAGMENT_PROGRAM_ARB);
+		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.alphaUnPremultiplyPixelShader);
+
+		GL_State(GLS_DEFAULT| GLS_DEPTHTEST_DISABLE);
+
+		// wait do we really need to clear? we're just drawing back, why do we care?
+		qglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		qglClear(GL_COLOR_BUFFER_BIT);
+
+		qglBegin(GL_QUADS);
+		qglTexCoord2f(0.0f, 0.0f);
+		qglVertex2f(-1.0f, -1.0f);
+
+		qglTexCoord2f(0.0f, (float)glConfig.vidHeight);
+		qglVertex2f(-1.0f, 1.0f);
+
+		qglTexCoord2f((float)glConfig.vidWidth, (float)glConfig.vidHeight);
+		qglVertex2f(1.0f, 1.0f);
+
+		qglTexCoord2f((float)glConfig.vidWidth, 0.0f);
+		qglVertex2f(1.0f, -1.0f);
+		qglEnd();
+
+		qglDisable(GL_VERTEX_PROGRAM_ARB);
+		qglDisable(GL_FRAGMENT_PROGRAM_ARB);
+
+		// and copy it back :P
+		qglCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, glConfig.vidWidth, glConfig.vidHeight);
+	}
+
+	qglBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+	qglDisable(GL_TEXTURE_RECTANGLE_ARB);
+
+	return (const void *)(cmd + 1);
+}
+
+/*
 ====================
 RB_ExecuteRenderCommands
 
@@ -1557,6 +1655,9 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			break;
 		case RC_READ_PIXELS:
 			data = RB_ReadPixels( data );
+			break;
+		case RC_CAPTURE_HACKPORTALS:
+			data = RB_CaptureHackPortals( data );
 			break;
 		case RC_END_OF_LIST:
 			// stop rendering

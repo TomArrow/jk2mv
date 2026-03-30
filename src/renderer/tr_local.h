@@ -373,6 +373,7 @@ typedef struct {
 	byte			isVideoMap;
 
 	qboolean		isWorldBundle; // HAHAHAHAHAHAHA i suck
+	qboolean		isHackPortal;
 } textureBundle_t;
 
 #define NUM_TEXTURE_BUNDLES 2
@@ -403,6 +404,7 @@ typedef struct {
 
 	// Whether this object emits a glow or not.
 	qboolean		glow;
+	qboolean		hasHackPortal;
 } shaderStage_t;
 
 struct shaderCommands_s;
@@ -523,6 +525,8 @@ Ghoul2 Insert End
 
 	qboolean isWorldShader; // UGLY hack.
 	int solidity; // 0 = undefined. 1 = playerclip. -1 = nonsolid
+
+	qboolean		hasHackPortal;	// this is a special hacky portal (tommyternal feature), to allow additive portals and shenanigans like that
 } shader_t;
 
 /*
@@ -580,6 +584,9 @@ typedef struct {
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
+	int			numHackPortalDrawSurfs;
+	struct drawSurf_s	*hackPortalDrawSurfs;
+
 	qboolean	forceVisRefresh; // does kinda same as areamaskModified for when we change r_overbrightbits
 
 	qboolean	mirroredGameplay; // we are mirroring the display
@@ -620,6 +627,7 @@ typedef struct {
 	orientationr_t	world;
 	vec3_t		pvsOrigin;			// may be different than or.origin for portals
 	qboolean	isPortal;			// true if this view is through a portal
+	int			hackPortalNum;		// true if this view is the first hack portal (wanna clear to black so we can alpha unpremultiply)
 	qboolean	isMirror;			// the portal is a mirror, invert the face culling
 	int			frameSceneNum;		// copied from tr.frameSceneNum
 	int			frameCount;			// copied from tr.frameCount
@@ -961,8 +969,10 @@ extern	refimport_t		ri;
 #define	MAX_SKINS				1024
 
 
-#define	MAX_DRAWSURFS			0x10000
-#define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
+#define	MAX_DRAWSURFS				0x10000
+#define	MAX_DRAWSURFS_HACKPORTAL	0x10
+#define	DRAWSURF_MASK				(MAX_DRAWSURFS-1)
+#define	DRAWSURF_HACKPORTAL_MASK	(MAX_DRAWSURFS_HACKPORTAL-1)
 
 /*
 
@@ -1004,6 +1014,7 @@ typedef struct {
 // the renderer front end should never modify glstate_t
 typedef struct {
 	int			currenttextures[2];
+	qboolean	rectangletex[2];
 	int			currenttmu;
 	qboolean	finishCalled;
 	int			texEnv[2];
@@ -1093,7 +1104,7 @@ typedef struct {
 	// Image the glowing objects are rendered to. - AReis
 	GLuint					screenGlow;
 
-	// A rectangular texture representing the normally rendered scene.
+	// A rectangular texture representing the normally rendered scene. Also used for hackportals
 	GLuint					sceneImage;
 
 	// Image used to downsample and blur scene to.	- AReis
@@ -1180,7 +1191,7 @@ typedef struct {
 	char					levelshotName[MAX_OSPATH];
 
 	// gamma correction
-	GLuint gammaVertexShader, gammaPixelShader, hdrPixelShader;
+	GLuint gammaVertexShader, gammaPixelShader, hdrPixelShader, alphaUnPremultiplyPixelShader;
 	GLuint gammaLUTImage;
 
 	int						dynamicGlowWidth;
@@ -1188,6 +1199,8 @@ typedef struct {
 
 	vec4_t					celLineColor;
 	qboolean				celLineColorIsSet;
+
+	vec4_t					stencilShadowColor;
 
 
 	//SQL position cube query helper
@@ -1246,6 +1259,7 @@ extern cvar_t	*r_primitives;			// "0" = based on compiled vertex array existance
 
 extern cvar_t	*r_inGameVideo;				// controls whether in game video should be draw
 extern cvar_t	*r_fastsky;				// controls whether sky should be cleared or drawn
+extern cvar_t	*r_fastHackPortalMultisample; // skip alpha unpremultiply for hackportals
 extern cvar_t	*r_drawSun;				// controls drawing of sun quad
 extern cvar_t	*r_dynamiclight;		// dynamic lights enabled/disabled
 extern cvar_t	*r_dlightBacks;			// dlight non-facing surfaces for continuity
@@ -1339,6 +1353,7 @@ extern	cvar_t	*r_clear;						// force screen clear every frame
 
 extern	cvar_t	*r_shadows;						// controls shadows: 0 = none, 1 = blur, 2 = stencil, 3 = black planar projection
 extern	cvar_t	*r_stencilSky;					// use stencils to allow drawing multiple skies without overlap issues
+extern	cvar_t	*r_stencilShadowColor;			// color of stencil shadows
 extern	cvar_t	*r_flares;						// light flares
 
 extern	cvar_t	*r_intensity;
@@ -1569,6 +1584,7 @@ void		R_ShaderList_f( void );
 void	R_RemapShader(const char *oldShader, const char *newShader, const char *timeOffset);
 void R_RemapShaderAdvanced(const char *shaderName, const char *newShaderName, int timeOffset, shaderRemapLightmapType_t lightmapMode, shaderRemapStyleType_t styleMode);
 void R_RemoveAdvancedRemaps( void );
+void R_DeActivateHackPortalTex();
 
 /*
 ====================================================================
@@ -1658,7 +1674,7 @@ inline bool RB_TessShaderSame(shader_t* shader, shader_t* tessShader) {
 void RB_BeginSurface(shader_t *shader, int fogNum );
 void RB_EndSurface(void);
 void RB_CheckOverflow( int verts, int indexes );
-#define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
+#define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES/2 && tess.shader == tr.shadowShader || tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
 
 void RB_StageIteratorGeneric( void );
 void RB_StageIteratorSky( void );
@@ -1961,6 +1977,11 @@ typedef struct {
 	GLenum	format;
 } readPixelsCommand_t;
 
+typedef struct {
+	int		commandId;
+	GLuint	glImage;
+} captureHackPortalsCommand_t;
+
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
@@ -1973,6 +1994,7 @@ typedef enum {
 	RC_GAMMA_CORRECTION,
 	RC_READ_PIXELS,
 	RC_DRAW_LINE,
+	RC_CAPTURE_HACKPORTALS,
 } renderCommand_t;
 
 
@@ -1988,6 +2010,7 @@ typedef enum {
 // on an SMP machine
 typedef struct {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
+	drawSurf_t	drawSurfsHackPortal[MAX_DRAWSURFS_HACKPORTAL];
 	dlight_t	dlights[MAX_DLIGHTS];
 	trRefEntity_t	entities[MAX_ENTITIES];
 	trMiniRefEntity_t	miniEntities[MAX_MINI_ENTITIES];
@@ -2011,6 +2034,7 @@ void R_SyncRenderThread(void);
 void RB_ExecuteRenderCommands( const void *data );
 
 void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
+void R_AddCaptureHackPortalsCmd(GLuint glImage);
 
 void RE_SetColor( const vec4_t rgba );
 void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1,

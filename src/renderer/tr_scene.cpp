@@ -12,6 +12,7 @@
 #endif
 
 static	int			r_firstSceneDrawSurf;
+static	int			r_firstSceneHackPortalDrawSurf;
 
 static	int			r_numdlights;
 static	int			r_firstSceneDlight;
@@ -39,6 +40,7 @@ void R_InitNextFrame(void) {
 	backEndData->commands.used = 0;
 
 	r_firstSceneDrawSurf = 0;
+	r_firstSceneHackPortalDrawSurf = 0;
 
 	r_numdlights = 0;
 	r_firstSceneDlight = 0;
@@ -484,6 +486,9 @@ void RE_RenderScene( const refdef_t *fd, qboolean mirror ) {
 	tr.refdef.numDrawSurfs = r_firstSceneDrawSurf;
 	tr.refdef.drawSurfs = backEndData->drawSurfs;
 
+	tr.refdef.numHackPortalDrawSurfs = r_firstSceneHackPortalDrawSurf;
+	tr.refdef.hackPortalDrawSurfs = backEndData->drawSurfsHackPortal;
+
 	tr.refdef.num_entities = r_numentities - r_firstSceneEntity;
 	tr.refdef.entities = &backEndData->entities[r_firstSceneEntity];
 	tr.refdef.miniEntities = &backEndData->miniEntities[r_firstSceneMiniEntity];
@@ -536,6 +541,7 @@ void RE_RenderScene( const refdef_t *fd, qboolean mirror ) {
 
 	// the next scene rendered in this frame will tack on after this one
 	r_firstSceneDrawSurf = tr.refdef.numDrawSurfs;
+	r_firstSceneHackPortalDrawSurf = tr.refdef.numHackPortalDrawSurfs;
 	r_firstSceneEntity = r_numentities;
 	r_firstSceneMiniEntity = r_numminientities;
 	r_firstSceneDlight = r_numdlights;
