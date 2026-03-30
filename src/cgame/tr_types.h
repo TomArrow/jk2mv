@@ -350,7 +350,7 @@ typedef struct {
 	int						maxTextureSize;			// queried from GL
 	int						maxActiveTextures;		// multitexture ability
 
-	int						colorBits, depthBits, stencilBits;
+	int						colorBits, depthBits, stencilBits, samples;
 
 	qboolean				deviceSupportsGamma;
 	textureCompression_t	textureCompression;
@@ -377,6 +377,10 @@ typedef struct {
 	// gamma correction
 	qboolean				deviceSupportsPostprocessingGamma;
 	qboolean				deviceSupportsPostprocessingGammaHDR;
+
+	// hack portals
+	qboolean				deviceSupportsHackPortals;
+	qboolean				deviceSupportsHackPortalAlphaUnPremultiply;
 
 	//
 	// following variables can change every frame!

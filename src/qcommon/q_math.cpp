@@ -348,6 +348,7 @@ float	Q_crandom( int *seed ) {
 
 // these declarations are for C99 inline
 extern void VectorSet( vec3_t v, float x, float y, float z );
+extern void Vector4Set( vec4_t v, float x, float y, float z, float w );
 extern void VectorClear( vec3_t a );
 extern void VectorNegate( const vec3_t in, vec3_t out );
 extern vec_t DotProduct( const vec3_t v1, const vec3_t v2 );

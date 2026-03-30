@@ -172,6 +172,24 @@ void	R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	cmd->viewParms = tr.viewParms;
 }
 
+/*
+=============
+R_AddCaptureHackPortalsCmd
+
+=============
+*/
+void	R_AddCaptureHackPortalsCmd( GLuint glImage ) {
+	captureHackPortalsCommand_t	*cmd;
+
+	cmd = (captureHackPortalsCommand_t*)R_GetCommandBuffer( sizeof( *cmd ) );
+	if ( !cmd ) {
+		return;
+	}
+	cmd->commandId = RC_CAPTURE_HACKPORTALS;
+
+	cmd->glImage = glImage;
+}
+
 
 /*
 =============
@@ -499,6 +517,14 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 			}
 		}
 		r_celoutlineColor->modified = qfalse;
+	}
+
+	if (r_stencilShadowColor->modified) {
+		const char* stencilShadowColorTextPointer = r_stencilShadowColor->string;
+		if (!parseVec4(stencilShadowColorTextPointer,tr.stencilShadowColor)) {
+			Vector4Set(tr.stencilShadowColor,0.6f,0.6f,0.6f,1.0f);
+		}
+		r_stencilShadowColor->modified = qfalse;
 	}
 
 	//

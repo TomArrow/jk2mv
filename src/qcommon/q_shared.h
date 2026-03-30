@@ -899,6 +899,13 @@ ID_INLINE void VectorSet( vec3_t v, float x, float y, float z ) {
 	v[2] = z;
 }
 
+ID_INLINE void Vector4Set( vec4_t v, float x, float y, float z, float w ) {
+	v[0] = x;
+	v[1] = y;
+	v[2] = z;
+	v[3] = w;
+}
+
 ID_INLINE void VectorClear( vec3_t a ) {
 	a[0] = a[1] = a[2] = 0;
 }

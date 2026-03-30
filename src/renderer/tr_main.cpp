@@ -940,7 +940,7 @@ R_MirrorViewBySurface
 Returns qtrue if another view has been rendered
 ========================
 */
-qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
+qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, int hackPortalNum) {
 	vec4_t			clipDest[128];
 	viewParms_t		newParms;
 	viewParms_t		oldParms;
@@ -966,6 +966,7 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 
 	newParms = tr.viewParms;
 	newParms.isPortal = qtrue;
+	newParms.hackPortalNum = hackPortalNum;
 	if ( !R_GetPortalOrientations( drawSurf, entityNum, &surface, &camera,
 		newParms.pvsOrigin, &newParms.isMirror ) ) {
 		return qfalse;		// bad portal, no portalentity
@@ -981,6 +982,13 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 	R_MirrorVector (oldParms.ori.axis[2], &surface, &camera, newParms.ori.axis[2]);
 
 	// OPTIMIZE: restrict the viewport on the mirrored view
+	if (hackPortalNum) {
+		viewParms_t	surfacePreDrawParms = oldParms;
+		surfacePreDrawParms.hackPortalNum = -hackPortalNum;
+		tr.viewParms = surfacePreDrawParms;
+		R_AddDrawSurfCmd(drawSurf, 1); // we just draw this one surface to limit drawing to the actual area of the portal surface
+		tr.viewParms = oldParms;
+	}
 
 	// render the mirror view
 	R_RenderView (&newParms);
@@ -1094,6 +1102,14 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 		}
 		tr.viewParms.lastSkyShader = shader->sortedIndex;
 	}
+	if (shader->hasHackPortal) {
+		// special tommyternal hack portal to allow additive portals and such.
+		index = tr.refdef.numHackPortalDrawSurfs & DRAWSURF_HACKPORTAL_MASK;
+		tr.refdef.hackPortalDrawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT)
+			| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
+		tr.refdef.hackPortalDrawSurfs[index].surface = surface;
+		tr.refdef.numHackPortalDrawSurfs++;
+	}
 }
 
 /*
@@ -1114,12 +1130,13 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 R_SortDrawSurfs
 =================
 */
-void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
+void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs, drawSurf_t *hackPortalDrawSurfs, int numHackPortalDrawSurfs ) {
 	shader_t		*shader;
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
 	int				i;
+	int				portalRenderCount = 0;
 
 	// it is possible for some views to not have any surfaces
 	if ( numDrawSurfs < 1 ) {
@@ -1130,6 +1147,20 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 	// sort the drawsurfs by sort type, then orientation, then shader
 	R_RadixSort(drawSurfs, numDrawSurfs);
+
+	for (i = 0; i < numHackPortalDrawSurfs; i++) {
+		R_DecomposeSort((hackPortalDrawSurfs + i)->sort, &entityNum, &shader, &fogNum, &dlighted);
+
+		// if the mirror was completely clipped away, we may need to check another surface
+		if (R_MirrorViewBySurface((hackPortalDrawSurfs + i), entityNum, portalRenderCount + 1)) {
+			portalRenderCount++;
+		}
+	}
+
+	if (portalRenderCount) { // we capture whatever hackportals were drawn and will use them later. 
+		// we reuse tr.sceneImage. it's just used for gamma correction otherwise, why not. Later we will bind it to draw the portal surface.
+		R_AddCaptureHackPortalsCmd(tr.sceneImage); 
+	}
 
 	// check for any pass through drawing, which
 	// may cause another view to be rendered first
@@ -1146,13 +1177,20 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		}
 
 		// if the mirror was completely clipped away, we may need to check another surface
-		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
+		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum, qfalse) ) {
+			portalRenderCount++;
 			// this is a debug option to see exactly what is being mirrored
 			if ( r_portalOnly->integer ) {
+				R_AddDrawSurfCmd(drawSurfs, 0); // just draw with 0, so it doesn't mess up state for 2d
 				return;
 			}
 			break;		// only one mirror view at a time
 		}
+	}
+
+	if (portalRenderCount && r_portalOnly->integer) {
+		R_AddDrawSurfCmd(drawSurfs, 0); // just draw with 0, so it doesn't mess up state for 2d
+		return;
 	}
 
 	R_AddDrawSurfCmd( drawSurfs, numDrawSurfs );
@@ -1360,6 +1398,8 @@ or a mirror / remote location
 void R_RenderView (viewParms_t *parms) {
 	int		firstDrawSurf;
 	int		numDrawSurfs;
+	int		firstHackPortalDrawSurf;
+	int		numHackPortalDrawSurfs;
 
 	if ( parms->viewportWidth <= 0 || parms->viewportHeight <= 0 ) {
 		return;
@@ -1374,6 +1414,7 @@ void R_RenderView (viewParms_t *parms) {
 	tr.viewParms.lastSkyShader = -1;
 
 	firstDrawSurf = tr.refdef.numDrawSurfs;
+	firstHackPortalDrawSurf = tr.refdef.numHackPortalDrawSurfs;
 
 	tr.viewCount++;
 
@@ -1392,7 +1433,12 @@ void R_RenderView (viewParms_t *parms) {
 		numDrawSurfs = MAX_DRAWSURFS;
 	}
 
-	R_SortDrawSurfs( tr.refdef.drawSurfs + firstDrawSurf, numDrawSurfs - firstDrawSurf );
+	numHackPortalDrawSurfs = tr.refdef.numHackPortalDrawSurfs;
+	if (numHackPortalDrawSurfs > MAX_DRAWSURFS_HACKPORTAL) {
+		numHackPortalDrawSurfs = MAX_DRAWSURFS_HACKPORTAL;
+	}
+
+	R_SortDrawSurfs( tr.refdef.drawSurfs + firstDrawSurf, numDrawSurfs - firstDrawSurf, tr.refdef.hackPortalDrawSurfs + firstHackPortalDrawSurf, numHackPortalDrawSurfs - firstHackPortalDrawSurf);
 
 	// draw main system development information (surface outlines, etc)
 	R_DebugGraphics();

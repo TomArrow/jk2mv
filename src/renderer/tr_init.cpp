@@ -62,6 +62,7 @@ cvar_t	*r_measureOverdraw;
 
 cvar_t	*r_inGameVideo;
 cvar_t	*r_fastsky;
+cvar_t	*r_fastHackPortalMultisample;
 cvar_t	*r_drawSun;
 cvar_t	*r_dynamiclight;
 cvar_t	*r_dlightBacks;
@@ -130,6 +131,7 @@ cvar_t	*r_styleOnly;
 cvar_t	*r_uiFullScreen;
 cvar_t	*r_shadows;
 cvar_t	*r_stencilSky;
+cvar_t	*r_stencilShadowColor;
 cvar_t	*r_flares;
 cvar_t	*r_aspectratio;
 cvar_t	*r_nobind;
@@ -415,6 +417,7 @@ static void GLimp_InitExtensions(void) {
 	if (!r_allowExtensions->integer) {
 		Com_Printf("*** IGNORING OPENGL EXTENSIONS ***\n");
 		g_bDynamicGlowSupported = false;
+		glConfig.deviceSupportsHackPortals = qfalse;
 		ri.Cvar_Set("r_DynamicGlow", "0");
 		return;
 	}
@@ -633,6 +636,13 @@ static void GLimp_InitExtensions(void) {
 	if (bNVRegisterCombiners)
 		qglGetIntegerv(GL_MAX_GENERAL_COMBINERS_NV, &iNumGeneralCombiners);
 
+	if (bTexRectSupported && qglActiveTextureARB) {
+		glConfig.deviceSupportsHackPortals = qtrue;
+	}
+	else {
+		glConfig.deviceSupportsHackPortals = qfalse;
+	}
+
 	// Only allow dynamic glows/flares if they have the hardware
 	if (bTexRectSupported && bARBVertexProgram && qglActiveTextureARB && glConfig.maxActiveTextures >= 4 &&
 		((bNVRegisterCombiners && iNumGeneralCombiners >= 2) || bARBFragmentProgram)) {
@@ -652,9 +662,11 @@ static void GLimp_InitExtensions(void) {
 #endif
 		glConfig.deviceSupportsPostprocessingGamma = qtrue;
 		glConfig.deviceSupportsPostprocessingGammaHDR = qtrue;
+		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qtrue;
 	} else {
 		glConfig.deviceSupportsPostprocessingGamma = qfalse;
 		glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
+		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qfalse;
 	}
 
 	// GL_EXT_texture_lod_bias
@@ -953,10 +965,12 @@ void GL_SetDefaultState( void )
 		GL_TextureMode( r_textureMode->string );
 		GL_TexEnv( GL_MODULATE );
 		qglDisable( GL_TEXTURE_2D );
+		qglDisable( GL_TEXTURE_RECTANGLE_ARB );
 		GL_SelectTexture( 0 );
 	}
 
 	qglEnable(GL_TEXTURE_2D);
+	qglDisable( GL_TEXTURE_RECTANGLE_ARB );
 	GL_TextureMode( r_textureMode->string );
 	GL_TexEnv( GL_MODULATE );
 
@@ -1204,6 +1218,7 @@ void R_Register( void )
 	AssertCvarRange( r_znear, 0.001f, 200, qtrue );
 	r_ignoreGLErrors = ri.Cvar_Get("r_ignoreGLErrors", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_fastsky = ri.Cvar_Get("r_fastsky", "0", CVAR_GLOBAL);
+	r_fastHackPortalMultisample = ri.Cvar_Get("r_fastHackPortalMultisample", "0", CVAR_GLOBAL | CVAR_ARCHIVE);
 	r_inGameVideo = ri.Cvar_Get("r_inGameVideo", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_drawSun = ri.Cvar_Get("r_drawSun", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_dynamiclight = ri.Cvar_Get("r_dynamiclight", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
@@ -1288,6 +1303,8 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 	r_stencilSky = ri.Cvar_Get( "r_stencilSky", "1", CVAR_ARCHIVE );
+	r_stencilShadowColor = ri.Cvar_Get( "r_stencilShadowColor", "0.6", CVAR_ARCHIVE );
+	r_stencilShadowColor->modified = qtrue;
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), CVAR_ARCHIVE | CVAR_LATCH);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), CVAR_ARCHIVE | CVAR_LATCH);
