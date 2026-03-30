@@ -596,7 +596,7 @@ int Cmd_Search(const char* search_term, cmd_function_t** buf, int maxcount) {
 	int i, count = 0;
 
 	for (cmd = cmd_functions; cmd && count < maxcount; cmd = cmd->next) {
-		if (Q_stristr(cmd->name, (char*)search_term)) {
+		if (!cmd->meme && Q_stristr(cmd->name, (char*)search_term)) {
 			buf[count++] = cmd;
 		}
 	}

@@ -4040,7 +4040,7 @@ static void Com_PrintModules(module_t firstModule, int moduleMask, printf_t prin
 	print("\n");
 }
 
-printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, bool printSearch, int printWidth)
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth)
 {
 	qboolean isCvar = qfalse;
 	const char* desc;
@@ -4066,7 +4066,7 @@ printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotF
 			countCvars = Cvar_Search(name, findBuf, sizeof(findBuf)/sizeof(findBuf[0]));
 			countCmds = Cmd_Search(name, findBufCmd, sizeof(findBuf)/sizeof(findBuf[0]));
 			for (i = 0; i < countCvars; i++) {
-				Cvar_PrintFirstHelpLine(findBuf[i]->name, print, true);
+				Cvar_PrintFirstHelpLine(findBuf[i]->name, print, printSearch > 1);
 			}
 			for (i = 0; i < countCmds; i++) {
 				print(S_COLOR_CMD "%s\n", findBufCmd[i]->name);

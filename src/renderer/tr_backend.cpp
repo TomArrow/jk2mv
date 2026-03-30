@@ -446,10 +446,10 @@ void RB_BeginDrawingView (void) {
 		glState.finishCalled = qtrue;
 	}
 
-	if (!com_developer->integer && r_shadows->integer == 2)
-	{
+	//if (!com_developer->integer && r_shadows->integer == 2)
+	//{
 		//Cvar_Set("cg_shadows", "1"); //TA: why?
-	}
+	//}
 
 	// we will need to change the projection matrix before drawing
 	// 2D images again
@@ -1463,7 +1463,7 @@ const void *RB_GammaCorrection( const void *data )
 	qglEnable(GL_FRAGMENT_PROGRAM_ARB);
 	if (doingHDR) {
 		qglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, tr.hdrPixelShader);
-		float obbMult[5] = { tr.overbrightBitsMultiplier, r_gammaHDR->value, 0, 0, 0 };
+		float obbMult[5] = { (float)tr.overbrightBitsMultiplier, r_gammaHDR->value, 0, 0, 0 };
 		qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, obbMult);
 		qglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, obbMult+1);
 	}

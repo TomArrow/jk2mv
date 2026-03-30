@@ -1335,6 +1335,7 @@ void RenderSurfaces(CRenderSurface &RS)
 		// stencil shadows can't do personal models unless I polyhedron clip
 		if ( !RS.personalModel
 			&& r_shadows->integer == 2
+			&& clRenderInfo.wallhackOk // the shadows go through walls :/
 			&& RS.fogNum == 0
 			&& !(RS.renderfx & ( RF_NOSHADOW | RF_DEPTHHACK ) )
 			&& shader->sort == SS_OPAQUE )
@@ -1346,9 +1347,9 @@ void RenderSurfaces(CRenderSurface &RS)
 		}
 
 		// projection shadows work fine with personal models
-		if ( r_shadows->integer == 3
+		if ( (r_shadows->integer == 3 || r_shadows->integer == 2 && !clRenderInfo.wallhackOk)
 			&& RS.fogNum == 0
-			&& (RS.renderfx & RF_SHADOW_PLANE )
+			&& ((RS.renderfx & RF_SHADOW_PLANE ) || r_shadows->integer == 2 && !clRenderInfo.wallhackOk)
 			&& shader->sort == SS_OPAQUE )
 		{		// set the surface info to point at the where the transformed bone list is going to be for when the surface gets rendered out
 			CRenderableSurface *newSurf = new CRenderableSurface;

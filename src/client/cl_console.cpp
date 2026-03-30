@@ -18,6 +18,7 @@ cvar_t		*con_opacity;
 cvar_t		*con_skipNotifyKeyword;;
 cvar_t		*con_drawHelp;
 cvar_t		*con_drawHelpSearchMinLength;
+cvar_t		*con_drawHelpSearchShowValues;
 
 //EternalJK2MV
 cvar_t		*con_blackColorOverride;
@@ -689,6 +690,7 @@ void Con_Init (void) {
 	con_skipNotifyKeyword = Cvar_Get ("con_skipNotifyKeyword", "", CVAR_ARCHIVE); // NOT global, because it's made for compatibility with some mods
 	con_drawHelp = Cvar_Get ("con_drawHelp", "31", CVAR_ARCHIVE); 
 	con_drawHelpSearchMinLength = Cvar_Get ("con_drawHelpSearchMinLength", "3", CVAR_ARCHIVE);
+	con_drawHelpSearchShowValues = Cvar_Get ("con_drawHelpSearchShowValues", "1", CVAR_ARCHIVE);
 
 
 	Field_Clear( &kg.g_consoleField );
@@ -1364,7 +1366,7 @@ static void Con_DrawHelp()
 	const bool printAlways = (con_drawHelp->integer & DRAWHELP_NOTFOUND_BIT) != 0;
 	const bool printModules = (con_drawHelp->integer & DRAWHELP_MODULES_BIT) != 0;
 	const bool printAttribs = (con_drawHelp->integer & DRAWHELP_ATTRIBS_BIT) != 0;
-	const bool printSearch = (con_drawHelp->integer & DRAWHELP_SEARCH) != 0 && Cmd_Argc() == 1 && strlen(name) >= con_drawHelpSearchMinLength->integer;
+	const int printSearch = ((con_drawHelp->integer & DRAWHELP_SEARCH) != 0 && Cmd_Argc() == 1 && strlen(name) >= con_drawHelpSearchMinLength->integer) ? (con_drawHelpSearchShowValues->integer ? 2 : 1): 0;
 	con.helpDraw = qfalse;
 	con.helpX = 0;
 	con.helpWidth = 0;

@@ -84,7 +84,7 @@ typedef enum {
 	PHR_HADHELP
 } printHelpResult_t;
 
-printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, bool printSearch, int printWidth);
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth);
 
 
 extern qboolean com_demoplaying;
