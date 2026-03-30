@@ -413,6 +413,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return Sys_Milliseconds();
 	case G_CVAR_REGISTER:
 		Cvar_Register( VMAV(1, vmCvar_t), VMAS(2), VMAS(3), args[4] );
+		Cvar_SetModule(VMAS(2), MODULE_GAME);
 		return 0;
 	case G_CVAR_UPDATE:
 		Cvar_Update( VMAV(1, vmCvar_t) );

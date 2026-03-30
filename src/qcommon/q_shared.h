@@ -8,6 +8,13 @@
 
 #define MAX_TEAMNAME 32
 
+#if defined(_MSC_VER)
+#include <sal.h>
+#define PRINTF_FORMAT_STRING _Printf_format_string_
+#else
+#define PRINTF_FORMAT_STRING
+#endif
+
 /**********************************************************************
   VM Considerations
 
@@ -719,6 +726,7 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount, bool lenie
 #define Q_IsColorString(p)	( (p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString_1_02(p)	( (p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE ) // 1.02 ColorStrings
 #define Q_IsColorString_Extended(p) Q_IsColorString_1_02(p)
+#define Q_IsColorString_CPMA(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE )
 
 // stealsies from jomme/nt mod :) thanks
 #define Q_IsColorStringNT(p)	( (p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= 0x7F && *((p)+1) >= '0' ) // changed from >= 0x00 to '0' compared to NT
@@ -742,6 +750,8 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount, bool lenie
 #define Q_IsColorStringHexLenient(p) ((p) && *(p) == Q_COLOR_ESCAPE && Q_IsColorStringHexRestLenient((p)+1) )
 
 #define Q_IsColorStringHex(p,lenient) ( !(lenient) && Q_IsColorStringHexStrict((p)) || (lenient) && Q_IsColorStringHexLenient((p))   )
+
+const /* vec4_t */ float* CPMAColorFromChar(char ccode);
 
 // Default Colors
 #define COLOR_BLACK		'0'
@@ -792,6 +802,24 @@ qboolean Q_parseColorHex(const char* p, float* color, int* skipCount, bool lenie
 #define S_COLOR_DK_BLUE "^m"
 #define S_COLOR_JK2MV   "^n" // Different in Debug/Release
 #define S_COLOR_LT_TRANSPARENT "^o"
+
+// CNQ3 help stuff
+#define COLOR_CVAR		'\x20'
+#define COLOR_CMD		'\x21'
+#define COLOR_VAL		'\x22'
+#define COLOR_HELP		'\x23'
+#define COLOR_WAR		'\x24'
+#define COLOR_ERR		'\x25'
+#define S_COLOR_CVAR	"^\x20"
+#define S_COLOR_CMD		"^\x21"
+#define S_COLOR_VAL		"^\x22"
+#define S_COLOR_HELP	"^\x23"
+#define S_COLOR_WAR		"^\x24"
+#define S_COLOR_ERR		"^\x25"
+#define COLOR_INVALID	'\xFF'
+#define COLOR_MKTEXT	'\xFE'
+#define COLOR_MKSHAD	'\xFD'
+#define COLOR_SHAD		'\xFC'
 
 extern const vec4_t	g_color_table[COLOR_EXT_AMOUNT]; 
 extern vec4_t	g_color_table_nt[128];
@@ -1121,6 +1149,7 @@ int		Q_strlen(const char *s);
 
 // strlen that discounts Quake color sequences
 int Q_PrintStrlen( const char *string, qboolean use102color, qboolean ntModColors);
+int Q_PrintStroff(const char* string, int charOffset, qboolean use102color, qboolean ntModColors);
 
 int Q_PrintStrCharsTo(const char *str, int pos, char *color, qboolean use102color, qboolean ntModColors);
 int Q_PrintStrLenTo(const char *str, int chars, char *color, qboolean use102color, qboolean ntModColors);
@@ -1163,6 +1192,29 @@ void Info_NextPair( const char **s, char *key, char *value );
 Q_NORETURN void	QDECL  Com_Error( errorParm_t level, const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
 void	QDECL Com_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 
+
+typedef void (QDECL* printf_t)(PRINTF_FORMAT_STRING const char* fmt, ...);
+
+#define MODULE_LIST(X) \
+	X(MAIN, "Main") \
+	X(RENDERER, "Renderer") \
+	X(FX, "FX") \
+	X(BOTLIBRARY, "BotLib") \
+	X(GAME, "Game") \
+	X(CGAME, "ClientGame") \
+	X(UI, "UI") \
+	X(NONE, "") \
+
+#define MODULE_ITEM(Enum, Desc) MODULE_##Enum, 
+typedef enum {
+	MODULE_LIST(MODULE_ITEM)
+	MODULE_MAX
+} module_t;
+#undef MODULE_ITEM
+
+
+
+
 /*
 ==========================================================
 
@@ -1198,17 +1250,70 @@ default values.
 #define CVAR_VM_NOREAD		0x00004000		// the cvar can NOT be read-accessed by the vm modules
 #define CVAR_VM_NOWRITE		0x00008000		// the cvar can NOT be write-accessed by the vm modules
 
+// added some CNQ3 cool cvar stuff
+// CVar categories
+#define CVARCAT_GENERAL			1
+#define CVARCAT_GAMEPLAY		2
+#define CVARCAT_NETWORK			4
+#define CVARCAT_DISPLAY			8
+#define CVARCAT_GRAPHICS		16
+#define CVARCAT_SOUND			32
+#define CVARCAT_CONSOLE			64
+#define CVARCAT_HUD				128
+#define CVARCAT_GUI				256
+#define CVARCAT_PERFORMANCE		512
+#define CVARCAT_DEBUGGING		1024
+#define CVARCAT_INPUT			2048
+#define CVARCAT_DEMO			4096
+
+typedef enum {
+	CVART_STRING,		// no validation
+	CVART_FLOAT,		// uses floating-point min/max bounds
+	CVART_INTEGER,		// uses integer min/max bounds
+	CVART_BITMASK,		// uses integer min/max bounds
+	CVART_BOOL,			// uses integer min/max bounds, min=0 and max=1
+	// extended data types (not currently used by the CPMA QVMs)
+	CVART_COLOR_CPMA,	// CPMA color code (0-9 A-Z a-z)
+	CVART_COLOR_CPMA_E,	// CPMA color code or empty
+	CVART_COLOR_CHBLS,	// CPMA color codes: rail Core, Head, Body, Legs, rail Spiral
+	CVART_COLOR_RGB,	// as hex, e.g. FF00FF
+	CVART_COLOR_RGBA,	// as hex, e.g. FF00FF00
+	CVART_COUNT			// always last in the enum
+} cvarType_t;
+
+typedef struct intValidator_s {
+	int min;
+	int max;
+} intValidator_t;
+
+typedef struct floatValidator_s {
+	float min;
+	float max;
+} floatValidator_t;
+
+typedef union {
+	intValidator_t		i;
+	floatValidator_s	f;
+} cvarValidator_t;
+
+
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s {
 	const char	*name;
 	const char	*string;
 	const char	*resetString;		// cvar_restart will reset to this value
 	const char	*latchedString;		// for CVAR_LATCH vars
+	const char	*desc;
+	const char	*help;
 	int			flags;
+	cvarType_t	type;
+	module_t	firstModule;
+	int			moduleMask;
 	qboolean	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
 	float		value;				// atof( string )
 	int			integer;			// atoi( string )
+	cvarValidator_t	validator;
 	struct cvar_s *next;
 	struct cvar_s *hashNext;
 } cvar_t;

@@ -75,6 +75,18 @@ qboolean Com_GetLocalizedString(const char *reference, char *dst, size_t dstsize
 int Com_GetNumLanguages(void);
 void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSize);
 
+void Help_AllocSplitText(const char** desc, const char** help, const char* combined);
+
+typedef enum {
+	PHR_NOTFOUND,
+	PHR_SEARCHRESULTS,
+	PHR_NOHELP,
+	PHR_HADHELP
+} printHelpResult_t;
+
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, bool printSearch, int printWidth);
+
+
 extern qboolean com_demoplaying;
 
 // cl_keys.cpp
@@ -557,6 +569,19 @@ then searches for a command or variable that matches the first token.
 
 typedef void (*xcommand_t) (void);
 
+typedef struct cmd_function_s
+{
+	struct cmd_function_s* next;
+	const char* name;
+	const char* desc;
+	const char* help;
+	xcommand_t				function;
+	completionFunc_t		complete; // for auto-complete (copied from OpenJK)
+	qboolean				meme; // dont autocomplete unless exact match
+	module_t				firstModule;
+	int						moduleMask;
+} cmd_function_t;
+
 void	Cmd_Init (void);
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
@@ -568,6 +593,20 @@ void	Cmd_AddMemeCommand( const char *cmd_name, xcommand_t function ); // no auto
 // as a clc_clientCommand instead of executed locally
 
 void	Cmd_RemoveCommand( const char *cmd_name );
+
+void Cmd_SetHelp(const char* cmd_name, const char* cmd_help);
+qboolean Cmd_GetHelp(const char** desc, const char** help, const char* cmd_name);	// qtrue if the cmd was found
+
+int		Cmd_Search(const char* search_term, cmd_function_t** buf, int maxcount);
+
+void Cmd_SetModule(const char* cmd_name, module_t module);
+
+// removes all commands that were *only* registered by the given module
+void Cmd_UnregisterModule(module_t module);
+
+void Cmd_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* cmd_name);
+
+const char* Cmd_GetRegisteredName(const char* cmd_name);
 
 void	Cmd_CommandCompletion( void(*callback)(const char *s, qboolean meme) );
 // callback with each valid string
@@ -593,6 +632,8 @@ void	Cmd_Execute( void );
 void	Cmd_ExecuteString( const char *text );
 // Parses a single line of text into arguments and tries to execute it
 // as if it was typed at the console
+
+
 
 
 /*
@@ -622,6 +663,7 @@ modules of the program.
 
 */
 
+
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags );
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboolean isVmCall );
 // creates the variable if it doesn't exist, or returns the existing one
@@ -629,11 +671,27 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 // that allows variables to be unarchived without needing bitflags
 // if value is "", the value will not override a previously set value.
 
+void	Cvar_SetHelp(const char* var_name, const char* help);
+qboolean	Cvar_GetHelp(const char** desc, const char** help, const char* var_name);	// qtrue if the cvar was found
+
+void	Cvar_SetRange(const char* var_name, cvarType_t type, const char* min, const char* max);
+
+void	Cvar_SetDataType(const char* cvarName, cvarType_t type);
+
 void	Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 // basically a slightly modified Cvar_Get for the interpreted modules
 
 void	Cvar_Update( vmCvar_t *vmCvar );
 // updates an interpreted modules' version of a cvar
+
+void	Cvar_SetModule(const char* var_name, module_t module);
+void	Cvar_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* var_name);
+
+const char* Cvar_GetRegisteredName(const char* var_name);
+
+void	Cvar_PrintTypeAndRange(const char* var_name, printf_t print);
+void	Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue);
+void	Cvar_PrintFlags(const char* var_name, printf_t print);
 
 void 	Cvar_Set( const char *var_name, const char *value );
 cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force );
@@ -648,7 +706,7 @@ void	Cvar_SetValue( const char *var_name, float value, qboolean isVmCall );
 // expands value to a string and calls Cvar_Set
 
 cvar_t *Cvar_FindVar(const char *var_name);
-
+int		Cvar_Search(const char* search_term, cvar_t** buf, int maxcount);
 float	Cvar_VariableValue( const char *var_name );
 float	Cvar_VariableValue( const char *var_name, qboolean isVmCall );
 int		Cvar_VariableIntegerValue( const char *var_name );
@@ -721,16 +779,6 @@ issues.
 #define	MAX_FILE_HANDLES	256 // increased from 64 in jk2mv
 #define	FS_INVALID_HANDLE	0
 
-typedef enum {
-	MODULE_MAIN,
-	MODULE_RENDERER,
-	MODULE_FX,
-	MODULE_BOTLIB,
-	MODULE_GAME,
-	MODULE_CGAME,
-	MODULE_UI,
-	MODULE_MAX
-} module_t;
 
 enum fileCompressionScheme_t {
 	FILECOMPRESSION_NONE, // Normal default file handling

@@ -348,15 +348,6 @@ void Cmd_Echo_f (void)
 =============================================================================
 */
 
-typedef struct cmd_function_s
-{
-	struct cmd_function_s	*next;
-	const char				*name;
-	xcommand_t				function;
-	completionFunc_t		complete; // for auto-complete (copied from OpenJK)
-	qboolean				meme; // dont autocomplete unless exact match
-} cmd_function_t;
-
 
 static	int			cmd_argc;
 static	char		*cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
@@ -521,6 +512,10 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd->complete = NULL; // for auto-complete (copied from OpenJK)
 	cmd->next = cmd_functions;
 	cmd->meme = qfalse;
+	cmd->firstModule = MODULE_NONE;
+	cmd->moduleMask = 0;
+	cmd->desc = NULL;
+	cmd->help = NULL;
 	cmd_functions = cmd;
 }
 /*
@@ -579,6 +574,35 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 	}
 }
 
+static cmd_function_t* Cmd_FindCommand(const char* cmd_name)
+{
+	cmd_function_t* cmd;
+	for (cmd = cmd_functions; cmd; cmd = cmd->next) {
+		if (!Q_stricmp(cmd_name, cmd->name)) {
+			return cmd;
+		}
+	}
+
+	return NULL;
+}
+
+/*
+============
+Cmd_Search
+============
+*/
+int Cmd_Search(const char* search_term, cmd_function_t** buf, int maxcount) {
+	cmd_function_t* cmd;
+	int i, count = 0;
+
+	for (cmd = cmd_functions; cmd && count < maxcount; cmd = cmd->next) {
+		if (Q_stristr(cmd->name, (char*)search_term)) {
+			buf[count++] = cmd;
+		}
+	}
+
+	return count;
+}
 
 /*
 ============
@@ -591,6 +615,82 @@ void	Cmd_CommandCompletion( void(*callback)(const char *s, qboolean meme) ) {
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
 		callback( cmd->name, cmd->meme );
 	}
+}
+
+
+void Cmd_SetHelp(const char* cmd_name, const char* cmd_help)
+{
+	cmd_function_t* cmd = Cmd_FindCommand(cmd_name);
+	if (cmd)
+		Help_AllocSplitText(&cmd->desc, &cmd->help, cmd_help);
+}
+
+
+qboolean Cmd_GetHelp(const char** desc, const char** help, const char* cmd_name)
+{
+	cmd_function_t* cmd = Cmd_FindCommand(cmd_name);
+	if (!cmd || cmd->meme) {
+		*desc = NULL;
+		*help = NULL;
+		return qfalse;
+	}
+
+	*desc = cmd->desc;
+	*help = cmd->help;
+	return qtrue;
+}
+
+
+void Cmd_SetModule(const char* cmd_name, module_t module)
+{
+	cmd_function_t* cmd = Cmd_FindCommand(cmd_name);
+	if (!cmd)
+		return;
+
+	cmd->moduleMask |= 1 << (int)module;
+	if (cmd->firstModule == MODULE_NONE)
+		cmd->firstModule = module;
+}
+
+
+void Cmd_UnregisterModule(module_t module)
+{
+	if (module <= MODULE_NONE || module >= MODULE_MAX)
+		return;
+
+	cmd_function_t* cmd = cmd_functions;
+	while (cmd) {
+		if (cmd->firstModule == module && cmd->moduleMask == 1 << (int)module) {
+			cmd_function_t* next;
+			next = cmd->next;
+			Cmd_RemoveCommand(cmd->name);
+			cmd = next;
+		}
+		else {
+			cmd = cmd->next;
+		}
+	}
+}
+
+
+void Cmd_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* cmd_name)
+{
+	cmd_function_t* cmd = Cmd_FindCommand(cmd_name);
+	if (!cmd)
+		return;
+
+	*firstModule = cmd->firstModule;
+	*moduleMask = cmd->moduleMask;
+}
+
+
+const char* Cmd_GetRegisteredName(const char* cmd_name)
+{
+	cmd_function_t* cmd = Cmd_FindCommand(cmd_name);
+	if (!cmd)
+		return NULL;
+
+	return cmd->name;
 }
 
 

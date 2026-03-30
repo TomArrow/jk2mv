@@ -975,6 +975,7 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		return Sys_Milliseconds();
 	case CG_CVAR_REGISTER:
 		Cvar_Register( VMAV(1, vmCvar_t), VMAS(2), VMAS(3), args[4] );
+		Cvar_SetModule( VMAS(2), MODULE_CGAME);
 		return 0;
 	case CG_CVAR_UPDATE:
 		Cvar_Update( VMAV(1, vmCvar_t) );

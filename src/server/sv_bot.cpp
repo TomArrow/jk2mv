@@ -552,26 +552,26 @@ static int bot_Z_AvailableMemory(void)
 }
 
 static int BotImport_FS_FOpenFileByMode(const char *qpath, fileHandle_t *f, fsMode_t mode) {
-	return FS_FOpenFileByMode(qpath, f, mode, MODULE_BOTLIB);
+	return FS_FOpenFileByMode(qpath, f, mode, MODULE_BOTLIBRARY);
 }
 
 static int BotImport_FS_FOpenFileByModeHash( const char *qpath, fileHandle_t *f, fsMode_t mode, unsigned long *hash ) {
-	return FS_FOpenFileByModeHash(qpath, f, mode, hash, MODULE_BOTLIB);
+	return FS_FOpenFileByModeHash(qpath, f, mode, hash, MODULE_BOTLIBRARY);
 }
 
 static int BotImport_FS_Read2( void *buffer, int len, fileHandle_t f ) {
-	return FS_Read2(buffer, len, f, MODULE_BOTLIB);
+	return FS_Read2(buffer, len, f, MODULE_BOTLIBRARY);
 }
 
 static void BotImport_FS_FCloseFile( fileHandle_t f ) {
-	FS_FCloseFile( f, MODULE_BOTLIB );
+	FS_FCloseFile( f, MODULE_BOTLIBRARY);
 }
 static int BotImport_FS_Write( const void *buffer, int len, fileHandle_t h ) {
-	return FS_Write(buffer, len, h, MODULE_BOTLIB);
+	return FS_Write(buffer, len, h, MODULE_BOTLIBRARY);
 }
 
 static int BotImport_FS_Seek( fileHandle_t f, int offset, int origin ) {
-	return FS_Seek(f, offset, origin, MODULE_BOTLIB);
+	return FS_Seek(f, offset, origin, MODULE_BOTLIBRARY);
 }
 
 /*

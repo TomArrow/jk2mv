@@ -5,6 +5,7 @@
 #include "../qcommon/strip.h"
 #include <mv_setup.h>
 
+static void GetFloatColor(float* c, const cvar_t* cvar, qboolean hasAlpha); // cnq3
 
 console_t	con;
 
@@ -14,7 +15,9 @@ cvar_t		*con_scale;
 cvar_t		*con_speed;
 cvar_t		*con_timestamps;
 cvar_t		*con_opacity;
-cvar_t		*con_skipNotifyKeyword;
+cvar_t		*con_skipNotifyKeyword;;
+cvar_t		*con_drawHelp;
+cvar_t		*con_drawHelpSearchMinLength;
 
 //EternalJK2MV
 cvar_t		*con_blackColorOverride;
@@ -33,6 +36,29 @@ static const conChar_t CON_WRAP = { { ColorIndex_Extended(COLOR_LT_TRANSPARENT),
 static const conChar_t CON_BLANK = { { ColorIndex(COLOR_WHITE), CON_BLANK_CHAR } };
 
 vec4_t	console_color = {1.0, 1.0, 1.0, 1.0};
+
+#define COLOR_LIST(X) \
+	X(Arrow,	"4778B2FF",	qtrue,	"RGBA color of backscroll arrows",		"Console backscroll arrows") \
+	X(Shadow,	"000000FF",	qtrue,	"RGBA color of text shadows",			"Console text shadows") \
+	X(MkBG,		"BFBFBFFF",	qtrue,	"RGBA color of the mark background",	"Console mark background") \
+	X(MkShadow,	"FFFFFF00",	qtrue,	"RGBA color of the mark text shadows",	"Console mark text shadows") \
+	X(Text,		"E2E2E2",	qfalse,	"RGB color of text",					"Console text") \
+	X(MkText,	"000000",	qfalse,	"RGB color of mark text",				"Console mark text") \
+	X(CVar,		"4778B2",	qfalse,	"RGB color of variable names",			"Console variable names") \
+	X(Cmd,		"4FA7BD",	qfalse,	"RGB color of command names",			"Console command names") \
+	X(Value,	"E5BC39",	qfalse,	"RGB color of variable values",			"Console variable values") \
+	X(Help,		"ABC1C6",	qfalse,	"RGB color of help text",				"Console help text") \
+	X(Search,	"FFFF00",	qfalse,	"RGB color of search result marker",	"Console search result marker") \
+	X(HL,		"303033FF",	qtrue,	help_con_colHL,							"Console completion highlights") 
+	//X(BG, "101013F6", qtrue, "RGBA color of the background", "Console background") \
+	X(Border,	"4778B2FF",	qtrue,	"RGBA color of the border",				"Console border") \
+
+#define COLOR_LIST_ITEM( Name, Default, HasAlpha, Help, Title ) \
+	static cvar_t* con_col##Name; \
+	static vec4_t col##Name;
+COLOR_LIST(COLOR_LIST_ITEM)
+#undef COLOR_LIST_ITEM
+
 
 /*
 ================
@@ -633,6 +659,8 @@ void Con_CheckResize (void)
 	}
 }
 
+
+
 /*
 ================
 Con_Init
@@ -640,6 +668,12 @@ Con_Init
 */
 static char version[MAX_STRING_CHARS] = { 0 };
 void Con_Init (void) {
+
+#define COLOR_LIST_ITEM( Name, Default, HasAlpha, Help, Title ) \
+	con_col##Name =  Cvar_Get("con_col" #Name, Default, CVAR_ARCHIVE);
+	COLOR_LIST(COLOR_LIST_ITEM)
+#undef COLOR_LIST_ITEM
+
 	con_height = Cvar_Get ("con_height", "0.5", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_notifytime = Cvar_Get ("con_notifytime", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
 	con_speed = Cvar_Get ("con_speed", "3", CVAR_GLOBAL | CVAR_ARCHIVE);
@@ -653,6 +687,8 @@ void Con_Init (void) {
 	con_notifyconnect = Cvar_Get("con_notifyconnect", "1", CVAR_ARCHIVE); // "Notifies you when someone connects to the server"
 	con_notifyvote = Cvar_Get("con_notifyvote", "1", CVAR_ARCHIVE); // "Notifies you when someone calls a vote"
 	con_skipNotifyKeyword = Cvar_Get ("con_skipNotifyKeyword", "", CVAR_ARCHIVE); // NOT global, because it's made for compatibility with some mods
+	con_drawHelp = Cvar_Get ("con_drawHelp", "31", CVAR_ARCHIVE); 
+	con_drawHelpSearchMinLength = Cvar_Get ("con_drawHelpSearchMinLength", "3", CVAR_ARCHIVE);
 
 
 	Field_Clear( &kg.g_consoleField );
@@ -721,6 +757,10 @@ void Con_Init (void) {
 
 	if (!version[0])
 		Q_strncpyz(version, "EternalJK2MV", sizeof(version));
+
+#define COLOR_LIST_ITEM( Name, Default, HasAlpha, Help, Title ) GetFloatColor( col##Name, con_col##Name, HasAlpha );
+	COLOR_LIST(COLOR_LIST_ITEM)
+#undef COLOR_LIST_ITEM
 }
 
 
@@ -1168,6 +1208,199 @@ void Con_DrawNotify (void)
 
 }
 
+
+// from CNQ3 engine, with some changes
+void Com_ParseHexColor(float* c, const char* text, bool hasAlpha)
+{
+	c[0] = 1.0f;
+	c[1] = 1.0f;
+	c[2] = 1.0f;
+	c[3] = 1.0f;
+
+	unsigned int uc[4];
+	if (hasAlpha) {
+		if (sscanf(text, "%02X%02X%02X%02X", &uc[0], &uc[1], &uc[2], &uc[3]) != 4)
+			return;
+		c[0] = uc[0] / 255.0f;
+		c[1] = uc[1] / 255.0f;
+		c[2] = uc[2] / 255.0f;
+		c[3] = uc[3] / 255.0f;
+	}
+	else {
+		if (sscanf(text, "%02X%02X%02X", &uc[0], &uc[1], &uc[2]) != 3)
+			return;
+		c[0] = uc[0] / 255.0f;
+		c[1] = uc[1] / 255.0f;
+		c[2] = uc[2] / 255.0f;
+		c[3] = 1.0f;
+	}
+}
+static bool IsValidHexChar(char c)
+{
+	return
+		(c >= '0' && c <= '9') ||
+		(c >= 'a' && c <= 'f') ||
+		(c >= 'A' && c <= 'F');
+}
+
+static bool IsValidHexColor(const char* s, qboolean hasAlpha)
+{
+	const int chars = hasAlpha ? 8 : 6;
+	for (int i = 0; i < chars; ++i) {
+		if (*s == '\0' || !IsValidHexChar(*s))
+			return qfalse;
+		s++;
+	}
+
+	return *s == '\0';
+}
+
+static void GetFloatColor(float* c, const cvar_t* cvar, qboolean hasAlpha)
+{
+	const char* s = cvar->string;
+	if (!IsValidHexColor(s, hasAlpha)) {
+		s = cvar->resetString;
+		if (!IsValidHexColor(s, hasAlpha))
+			return;
+	}
+
+	Com_ParseHexColor(c, s, hasAlpha);
+}
+
+
+const float* CPMAConsoleColorFromChar(char ccode)
+{
+	if (ccode == COLOR_WHITE)
+		return colText;
+	if (ccode == COLOR_CVAR)
+		return colCVar;
+	if (ccode == COLOR_CMD)
+		return colCmd;
+	if (ccode == COLOR_VAL)
+		return colValue;
+	if (ccode == COLOR_HELP)
+		return colHelp;
+	if (ccode == COLOR_MKTEXT)
+		return colMkText;
+	if (ccode == COLOR_MKSHAD)
+		return colMkShadow;
+	if (ccode == COLOR_SHAD)
+		return colShadow;
+
+	return CPMAColorFromChar(ccode);
+}
+static void Con_FillRect(float x, float y, float w, float h, const vec4_t color, qhandle_t shader)
+{
+	re.SetColor(color);
+	re.DrawStretchPic(x, y, w, h, 0, 0, 0, 0, shader, cls.xadjust, cls.yadjust);
+	re.SetColor(NULL);
+}
+static void QDECL Con_HelpPrintf(PRINTF_FORMAT_STRING const char* fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+	Q_vsnprintf(con.helpText, sizeof(con.helpText), fmt, argptr);
+	va_end(argptr);
+
+	const float* color = colText;
+	const char* c = con.helpText;
+	while (*c != '\0') {
+		// measure the length of the current word
+		int wl = 0;
+		while (c[wl] != '\0' && c[wl] > ' ')
+			wl++;
+
+		const qboolean wordBreak = (qboolean)((wl > 0) && (con.helpX + wl >= con.linewidth/* CONSOLE_WIDTH*/) && (wl < con.linewidth/* CONSOLE_WIDTH*/));
+		const qboolean forcedBreak = (qboolean)( con.helpX >= con.linewidth/* CONSOLE_WIDTH*/);
+		if (*c == '\n' || forcedBreak || wordBreak) {
+			if (!forcedBreak && !wordBreak)
+				c++;
+			con.helpWidth = MAX(con.helpWidth, con.helpX);
+			con.helpX = 0;
+			con.helpY += con.charHeight;
+			con.helpLines++;
+			continue;
+		}
+
+		if (Q_IsColorString_CPMA(c)) { // dumb. adapt this to jk2 logic sometime.
+			color = CPMAConsoleColorFromChar(c[1]);
+			c += 2;
+			continue;
+		}
+
+		if (con.helpDraw) {
+			re.SetColor(colShadow);
+			SCR_DrawSmallChar(con.helpXAdjust + con.helpX * con.charWidth + 1, con.helpY + 1, *c);
+			re.SetColor(color);
+			SCR_DrawSmallChar(con.helpXAdjust + con.helpX * con.charWidth, con.helpY, *c);
+		}
+		c++;
+		con.helpX++;
+	}
+}
+
+static void Con_DrawHelp()
+{
+	if (!con_drawHelp->integer)
+		return;
+
+	if (!(con_drawHelp->integer & DRAWHELP_ENABLE_BIT))
+		return;
+
+	if (con.displayFrac == 0.0f || con.displayFrac < con.finalFrac)
+		return;
+
+	Cmd_TokenizeString(kg.g_consoleField.buffer);
+	if (Cmd_Argc() < 1)
+		return;
+
+	const char* name = Cmd_Argv(0);
+	if (*name == '/' || *name == '\\')
+		name++;
+
+	if (*name == '\0')
+		return;
+
+	const bool printAlways = (con_drawHelp->integer & DRAWHELP_NOTFOUND_BIT) != 0;
+	const bool printModules = (con_drawHelp->integer & DRAWHELP_MODULES_BIT) != 0;
+	const bool printAttribs = (con_drawHelp->integer & DRAWHELP_ATTRIBS_BIT) != 0;
+	const bool printSearch = (con_drawHelp->integer & DRAWHELP_SEARCH) != 0 && Cmd_Argc() == 1 && strlen(name) >= con_drawHelpSearchMinLength->integer;
+	con.helpDraw = qfalse;
+	con.helpX = 0;
+	con.helpWidth = 0;
+	con.helpLines = 0;
+	con.helpXAdjust = con.xadjust + 2 * con.charWidth;
+	printHelpResult_t result = Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth);
+	if (result == PHR_NOTFOUND || (result == PHR_NOHELP && !printAlways))
+		return;
+
+
+	// draw the background at full opacity only if fullscreen
+
+	vec4_t con_color;
+	MAKERGBA(con_color, 1.0f, 1.0f, 1.0f, Com_Clamp(0.0f, 1.0f, con_opacity->value));
+	//re.SetColor(con_color);
+	//SCR_DrawPic(0, 0, SCREEN_WIDTH, (float)y, cls.consoleShader);
+
+	const float d = (int)con.charHeight;
+	const float x = (int)(con.helpXAdjust - con.charWidth);
+	const float y = (int)(cls.glconfig.vidHeight * con.displayFrac);
+	const float w = (int)((con.helpWidth + 2) * con.charWidth);
+	const float h = (int)((con.helpLines + 1) * con.charHeight);
+	con.helpDraw = qtrue;
+	con.helpX = 0;
+	con.helpY = y + 1.5f * con.charHeight;
+	const float yh = (int)(con.helpY - con.charHeight / 2.0f);
+	//re.SetColor(colBG);
+	//re.DrawTriangle(x, y, x + d, y + d, x, y + d, 0, 0, 0, 0, 0, 0, cls.whiteShader);
+	Con_FillRect(x, yh, w, h, con_color, cls.consoleShader);
+	Con_FillRect(x + 1, yh + h + 0, w - 1, 1, g_color_table[ColorIndex_Extended(COLOR_JK2MV)],cls.whiteShader);
+	Con_FillRect(x + 2, yh + h + 1, w - 2, 1, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
+	Con_FillRect(x + w + 0, yh + 1, 1, h + 1, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
+	Con_FillRect(x + w + 1, yh + 2, 1, h + 0, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
+	Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth);
+}
+
 /*
 ================
 Con_DrawSolidConsole
@@ -1362,6 +1595,8 @@ void Con_DrawSolidConsole( float frac ) {
 			}
 		}
 	}
+
+	Con_DrawHelp();
 
 	re.SetColor( NULL );
 }

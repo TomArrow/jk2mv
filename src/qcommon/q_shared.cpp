@@ -1076,6 +1076,27 @@ char *Q_CleanStr(char *string, qboolean use102color, qboolean ntModColors) {
 	return string;
 }
 
+// from cnq3
+int Q_PrintStroff(const char* string, int charOffset, qboolean use102color, qboolean ntModColors)
+{
+	int len = 0;
+	const char* p = string;
+
+	if (!p)
+		return 0;
+
+	while (*p && len < charOffset) {
+		if (Q_IsColorString(p) || (use102color && Q_IsColorString_1_02(p)) || (ntModColors && Q_IsColorStringNT(p))) {
+			p += 2;
+			continue;
+		}
+		p++;
+		len++;
+	}
+
+	return p - string;
+}
+
 /*
 ==================
 Q_StripColor

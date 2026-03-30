@@ -503,6 +503,14 @@ typedef struct clientStatic_s {
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
 #define	NUM_CON_TIMES	4
 
+// con_drawHelp flags
+#define DRAWHELP_ENABLE_BIT		1
+#define DRAWHELP_NOTFOUND_BIT	2
+#define DRAWHELP_MODULES_BIT	4
+#define DRAWHELP_ATTRIBS_BIT	8
+#define DRAWHELP_SEARCH			16
+#define DRAWHELP_MAX			31
+
 typedef union {
 	struct {
 		unsigned char	color;
@@ -542,6 +550,15 @@ typedef struct {
 	int		times[NUM_CON_TIMES];	// cls.realtime time the line was generated
 								// for transparent notify lines
 	vec4_t	color;
+
+	// from CNQ3
+	char		helpText[MAXPRINTMSG];
+	int			helpX;		// char index
+	float		helpY;		// top coordinate
+	int			helpWidth;	// char count of the longest line
+	int			helpLines;	// line count
+	qboolean	helpDraw;
+	float		helpXAdjust;
 } console_t;
 
 extern	clientStatic_t		cls;

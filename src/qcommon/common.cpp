@@ -3964,6 +3964,176 @@ qboolean Field_WasComplete()
 	return wasComplete;
 }
 
+
+
+
+void Help_AllocSplitText(const char** desc, const char** help, const char* combined)
+{
+	if (*desc != NULL || *help != NULL) {
+		// break here for some debugging fun
+		return;
+	}
+
+	const char* const newLine = strchr(combined, '\n');
+	if (!newLine) {
+		*desc = CopyString(combined);
+		return;
+	}
+
+	const int srcLen = strlen(combined);
+	const int descLen = newLine - combined;
+	const int helpLen = srcLen - descLen - 1;
+	*desc = (char*)S_Malloc(descLen + 1);
+	*help = (char*)S_Malloc(helpLen + 1);
+	memcpy((char*)*desc, combined, descLen);
+	memcpy((char*)*help, combined + descLen + 1, helpLen);
+	((char*)*desc)[descLen] = '\0';
+	((char*)*help)[helpLen] = '\0';
+}
+
+
+void Com_TruncatePrintString(char* buffer, int size, int maxLength)
+{
+	if (Q_PrintStrlen(buffer,qtrue,qfalse) <= maxLength)
+		return;
+
+	int byteIndex = Q_PrintStroff(buffer, maxLength,qtrue,qfalse);
+	if (byteIndex < 0 || byteIndex >= size)
+		byteIndex = size - 1;
+
+	buffer[byteIndex - 4] = '.';
+	buffer[byteIndex - 3] = '.';
+	buffer[byteIndex - 2] = '.';
+	buffer[byteIndex - 1] = '\n';
+	buffer[byteIndex - 0] = '\0';
+}
+
+
+static void Com_PrintModules(module_t firstModule, int moduleMask, printf_t print)
+{
+#define MODULE_ITEM(Enum, Desc) Desc, 
+	static const char* ModuleNames[MODULE_MAX + 1] =
+	{
+		MODULE_LIST(MODULE_ITEM)
+		""
+	};
+#undef MODULE_ITEM
+
+	if (firstModule == MODULE_NONE || moduleMask == 0) {
+		print("Module: Unknown\n");
+		return;
+	}
+
+	const int otherModules = moduleMask & (~(1 << firstModule));
+
+	if (otherModules)
+		print("Modules: ");
+	else
+		print("Module: ");
+	print("%s", ModuleNames[firstModule]);
+
+	for (int i = 0; i < 32; ++i) {
+		if ((otherModules >> i) & 1)
+			print(", %s", ModuleNames[i]);
+	}
+
+	print("\n");
+}
+
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, bool printSearch, int printWidth)
+{
+	qboolean isCvar = qfalse;
+	const char* desc;
+	const char* help;
+	const char* registeredName;
+	module_t firstModule;
+	int moduleMask;
+	if (Cvar_GetHelp(&desc, &help, name)) {
+		isCvar = qtrue;
+		Cvar_GetModuleInfo(&firstModule, &moduleMask, name);
+		registeredName = Cvar_GetRegisteredName(name);
+	}
+	else if (Cmd_GetHelp(&desc, &help, name)) {
+		Cmd_GetModuleInfo(&firstModule, &moduleMask, name);
+		registeredName = Cmd_GetRegisteredName(name);
+	}
+	else {
+		bool searchResults = false;
+		if (printSearch) {
+			int countCvars, countCmds,i;
+			cvar_t* findBuf[20];
+			cmd_function_t* findBufCmd[20];
+			countCvars = Cvar_Search(name, findBuf, sizeof(findBuf)/sizeof(findBuf[0]));
+			countCmds = Cmd_Search(name, findBufCmd, sizeof(findBuf)/sizeof(findBuf[0]));
+			for (i = 0; i < countCvars; i++) {
+				Cvar_PrintFirstHelpLine(findBuf[i]->name, print, true);
+			}
+			for (i = 0; i < countCmds; i++) {
+				print(S_COLOR_CMD "%s\n", findBufCmd[i]->name);
+			}
+			searchResults = countCvars > 0 || countCmds > 0;
+			if (searchResults) {
+				return PHR_SEARCHRESULTS;
+			}
+		}
+		if (printNotFound && !searchResults)
+			print("found no cvar/command with the name '%s'\n", name);
+		return PHR_NOTFOUND;
+	}
+
+	if (registeredName)
+		name = registeredName;
+
+	if (isCvar)
+		Cvar_PrintFirstHelpLine(name, print, false);
+	else
+		print(S_COLOR_CMD "%s\n", name);
+
+	const cvar_t* const cvar = Cvar_FindVar(name);
+	if (cvar != NULL) {
+		const char* const quote1 = cvar->type == CVART_STRING ? "\"" : "";
+		const char* const quote2 = cvar->type == CVART_STRING ? "^7\"" : "^7";
+		if (cvar->latchedString != NULL) {
+			const char* const combined =
+				va("Current: %s" S_COLOR_VAL "%s%s (Latched: %s" S_COLOR_VAL "%s%s)\n",
+					quote1, cvar->string, quote2, quote1, cvar->latchedString, quote2);
+			if (strlen(combined) < printWidth) {
+				print(combined);
+			}
+			else {
+				print("Current: %s" S_COLOR_VAL "%s%s\n", quote1, cvar->string, quote2);
+				print("Latched: %s" S_COLOR_VAL "%s%s\n", quote1, cvar->latchedString, quote2);
+			}
+		}
+		else {
+			print("Current: %s" S_COLOR_VAL "%s" S_COLOR_HELP "%s\n", quote1, cvar->string, quote2);
+		}
+	}
+
+	if (printModules)
+		Com_PrintModules(firstModule, moduleMask, print);
+
+	if (isCvar && printFlags)
+		Cvar_PrintFlags(name, print);
+
+	if (!desc) {
+		if (printNotFound)
+			print("no help text found for %s %s%s\n",
+				isCvar ? "cvar" : "command", isCvar ? S_COLOR_CVAR : S_COLOR_CMD, name);
+		return PHR_NOHELP;
+	}
+
+	const char firstLetter = toupper(*desc);
+	print(S_COLOR_HELP "%c%s" S_COLOR_HELP ".\n", firstLetter, desc + 1);
+
+	if (help)
+		print(S_COLOR_HELP "%s\n", help);
+
+	return PHR_HADHELP;
+}
+
+
+
 /*
 ====================
 FloatAsInt

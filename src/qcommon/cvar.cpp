@@ -2,6 +2,7 @@
 
 #include "../qcommon/q_shared.h"
 #include "qcommon.h"
+#include <cfloat>
 
 cvar_t		*cvar_vars;
 cvar_t		*cvar_cheats;
@@ -76,6 +77,24 @@ cvar_t *Cvar_FindVar( const char *var_name ) {
 	}
 
 	return NULL;
+}
+
+/*
+============
+Cvar_Search
+============
+*/
+int Cvar_Search( const char *search_term, cvar_t** buf, int maxcount ) {
+	cvar_t	*var = cvar_indexes;
+	int i, count=0;
+
+	for (i = 0; i < cvar_numIndexes && count < maxcount; i++, var++) {
+		if (Q_stristr(var->name, (char*)search_term)) {
+			buf[count++] = var;
+		}
+	}
+
+	return count;
 }
 
 /*
@@ -285,6 +304,11 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	var->string = CopyString (var_value);
 	var->modified = qtrue;
 	var->modificationCount = 1;
+	var->firstModule = MODULE_NONE;
+	var->moduleMask = 0;
+	var->desc = NULL;
+	var->help = NULL;
+	var->type = CVART_STRING;
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
 	int error = 0;
@@ -318,6 +342,32 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 }
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	return Cvar_Get( var_name, var_value, flags, qfalse );
+}
+
+void Cvar_SetHelp(const char* var_name, const char* help)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	Help_AllocSplitText(&var->desc, &var->help, help);
+}
+
+
+qboolean Cvar_GetHelp(const char** desc, const char** help, const char* var_name)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+	{
+		*desc = NULL;
+		*help = NULL;
+		return qfalse;
+	}
+
+	*desc = var->desc;
+	*help = var->help;
+
+	return qtrue;
 }
 
 /*
@@ -468,6 +518,184 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force, qboo
 
 	return var;
 }
+
+
+
+void Cvar_SetModule(const char* var_name, module_t module)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	var->moduleMask |= 1 << (int)module;
+	if (var->firstModule == MODULE_NONE)
+		var->firstModule = module;
+}
+
+
+void Cvar_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* var_name)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	*firstModule = var->firstModule;
+	*moduleMask = var->moduleMask;
+}
+
+
+const char* Cvar_GetRegisteredName(const char* var_name)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return NULL;
+
+	return var->name;
+}
+
+
+static const char* Cvar_FormatRangeFloat(float vf)
+{
+	const int vi = (int)vf;
+	const qboolean round = (qboolean)( vf == (float)vi);
+
+	return round ? va("%d.0", vi) : va("%.3g", vf);
+}
+
+
+void Cvar_PrintTypeAndRange(const char* var_name, printf_t print)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	if (var->type == CVART_BOOL) {
+		print(S_COLOR_VAL "0^7|" S_COLOR_VAL "1");
+	}
+	else if (var->type == CVART_BITMASK) {
+		print("bitmask");
+	}
+	else if (var->type == CVART_FLOAT) {
+		const float minV = var->validator.f.min;
+		const float maxV = var->validator.f.max;
+		if (minV == -FLT_MAX && maxV == FLT_MAX) {
+			print("float_value");
+		}
+		else {
+			const char* min = minV == -FLT_MAX ? "-inf" : Cvar_FormatRangeFloat(minV);
+			const char* max = maxV == +FLT_MAX ? "+inf" : Cvar_FormatRangeFloat(maxV);
+			print(S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s", min, max);
+		}
+	}
+	else if (var->type == CVART_INTEGER) {
+		const int minV = var->validator.i.min;
+		const int maxV = var->validator.i.max;
+		const int diff = maxV - minV;
+		if (minV == INT_MIN && maxV == INT_MAX) {
+			print("integer_value");
+		}
+		else if (diff == 0) {
+			print(S_COLOR_VAL "%d", minV);
+		}
+		else if (diff == 1) {
+			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1);
+		}
+		else if (diff == 2) {
+			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1, minV + 2);
+		}
+		else if (diff == 3) {
+			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1, minV + 2, minV + 3);
+		}
+		else {
+			const char* min = minV == INT_MIN ? "-inf" : va("%d", minV);
+			const char* max = maxV == INT_MAX ? "+inf" : va("%d", maxV);
+			print(S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s", min, max);
+		}
+	}
+	else if (var->type == CVART_COLOR_RGB) {
+		print("RGB");
+	}
+	else if (var->type == CVART_COLOR_RGBA) {
+		print("RGBA");
+	}
+	else if (var->type == CVART_COLOR_CPMA || var->type == CVART_COLOR_CPMA_E) {
+		print("color code");
+	}
+	else if (var->type == CVART_COLOR_CHBLS) {
+		print("CHBLS colors");
+	}
+	else {
+		print("string");
+	}
+}
+
+
+void Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	const char* const q = var->type == CVART_STRING ? "\"" : "";
+	print(S_COLOR_CVAR "%s ^7<", var_name);
+	Cvar_PrintTypeAndRange(var_name, print);
+	if (withValue) {
+		print("> %s" S_COLOR_VAL "%s^7%s (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->string, q, q, var->resetString, q);
+	}
+	else {
+		print("> (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->resetString, q);
+	}
+}
+
+
+void Cvar_PrintFlags(const char* var_name, printf_t print)
+{
+	cvar_t* var = Cvar_FindVar(var_name);
+	if (!var)
+		return;
+
+	static const char* names[] = {
+		"Archived",
+		"User Info",
+		"Server Info",
+		"System Info",
+		"Init",
+		"Latched",
+		"Read-only",
+		"User-created",
+		"Temporary",
+		"Cheat-protected",
+		"No Reset",
+		"Server-created"
+	};
+
+	const int flags = var->flags;
+	int count = 0;
+	for (int i = 0; i < ARRAY_LEN(names); ++i) {
+		if ((flags >> i) & 1)
+			++count;
+	}
+
+	print(count != 1 ? "Attributes: " : "Attribute: ");
+
+	int printed = 0;
+	for (int i = 0; i < ARRAY_LEN(names); ++i) {
+		if (!((flags >> i) & 1))
+			continue;
+
+		if (printed)
+			print(", ");
+		print(names[i]);
+		++printed;
+	}
+
+	if (count)
+		print("\n");
+	else
+		print("None\n");
+}
+
+
 
 /*
 ============
