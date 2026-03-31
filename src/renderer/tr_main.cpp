@@ -948,7 +948,10 @@ qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum, int hackPor
 
 	// don't recursively mirror
 	if (tr.viewParms.isPortal) {
-		ri.Printf( PRINT_DEVELOPER, "WARNING: recursive mirror/portal found\n" );
+		if (!tr.viewParms.hackPortalNum && !hackPortalNum) {
+			// with hackportals we kinda expect this as we allow multiple, so just silently ignore it.
+			ri.Printf(PRINT_DEVELOPER, "WARNING: recursive mirror/portal found\n");
+		}
 		return qfalse;
 	}
 

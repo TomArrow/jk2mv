@@ -1199,8 +1199,13 @@ void Info_NextPair( const char **s, char *key, char *value );
 Q_NORETURN void	QDECL  Com_Error( errorParm_t level, const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
 void	QDECL Com_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 
+typedef struct printfBounds_s {
+	int		x, y, w, h;
+} printfBounds_t;
 
-typedef void (QDECL* printf_t)(PRINTF_FORMAT_STRING const char* fmt, ...);
+typedef printfBounds_t* (QDECL* printf_t)(PRINTF_FORMAT_STRING const char* fmt, ...);
+
+bool	Com_PrintfBoundsContain(printfBounds_t* bounds, int x, int y);
 
 #define MODULE_LIST(X) \
 	X(MAIN, "Main") \
@@ -1324,6 +1329,8 @@ typedef struct cvar_s {
 	struct cvar_s *next;
 	struct cvar_s *hashNext;
 } cvar_t;
+
+typedef void (QDECL* cvarCallback_t)(cvar_t* cvar, printfBounds_t* bounds);
 
 #define	MAX_CVAR_VALUE_STRING	256
 

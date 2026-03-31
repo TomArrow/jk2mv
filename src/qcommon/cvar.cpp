@@ -343,6 +343,11 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	return Cvar_Get( var_name, var_value, flags, qfalse );
 }
+cvar_t *Cvar_GetRenderer( const char *var_name, const char *var_value, int flags ) {
+	cvar_t* tmp= Cvar_Get( var_name, var_value, flags, qfalse );
+	Cvar_SetModule(var_name,MODULE_RENDERER);
+	return tmp;
+}
 
 void Cvar_SetHelp(const char* var_name, const char* help)
 {
@@ -630,20 +635,37 @@ void Cvar_PrintTypeAndRange(const char* var_name, printf_t print)
 }
 
 
-void Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue)
+printfBounds_t* Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue)
 {
 	cvar_t* var = Cvar_FindVar(var_name);
 	if (!var)
-		return;
+		return NULL;
+
+	static printfBounds_t bounds = { 0,0,0,0 };
+	printfBounds_t* boundsRet;
+	bool hadBounds;
 
 	const char* const q = var->type == CVART_STRING ? "\"" : "";
-	print(S_COLOR_CVAR "%s ^7<", var_name);
+	boundsRet = print(S_COLOR_CVAR "%s ^7<", var_name);
+	if (boundsRet) {
+		bounds = *boundsRet;
+		boundsRet = NULL;
+		hadBounds = true;
+	}
 	Cvar_PrintTypeAndRange(var_name, print);
 	if (withValue) {
-		print("> %s" S_COLOR_VAL "%s^7%s (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->string, q, q, var->resetString, q);
+		boundsRet = print("> %s" S_COLOR_VAL "%s^7%s (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->string, q, q, var->resetString, q);
 	}
 	else {
-		print("> (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->resetString, q);
+		boundsRet = print("> (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->resetString, q);
+	}
+	if (boundsRet && hadBounds) {
+		bounds.w = (boundsRet->x + boundsRet->w) - bounds.x;
+		bounds.h = (boundsRet->y + boundsRet->h) - bounds.y;
+		return &bounds;
+	}
+	else {
+		return NULL;
 	}
 }
 

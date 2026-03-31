@@ -2565,6 +2565,9 @@ int Com_EventLoop( void ) {
 		case SE_MOUSE:
 			CL_MouseEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
+		case SE_MOUSEINACTIVE:
+			CL_MouseInactiveEvent( ev.evValue, ev.evValue2, ev.evTime );
+			break;
 		case SE_JOYSTICK_AXIS:
 			CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
@@ -4040,7 +4043,14 @@ static void Com_PrintModules(module_t firstModule, int moduleMask, printf_t prin
 	print("\n");
 }
 
-printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth)
+bool	Com_PrintfBoundsContain(printfBounds_t* bounds, int x, int y) {
+	if (!bounds) {
+		return false;
+	}
+	return x >= bounds->x && x < (bounds->x + bounds->w) && y >= bounds->y && y < (bounds->y + bounds->h);
+}
+
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth, int hoverX, int hoverY, cvarCallback_t cvarHovered, cmdCallback_t cmdHovered)
 {
 	qboolean isCvar = qfalse;
 	const char* desc;
@@ -4063,13 +4073,20 @@ printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotF
 			int countCvars, countCmds,i;
 			cvar_t* findBuf[20];
 			cmd_function_t* findBufCmd[20];
+			printfBounds_t* bounds;
 			countCvars = Cvar_Search(name, findBuf, sizeof(findBuf)/sizeof(findBuf[0]));
 			countCmds = Cmd_Search(name, findBufCmd, sizeof(findBuf)/sizeof(findBuf[0]));
 			for (i = 0; i < countCvars; i++) {
-				Cvar_PrintFirstHelpLine(findBuf[i]->name, print, printSearch > 1);
+				bounds = Cvar_PrintFirstHelpLine(findBuf[i]->name, print, printSearch > 1);
+				if (cvarHovered && bounds && Com_PrintfBoundsContain(bounds, hoverX, hoverY)) {
+					cvarHovered(findBuf[i], bounds);
+				}
 			}
 			for (i = 0; i < countCmds; i++) {
-				print(S_COLOR_CMD "%s\n", findBufCmd[i]->name);
+				bounds = print(S_COLOR_CMD "%s\n", findBufCmd[i]->name);
+				if (cmdHovered && bounds && Com_PrintfBoundsContain(bounds, hoverX, hoverY)) {
+					cmdHovered(findBufCmd[i],bounds);
+				}
 			}
 			searchResults = countCvars > 0 || countCmds > 0;
 			if (searchResults) {

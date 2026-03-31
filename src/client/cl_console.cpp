@@ -1297,12 +1297,18 @@ static void Con_FillRect(float x, float y, float w, float h, const vec4_t color,
 	re.DrawStretchPic(x, y, w, h, 0, 0, 0, 0, shader, cls.xadjust, cls.yadjust);
 	re.SetColor(NULL);
 }
-static void QDECL Con_HelpPrintf(PRINTF_FORMAT_STRING const char* fmt, ...)
+static printfBounds_t* QDECL Con_HelpPrintf(PRINTF_FORMAT_STRING const char* fmt, ...)
 {
+	static printfBounds_t bounds = {(int)con.helpX, (int)con.helpY};
 	va_list argptr;
 	va_start(argptr, fmt);
 	Q_vsnprintf(con.helpText, sizeof(con.helpText), fmt, argptr);
 	va_end(argptr);
+
+	bounds.x = con.helpX;
+	bounds.y = con.helpY;
+	bounds.w = 0;
+	bounds.h = 0;
 
 	const float* color = colText;
 	const char* c = con.helpText;
@@ -1321,6 +1327,7 @@ static void QDECL Con_HelpPrintf(PRINTF_FORMAT_STRING const char* fmt, ...)
 			con.helpX = 0;
 			con.helpY += con.charHeight;
 			con.helpLines++;
+			bounds.h = MAX(bounds.h, con.helpY - bounds.y);
 			continue;
 		}
 
@@ -1338,7 +1345,39 @@ static void QDECL Con_HelpPrintf(PRINTF_FORMAT_STRING const char* fmt, ...)
 		}
 		c++;
 		con.helpX++;
+		bounds.w = MAX(bounds.w, con.helpX - bounds.x);
 	}
+	bounds.x *= con.charWidth;
+	bounds.x += con.helpXAdjust;
+	if (con.helpX) {
+		bounds.h += con.charHeight;
+	}
+	bounds.w *= con.charWidth;
+	return &bounds;
+}
+
+static void QDECL Con_CvarHovered(cvar_t* cvar, printfBounds_t* bounds)
+{
+	con.hoveredCvar = cvar;
+	con.hoveredBounds = *bounds;
+	//Com_Printf("%s is hovered, %d %d in %d %d %d %d\n", cvar->name, cls.consoleMouse.x, cls.consoleMouse.y, bounds->x,bounds->y,bounds->w,bounds->h);
+}
+static void QDECL Con_CmdHovered(cmd_function_t* cmd, printfBounds_t* bounds)
+{
+	con.hoveredCmd = cmd;
+	con.hoveredBounds = *bounds;
+	//Com_Printf("%s is hovered, %d %d in %d %d %d %d\n", cmd->name, cls.consoleMouse.x, cls.consoleMouse.y, bounds->x, bounds->y, bounds->w, bounds->h);
+}
+
+static void Con_SetField(const char* value) {
+	char* replaceStart = kg.g_consoleField.buffer;
+	if (replaceStart[0] == '\\' || replaceStart[0] == '/') {
+		replaceStart++;
+	}
+	int replaceoffset = (int)strlen(kg.g_consoleField.buffer) - (int)strlen(replaceStart);
+	Q_strncpyz(&kg.g_consoleField.buffer[replaceoffset], value, MAX_EDIT_LINE - replaceoffset);
+	Q_strcat(kg.g_consoleField.buffer, MAX_EDIT_LINE, " ");
+	kg.g_consoleField.cursor = (int)strlen(kg.g_consoleField.buffer);
 }
 
 static void Con_DrawHelp()
@@ -1371,8 +1410,12 @@ static void Con_DrawHelp()
 	con.helpX = 0;
 	con.helpWidth = 0;
 	con.helpLines = 0;
+	con.hoveredCvar = NULL;
+	con.hoveredCmd = NULL;
 	con.helpXAdjust = con.xadjust + 2 * con.charWidth;
-	printHelpResult_t result = Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth);
+	const float y = (int)(cls.glconfig.vidHeight * con.displayFrac);
+	con.helpY = y + 1.5f * con.charHeight;
+	printHelpResult_t result = Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth, cls.consoleMouse.x, cls.consoleMouse.y, Con_CvarHovered, Con_CmdHovered);
 	if (result == PHR_NOTFOUND || (result == PHR_NOHELP && !printAlways))
 		return;
 
@@ -1386,7 +1429,6 @@ static void Con_DrawHelp()
 
 	const float d = (int)con.charHeight;
 	const float x = (int)(con.helpXAdjust - con.charWidth);
-	const float y = (int)(cls.glconfig.vidHeight * con.displayFrac);
 	const float w = (int)((con.helpWidth + 2) * con.charWidth);
 	const float h = (int)((con.helpLines + 1) * con.charHeight);
 	con.helpDraw = qtrue;
@@ -1400,7 +1442,24 @@ static void Con_DrawHelp()
 	Con_FillRect(x + 2, yh + h + 1, w - 2, 1, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
 	Con_FillRect(x + w + 0, yh + 1, 1, h + 1, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
 	Con_FillRect(x + w + 1, yh + 2, 1, h + 0, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
-	Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth);
+
+	if (con.hoveredCmd || con.hoveredCvar) {
+		Con_FillRect(con.hoveredBounds.x, con.hoveredBounds.y, con.hoveredBounds.w, con.hoveredBounds.h, g_color_table[ColorIndex_Extended(COLOR_LT_BLUE)], cls.whiteShader);
+	}
+
+	Com_PrintHelp(name, &Con_HelpPrintf, qfalse, printModules, printAttribs, printSearch, con.linewidth,  cls.consoleMouse.x, cls.consoleMouse.y, NULL, NULL);
+
+	//Con_FillRect(cls.consoleMouse.x, cls.consoleMouse.y, 5,5, g_color_table[ColorIndex_Extended(COLOR_JK2MV)], cls.whiteShader);
+
+
+	if ((con.hoveredCmd || con.hoveredCvar) && kg.keys[A_MOUSE1].down) {
+		if (con.hoveredCmd) {
+			Con_SetField(con.hoveredCmd->name);
+		}
+		else {
+			Con_SetField(con.hoveredCvar->name);
+		}
+	}
 }
 
 /*

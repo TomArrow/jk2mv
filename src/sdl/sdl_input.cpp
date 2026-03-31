@@ -844,6 +844,9 @@ static void IN_ProcessEvents( int eventTime )
 					mx += e.motion.xrel;
 					my += e.motion.yrel;
 				}
+				else {
+					Sys_QueEvent(eventTime, SE_MOUSEINACTIVE, e.motion.x, e.motion.y, 0, NULL);
+				}
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:

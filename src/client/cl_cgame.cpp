@@ -334,6 +334,7 @@ void CL_AddCgameCommand( const char *cmdName, qboolean meme ) {
 	else {
 		Cmd_AddCommand(cmdName, NULL);
 	}
+	Cmd_SetModule(cmdName, MODULE_CGAME);
 }
 
 /*

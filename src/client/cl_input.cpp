@@ -617,6 +617,18 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 
 /*
 =================
+CL_MouseInactiveEvent
+=================
+*/
+void CL_MouseInactiveEvent( int x, int y, int time ) {
+	if (cls.keyCatchers & KEYCATCH_CONSOLE) {
+		cls.consoleMouse.x = x;
+		cls.consoleMouse.y = y;
+	}
+}
+
+/*
+=================
 CL_JoystickEvent
 
 Joystick values stay set until changed

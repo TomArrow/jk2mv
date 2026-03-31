@@ -498,6 +498,10 @@ typedef struct clientStatic_s {
 	qboolean	submodelBypass;
 
 	int			cs_remaps;
+
+	struct {
+		int	x, y;
+	} consoleMouse;
 } clientStatic_t;
 
 #define	CON_TEXTSIZE	131072 // increased in jk2mv
@@ -559,6 +563,10 @@ typedef struct {
 	int			helpLines;	// line count
 	qboolean	helpDraw;
 	float		helpXAdjust;
+
+	cvar_t*				hoveredCvar;
+	cmd_function_t*		hoveredCmd;
+	printfBounds_t		hoveredBounds;
 } console_t;
 
 extern	clientStatic_t		cls;

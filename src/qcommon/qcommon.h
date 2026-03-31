@@ -77,14 +77,6 @@ void Com_GetLanguageName(int languageIndex, char *buffer, unsigned int bufferSiz
 
 void Help_AllocSplitText(const char** desc, const char** help, const char* combined);
 
-typedef enum {
-	PHR_NOTFOUND,
-	PHR_SEARCHRESULTS,
-	PHR_NOHELP,
-	PHR_HADHELP
-} printHelpResult_t;
-
-printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth);
 
 
 extern qboolean com_demoplaying;
@@ -582,6 +574,17 @@ typedef struct cmd_function_s
 	int						moduleMask;
 } cmd_function_t;
 
+typedef void (QDECL* cmdCallback_t)(cmd_function_t* cmd, printfBounds_t* bounds);
+
+typedef enum {
+	PHR_NOTFOUND,
+	PHR_SEARCHRESULTS,
+	PHR_NOHELP,
+	PHR_HADHELP
+} printHelpResult_t;
+
+printHelpResult_t Com_PrintHelp(const char* name, printf_t print, bool printNotFound, bool printModules, bool printFlags, int printSearch, int printWidth, int hoverX, int hoverY, cvarCallback_t cvarHovered, cmdCallback_t cmdHovered);
+
 void	Cmd_Init (void);
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
@@ -665,6 +668,7 @@ modules of the program.
 
 
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags );
+cvar_t *Cvar_GetRenderer( const char *var_name, const char *var_value, int flags );
 cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboolean isVmCall );
 // creates the variable if it doesn't exist, or returns the existing one
 // if it exists, the value will not be changed, but flags will be ORed in
@@ -690,7 +694,7 @@ void	Cvar_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* var_
 const char* Cvar_GetRegisteredName(const char* var_name);
 
 void	Cvar_PrintTypeAndRange(const char* var_name, printf_t print);
-void	Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue);
+printfBounds_t*	Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue);
 void	Cvar_PrintFlags(const char* var_name, printf_t print);
 
 void 	Cvar_Set( const char *var_name, const char *value );
@@ -1178,6 +1182,7 @@ void CL_CharEvent( int key );
 // char events are for field typing, not game control
 
 void CL_MouseEvent( int dx, int dy, int time );
+void CL_MouseInactiveEvent( int x, int y, int time );
 
 void CL_JoystickEvent( int axis, int value, int time );
 

@@ -51,6 +51,7 @@ typedef enum {
 	SE_KEY,		// evValue is a key code, evValue2 is the down flag
 	SE_CHAR,	// evValue is an ascii char
 	SE_MOUSE,	// evValue and evValue2 are reletive signed x / y moves
+	SE_MOUSEINACTIVE,	// evValue and evValue2 are absolute signed x / y moves when mouse isn't being captured (console down)
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
 	SE_CONSOLE,	// evPtr is a char*
 #ifdef ASYNCIO
