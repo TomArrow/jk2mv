@@ -3669,6 +3669,8 @@ void R_SetColorMappings( void ) {
 		tr.overbrightBits = 0;
 	}
 
+	tr.lightmapBrighten = r_lightmapBrighten->value*65535.0f;
+
 	// never overbright in windowed mode
 	if (r_gammamethod->integer == GAMMA_HARDWARE && !glConfig.isFullscreen) {
 		tr.overbrightBits = 0;

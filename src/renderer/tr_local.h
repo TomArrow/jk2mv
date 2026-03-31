@@ -1134,6 +1134,7 @@ typedef struct {
 	int						identityLightByte;	// identityLight * 255
 	int						overbrightBits;		// r_overbrightBits->integer, but set to 0 if no hw gamma
 	int						overbrightBitsMultiplier;		// when doing HDR output, this will normalize brightness for us
+	int						lightmapBrighten;
 
 	orientationr_t			ori;					// for current entity
 
@@ -1374,6 +1375,7 @@ extern	cvar_t	*r_ignoreGLErrors;
 
 extern	cvar_t	*r_overBrightBits;
 extern	cvar_t	*r_mapOverBrightBits;
+extern	cvar_t	*r_lightmapBrighten;
 
 extern	cvar_t	*r_debugSurface;
 extern	cvar_t	*r_simpleMipMaps;

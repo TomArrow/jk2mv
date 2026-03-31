@@ -461,7 +461,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 		R_SetColorMappings();
 	}
 
-	if (r_overBrightBits->modified || r_mapOverBrightBits->modified) {
+	if (r_overBrightBits->modified || r_mapOverBrightBits->modified || r_lightmapBrighten->modified) {
 		char mapname[MAX_QPATH] = {0};
 
 		R_SyncRenderThread();
@@ -482,6 +482,8 @@ void RE_BeginFrame( stereoFrame_t stereoFrame, qboolean skipBackend ) {
 			r_overBrightBits->modified = qfalse;
 		if (r_mapOverBrightBits->modified)
 			r_mapOverBrightBits->modified = qfalse;
+		if (r_lightmapBrighten->modified)
+			r_lightmapBrighten->modified = qfalse;
 	}
 
 	//

@@ -79,7 +79,8 @@ R_ColorShiftLightingBytes
 ===============
 */
 static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
-	int		shift=0, r, g, b;
+	int		shift = 0;
+	int64_t	r, g, b;
 
 	// should NOT do it if overbrightBits is 0
 	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
@@ -103,6 +104,13 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 		r = in[0] << shift;
 		g = in[1] << shift;
 		b = in[2] << shift;
+	}
+
+	if (tr.lightmapBrighten > 0) {
+		int64_t baseVal = 255 >> tr.overbrightBits; // when using overbright bits, we don't wanna move towards everything being completely blown out.
+		r = ((65535 - tr.lightmapBrighten) * r + tr.lightmapBrighten * baseVal) / 65535;
+		g = ((65535 - tr.lightmapBrighten) * g + tr.lightmapBrighten * baseVal) / 65535;
+		b = ((65535 - tr.lightmapBrighten) * b + tr.lightmapBrighten * baseVal) / 65535;
 	}
 
 	// normalize by color instead of saturating to white
@@ -151,9 +159,16 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], unsigned short out[3] 
 		b = (int)in[2] << shift;
 	}
 
+	if (tr.lightmapBrighten > 0) {
+		int64_t baseVal = 65535 >> tr.overbrightBits; // when using overbright bits, we don't wanna move towards everything being completely blown out.
+		r = ((65535 - tr.lightmapBrighten) * r + tr.lightmapBrighten * baseVal) / 65535;
+		g = ((65535 - tr.lightmapBrighten) * g + tr.lightmapBrighten * baseVal) / 65535;
+		b = ((65535 - tr.lightmapBrighten) * b + tr.lightmapBrighten * baseVal) / 65535;
+	}
+
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 65535 ) {
-		int		max;
+		int64_t		max;
 
 		max = r > g ? r : g;
 		max = max > b ? max : b;
@@ -180,7 +195,8 @@ R_ColorShiftLightingBytes
 */
 static	void R_ColorShiftLightingBytes( byte in[3])
 {
-	int		shift=0, r, g, b;
+	int shift = 0;
+	int64_t		r, g, b;
 
 	//// should NOT do it if overbrightBits is 0
 	//if (tr.overbrightBits)
@@ -207,9 +223,16 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 		b = in[2] << shift;
 	}
 
+	if (tr.lightmapBrighten > 0) {
+		int64_t baseVal = 255 >> tr.overbrightBits; // when using overbright bits, we don't wanna move towards everything being completely blown out.
+		r = ((65535 - tr.lightmapBrighten) * r + tr.lightmapBrighten * baseVal) / 65535;
+		g = ((65535 - tr.lightmapBrighten) * g + tr.lightmapBrighten * baseVal) / 65535;
+		b = ((65535 - tr.lightmapBrighten) * b + tr.lightmapBrighten * baseVal) / 65535;
+	}
+
 	// normalize by color instead of saturating to white
 	if ( ( r | g | b ) > 255 ) {
-		int		max;
+		int64_t		max;
 
 		max = r > g ? r : g;
 		max = max > b ? max : b;
