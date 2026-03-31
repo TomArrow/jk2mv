@@ -693,7 +693,7 @@ void	Cvar_GetModuleInfo(module_t* firstModule, int* moduleMask, const char* var_
 
 const char* Cvar_GetRegisteredName(const char* var_name);
 
-void	Cvar_PrintTypeAndRange(const char* var_name, printf_t print);
+void	Cvar_PrintTypeAndRange(const char* var_name, printf_t print, const char* prefix, const char* suffix);
 printfBounds_t*	Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bool withValue);
 void	Cvar_PrintFlags(const char* var_name, printf_t print);
 

@@ -1279,6 +1279,7 @@ default values.
 #define CVARCAT_DEMO			4096
 
 typedef enum {
+	CVART_UNKNOWN,		// type not known
 	CVART_STRING,		// no validation
 	CVART_FLOAT,		// uses floating-point min/max bounds
 	CVART_INTEGER,		// uses integer min/max bounds

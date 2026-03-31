@@ -308,7 +308,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, qboole
 	var->moduleMask = 0;
 	var->desc = NULL;
 	var->help = NULL;
-	var->type = CVART_STRING;
+	var->type = CVART_UNKNOWN;
 #if defined (_MSC_VER) && (_MSC_VER < 1800)
 	var->value = atof (var->string);
 	int error = 0;
@@ -568,28 +568,31 @@ static const char* Cvar_FormatRangeFloat(float vf)
 }
 
 
-void Cvar_PrintTypeAndRange(const char* var_name, printf_t print)
+void Cvar_PrintTypeAndRange(const char* var_name, printf_t print, const char* prefix, const char* suffix)
 {
 	cvar_t* var = Cvar_FindVar(var_name);
 	if (!var)
 		return;
 
+	if (!prefix) prefix = "";
+	if (!suffix) suffix = "";
+
 	if (var->type == CVART_BOOL) {
-		print(S_COLOR_VAL "0^7|" S_COLOR_VAL "1");
+		print("%s" S_COLOR_VAL "0^7|" S_COLOR_VAL "1" "%s", prefix, suffix);
 	}
 	else if (var->type == CVART_BITMASK) {
-		print("bitmask");
+		print("%s" "bitmask" "%s", prefix, suffix);
 	}
 	else if (var->type == CVART_FLOAT) {
 		const float minV = var->validator.f.min;
 		const float maxV = var->validator.f.max;
 		if (minV == -FLT_MAX && maxV == FLT_MAX) {
-			print("float_value");
+			print("%s" "float_value" "%s", prefix, suffix);
 		}
 		else {
 			const char* min = minV == -FLT_MAX ? "-inf" : Cvar_FormatRangeFloat(minV);
 			const char* max = maxV == +FLT_MAX ? "+inf" : Cvar_FormatRangeFloat(maxV);
-			print(S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s", min, max);
+			print("%s" S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s" "%s", prefix, min, max, suffix);
 		}
 	}
 	else if (var->type == CVART_INTEGER) {
@@ -597,40 +600,43 @@ void Cvar_PrintTypeAndRange(const char* var_name, printf_t print)
 		const int maxV = var->validator.i.max;
 		const int diff = maxV - minV;
 		if (minV == INT_MIN && maxV == INT_MAX) {
-			print("integer_value");
+			print("%s" "integer_value" "%s", prefix, suffix);
 		}
 		else if (diff == 0) {
-			print(S_COLOR_VAL "%d", minV);
+			print("%s" S_COLOR_VAL "%d" "%s", prefix, minV, suffix);
 		}
 		else if (diff == 1) {
-			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1);
+			print("%s" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d" "%s", prefix, minV, minV + 1, suffix);
 		}
 		else if (diff == 2) {
-			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1, minV + 2);
+			print("%s" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d" "%s", prefix, minV, minV + 1, minV + 2, suffix);
 		}
 		else if (diff == 3) {
-			print(S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d", minV, minV + 1, minV + 2, minV + 3);
+			print("%s" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d^7|" S_COLOR_VAL "%d" "%s", prefix, minV, minV + 1, minV + 2, minV + 3, suffix);
 		}
 		else {
 			const char* min = minV == INT_MIN ? "-inf" : va("%d", minV);
 			const char* max = maxV == INT_MAX ? "+inf" : va("%d", maxV);
-			print(S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s", min, max);
+			print("%s" S_COLOR_VAL "%s ^7to " S_COLOR_VAL "%s" "%s", prefix, min, max, suffix);
 		}
 	}
 	else if (var->type == CVART_COLOR_RGB) {
-		print("RGB");
+		print("%s" "RGB" "%s", prefix, suffix);
 	}
 	else if (var->type == CVART_COLOR_RGBA) {
-		print("RGBA");
+		print("%s" "RGBA" "%s", prefix, suffix);
 	}
 	else if (var->type == CVART_COLOR_CPMA || var->type == CVART_COLOR_CPMA_E) {
-		print("color code");
+		print("%s" "color code" "%s", prefix, suffix);
 	}
 	else if (var->type == CVART_COLOR_CHBLS) {
-		print("CHBLS colors");
+		print("%s" "CHBLS colors" "%s", prefix, suffix);
+	}
+	else if (var->type == CVART_STRING) {
+		print("%s" "string" "%s", prefix, suffix);
 	}
 	else {
-		print("string");
+		//print("string");
 	}
 }
 
@@ -645,19 +651,19 @@ printfBounds_t* Cvar_PrintFirstHelpLine(const char* var_name, printf_t print, bo
 	printfBounds_t* boundsRet;
 	bool hadBounds;
 
-	const char* const q = var->type == CVART_STRING ? "\"" : "";
-	boundsRet = print(S_COLOR_CVAR "%s ^7<", var_name);
+	const char* const q = (var->type == CVART_STRING || var->type == CVART_UNKNOWN) ? "\"" : "";
+	boundsRet = print(S_COLOR_CVAR "%s", var_name);
 	if (boundsRet) {
 		bounds = *boundsRet;
 		boundsRet = NULL;
 		hadBounds = true;
 	}
-	Cvar_PrintTypeAndRange(var_name, print);
+	Cvar_PrintTypeAndRange(var_name, print, " ^7<", ">");
 	if (withValue) {
-		boundsRet = print("> %s" S_COLOR_VAL "%s^7%s (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->string, q, q, var->resetString, q);
+		boundsRet = print(" ^7%s" S_COLOR_VAL "%s^7%s (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->string, q, q, var->resetString, q);
 	}
 	else {
-		boundsRet = print("> (default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->resetString, q);
+		boundsRet = print(" ^7(default: %s" S_COLOR_VAL "%s^7%s)\n", q, var->resetString, q);
 	}
 	if (boundsRet && hadBounds) {
 		bounds.w = (boundsRet->x + boundsRet->w) - bounds.x;
