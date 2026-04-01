@@ -519,6 +519,7 @@ int VM_MVMenuLevel(const vm_t *vm);
 mvversion_t VM_GetGameversion(const vm_t *vm);
 void VM_SetGameversion(vm_t *vm, mvversion_t gameversion);
 int VM_GetIndex(const vm_t *vm);
+qboolean VM_IsDLL(const vm_t *vm);
 
 /*
 ==============================================================
@@ -1235,6 +1236,7 @@ extern	cvar_t	*com_cool_apiFeatures;
 extern	cvar_t	*com_cool_apiDBVersion;
 extern	cvar_t	*com_cool_apiJKAVersion;
 extern	cvar_t	*com_cool_apiUserCmdStoreVersion;
+extern	cvar_t	*com_cool_supportedCoolApiVMFeatures;
 
 extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;

@@ -50,6 +50,10 @@ const int supportedCoolApiFeatures =
 | COOL_APIFEATURE_G_UPDATESPECTATORS
 | COOL_APIFEATURE_BENCHMARKING
 ;
+const int supportedCoolApiVMFeatures =
+COOL_APIFEATURE_VMGAME_FLAG_SEGMENTEDREPLAY
+| COOL_APIFEATURE_VMGAME_GAME_FIX_TRACECALLS
+;
 
 Benchmarking benchmark;
 
@@ -109,6 +113,7 @@ cvar_t	*com_cool_apiFeatures;
 cvar_t	*com_cool_apiDBVersion;
 cvar_t	*com_cool_apiJKAVersion;
 cvar_t	*com_cool_apiUserCmdStoreVersion;
+cvar_t	*com_cool_supportedCoolApiVMFeatures;
 
 cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
@@ -2860,6 +2865,7 @@ void Com_Init( char *commandLine ) {
 	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
 	com_cool_apiJKAVersion = Cvar_Get("cool_apiJKAVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
 	com_cool_apiUserCmdStoreVersion = Cvar_Get("cool_apiUserCmdStoreVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
+	com_cool_supportedCoolApiVMFeatures = Cvar_Get("com_cool_supportedCoolApiVMFeatures", va("%d", supportedCoolApiVMFeatures), CVAR_INIT | CVAR_VM_NOWRITE);
 
 	mv_apienabled = Cvar_Get("mv_apienabled", XSTR(MV_APILEVEL), CVAR_INIT | CVAR_VM_NOWRITE);
 	com_timestamps = Cvar_Get("com_timestamps", "1", CVAR_ARCHIVE);

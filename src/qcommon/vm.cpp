@@ -1355,3 +1355,7 @@ int VM_GetIndex(const vm_t *vm)
 {
 	return vm->index;
 }
+qboolean VM_IsDLL(const vm_t *vm)
+{
+	return (qboolean)!!vm->dllHandle;
+}
