@@ -85,7 +85,7 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], byte out[3] ) {
 	// should NOT do it if overbrightBits is 0
 	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
 
-	if (!shift)
+	if (!shift && !tr.lightmapBrighten)
 	{
 		out[0] = in[0];
 		out[1] = in[1];
@@ -136,7 +136,7 @@ static	void R_ColorShiftLightingBytes3( const byte in[3], unsigned short out[3] 
 	// should NOT do it if overbrightBits is 0
 	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
 
-	if (!shift)
+	if (!shift && !tr.lightmapBrighten)
 	{
 		out[0] = (unsigned short)in[0] << 8;
 		out[1] = (unsigned short)in[1] << 8;
@@ -205,7 +205,7 @@ static	void R_ColorShiftLightingBytes( byte in[3])
 	//shift = MAX(0, r_mapOverBrightBits->integer - tr.overbrightBits);
 	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
 
-	if (!shift)
+	if (!shift && !tr.lightmapBrighten)
 	{
 		return;
 	}
