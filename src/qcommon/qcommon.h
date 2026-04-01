@@ -10,6 +10,9 @@
 
 #include <vector>
 #include <memory>
+#include <chrono> 
+#include <stdexcept>
+	
 
 #define ASYNCIO
 
@@ -977,6 +980,197 @@ MISC
 #define CPUID_AMD_3DNOW			0x30			// AMD K6 3DNOW!
 //
 //==========================================================
+// Benchmarking
+
+typedef std::chrono::time_point<std::chrono::steady_clock> BenchmarkTime;
+typedef enum benchmarkModule_s {
+	BENCHMOD_CGAME,
+	BENCHMOD_GAME,
+	BENCHMOD_COUNT,
+} benchmarkModule_t;
+class BenchmarkItem {
+public:
+	bool						active = false;
+	bool						set = false;
+	BenchmarkTime				lastReset = std::chrono::steady_clock::now();
+	int64_t						iterTouch = -1;
+	float						thisIterResult;
+	double						accumTime = 0;
+};
+class MultiRecipientBenchmarkItem {
+public:
+	BenchmarkItem	item[BENCHMOD_COUNT];
+	int				recipients;
+	void	setRecipient(benchmarkModule_t recipient, bool active) {
+		recipients &= ~(1 << recipient);
+		recipients |= (int)active * (1 << recipient);
+	}
+	void	setStartTime() {
+		for (int i = 0; i < BENCHMOD_COUNT; i++) {
+			if (recipients & (1 << i)) {
+				item[i].lastReset = std::chrono::steady_clock::now();
+				item[i].set = true;
+			}
+		}
+	}
+	void	setEndTime() {
+		for (int i = 0; i < BENCHMOD_COUNT; i++) {
+			if (recipients & (1 << i)) {
+				if (item[i].set) {
+					std::chrono::duration<double, std::milli> ms = std::chrono::steady_clock::now() - item[i].lastReset;
+					item[i].accumTime += ms.count();
+				}
+			}
+		}
+	}
+};
+class Benchmarking {
+	int64_t						iter = 0;
+public:
+	BenchmarkItem					genericBenchmarks[BENCHMOD_COUNT][BENCHMARK_MAX_INDEX_COUNT];
+	MultiRecipientBenchmarkItem		benchmarkTraces[BENCHMOD_COUNT];
+	MultiRecipientBenchmarkItem		benchmarkTracesMarked[BENCHMOD_COUNT];
+	MultiRecipientBenchmarkItem		benchmarkSnapshots[BENCHMOD_COUNT];
+	MultiRecipientBenchmarkItem		benchmarkRender;
+	MultiRecipientBenchmarkItem		vmcallBenchmarks[BENCHMOD_COUNT][BENCHMARK_MAX_VMCALL_COUNT + 1];
+	int								vmBenchActive[BENCHMOD_COUNT]; // bitmask. any module may request benches for other module vm calls. bit odd i guess but whatever xd
+
+	//inline double getTimeDiff(const BenchmarkTime& now, const BenchmarkTime& start) {
+	//	std::chrono::duration<double, std::milli> ms = now - start;
+	//	return ms.count();
+	//}
+
+	//inline double getTimeSince(const BenchmarkTime& start) {
+	//	std::chrono::duration<double, std::milli> ms = std::chrono::steady_clock::now() - start;
+	//	return ms.count();
+	//}
+	//inline double getTimeSinceReset(BenchmarkTime& start) {
+	//	std::chrono::duration<double, std::milli> ms = std::chrono::steady_clock::now() - start;
+	//	start = std::chrono::steady_clock::now();
+	//	return ms.count();
+	//}
+	inline float getTimeSinceAndReset(BenchmarkItem& item) {
+		if (item.iterTouch == iter) {
+			return item.thisIterResult;
+		}
+		if (item.set) {
+			std::chrono::duration<double, std::milli> ms = std::chrono::steady_clock::now() - item.lastReset;
+			item.thisIterResult = (float)ms.count();
+		}
+		else {
+			item.thisIterResult = 0;
+		}
+		item.iterTouch = iter;
+		item.lastReset = std::chrono::steady_clock::now();
+		item.set = true;
+		return item.thisIterResult;
+	}
+	inline float getAccumAndReset(BenchmarkItem& item) {
+		if (item.iterTouch == iter) {
+			return item.thisIterResult;
+		}
+		item.thisIterResult = item.accumTime;
+		item.accumTime = 0;
+		item.iterTouch = iter;
+		return item.thisIterResult;
+	}
+
+	template<benchmarkModule_t theModule>
+	inline int normalizeVMCall(int vmCall) {
+		if constexpr (theModule == BENCHMOD_GAME) {
+			if (vmCall >= 100) {
+				vmCall -= BENCHMARK_MEASURE_VMCALLS_MVOFFSET;
+			}
+			if (vmCall < 0 || vmCall >= BENCHMARK_MAX_VMCALL_COUNT) {
+				vmCall = BENCHMARK_MAX_VMCALL_COUNT; // phantom measurer.
+			}
+		}
+		else if constexpr( theModule == BENCHMOD_CGAME) {
+			if (vmCall >= 100) {
+				vmCall -= BENCHMARK_MEASURE_VMCALLS_MVOFFSET;
+			}
+			if (vmCall < 0 || vmCall >= BENCHMARK_MAX_VMCALL_COUNT) {
+				vmCall = BENCHMARK_MAX_VMCALL_COUNT; // phantom measurer.
+			}
+		}
+		throw std::logic_error("normalizeVMCall: Invalid template parameter value.");
+	}
+
+	// param1 param2 param3 are placeholders in case i ever need them.
+	inline float APICall(const int flags, const int param1, const int param2, const int param3, float* multiResultArr, const int multiResultArrSize, const benchmarkModule_t callingModule) {
+		float retVal = 0;
+
+		// targetModule is the module we are trying to observe, basically client/server (cgame/game) distinction
+		// it applies to some things and not to others (e.g. renderer is always clientside obviously)
+		benchmarkModule_t targetModule = (flags & BENCHMARK_MEASURE_VMTARGET_GAME) ? BENCHMOD_GAME : BENCHMOD_CGAME;
+		iter++;
+		if ((flags & BENCHMARK_START_CLOCK) || flags & BENCHMARK_GET_RESTART_CLOCK) {
+			if (flags & BENCHMARK_INDEX_MASK) {
+				for (int i = 0; i < BENCHMARK_MAX_INDEX_COUNT; i++) {
+					if ((BENCHMARK_INDEX_0 << i) & flags) {
+						if (genericBenchmarks[callingModule][i].set) {
+							retVal += getTimeSinceAndReset(genericBenchmarks[callingModule][i]);
+						}
+					}
+				}
+			}
+		}
+		if (flags & BENCHMARK_SETMEASUREMENTS) {
+
+			benchmarkTraces[targetModule].setRecipient(callingModule, flags & BENCHMARK_MEASURE_TRACES);
+			benchmarkTracesMarked[targetModule].setRecipient(callingModule, flags & BENCHMARK_MEASURE_TRACES_MARKED);
+			benchmarkSnapshots[targetModule].setRecipient(callingModule, flags & BENCHMARK_MEASURE_SNAPSHOTS);
+			benchmarkRender.setRecipient(callingModule, flags & BENCHMARK_MEASURE_RENDER);
+			vmBenchActive[targetModule] &= ~(1<<callingModule);
+			vmBenchActive[targetModule] = !!(flags & BENCHMARK_MEASURE_VMCALLS) * (1<<callingModule);
+		}
+		
+		if (flags & BENCHMARK_GETCLEARMEASUREMENT) {
+			if (flags & BENCHMARK_MEASURE_TRACES) {
+				retVal += getAccumAndReset(benchmarkTraces[targetModule].item[callingModule]);
+			}
+			if (flags & BENCHMARK_MEASURE_TRACES_MARKED) {
+				retVal += getAccumAndReset(benchmarkTracesMarked[targetModule].item[callingModule]);
+			}
+			if (flags & BENCHMARK_MEASURE_SNAPSHOTS) {
+				retVal += getAccumAndReset(benchmarkSnapshots[targetModule].item[callingModule]);
+			} 
+			if (flags & BENCHMARK_MEASURE_RENDER) {
+				retVal += getAccumAndReset(benchmarkRender.item[callingModule]);
+			}
+			if (flags & BENCHMARK_MEASURE_VMCALLS) {
+				unsigned int vmCallNum = (((unsigned int)flags & BENCHMARK_MEASURE_VMCALLS_MASK) >> BENCHMARK_MEASURE_VMCALLS_SHIFT) & (BENCHMARK_MAX_VMCALL_COUNT - 1);
+				if (vmCallNum == (BENCHMARK_MAX_VMCALL_COUNT - 1) || vmCallNum < 0 || vmCallNum >= BENCHMARK_MAX_VMCALL_COUNT) {
+					// sum all
+					for (int i = 0; i < BENCHMARK_MAX_VMCALL_COUNT; i++) {
+						retVal += getAccumAndReset(vmcallBenchmarks[targetModule][i].item[callingModule]);
+					}
+				}
+				else {
+					retVal += getAccumAndReset(vmcallBenchmarks[targetModule][vmCallNum].item[callingModule]);
+				}
+			}
+		}
+		if (multiResultArr) {
+			if (flags & BENCHMARK_MAX_VMCALL_COUNT) {
+				for (int i = 0; i < BENCHMARK_MAX_INDEX_COUNT && i < multiResultArrSize; i++) {
+					multiResultArr[i] = getAccumAndReset(vmcallBenchmarks[targetModule][i].item[callingModule]);
+				}
+			}
+			else {
+				for (int i = 0; i < BENCHMARK_MAX_INDEX_COUNT && i < multiResultArrSize; i++) {
+					multiResultArr[i] = getTimeSinceAndReset(genericBenchmarks[callingModule][i]);
+				}
+			}
+		}
+		return retVal;
+	}
+
+};
+extern Benchmarking benchmark;
+
+//============================================================================
+
 
 
 typedef struct clientRendererInfo_s {

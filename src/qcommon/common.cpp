@@ -48,7 +48,10 @@ const int supportedCoolApiFeatures =
 | COOL_APIFEATURE_JEDI_ACADEMY
 | COOL_APIFEATURE_CROSS_SERVER_COMMANDS
 | COOL_APIFEATURE_G_UPDATESPECTATORS
+| COOL_APIFEATURE_BENCHMARKING
 ;
+
+Benchmarking benchmark;
 
 #define MAX_NUM_ARGVS	50
 
@@ -141,6 +144,13 @@ void Com_WriteConfig_f( void );
 void Com_WriteConfigDiff_f( void );
 void Com_WriteConfigDiffRealtime_f( void );
 void CIN_CloseAllVideos();
+
+
+
+//============================================================================
+// Benchmarking
+
+
 
 //============================================================================
 

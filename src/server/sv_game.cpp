@@ -1203,6 +1203,18 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			return 0;
 		}
 	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_BENCHMARKING) {
+
+		switch (args[0]) {
+
+		case G_COOL_API_BENCHMARK:
+			{
+				floatint_t res;
+				res.f = benchmark.APICall(args[1], args[2], args[3], args[4], args[5] ? VMAP(5, float, args[6]) : NULL, args[6], BENCHMOD_GAME);
+				return res.i;
+			}
+		}
+	}
 	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_SENDBACKUCMD_GAMEGENERATED) {
 		switch (args[0]) {
 

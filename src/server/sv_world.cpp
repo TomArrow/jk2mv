@@ -718,6 +718,13 @@ Ghoul2 Insert End
 		maxs = vec3_origin;
 	}
 
+	if (benchmark.benchmarkTraces[BENCHMOD_GAME].recipients) {
+		benchmark.benchmarkTraces[BENCHMOD_GAME].setStartTime();
+	}
+	if (traceCustomization && (traceCustomization->traceCustomFlags & TRACECUSTOMFLAG_BENCHMARK) && benchmark.benchmarkTracesMarked[BENCHMOD_GAME].recipients) {
+		benchmark.benchmarkTracesMarked[BENCHMOD_GAME].setStartTime();
+	}
+
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
@@ -769,6 +776,13 @@ Ghoul2 Insert End
 	SV_ClipMoveToEntities ( &clip, traceCustomization );
 
 	*results = clip.trace;
+
+	if (benchmark.benchmarkTraces[BENCHMOD_GAME].recipients) {
+		benchmark.benchmarkTraces[BENCHMOD_GAME].setEndTime();
+	}
+	if (traceCustomization && (traceCustomization->traceCustomFlags & TRACECUSTOMFLAG_BENCHMARK) && benchmark.benchmarkTracesMarked[BENCHMOD_GAME].recipients) {
+		benchmark.benchmarkTracesMarked[BENCHMOD_GAME].setEndTime();
+	}
 }
 
 

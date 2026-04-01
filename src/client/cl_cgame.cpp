@@ -817,9 +817,9 @@ static void CL_TraceBenchMark(const refdef_t* fd) {
 
 	double totalTime = 0;
 	size_t totalTraces = 0;
-	auto start = std::chrono::high_resolution_clock::now();
+	auto start = std::chrono::steady_clock::now();
 	do {
-		auto now = std::chrono::high_resolution_clock::now();
+		auto now = std::chrono::steady_clock::now();
 
 		for (int i = 0; i < BENCH_TRACES_PER_ITER; i++) {
 			VectorCopy(org, orgVar);
@@ -1705,6 +1705,18 @@ Ghoul2 Insert End
 		case CG_COOL_API_ADDMEMECOMMAND:
 			CL_AddCgameCommand(VMAS(1),qtrue); // means no autocomplete to this, it must be typed exactly
 			return 0;
+			break;
+		}
+	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_BENCHMARKING) {
+		switch (args[0]) {
+
+		case CG_COOL_API_BENCHMARK:
+			{
+				floatint_t res;
+				res.f = benchmark.APICall(args[1], args[2], args[3], args[4], args[5] ? VMAP(5, float, args[6]) : NULL, args[6], BENCHMOD_CGAME);
+				return res.i;
+			}
 			break;
 		}
 	}
