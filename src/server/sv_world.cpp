@@ -741,6 +741,10 @@ Ghoul2 Insert End
 		clip.trace.entityNum = ENTITYNUM_NONE;
 	}
 
+	if (traceCustomization->traceCustomFlags & (TRACECUSTOMFLAG_MARKBRUSHES | TRACECUSTOMFLAG_WALKBRUSHES)) {
+		goto tracedone;
+	}
+
 	clip.contentmask = contentmask;
 /*
 Ghoul2 Insert Start
@@ -774,6 +778,8 @@ Ghoul2 Insert End
 
 	// clip to other solid entities
 	SV_ClipMoveToEntities ( &clip, traceCustomization );
+
+tracedone:
 
 	*results = clip.trace;
 
