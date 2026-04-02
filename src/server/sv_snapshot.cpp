@@ -560,7 +560,10 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 
 			// MV entities can be flagged to be sent only to specific
 			// clients (can't filter following spectators this way)
-			if ( mvEnt->snapshotIgnore[frame->ps.clientNum] ) continue;
+			if (mvEnt->snapshotIgnore[frame->ps.clientNum])
+			{
+				continue;
+			}
 			else if ( mvEnt->snapshotEnforce[frame->ps.clientNum] )
 			{
 				SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCE, distance);
@@ -568,7 +571,10 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			}
 
 			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS) {
-				if (mvEnt->snapshotIgnoreRealClient[realClientNum]) continue;
+				if (mvEnt->snapshotIgnoreRealClient[realClientNum])
+				{
+					continue;
+				}
 				else if (mvEnt->snapshotEnforceRealClient[realClientNum])
 				{
 					SV_AddEntToSnapshot(svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCEREAL, distance);
