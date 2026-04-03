@@ -1856,6 +1856,14 @@ Ghoul2 Insert End
 			return 0;
 		}
 	}
+	else {
+		if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_MVAPI_SUBMODELBYPASS_SNEAKPEEK) {
+			switch (args[0]) {
+			case CG_MVAPI_ENABLE_SUBMODELBYPASS:
+				return CL_CgameEnableSubmodelBypass((qboolean)!!args[1]);
+			}
+		}
+	}
 
 	Com_Error( ERR_DROP, "Bad cgame system trap: %lli", (long long int)args[0] );
 	return 0;
