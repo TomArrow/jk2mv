@@ -1179,7 +1179,7 @@ void R_Register( void )
 	r_texturebitslm = ri.Cvar_Get("r_texturebitslm", "0", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_overBrightBits = ri.Cvar_Get("r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 	r_mapOverBrightBits = ri.Cvar_Get("r_mapOverBrightBits", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
-	r_lightmapBrighten = ri.Cvar_Get("r_lightmapBrighten", "0.0", CVAR_ARCHIVE | CVAR_GLOBAL);
+	r_lightmapBrighten = ri.Cvar_Get("r_lightmapBrighten", "0.0", CVAR_GLOBAL );
 	r_intensity = ri.Cvar_Get("r_intensity", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
 	r_aspectratio = ri.Cvar_Get("r_aspectratio", "-1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH); // screen resolutions
 	r_customaspect = ri.Cvar_Get("r_customaspect", "1", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH);
