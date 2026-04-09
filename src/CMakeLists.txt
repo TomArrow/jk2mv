@@ -283,6 +283,7 @@ if (BuildMVMP)
 	# Libraries
 	
 	# OpenGL
+	set(OpenGL_GL_PREFERENCE GLVND)
 	find_package(OpenGL)
 	if(NOT OPENGL_FOUND)
 		message(FATAL_ERROR "OpenGL dev files not found!")

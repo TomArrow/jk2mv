@@ -1472,6 +1472,10 @@ static void SV_InitGameVM( qboolean restart ) {
 		VM_Call(gvm, MVAPI_AFTER_INIT);
 	}
 
+	if (!sv.gentities || !sv.gameClients) {
+		Com_Error(ERR_DROP, "SV_InitGameVM: failed to locate game data\n");
+	}
+
 	// clear all gentity pointers that might still be set from
 	// a previous level
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
