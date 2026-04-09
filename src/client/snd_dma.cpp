@@ -159,6 +159,7 @@ portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
 \**************************************************************************************************/
 
 int			s_UseOpenAL	= false;		// Determines if using Open AL or the default software mixer
+int			s_UseOpenALForceDisable	= false;		// we wanna force disable it for video recording
 ALfloat		listener_pos[3];		// Listener Position
 ALfloat		listener_ori[6];		// Listener Orientation
 int			s_numChannels;			// Number of AL Sources == Num of Channels
@@ -337,7 +338,7 @@ void S_Init( void )
 
 #ifdef USE_OPENAL
 	cv = Cvar_Get("s_UseOpenAL", "0", CVAR_ARCHIVE | CVAR_LATCH | CVAR_GLOBAL);
-	s_UseOpenAL = !!(cv->integer);
+	s_UseOpenAL = !!(cv->integer) && !s_UseOpenALForceDisable;
 
 	if (s_UseOpenAL)
 	{

@@ -17,6 +17,7 @@
 
 // Open AL
 extern int s_UseOpenAL;
+extern int s_UseOpenALForceDisable;
 
 /*
 ===============================================================================

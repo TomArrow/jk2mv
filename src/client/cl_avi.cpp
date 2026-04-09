@@ -335,6 +335,9 @@ static qboolean CL_ValidatePipeFormat(const char* s)
 }
 
 
+// Open AL
+extern int s_UseOpenAL;
+extern int s_UseOpenALForceDisable;
 /*
   ===============
   CL_OpenAVIForWriting
@@ -386,6 +389,15 @@ qboolean CL_OpenAVIForWriting( const char *fileName, qboolean pipe )
 	}
 
 	Q_strncpyz( afd.fileName, fileName, MAX_QPATH );
+
+	if (s_UseOpenAL) {
+		// can't record audio with openAL so turn it off for the duration of the video recording.
+
+		Com_Printf(S_COLOR_YELLOW "WARNING: Audio capture is not supported "
+			"with OpenAL. Temporarily disabling OpenAL for the duration of the capture.\n");
+		s_UseOpenALForceDisable = true;
+		CL_Snd_Restart_f();
+	}
 
 	afd.frameRate = cl_aviFrameRate->integer;
 	afd.framePeriod = (int)( 1000000.0f / afd.frameRate );
@@ -678,6 +690,11 @@ qboolean CL_CloseAVI( void )
 		afd.f = FS_INVALID_HANDLE;
 		afd.fileOpen = qfalse;
 		afd.pipe = qfalse;
+		if (s_UseOpenALForceDisable) {
+			// if we were forcing audio to be DMA, go back to openAL now.
+			s_UseOpenALForceDisable = false;
+			CL_Snd_Restart_f();
+		}
 		return qtrue;
 	}
 
@@ -738,6 +755,12 @@ qboolean CL_CloseAVI( void )
 	FS_FCloseFile( afd.f );
 
 	Com_DPrintf( "Wrote %d:%d frames to %s\n", afd.numVideoFrames, afd.numAudioFrames, afd.fileName );
+
+	if (s_UseOpenALForceDisable) {
+		// if we were forcing audio to be DMA, go back to openAL now.
+		s_UseOpenALForceDisable = false;
+		CL_Snd_Restart_f();
+	}
 
 	return qtrue;
 }
