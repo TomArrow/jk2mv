@@ -392,11 +392,16 @@ qboolean CL_OpenAVIForWriting( const char *fileName, qboolean pipe )
 
 	if (s_UseOpenAL) {
 		// can't record audio with openAL so turn it off for the duration of the video recording.
-
 		Com_Printf(S_COLOR_YELLOW "WARNING: Audio capture is not supported "
 			"with OpenAL. Temporarily disabling OpenAL for the duration of the capture.\n");
 		s_UseOpenALForceDisable = true;
+		if (!com_developer->integer) {
+			Com_BeginRedirect(NULL, 0, NULL, qtrue);
+		}
 		CL_Snd_Restart_f();
+		if (!com_developer->integer) {
+			Com_EndRedirect();
+		}
 	}
 
 	afd.frameRate = cl_aviFrameRate->integer;
@@ -693,7 +698,13 @@ qboolean CL_CloseAVI( void )
 		if (s_UseOpenALForceDisable) {
 			// if we were forcing audio to be DMA, go back to openAL now.
 			s_UseOpenALForceDisable = false;
+			if (!com_developer->integer) {
+				Com_BeginRedirect(NULL, 0, NULL, qtrue);
+			}
 			CL_Snd_Restart_f();
+			if (!com_developer->integer) {
+				Com_EndRedirect();
+			}
 		}
 		return qtrue;
 	}
