@@ -741,7 +741,7 @@ Ghoul2 Insert End
 		clip.trace.entityNum = ENTITYNUM_NONE;
 	}
 
-	if (traceCustomization->traceCustomFlags & (TRACECUSTOMFLAG_MARKBRUSHES | TRACECUSTOMFLAG_WALKBRUSHES)) {
+	if (traceCustomization->traceCustomFlags & (TRACECUSTOMFLAG_MARKBRUSHES | TRACECUSTOMFLAG_WALKBRUSHES | TRACECUSTOMFLAG_SKIPENTITYTRACE)) {
 		goto tracedone;
 	}
 

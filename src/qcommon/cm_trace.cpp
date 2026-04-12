@@ -1026,7 +1026,7 @@ trace volumes it is possible to hit something in a later leaf with
 a smaller intercept fraction.
 ==================
 */
-void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t p1, vec3_t p2) {
+void CM_TraceThroughTree( traceWork_t *tw, int numParent, int num, float p1f, float p2f, vec3_t p1, vec3_t p2) {
 	cNode_t		*node;
 	cplane_t	*plane;
 	float		t1, t2, offset;
@@ -1042,6 +1042,18 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 
 	// if < 0, we are in a leaf node
 	if (num < 0) {
+
+		if ((tw->traceCustomizationFlags & TRACECUSTOMFLAG_FASTHULLTRACE)) {
+			if (cm.leafs[-1 - num].cluster == -1) {
+				node = cm.nodes + numParent;
+				plane = node->plane;
+				tw->trace.fraction = p1f;
+				tw->trace.contents |= CONTENTS_SOLID;
+				tw->trace.plane = *plane;
+			}
+			return;
+		}
+
 		CM_TraceThroughLeaf( tw, &cm.leafs[-1-num] );
 		return;
 	}
@@ -1082,11 +1094,11 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 
 	// see which sides we need to consider
 	if ( t1 >= offset + 1 && t2 >= offset + 1 ) {
-		CM_TraceThroughTree( tw, node->children[0], p1f, p2f, p1, p2 );
+		CM_TraceThroughTree( tw, num, node->children[0], p1f, p2f, p1, p2 );
 		return;
 	}
 	if ( t1 < -offset - 1 && t2 < -offset - 1 ) {
-		CM_TraceThroughTree( tw, node->children[1], p1f, p2f, p1, p2 );
+		CM_TraceThroughTree( tw, num, node->children[1], p1f, p2f, p1, p2 );
 		return;
 	}
 
@@ -1121,7 +1133,7 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 	mid[1] = p1[1] + frac*(p2[1] - p1[1]);
 	mid[2] = p1[2] + frac*(p2[2] - p1[2]);
 
-	CM_TraceThroughTree( tw, node->children[side], p1f, midf, p1, mid );
+	CM_TraceThroughTree( tw, num, node->children[side], p1f, midf, p1, mid );
 
 
 	// go past the node
@@ -1138,7 +1150,7 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 	mid[1] = p1[1] + frac2*(p2[1] - p1[1]);
 	mid[2] = p1[2] + frac2*(p2[2] - p1[2]);
 
-	CM_TraceThroughTree( tw, node->children[side^1], midf, p2f, mid, p2 );
+	CM_TraceThroughTree( tw, num, node->children[side^1], midf, p2f, mid, p2 );
 }
 
 
@@ -1380,7 +1392,7 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 				CM_TraceThroughLeaf( &tw, &cmod->leaf );
 			}
 		} else {
-			CM_TraceThroughTree( &tw, 0, 0, 1, tw.start, tw.end );
+			CM_TraceThroughTree( &tw, 0, 0, 0, 1, tw.start, tw.end );
 		}
 	}
 
