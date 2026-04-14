@@ -1213,7 +1213,7 @@ void SV_CheckTimeouts( void ) {
 					// nuke user info
 					SV_SetUserinfo(cl - svs.clients, "");
 					if (cl->demo.demorecording) {
-						SV_StopRecordDemo(cl);
+						SV_StopRecordDemo(cl,&cl->demo,qfalse);
 					}
 					SV_ClearClientDemoPreRecord(cl); // Happens on (re)connect too but let's be safe/clean :)
 					SV_ClearClientDemoMeta(cl);

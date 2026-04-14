@@ -475,8 +475,8 @@ void SV_ClientUpdateSnaps( client_t *client );
 //
 void SV_Heartbeat_f( void );
 
-void SV_RecordDemo(client_t* cl, char* demoName);
-void SV_StopRecordDemo(client_t* cl);
+void SV_RecordDemo(client_t* cl, char* demoName, qboolean clip, qboolean limitPastMS, unsigned int pastMS);
+void SV_StopRecordDemo(client_t* client,demoInfo_t* demo, qboolean clip);
 void SV_ClearClientDemoMeta(client_t* cl);
 void SV_ClearClientDemoPreRecord(client_t* cl);
 void SV_ClearAllDemoPreRecord();

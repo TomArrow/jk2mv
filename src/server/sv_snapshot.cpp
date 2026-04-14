@@ -872,7 +872,7 @@ int SV_GetClientSnapshotMsec(client_t* client) {
 }
 
 #ifdef SVDEMO
-extern void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes);
+extern void SV_WriteDemoMessage(client_t* cl, demoInfo_t* demo, msg_t* msg, int headerBytes);
 // defined in sv_client.cpp
 extern void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg);
 #endif
@@ -956,7 +956,7 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 		if (client->demo.demorecording && !client->demo.demowaiting) {
 			msg_t msgcopy = *msg;
 			MSG_WriteByte(&msgcopy, svc_EOF);
-			SV_WriteDemoMessage(client, &msgcopy, 0);
+			SV_WriteDemoMessage(client, &client->demo, &msgcopy, 0);
 		}
 
 		// Check for whether a new keyframe must be written in pre recording, and if so, do it.

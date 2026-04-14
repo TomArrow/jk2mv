@@ -866,22 +866,22 @@ static void SV_KillServer_f( void ) {
 
 #ifdef SVDEMO
 
-void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes) {
+void SV_WriteDemoMessage(client_t* cl, demoInfo_t* demo, msg_t* msg, int headerBytes) {
 	int		len, swlen;
 
 	// write the packet sequence
 	len = cl->netchan.outgoingSequence;
 	swlen = LittleLong(len);
-	FS_Write(&swlen, 4, cl->demo.demofile);
+	FS_Write(&swlen, 4, demo->demofile);
 
 	// skip the packet sequencing information
 	len = msg->cursize - headerBytes;
 	swlen = LittleLong(len);
-	FS_Write(&swlen, 4, cl->demo.demofile);
-	FS_Write(msg->data + headerBytes, len, cl->demo.demofile);
+	FS_Write(&swlen, 4, demo->demofile);
+	FS_Write(msg->data + headerBytes, len, demo->demofile);
 }
 
-void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageNum) { // Version that specifies messagenumber manually, for buffered (pre-record) messages.
+void SV_WriteDemoMessage(client_t* cl, demoInfo_t* demo, msg_t* msg, int headerBytes, int messageNum) { // Version that specifies messagenumber manually, for buffered (pre-record) messages.
 	int		len, swlen;
 
 	// write the packet sequence
@@ -890,7 +890,7 @@ void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageN
 	if (com_developer->integer > 1) {
 		//Com_Printf("a ");
 	}
-	FS_Write(&swlen, 4, cl->demo.demofile);
+	FS_Write(&swlen, 4, demo->demofile);
 
 	// skip the packet sequencing information
 	len = msg->cursize - headerBytes;
@@ -898,11 +898,11 @@ void SV_WriteDemoMessage(client_t* cl, msg_t* msg, int headerBytes, int messageN
 	if (com_developer->integer > 1) {
 		//Com_Printf("b ");
 	}
-	FS_Write(&swlen, 4, cl->demo.demofile);
+	FS_Write(&swlen, 4, demo->demofile);
 	if (com_developer->integer > 1) {
 		//Com_Printf("c ");
 	}
-	FS_Write(msg->data + headerBytes, len, cl->demo.demofile);
+	FS_Write(msg->data + headerBytes, len, demo->demofile);
 }
 
 
@@ -1003,10 +1003,10 @@ void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet) {
 
 void SV_SendClientUcmdSendback(client_t* client, qboolean force);
 
-void SV_StopRecordDemo(client_t* cl) {
+void SV_StopRecordDemo(client_t* cl, demoInfo_t* demo, qboolean clip) {
 	int		len;
 
-	if (!cl->demo.demorecording) {
+	if (!demo->demorecording) {
 		Com_Printf("Client %d is not recording a demo.\n", cl - svs.clients);
 		return;
 	}
@@ -1015,15 +1015,17 @@ void SV_StopRecordDemo(client_t* cl) {
 		Com_Printf("Stopping demo recording ... ");
 	}
 
-	SV_SendClientUcmdSendback(cl,qtrue); // force dump any usercmds in when demos finish so nothing gets lost 
+	if (!clip) {
+		SV_SendClientUcmdSendback(cl, qtrue); // force dump any usercmds in when demos finish so nothing gets lost. if doing a clip demo, don't do this as it wouldn't end up in the demo. instead we do it when starting the demo, before dumping the pre-record stuff in.
+	}
 
 	// finish up
 	len = -1;
-	FS_Write(&len, 4, cl->demo.demofile);
-	FS_Write(&len, 4, cl->demo.demofile);
-	FS_FCloseFile(cl->demo.demofile);
-	cl->demo.demofile = 0;
-	cl->demo.demorecording = qfalse;
+	FS_Write(&len, 4, demo->demofile);
+	FS_Write(&len, 4, demo->demofile);
+	FS_FCloseFile(demo->demofile);
+	demo->demofile = 0;
+	demo->demorecording = qfalse;
 	if (com_developer->integer)
 		Com_Printf("Stopped demo for client %d.\n", cl - svs.clients);
 }
@@ -1054,7 +1056,7 @@ void SV_StopAutoRecordDemos() {
 	if (svs.clients && sv_autoDemo->integer) {
 		for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
 			if (client->demo.demorecording) {
-				SV_StopRecordDemo(client);
+				SV_StopRecordDemo(client, &client->demo, qfalse);
 			}
 		}
 	}
@@ -1097,7 +1099,7 @@ void SV_StopRecord_f(void) {
 			return;
 		}
 	}
-	SV_StopRecordDemo(cl);
+	SV_StopRecordDemo(cl, &cl->demo, qfalse);
 }
 
 /*
@@ -1159,46 +1161,67 @@ void SV_DemoFilename(char* buf, int bufSize) {
 
 // defined in sv_client.cpp
 extern void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg);
-void SV_RecordDemo(client_t* cl, char* demoName) {
+void SV_RecordDemo(client_t* cl, char* demoName, qboolean clip, qboolean limitPastMS, unsigned int pastMS) {
 	char		name[MAX_OSPATH];
-	byte		bufData[MAX_MSGLEN];
+	static byte		bufData[MAX_MSGLEN];
 	msg_t		msg;
 	int			len;
 	std::stringstream ssMeta; // JSON metadata
+	demoInfo_t* demo = &cl->demo;
+
+	if (!pastMS) {
+		pastMS = UINT_MAX;
+	}
 
 	if (com_developer->integer > 1) {
 		Com_Printf("Starting demo recording ... ");
 	}
 
-	if (cl->demo.demorecording) {
+	if (demo->demorecording && !clip) {
 		Com_Printf("Already recording.\n");
 		return;
 	}
 
-	if (cl->state != CS_ACTIVE) {
+	if (cl->state != CS_ACTIVE && !(cl->state == CS_ZOMBIE && cl->zombified)) {
 		Com_Printf("Client is not active.\n");
 		return;
 	}
 
+	if (clip && !sv_demoPreRecord->integer) {
+		Com_Printf("Demo clip recording not possible without sv_demoPreRecord.\n");
+		return;
+	}
+
+	if (clip) { 
+		// this is just a one-off demo we immediately close once pre-record is dumped into it.
+		static demoInfo_t	clipDemo;
+		memset(&clipDemo, 0, sizeof(clipDemo));
+		demo = &clipDemo;
+	}
+
 	// open the demo file
-	Q_strncpyz(cl->demo.demoName, demoName, sizeof(cl->demo.demoName));
-	Com_sprintf(name, sizeof(name), "demos/%s.dm_%d", cl->demo.demoName, MV_GetCurrentProtocol()); //Should use DEMO_EXTENSION
+	Q_strncpyz(demo->demoName, demoName, sizeof(demo->demoName));
+	Com_sprintf(name, sizeof(name), "demos/%s.dm_%d", demo->demoName, MV_GetCurrentProtocol()); //Should use DEMO_EXTENSION
 
 
 	if (com_developer->integer) {
 		Com_Printf("recording to %s.\n", name);
 	}
-	cl->demo.demofile = FS_FOpenFileWriteAsync(name, qtrue);
-	if (!cl->demo.demofile) {
+	demo->demofile = FS_FOpenFileWriteAsync(name, qtrue);
+	if (!demo->demofile) {
 		Com_Printf("ERROR: couldn't open.\n");
 		return;
 	}
-	cl->demo.demorecording = qtrue;
 
-	cl->demo.isBot = (cl->netchan.remoteAddress.type == NA_BOT) ? qtrue : qfalse;
-	cl->demo.botReliableAcknowledge = cl->reliableSent;
-	cl->demo.clientDemoReliableAcknowledge = cl->reliableSent;
+	if (clip) {
+		SV_SendClientUcmdSendback(cl, qtrue); // flush the sendback now, so that it ends up in the demo through pre-record. yea ik, ugly.
+	}
 
+	demo->demorecording = qtrue;
+
+	demo->isBot = (cl->netchan.remoteAddress.type == NA_BOT) ? qtrue : qfalse;
+	demo->botReliableAcknowledge = cl->reliableSent;
+	demo->clientDemoReliableAcknowledge = cl->reliableSent;
 
 	// Save metadata message if desired
 	if (sv_demoWriteMeta->integer) {
@@ -1208,6 +1231,10 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 		int i;
 		ssMeta << "{";
 		ssMeta << "\"wr\":\"TommyTernal_Server\""; // Writer (keyword used by other tools too to identify origin of demo)
+
+		if (clip) {
+			ssMeta << ",\"clip\":1" ;
+		}
 
 		// Go through manually set metadata and add it.
 		for (auto it = demoMetaData[cl - svs.clients].begin(); it != demoMetaData[cl - svs.clients].end(); it++) {
@@ -1259,6 +1286,26 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 				break;
 			}
 		}
+		if (firstOldKeyframeFound && limitPastMS && pastMS < ((sv_demoPreRecordTime->integer + sv_demoPreRecordKeyframeDistance->integer) * 1000) && (sv.time - firstOldKeyframe->get()->time) > pastMS) {
+			if (com_developer->integer > 1) {
+				Com_Printf("Pre-record contains more data than needed, check for later keyframes ... ");
+			}
+			int targettime = sv.time- pastMS;
+			int skippedKeyframes = 0;
+			int oldtime = firstOldKeyframe->get()->time;
+			for (demoPreRecordBufferIt it = (firstOldKeyframe+1); it != demoPreRecordBuffer[cl - svs.clients].end(); it++) {
+				if (it->get()->time > targettime) {
+					break;
+				}
+				else if (it->get()->isKeyframe && it->get()->time < sv.time) {
+					firstOldKeyframe = it;
+					skippedKeyframes++;
+				}
+			}
+			if (com_developer->integer > 1) {
+				Com_Printf("Pre-record trimmed by %d keyframes / %d milliseconds ... ",skippedKeyframes, firstOldKeyframe->get()->time - oldtime);
+			}
+		}
 		if (firstOldKeyframeFound) {
 			if (com_developer->integer > 1) {
 				Com_Printf("Dumping pre-recorded demo messages ... ");
@@ -1286,7 +1333,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 						if (com_developer->integer > 1) {
 							Com_Printf("Writing demo metadata (pre-record) ... ");
 						}
-						SV_WriteEmptyMessageWithMetadata(it->get()->lastClientCommand, cl->demo.demofile, ssMeta.str().c_str(), it->get()->msgNum - 1);
+						SV_WriteEmptyMessageWithMetadata(it->get()->lastClientCommand, demo->demofile, ssMeta.str().c_str(), it->get()->msgNum - 1);
 						if (com_developer->integer > 1) {
 							Com_Printf("done, writing pre-record messages ... ");
 						}
@@ -1294,7 +1341,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 					if (com_developer->integer > 1) {
 						//Com_Printf("%d", it->get()->msgNum);
 					}
-					SV_WriteDemoMessage(cl, &preRecordMsg, 0, it->get()->msgNum);
+					SV_WriteDemoMessage(cl, demo, &preRecordMsg, 0, it->get()->msgNum);
 					if (com_developer->integer > 1) {
 						//Com_Printf("w ");
 					}
@@ -1303,12 +1350,23 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 			if (com_developer->integer > 1) {
 				Com_Printf("done.\n");
 			}
+
+			if (clip) {
+				// this is just a quick clip so we immediately close the demo again
+				SV_StopRecordDemo(cl,demo,qtrue);
+			}
+
 			return; // No need to go through the whole normal demo procedure with demowaiting etc.
 		}
 	}
 
+	if (clip) { // this is some bug/weird state. don't open a file just to leave it dangling.
+		SV_StopRecordDemo(cl,demo,qtrue);
+		return;
+	}
+
 	// don't start saving messages until a non-delta compressed message is received
-	cl->demo.demowaiting = qtrue;
+	demo->demowaiting = qtrue;
 
 	// write out the gamestate message
 	MSG_Init(&msg, bufData, sizeof(bufData));
@@ -1334,7 +1392,7 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 		if (com_developer->integer > 1) {
 			Com_Printf("Writing demo metadata (default) ... ");
 		}
-		SV_WriteEmptyMessageWithMetadata(cl->lastClientCommand, cl->demo.demofile, ssMeta.str().c_str(), cl->netchan.outgoingSequence - 2);
+		SV_WriteEmptyMessageWithMetadata(cl->lastClientCommand, demo->demofile, ssMeta.str().c_str(), cl->netchan.outgoingSequence - 2);
 		if (com_developer->integer > 1) {
 			Com_Printf("done, writing gamestate ... ");
 		}
@@ -1342,11 +1400,11 @@ void SV_RecordDemo(client_t* cl, char* demoName) {
 
 	// write it to the demo file
 	len = LittleLong(cl->netchan.outgoingSequence - 1);
-	FS_Write(&len, 4, cl->demo.demofile);
+	FS_Write(&len, 4, demo->demofile);
 
 	len = LittleLong(msg.cursize);
-	FS_Write(&len, 4, cl->demo.demofile);
-	FS_Write(msg.data, msg.cursize, cl->demo.demofile);
+	FS_Write(&len, 4, demo->demofile);
+	FS_Write(msg.data, msg.cursize, demo->demofile);
 
 	if (com_developer->integer > 1) {
 		Com_Printf("done.\n");
@@ -1384,7 +1442,7 @@ void SV_AutoRecordDemo(client_t* cl) {
 		Q_strstrip(*start, "\n\r;:.?*<>|\\/\"", NULL);
 	}
 	Com_sprintf(demoName, sizeof(demoName), "autorecord/%s/%s/%s", folderTreeDate, demoFolderName, demoFileName);
-	SV_RecordDemo(cl, demoName);
+	SV_RecordDemo(cl, demoName, qfalse, qfalse, UINT_MAX);
 }
 
 static time_t SV_ExtractTimeFromDemoFolder(char* folder) {
@@ -1549,6 +1607,9 @@ static void SV_Record_f(void) {
 	int			i;
 	char* s;
 	client_t* cl;
+	qboolean	clip = qfalse;
+	qboolean		limitPastMS = qfalse;
+	unsigned int	pastMS = UINT_MAX; // how many past milliseconds from prerecord we want.
 	//int			len;
 
 	if (svs.clients == NULL) {
@@ -1556,12 +1617,14 @@ static void SV_Record_f(void) {
 		return;
 	}
 
-	if (Cmd_Argc() > 3) {
-		Com_Printf("record <demoname> <clientnum>\n");
+	clip = (qboolean)(!Q_stricmp(Cmd_Argv(0),"svrecordclip"));
+
+	if (Cmd_Argc() > 4) {
+		Com_Printf("svrecord <demoname> <clientnum> <pastms>\n");
 		return;
 	}
 
-	if (Cmd_Argc() == 3) {
+	if (Cmd_Argc() >= 3) {
 		int clIndex = atoi(Cmd_Argv(2));
 		if (clIndex < 0 || clIndex >= sv_maxclients->integer) {
 			Com_Printf("Unknown client number %d.\n", clIndex);
@@ -1577,7 +1640,7 @@ static void SV_Record_f(void) {
 				continue;
 			}
 
-			if (cl->demo.demorecording)
+			if (cl->demo.demorecording && !clip)
 			{
 				continue;
 			}
@@ -1588,14 +1651,24 @@ static void SV_Record_f(void) {
 			}
 		}
 	}
+	
+	if (Cmd_Argc() >= 4) {
+		pastMS = atoi(Cmd_Argv(3));
+		limitPastMS = qtrue;
+	}
 
 	if (cl - svs.clients >= sv_maxclients->integer) {
 		Com_Printf("No active client could be found.\n");
 		return;
 	}
 
-	if (cl->demo.demorecording) {
+	if (cl->demo.demorecording && !clip) {
 		Com_Printf("Already recording.\n");
+		return;
+	}
+
+	if (clip && !sv_demoPreRecord->integer) {
+		Com_Printf("Demo clip recording not possible without sv_demoPreRecord.\n");
 		return;
 	}
 
@@ -1621,7 +1694,7 @@ static void SV_Record_f(void) {
 		}
 	}
 
-	SV_RecordDemo(cl, demoName);
+	SV_RecordDemo(cl, demoName, clip, limitPastMS, pastMS);
 }
 
 // Set metadata for demos of a particular client
@@ -1801,6 +1874,7 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand ("forcetoggle", SV_ForceToggle_f);
 
 #ifdef SVDEMO
+	Cmd_AddCommand("svrecordclip", SV_Record_f);// , "Record a server-side demo (only dump pre-record and end the demo)");
 	Cmd_AddCommand("svrecord", SV_Record_f);// , "Record a server-side demo");
 	Cmd_AddCommand("svstoprecord", SV_StopRecord_f);//, "Stop recording a server-side demo");
 	Cmd_AddCommand("svdemometa", SV_DemoMeta_f);//, "Sets a new metadata entry for server-side demos for one player. Call with clientnum, metakey, [data]");

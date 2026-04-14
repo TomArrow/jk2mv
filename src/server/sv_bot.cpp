@@ -68,7 +68,7 @@ void SV_BotFreeClient( int clientNum ) {
 
 #ifdef SVDEMO
 	if (cl->demo.demorecording) {
-		SV_StopRecordDemo(cl);
+		SV_StopRecordDemo(cl,&cl->demo, qfalse);
 	}
 	SV_ClearClientDemoPreRecord(cl);
 	SV_ClearClientDemoMeta(cl);

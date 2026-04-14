@@ -448,7 +448,7 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 #ifdef SVDEMO
 
 		if (drop->demo.demorecording) {
-			SV_StopRecordDemo(drop);
+			SV_StopRecordDemo(drop,&drop->demo,qfalse);
 		}
 		SV_ClearClientDemoPreRecord(drop); // Happens on (re)connect too but let's be safe/clean :)
 		SV_ClearClientDemoMeta(drop);
