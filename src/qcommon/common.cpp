@@ -298,7 +298,7 @@ A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 =============
 */
 std::recursive_mutex printfLock;
-void QDECL Com_Printf( const char *fmt, ... )
+void QDECL Com_Printf(PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	std::lock_guard<std::recursive_mutex> l(printfLock);
 	va_list		argptr;
@@ -311,7 +311,7 @@ void QDECL Com_Printf( const char *fmt, ... )
 	Com_Puts_Ext( qfalse, qfalse, msg );
 }
 
-void QDECL Com_Printf_Ext( qboolean extendedColors, const char *fmt, ... )
+void QDECL Com_Printf_Ext( qboolean extendedColors, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -323,7 +323,7 @@ void QDECL Com_Printf_Ext( qboolean extendedColors, const char *fmt, ... )
 	Com_Puts_Ext( extendedColors, qfalse, msg);
 }
 
-void QDECL Com_Printf_MV( int flags, const char *fmt, ... )
+void QDECL Com_Printf_MV( int flags, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -343,7 +343,7 @@ Com_DPrintf
 A Com_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void QDECL Com_DPrintf( const char *fmt, ...) {
+void QDECL Com_DPrintf( PRINTF_FORMAT_STRING const char *fmt, ...) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
@@ -359,7 +359,7 @@ void QDECL Com_DPrintf( const char *fmt, ...) {
 }
 
 // Outputs to the VC / Windows Debug window (only in debug compile)
-void QDECL Com_OPrintf( const char *fmt, ...)
+void QDECL Com_OPrintf(PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
@@ -413,7 +413,7 @@ Both client and server can use this, and it will
 do the apropriate things.
 =============
 */
-Q_NORETURN void QDECL Com_Error( errorParm_t code, const char *fmt, ... ) {
+Q_NORETURN void QDECL Com_Error( errorParm_t code, PRINTF_FORMAT_STRING const char *fmt, ... ) {
 	va_list		argptr;
 	static int	lastErrorTime;
 	static int	errorCount;

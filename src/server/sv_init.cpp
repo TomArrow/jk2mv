@@ -687,7 +687,7 @@ Ghoul2 Insert End
 	sv.serverId = com_frameTime;
 	sv.restartedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
-	Cvar_Set( "sv_gameStartUnixTime", va("%" PRId64 "\n", (int64_t)std::time(nullptr)) );
+	Cvar_Set( "sv_gameStartUnixTime", va("%" INT64PRINTF, (int64_t)std::time(nullptr)) );
 
 	// make a random id for this server to avoid recursion with badly configured cross-server commands.
 	if (randombytes(&serverUniqueCrossServerCommandsId, 4)) {

@@ -222,6 +222,16 @@ if(MSVC)
 	# 4047 = 'function': 'type*' differs in levels of indirection from 'type**'
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /w34996 /wd4267 /we4013 /we4133 /we4047 /we4020")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /w34996 /wd4267 /wd26812 /we4013 /we4133 /we4047 /we4020")
+		
+	# printf style function type checks. leads to weird errors so often when unchecked, especially in qvm
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /we3018 /we4313 /we4477 /we6063 /we6064 /we6065 /we6066 /we6067 /we6340 /we6273 /we6284 /we6328 /we6271 /we28251")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /we3018 /we4313 /we4477 /we6063 /we6064 /we6065 /we6066 /we6067 /we6340 /we6273 /we6284 /we6328 /we6271 /we28251")
+	
+	# Debug analyze (find va argument errors and such)
+	if(NOT FOR_WINXP)
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /analyze")
+		set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /analyze")
+	endif()
 	
 	# Multithreaded
 	set(CMAKE_CXX_FLAGS_RELEASE "/MT")
@@ -257,8 +267,8 @@ if(MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /DEBUG:FULL")
 elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES Clang|AppleClang))
 	# Additional flags for debug configuration
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb3")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb3 -Werror=format")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3 -Werror=format")
 
 	# we need sse optimizations in debug configuration, too because of the inline assembler which is sse code
 	if(ARCH_X86)
@@ -400,6 +410,7 @@ if(WITH_MARIADB AND NOT FOR_WINXP)
 	option(WITH_EXTERNAL_ZLIB "" ON)
 	option(MARIADB_FORCE_EXTERNAL_ZLIB "" ON)
 	#and then set anyway to update cache
+	set(NO_COMPILE_FLAGS_REWRITE ON)
 	set(IGNORE_PACKAGING ON)
 	set(ALL_PLUGINS_STATIC ON)
 	set(WITH_MSI OFF)

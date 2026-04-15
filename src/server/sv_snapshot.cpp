@@ -1186,7 +1186,7 @@ void SV_SendClientUcmdSendback(client_t* client, qboolean force) {
 			userStoredUcmdCounts[client - svs.clients] = 0;
 		}
 		else if ((userStoredUcmdCounts[client - svs.clients] == 0) != (userMessages[client - svs.clients].size() == 0)) {
-			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d, client is %d\n", userStoredUcmdCounts[client - svs.clients], userMessages[client - svs.clients].size(), client - svs.clients);
+			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d, client is %d\n", userStoredUcmdCounts[client - svs.clients], (int)userMessages[client - svs.clients].size(), (int)(client - svs.clients));
 			userStoredUcmdCounts[client - svs.clients] = 0;
 		}
 
@@ -1354,9 +1354,9 @@ void SV_CheckInvalidUserInfoValues(client_t* cl) {
 	if (!warning || cl->lastInvalidValuesWarning && svs.time - timeout < cl->lastInvalidValuesWarning && svs.time > cl->lastInvalidValuesWarning) {
 		return;
 	}
-	SV_SendServerCommand(cl,va("print \"%s\n\"",warning));
+	SV_SendServerCommand(cl,"print \"%s\n\"",warning);
 	if (critical) {
-		SV_SendServerCommand(cl, va("cp \"%s\n\"", warning));
+		SV_SendServerCommand(cl, "cp \"%s\n\"", warning);
 		Com_Printf("^3Sending critical warning to client %s: %s\n",cl->name, warning);
 	}
 	else {

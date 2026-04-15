@@ -862,7 +862,7 @@ qboolean Cvar_Command( void ) {
 	if (!strcmp(value, "!")) //toggle
 	{
 		char buff[5];
-		sprintf(buff,"%i",!v->value);
+		sprintf(buff,"%i",(int)(!v->value));
 		Cvar_Set2 (v->name, buff, qfalse);// toggle the value
 	}
 	else
@@ -967,7 +967,7 @@ void Cvar_Toggle_f( void ) {
 
 	if(c == 2) {
 		Cvar_Set2(Cmd_Argv(1), va("%d",
-			!Cvar_VariableValue(Cmd_Argv(1))),
+			(int)!Cvar_VariableValue(Cmd_Argv(1))),
 			qfalse);
 		return;
 	}

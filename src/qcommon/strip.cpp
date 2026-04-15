@@ -1021,7 +1021,7 @@ bool cStringPackage::UnderstandToken(char *&Data, int &Size, int token, char *da
 
 bool cStringPackage::SubSave(FILE *FH )
 {
-	fprintf(FH,"%s %d\n",Tokens[TK_ID], ID);
+	fprintf(FH,"%s %d\n",Tokens[TK_ID], (int)ID);
 
 	if (Reference)
 	{

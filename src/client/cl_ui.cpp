@@ -1252,7 +1252,7 @@ Ghoul2 Insert End
 		}
 	}
 
-	Com_Error( ERR_DROP, "Bad UI system trap: %lli", (long long int)args[0] );
+	Com_Error( ERR_DROP, "Bad UI system trap: %" INT64PRINTF, (int64_t)args[0] );
 	return 0;
 }
 

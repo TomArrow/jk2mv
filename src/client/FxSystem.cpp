@@ -34,7 +34,7 @@ void SFxHelper::ReInit(void)
 }
 
 //------------------------------------------------------
-void SFxHelper::Print( const char *msg, ... )
+void SFxHelper::Print( PRINTF_FORMAT_STRING const char *msg, ... )
 {
 	va_list		argptr;
 	char		text[1024];

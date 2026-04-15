@@ -527,12 +527,12 @@ static bool GLimp_DetectAvailableModes(void)
 
 	for( i = 0; i < numModes; i++ )
 	{
-		const char *newModeString = va( "%ux%u ", modes[ i ].w, modes[ i ].h );
+		const char *newModeString = va( "%dx%d ", modes[ i ].w, modes[ i ].h );
 
 		if( strlen( newModeString ) < (int)sizeof( buf ) - strlen( buf ) )
 			Q_strcat( buf, sizeof( buf ), newModeString );
 		else
-			Com_Printf( "Skipping mode %ux%u, buffer too small\n", modes[ i ].w, modes[ i ].h );
+			Com_Printf( "Skipping mode %dx%d, buffer too small\n", modes[ i ].w, modes[ i ].h );
 	}
 
 	if( *buf )

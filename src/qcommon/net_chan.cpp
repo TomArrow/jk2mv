@@ -538,7 +538,7 @@ const char	*NET_AdrToString(netadr_t a) {
 		Com_sprintf(s, sizeof(s), "bot");
 	} else if (a.type == NA_IP) {
 		Com_sprintf(s, sizeof(s), "%i.%i.%i.%i:%hu",
-			a.ip[0], a.ip[1], a.ip[2], a.ip[3], BigShort(a.port));
+			(int)a.ip[0], (int)a.ip[1], (int)a.ip[2], (int)a.ip[3], (unsigned short)BigShort(a.port));
 	} else if (a.type == NA_BAD) {
 		Com_sprintf(s, sizeof(s), "BAD");
 	}
@@ -664,7 +664,7 @@ NET_OutOfBandPrint
 Sends a text message in an out-of-band datagram
 ================
 */
-void QDECL NET_OutOfBandPrint(netsrc_t sock, netadr_t adr, const char *format, ...) {
+void QDECL NET_OutOfBandPrint(netsrc_t sock, netadr_t adr, PRINTF_FORMAT_STRING const char *format, ...) {
 	va_list		argptr;
 	char		string[MAX_MSGLEN];
 

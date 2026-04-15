@@ -151,6 +151,7 @@ static const char *GetErrorString( DWORD error ) {
 }
 
 void Sys_SetProcessorAffinity( void ) {
+	unsigned int processMaskUint;
 	DWORD_PTR processMask, processAffinityMask, systemAffinityMask;
 	HANDLE handle = GetCurrentProcess();
 
@@ -160,8 +161,10 @@ void Sys_SetProcessorAffinity( void ) {
 	if ( !GetProcessAffinityMask( handle, &processAffinityMask, &systemAffinityMask ) )
 		return;
 
-	if ( sscanf( com_affinity->string, "%X", &processMask ) != 1 )
-		processMask = 1; // set to first core only
+	if ( sscanf( com_affinity->string, "%X", &processMaskUint) != 1 )
+		processMaskUint = 1; // set to first core only
+
+	processMask = processMaskUint;
 
 	if ( !processMask )
 		processMask = systemAffinityMask; // use all the cores available to the system
@@ -638,7 +641,7 @@ int Sys_FLock(int fd, flockCmd_t cmd, qboolean nb) {
 	DWORD lower = 1;
 	DWORD upper = 0;
 	DWORD flags = 0;
-	int res;
+	int res = 0;
 
 	if (h == INVALID_HANDLE_VALUE) {
 		return -1;
@@ -807,7 +810,7 @@ void Sys_WriteCrashlog() {
 	case EXCEPTION_INT_OVERFLOW:             fprintf(f, "Integer overflow"); break;
 	case EXCEPTION_PRIV_INSTRUCTION:         fprintf(f, "Privileged instruction"); break;
 	case EXCEPTION_STACK_OVERFLOW:           fprintf(f, "Stack overflow"); break;
-	default: fprintf(f, "Unknown (%d)", exception_type);
+	default: fprintf(f, "Unknown (%u)", exception_type);
 	}
 	fprintf(f, "\n");
 

@@ -383,7 +383,7 @@ void Con_CopyLink(void) {
 		}
 	}
 	if (!link) {
-		Com_Printf("^1No Links or IPs found!\n", buffer);
+		Com_Printf("^1No Links or IPs found!\n");
 	}
 	Hunk_FreeTempMemory(buffer);
 }
@@ -721,7 +721,7 @@ void Con_Init (void) {
 		int day, year;
 		char month[4];
 
-		if (sscanf(__DATE__, "%s %i %i", &month, &day, &year) == 3) {
+		if (sscanf(__DATE__, "%s %i %i", month, &day, &year) == 3) {
 			int mm = 0;
 
 			//sry..
@@ -1616,7 +1616,7 @@ void Con_DrawSolidConsole( float frac ) {
 				if ( text[x].f.color != currentColor ) {
 					currentColor = text[x].f.color;
 					if (serverIsTommyTernal && Q_IsColorCharNT(currentColor)) {
-						Q_strcat(sTemp,sizeof(sTemp), va("^%i", currentColor));
+						Q_strcat(sTemp,sizeof(sTemp), va("^%i", (int)currentColor));
 					}
 					else {
 						Q_strcat(sTemp, sizeof(sTemp), va("^%i", (currentColor > 7 ? COLOR_JK2MV_FALLBACK : currentColor)));

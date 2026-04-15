@@ -1236,7 +1236,7 @@ void SE_CheckForLanguageUpdates(void)
 		const char* psErrorMessage = SE_LoadLanguage( se_language->string, SE_TRUE );
 		if ( psErrorMessage )
 		{
-			Com_Error( ERR_DROP, psErrorMessage );
+			Com_Error( ERR_DROP, "%s", psErrorMessage);
 		}
 		se_language->modified = SE_FALSE;
 	}

@@ -212,7 +212,7 @@ char *COM_Parse(const char **data_p) {
 	return COM_ParseExt(data_p, qtrue);
 }
 
-void COM_ParseError(char *format, ...) {
+void COM_ParseError( PRINTF_FORMAT_STRING char *format, ...) {
 	va_list argptr;
 	static char string[4096];
 
@@ -223,7 +223,7 @@ void COM_ParseError(char *format, ...) {
 	Com_Printf("ERROR: %s, line %d: %s\n", com_parsename, com_lines, string);
 }
 
-void COM_ParseWarning(char *format, ...) {
+void COM_ParseWarning(PRINTF_FORMAT_STRING char *format, ...) {
 	va_list argptr;
 	static char string[4096];
 
@@ -1227,7 +1227,7 @@ Special wrapper function for Microsoft's broken _vsnprintf() function.
 =============
 */
 
-size_t Q_vsnprintf(char *str, size_t size, const char *format, va_list ap) {
+size_t Q_vsnprintf(char *str, size_t size, PRINTF_FORMAT_STRING const char *format, va_list ap) {
 	int retval;
 	retval = _vsnprintf(str, size, format, ap);
 	if (retval < 0 || retval == size) {
@@ -1244,7 +1244,7 @@ size_t Q_vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 }
 #endif
 
-void QDECL Com_sprintf(char *dest, int size, const char *fmt, ...) {
+void QDECL Com_sprintf(char *dest, int size, PRINTF_FORMAT_STRING const char *fmt, ...) {
 	size_t		len;
 	va_list		argptr;
 
@@ -1257,7 +1257,11 @@ void QDECL Com_sprintf(char *dest, int size, const char *fmt, ...) {
 	va_end(argptr);
 
 	if (len >= (size_t)size) {
+#ifdef LIMITED_FORMATS
+		Com_Printf("Com_sprintf: overflow of %" INT64PRINTF " in %d\n", (int64_t)len, size);
+#else
 		Com_Printf("Com_sprintf: overflow of %zu in %d\n", len, size);
+#endif
 	}
 }
 
@@ -1274,7 +1278,7 @@ FIXME: make this buffer size safe someday
 #define	MAX_VA_STRING	32000
 #define MAX_VA_BUFFERS 4
 
-char * QDECL va(const char *format, ...) {
+char * QDECL va(PRINTF_FORMAT_STRING const char *format, ...) {
 	va_list		argptr;
 	static char	string[MAX_VA_BUFFERS][MAX_VA_STRING];	// in case va is called by nested functions
 	static int	index = 0;

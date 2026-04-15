@@ -760,14 +760,14 @@ static void IN_ProcessEvents( int eventTime )
 						POWERBROADCAST_SETTING* setting = (POWERBROADCAST_SETTING*)e.syswm.msg->msg.win.lParam;
 						if (IsEqualGUID(setting->PowerSetting, GUID_MONITOR_POWER_ON)) {
 							DWORD state = *(DWORD*)setting->Data;
-							Com_DPrintf("Sys_WinPowerMsgHook: Monitor Power On is %d\n", state);
+							Com_DPrintf("Sys_WinPowerMsgHook: Monitor Power On is %u\n", state);
 							qboolean amScreensaving = (qboolean)(!state);
 							if (com_screensaverActive->integer != amScreensaving) {
 								Cvar_SetValue("com_screensaverActive", amScreensaving);
 							}
 						}else if (IsEqualGUID(setting->PowerSetting, GUID_CONSOLE_DISPLAY_STATE)) {
 							DWORD state = *(DWORD*)setting->Data;
-							Com_DPrintf("Sys_WinPowerMsgHook: Console Displaya State is %d\n", state);
+							Com_DPrintf("Sys_WinPowerMsgHook: Console Display State is %u\n", state);
 							qboolean amScreensaving = (qboolean)(!state);
 							if (com_screensaverActive->integer != amScreensaving) {
 								Cvar_SetValue("com_screensaverActive", amScreensaving);

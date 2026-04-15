@@ -1402,7 +1402,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 	}
 
-	Com_Error( ERR_DROP, "Bad game system trap: %lli", (long long int)args[0] );
+	Com_Error( ERR_DROP, "Bad game system trap: %" INT64PRINTF, (int64_t)args[0] );
 	return -1;
 }
 

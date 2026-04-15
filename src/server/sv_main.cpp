@@ -215,7 +215,7 @@ the client game module: "cp", "print", "chat", etc
 A NULL client will broadcast to all clients
 =================
 */
-void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
+void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *fmt, ...) {
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
 	client_t	*client;
@@ -313,8 +313,8 @@ void SV_MasterHeartbeat( void ) {
 				adr[i].port = BigShort( PORT_MASTER );
 			}
 			Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", sv_master[i]->string,
-				adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
-				BigShort( adr[i].port ) );
+				(int)adr[i].ip[0], (int)adr[i].ip[1], (int)adr[i].ip[2], (int)adr[i].ip[3],
+				(int)(unsigned short)BigShort( adr[i].port ) );
 
 			SVC_WhitelistAdr( adr[i] );
 		}
@@ -986,13 +986,13 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	}
 
 	if (dropped[cmd] > 0 && lastMsg[cmd] + 1000 < now) {
-		Com_Printf("SV_ConnectionlessPacket: \"%s\" rate limit exceeded, dropped %d requests\n", commands[cmd], dropped[cmd]);
+		Com_Printf("SV_ConnectionlessPacket: \"%s\" rate limit exceeded, dropped %u requests\n", commands[cmd], dropped[cmd]);
 		dropped[cmd] = 0;
 		lastMsg[cmd] = now;
 	}
 
 	if (droppedAdr > 0 && lastMsgAdr + 1000 < now) {
-		Com_Printf("SV_ConnectionlessPacket: IP rate limit exceeded, dropped %d requests\n", droppedAdr);
+		Com_Printf("SV_ConnectionlessPacket: IP rate limit exceeded, dropped %u requests\n", droppedAdr);
 		droppedAdr = 0;
 		lastMsgAdr = now;
 	}
@@ -1533,28 +1533,28 @@ void SV_Frame( int msec ) {
 		for (int i = 1; i < 16 && !hit; i++) {
 			compareTime = 0x70000000 - i * 1000;
 			if (sv.time >= compareTime && oldSvTime < compareTime) {
-				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d seconds\n\"",i));
+				SV_SendServerCommand(NULL, "print \"^1WARNING: If map is not changed, server will be forced to restart in %d seconds\n\"",i);
 				hit = qtrue;
 			}
 		}
 		for (int i = 1; i < 10 && !hit; i++) {
 			compareTime = 0x70000000 - i * 60000;
 			if (sv.time >= compareTime && oldSvTime < compareTime) {
-				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i));
+				SV_SendServerCommand(NULL, "print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i);
 				hit = qtrue;
 			}
 		}
 		for (int i = 1; i < 6 && !hit; i++) {
 			compareTime = 0x70000000 - i * 600000;
 			if (sv.time >= compareTime && oldSvTime < compareTime) {
-				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i*10));
+				SV_SendServerCommand(NULL, "print \"^1WARNING: If map is not changed, server will be forced to restart in %d minutes\n\"",i*10);
 				hit = qtrue;
 			}
 		}
 		for (int i = 1; i < 10 && !hit; i++) {
 			compareTime = 0x70000000 - i * 3600000;
 			if (sv.time >= compareTime && oldSvTime < compareTime) {
-				SV_SendServerCommand(NULL, va("print \"^1WARNING: If map is not changed, server will be forced to restart in %d hours\n\"",i*10));
+				SV_SendServerCommand(NULL, "print \"^1WARNING: If map is not changed, server will be forced to restart in %d hours\n\"",i*10);
 				hit = qtrue;
 			}
 		}

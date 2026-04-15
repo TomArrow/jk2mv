@@ -2628,7 +2628,7 @@ void LoadJPG( const char *filename, unsigned char **pic, int *width, int *height
 		ri.FS_FreeFile (fbuffer.v);
 		jpeg_destroy_decompress(&cinfo);
 
-		Com_Printf("LoadJPG: %s has an invalid image format: %dx%d*4=%d, components: %d", filename,
+		Com_Printf("LoadJPG: %s has an invalid image format: %ux%u*4=%u, components: %d", filename,
 			cinfo.output_width, cinfo.output_height, pixelcount * 4, cinfo.output_components);
 		return;
 	}

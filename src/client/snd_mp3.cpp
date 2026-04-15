@@ -270,7 +270,7 @@ void S_MP3_CalcVols_f( void )
 
 	if (Cmd_Argc()>4)	// 3 optional arguments
 	{
-		Com_Printf(sUsage);
+		Com_Printf("%s",sUsage);
 		return;
 	}
 
@@ -300,7 +300,7 @@ void S_MP3_CalcVols_f( void )
 			{
 				// unknown switch...
 				//
-				Com_Printf(sUsage);
+				Com_Printf("%s", sUsage);
 				return;
 			}
 			continue;

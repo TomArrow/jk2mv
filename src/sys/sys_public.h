@@ -101,7 +101,7 @@ void	Sys_UnloadModuleLibrary(void *dllHandle);
 
 char	*Sys_GetCurrentUser( void );
 
-Q_NORETURN void Sys_Error( const char *error, ... ) __attribute__ ((format (printf, 1, 2)));
+Q_NORETURN void Sys_Error(PRINTF_FORMAT_STRING const char *error, ... ) __attribute__ ((format (printf, 1, 2)));
 Q_NORETURN void Sys_Quit (void);
 char	*Sys_GetClipboardData( void );	// note that this isn't journaled...
 

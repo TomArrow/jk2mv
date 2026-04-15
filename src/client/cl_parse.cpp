@@ -1318,7 +1318,7 @@ qboolean CL_ParseUDPDownload ( msg_t *msg ) {
 	MSG_ReadData(msg, data, size);
 
 	if (clc.downloadBlock != block) {
-		Com_DPrintf( "CL_ParseDownload: Expected block %d, got %d\n", clc.downloadBlock, block);
+		Com_DPrintf( "CL_ParseDownload: Expected block %d, got %d\n", clc.downloadBlock, (int)block);
 		return qtrue;
 	}
 
@@ -1971,12 +1971,12 @@ void CL_Ezdemo_f(void) {
 				*toEdit = EZDEMO_PREDICTEDCLIENT;
 			}
 			else if (!CL_StringIsDigitsOnly(buf) || !(i < argc) || cl >= MAX_CLIENTS || cl < 0) {
-				Com_Printf(fail);
+				Com_Printf("%s",fail);
 				return;
 			}
 			else {
 				if (!CL_StringIsDigitsOnly(buf) || cl < 0 || cl >= MAX_CLIENTS) {
-					Com_Printf(fail);
+					Com_Printf("%s", fail);
 					return;
 				}
 

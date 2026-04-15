@@ -8,11 +8,25 @@
 
 #define MAX_TEAMNAME 32
 
+#define STRINGIFY(x) STRINGIFY2(x)
+#define STRINGIFY2(x) #x
+
+#if defined(__GNUC__)
+#define PRINTF_FORMAT_FUNCTION(a,b) __attribute__((format(printf, a, b)))
+#else
+#define PRINTF_FORMAT_FUNCTION(a,b)
+#endif
 #if defined(_MSC_VER)
 #include <sal.h>
 #define PRINTF_FORMAT_STRING _Printf_format_string_
 #else
 #define PRINTF_FORMAT_STRING
+#endif
+#if defined(_MSC_VER)
+#include <sal.h>
+#define SCANF_FORMAT_STRING _Scanf_format_string_ 
+#else
+#define SCANF_FORMAT_STRING
 #endif
 
 /**********************************************************************
@@ -43,6 +57,8 @@
 
 #define assert(exp)     ((void)0)
 
+#define INT64PRINTF "d"
+
 #else
 
 #include <assert.h>
@@ -59,12 +75,22 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#if defined(__MINGW32__) && defined(FOR_WINXP)
+#define INT64PRINTF "I64d"
+#define LIMITED_FORMATS 1
+#else
+#include <inttypes.h>
+#define INT64PRINTF PRId64
+#endif
+
 #ifdef __cplusplus
 #define _HAS_STD_BYTE 0
 #	include <cstddef>
 #endif
 
 #endif
+
+//#pragma message "MVENGINE: INT64PRINTF is " STRINGIFY(INT64PRINTF)
 
 // this is the define for determining if we have an asm version of a C function
 #if (defined ARCH_X86)  && !defined __LCC__
@@ -1051,8 +1077,8 @@ const char	*SkipWhitespace( const char *data, qboolean *hasNewLines );
 char	*COM_Parse( const char **data_p );
 char	*COM_ParseExt( const char **data_p, qboolean allowLineBreak );
 int		COM_Compress( char *data_p );
-void	COM_ParseError( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
-void	COM_ParseWarning( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
+void	COM_ParseError( PRINTF_FORMAT_STRING char *format, ... ) __attribute__ ((format (printf, 1, 2)));
+void	COM_ParseWarning( PRINTF_FORMAT_STRING char *format, ... ) __attribute__ ((format (printf, 1, 2)));
 qboolean COM_ParseString( const char **data, const char **s );
 qboolean COM_ParseInt( const char **data, int *i );
 qboolean COM_ParseFloat( const char **data, float *f );
@@ -1090,10 +1116,10 @@ void Parse1DMatrix (const char **buf_p, int x, float *m);
 void Parse2DMatrix (const char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 
-void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
+void	QDECL Com_sprintf (char *dest, int size, PRINTF_FORMAT_STRING const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-size_t Q_vsnprintf(char *str, size_t size, const char *format, va_list ap);
+size_t Q_vsnprintf(char *str, size_t size, PRINTF_FORMAT_STRING const char *format, va_list ap);
 #else
 #define Q_vsnprintf vsnprintf
 #endif
@@ -1180,7 +1206,7 @@ float	LittleFloat (const float *l);
 
 void	Swap_Init (void);
 */
-char	* QDECL va(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+char	* QDECL va(PRINTF_FORMAT_STRING const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
 //=============================================
 
@@ -1196,8 +1222,8 @@ qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-Q_NORETURN void	QDECL  Com_Error( errorParm_t level, const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
-void	QDECL Com_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
+Q_NORETURN void	QDECL  Com_Error( errorParm_t level, PRINTF_FORMAT_STRING const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
+void	QDECL Com_Printf( PRINTF_FORMAT_STRING const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 
 typedef struct printfBounds_s {
 	int		x, y, w, h;

@@ -361,10 +361,10 @@ void SCR_DrawDemoRecording( void ) {
 	} else if (cl_drawRecording->integer) {
 		pos = FS_FTell( clc.demofile );
 		if (bufferedDemoMessages.size() > 0 || cl_demoRecordBufferedReorder->integer) {
-			sprintf(string, "RECORDING %s: %ik (%i queued)", clc.demoName, pos / 1024, (int)bufferedDemoMessages.size());
+			Com_sprintf(string, sizeof(string), "RECORDING %s: %ik (%i queued)", clc.demoName, pos / 1024, (int)bufferedDemoMessages.size());
 		}
 		else {
-			sprintf(string, "RECORDING %s: %ik", clc.demoName, pos / 1024);
+			Com_sprintf(string, sizeof(string), "RECORDING %s: %ik", clc.demoName, pos / 1024);
 		}
 		SCR_DrawStringExt( ((SCREEN_WIDTH / 2) * (1 / cls.cgxadj)) - (int)strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue );
 	}
@@ -579,7 +579,7 @@ static void SCR_DrawPS() {
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d", "zoomMode", ps->zoomMode), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d", "zoomTime", ps->zoomTime), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d", "zoomLocked", ps->zoomLocked), white, qtrue);
-	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %d", "zoomFov", ps->zoomFov), white, qtrue);
+	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 16, va("%" STRINGWIDTHMAX "s %f", "zoomFov", ps->zoomFov), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 17, va("%" STRINGWIDTHMAX "s %d", "fd.frcPwrsActv", ps->fd.forcePowersActive), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 18, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId", ps->fd.forceMindtrickTargetIndex), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 19, va("%" STRINGWIDTHMAX "s %d", "fd.frMndtrckId2", ps->fd.forceMindtrickTargetIndex2), white, qtrue);
@@ -602,8 +602,8 @@ static void SCR_DrawPS() {
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 8, va("%" STRINGWIDTHMAX "s %d", "emplacedIndex", ps->emplacedIndex), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 9, va("%" STRINGWIDTHMAX "s %d", "fd.frcRagRecTim", ps->fd.forceRageRecoveryTime), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 10, va("%" STRINGWIDTHMAX "s %d", "rocketLockIndex", ps->rocketLockIndex), white, qtrue);
-	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %d", "rocketLockTime", ps->rocketLockTime), white, qtrue);
-	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %d", "rocketTargtTime", ps->rocketTargetTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 11, va("%" STRINGWIDTHMAX "s %f", "rocketLockTime", ps->rocketLockTime), white, qtrue);
+	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 12, va("%" STRINGWIDTHMAX "s %f", "rocketTargtTime", ps->rocketTargetTime), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 13, va("%" STRINGWIDTHMAX "s %d", "holocronBits", ps->holocronBits), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 14, va("%" STRINGWIDTHMAX "s %d", "isJediMaster", ps->isJediMaster), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 15, va("%" STRINGWIDTHMAX "s %d", "forceRestricted", ps->forceRestricted), white, qtrue);

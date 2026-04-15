@@ -2311,7 +2311,7 @@ int FS_Write( const void *buffer, int len, fileHandle_t h, module_t module ) {
 }
 
 #define	MAXPRINTMSG	4096
-void QDECL FS_Printf( fileHandle_t h, const char *fmt, ... ) {
+void QDECL FS_Printf( fileHandle_t h, PRINTF_FORMAT_STRING  const char *fmt, ... ) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 

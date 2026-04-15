@@ -408,7 +408,7 @@ extern	cvar_t	*mv_resetServerTime;
 // sv_main.c
 //
 void SV_FinalMessage (char *message);
-void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void QDECL SV_SendServerCommand( client_t *cl, PRINTF_FORMAT_STRING const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 
 void SV_AddOperatorCommands (void);

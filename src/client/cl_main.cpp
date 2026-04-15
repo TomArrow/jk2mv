@@ -311,7 +311,7 @@ static void CL_ColorString_f(void) {
 			return;
 		}
 
-		Cvar_Set("cl_colorString", va("%i", (1 << index) ^ (cl_colorString->integer & mask)));
+		Cvar_Set("cl_colorString", va("%i",(int)( (1 << index) ^ (cl_colorString->integer & mask))));
 
 		Com_Printf("%s %s^7\n", colors[index].string, ((cl_colorString->integer & (1 << index))
 			? "^2Enabled" : "^1Disabled"));
@@ -754,7 +754,7 @@ void CL_WriteClientUcmdDemoSaveback(qboolean force, int sequenceNumber) {
 			userStoredUcmdCount = 0;
 		}
 		else if ((userStoredUcmdCount == 0) != (clUserMessages.size() == 0)) {
-			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d\n", userStoredUcmdCount, clUserMessages.size());
+			Com_Printf("^1userStoredUcmdCounts and userMessages zero count not same!!! SHOULD NOT HAPPEN! userStoredUcmdCounts is %d, userMessages count is %d\n", userStoredUcmdCount, (int)clUserMessages.size());
 			userStoredUcmdCount = 0;
 		}
 
@@ -1662,9 +1662,9 @@ void CL_RequestMotd( void ) {
 	}
 	cls.updateServer.port = BigShort( PORT_UPDATE );
 	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", UPDATE_SERVER_NAME,
-		cls.updateServer.ip[0], cls.updateServer.ip[1],
-		cls.updateServer.ip[2], cls.updateServer.ip[3],
-		BigShort( cls.updateServer.port ) );
+		(int)cls.updateServer.ip[0], (int)cls.updateServer.ip[1],
+		(int)cls.updateServer.ip[2], (int)cls.updateServer.ip[3],
+		(int)(unsigned short)BigShort( cls.updateServer.port ) );
 
 	info[0] = 0;
   // NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a true randomization
@@ -1823,9 +1823,9 @@ void CL_Connect_f( void ) {
 		clc.serverAddress.port = BigShort( PORT_SERVER );
 	}
 	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", cls.servername,
-		clc.serverAddress.ip[0], clc.serverAddress.ip[1],
-		clc.serverAddress.ip[2], clc.serverAddress.ip[3],
-		BigShort( clc.serverAddress.port ) );
+		(int)clc.serverAddress.ip[0], (int)clc.serverAddress.ip[1],
+		(int)clc.serverAddress.ip[2], (int)clc.serverAddress.ip[3],
+		(int)(unsigned short)BigShort( clc.serverAddress.port ) );
 
 	// if we aren't playing on a lan, we need to authenticate
 	// with the cd key
@@ -2763,11 +2763,11 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 		}
 
 		Com_DPrintf( "server: %d ip: %d.%d.%d.%d:%d\n",numservers,
-				addresses[numservers].ip[0],
-				addresses[numservers].ip[1],
-				addresses[numservers].ip[2],
-				addresses[numservers].ip[3],
-				addresses[numservers].port );
+				(int)addresses[numservers].ip[0],
+				(int)addresses[numservers].ip[1],
+				(int)addresses[numservers].ip[2],
+				(int)addresses[numservers].ip[3],
+				(int)addresses[numservers].port );
 
 		numservers++;
 		if (numservers >= MAX_SERVERSPERPACKET) {
@@ -3407,7 +3407,7 @@ DLL glue
 ================
 */
  __attribute__ ((format (printf, 2, 3)))
-void QDECL CL_RefPrintf( int print_level, const char *fmt, ...) {
+void QDECL CL_RefPrintf( int print_level, PRINTF_FORMAT_STRING const char *fmt, ...) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
@@ -4007,7 +4007,7 @@ void CL_Shutdown( void ) {
 
 }
 
-void QDECL CL_LogPrintf(fileHandle_t fileHandle, const char *fmt, ...) {
+void QDECL CL_LogPrintf(fileHandle_t fileHandle, PRINTF_FORMAT_STRING const char *fmt, ...) {
 	va_list argptr;
 	char string[1024] = { 0 };
 	size_t len;
@@ -4180,8 +4180,8 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 			val = Info_ValueForKey(infoString, "mvhttp");
 			if (strtol(val, NULL, 10)) {
 				Com_sprintf(clc.httpdl, sizeof(clc.httpdl), "http://%i.%i.%i.%i:%s",
-					clc.serverAddress.ip[0], clc.serverAddress.ip[1],
-					clc.serverAddress.ip[2], clc.serverAddress.ip[3], val);
+					(int)clc.serverAddress.ip[0], (int)clc.serverAddress.ip[1],
+					(int)clc.serverAddress.ip[2], (int)clc.serverAddress.ip[3], val);
 			} else if ((val = Info_ValueForKey(infoString, "mvhttpurl")) && Q_stristr(val, "http://")) {
 				Q_strncpyz(clc.httpdl, val, sizeof(clc.httpdl));
 

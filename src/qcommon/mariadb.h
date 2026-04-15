@@ -12,6 +12,7 @@
 #include <queue>
 #include <chrono>
 #include <stdexcept>
+#include <inttypes.h>
 
 extern cvar_t* db_enabled;
 
@@ -108,7 +109,7 @@ public:
 			return "NULL";
 			break;
 		case SQLVALUE_TYPE_INTEGER:
-			return va("%d",intValue);
+			return va("%" INT64PRINTF,intValue);
 			break;
 		case SQLVALUE_TYPE_REAL:
 			return va("%f", (float)doubleValue);

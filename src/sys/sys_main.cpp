@@ -269,7 +269,7 @@ static void Sys_ErrorDialog(const char *error) {
 }
 #endif
 
-void Q_NORETURN QDECL Sys_Error(const char *error, ...) {
+void Q_NORETURN QDECL Sys_Error(PRINTF_FORMAT_STRING const char *error, ...) {
 	va_list argptr;
 	char    string[1024];
 

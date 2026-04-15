@@ -389,7 +389,7 @@ Sys_ShowIP
 */
 void Sys_ShowIP(void) {
 	for ( int i=0; i<numIP; i++ )
-		Com_Printf( "IP: %i.%i.%i.%i\n", localIP[i][0], localIP[i][1], localIP[i][2], localIP[i][3] );
+		Com_Printf( "IP: %i.%i.%i.%i\n", (int)localIP[i][0], (int)localIP[i][1], (int)localIP[i][2], (int)localIP[i][3] );
 }
 
 //=============================================================================
@@ -636,11 +636,11 @@ void NET_OpenSocks( int port ) {
 	}
 	// check completion code
 	if( buf[1] != 0 ) {
-		Com_Printf( "NET_OpenSocks: request denied: %i\n", buf[1] );
+		Com_Printf( "NET_OpenSocks: request denied: %i\n", (int)buf[1] );
 		return;
 	}
 	if( buf[3] != 1 ) {
-		Com_Printf( "NET_OpenSocks: relay address is not IPV4: %i\n", buf[3] );
+		Com_Printf( "NET_OpenSocks: relay address is not IPV4: %i\n", (int)buf[3] );
 		return;
 	}
 	socksRelayAddr.sin_family = AF_INET;

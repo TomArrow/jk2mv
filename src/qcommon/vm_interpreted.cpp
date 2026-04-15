@@ -921,7 +921,7 @@ done:
 	vm->currentlyInterpreting = qfalse;
 
 	if (opStackOfs != 1 || *(unsigned *)opStack != 0xDEADBEEFu)
-		Com_Error(ERR_DROP, "Interpreter error: opStack[0] = %X, opStackOfs = %d", opStack[0], opStackOfs);
+		Com_Error(ERR_DROP, "Interpreter error: opStack[0] = %X, opStackOfs = %d", opStack[0], (int)opStackOfs);
 
 	vm->programStack = stackOnEntry;
 

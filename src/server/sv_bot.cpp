@@ -121,7 +121,7 @@ BotImport_Print
 ==================
 */
  __attribute__ ((format (printf, 2, 3)))
-void QDECL BotImport_Print(int type, char *fmt, ...)
+void QDECL BotImport_Print(int type, PRINTF_FORMAT_STRING char *fmt, ...)
 {
 	char str[2048];
 	va_list ap;

@@ -4,7 +4,6 @@
 #include "../qcommon/strip.h"
 
 #include <sstream>
-#include <inttypes.h>
 #include <ctime>
 
 #ifdef SVDEMO
@@ -298,7 +297,7 @@ static void SV_MapRestart_f( void ) {
 	sv.restartedServerId = sv.serverId;
 	sv.serverId = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
-	Cvar_Set("sv_gameStartUnixTime", va("%" PRId64 "\n", (int64_t)std::time(nullptr)));
+	Cvar_Set("sv_gameStartUnixTime", va("%" INT64PRINTF, (int64_t)std::time(nullptr)));
 
 #ifdef SVDEMO
 	time(&sv.realMapTimeStarted);
@@ -1007,7 +1006,7 @@ void SV_StopRecordDemo(client_t* cl, demoInfo_t* demo, qboolean clip) {
 	int		len;
 
 	if (!demo->demorecording) {
-		Com_Printf("Client %d is not recording a demo.\n", cl - svs.clients);
+		Com_Printf("Client %d is not recording a demo.\n", (int)(cl - svs.clients));
 		return;
 	}
 
@@ -1027,7 +1026,7 @@ void SV_StopRecordDemo(client_t* cl, demoInfo_t* demo, qboolean clip) {
 	demo->demofile = 0;
 	demo->demorecording = qfalse;
 	if (com_developer->integer)
-		Com_Printf("Stopped demo for client %d.\n", cl - svs.clients);
+		Com_Printf("Stopped demo for client %d.\n", (int)(cl - svs.clients));
 }
 
 void SV_ClearClientDemoMeta(client_t* cl) {
@@ -1268,7 +1267,7 @@ void SV_RecordDemo(client_t* cl, char* demoName, qboolean clip, qboolean limitPa
 	// already takes care of that
 	if (sv_demoPreRecord->integer) {
 		if (com_developer->integer > 5) {
-			SV_SendServerCommand(cl, "cp \"Starting demo. Buffer size: %d/%d\n\"", demoPreRecordBuffer[cl - svs.clients].size(), demoPreRecordBuffer[cl - svs.clients].capacity());
+			SV_SendServerCommand(cl, "cp \"Starting demo. Buffer size: %d/%d\n\"", (int)demoPreRecordBuffer[cl - svs.clients].size(), (int)demoPreRecordBuffer[cl - svs.clients].capacity());
 		}
 		if (com_developer->integer > 1) {
 			Com_Printf("Checking demo pre-record queue ... ");
@@ -1277,7 +1276,7 @@ void SV_RecordDemo(client_t* cl, char* demoName, qboolean clip, qboolean limitPa
 		demoPreRecordBufferIt firstOldKeyframe;
 		qboolean firstOldKeyframeFound = qfalse;
 		if (com_developer->integer > 1) {
-			Com_Printf("Demo pre-record queue size is %d, number of first message in queue is %d ... ", demoPreRecordBuffer[cl - svs.clients].size(), demoPreRecordBuffer[cl - svs.clients].size() ? demoPreRecordBuffer[cl - svs.clients].begin()->get()->msgNum : 0);
+			Com_Printf("Demo pre-record queue size is %u, number of first message in queue is %d ... ", (unsigned int)demoPreRecordBuffer[cl - svs.clients].size(), demoPreRecordBuffer[cl - svs.clients].size() ? demoPreRecordBuffer[cl - svs.clients].begin()->get()->msgNum : 0);
 		}
 		for (demoPreRecordBufferIt it = demoPreRecordBuffer[cl - svs.clients].begin(); it != demoPreRecordBuffer[cl - svs.clients].end(); it++) {
 			if (it->get()->isKeyframe && it->get()->time < sv.time) {
@@ -1435,7 +1434,7 @@ void SV_AutoRecordDemo(client_t* cl) {
 		Com_sprintf(demoFileName, sizeof(demoFileName), "%s %s", Cvar_VariableString("mapname"), date);
 	else
 		Com_sprintf(demoFileName, sizeof(demoFileName), "%d %s %s %s",
-			cl - svs.clients, demoPlayerName, Cvar_VariableString("mapname"), date);
+			(int)(cl - svs.clients), demoPlayerName, Cvar_VariableString("mapname"), date);
 	Com_sprintf(demoFolderName, sizeof(demoFolderName), "%s %s", Cvar_VariableString("mapname"), folderDate);
 	// sanitize filename
 	for (char** start = demoNames; start - demoNames < (ptrdiff_t)ARRAY_LEN(demoNames); start++) {
