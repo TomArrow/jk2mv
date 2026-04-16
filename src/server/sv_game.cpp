@@ -1111,6 +1111,14 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 			return 0;
 		}
 	}
+
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_FASTHULLTRACE) {
+		switch (args[0]) {
+		case G_COOL_API_POINTCONTENTSHULLFAST:
+
+			return SV_PointContentsHullFast(VMAP(1, const vec_t, 3));
+		}
+	}
 	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_G_USERCMDSTORE) {
 		switch (args[0]) {
 		case G_COOL_API_PLAYERUSERCMD_ADD:

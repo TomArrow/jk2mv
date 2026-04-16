@@ -1048,6 +1048,9 @@ void CM_TraceThroughTree( traceWork_t *tw, int numParent, int num, float p1f, fl
 				node = cm.nodes + numParent;
 				plane = node->plane;
 				tw->trace.fraction = p1f;
+				if (p1f == 0.0f) {
+					tw->trace.startsolid = qtrue;
+				}
 				tw->trace.contents |= CONTENTS_SOLID;
 				tw->trace.plane = *plane;
 			}

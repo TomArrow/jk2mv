@@ -24,6 +24,7 @@ char		*CM_EntityString (void);
 
 // returns an ORed contents mask
 int			CM_PointContents( const vec3_t p, clipHandle_t model );
+int			CM_PointContentsHullFast( const vec3_t p );
 int			CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles );
 
 void		CM_BoxTrace ( trace_t *results, const vec3_t start, const vec3_t end,

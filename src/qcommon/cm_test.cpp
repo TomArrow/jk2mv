@@ -249,6 +249,29 @@ int CM_PointContents( const vec3_t p, clipHandle_t model ) {
 
 /*
 ==================
+CM_PointContentsHullFast
+
+==================
+*/
+int CM_PointContentsHullFast( const vec3_t p ) {
+	int			leafnum;
+	cLeaf_t		*leaf;
+	int			contents;
+
+	if (!cm.numNodes) {	// map not loaded
+		return 0;
+	}
+
+	leafnum = CM_PointLeafnum_r(p, 0);
+	leaf = &cm.leafs[leafnum];
+
+	return leaf->cluster == -1 ? CONTENTS_SOLID : 0;
+
+	return contents;
+}
+
+/*
+==================
 CM_TransformedPointContents
 
 Handles offseting and rotation of the end points for moving and

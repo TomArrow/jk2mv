@@ -832,4 +832,14 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 	return contents;
 }
 
+/*
+=============
+SV_PointContentsWorldFast
+=============
+*/
+int SV_PointContentsHullFast( const vec3_t p ) {
+	
+	return CM_PointContentsHullFast(p);
+}
+
 

@@ -1720,6 +1720,13 @@ Ghoul2 Insert End
 			break;
 		}
 	}
+	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_FASTHULLTRACE) {
+		switch (args[0]) {
+		case CG_COOL_API_POINTCONTENTSHULLFAST:
+
+			return CM_PointContentsHullFast(VMAP(1, const vec_t, 3));
+		}
+	}
 	if (com_coolApi_supported_cgame->integer & COOL_APIFEATURE_MARIADB) {
 		switch (args[0]) {
 
