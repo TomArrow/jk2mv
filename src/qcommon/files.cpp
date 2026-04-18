@@ -3798,7 +3798,7 @@ static void FS_Restart_f( void ) {
 		Com_Printf( "^3WARNING: Cannot restart file system due to active file handles for pk3 files inside of modules.\n" );
 		return;
 	}
-	FS_Restart2( fs_checksumFeed, qtrue );
+	FS_Restart2( fs_checksumFeed, qtrue, qfalse);
 }
 
 //===========================================================================
@@ -4797,6 +4797,14 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 		fs_referencedPaksChanged = qtrue;
 	}
 	fs_numServerReferencedPaks = tmp;
+
+	if (com_sv_running->integer) {
+		// fs_referencedPaksChanged is a dumb hack so we can play demos that reference dl_ pk3s but have a corrupt/non-existent checksumfeed (0)
+		// unfortunately a running server in a client will already have loaded the filesystem right but not set the referenced paks serverside,
+		// therefore we would force a file system restart and kill all open game files....
+		// TODO and TLDR: This is a shitty workaround for shittily reframed demos. Fix it all at some point.
+		fs_referencedPaksChanged = qfalse; 
+	}
 }
 
 /*
@@ -4847,14 +4855,14 @@ void FS_InitFilesystem( void ) {
 FS_Restart
 ================
 */
-void FS_Restart2( int checksumFeed, qboolean inPlace ) {
+void FS_Restart2( int checksumFeed, qboolean inPlace, qboolean checksumFeedIsBeingUnset) {
 
 	// free anything we currently have loaded
 	FS_Shutdown(qfalse, inPlace);
 
 	// set the checksum feed
 	fs_checksumFeed = checksumFeed;
-	fs_checksumFeedSet = qtrue;
+	fs_checksumFeedSet = (qboolean)(!checksumFeedIsBeingUnset);
 	fs_referencedPaksChanged = qfalse;
 
 	// clear pak references
@@ -4875,7 +4883,7 @@ void FS_Restart2( int checksumFeed, qboolean inPlace ) {
 			Cvar_Set("fs_gamedirvar", lastValidGame);
 			lastValidBase[0] = '\0';
 			lastValidGame[0] = '\0';
-			FS_Restart(checksumFeed);
+			FS_Restart(checksumFeed, qfalse);
 			Com_Error( ERR_DROP, "Invalid game folder" );
 			return;
 		}
@@ -4899,8 +4907,8 @@ void FS_Restart2( int checksumFeed, qboolean inPlace ) {
 
 }
 
-void FS_Restart( int checksumFeed ) {
-	FS_Restart2( checksumFeed, qfalse );
+void FS_Restart( int checksumFeed, qboolean checksumFeedIsBeingUnset) {
+	FS_Restart2( checksumFeed, qfalse, checksumFeedIsBeingUnset);
 }
 
 /*
@@ -4911,7 +4919,7 @@ restart if necessary
 */
 qboolean FS_ConditionalRestart( int checksumFeed ) {
 	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed || !fs_checksumFeedSet || fs_referencedPaksChanged) {
-		FS_Restart( checksumFeed );
+		FS_Restart( checksumFeed, qfalse);
 		return qtrue;
 	}
 	return qfalse;

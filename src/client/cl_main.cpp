@@ -1446,7 +1446,7 @@ void CL_FlushMemory( qboolean disconnecting ) {
 		// change checksum feed so that next FS_ConditionalRestart()
 		// works when connecting back to the same server
 		clc.checksumFeed = 0;
-		FS_Restart(clc.checksumFeed);
+		FS_Restart(clc.checksumFeed, qtrue);
 	}
 
 	CL_StartHunkUsers();
@@ -2060,7 +2060,7 @@ Restart the filesystem
 */
 
 void CL_FS_Restart_f( void ) {
-	FS_Restart( clc.checksumFeed ); //xD
+	FS_Restart( clc.checksumFeed, qfalse ); //xD
 }
 
 /*
@@ -2273,7 +2273,7 @@ void CL_DownloadsComplete( void ) {
 	if (clc.downloadRestart) {
 		clc.downloadRestart = qfalse;
 
-		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
+		FS_Restart(clc.checksumFeed, qfalse); // We possibly downloaded a pak, restart the file system to load it
 
 		// inform the server so we get new gamestate info
 		CL_AddReliableCommand( "donedl" );

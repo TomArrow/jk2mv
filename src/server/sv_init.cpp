@@ -672,7 +672,7 @@ Ghoul2 Insert End
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
 
 	FS_PureServerSetReferencedPaks("", "");
-	FS_Restart( sv.checksumFeed );
+	FS_Restart( sv.checksumFeed, qfalse);
 
 	CM_LoadMap( va("maps/%s.bsp", server), qfalse, &checksum );
 
@@ -983,7 +983,8 @@ void SV_Init (void) {
 	Cvar_Set("sv_master2", "master.jk2mv.org");
 	sv_master[2] = Cvar_Get("sv_master3", "master.jkhub.org", CVAR_ROM);
 	Cvar_Set("sv_master3", "master.jkhub.org");
-	sv_master[3] = Cvar_Get("sv_master4", "", CVAR_ARCHIVE | CVAR_GLOBAL);
+	sv_master[3] = Cvar_Get("sv_master4", "master.ouned.de", CVAR_ROM);
+	Cvar_Set("sv_master4", "master.ouned.de");
 	sv_master[4] = Cvar_Get("sv_master5", "", CVAR_ARCHIVE | CVAR_GLOBAL);
 	sv_master[5] = Cvar_Get("sv_master6", "", CVAR_ARCHIVE | CVAR_GLOBAL);
 	sv_master[6] = Cvar_Get("sv_master7", "", CVAR_ARCHIVE | CVAR_GLOBAL);

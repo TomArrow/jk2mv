@@ -800,8 +800,8 @@ void	FS_InitFilesystem (void);
 void	FS_Shutdown( qboolean closemfp, qboolean keepModuleFiles );
 
 qboolean	FS_ConditionalRestart( int checksumFeed );
-void	FS_Restart2( int checksumFeed, qboolean inPlace );
-void	FS_Restart( int checksumFeed );
+void	FS_Restart2( int checksumFeed, qboolean inPlace, qboolean checksumFeedIsBeingUnset);
+void	FS_Restart( int checksumFeed, qboolean checksumFeedIsBeingUnset);
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
 const char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles );
