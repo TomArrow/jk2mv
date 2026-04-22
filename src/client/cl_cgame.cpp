@@ -2081,8 +2081,15 @@ void CL_AdjustTimeDelta( void ) {
 	}
 
 	newDelta = cl.snap.serverTime - cls.realtime;
-	if (cl_smoothenSnapLag->integer) {
-		newDelta = CL_GetLowValueMedianDelta(newDelta);
+	if (cl_smoothenSnapLag->integer && !com_sv_running->integer || cl_smoothenSnapLag->integer >= 2) {
+		int adjustedNewDelta = CL_GetLowValueMedianDelta(newDelta);
+		if (cl_smoothenSnapLagMaxComp->integer && abs(adjustedNewDelta-newDelta) > cl_smoothenSnapLagMaxComp->integer) {
+			// prevent Esc-Menu/debugging/other extreme lags from totally lagging us out
+			CL_ResetSnapLagSmoothing();
+		}
+		else {
+			newDelta = adjustedNewDelta;
+		}
 		resetTime = 1000;
 		softResetTime = 200;
 	}

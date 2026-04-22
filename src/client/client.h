@@ -619,6 +619,7 @@ extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_timeNudgeAntiLagHack;
 extern	cvar_t	*cl_timeNudgeSafeServerTime;
 extern	cvar_t	*cl_smoothenSnapLag;
+extern	cvar_t	*cl_smoothenSnapLagMaxComp;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 

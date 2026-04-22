@@ -449,6 +449,249 @@
 			}
 		}
 
+
+//-------------------------------------------
+// Map rating bar
+//-------------------------------------------
+		itemDef 
+		{
+			name				background_pic_bottom
+			group				none
+			style				WINDOW_STYLE_SHADER
+			rect				190 448 260 16
+			background			"gfx/menus/menu_top_mp"
+			forecolor			1 1 1 1
+			visible				1
+			decoration
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		/*itemDef 
+		{
+			name				rateMapText
+			text				"Rate map"
+			type				ITEM_TYPE_TEXT
+			style				WINDOW_STYLE_FILLED
+			rect				200 448 50 16
+			font				2
+			textscale			.7
+			textstyle			3
+			textalign			ITEM_ALIGN_CENTER
+			textalignx		 	25
+			textaligny			-2
+			forecolor			1 1 1 1
+			backcolor			0 0 0 0
+			visible				1
+		}*/
+		
+		
+		
+		
+		itemDef
+		{
+			name				mapratingSlider
+			group				maprating
+			type				ITEM_TYPE_SLIDER
+			//text				"Rate map:"
+			text				""
+			cvarfloat			"ui_mapRating" 5 0 10
+			rect				192 448 156 16
+			textalign			ITEM_ALIGN_RIGHT
+			textalignx			52
+			textaligny			-2
+			font				2
+			textscale			0.4
+			//forecolor			.615 .615 .956 1
+			forecolor			1 1 1 1
+			visible				1
+			action
+			{
+				play			"sound/interface/button1.wav" ;
+			}
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		
+		itemDef 
+		{
+			name				mapRatingTextField
+			group				maprating
+			type				ITEM_TYPE_TEXT
+			text				"Rate map for style"
+			cvar				"ui_mapRatingStyle"
+			rect				192 443 40 16
+			font 				2
+			textscale			0.4
+			textaligny			2
+			//forecolor			.615 .615 .956 1
+			forecolor			1 1 1 1
+			visible				1
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		
+		itemDef 
+		{
+			name				mapRatingStyleField
+			group				maprating
+			type				ITEM_TYPE_MULTI
+			cvarStrList			{ "JK2", "0", "QuaJK", "5", "Dream", "11", "Sicko", "4", "Q2", "9", "Bounce", "6" }
+			text				""
+			cvar				"ui_mapRatingStyle"
+			rect				190 450 40 16
+			font 				2
+			textscale			0.5
+			textaligny			2
+			//forecolor			.615 .615 .956 1
+			forecolor			1 1 1 1
+			visible				1
+			action				{ 
+				play "sound/interface/button1.wav" ; 
+				exec			"set ui_mapRating _"
+			}
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		
+		itemDef 
+		{
+			name				mapRatingField
+			group				maprating
+			type				ITEM_TYPE_NUMERICFIELD
+			text				""
+			cvar				"ui_mapRating"
+			rect				350 448 50 16
+			font 				2
+			textscale			0.6
+			//forecolor			.615 .615 .956 1
+			forecolor			1 1 1 1
+			visible				1
+			action				{ play "sound/interface/button1.wav" ; }
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		
+		itemDef 
+		{
+			name				rateMapButton
+			//group				none
+			style				WINDOW_STYLE_SHADER
+			rect				395 448 50 16
+			background		"gfx/menus/menu_buttonback"			// Frame around button
+			forecolor			1 1 1 1
+			decoration
+			visible			0
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"-1"
+			} 
+		}
+		
+		itemDef 
+		{
+			name				rateMapConfirm
+			text				"Confirm"
+			type				1
+			style				WINDOW_STYLE_FILLED
+			rect				395 448 50 16
+			font				2
+			textscale			.7
+			textstyle			3
+			textalign			ITEM_ALIGN_CENTER
+			textalignx		 	25
+			textaligny			-2
+			forecolor			1 1 1 1
+			backcolor			0 0 0 0
+			visible				1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"uiRateMapConfirmed"
+			}
+			mouseenter 
+			{ 
+				show			rateMapButton
+			}
+			mouseexit 
+			{ 
+				hide			rateMapButton
+			}
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"2" ;
+				"-1"
+			} 
+		}
+		itemDef 
+		{
+			name				rateMapUpdate
+			text				"Update"
+			type				1
+			style				WINDOW_STYLE_FILLED
+			rect				395 448 50 16
+			font				2
+			textscale			.7
+			textstyle			3
+			textalign			ITEM_ALIGN_CENTER
+			textalignx		 	25
+			textaligny			-2
+			forecolor			1 1 1 1
+			backcolor			0 0 0 0
+			visible				1
+			action 
+			{ 
+				play			"sound/interface/button1.wav" ;
+				exec			"uiRateMapConfirmed"
+			}
+			mouseenter 
+			{ 
+				show			rateMapButton
+			}
+			mouseexit 
+			{ 
+				hide			rateMapButton
+			}
+			cvarTest			"ui_mapRatingState"
+			hideCvar
+			{ 
+				"" ;
+				"0" ;
+				"1" ;
+				"-1"
+			} 
+		}
+
 //-------------------------------------------
 // Bottom Bar
 //-------------------------------------------
