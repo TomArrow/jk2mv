@@ -1178,8 +1178,8 @@ void SV_UserinfoChanged( client_t *cl ) {
 	// name for C code
 	Q_strncpyz( cl->name, Info_ValueForKey (cl->userinfo, "name"), sizeof(cl->name) );
 
-	if (!Q_stricmp( "[oldclient]", Info_ValueForKey(cl->userinfo, "sex"))) {
-		cl->unsafeClient = qtrue;
+	if (!Q_stricmp( "[oldclient]", Info_ValueForKey(cl->userinfo, "ui_singlePlayerActive"))) {
+		cl->ancientClient = qtrue;
 	}
 
 	// rate command

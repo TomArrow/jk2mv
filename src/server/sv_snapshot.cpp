@@ -1337,7 +1337,7 @@ void SV_CheckInvalidUserInfoValues(client_t* cl) {
 	const char* warning = NULL;
 	int64_t timeout = 120000;
 	bool critical = false;
-	if (cl->unsafeClient) {
+	if (cl->ancientClient) {
 		warning = "^1Your client is very old and potentially unsafe\n^1to use. Seriously consider upgrading.\n^2JK2MV^7, among other options, is open-source,\nfreely available and contains many\nsecurity fixes and improvements.\nIt also allows you to connect to servers for\nall patch versions of Jedi Outcast.\nGet it at:\n^2https://jk2mv.org/";
 		critical = true;
 	} else if (cl->invalidValues & (1 << (int)CHECKEDTYPE_RATE)) {

@@ -814,7 +814,7 @@ Ghoul2 Insert End
 
 	// save systeminfo and serverinfo strings
 	Q_strncpyz( systemInfo, Cvar_InfoString_Big( CVAR_SYSTEMINFO ), sizeof( systemInfo ) );
-	Info_SetValueForKey_Big(systemInfo,"sex","[oldclient]"); // let's do a public service and check the client for being very old by trying to set something we shouldn't be able to set. and if we detect it succeeding ("sex" is a CVAR_USERINFO we get sent, but it's not rly used for anything), we warn the user.
+	Info_SetValueForKey_Big(systemInfo,"ui_singlePlayerActive","[oldclient]"); // let's do a public service and check the client for being very old by trying to set something we shouldn't be able to set. and if we detect it succeeding, we warn the user. ("ui_singlePlayerActive" is a CVAR_USERINFO we get sent, but it doesn't rly affect anything in jk2mp as long as it evaluates to 0/not "1", plus, it doesn't get archived/persisted)
 	cvar_modifiedFlags &= ~CVAR_SYSTEMINFO;
 	SV_SetConfigstring( CS_SYSTEMINFO, systemInfo );
 

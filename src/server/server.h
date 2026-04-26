@@ -249,7 +249,7 @@ typedef struct client_s {
 
 	int				invalidValues;		// checkedNumberType_t
 	int64_t			lastInvalidValuesWarning; // svs.time of last invalid values warning
-	qboolean		unsafeClient;		// we tried to set "sex" via CVAR_SYSTEMINFO and succeeded. warn the user to update.
+	qboolean		ancientClient;		// we tried to set "ui_singlePlayerActive" via CVAR_SYSTEMINFO and succeeded. warn the user to update.
 
 #ifdef SVDEMO
 	demoInfo_t		demo;
