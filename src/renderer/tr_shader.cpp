@@ -4381,7 +4381,7 @@ const char *g_alphaUnPremultiplyPixelShaderARB = {
 	"END"
 };
 
-qboolean MV_GammaGenerateProgram() {
+qboolean MV_GammaGenerateVertexShaderProgram() {
 	int err = 0;
 	assert(qglGenProgramsARB);
 
@@ -4393,6 +4393,13 @@ qboolean MV_GammaGenerateProgram() {
 	if (err != -1) {
 		return qtrue;
 	}
+
+	return qfalse;
+}
+
+qboolean MV_GammaGeneratePixelShaderProgram() {
+	int err = 0;
+	assert(qglGenProgramsARB);
 
 	// pixel shader
 	qglGenProgramsARB(1, &tr.gammaPixelShader);
@@ -4546,22 +4553,32 @@ static void CreateInternalShaders( void ) {
 
 
 #ifndef DEDICATED
-	// gamma correction
-	if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
-		if (MV_GammaGenerateProgram()) {
-			ri.Printf(PRINT_WARNING, "WARNING: failed initializing gamma program... falling back to hardware gamma correction\n");
-			glConfig.deviceSupportsPostprocessingGamma = qfalse;
-			r_gammamethod->integer = GAMMA_HARDWARE; // temporary fallback to hardware gamma
-		}
-		else if (R_GammaGenerateHDRProgram()) {
-			ri.Printf(PRINT_WARNING, "WARNING: failed initializing hdr program... HDR converstion won't be available\n");
-			glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
-		}
-	}
-	if (R_GenerateAlphaUnPremultiplyProgram()) {
-		ri.Printf(PRINT_WARNING, "WARNING: failed initializing alpha unpremultiply program ... hackportals might have seams when using multisampling\n");
+	if (MV_GammaGenerateVertexShaderProgram()) {
+		ri.Printf(PRINT_WARNING, "WARNING: failed initializing gamma vertex program... falling back to hardware gamma correction, alpha unpremultiply for hackportals deactivated\n");
+		glConfig.deviceSupportsPostprocessingGamma = qfalse;
+		glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
 		glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qfalse;
+		r_gammamethod->integer = GAMMA_HARDWARE; // temporary fallback to hardware gamma
 	}
+	else {
+		// gamma correction
+		if (r_gammamethod->integer == GAMMA_POSTPROCESSING) {
+			if (MV_GammaGeneratePixelShaderProgram()) {
+				ri.Printf(PRINT_WARNING, "WARNING: failed initializing gamma program... falling back to hardware gamma correction\n");
+				glConfig.deviceSupportsPostprocessingGamma = qfalse;
+				r_gammamethod->integer = GAMMA_HARDWARE; // temporary fallback to hardware gamma
+			}
+			else if (R_GammaGenerateHDRProgram()) {
+				ri.Printf(PRINT_WARNING, "WARNING: failed initializing hdr program... HDR converstion won't be available\n");
+				glConfig.deviceSupportsPostprocessingGammaHDR = qfalse;
+			}
+		}
+		if (R_GenerateAlphaUnPremultiplyProgram()) {
+			ri.Printf(PRINT_WARNING, "WARNING: failed initializing alpha unpremultiply program ... hackportals might have seams when using multisampling\n");
+			glConfig.deviceSupportsHackPortalAlphaUnPremultiply = qfalse;
+		}
+	}
+
 #endif
 }
 
