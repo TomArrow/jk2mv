@@ -1337,18 +1337,25 @@ void SV_CheckInvalidUserInfoValues(client_t* cl) {
 	const char* warning = NULL;
 	int64_t timeout = 120000;
 	bool critical = false;
-	if (cl->invalidValues & (1 << (int)CHECKEDTYPE_RATE)) {
-		warning = "^1Your 'rate' value is invalid. Please check it and set a proper value.";
+	if (cl->unsafeClient) {
+		warning = "^1Your client is very old and potentially unsafe\n^1to use. Seriously consider upgrading.\n^2JK2MV^7, among other options, is open-source,\nfreely available and contains many\nsecurity fixes and improvements.\nIt also allows you to connect to servers for\nall patch versions of Jedi Outcast.\nGet it at:\n^2https://jk2mv.org/";
+		critical = true;
+	} else if (cl->invalidValues & (1 << (int)CHECKEDTYPE_RATE)) {
+		warning = "^1Your 'rate' value is invalid.\n^1Please check it and set a proper value.";
 		critical = true;
 	} else if (cl->invalidValues & (1 << (int)CHECKEDTYPE_SNAPS)) {
-		warning = "^1Your 'snaps' value is invalid. Please check it and set a proper value.";
+		warning = "^1Your 'snaps' value is invalid.\n^1Please check it and set a proper value.";
 		critical = true;
-	} else if (cl->rate < 5000) {
-		warning = va("^3Your 'rate' value is extremely low (%d). Please consider a higher value.",cl->rate);
+	} else if (cl->rate < 50000) {
+		warning = va("^3Your 'rate' value is extremely low (%d).\n^3Please consider a higher value (50000+).",cl->rate);
 		timeout = 60000 * 20; // every 20 min
+	} else if (cl->snaps < 20) {
+		// we only wanna warn about this in spec i guess but too lazy to code that rn. whatever.
+		warning = va("^3Your 'snaps' value is extremely low (%d).\n^3Please consider a higher value (30+).",cl->snaps);
+		timeout = 60000 * 60; // every 60 min
 	} else if (cl->snaps < 30) {
 		// we only wanna warn about this in spec i guess but too lazy to code that rn. whatever.
-		warning = va("^3Your 'snaps' value is extremely low (%d). Please consider a higher value.",cl->snaps);
+		warning = va("^3Your 'snaps' value is pretty low (%d).\n^3Consider a higher value (30+).",cl->snaps);
 		timeout = 60000 * 60; // every 60 min
 	}
 	if (!warning || cl->lastInvalidValuesWarning && svs.time - timeout < cl->lastInvalidValuesWarning && svs.time > cl->lastInvalidValuesWarning) {
@@ -1404,7 +1411,9 @@ void SV_SendClientMessages( void ) {
 		}
 
 		// warn user if he has invalid snaps/rate settings
-		SV_CheckInvalidUserInfoValues(c);
+		if (c->state == CS_ACTIVE) {
+			SV_CheckInvalidUserInfoValues(c);
+		}
 
 		// generate and send a new message
 		SV_SendClientSnapshot( c, softLimit);
