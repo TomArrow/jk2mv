@@ -257,6 +257,9 @@ typedef struct client_s {
 
 	qboolean		zombified;
 	int				customSnapEntCount; // client requested to not have the snapshot entity count limited to 256
+
+	int64_t			lastPingHackWarning;
+	int64_t			lastPingHackPublicWarning;
 } client_t;
 
 //=============================================================================
@@ -410,6 +413,7 @@ extern	cvar_t	*mv_resetServerTime;
 //
 void SV_FinalMessage (char *message);
 void QDECL SV_SendServerCommand( client_t *cl, PRINTF_FORMAT_STRING const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void QDECL SV_SendServerCommandIncludingFollowers( client_t *cl, PRINTF_FORMAT_STRING const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
 
 
 void SV_AddOperatorCommands (void);

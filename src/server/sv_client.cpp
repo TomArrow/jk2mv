@@ -1651,7 +1651,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t* umsg ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t* umsg, qboolean ackValid ) {
 	int			i, key;
 	int			cmdCount;
 	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX,MAX(MAX_PACKET_USERCMDS_MIN, sv_maxPacketUserCmds->integer));
@@ -1695,11 +1695,13 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, userMessage_t
 
 	// save time for ping calculation
 	// With sv_pingFix enabled we store the time of the first acknowledge, instead of the last. And we use a time value that is not limited by sv_fps.
-	if (!sv_pingFix->integer || cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked == -1) {
-		cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
-		if (umsg) {
-			umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
-			umsg->pingKnown = qtrue;
+	if (ackValid) {
+		if (!sv_pingFix->integer || cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked == -1) {
+			cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked = (sv_pingFix->integer ? Sys_Milliseconds() : svs.time);
+			if (umsg) {
+				umsg->ping = cl->frames[cl->messageAcknowledge & PACKET_MASK].messageAcked - cl->frames[cl->messageAcknowledge & PACKET_MASK].messageSent;
+				umsg->pingKnown = qtrue;
+			}
 		}
 	}
 
@@ -1793,34 +1795,69 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	int			c;
 	int			serverId;
 	userMessage_t* umsg = NULL;
+	qboolean	messageAckValid = qtrue;
+	qboolean	reliableAckValid = qtrue;
+	int			messageAck, reliableAck; // TA: If we detect user-provided data to be faulty, don't even write it into any internal structures so we don't mess anything up.
 
 	MSG_Bitstream(msg);
 
 	serverId = MSG_ReadLong( msg );
-	cl->messageAcknowledge = MSG_ReadLong( msg );
+	messageAck = MSG_ReadLong( msg );
 
-	if (cl->messageAcknowledge < 0) {
+	if (messageAck >= cl->netchan.outgoingSequence ) {
+		if (svs.time - cl->lastPingHackWarning > 50 || cl->lastPingHackWarning > svs.time) { // debounce it a lil bit so we dont server command overflow this n00b, we just wanna annoy him.
+			SV_SendServerCommandIncludingFollowers(cl, "print \"^%cnice ping hacking n00b\n\"",(char)Q_irand('0','z'-'0'));
+			cl->lastPingHackWarning = svs.time;
+		}
+		if (svs.time - cl->lastPingHackPublicWarning > 120000 || cl->lastPingHackPublicWarning > svs.time) { // debounce it a lil bit so we dont server command overflow this n00b, we just wanna annoy him.
+			SV_SendServerCommandIncludingFollowers(NULL, "print \"^1Client ^3%d ^1is doing ping hacking ;)\n\"", (int)(cl - svs.clients));
+			cl->lastPingHackPublicWarning = svs.time;
+		}
+		messageAckValid = qfalse;
+	}
+	else if (messageAck < 0) {
 		// usually only hackers create messages like this
 		// it is more annoying for them to let them hanging
 		//SV_DropClient( cl, "illegible client message" );
 		return;
 	}
-
-	cl->reliableAcknowledge = MSG_ReadLong( msg );
-	if (cl->reliableAcknowledge > cl->demo.clientDemoReliableAcknowledge) {
-		cl->demo.clientDemoReliableAcknowledge = cl->reliableAcknowledge;
+	else {
+		cl->messageAcknowledge = messageAck;
 	}
 
+
+	reliableAck = MSG_ReadLong( msg );
+
+	if (reliableAck > cl->reliableSent ) {
+		//cl->reliableAcknowledge = std::max(0, cl->reliableSent - 10);//MAX_RELIABLE_COMMANDS/2);
+		if (svs.time - cl->lastPingHackWarning > 50 || cl->lastPingHackWarning > svs.time) { // debounce it a lil bit so we dont server command overflow this n00b, we just wanna annoy him.
+			SV_SendServerCommandIncludingFollowers(cl, "print \"^%cnice whatever the fuck hacking n00b\n\"", (char)Q_irand('0', 'z' - '0'));
+			cl->lastPingHackWarning = svs.time;
+		}
+		if (svs.time - cl->lastPingHackPublicWarning > 120000 || cl->lastPingHackPublicWarning > svs.time) { // debounce it a lil bit so we dont server command overflow this n00b, we just wanna annoy him.
+			SV_SendServerCommandIncludingFollowers(NULL, "print \"^1Client ^3%d ^1is doing some weird reliable acknowledge hacking, wtf why\n\"",(int)(cl - svs.clients));
+			cl->lastPingHackPublicWarning = svs.time;
+		}
+		reliableAckValid = qfalse;
+	}
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server
 	// commands which the server thinks are not yet acknowledged in SV_UpdateServerCommandsToClient
-	if (cl->reliableAcknowledge < cl->reliableSequence - MAX_RELIABLE_COMMANDS) {
+	else if (reliableAck < cl->reliableSequence - MAX_RELIABLE_COMMANDS) {
 		// usually only hackers create messages like this
 		// it is more annoying for them to let them hanging
 		//SV_DropClient( cl, "illegible client message" );
-		cl->reliableAcknowledge = cl->reliableSequence;
+		cl->reliableAcknowledge = cl->reliableSent - 10; // TA: do -10 so demos won't get messed up? actually, do something smarter to avoid demo corruption idk.
 		return;
 	}
+	else {
+		cl->reliableAcknowledge = reliableAck;
+	}
+
+	if (cl->reliableAcknowledge > cl->demo.clientDemoReliableAcknowledge && reliableAckValid) {
+		cl->demo.clientDemoReliableAcknowledge = cl->reliableAcknowledge;
+	}
+
 	// if this is a usercmd from a previous gamestate,
 	// ignore it or retransmit the current gamestate
 	//
@@ -1878,9 +1915,9 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 
 	// read the usercmd_t
 	if ( c == clc_move ) {
-		SV_UserMove( cl, msg, qtrue, umsg );
+		SV_UserMove( cl, msg, qtrue, umsg, messageAckValid );
 	} else if ( c == clc_moveNoDelta ) {
-		SV_UserMove( cl, msg, qfalse, umsg );
+		SV_UserMove( cl, msg, qfalse, umsg, messageAckValid);
 	} else if ( c != clc_EOF ) {
 		Com_Printf( "WARNING: bad command byte for client %i\n", (int)(cl - svs.clients) );
 	}

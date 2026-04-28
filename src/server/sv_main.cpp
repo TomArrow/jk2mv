@@ -252,6 +252,66 @@ void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *f
 
 
 /*
+=================
+SV_SendServerCommandIncludingFollowers
+
+Sends a reliable command string to be interpreted by
+the client game module: "cp", "print", "chat", etc
+A NULL client will broadcast to all clients
+=================
+*/
+void QDECL SV_SendServerCommandIncludingFollowers(client_t* cl, PRINTF_FORMAT_STRING const char* fmt, ...) {
+	va_list		argptr;
+	byte		message[MAX_MSGLEN];
+	client_t* client;
+	playerState_t* ps;
+	int			j;
+
+	va_start(argptr, fmt);
+	Q_vsnprintf((char*)message, sizeof(message), fmt, argptr);
+	va_end(argptr);
+
+	// q3msgboom exploit
+	// more info? http://aluigi.altervista.org/adv/q3msgboom-adv.txt
+	if (strlen((char*)message) > 1022) {
+		return;
+	}
+
+	if (cl != NULL) {
+		SV_AddServerCommand(cl, (char*)message);
+		if (!sv.gameClients) {
+			// game not properly inited yet?
+			return;
+		}
+		// send the data to all his followers
+		for (j = 0, client = svs.clients; j < sv_maxclients->integer; j++, client++) {
+			if (client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified)) {
+				continue;
+			}
+			ps = SV_GameClientNum(j);
+			if ((ps->pm_flags & PMF_FOLLOW) && ps->clientNum == (cl-svs.clients)) {
+				SV_AddServerCommand(client, (char*)message);
+			}
+		}
+		return;
+	}
+
+	// hack to echo broadcast prints to console
+	if (com_dedicated->integer && !strncmp((char*)message, "print", 5)) {
+		Com_Printf("broadcast: %s\n", SV_ExpandNewlines((char*)message));
+	}
+
+	// send the data to all relevent clients
+	for (j = 0, client = svs.clients; j < sv_maxclients->integer; j++, client++) {
+		if (client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified)) {
+			continue;
+		}
+		SV_AddServerCommand(client, (char*)message);
+	}
+}
+
+
+/*
 ==============================================================================
 
 MASTER SERVER FUNCTIONS
