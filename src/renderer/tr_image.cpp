@@ -4151,6 +4151,25 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		{//single skin
 			hSkin = RE_RegisterIndividualSkin(name, hSkin);
 		}
+
+		if (!hSkin) {
+			// load failed. it may have failed because the file wasn't found.
+			// but one of the individual skins may have succeeded, leaving numSurfaces > 0. 
+			// cgame will be correctly informed that the skin doesn't exist.
+			// but the next time that exact same non-existing skin is loaded,
+			// tr.skins will serve the cached version and numSurfaces is non-zero
+			// so a faulty skin is applied.
+			// so let's "clean up" here.
+			// unfortunately i'm not sure if we can safely (or at all) free normal hunk memory here.
+			// a better approach here might be to allocate some temporary memory first
+			// and if things fail, we just discard that. otherwise we copy over to real hunk.
+			//for (int i = 0; i < skin->numSurfaces; i++) {
+			//	Hunk_Free();
+			//}
+			// TLDR: accept the memory "leak" (hunk is automatically cleaned anyway during mapchanges and such)
+			// and just make sure the numsurfaces check will force a return of 0 the next time too
+			skin->numSurfaces = 0;
+		}
 	}
 	else
 	{ // Original JK2-Style skin-loading
