@@ -509,6 +509,9 @@ void CL_AddReliableCommand( const char *cmd ) {
 	clc.reliableSequence++;
 	index = clc.reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
 	Q_strncpyz( clc.reliableCommands[ index ], cmd, sizeof( clc.reliableCommands[ index ] ) );
+	if (com_developer->integer > 1) {
+		Com_DPrintf("clientCommand (sending): %i : %s\n", clc.reliableSequence, cmd);
+	}
 }
 
 /*
@@ -3189,13 +3192,13 @@ CL_CheckUserinfo
 
 ==================
 */
-void CL_CheckUserinfo( void ) {
+void CL_CheckUserinfo( qboolean force ) {
 	// don't add reliable commands when not yet connected
 	if ( cls.state < CA_CHALLENGING ) {
 		return;
 	}
 	// don't overflow the reliable command buffer when paused
-	if ( cl_paused->integer ) {
+	if ( cl_paused->integer && !force) {
 		return;
 	}
 	// send a reliable userinfo update if needed
@@ -3358,7 +3361,7 @@ void CL_Frame ( int msec ) {
 	CL_CheckCvarUpdate();
 
 	// see if we need to update any userinfo
-	CL_CheckUserinfo();
+	CL_CheckUserinfo( qfalse );
 
 	// if we haven't gotten a packet in a long time,
 	// drop the connection
@@ -3636,6 +3639,30 @@ void CL_SetForcePowers_f( void ) {
 	return;
 }
 
+// intercept the forcechanged cmd and force CVAR_USERINFO updates to the server first.
+// this solves the bug where an open menu will not allow updating CVAR_USERINFO, hence
+// the "forcechanged" command arrives at the server before the actual forcepowers change.
+// so we simply force the update here. 
+// in addition, since some servers are ignoring the argument to forcechanged to "fix" the bug,
+// effectively fixing the bug but breaking the "join game" buttons,
+// we append an extra "team" command to restore the originally intended functionality.
+void CL_ForceChanged_f( void ) {
+	CL_CheckUserinfo(qtrue);
+	if (Cmd_Argc() == 2) {
+		const char* arg = Cmd_Argv(1);
+		if (!Q_stricmp(arg, "none") || !Q_stricmp(arg, "same") || !Q_stricmp(arg, ";")) {
+			// 1.02 clients send those and trigger unwanted team-changes... so fix that.
+			CL_AddReliableCommand("forcechanged");
+		}
+		else {
+			CL_AddReliableCommand(va("team %s", arg));
+		}
+	}
+	else {
+		Cmd_ForwardToServer();
+	}
+}
+
 #ifdef G2_COLLISION_ENABLED
 #define G2_VERT_SPACE_CLIENT_SIZE 256
 #endif
@@ -3906,6 +3933,7 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("team_model", CL_SetTeamModel_f );
 	Cmd_SetCommandCompletionFunc( "team_model", CL_CompleteModelName );
 	Cmd_AddCommand ("forcepowers", CL_SetForcePowers_f );
+	Cmd_AddCommand ("forcechanged", CL_ForceChanged_f );
 	Cmd_AddCommand ("saveDemo", demoAutoSave_f);
 	Cmd_AddCommand ("saveDemoLast", demoAutoSaveLast_f);
 	Cmd_AddCommand ("video", CL_Video_f);

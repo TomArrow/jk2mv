@@ -767,6 +767,11 @@ void	Cmd_Execute( void ) {
 	CL_ForwardCommandToServer ( cmd_cmd );
 }
 
+void	Cmd_ForwardToServer(void) {
+	CL_ForwardCommandToServer(cmd_cmd);
+}
+
+
 /*
 ============
 Cmd_List_f

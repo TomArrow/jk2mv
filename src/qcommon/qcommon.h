@@ -637,6 +637,7 @@ void	Cmd_TokenizeString( const char *text );
 
 void	Cmd_Execute( void );
 void	Cmd_ExecuteString( const char *text );
+void	Cmd_ForwardToServer(void);
 // Parses a single line of text into arguments and tries to execute it
 // as if it was typed at the console
 
