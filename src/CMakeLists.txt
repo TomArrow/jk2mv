@@ -175,6 +175,20 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/randombytes.cpp"
 		"qcommon/levenshtein.cpp"
 	)
+	
+	# if DEBUG_FASTTRACE is set, we do optimize these even in debug mode.
+	set(MVMPTracingFiles
+		"qcommon/cm_load.cpp"
+		"qcommon/cm_patch.cpp"
+		"qcommon/cm_polylib.cpp"
+		"qcommon/cm_test.cpp"
+		"qcommon/cm_trace.cpp"
+	)
+	if(DEBUG_FASTTRACE)
+	
+		message(STATUS "Setting options ${CXXFLAGS_DEBUG_NOOPT} for: ${MVMPTracingFiles}") 
+		set_source_files_properties(${MVMPTracingFiles} PROPERTIES COMPILE_FLAGS "$<$<CONFIG:Debug>:${CXXFLAGS_DEBUG_NOOPT}>")
+	endif()
 
 	if(ARCH_X86)
 		set(MVMPDEDCommonFiles ${MVMPDEDCommonFiles}

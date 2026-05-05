@@ -43,6 +43,7 @@ if(CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Customizable options
+option(DEBUG_FASTTRACE "Even in a debug build, optimize source files responsible for tracing (cm_)" OFF)
 option(WITH_MARIADB "Include MariaDB support (doesn't work on WinXP)" ON)
 option(WITH_BCRYPT "Use Windows Bcrypt API (doesn't work on WinXP)" ON)
 option(FOR_WINXP "Disable all features that Windows XP doesn't provide'" OFF)
@@ -211,6 +212,9 @@ set(GlobalDefines ${GlobalDefines} "BOTLIB" "_JK2")
 set(DebugDefines ${DebugDefines} "DEBUG")
 set(ReleaseDefines "FINAL_BUILD" "NDEBUG")
 
+set(CFLAGS_DEBUG_NOOPT "")
+set(CXXFLAGS_DEBUG_NOOPT "")
+
 if(MSVC)
 	# Warnings
 	# 4244 = conversion' conversion from 'type1' to 'type2', possible loss of data
@@ -245,10 +249,16 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MP")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /Oi /Ot /Ob2") # maximize speed
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ot /Ob2")
+	
+	#sadly we run into issues here because RTC1 is incompatible and its being set everywhere. need to figure out how to unset it for specific files first
+	#set(CFLAGS_DEBUG_NOOPT "/O2 /Oi /Ot /Ob2")
+	#set(CXXFLAGS_DEBUG_NOOPT "/O2 /Oi /Ot /Ob2")
 
 	if(ARCH_X86_32)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+		set(CFLAGS_DEBUG_NOOPT "${CFLAGS_DEBUG_NOOPT} /arch:SSE2")
+		set(CXXFLAGS_DEBUG_NOOPT "${CXXFLAGS_DEBUG_NOOPT} /arch:SSE2")
 
 		# dont use safe exception handler
 		# openal does not support it on X86_32
@@ -279,6 +289,9 @@ elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES
 	# Optimization
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+	
+	set(CFLAGS_DEBUG_NOOPT "-O3")
+	set(CXXFLAGS_DEBUG_NOOPT "-O3")
 
 	# General
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g1 -fno-omit-frame-pointer")
@@ -292,6 +305,7 @@ elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES
 	if(${CMAKE_C_COMPILER_ID} STREQUAL GNU)
 		if(ARCH_X86)
 			set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mfpmath=sse")
+			set(CFLAGS_DEBUG_NOOPT "${CFLAGS_DEBUG_NOOPT} -mfpmath=sse")
 		endif()
 
 		# Link only libs actually needed
@@ -301,6 +315,7 @@ elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES
 	if(${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
 		if(ARCH_X86)
 			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mfpmath=sse")
+			set(CXXFLAGS_DEBUG_NOOPT "${CXXFLAGS_DEBUG_NOOPT} -mfpmath=sse")
 		endif()
 
 		# Link only libs actually needed
