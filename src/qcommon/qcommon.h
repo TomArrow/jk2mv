@@ -1243,6 +1243,8 @@ extern	cvar_t	*mv_apienabled;
 extern	cvar_t	*com_debugMessage;
 extern	cvar_t	*mg_loglevel;
 
+extern	cvar_t	*com_basePathLibraries;
+
 extern	cvar_t	*com_renderfps;
 
 extern	cvar_t	*com_hunkDynamic;

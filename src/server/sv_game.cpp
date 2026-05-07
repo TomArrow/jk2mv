@@ -1518,6 +1518,10 @@ void SV_RestartGameProgs( void ) {
 		Com_Error( ERR_FATAL, "VM_Restart on game failed" );
 	}
 
+	// if through freak error we restarted with a non-mv vm after previously having an mv vm, we will crash from accessing still wrongly set stuff
+	// TODO there's probably more stuff like this that needs to be rectified. coolapi, mvapi etc
+	sv.gentitiesMV = NULL; 
+
 	SV_InitGameVM( qtrue );
 }
 
@@ -1543,7 +1547,7 @@ void SV_InitGameProgs( void ) {
 	}
 
 	// load the dll or bytecode
-	gvm = VM_Create( "jk2mpgame", qfalse, SV_GameSystemCalls, (vmInterpret_t)(int)Cvar_VariableValue( "vm_game" ) );
+	gvm = VM_Create( "jk2mpgame", (qboolean)!!(com_basePathLibraries->integer & 1), SV_GameSystemCalls, (vmInterpret_t)(int)Cvar_VariableValue( "vm_game" ) );
 	if ( !gvm ) {
 		Com_Error( ERR_FATAL, "VM_Create on game failed" );
 	}

@@ -1305,7 +1305,7 @@ void CL_InitUI(qboolean mainMenu) {
 		} else {
 			interpret = (vmInterpret_t)(int)Cvar_VariableValue("vm_ui");
 		}
-		uivm = VM_Create("ui", (qboolean)!!mv_menuOverride->integer, CL_UISystemCalls, interpret);
+		uivm = VM_Create("ui", (qboolean)(!!mv_menuOverride->integer || !!(com_basePathLibraries->integer & 4)), CL_UISystemCalls, interpret);
 	}
 
 	// Load the mvmenu if we want the mainMenu or failed to load a ui module earlier

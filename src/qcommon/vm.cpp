@@ -715,6 +715,7 @@ vm_t *VM_Create( const char *module, qboolean mvOverride, intptr_t (*systemCalls
 
 	vm->mvmenu = 0;
 	vm->index = i;
+	vm->mvOverride = mvOverride;
 
 	if (interpret == VMI_NATIVE) {
 		// try to load as a system dll

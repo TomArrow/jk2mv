@@ -122,6 +122,8 @@ cvar_t	*mv_apienabled;
 cvar_t	*com_timestamps;
 cvar_t	*com_debugMessage;
 
+cvar_t	*com_basePathLibraries; // forces dll/so loading from basepath instead of base/eternaljk2 subfolder. bitmask: game, cgame, ui
+
 cvar_t	*mg_loglevel;
 
 #ifdef _WIN32
@@ -2839,6 +2841,7 @@ void Com_Init( char *commandLine ) {
 	com_timedemo = Cvar_Get ("timedemo", "0", 0);
 	com_cameraMode = Cvar_Get ("com_cameraMode", "0", CVAR_CHEAT);
 	com_debugMessage = Cvar_Get ("com_debugMessage", "0", CVAR_TEMP);
+	com_basePathLibraries = Cvar_Get ("com_basePathLibraries", "7", CVAR_INIT | CVAR_VM_NOWRITE);
 	mg_loglevel = Cvar_Get ("mg_loglevel", "0", CVAR_TEMP);
 
 #ifdef _WIN32
