@@ -1340,6 +1340,17 @@ void SV_UserinfoChanged( client_t *cl ) {
 	else
 		ip = NET_AdrToString( cl->netchan.remoteAddress );
 
+	// tommyternal raw name. game module can read this instead of name to get what the user actually set himself
+	// to not get confused by us reading CS_PLAYERS and setting it here and it then basically forming a loop where game is 
+	// trying to modify its own modification
+	if ((com_coolApi_supported_game->integer & COOL_APIFEATURE_CLIENTREALNAME)) {
+		if (!Info_SetValueForKey(cl->userinfo, "ttrn", Info_ValueForKey(cl->userinfo, "name")))
+		{
+			SV_DropClient(cl, "userinfo string length exceeded");
+			return;
+		}
+	}
+
 	if ( !Info_SetValueForKey(cl->userinfo, "ip", ip) )
 		SV_DropClient( cl, "userinfo string length exceeded" );
 }

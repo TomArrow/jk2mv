@@ -308,7 +308,7 @@ void Con_CopyLink(void) {
 	//short *line;
 	conChar_t *line;
 	char *buffer, n[] = "\0";
-	const char *link, *point1, *point2, *point3;
+	const char *link = NULL, *point1, *point2, *point3;
 	qboolean containsNum = qfalse, containsPoint = qfalse;
 
 	buffer = (char *)Hunk_AllocateTempMemory(con.linewidth);

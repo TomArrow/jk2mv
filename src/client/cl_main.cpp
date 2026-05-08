@@ -205,7 +205,19 @@ void CL_Video_f( void )
 	if( Cmd_Argc( ) == 2 )
 		{
 			// explicit filename
-			Com_sprintf(filename, sizeof(filename), "videos/video%04d.%s", i, ext);
+			Com_sprintf( filename, sizeof( filename ), "videos/%s", Cmd_Argv( 1 ) );
+
+			// override video file extension
+			if ( pipe )
+			{
+				char *sep = strrchr( filename, '/' ); // last path separator
+				char *e = strrchr( filename, '.' );
+
+				if ( e && e > sep && *(e+1) != '\0' ) {
+					ext = e + 1;
+					*e = '\0';
+				}
+			}
 		}
 	else
 		{

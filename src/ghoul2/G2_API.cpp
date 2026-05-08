@@ -434,6 +434,7 @@ qboolean G2API_SetBoneAnim(g2handle_t g2h, const int modelIndex, const char *bon
 	{
 		setFrame=0.0f;
 	}
+	//Com_Printf("G2API_SetBoneAnim modelIndex %d, bonename %s, AstartFrame %d, AendFrame %d, currentTime %d\n", modelIndex, boneName, AstartFrame, AendFrame, currentTime);
 
 	CGhoul2Info_v *ghoul2 = G2API_GetGhoul2Model(g2h);
 
