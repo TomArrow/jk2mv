@@ -1185,6 +1185,7 @@ static Q_NORETURN void Sys_CrashLogger(int argc, char *argv[]) {
 	Sys_CrashReadVm();
 
 	FILE		*f = NULL;
+	FILE		*maps = NULL;
 	time_t		rawtime;
 	char		timeStr[32];
 	char		*path;
@@ -1206,7 +1207,7 @@ static Q_NORETURN void Sys_CrashLogger(int argc, char *argv[]) {
 	if (f == NULL) {
 		f = stderr;
 	}
-
+	
 	fprintf(f, "---JK2MV Crashlog-----------------------\n");
 	fprintf(f, "\n");
 	fprintf(f, "Date:               %s", ctime(&rawtime));
@@ -1241,6 +1242,19 @@ static Q_NORETURN void Sys_CrashLogger(int argc, char *argv[]) {
 		fprintf(f, "\n");
 	}
 
+	maps = fopen("/proc/self/maps", "r");
+	if(maps){
+		char inbuf[1024];
+		fprintf(f, "\n");
+		fprintf(f, "---Process Mappings----------------------\n");
+		fprintf(f, "\n");
+		while(fgets(inbuf,sizeof(inbuf), maps)){
+			fprintf(f, "%s",inbuf);
+		}
+		fclose(maps);
+	}
+	
+	
 	fprintf(f, "\n");
 	fprintf(f, "---Machine Context----------------------\n");
 	fprintf(f, "\n");
