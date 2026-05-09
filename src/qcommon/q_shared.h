@@ -352,7 +352,7 @@ typedef int		g2handle_t;
 
 #define	MAX_NAME_LENGTH		32		// max length of a client name
 
-#define	MAX_SAY_TEXT	150
+#define	MAX_SAY_TEXT	200
 
 // paramters for command buffer stuffing
 typedef enum {
