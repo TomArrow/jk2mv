@@ -37,6 +37,7 @@ typedef struct {
 typedef struct cbrush_s {
 	int			shaderNum;		// the shader that determined the contents
 	int			contents;
+	int			surfaceFlagsShared; // surfaceflags that all of the brush sides here have
 	vec3_t		bounds[2];
 	int			numsides;
 	cbrushside_t	*sides;

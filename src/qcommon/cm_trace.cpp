@@ -249,6 +249,10 @@ void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 			continue;
 		}
 
+		if ((b->surfaceFlagsShared & SURF_NODRAW) && (tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOINVIS)) {
+			continue;
+		}
+
 		CM_TestBoxInBrush( tw, b );
 		if ( tw->trace.allsolid ) {
 			return;
@@ -259,7 +263,7 @@ void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 #ifdef BSPC
 	if (1) {
 #else
-	if ( !cm_noCurves->integer ) {
+	if ( !cm_noCurves->integer && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOPATCH)) {
 #endif //BSPC
 		for ( k = 0 ; k < leaf->numLeafSurfaces ; k++ ) {
 			patch = cm.surfaces[ cm.leafsurfaces[ leaf->firstLeafSurface + k ] ];
@@ -272,6 +276,10 @@ void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 			patch->checkcount = cm.checkcount;
 
 			if ( !(patch->contents & tw->contents)) {
+				continue;
+			}
+
+			if ( (patch->surfaceFlags & SURF_NODRAW) && (tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOINVIS)) {
 				continue;
 			}
 
@@ -687,6 +695,10 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 			continue;
 		}
 
+		if ((b->surfaceFlagsShared & SURF_NODRAW) && (tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOINVIS)) {
+			continue;
+		}
+
 		CM_TraceThroughBrush( tw, b );
 		if ( !tw->trace.fraction ) {
 			return;
@@ -697,7 +709,7 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 #ifdef BSPC
 	if (1) {
 #else
-	if ( !cm_noCurves->integer ) {
+	if ( !cm_noCurves->integer && !(tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOPATCH)) {
 #endif
 		for ( k = 0 ; k < leaf->numLeafSurfaces ; k++ ) {
 			patch = cm.surfaces[ cm.leafsurfaces[ leaf->firstLeafSurface + k ] ];
@@ -710,6 +722,10 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 			patch->checkcount = cm.checkcount;
 
 			if ( !(patch->contents & tw->contents) ) {
+				continue;
+			}
+
+			if ((patch->surfaceFlags & SURF_NODRAW) && (tw->traceCustomizationFlags & TRACECUSTOMFLAG_NOINVIS)) {
 				continue;
 			}
 

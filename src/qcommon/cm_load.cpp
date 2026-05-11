@@ -221,7 +221,7 @@ CMod_LoadBrushes
 void CMod_LoadBrushes( lump_t *l ) {
 	dbrush_t	*in;
 	cbrush_t	*out;
-	int			i, count;
+	int			i, j, count;
 
 	in = (dbrush_t *)(cmod_base + l->fileofs);
 	if (l->filelen % sizeof(*in)) {
@@ -237,6 +237,15 @@ void CMod_LoadBrushes( lump_t *l ) {
 	for ( i=0 ; i<count ; i++, out++, in++ ) {
 		out->sides = cm.brushsides + LittleLong(in->firstSide);
 		out->numsides = LittleLong(in->numSides);
+
+		for (j = 0; j < out->numsides; j++) {
+			if (j == 0) {
+				out->surfaceFlagsShared = out->sides[j].surfaceFlags;
+			}
+			else {
+				out->surfaceFlagsShared &= out->sides[j].surfaceFlags;
+			}
+		}
 
 		out->shaderNum = LittleLong( in->shaderNum );
 		if ( out->shaderNum < 0 || out->shaderNum >= cm.numShaders ) {
