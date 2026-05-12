@@ -683,8 +683,11 @@ static void DB_SetOptions() {
 }
 
 void DB_Init() {
-
+#ifdef USE_MARIADB
 	db_enabled = Cvar_Get("db_enabled", "0", CVAR_ARCHIVE);
+#else
+	db_enabled = Cvar_Get("db_enabled", "0", CVAR_INIT | CVAR_ROM);
+#endif
 	db_url = Cvar_Get("db_url", "jdbc:mariadb://example12345.com:5509/dbname", CVAR_ARCHIVE); // "jdbc:mariadb://localhost:3306/todo"
 	db_username = Cvar_Get("db_username", "", CVAR_ARCHIVE);
 	db_password = Cvar_Get("db_password", "", CVAR_ARCHIVE);

@@ -33,7 +33,9 @@ const int supportedCoolApiFeatures =
 | COOL_APIFEATURE_EXPANDEDSETUSERCMD
 | COOL_APIFEATURE_EZDEMOCGAMEBUFFER
 | COOL_APIFEATURE_GETTIMESINCESNAPRECEIVED
+#ifdef USE_MARIADB
 | COOL_APIFEATURE_MARIADB
+#endif
 | COOL_APIFEATURE_MVAPI_PLAYERSNAPSHOT_SNEAKPEEK
 | COOL_APIFEATURE_G_SETBRUSHMODELCONTENTFLAGS
 | COOL_APIFEATURE_G_USERCMDSTORE
@@ -2873,7 +2875,11 @@ void Com_Init( char *commandLine ) {
 	com_cool_apiFeatures = Cvar_Get("cool_apiFeatures", va("%d", supportedCoolApiFeatures), CVAR_INIT | CVAR_VM_NOWRITE);
 	// 2024-09-25 bump to 2: CG/G_COOL_API_DB_AddRequestTyped
 	// 2024-09-25 bump to 3: Prepared statements and such
-	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE); 
+#ifdef USE_MARIADB
+	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "3", CVAR_INIT | CVAR_VM_NOWRITE);
+#else
+	com_cool_apiDBVersion = Cvar_Get("cool_apiDBVersion", "0", CVAR_INIT | CVAR_VM_NOWRITE);
+#endif
 	com_cool_apiJKAVersion = Cvar_Get("cool_apiJKAVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
 	com_cool_apiUserCmdStoreVersion = Cvar_Get("cool_apiUserCmdStoreVersion", "1", CVAR_INIT | CVAR_VM_NOWRITE);
 	com_cool_supportedCoolApiVMFeatures = Cvar_Get("com_cool_supportedCoolApiVMFeatures", va("%d", supportedCoolApiVMFeatures), CVAR_INIT | CVAR_VM_NOWRITE);
