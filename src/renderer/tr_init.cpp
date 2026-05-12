@@ -1647,10 +1647,16 @@ void RE_SetLightStyle(int style, int color)
 void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 	int		oldWidth = glConfig.vidWidth;
 	int		oldHeight = glConfig.vidHeight;
+	int		oldWinWidth = glConfig.winWidth;
+	int		oldWinHeight = glConfig.winHeight;
 
 	WIN_UpdateGLConfig( &glConfig );
 
+	if (oldWinWidth != glConfig.winWidth || oldWinHeight != glConfig.winHeight) {
+		Com_DPrintf("RE_UpdateGLConfig: Window size changed: %dx%d=>%dx%d\n", oldWinWidth, oldWinHeight, glConfig.winWidth, glConfig.winHeight);
+	}
 	if (oldWidth != glConfig.vidWidth || oldHeight != glConfig.vidHeight) {
+		Com_DPrintf("RE_UpdateGLConfig: Drawable window area changed: %dx%d=>%dx%d\n",oldWidth,oldHeight,glConfig.vidWidth,glConfig.vidHeight);
 		R_SyncRenderThread();
 		R_UpdateImages();
 	}

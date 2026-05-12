@@ -413,18 +413,19 @@ void WIN_UpdateGLConfig( glconfig_t *glConfig ) {
 	// changing scaling in display settings.
 	SDL_GL_GetDrawableSize(screen, &glConfig->vidWidth, &glConfig->vidHeight);
 	if (r_allowResize->integer) {
-		SDL_DisplayMode desktopMode;
-		Com_Memset(&desktopMode, 0, sizeof(SDL_DisplayMode));
-		if (desktopMode.w > 0 && desktopMode.h > 0) {
-			glConfig->winWidth = desktopMode.w;
-			glConfig->winHeight = desktopMode.h;
+		int winWidth = 0, winHeight = 0;
+		SDL_GetWindowSize(screen,&winWidth, &winHeight);
+		if (winWidth > 0 && winHeight > 0) {
+			glConfig->winWidth = winWidth;
+			glConfig->winHeight = winHeight;
 		}
-		else if(glConfig->vidWidth > 0 && glConfig->vidHeight > 0){
+		//else if(glConfig->vidWidth > 0 && glConfig->vidHeight > 0){
 			// idk
-			glConfig->winWidth = glConfig->vidWidth;
-			glConfig->winHeight = glConfig->vidHeight;
-		}
+		//	glConfig->winWidth = glConfig->vidWidth;
+		//	glConfig->winHeight = glConfig->vidHeight;
+		//}
 	}
+
 	glConfig->displayScale = displayBaseScale * glConfig->vidHeight / glConfig->winHeight;
 }
 
