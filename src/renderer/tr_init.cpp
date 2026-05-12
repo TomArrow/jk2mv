@@ -1650,18 +1650,24 @@ void RE_UpdateGLConfig( glconfig_t *glconfigOut ) {
 	int		oldWinWidth = glConfig.winWidth;
 	int		oldWinHeight = glConfig.winHeight;
 	float	oldDisplayScale = glConfig.displayScale;
+	static qboolean lastWasInvalid = qfalse;
 
 	WIN_UpdateGLConfig( &glConfig );
 
 	if (glConfig.winWidth <= 0 || glConfig.winHeight <= 0 || glConfig.vidWidth <= 0 || glConfig.vidHeight <= 0 ) {
-		Com_DPrintf("^3RE_UpdateGLConfig: Invalid sizes returned: drawable area %dx%d=>%dx%d, window size %dx%d=>%dx%d. Ignoring changes\n", oldWidth, oldHeight, glConfig.vidWidth, glConfig.vidHeight, oldWinWidth, oldWinHeight, glConfig.winWidth, glConfig.winHeight);
+		if (!lastWasInvalid) { // avoid spam in dumb way
+			Com_DPrintf("^3RE_UpdateGLConfig: Invalid sizes returned: drawable area %dx%d=>%dx%d, window size %dx%d=>%dx%d. Ignoring changes\n", oldWidth, oldHeight, glConfig.vidWidth, glConfig.vidHeight, oldWinWidth, oldWinHeight, glConfig.winWidth, glConfig.winHeight);
+		}
 		glConfig.vidWidth = oldWidth;
 		glConfig.vidHeight = oldHeight;
 		glConfig.winWidth = oldWinWidth;
 		glConfig.winHeight = oldWinHeight;
 		glConfig.displayScale = oldDisplayScale;
+		lastWasInvalid = qtrue;
 		return;
 	}
+
+	lastWasInvalid = qfalse;
 
 	if (oldWinWidth != glConfig.winWidth || oldWinHeight != glConfig.winHeight) {
 		Com_DPrintf("RE_UpdateGLConfig: Window size changed: %dx%d=>%dx%d\n", oldWinWidth, oldWinHeight, glConfig.winWidth, glConfig.winHeight);
