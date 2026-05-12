@@ -1,5 +1,6 @@
 // tr_noise.c
 #include "tr_local.h"
+#include "../qcommon/randombytes.h"
 
 #define NOISE_SIZE 256
 #define NOISE_MASK ( NOISE_SIZE - 1 )
@@ -29,6 +30,7 @@ float GetNoiseTime( int t )
 void R_NoiseInit( void )
 {
 	int i;
+	unsigned int randomseed = 0;
 
 	srand( 1001 );
 
@@ -36,6 +38,15 @@ void R_NoiseInit( void )
 	{
 		s_noise_table[i] = ( float ) ( ( ( rand() / ( float ) RAND_MAX ) * 2.0f - 1.0f ) );
 		s_noise_perm[i] = ( unsigned char ) ( rand() / ( float ) RAND_MAX * 255 );
+	}
+
+	if (com_randomFixes->integer) {
+		// since we did this ridiculous srand(), reset us back to something reasonable?
+		if (randombytes(&randomseed, 4)) {
+			// guess it failed. fall back to this.
+			randomseed = Com_Milliseconds();
+		}
+		srand(randomseed);
 	}
 }
 

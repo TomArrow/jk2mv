@@ -1232,6 +1232,7 @@ extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
 extern	cvar_t	*com_busyWait;
 extern	cvar_t	*com_silentScreenshots;
+extern	cvar_t	*com_randomFixes; // fixes to random seeding
 
 extern	cvar_t	*com_cool_apiFeatures;
 extern	cvar_t	*com_cool_apiDBVersion;

@@ -18,6 +18,8 @@
 #include <memory>
 
 #include "../qcommon/mariadb.h"
+#include "../qcommon/randombytes.h"
+#include "../qcommon/vm_local.h"
 
 cvar_t* com_coolApi_supported_game_userCmdStoreVersion;
 cvar_t* com_coolApi_supported_game;
@@ -1450,6 +1452,7 @@ Called for both a full init and a restart
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
 	int apireq;
+	unsigned int randomseed;
 
 	// clear physics interaction links
 	SV_ClearWorld ();
@@ -1466,7 +1469,18 @@ static void SV_InitGameVM( qboolean restart ) {
 	com_coolApi_supported_game_userCmdStoreVersion = Cvar_Get("coolApi_supported_game_userCmdStoreVersion", "0", CVAR_ROM);
 	com_coolApi_supported_game_vmflags = Cvar_Get("coolApi_supported_game_vmflags", "0", CVAR_ROM);
 
-	apireq = VM_Call(gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart,
+	randomseed = 0;
+	if (sv_trueRandomSeed->integer == 2 || sv_trueRandomSeed->integer && gvm->dllHandle) {
+		// let's get a TRULY random randomseed shall we? 
+		if (randombytes(&randomseed, 4)) {
+			// guess it failed. fall back to this.
+			randomseed = Com_Milliseconds();
+		}
+	}
+	else {
+		randomseed = Com_Milliseconds();
+	}
+	apireq = VM_Call(gvm, GAME_INIT, sv.time, randomseed, restart,
 		0, 0, 0, 0, 0, 0, 0, 0, MIN(mv_apienabled->integer, MV_APILEVEL));
 	if (apireq > mv_apienabled->integer) {
 		apireq = mv_apienabled->integer;

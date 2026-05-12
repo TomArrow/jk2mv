@@ -23,6 +23,7 @@ Ghoul2 Insert Start
 #endif
 
 #include "../qcommon/strip.h"
+#include "../qcommon/vm_local.h"
 
 
 qboolean SV_NeedResetTime() {
@@ -495,6 +496,7 @@ void SV_SpawnServer( char *server, qboolean killBots, ForceReload_e eForceReload
 	char		systemInfo[16384];
 	const char	*p;
 	qboolean	resetTime;
+	unsigned int	randomseed;
 
 #ifdef SVDEMO
 	SV_StopAutoRecordDemos();
@@ -668,7 +670,18 @@ Ghoul2 Insert End
 	Cvar_Set("cl_paused", "0");
 
 	// get a new checksum feed and restart the file system
-	srand(Com_Milliseconds());
+	randomseed = 0;
+	if (sv_trueRandomSeed->integer == 2 || sv_trueRandomSeed->integer && (!gvm || gvm->dllHandle)) {
+		// let's get a TRULY random randomseed shall we? 
+		if (randombytes(&randomseed, 4)) {
+			// guess it failed. fall back to this.
+			randomseed = Com_Milliseconds();
+		}
+	}
+	else {
+		randomseed = Com_Milliseconds();
+	}
+	srand(randomseed);
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
 
 	FS_PureServerSetReferencedPaks("", "");
@@ -974,6 +987,7 @@ void SV_Init (void) {
 	//sv_botFps = Cvar_Get ("sv_botFps", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	//sv_botFpsAllowIrregular = Cvar_Get ("sv_botFpsAllowIrregular", "0", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_timeout = Cvar_Get ("sv_timeout", "200", CVAR_TEMP );
+	sv_trueRandomSeed = Cvar_Get ("sv_trueRandomSeed", "1", CVAR_ARCHIVE );
 	sv_zombietime = Cvar_Get ("sv_zombietime", "2", CVAR_TEMP );
 	Cvar_Get ("nextmap", "", CVAR_TEMP );
 

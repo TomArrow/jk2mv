@@ -11,6 +11,7 @@ cvar_t	*sv_gameFpsAllowIrregular; // Allows game fps to reach its intended fps e
 cvar_t	*sv_gameFpsSpecFix; // Fixes spectator smoothness when using gamefps
 //cvar_t	*sv_botFps;				// time rate for running bots (while allowing higher snaps rate with higher sv_fps). TRY to make this a clean fraction of sv_fps please.
 //cvar_t	*sv_botFpsAllowIrregular; // Allows bot fps to reach its intended fps even if it isn't a clean fraction of sv_fps. Who knows how well that's gonna go though
+cvar_t	*sv_trueRandomSeed;		// generate a truly random seed for game module. 1 = for library vm, 2 = always even qvm (is this ok?)
 cvar_t	*sv_timeout;			// seconds without any message
 cvar_t	*sv_zombietime;			// seconds to sink messages after disconnect
 cvar_t	*sv_rconPassword;		// password for remote server commands

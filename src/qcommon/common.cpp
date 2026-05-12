@@ -6,6 +6,7 @@
 # include <fenv.h>
 #endif
 
+#include "../qcommon/randombytes.h"
 #include "../qcommon/q_shared.h"
 #include "../sys/sys_local.h"
 #include "qcommon.h"
@@ -112,6 +113,7 @@ cvar_t	*sv_paused;
 cvar_t	*com_cameraMode;
 cvar_t	*com_busyWait;
 cvar_t	*com_silentScreenshots;
+cvar_t	*com_randomFixes; // fixes to random seeding.
 
 cvar_t	*com_cool_apiFeatures;
 cvar_t	*com_cool_apiDBVersion;
@@ -2745,6 +2747,7 @@ Com_Init
 
 void Com_Init( char *commandLine ) {
 	char	*s;
+	unsigned int		randomseed;
 
 	Com_Printf( "%s %s %s\n", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 
@@ -2857,6 +2860,7 @@ void Com_Init( char *commandLine ) {
 	com_buildScript = Cvar_Get( "com_buildScript", "0", 0 );
 	com_busyWait = Cvar_Get("com_busyWait", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 	com_silentScreenshots = Cvar_Get("com_silentScreenshots", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
+	com_randomFixes = Cvar_Get("com_randomFixes", "1", CVAR_ARCHIVE | CVAR_GLOBAL);
 
 	com_introPlayed = Cvar_Get("com_introplayed", "0", CVAR_ARCHIVE | CVAR_GLOBAL);
 
@@ -2904,7 +2908,17 @@ void Com_Init( char *commandLine ) {
 	Sys_Init();
 	NET_HTTP_Init();
 
-	srand(time(NULL));
+	randomseed = 0;
+	if (com_randomFixes->integer) {
+		if (randombytes(&randomseed, 4)) {
+			// guess it failed. fall back to this.
+			randomseed = time(NULL);
+		}
+	}
+	else {
+		randomseed = time(NULL);
+	}
+	srand(randomseed);
 	Netchan_Init( rand() % 0xffff );	// pick a port value that should be nice and random
 
 	VM_Init();

@@ -325,6 +325,7 @@ extern	cvar_t	*sv_gameFpsAllowIrregular;
 extern	cvar_t	*sv_gameFpsSpecFix; // bitmask: 1 = call game spectator run frame if supported. 2 = hack update followers serverside.
 //extern	cvar_t	*sv_botFps;
 //extern	cvar_t	*sv_botFpsAllowIrregular;
+extern	cvar_t	*sv_trueRandomSeed; // generate a truly random seed for game module. 1 = for library vm, 2 = always even qvm (is this ok?)
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
 extern	cvar_t	*sv_rconPassword;
