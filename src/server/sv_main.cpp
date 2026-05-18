@@ -498,6 +498,19 @@ static qboolean SVC_RateLimitAddress(netadr_t from, int burst, int period, int n
 	return SVC_RateLimit(bucket, burst, period, now);
 }
 
+int SV_GetIronmannerCount() {
+	int		ironmen = 0;
+	int		i;
+	client_t* cl;
+	for (i = 0; i < sv_maxclients->integer; i++) {
+		cl = &svs.clients[i];
+		if (cl->state >= CS_CONNECTED && cl->mode == 5) { // mode 5 is ironman mode in tommyternal game (disgusting i know, gotta find a nicer way...)
+			ironmen++;
+		}
+	}
+	return ironmen;
+}
+
 /*
 ================
 SVC_Status
@@ -516,6 +529,7 @@ void SVC_Status( netadr_t from ) {
 	size_t	statusLength;
 	size_t	playerLength;
 	char	infostring[MAX_INFO_STRING];
+	int		ironmen;
 
 	strcpy( infostring, Cvar_InfoString( CVAR_SERVERINFO ) );
 
@@ -530,6 +544,11 @@ void SVC_Status( netadr_t from ) {
 		Com_sprintf( keywords, sizeof( keywords ), "demo %s",
 			Info_ValueForKey( infostring, "sv_keywords" ) );
 		Info_SetValueForKey( infostring, "sv_keywords", keywords );
+	}
+
+	if (com_coolApi_supported_game->integer) { // just to check if its tommyternal game module at all
+		ironmen = SV_GetIronmannerCount();
+		Info_SetValueForKey(infostring, "ironmen", va("%d", ironmen));
 	}
 
 	status[0] = 0;

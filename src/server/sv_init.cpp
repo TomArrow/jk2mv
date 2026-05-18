@@ -66,6 +66,11 @@ void SV_SetConfigstring (int index, const char *val) {
 	Z_Free( (void *)sv.configstrings[index] );
 	sv.configstrings[index] = CopyString( val );
 
+	if (com_coolApi_supported_game->integer && index >= CS_PLAYERS && index < CS_PLAYERS + sv_maxclients->integer && svs.clients) {
+		// just checking com_coolApi_supported_game->integer to make sure we are dealing with tommyternal game (lame i know)
+		(svs.clients+(index- CS_PLAYERS))->mode = atoi(Info_ValueForKey(val,"mode"));
+	}
+
 	// send it to all the clients if we aren't
 	// spawning a new server
 	if ( sv.state == SS_GAME || sv.restarting ) {

@@ -260,6 +260,8 @@ typedef struct client_s {
 
 	int64_t			lastPingHackWarning;
 	int64_t			lastPingHackPublicWarning;
+
+	int				mode; // tracking game mode for tommyternal. 5 is ironman
 } client_t;
 
 //=============================================================================
