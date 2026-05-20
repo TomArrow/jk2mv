@@ -4212,6 +4212,8 @@ static void FS_Startup( const char *gameName ) {
 	int s;
 	searchpath_t *search;
 
+	fs_packFiles = 0;
+
 	Com_Printf( "----- FS_Startup -----\n" );
 
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
