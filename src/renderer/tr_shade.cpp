@@ -454,6 +454,10 @@ static void DrawTris (shaderCommands_t *input) {
 	GL_Bind( tr.whiteImage );
 	qglColor3f (1,1,1);
 
+	if (r_showtris->integer > 1) {
+		GL_Cull(CT_TWO_SIDED);
+	}
+
 	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
 	qglDepthRange( 0, 0 );
 

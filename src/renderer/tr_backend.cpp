@@ -1251,6 +1251,15 @@ const void	*RB_DrawBuffer( const void *data ) {
 
 	cmd = (const drawBufferCommand_t *)data;
 
+	if (glConfig.deviceSupportsDepthClamp ) {
+		if (r_depthClamp->integer) {
+			qglEnable(GL_DEPTH_CLAMP);
+		}
+		else {
+			qglDisable(GL_DEPTH_CLAMP);
+		}
+	}
+
 	qglDrawBuffer( cmd->buffer );
 	qglReadBuffer( cmd->buffer );
 

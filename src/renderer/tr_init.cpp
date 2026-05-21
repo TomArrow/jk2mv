@@ -132,6 +132,7 @@ cvar_t	*r_uiFullScreen;
 cvar_t	*r_shadows;
 cvar_t	*r_stencilSky;
 cvar_t	*r_stencilShadowColor;
+cvar_t	*r_stencilShadowZFail;
 cvar_t	*r_flares;
 cvar_t	*r_aspectratio;
 cvar_t	*r_nobind;
@@ -199,6 +200,7 @@ cvar_t	*r_modelpoolmegs;
 
 cvar_t	*r_drawAllAreas;
 cvar_t	*r_imageLoadLowMem;
+cvar_t	*r_depthClamp;
 
 cvar_t *r_screenshotJpegQuality;
 
@@ -496,6 +498,15 @@ static void GLimp_InitExtensions(void) {
 		}
 	} else {
 		Com_Printf("...GL_ARB_multitexture not found\n");
+	}
+
+	glConfig.deviceSupportsDepthClamp = qfalse;
+	if (GL_CheckForExtension("GL_ARB_depth_clamp")) {
+		Com_Printf("...using GL_ARB_depth_clamp\n");
+		glConfig.deviceSupportsDepthClamp = qtrue;
+	}
+	else {
+		Com_Printf("...GL_ARB_depth_clamp not found\n");
 	}
 
 	// GL_EXT_compiled_vertex_array
@@ -1249,6 +1260,7 @@ void R_Register( void )
 	r_printShaders = ri.Cvar_Get( "r_printShaders", "0", 0 );
 
 	r_imageLoadLowMem = ri.Cvar_Get( "r_imageLoadLowMem", "0", CVAR_ARCHIVE );
+	r_depthClamp = ri.Cvar_Get( "r_depthClamp", "1", CVAR_CHEAT );
 
 	r_surfaceSprites = ri.Cvar_Get ("r_surfaceSprites", "1", CVAR_TEMP);
 	r_surfaceWeather = ri.Cvar_Get ("r_surfaceWeather", "0", CVAR_TEMP);
@@ -1305,6 +1317,7 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_TEMP);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 	r_stencilSky = ri.Cvar_Get( "r_stencilSky", "1", CVAR_ARCHIVE );
+	r_stencilShadowZFail = ri.Cvar_Get( "r_stencilShadowZFail", "1", CVAR_ARCHIVE );
 	r_stencilShadowColor = ri.Cvar_Get( "r_stencilShadowColor", "0.6", CVAR_ARCHIVE );
 	r_stencilShadowColor->modified = qtrue;
 

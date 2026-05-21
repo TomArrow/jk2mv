@@ -1355,6 +1355,7 @@ extern	cvar_t	*r_clear;						// force screen clear every frame
 extern	cvar_t	*r_shadows;						// controls shadows: 0 = none, 1 = blur, 2 = stencil, 3 = black planar projection
 extern	cvar_t	*r_stencilSky;					// use stencils to allow drawing multiple skies without overlap issues
 extern	cvar_t	*r_stencilShadowColor;			// color of stencil shadows
+extern	cvar_t	*r_stencilShadowZFail;			// use z-fail for stencil shadows
 extern	cvar_t	*r_flares;						// light flares
 
 extern	cvar_t	*r_intensity;
@@ -1386,6 +1387,7 @@ extern	cvar_t	*r_debugSort;
 
 extern	cvar_t	*r_drawAllAreas;
 extern	cvar_t	*r_imageLoadLowMem;
+extern	cvar_t	*r_depthClamp;
 
 extern	cvar_t	*r_printShaders;
 

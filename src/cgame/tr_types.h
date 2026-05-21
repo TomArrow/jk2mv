@@ -382,6 +382,8 @@ typedef struct {
 	qboolean				deviceSupportsHackPortals;
 	qboolean				deviceSupportsHackPortalAlphaUnPremultiply;
 
+	qboolean				deviceSupportsDepthClamp;
+
 	//
 	// following variables can change every frame!
 	//
