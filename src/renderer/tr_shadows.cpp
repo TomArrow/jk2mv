@@ -162,7 +162,7 @@ void RB_ShadowTessEnd( void ) {
 	int		numTris;
 	vec3_t	lightDir;
 	float	expandLength = 512;
-	qboolean	zFail = (qboolean)(r_stencilShadowZFail->integer && glConfig.deviceSupportsDepthClamp && r_depthClamp->integer);
+	qboolean	zFail = (qboolean)(r_stencilShadowZFail->integer && glConfig.deviceSupportsDepthClamp && (r_depthClamp->integer || !clRenderInfo.wallhackOk));
 
 	// TODO Depth Fail ("Carmack's Reverse")?
 	// TODO reject normals that align with the shadow/light direction, so we don't shadow undersides of stuff (looks bad)

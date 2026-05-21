@@ -1252,7 +1252,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 	cmd = (const drawBufferCommand_t *)data;
 
 	if (glConfig.deviceSupportsDepthClamp ) {
-		if (r_depthClamp->integer) {
+		if (r_depthClamp->integer || !clRenderInfo.wallhackOk) {
 			qglEnable(GL_DEPTH_CLAMP);
 		}
 		else {

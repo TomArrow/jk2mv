@@ -1260,7 +1260,7 @@ void R_Register( void )
 	r_printShaders = ri.Cvar_Get( "r_printShaders", "0", 0 );
 
 	r_imageLoadLowMem = ri.Cvar_Get( "r_imageLoadLowMem", "0", CVAR_ARCHIVE );
-	r_depthClamp = ri.Cvar_Get( "r_depthClamp", "1", CVAR_CHEAT );
+	r_depthClamp = ri.Cvar_Get( "r_depthClamp", "1", CVAR_ARCHIVE );
 
 	r_surfaceSprites = ri.Cvar_Get ("r_surfaceSprites", "1", CVAR_TEMP);
 	r_surfaceWeather = ri.Cvar_Get ("r_surfaceWeather", "0", CVAR_TEMP);
