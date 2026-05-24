@@ -3237,7 +3237,9 @@ void Com_Frame( qboolean noDelay) {
 			timeVal = com_frameTime - lastTime;
 			bias += timeVal - minMsec;
 
-			if (bias > minMsec)
+			if (minMsec > 0 && bias > minMsec - 1) 
+				bias = minMsec - 1; // if 0 isn't allowed, don't drop to 0, or our cls.realtime tracking goes crazy due to Com_ModifyMsec() pushing 0 to 1 (actual measured time <=> tracked time)
+			else if (bias > minMsec)
 				bias = minMsec;
 
 			// Adjust minMsec if previous frame took too long to render so
