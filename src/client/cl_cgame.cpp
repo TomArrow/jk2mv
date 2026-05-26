@@ -2,6 +2,7 @@
 
 #include "client.h"
 #include <chrono>
+#include <algorithm>
 #include "../game/botlib.h"
 
 #if !defined(FX_EXPORT_H_INC)
@@ -2001,10 +2002,6 @@ void CL_CGameRendering( stereoFrame_t stereo ) {
 	VM_Debug( 0 );
 }
 
-int	sortDeltas(const void *a, const void *b) {
-	return (*(int*)a - *(int*)b);
-}
-
 int CL_GetLowValueMedianDelta(int newDelta) {
 
 	//if (!cl_smoothenSnapLag->integer) {
@@ -2020,8 +2017,8 @@ int CL_GetLowValueMedianDelta(int newDelta) {
 		// recalculate median
 		deltasCount = MIN(cl.serverTimeDeltaSmooth.pastDeltasCount, SERVERTIME_DELTA_SMOOTH_SAMPLES);
 		memcpy(deltasCopy, cl.serverTimeDeltaSmooth.pastDeltas,deltasCount*sizeof(deltasCopy[0]));
-		qsort(deltasCopy, deltasCount, sizeof(deltasCopy[0]), sortDeltas);
 		medianIndex = deltasCount / 20; // divide by 10, then by 2
+		std::nth_element(deltasCopy, deltasCopy+medianIndex, deltasCopy+ SERVERTIME_DELTA_SMOOTH_SAMPLES);
 		cl.serverTimeDeltaSmooth.medianValue = deltasCopy[medianIndex];
 		cl.serverTimeDeltaSmooth.lastDeltaTime = cls.realtime;
 	}
