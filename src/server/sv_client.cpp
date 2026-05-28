@@ -382,6 +382,10 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		return;		// already dropped
 	}
 
+	if (com_developer->integer) {
+		Com_Printf("Dropping client with userinfo: %s\n",drop->userinfo);
+	}
+
 	if (drop->netchan.remoteAddress.type != NA_BOT) {
 		// see if we already have a challenge for this ip
 		challenge = &svs.challenges[0];
