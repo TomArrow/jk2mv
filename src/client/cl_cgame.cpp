@@ -2004,9 +2004,7 @@ void CL_CGameRendering( stereoFrame_t stereo ) {
 
 int CL_GetLowValueMedianDelta(int newDelta) {
 
-	//if (!cl_smoothenSnapLag->integer) {
-	//	return newDelta;
-	//}
+	// TODO sanity check if we need to account for wrapping behavior with the delta
 
 	if (cls.realtime - cl.serverTimeDeltaSmooth.lastDeltaTime >= 100 || !cl.serverTimeDeltaSmooth.lastDeltaTime || cl.serverTimeDeltaSmooth.pastDeltasCount) {
 		int deltasCopy[SERVERTIME_DELTA_SMOOTH_SAMPLES];
@@ -2017,8 +2015,13 @@ int CL_GetLowValueMedianDelta(int newDelta) {
 		// recalculate median
 		deltasCount = MIN(cl.serverTimeDeltaSmooth.pastDeltasCount, SERVERTIME_DELTA_SMOOTH_SAMPLES);
 		memcpy(deltasCopy, cl.serverTimeDeltaSmooth.pastDeltas,deltasCount*sizeof(deltasCopy[0]));
-		medianIndex = deltasCount / 20; // divide by 10, then by 2
-		std::nth_element(deltasCopy, deltasCopy+medianIndex, deltasCopy+ SERVERTIME_DELTA_SMOOTH_SAMPLES);
+		// short explainer: the delta is cl.snap.serverTime minus cls.realtime. if there is increased network delay from server to us,
+		// we receive the snap later, therefore our cl.snap.serverTime will increase slower than cls.realtime, therefore the delta will decrease.
+		// therefore the samples with the highest delta implicitly are the ones we got with the least delay
+		// therefore cl_smoothenSnapLagMedianPercentile is by default 94. We pick a "median" near the highest deltas
+		// as it filters out strongly delayed snap deltas
+		medianIndex = std::clamp(cl_smoothenSnapLagMedianPercentile->integer * deltasCount / 100, 0, deltasCount - 1);
+		std::nth_element(deltasCopy, deltasCopy+medianIndex, deltasCopy+ deltasCount);
 		cl.serverTimeDeltaSmooth.medianValue = deltasCopy[medianIndex];
 		cl.serverTimeDeltaSmooth.lastDeltaTime = cls.realtime;
 	}
