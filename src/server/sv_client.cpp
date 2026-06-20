@@ -1348,7 +1348,8 @@ void SV_UserinfoChanged( client_t *cl ) {
 	// to not get confused by us reading CS_PLAYERS and setting it here and it then basically forming a loop where game is 
 	// trying to modify its own modification
 	if ((com_coolApi_supported_game->integer & COOL_APIFEATURE_CLIENTREALNAME)) {
-		if (!Info_SetValueForKey(cl->userinfo, "ttrn", Info_ValueForKey(cl->userinfo, "name")))
+		const char* n = Info_ValueForKey(cl->userinfo, "name");
+		if (*n && !Info_SetValueForKey(cl->userinfo, "ttrn", n)) // Info_SetValueForKey returns qfalse if input has zero length
 		{
 			SV_DropClient(cl, "userinfo string length exceeded");
 			return;
