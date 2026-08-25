@@ -490,12 +490,17 @@ int EmitCallDoSyscall(vm_t *vm)
 
 	// Push important registers to stack as we can't really make
 	// any assumptions about calling conventions.
-	EmitString("51");			// push ebx
+	EmitString("51");			// push ecx
+	EmitString("53");			// push ebx
 	EmitString("56");			// push esi
 	EmitString("57");			// push edi
 #if idx64
 	EmitRexString(0x41, "50");		// push r8
 	EmitRexString(0x41, "51");		// push r9
+	EmitRexString(0x41, "54");		// push r12
+	EmitRexString(0x41, "55");		// push r13
+	EmitRexString(0x41, "56");		// push r14
+	EmitRexString(0x41, "57");		// push r15
 #endif
 
 	// write arguments to global vars
@@ -520,25 +525,39 @@ int EmitCallDoSyscall(vm_t *vm)
 	EmitPtr(&vm_arg);
 
 	// align the stack pointer to a 16-byte-boundary
+#if defined(_MSC_VER) && defined(idx64)
+	EmitRexString(0x48, "89 E6");		// mov esi, esp
+	EmitRexString(0x48, "83 E4 F0");	// and esp, 0xFFFFFFF0
+#else
 	EmitRexString(0x48, "89 E0");		// mov eax, esp
 	EmitString("51");					// push ecx (decrease esp in a portable way)
 	EmitRexString(0x48, "83 E4 F0");	// and esp, 0xFFFFFFF0
 	EmitString("59");					// pop ecx (increase esp in a portable way)
 	EmitString("50");					// push eax
+#endif
 
 	// call the syscall wrapper function DoSyscall()
 
 	EmitString("FF D2");			// call edx
 
 	// reset the stack pointer to its previous value
+#if defined(_MSC_VER) && defined(idx64)
+	EmitRexString(0x48, "89 F4");		// mov esp, esi
+#else
 	EmitString("5C");				// pop esp
+#endif
 #if idx64
+	EmitRexString(0x41, "5F");		// pop r15
+	EmitRexString(0x41, "5E");		// pop r14
+	EmitRexString(0x41, "5D");		// pop r13
+	EmitRexString(0x41, "5C");		// pop r12
 	EmitRexString(0x41, "59");		// pop r9
 	EmitRexString(0x41, "58");		// pop r8
 #endif
 	EmitString("5F");			// pop edi
 	EmitString("5E");			// pop esi
-	EmitString("59");			// pop ebx
+	EmitString("58");			// pop ebx
+	EmitString("59");			// pop ecx
 
 	// restore frame pointer
 	EmitString("5D");			// pop ebp
