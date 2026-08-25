@@ -226,6 +226,8 @@ void Con_Copy(void) {
 	int				bufferlen, savebufferlen;
 	char			*savebuffer;
 
+	buffer[0] = '\0';
+
 	// skip empty lines
 	for (l = 1, empty = qtrue; l < con.totallines && empty; l++)
 	{
@@ -311,16 +313,18 @@ void Con_CopyLink(void) {
 	const char *link = NULL, *point1, *point2, *point3;
 	qboolean containsNum = qfalse, containsPoint = qfalse;
 
-	buffer = (char *)Hunk_AllocateTempMemory(con.linewidth);
+	buffer = (char *)Hunk_AllocateTempMemory(con.linewidth+1);
 
 	for (l = con.current; l >= con.current - 32; l--)
 	{
-		line = con.text + (l%con.totallines)*con.linewidth;
+		line = con.text  + (l%con.totallines)*con.rowwidth;
 		for (i = 0; i < con.linewidth; i++) {
 			buffer[i] = (char)(line[i].f.character);// & 0xff);
 			if (!containsNum && Q_isanumber(&buffer[i])) containsNum = qtrue;
 			if (!containsPoint && buffer[i] == '.') containsPoint = qtrue;
 		}
+		buffer[i] = '\0';
+
 		// Clear spaces at end of buffer
 		for (x = con.linewidth - 1; x >= 0; x--) {
 			if (buffer[x] == ' ')
@@ -331,10 +335,13 @@ void Con_CopyLink(void) {
 		Q_StripColor(buffer, (qboolean)(r_fullbright->integer >= 200000 && r_fullbright->integer <= 200001));
 		if ((link = Q_stristr(buffer, "://")) || (link = Q_stristr(buffer, "www."))) {
 			// Move link ptr back until it hits a space or first char of string
-			while (link != &buffer[0] && *(link - 1) != ' ') link--;
+			while (link != &buffer[0] && *(link - 1) != ' ' && *(link - 1) != '"') link--;
 			for (i = 0; buffer[i] != 0; i++) {
 				buffer[i] = *link++;
-				if (*link == ' ' || *link == '"') buffer[i + 1] = 0;
+				if (*link == ' ' || *link == '"' || !*link) { 
+					buffer[i + 1] = 0;
+					break;
+				}
 			}
 			Sys_SetClipboardData(buffer);
 			Com_Printf("^2Link ^7\"%s\" ^2Copied!\n", buffer);
