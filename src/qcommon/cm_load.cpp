@@ -684,6 +684,8 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 		return;
 	}
 
+	MiniMap_MakeMinimap(name);
+
 	// free old stuff
 	CM_ClearMap();
 

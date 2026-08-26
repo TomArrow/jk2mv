@@ -1009,6 +1009,7 @@ vec_t Distance( const vec3_t p1, const vec3_t p2 );
 void VectorNormalizeFast( vec3_t v );
 void VectorInverse( vec3_t v );
 vec_t VectorNormalize (vec3_t v);		// returns vector length
+vec_t Vector2Normalize(vec2_t v);		// returns vector2 length
 vec_t VectorNormalize2( const vec3_t v, vec3_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
 

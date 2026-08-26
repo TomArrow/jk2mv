@@ -148,6 +148,7 @@ if (BuildMVMP OR BuildMVDED)
 		"qcommon/GenericParser2.cpp"
 		"qcommon/RoffSystem.cpp"
 		"qcommon/cm_load.cpp"
+		"qcommon/cm_minimap.cpp"
 		"qcommon/cm_patch.cpp"
 		"qcommon/cm_polylib.cpp"
 		"qcommon/cm_test.cpp"

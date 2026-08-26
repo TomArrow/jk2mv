@@ -202,3 +202,8 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 void CM_ClearLevelPatches( void );
 
+
+
+// cm_minimap.cpp
+qboolean MiniMap_MakeMinimap(const char* name);
+
