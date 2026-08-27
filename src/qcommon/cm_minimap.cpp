@@ -426,11 +426,6 @@ qboolean MiniMap_Load(const char* name) {
 	// load the file
 	//
 
-	//
-	// load the file into a buffer that we either discard as usual at the bottom, or if we've got enough memory
-	//	then keep it long enough to save the renderer re-loading it (if not dedicated server),
-	//	then discard it after that...
-	//
 	buf = NULL;
 	fileHandle_t h;
 	const int iBSPLen = FS_FOpenFileRead(name, &h, qfalse);
@@ -438,9 +433,6 @@ qboolean MiniMap_Load(const char* name) {
 	{
 		minimapBspCache = malloc(iBSPLen);
 		FS_Read(minimapBspCache, iBSPLen, h);
-
-		int pakChecksum = FS_WhichPack_f(h);
-		Cvar_Set("cm_checksumPak", va("%d", pakChecksum));
 
 		FS_FCloseFile(h);
 
@@ -483,8 +475,14 @@ qboolean MiniMap_Load(const char* name) {
 
 }
 
-void MiniMap_Draw(int imageWidth, int imageHeight) {
+const char* MiniMap_Draw(int imageWidth, int imageHeight, qboolean autoShrink = qtrue, byte* floatbuf = NULL, int floatbufsize = NULL, int* finalWidth = NULL, int* finalHeight = NULL) {
 
+	if (finalWidth) {
+		*finalWidth = 0;
+	}
+	if (finalHeight) {
+		*finalHeight = 0;
+	}
 
 	// figure out total map dimensions
 	float minX = FLT_MAX, maxX = -FLT_MAX;
@@ -522,12 +520,29 @@ void MiniMap_Draw(int imageWidth, int imageHeight) {
 		imageHeight = tmp;
 		rotated = qtrue;
 	}
+	if (autoShrink) {
+		float sideRatio = xRange / yRange;
+		float sideRatioOut = (float)imageWidth / (float)imageHeight;
+		sideRatioOut *= rotated ? 2.0f : 0.5f;
+		if (sideRatio > sideRatioOut) {
+			imageHeight*= sideRatioOut / sideRatio;
+		}
+		else if (sideRatioOut > sideRatio) {
+			imageWidth *= sideRatio / sideRatioOut;
+		}
+		if (imageHeight < 2) {
+			imageHeight = 2;
+		}
+		if (imageWidth < 2) {
+			imageWidth = 2;
+		}
+	}
 	int stride = imageWidth * 3;
 	int dataSize = stride * sizeof(float) * imageHeight;
 	float* imgData = (float*)calloc(1, dataSize);
 
 	if (!imgData) {
-		return;
+		return NULL;
 	}
 
 	for (int i = 0; i < faceTriangles.size(); i++) {
@@ -629,7 +644,7 @@ void MiniMap_Draw(int imageWidth, int imageHeight) {
 	char* asText = (char*)malloc(textSize);
 	if (!asText) {
 		free(imgData);
-		return;
+		return NULL;
 	}
 	asText[textSize - 1] = '\0';
 	for (int y = 0; y < imageHeight; y++) {
@@ -658,20 +673,32 @@ void MiniMap_Draw(int imageWidth, int imageHeight) {
 		asText[y * textStride + imageWidth] = '\n';
 	}
 
-	FS_WriteFile("debugdumps/minimap.raw",imgData, dataSize);
-	Com_Printf("%s", asText);
-	free(imgData);
-	free(asText);
+	//FS_WriteFile("debugdumps/minimap.raw",imgData, dataSize);
+	//if (com_developer->integer) {
+	//	Com_Printf("%s", asText);
+	//}
 
-	return;
+	if (floatbuf) {
+		memcpy(floatbuf,imgData,MIN(dataSize,floatbufsize));
+	}
+	if (finalWidth) {
+		*finalWidth = imageWidth;
+	}
+	if (finalHeight) {
+		*finalHeight = imageHeight;
+	}
+
+	free(imgData);
+
+	return asText;
 }
 
-qboolean MiniMap_MakeMinimap(const char* name) {
+const char* MiniMap_MakeMinimap(const char* name, int width, int height, qboolean autoShrink, byte* floatbuf, int floatbufsize, int* finalWidth, int* finalHeight) {
 	if (!MiniMap_Load(name)) {
-		return qfalse;
+		return NULL;
 	}
-	MiniMap_Draw(90, 25);
+	const char* minimapASCII = MiniMap_Draw(width, height, autoShrink, floatbuf, floatbufsize, finalWidth, finalHeight);
 	MiniMap_ClearMap();
-	return qtrue;
+	return minimapASCII;
 }
 

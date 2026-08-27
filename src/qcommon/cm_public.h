@@ -71,4 +71,10 @@ void CM_LoadShaderText(qboolean forceReload);
 
 void CM_SetBrushModelContentFlags(int modelIndex, int flags, coolApiSetBModelCFlagsMode_t setMode);
 
+
+
+
+// cm_minimap.cpp
+const char* MiniMap_MakeMinimap(const char* name, int width, int height, qboolean autoShrink = qtrue, byte* floatbuf = NULL, int floatbufsize = NULL, int* finalWidth = NULL, int* finalHeight = NULL);
+
 #endif // _CM_PUBLIC_H_

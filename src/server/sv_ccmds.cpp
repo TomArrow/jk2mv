@@ -136,6 +136,20 @@ static client_t *SV_GetPlayerByNum( void ) {
 
 
 
+// show us an ascii version of a map. if we dont find the map, forward to server.
+void SV_PeekMap_f(void) {
+	if (Cmd_Argc() == 1) { // just in case its some specific server thing?
+		return;
+	}
+	const char* ascii = MiniMap_MakeMinimap(va("maps/%s.bsp", Cmd_Argv(1)), 90, 25, qtrue);
+	if (ascii) {
+		Com_Printf("%s\n", ascii);
+		free((void*)ascii);
+		return;
+	}
+}
+
+
 /*
 ==================
 SV_Map_f
@@ -1858,7 +1872,9 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand ("map_restart", SV_MapRestart_f);
 	Cmd_AddCommand ("sectorlist", SV_SectorList_f);
 	Cmd_AddCommand ("map", SV_Map_f);
+	Cmd_AddCommand ("peekmap", SV_PeekMap_f);
 	Cmd_SetCommandCompletionFunc( "map", SV_CompleteMapName );
+	Cmd_SetCommandCompletionFunc( "peekmap", SV_CompleteMapName );
 	Cmd_AddCommand ("devmap", SV_Map_f);
 	Cmd_SetCommandCompletionFunc( "devmap", SV_CompleteMapName );
 	Cmd_AddCommand ("spmap", SV_Map_f);

@@ -46,6 +46,7 @@ cvar_t		*cm_playerCurveClip;
 // shitty "API" for game module.
 cvar_t		*cm_checksumBsp;
 cvar_t		*cm_checksumPak;
+cvar_t		*cm_miniMapASCII;
 
 cmodel_t	box_model;
 cplane_t	*box_planes;
@@ -677,6 +678,7 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 #endif
 	cm_checksumBsp = Cvar_Get("cm_checksumBsp", "0", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_NORESTART);
 	cm_checksumPak = Cvar_Get("cm_checksumPak", "0", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_NORESTART);
+	cm_miniMapASCII = Cvar_Get("cm_miniMapASCII", "", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_NORESTART);
 	Com_DPrintf( "CM_LoadMap( %s, %i )\n", name, clientload );
 
 	if ( !strcmp( cm.name, name ) && clientload ) {
@@ -684,10 +686,18 @@ static void CM_LoadMap_Actual( const char *name, qboolean clientload, int *check
 		return;
 	}
 
-	MiniMap_MakeMinimap(name);
-
 	// free old stuff
 	CM_ClearMap();
+
+	const char* minimapASCII = MiniMap_MakeMinimap(name, 90, 25, qtrue);
+	if (minimapASCII) {
+		Cvar_Set("cm_miniMapASCII", minimapASCII);
+		if (com_developer->integer) {
+			Com_Printf("ASCII minimap for '%s' generated:\n%s\n", name, minimapASCII);
+		}
+		free((void*)minimapASCII);
+		minimapASCII = NULL;
+	}
 
 	if ( !name[0] ) {
 		cm.numLeafs = 1;

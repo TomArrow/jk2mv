@@ -1245,6 +1245,27 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		}
 		}
 	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_ASCIIMINIMAP) {
+		switch (args[0]) {
+
+		case G_COOL_API_MAKEASCIIMINIMAP:
+		{
+			const char* bspfile = VMAS(1);
+			int buffersize = args[3];
+			char* buffer = VMAP(2, char, args[3]);
+			byte* floatbuf = args[7] ? VMAP(7, byte, args[8]) : NULL;
+			const char* minimapASCII = MiniMap_MakeMinimap(bspfile,args[4], args[5], (qboolean)args[6], floatbuf, args[8], VMAP(9, int, 1), VMAP(10, int, 1));
+			if (minimapASCII) {
+				Q_strncpyz(buffer,minimapASCII,buffersize);
+				free((void*)minimapASCII);
+				return qtrue;
+			}
+			else {
+				return qfalse;
+			}
+		}
+		}
+	}
 	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MARIADB) {
 		switch (args[0]) {
 		case G_COOL_API_DB_ESCAPESTRING:

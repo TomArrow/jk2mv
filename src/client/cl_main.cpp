@@ -3676,6 +3676,31 @@ void CL_ForceChanged_f( void ) {
 	}
 }
 
+// show us an ascii version of a map. if we dont find the map, forward to server.
+void CL_PeekMap_f(void) {
+	if (Cmd_Argc() == 1) { // just in case its some specific server thing?
+		Cmd_ForwardToServer();
+		return;
+	}
+	const char* ascii = MiniMap_MakeMinimap(va("maps/%s.bsp",Cmd_Argv(1)), 90, 25, qtrue );
+	if (ascii) {
+		Com_Printf("%s\n",ascii);
+		free((void*)ascii);
+		return;
+	}
+	Cmd_ForwardToServer(); // map not found. forward to server
+}
+
+/*
+==================
+SV_CompleteMapName
+==================
+*/
+static void CL_CompleteMapName(char* args, int argNum) { // for auto-complete (copied from OpenJK)
+	if (argNum == 2)
+		Field_CompleteFilename("maps", ".bsp", qtrue);
+}
+
 #ifdef G2_COLLISION_ENABLED
 #define G2_VERT_SPACE_CLIENT_SIZE 256
 #endif
@@ -3948,6 +3973,8 @@ void CL_Init( void ) {
 	Cmd_SetCommandCompletionFunc( "team_model", CL_CompleteModelName );
 	Cmd_AddCommand ("forcepowers", CL_SetForcePowers_f );
 	Cmd_AddCommand ("forcechanged", CL_ForceChanged_f );
+	Cmd_AddCommand ("peekmap", CL_PeekMap_f);
+	Cmd_SetCommandCompletionFunc("peekmap", CL_CompleteMapName);
 	Cmd_AddCommand ("saveDemo", demoAutoSave_f);
 	Cmd_AddCommand ("saveDemoLast", demoAutoSaveLast_f);
 	Cmd_AddCommand ("video", CL_Video_f);
