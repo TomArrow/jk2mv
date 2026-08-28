@@ -134,10 +134,18 @@ static client_t *SV_GetPlayerByNum( void ) {
 
 //=========================================================
 
-
+#if !DEDICATED
+void CL_PeekMap_f(void);
+#endif
 
 // show us an ascii version of a map. if we dont find the map, forward to server.
 void SV_PeekMap_f(void) {
+#if !DEDICATED
+	if (!com_dedicated->integer) { // MEH. call the client version instead. which does forwarding of the cmd to the server if needed
+		CL_PeekMap_f();
+		return;
+	}
+#endif
 	if (Cmd_Argc() == 1) { // just in case its some specific server thing?
 		return;
 	}
