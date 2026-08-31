@@ -386,6 +386,7 @@ const char* get_filename_ext(const char* filename) {
 static char* logCfgExtensions[] = {
 	"log",
 	"cfg",
+	"dat", // e.g. bs records
 };
 static int logCfgExtensionsAmount = sizeof(logCfgExtensions) / sizeof(logCfgExtensions[0]);
 
