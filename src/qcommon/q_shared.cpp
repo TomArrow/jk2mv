@@ -1559,7 +1559,7 @@ qboolean Info_SetValueForKey(char *s, const char *key, const char *value) {
 
 	// q3infoboom exploit
 	if (strlen(newi) + strlen(s) >= MAX_INFO_STRING) {
-		Com_Printf("Info string length exceeded\n");
+		Com_Printf("Info string length exceeded on key '%s'\n",key);
 		return qfalse;
 	}
 
@@ -1606,7 +1606,7 @@ void Info_SetValueForKey_Big(char *s, const char *key, const char *value) {
 
 	// q3infoboom exploit
 	if (strlen(newi) + strlen(s) >= BIG_INFO_STRING) {
-		Com_Printf("BIG Info string length exceeded\n");
+		Com_Printf("BIG Info string length exceeded on key '%s'\n",key);
 		return;
 	}
 
