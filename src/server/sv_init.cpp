@@ -1035,6 +1035,7 @@ void SV_Init (void) {
 	sv_crossServerCommandIdent = Cvar_Get("sv_crossServerCommandIdent", "", CVAR_ARCHIVE);
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
+	sv_allowNWHClients = Cvar_Get("sv_allowNWHClients", "0", CVAR_ARCHIVE); // Allow nwh clients to connect, its just a server flag
 
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 

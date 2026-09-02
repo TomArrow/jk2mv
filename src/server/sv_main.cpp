@@ -79,6 +79,8 @@ cvar_t* sv_crossServerCommandIdent;
 
 cvar_t* sv_specAllEnts;
 
+cvar_t* sv_allowNWHClients;
+
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;
 cvar_t	*mv_fixforcecrash;
@@ -551,6 +553,13 @@ void SVC_Status( netadr_t from ) {
 		Info_SetValueForKey(infostring, "ironmen", va("%d", ironmen));
 	}
 
+	if (sv_allowNWHClients->integer) {
+		// allow nwh clients to connect, no hacking involved :)
+		// prefix the nwh-specific hostname with [not nwh] as well to not mislead people
+		Info_SetValueForKey(infostring, "nwh", "1");
+		Info_SetValueForKey(infostring, "sv_hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+	}
+
 	status[0] = 0;
 	statusLength = 0;
 
@@ -604,6 +613,13 @@ void SVC_Info( netadr_t from ) {
 	// echo back the parameter to status. so servers can use it as a challenge
 	// to prevent timed spoofed reply packets that add ghost servers
 	Info_SetValueForKey( infostring, "challenge", Cmd_Argv(1) );
+
+	if (sv_allowNWHClients->integer) {
+		// allow nwh clients to connect, no hacking involved :)
+		// prefix the nwh-specific hostname with [not nwh] as well to not mislead people
+		Info_SetValueForKey(infostring, "nwh", "1");
+		Info_SetValueForKey(infostring, "hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+	}
 
 	Info_SetValueForKey( infostring, "protocol", va("%i", MV_GetCurrentProtocol()) );
 	Info_SetValueForKey( infostring, "hostname", sv_hostname->string );

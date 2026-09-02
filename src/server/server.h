@@ -262,6 +262,8 @@ typedef struct client_s {
 	int64_t			lastPingHackPublicWarning;
 
 	int				mode; // tracking game mode for tommyternal. 5 is ironman
+	qboolean		nwhClient; // if sv_allowNWHClients 1, NWH clients may connect. They have hexcolors, so do some magic with that.
+	qboolean		nwhClientNotified; // send the user a quick message that this is not an nwh server
 } client_t;
 
 //=============================================================================
@@ -395,6 +397,8 @@ extern	cvar_t* sv_crossServerCommandIdent;
 
 extern	cvar_t* sv_specAllEnts;
 
+extern	cvar_t* sv_allowNWHClients;
+
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
 extern	cvar_t	*mv_fixforcecrash;
@@ -477,6 +481,7 @@ void SV_CloseDownload( client_t *cl );
 int SV_ClientRate( client_t *client );
 int SV_ClientSnaps( client_t *client );
 void SV_ClientUpdateSnaps( client_t *client );
+const char* SV_ConvertHexColors(const char* input, qboolean NT);
 
 //
 // sv_ccmds.c

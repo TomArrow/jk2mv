@@ -1413,6 +1413,10 @@ void SV_SendClientMessages( void ) {
 		// warn user if he has invalid snaps/rate settings
 		if (c->state == CS_ACTIVE) {
 			SV_CheckInvalidUserInfoValues(c);
+			if (c->nwhClient && !c->nwhClientNotified) {
+				SV_SendServerCommand(c,"print \"^2Welcome, NWH user! ^3Please note that this server is ^1NOT^3 an NWH server. Connecting here is possible via a simple compatibility flag and serverside hexcolor conversion. The server does ^1NOT^3 do or emulate NWH client verification. It is a normal JK2 server anyone can connect to.\n\"");
+				c->nwhClientNotified = qtrue;
+			}
 		}
 
 		// generate and send a new message

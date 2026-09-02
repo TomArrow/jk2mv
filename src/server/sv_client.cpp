@@ -1166,6 +1166,57 @@ int SV_GetUserInfoKeyVerifiedNumber(client_t* cl, checkedNumberType_t type) {
 	return atoi(valueString);
 }
 
+// converts a string with nwh colors to NT or base colors
+const char* SV_ConvertHexColors(const char* input, qboolean NT) {
+	static char buf[BIG_INFO_STRING];
+	char* s = buf;
+	char* out = buf;
+	vec4_t colorVec;
+	vec4_t colorVecDiff;
+	Q_strncpyz(buf, input, sizeof(buf)); // nwh colors are always longer than normal colors. we can just keep it all in the smae buffer
+	const vec4_t* colorTable = g_color_table;
+	int colorCount = sizeof(g_color_table) / sizeof(g_color_table[0]);
+
+	if (NT) {
+		colorTable = g_color_table_nt;
+		colorCount = sizeof(g_color_table_nt) / sizeof(g_color_table_nt[0]);
+	}
+
+	while (*s) {
+		if (Q_IsColorStringHex((unsigned char*)s, qtrue)) {
+			int skipCount = 0;
+			Q_parseColorHex(s + 1, colorVec, &skipCount, qtrue);
+			s += 1 + skipCount;
+			// Find closest color
+			// Just use the extended table who cares
+			float closestColorDistance = 999999999999.0f;
+			int chosenColor = 7;
+			for (int i = 0; i < colorCount; i++) {
+				VectorSubtract(colorTable[i], colorVec, colorVecDiff);
+				float distanceHere = VectorLength(colorVecDiff);
+				if (distanceHere < closestColorDistance) {
+					closestColorDistance = distanceHere;
+					chosenColor = i;
+				}
+			}
+			*(out++) = '^';
+			*(out++) = (char)chosenColor;
+			continue;
+		}
+		*(out++)=*(s++);
+	}
+	*out = '\0';
+	return buf;
+}
+
+const char* SV_GetClientName(client_t* client) {
+	const char* name = Info_ValueForKey(client->userinfo, "name");
+	if (client->nwhClient) {
+		name = SV_ConvertHexColors(name,qtrue);
+	}
+	return name;
+}
+
 /*
 =================
 SV_UserinfoChanged
@@ -1179,8 +1230,10 @@ void SV_UserinfoChanged( client_t *cl ) {
 	char		*val;
 	int			i;
 
+	cl->nwhClient = (qboolean)(atoi(Info_ValueForKey(cl->userinfo, "nwh")) == 1);
+
 	// name for C code
-	Q_strncpyz( cl->name, Info_ValueForKey (cl->userinfo, "name"), sizeof(cl->name) );
+	Q_strncpyz( cl->name, SV_GetClientName(cl), sizeof(cl->name) );
 
 	if (!Q_stricmp( "[oldclient]", Info_ValueForKey(cl->userinfo, "ui_singlePlayerActive"))) {
 		cl->ancientClient = qtrue;
@@ -1208,7 +1261,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 
 	if (mv_fixnamecrash->integer && !(sv.fixes & MVFIX_NAMECRASH)) {
 		char name[61], cleanedName[61]; // 60 because some mods increased this
-		Q_strncpyz(name, Info_ValueForKey(cl->userinfo, "name"), sizeof(name));
+		Q_strncpyz(name, SV_GetClientName(cl), sizeof(name));
 		int count = 0;
 
 		for (int i = 0; i < (int)strlen(name); i++) {
@@ -1348,7 +1401,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 	// to not get confused by us reading CS_PLAYERS and setting it here and it then basically forming a loop where game is 
 	// trying to modify its own modification
 	if ((com_coolApi_supported_game->integer & COOL_APIFEATURE_CLIENTREALNAME)) {
-		const char* n = Info_ValueForKey(cl->userinfo, "name");
+		const char* n = SV_GetClientName(cl);
 		if (*n && !Info_SetValueForKey(cl->userinfo, "ttrn", n)) // Info_SetValueForKey returns qfalse if input has zero length
 		{
 			SV_DropClient(cl, "userinfo string length exceeded");
@@ -1599,7 +1652,13 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	// don't allow another command for one second
 	cl->nextReliableTime = svs.time + 1000;
 
-	SV_ExecuteClientCommand( cl, s, clientOk );
+	if (cl->nwhClient && (!Q_stricmp(cmd, "say") || !Q_stricmp(cmd, "say_team") || !Q_stricmp(cmd, "tell") || !Q_stricmp(cmd, "callvote"))) {
+		SV_ExecuteClientCommand(cl, SV_ConvertHexColors(s,qtrue), clientOk);
+	}
+	else {
+		SV_ExecuteClientCommand(cl, s, clientOk);
+	}
+
 
 	cl->lastClientCommand = seq;
 	Com_sprintf(cl->lastClientCommandString, sizeof(cl->lastClientCommandString), "%s", s);
