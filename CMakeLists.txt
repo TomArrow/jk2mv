@@ -46,6 +46,7 @@ endif()
 option(DEBUG_FASTTRACE "Even in a debug build, optimize source files responsible for tracing (cm_)" OFF)
 option(WITH_MARIADB "Include MariaDB support (doesn't work on WinXP)" ON)
 option(WITH_BCRYPT "Use Windows Bcrypt API (doesn't work on WinXP)" ON)
+option(WITH_ANALYSIS "Enable -fanalyzer switch for GCC" OFF)
 option(FOR_WINXP "Disable all features that Windows XP doesn't provide'" OFF)
 option(BuildPortableVersion "Build portable version (does not read or write files from your user/home directory" ON)
 option(BuildMVMP "Whether to create targets for the client (eternaljk2mvmp & eternaljk2mvmenu)" ON)
@@ -284,6 +285,11 @@ elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES
 	if(ARCH_X86)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+	endif()
+	
+	if(WITH_ANALYSIS)
+		# C++ not supported by this rn according to https://gcc.gnu.org/onlinedocs/gcc/Static-Analyzer-Options.html
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fanalyzer")
 	endif()
 
 	# Optimization
