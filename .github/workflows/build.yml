@@ -680,11 +680,6 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
-    
-    - name: Downgrade CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.31.6'
 
     - name: Determine parameters
       id: parameters
@@ -714,6 +709,12 @@ jobs:
         podman exec buildenv bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $PACKAGES"
         mkdir -p ${{github.workspace}}/build/actions
 
+    
+    - name: Downgrade CMake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
+        
     - name: Configure CMake
       shell: bash
       run: podman exec -w /jk2mv/build/actions buildenv cmake -G "Unix Makefiles" ${{ steps.parameters.outputs.OPTIONS }} -DWITH_ANALYSIS=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} /jk2mv
