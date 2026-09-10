@@ -680,6 +680,11 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
+    
+    - name: Downgrade CMake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.31.6'
 
     - name: Determine parameters
       id: parameters
