@@ -1590,6 +1590,8 @@ void R_RemapShaderAdvanced(const char *shaderName, const char *newShaderName, in
 void R_RemoveAdvancedRemaps( void );
 void R_DeActivateHackPortalTex();
 
+void R_GetShaderInfo(int shaderNum, const char** shaderName, const char** shaderText);
+
 /*
 ====================================================================
 

@@ -1792,6 +1792,8 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.CaptureFrameRaw = RE_CaptureFrameRaw;
 	re.CaptureFrameJPEG = RE_CaptureFrameJPEG;
 
+	re.GetShaderInfo = R_GetShaderInfo;
+
 	re.ext.GetViewOrientation = RE_GetViewOrientation;
 	re.ext.RegisterShader3D = RE_RegisterShader3D;
 #endif //!DEDICATED

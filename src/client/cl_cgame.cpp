@@ -1177,8 +1177,16 @@ intptr_t CL_CgameSystemCalls(intptr_t *args) {
 		re.AddAdditiveLightToScene( VMAP(1, const vec_t, 3), VMF(2), VMF(3), VMF(4), VMF(5) );
 		return 0;
 	case CG_R_RENDERSCENE:
-		if (cl_traceBenchmark->integer) {
-			CL_TraceBenchMark(VMAV(1, const refdef_t));
+		if (cl.lastRefDefFrameNumber != com_frameNumber) {
+			// only do this on the first renderscene call.
+			// this is bravely assuming the first is the main thing.
+			// usually it is. first the main scene is drawn and MAYBE later some
+			// flags on scoreboard and such
+			cl.lastRefDefFrameNumber = com_frameNumber;
+			cl.lastRefdef = *VMAV(1, const refdef_t);
+			if (cl_traceBenchmark->integer) {
+				CL_TraceBenchMark(&cl.lastRefdef);
+			}
 		}
 		re.RenderScene( VMAV(1, const refdef_t), (qboolean)(cl_mirror->integer));
 		return 0;

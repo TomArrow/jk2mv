@@ -587,6 +587,7 @@ void CMod_LoadPatches( lump_t *surfs, lump_t *verts ) {
 		}
 
 		shaderNum = LittleLong( in->shaderNum );
+		patch->shaderNum = shaderNum;
 		patch->contents = cm.shaders[shaderNum].contentFlags;
 		patch->surfaceFlags = cm.shaders[shaderNum].surfaceFlags;
 

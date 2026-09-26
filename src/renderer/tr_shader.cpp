@@ -3762,6 +3762,33 @@ shader_t *R_FindShader( const char *name, const int *lightmapIndex, const byte *
 #endif //!DEDICATED
 }
 
+
+void R_GetShaderInfo(int shaderNum, const char** shaderName, const char** shaderText) {
+	if (!tr.world) {
+		return;
+	}
+	if (shaderNum < 0 || shaderNum > tr.world->numShaders) {
+		return;
+	}
+	dshader_t* shader = &tr.world->shaders[shaderNum];
+	const char* name = shader->shader;
+	if (shaderName) {
+		*shaderName = name;
+	}
+
+	if (shaderText) {
+		static char shaderBuffer[BIG_INFO_STRING]; // lul dumb idk but should be big enough for most
+		const char* text = FindShaderInShaderText(name);
+		if (text && *text) {
+			const char* end = text;
+			SkipBracedSection(&end);
+			int len = end - text;
+			Q_strncpyz(shaderBuffer,text,MIN(sizeof(shaderBuffer),len+1));
+			*shaderText = shaderBuffer;
+		}
+	}
+}
+
 shader_t *R_FindAdvancedRemapShader( const char *name, const int *lightmapIndex, const byte *styles, qboolean mipRawImage ) {
 	return R_FindShader( name, lightmapIndex, styles, mipRawImage, qtrue );
 }

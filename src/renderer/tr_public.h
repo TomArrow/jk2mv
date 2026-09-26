@@ -122,6 +122,8 @@ typedef struct {
 	int (*CaptureFrameRaw)( byte *buffer, int bufSize, int padding );
 	int (*CaptureFrameJPEG)( byte *buffer, int bufSize, int quality );
 
+	void (*GetShaderInfo)( int shaderNum, const char** shaderName, const char** shaderText );
+
 	struct 
 	{
 		const orientation_t*	(*GetViewOrientation)						();

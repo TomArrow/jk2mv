@@ -71,6 +71,7 @@ typedef struct {
 	int			checkcount;				// to avoid repeated testings
 	int			surfaceFlags;
 	int			contents;
+	int			shaderNum;
 	struct patchCollide_s	*pc;
 } cPatch_t;
 
@@ -173,6 +174,7 @@ typedef struct {
 	sphere_t	sphere;		// sphere for oriendted capsule collision
 	float		surfaceClipEpsilon;	// this is normally a DEFINE but i wanna offer a precise trace without epsilon so we set it to 0 there.
 	int			traceCustomizationFlags;
+	int			surfaceShaderNum;
 } traceWork_t;
 
 typedef struct leafList_s {

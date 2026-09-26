@@ -198,6 +198,9 @@ typedef struct {
 		int			src;		// 1 = snapshot, 2 = cmd acknowledge
 		int			realtimegot;// when we got this info
 	} pingInfo;
+
+	refdef_t	lastRefdef;
+	int			lastRefDefFrameNumber;
 } clientActive_t;
 
 extern	clientActive_t		cl;
@@ -588,6 +591,7 @@ extern	cvar_t	*cl_timegraph;
 extern	cvar_t	* cl_showVelocity;
 extern	cvar_t	* cl_showVelocityAllowNegative;
 extern	cvar_t	* cl_showMouse;
+extern	cvar_t	* cl_showShader;
 extern	cvar_t	* cl_showMouseScale;
 extern	cvar_t	* cl_showMouseYScale;
 extern	cvar_t	* cl_showMouseVelocityScale;

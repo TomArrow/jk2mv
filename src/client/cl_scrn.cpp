@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <algorithm>
 
 extern console_t con;
 qboolean	scr_initialized;		// ready to draw
@@ -20,6 +21,7 @@ cvar_t* cl_showVelocity;
 cvar_t* cl_showVelocityAllowNegative;
 cvar_t* cl_drawPS;
 cvar_t* cl_drawPSHeight;
+cvar_t* cl_showShader;
 cvar_t* cl_showMouse;
 cvar_t* cl_showMouseScale;
 cvar_t* cl_showMouseYScale;
@@ -263,13 +265,14 @@ Coordinates are at 640 by 480 virtual resolution
 void SCR_DrawSmallStringExt( int x, int y, const char *string, const vec4_t setColor, qboolean forceColor ) {
 	vec4_t		color;
 	const char	*s;
-	int			xx;
+	int			xx,yy;
 
 	const bool use102color = MV_USE102COLOR;
 
 	// draw the colored text
 	s = string;
 	xx = x;
+	yy = y;
 	re.SetColor( setColor );
 	while ( *s ) {
 		if ( (serverIsTommyTernal && Q_IsColorStringNT(s))) {
@@ -290,8 +293,17 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, const vec4_t setC
 			s += 2;
 			continue;
 		}
-		SCR_DrawSmallChar( xx, y, *s );
-		xx += con.charWidth;
+		if (*s == '\n') {
+			yy += con.charHeight;
+			xx = x;
+		}
+		else if (*s == '\t') {
+			xx += con.charWidth*4;
+		}
+		else {
+			SCR_DrawSmallChar(xx, yy, *s);
+			xx += con.charWidth;
+		}
 		s++;
 	}
 	re.SetColor( NULL );
@@ -448,6 +460,7 @@ void SCR_Init( void ) {
 
 	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
 	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
+	cl_showShader = Cvar_Get("cl_showShader", "0", CVAR_ARCHIVE);
 	cl_showMouse = Cvar_Get("cl_showMouse", "0", CVAR_ARCHIVE);
 	cl_showMouseScale = Cvar_Get("cl_showMouseScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseYScale = Cvar_Get("cl_showMouseYScale", "2.0", CVAR_ARCHIVE);
@@ -708,6 +721,41 @@ static void SCR_DrawPS() {
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 29, va("%" STRINGWIDTHMAXSTATFIELDS "s %d", "ammo[13]", ps->ammo[13]), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 30, va("%" STRINGWIDTHMAXSTATFIELDS "s %d", "ammo[14]", ps->ammo[14]), white, qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 31, va("%" STRINGWIDTHMAXSTATFIELDS "s %d", "ammo[15]", ps->ammo[15]), white, qtrue);
+}
+
+static void SCR_DrawShowShader() {
+	if (!cl_showShader->integer) {
+		return;
+	}
+	traceCustomization_t custom = { };
+	trace_t trace;
+	vec3_t org, to;
+	int shaderNum;
+	int level = cl_showShader->integer;
+	qboolean everything = (qboolean)(level > 0);
+	level = std::abs(level);
+
+	VectorCopy(cl.lastRefdef.vieworg, org);
+
+	VectorMA(org, 99999.0f, cl.lastRefdef.viewaxis[0], to);
+
+	// find target
+	CM_BoxTrace(&trace, org, to, NULL, NULL, 0, everything ? -1 : MASK_SOLID, qfalse, &custom, &shaderNum);
+	VectorCopy(trace.endpos, to);
+
+	if (shaderNum <= -1) {
+		return;
+	}
+
+	const char* shaderName = NULL, *shaderInfo = NULL;
+	re.GetShaderInfo(shaderNum, &shaderName, cl_showShader->integer > 1 ? &shaderInfo : NULL);
+
+	if (shaderName) {
+		SCR_DrawSmallStringExt(300, 340, va("shader: %s", shaderName), colorWhite, qfalse);
+	}
+	if (shaderInfo && cl_showShader->integer > 1) {
+		SCR_DrawSmallStringExt(300, 360, va("shadertext:\n%s", shaderInfo), colorWhite, qfalse);
+	}
 }
 
 static void SCR_DrawShowMouse() {
@@ -1102,6 +1150,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 
 	SCR_DrawFPSGuess();
 	SCR_DrawShowMouse();
+	SCR_DrawShowShader();
 
 	SCR_DrawPS();
 
