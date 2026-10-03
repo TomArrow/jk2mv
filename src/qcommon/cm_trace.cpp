@@ -1427,8 +1427,18 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end,
 	if ( tw.trace.fraction == 1 ) {
 		VectorCopy (end, tw.trace.endpos);
 	} else {
-		for ( i=0 ; i<3 ; i++ ) {
-			tw.trace.endpos[i] = start[i] + tw.trace.fraction * (end[i] - start[i]);
+		if (tw.surfaceClipEpsilon && (tw.traceCustomizationFlags & TRACECUSTOMFLAG_FASTHULLTRACE)) {
+			vec3_t compensation;
+			// need to compensate (in an admittedly inadequate way) for the epsilon since we don't in the bsp tree
+			VectorScale(tw.trace.plane.normal, tw.surfaceClipEpsilon, compensation);
+			for (i = 0; i < 3; i++) {
+				tw.trace.endpos[i] = start[i] + tw.trace.fraction * (end[i] - start[i]) + compensation[i];
+			}
+		}
+		else {
+			for (i = 0; i < 3; i++) {
+				tw.trace.endpos[i] = start[i] + tw.trace.fraction * (end[i] - start[i]);
+			}
 		}
 	}
 
