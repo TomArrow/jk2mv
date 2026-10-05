@@ -200,11 +200,14 @@ void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
 SV_inPVS
 
 Also checks portalareas so that doors block sight
+
+Returns 0 for no, 1 for yes, and 2 for yes + same leaf
 =================
 */
-qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
+int SV_inPVS (const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
+	int		leafnum2;
 	int		cluster;
 	int		area1, area2;
 	byte	*mask;
@@ -214,14 +217,93 @@ qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
 	area1 = CM_LeafArea (leafnum);
 	mask = CM_ClusterPVS (cluster);
 
-	leafnum = CM_PointLeafnum (p2);
-	cluster = CM_LeafCluster (leafnum);
-	area2 = CM_LeafArea (leafnum);
+	leafnum2 = CM_PointLeafnum (p2);
+	cluster = CM_LeafCluster (leafnum2);
+	area2 = CM_LeafArea (leafnum2);
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
 		return qfalse;
 	if (!CM_AreasConnected (area1, area2))
 		return qfalse;		// a door blocks sight
-	return qtrue;
+	return leafnum == leafnum2 ? 2 : 1;
+}
+
+
+/*
+=================
+SV_inPVSEntity
+
+Like InPVS but does the more exhaustive search of SV_AddEntitiesVisibleFromPoint
+
+This lets game quickly check whether an entity will be sent, without false negatives like InPVS (e.g. stairs on ffa_bespin)
+
+For full accuracy call with ps.origin + ps.viewheight
+
+Returns 0 for no, 1 for yes, and 2 for yes + same leaf
+=================
+*/
+int SV_inPVSEntity (const vec3_t p1, sharedEntity_t* gEnt)
+{
+	svEntity_t*		svEnt;
+	int				leafnum;
+	int				clientarea, clientcluster;
+	int				i,l;
+	byte*			clientpvs;
+	byte*			bitvector;
+	int				leafnum2;
+
+	leafnum = CM_PointLeafnum(p1);
+	clientarea = CM_LeafArea(leafnum);
+	clientcluster = CM_LeafCluster(leafnum);
+	clientpvs = CM_ClusterPVS(clientcluster);
+
+	svEnt = SV_SvEntityForGentity(gEnt);
+
+	
+	// ignore if not touching a PV leaf
+	// check area
+	if ( !CM_AreasConnected( clientarea, svEnt->areanum ) ) {
+		// doors can legally straddle two areas, so
+		// we may need to check another one
+		if ( !CM_AreasConnected( clientarea, svEnt->areanum2 ) ) {
+			return 0;		// blocked by a door
+		}
+	}
+
+
+	bitvector = clientpvs;
+
+	// check individual leafs
+	if ( !svEnt->numClusters ) {
+		return 0;
+	}
+	l = 0;
+	for ( i=0 ; i < svEnt->numClusters ; i++ ) {
+		l = svEnt->clusternums[i];
+		if ( bitvector[l >> 3] & (1 << (l&7) ) ) {
+			break;
+		}
+	}
+
+	// if we haven't found it to be visible,
+	// check overflow clusters that coudln't be stored
+	if ( i == svEnt->numClusters ) {
+		if ( svEnt->lastCluster ) {
+			for ( ; l <= svEnt->lastCluster ; l++ ) {
+				if ( bitvector[l >> 3] & (1 << (l&7) ) ) {
+					break;
+				}
+			}
+			if ( l == svEnt->lastCluster ) {
+				return 0;	// not visible
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	leafnum2 = CM_PointLeafnum(gEnt->r.currentOrigin); // this isn't a guarantee, just a possibility.
+
+	return leafnum == leafnum2 ? 2 : 1;
 }
 
 
@@ -232,9 +314,10 @@ SV_inPVSIgnorePortals
 Does NOT check portalareas
 =================
 */
-qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
+int SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
+	int		leafnum2;
 	int		cluster;
 	int		area1, area2;
 	byte	*mask;
@@ -244,14 +327,14 @@ qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 	area1 = CM_LeafArea (leafnum);
 	mask = CM_ClusterPVS (cluster);
 
-	leafnum = CM_PointLeafnum (p2);
-	cluster = CM_LeafCluster (leafnum);
-	area2 = CM_LeafArea (leafnum);
+	leafnum2 = CM_PointLeafnum (p2);
+	cluster = CM_LeafCluster (leafnum2);
+	area2 = CM_LeafArea (leafnum2);
 
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
 		return qfalse;
 
-	return qtrue;
+	return leafnum == leafnum2 ? 2 : 1;
 }
 
 
@@ -1264,6 +1347,13 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 				return qfalse;
 			}
 		}
+		}
+	}
+	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_INPVSENTITY) {
+		switch (args[0]) {
+
+		case G_COOL_API_INPVSENTITY:
+			return SV_inPVSEntity(VMAP(1, const vec_t, 3), VMAIV(2, sharedEntity_t, MAX((int)sizeof(sharedEntity_t), sv.gentitySize)));
 		}
 	}
 	if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MARIADB) {

@@ -1075,6 +1075,9 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 						tw->trace.plane.dist = -tw->trace.plane.dist;
 					}
 				}
+				else {
+					tw->trace.allsolid = qtrue; // not sure if this is logical? meh
+				}
 			}
 			return;
 		}
