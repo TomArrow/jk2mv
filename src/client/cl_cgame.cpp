@@ -798,6 +798,45 @@ static void CL_TraceBenchMark(const refdef_t* fd) {
 	VectorMA(org, 99999.0f, fd->viewaxis[0], to);
 	
 
+	if (cl_traceBenchmark->integer == 4) {
+		trace_t trace2;
+		char colorPos = '2';
+		char colorNormal = '2';
+		CM_BoxTrace(&trace, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
+		custom.traceCustomFlags |= TRACECUSTOMFLAG_FASTHULLTRACE;
+		CM_BoxTrace(&trace2, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
+
+		float diff = Distance(trace.endpos, trace2.endpos);
+		float normalDot = DotProduct(trace.plane.normal,trace2.plane.normal);
+
+		if (diff > 5.0f) {
+			colorPos = '3';
+		} else if (diff > 5.0f) {
+			colorPos = '1';
+		}
+		if (normalDot < 0.9f) {
+			colorNormal = '3';
+		} else if (normalDot < 0.5f) {
+			colorNormal = '1';
+		}
+
+		Com_Printf("Debug fast hull trace; reference %.3f %.3f %.3f (normal %.3f %.3f %.3f); result: ^%c%.3f %.3f %.3f ^7(normal ^%c%.3f %.3f %.3f^7); diff ^%c%.3f ^7dot ^%c%.3f\n", 
+			trace.endpos[0],trace.endpos[1],trace.endpos[2],
+			trace.plane.normal[0], trace.plane.normal[1], trace.plane.normal[2],
+			colorPos,
+			trace2.endpos[0], trace2.endpos[1], trace2.endpos[2],
+			colorNormal,
+			trace2.plane.normal[0], trace2.plane.normal[1], trace2.plane.normal[2],
+			colorPos,
+			diff,
+			colorNormal,
+			normalDot
+		);
+
+
+		return;
+	}
+
 
 	// find target
 	CM_BoxTrace(&trace, org, to, NULL, NULL, 0, MASK_SOLID, qfalse, &custom);
