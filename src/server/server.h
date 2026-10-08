@@ -16,6 +16,9 @@
 #include "../api/mvapi.h"
 #include <memory>
 
+
+#define MV_PROTOCOL_VERSION	1 // serverside multiview protocol version (client should be able to read older ones ideally)
+
 //=============================================================================
 
 #define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
@@ -137,6 +140,22 @@ typedef struct {
 	int				messageSize;		// used to rate drop packets
 } clientSnapshot15_t;
 */
+
+#ifdef USE_MULTIVIEW
+
+//#define MAX_MV_FILES 4096 // for directory caching
+
+typedef byte entMask_t[MAX_GENTITIES / 8];
+
+typedef struct psFrame_s {
+	int				clientSlot;
+	int				areabytes;
+	byte			areabits[MAX_MAP_AREA_BYTES]; // portalarea visibility bits
+	playerState_t	ps;
+	entMask_t		entMask;
+} psFrame_t;
+
+#endif // USE_MV
 
 typedef enum {
 	CS_FREE,		// can be reused for a new connection
@@ -264,6 +283,26 @@ typedef struct client_s {
 	int				mode; // tracking game mode for tommyternal. 5 is ironman
 	qboolean		nwhClient; // if sv_allowNWHClients 1, NWH clients may connect. They have hexcolors, so do some magic with that.
 	qboolean		nwhClientNotified; // send the user a quick message that this is not an nwh server
+
+#ifdef USE_MULTIVIEW
+    struct {
+        int				protocol;
+
+        //int				scoreQueryTime;
+        //int				lastRecvTime; // any received command
+        //int				lastSentTime; // any sent command
+#ifdef USE_MV_ZCMD
+        //  command compression
+		struct			{
+			int			deltaSeq;
+			lzctx_t		ctx;
+			lzstream_t	stream[ MAX_RELIABLE_COMMANDS ];
+		} z;
+#endif
+        //qboolean		recorder;
+
+    } multiview;
+#endif // USE_MV
 } client_t;
 
 //=============================================================================
@@ -310,6 +349,14 @@ typedef struct {
 
 	int64_t		snapshotFrame;				// incremented on each frame, to mark generated clientPVS and prevent regeneration
 
+#ifdef USE_MULTIVIEW
+	int64_t		numSnapshotPSF;				// sv_democlients->integer*PACKET_BACKUP*MAX_CLIENTS
+	int64_t		nextSnapshotPSF;			// next snapshotPS to use
+	//int			modSnapshotPSF;				// clamp value
+	psFrame_t	*snapshotPSF;				// [numSnapshotPS]
+	//qboolean	emptyFrame;					// true if no game logic run during SV_Frame()
+#endif // USE_MV
+
 	struct {
 		bool enabled;
 		int64_t disableUntil;
@@ -339,6 +386,28 @@ extern	cvar_t	*sv_privatePassword;
 extern	cvar_t	*sv_allowDownload;
 extern	cvar_t	*mv_httpdownloads;
 extern	cvar_t	*mv_httpserverport;
+
+
+#ifdef USE_MULTIVIEW
+//extern	fileHandle_t	sv_demoFile;
+//extern	char	sv_demoFileName[ MAX_OSPATH ];
+//extern	char	sv_demoFileNameLast[ MAX_OSPATH ];
+
+//extern	int		sv_demoClientID;
+//extern	int		sv_lastAck;
+//extern	int		sv_lastClientSeq;
+
+extern	cvar_t	*sv_mvClients;
+//extern	cvar_t	*sv_mvPassword;
+//extern	cvar_t	*sv_demoFlags;
+//extern	cvar_t	*sv_autoRecord;
+
+//extern	cvar_t	*sv_mvFileCount;
+//extern	cvar_t	*sv_mvFolderSize;
+
+#endif // USE_MV
+
+
 extern	cvar_t	*sv_maxclients;
 extern	cvar_t	*sv_privateClients;
 extern	cvar_t	*sv_hostname;

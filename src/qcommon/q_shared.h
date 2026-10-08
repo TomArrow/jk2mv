@@ -6,6 +6,8 @@
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
+#define USE_MULTIVIEW				  // multiview enabled
+
 #define GET_ABIT( byteArray, bitIndex ) ((byteArray)[ (bitIndex) / 8 ] & ( 1 << ( (bitIndex) & 7 ) ))
 #define SET_ABIT( byteArray, bitIndex ) (byteArray)[ (bitIndex) / 8 ] |= ( 1 << ( (bitIndex) & 7 ) )
 

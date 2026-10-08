@@ -19,6 +19,25 @@ cvar_t	*sv_privatePassword;	// password for the privateClient slots
 cvar_t	*sv_allowDownload;
 cvar_t	*mv_httpdownloads;
 cvar_t	*mv_httpserverport;
+
+
+#ifdef USE_MULTIVIEW
+//fileHandle_t	sv_demoFile = FS_INVALID_HANDLE;
+//char	sv_demoFileName[ MAX_OSPATH ];
+//char	sv_demoFileNameLast[ MAX_OSPATH ];
+//int		sv_demoClientID; // current client
+//int		sv_lastAck;
+//int		sv_lastClientSeq;
+
+cvar_t	*sv_mvClients;
+//cvar_t	*sv_mvPassword;
+//cvar_t	*sv_demoFlags;
+//cvar_t	*sv_autoRecord;
+
+//cvar_t	*sv_mvFileCount;
+//cvar_t	*sv_mvFolderSize;
+#endif
+
 cvar_t	*sv_maxclients;
 cvar_t	*sv_privateClients;		// number of clients reserved for password
 cvar_t	*sv_hostname;
@@ -1669,6 +1688,13 @@ void SV_Frame( int msec ) {
 		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
 		return;
 	}
+#ifdef USE_MULTIVIEW
+	if ( svs.nextSnapshotPSF >= 0x7FFFFFFFFFFFFFFE - svs.numSnapshotPSF ) {
+		SV_Shutdown( "Restarting server due to numSnapshotPSF wrapping" );
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
+		return;
+	}
+#endif
 
 	if( sv.restartTime && sv.time >= sv.restartTime ) {
 		sv.restartTime = 0;

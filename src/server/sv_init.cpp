@@ -271,6 +271,27 @@ void SV_BoundMaxClients( int minimum ) {
 	}
 }
 
+#ifdef USE_MULTIVIEW
+/*
+===============
+SV_BoundMultiviewClients
+
+===============
+*/
+void SV_BoundMultiviewClients( int minimum ) {
+	// get the current maxclients value
+	Cvar_Get( "sv_mvClients", "0", 0 );
+
+	sv_mvClients->modified = qfalse;
+
+	if (sv_mvClients->integer < minimum ) {
+		Cvar_Set( "sv_mvClients", va("%i", minimum) );
+	} else if (sv_mvClients->integer > sv_maxclients->integer ) {
+		Cvar_Set( "sv_mvClients", va("%i", sv_maxclients->integer) );
+	}
+}
+#endif
+
 /*
 ===============
 SV_BoundMaxClients
@@ -317,18 +338,32 @@ void SV_Startup( void ) {
 		Com_Error( ERR_FATAL, "SV_Startup: svs.initialized" );
 	}
 	SV_BoundMaxClients( 1 );
+#ifdef USE_MULTIVIEW
+	SV_BoundMultiviewClients( 0 );
+#endif
 	SV_BoundSnapShotPacketEntitiesBackup( 1, 1 );
 
 	svs.clients = (struct client_s *)Z_Malloc (sizeof(client_t) * sv_maxclients->integer, TAG_CLIENTS, qtrue );
 	if ( com_dedicated->integer ) {
 		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
+#ifdef USE_MULTIVIEW
+		svs.numSnapshotPSF = sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
+#endif
 		Cvar_Set( "r_ghoul2animsmooth", "0");
 		Cvar_Set( "r_ghoul2unsqashaftersmooth", "0");
 
 	} else {
 		// we don't need nearly as many when playing locally
 		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
+#ifdef USE_MULTIVIEW
+		svs.numSnapshotPSF = sv_mvClients->integer * 4 * sv_maxclients->integer;
+#endif
 	}
+
+#ifdef USE_MULTIVIEW
+	// reserve 2 additional frames for recorder slot
+	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+#endif
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		userMessages[i].clear();
@@ -351,13 +386,22 @@ void SV_ChangeMaxClients( void ) {
 	int		i;
 	client_t	*oldClients;
 	int		count;
+#ifdef USE_MULTIVIEW
+	int		oldMultiviewClients;
+	int		countMultiviewClients;
+	countMultiviewClients = 0;
+#endif
 
 	// get the highest client number in use
-	count = 0;
+	count = 0; 
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
 		if ( svs.clients[i].state >= CS_CONNECTED ) {
 			if (i > count)
 				count = i;
+#ifdef USE_MULTIVIEW
+			if( svs.clients[i].multiview.protocol > 0 )
+				countMultiviewClients++;
+#endif
 		}
 	}
 	count++;
@@ -369,7 +413,13 @@ void SV_ChangeMaxClients( void ) {
 	SV_BoundMaxClients( count );
 	SV_BoundSnapShotPacketEntitiesBackup( 1, 1 );
 	// if still the same
-	if ( sv_maxclients->integer == oldMaxClients && oldPacketBackup == sv_snapShotPacketBackup->integer && oldEntityBackup == sv_snapShotEntitiesBackup->integer) {
+#ifdef USE_MULTIVIEW
+	oldMultiviewClients = sv_mvClients->integer;
+	SV_BoundMultiviewClients(countMultiviewClients);
+	if ( sv_maxclients->integer == oldMaxClients && oldPacketBackup == sv_snapShotPacketBackup->integer && oldEntityBackup == sv_snapShotEntitiesBackup->integer && oldMultiviewClients == sv_mvClients->integer) {
+#else
+	if ( sv_maxclients->integer == oldMaxClients && oldPacketBackup == sv_snapShotPacketBackup->integer && oldEntityBackup == sv_snapShotEntitiesBackup->integer ) {
+#endif
 		return;
 	}
 
@@ -406,10 +456,21 @@ void SV_ChangeMaxClients( void ) {
 	// allocate new snapshot entities
 	if ( com_dedicated->integer ) {
 		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
+#ifdef USE_MULTIVIEW
+		svs.numSnapshotPSF = sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
+#endif
 	} else {
 		// we don't need nearly as many when playing locally
 		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
+#ifdef USE_MULTIVIEW
+		svs.numSnapshotPSF = sv_mvClients->integer * 4 * sv_maxclients->integer;
+#endif
 	}
+
+#ifdef USE_MULTIVIEW
+	// reserve 2 additional frames for recorder slot
+	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+#endif
 }
 
 /*
@@ -526,6 +587,13 @@ Ghoul2 Insert Start
 		delete[] svs.snapshotEntities;
 		svs.snapshotEntities = NULL;
 	}
+#ifdef USE_MULTIVIEW
+	if (svs.snapshotPSF)
+	{
+		delete[] svs.snapshotPSF;
+		svs.snapshotPSF = NULL;
+	}
+#endif
 /*
 Ghoul2 Insert End
 */
@@ -580,7 +648,11 @@ Ghoul2 Insert Start
 		SV_Startup();
 	} else {
 		// check for maxclients change
-		if ( sv_maxclients->modified || sv_snapShotEntitiesBackup->modified || sv_snapShotPacketBackup->modified) {
+#ifdef USE_MULTIVIEW
+		if ( sv_maxclients->modified || sv_snapShotEntitiesBackup->modified || sv_snapShotPacketBackup->modified || sv_mvClients->modified ) {
+#else
+		if ( sv_maxclients->modified || sv_snapShotEntitiesBackup->modified || sv_snapShotPacketBackup->modified ) {
+#endif
 			SV_ChangeMaxClients();
 		}
 	}
@@ -605,6 +677,13 @@ Ghoul2 Insert Start
 	svs.snapshotEntities = new entityState_s[svs.numSnapshotEntities];
 	// we CAN afford to do this here, since we know the STL vectors in Ghoul2 are empty
 	memset(svs.snapshotEntities, 0, sizeof(entityState_t)*svs.numSnapshotEntities);
+
+#ifdef USE_MULTIVIEW
+	// allocate the multiview snapshot playerstate frames
+	svs.nextSnapshotPSF = 0;
+	svs.snapshotPSF = new psFrame_t[svs.numSnapshotPSF];
+	memset(svs.snapshotPSF, 0, sizeof(psFrame_t) * svs.numSnapshotPSF);
+#endif
 
 /*
 Ghoul2 Insert End
@@ -945,6 +1024,11 @@ void SV_Init (void) {
 	sv_needpass = Cvar_Get ("g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM );
 	Cvar_Get ("sv_keywords", "", CVAR_SERVERINFO);
 	sv_mapname = Cvar_Get ("mapname", "nomap", CVAR_SERVERINFO | CVAR_ROM);
+
+#ifdef USE_MULTIVIEW
+	sv_mvClients = Cvar_Get("sv_mvClients", "0", CVAR_ARCHIVE | CVAR_LATCH);
+#endif
+
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
@@ -1132,6 +1216,13 @@ Ghoul2 Insert Start
 		delete[] svs.snapshotEntities;
 		svs.snapshotEntities = NULL;
 	}
+#ifdef USE_MULTIVIEW
+	if (svs.snapshotPSF)
+	{
+		delete[] svs.snapshotPSF;
+		svs.snapshotPSF = NULL;
+	}
+#endif
 
 #ifdef G2_COLLISION_ENABLED
 	if ( com_dedicated->integer && G2VertSpaceServer)
