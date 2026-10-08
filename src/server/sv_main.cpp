@@ -1758,6 +1758,8 @@ void SV_Frame( int msec ) {
 	// check timeouts
 	SV_CheckTimeouts();
 
+	svs.snapshotFrame++;
+
 	// send messages back to the clients
 	SV_SendClientMessages();
 

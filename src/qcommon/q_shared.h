@@ -6,6 +6,9 @@
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
+#define GET_ABIT( byteArray, bitIndex ) ((byteArray)[ (bitIndex) / 8 ] & ( 1 << ( (bitIndex) & 7 ) ))
+#define SET_ABIT( byteArray, bitIndex ) (byteArray)[ (bitIndex) / 8 ] |= ( 1 << ( (bitIndex) & 7 ) )
+
 #define MAX_TEAMNAME 32
 
 #define STRINGIFY(x) STRINGIFY2(x)

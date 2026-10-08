@@ -308,6 +308,8 @@ typedef struct {
 	challenge_t	challenges[MAX_CHALLENGES];	// to prevent invalid IPs from connecting
 	netadr_t	redirectAddress;			// for rcon return messages
 
+	int64_t		snapshotFrame;				// incremented on each frame, to mark generated clientPVS and prevent regeneration
+
 	struct {
 		bool enabled;
 		int64_t disableUntil;

@@ -400,7 +400,19 @@ typedef struct {
 	int					snapshotEntities[MAX_SNAPSHOT_ENTITIES_SERVER];
 } snapshotEntityNumbers_t;
 
+typedef struct clientPVS_s {
+    int64_t		snapshotFrame; // svs.snapshotFrame
 
+    int			clientNum;
+    int			pm_type;
+    qboolean	spectator;
+    int			areabytes;
+    byte		areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
+    snapshotEntityNumbers_t	numbers;
+    byte		entMask[MAX_GENTITIES/8];
+} clientPVS_t;
+
+static clientPVS_t client_pvs[ MAX_CLIENTS ];
 
 
 /*
@@ -482,8 +494,7 @@ static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapsh
 SV_AddEntitiesVisibleFromPoint
 ===============
 */
-static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *frame,
-									snapshotEntityNumbers_t *eNums, qboolean portal, int realClientNum ) {
+static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientPVS_t* pvs, qboolean portal, int realClientNum ) {
 	int		e, i;
 	sharedEntity_t *ent;
 	svEntity_t	*svEnt;
@@ -508,7 +519,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 	clientcluster = CM_LeafCluster (leafnum);
 
 	// calculate the visible areas
-	frame->areabytes = CM_WriteAreaBits( frame->areabits, clientarea );
+	pvs->areabytes = CM_WriteAreaBits( pvs->areabits, clientarea );
 
 	clientpvs = CM_ClusterPVS (clientcluster);
 
@@ -545,8 +556,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			if ( VM_MVAPILevel( gvm ) >= 2 ) {
 				// MV entities can be flagged to be sent only to
 				// spectators or non-spectators
-				if ( frame->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
-					(frame->ps.pm_flags & PMF_FOLLOW) )
+				if ( pvs->spectator )
 				{
 					if ( mvEnt->mvFlags & MVF_NOSPEC )
 						continue;
@@ -560,13 +570,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 
 			// MV entities can be flagged to be sent only to specific
 			// clients (can't filter following spectators this way)
-			if (mvEnt->snapshotIgnore[frame->ps.clientNum])
+			if (mvEnt->snapshotIgnore[pvs->clientNum])
 			{
 				continue;
 			}
-			else if ( mvEnt->snapshotEnforce[frame->ps.clientNum] )
+			else if ( mvEnt->snapshotEnforce[pvs->clientNum] )
 			{
-				SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCE, distance);
+				SV_AddEntToSnapshot( svEnt, ent, &pvs->numbers, SSPRIO_MVSNAPSHOTENFORCE, distance);
 				continue;
 			}
 
@@ -577,7 +587,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 				}
 				else if (mvEnt->snapshotEnforceRealClient[realClientNum])
 				{
-					SV_AddEntToSnapshot(svEnt, ent, eNums, SSPRIO_MVSNAPSHOTENFORCEREAL, distance);
+					SV_AddEntToSnapshot(svEnt, ent, &pvs->numbers, SSPRIO_MVSNAPSHOTENFORCEREAL, distance);
 					continue;
 				}
 			}
@@ -590,13 +600,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 
 		// entities can be flagged to be sent to only one client
 		if ( ent->r.svFlags & SVF_SINGLECLIENT ) {
-			if ( ent->r.singleClient != frame->ps.clientNum ) {
+			if ( ent->r.singleClient != pvs->clientNum ) {
 				continue;
 			}
 		}
 		// entities can be flagged to be sent to everyone but one client
 		if ( ent->r.svFlags & SVF_NOTSINGLECLIENT ) {
-			if ( ent->r.singleClient == frame->ps.clientNum ) {
+			if ( ent->r.singleClient == pvs->clientNum ) {
 				continue;
 			}
 		}
@@ -607,9 +617,9 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		}
 
 		// broadcast entities are always sent, and so is the main player so we don't see noclip weirdness
-		if ( ent->r.svFlags & SVF_BROADCAST || (e == frame->ps.clientNum) || (ent->r.broadcastClients[frame->ps.clientNum/32] & (1<<(frame->ps.clientNum%32))))
+		if ( ent->r.svFlags & SVF_BROADCAST || (e == pvs->clientNum) || (ent->r.broadcastClients[pvs->clientNum/32] & (1<<(pvs->clientNum%32))))
 		{
-			SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_BROADCAST, distance);
+			SV_AddEntToSnapshot( svEnt, ent, &pvs->numbers, SSPRIO_BROADCAST, distance);
 			continue;
 		}
 
@@ -617,9 +627,9 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		if (sv_autoDemo->integer == 2) //How find out how to only add all entities for the bot named RECORDER, not all bots? what entities can we still exclude?
 		{
 			sharedEntity_t* ent2;
-			ent2 = SV_GentityNum(frame->ps.clientNum);
-			if (ent2->r.svFlags & SVF_BOT && /* ent2->playerState->*/frame->ps.pm_type == PM_SPECTATOR) {
-				SV_AddEntToSnapshot(svEnt, ent, eNums, SSPRIO_AUTODEMOSPECTATOR, distance);
+			ent2 = SV_GentityNum(pvs->clientNum);
+			if (ent2->r.svFlags & SVF_BOT && /* ent2->playerState->*/pvs->pm_type == PM_SPECTATOR) {
+				SV_AddEntToSnapshot(svEnt, ent, &pvs->numbers, SSPRIO_AUTODEMOSPECTATOR, distance);
 				continue;
 			}
 		}
@@ -668,7 +678,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		}
 
 		// add it
-		SV_AddEntToSnapshot( svEnt, ent, eNums, SSPRIO_VISIBLE, distance);
+		SV_AddEntToSnapshot( svEnt, ent, &pvs->numbers, SSPRIO_VISIBLE, distance);
 
 		// if its a portal entity, add everything visible from its camera position
 		if ( ent->r.svFlags & SVF_PORTAL ) {
@@ -679,14 +689,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 					continue;
 				}
 			}
-			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, qtrue, realClientNum );
+			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, pvs, qtrue, realClientNum );
 		}
 
 		vischeckfailed:
 
 		// If server has sv_specAllEnts set, spectators receive all entities.
-		if (sv_specAllEnts->integer && (frame->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
-			(frame->ps.pm_flags & PMF_FOLLOW)))
+		if (sv_specAllEnts->integer && pvs->spectator)
 		{
 			snapshotEntityPriority_t priority = SSPRIO_SPECALL;
 			if (ent->s.eType == ET_PLAYER) {
@@ -707,48 +716,146 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			else if (ent->s.eType == ET_PUSH_TRIGGER || ent->s.eType == ET_TELEPORT_TRIGGER) {
 				priority = SSPRIO_SPECALLTRIGGER; // triggers have lower priority (not visible in spec anyway)
 			}
-			SV_AddEntToSnapshot(svEnt, ent, eNums, priority, distance);
+			SV_AddEntToSnapshot(svEnt, ent, &pvs->numbers, priority, distance);
 			continue;
 		}
 
 	}
 }
 
+
+/*
+===============
+SV_InitSnapshotFrameData
+===============
+*/
+void SV_InitSnapshotFrameData( void ) 
+{
+	svs.snapshotFrame = 1; // start at 1 so theres no chance in hell of a clientpvs thinking it already has the calculated info.
+
+    Com_Memset( client_pvs, 0, sizeof( client_pvs ) );
+}
+
 /*
 =============
-SV_BuildClientSnapshot
+SV_BuildClientPVS
 
 Decides which entities are going to be visible to the client, and
 copies off the playerstate and areabits.
 
 This properly handles multiple recursive portals, but the render
 currently doesn't.
+=============
+*/
+static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
+		clientPVS_t* pvs;
+	vec3_t						org;
+	int							i, maxSnapEnts;
+	svEntity_t					*svEnt;
+	int							clientSlot = client - svs.clients;
+
+	pvs = &client_pvs[clientSlot];
+
+	if (pvs->snapshotFrame == svs.snapshotFrame) {
+		// Note: when we start doing multiview later:
+		// due to playsnapshot API, ps and entities can be different between calls.
+		// right now the only recipient-specific thing is solid-value. but thats entitystate, so not of that much relevance here since we only store entity numbers, not the entities
+		// 
+		// however that could change in theory, so maybe we could/should come up with a system that if we call this from the future multiview code,
+		// it does a playersnapshot API call if not cached yet? but thats terrible expensive. let's worry about it later.
+		// 
+		// maybe worth handling aside from that: PMF_FOLLOW is added to segmented replays, might send too many ents cuz it thinks its a spectator,
+		// but that's not specific to this caching system
+		return pvs;
+	}
+
+	pvs->snapshotFrame = svs.snapshotFrame;
+
+	// bump the counter used to prevent double adding
+	sv.snapshotCounter++;
+
+	// clear everything in this snapshot
+	pvs->numbers.numSnapshotEntities = 0;
+	pvs->areabytes = 0;
+	Com_Memset(pvs->areabits, 0, sizeof(pvs->areabits));
+
+	pvs->spectator = (qboolean)(ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || (ps->pm_flags & PMF_FOLLOW));
+	pvs->pm_type = ps->pm_type;
+
+	// never send client's own entity, because it can
+	// be regenerated from the playerstate
+	pvs->clientNum = ps->clientNum;
+	if (pvs->clientNum < 0 || pvs->clientNum >= MAX_GENTITIES) {
+		Com_Error(ERR_DROP, "SV_SvEntityForGentity: bad gEnt");
+	}
+	svEnt = &sv.svEntities[pvs->clientNum];
+	svEnt->snapshotCounter = sv.snapshotCounter;
+
+
+	// find the client's viewpoint
+	VectorCopy(ps->origin, org);
+	org[2] += ps->viewheight;
+
+	// add all the entities directly visible to the eye, which
+	// may include portal entities that merge other viewpoints
+	SV_AddEntitiesVisibleFromPoint(org, pvs, qfalse, client - svs.clients);
+
+	maxSnapEnts = client->customSnapEntCount ? client->customSnapEntCount : MAX_SNAPSHOT_ENTITIES_SERVER;
+	if (pvs->numbers.numSnapshotEntities > maxSnapEnts) {
+		// this is a normal client who would rather not receive more than the usual vanilla 256 ents per snapshot.
+		// pre-sort by priority
+		qsort(pvs->numbers.snapshotEntitiesRaw, pvs->numbers.numSnapshotEntities,
+			sizeof(pvs->numbers.snapshotEntitiesRaw[0]), SV_QsortSnapshotEntitiesByPriority);
+		// then limit
+		pvs->numbers.numSnapshotEntities = maxSnapEnts;
+	}
+
+	memset(pvs->entMask, 0, sizeof(pvs->entMask));
+	for (i = 0; i < pvs->numbers.numSnapshotEntities; i++) {
+		pvs->numbers.snapshotEntities[i] = pvs->numbers.snapshotEntitiesRaw[i].number;
+		SET_ABIT(pvs->entMask, pvs->numbers.snapshotEntities[i]);
+	}
+
+	// if there were portals visible, there may be out of order entities
+	// in the list which will need to be resorted for the delta compression
+	// to work correctly.  This also catches the error condition
+	// of an entity being included twice.
+	// TA: this is needed now anyway since we pre-sort by priority.
+	qsort(pvs->numbers.snapshotEntities, pvs->numbers.numSnapshotEntities,
+		sizeof(pvs->numbers.snapshotEntities[0]), SV_QsortEntityNumbers);
+
+	// now that all viewpoint's areabits have been OR'd together, invert
+	// all of them to make it a mask vector, which is what the renderer wants
+	for (i = 0; i < MAX_MAP_AREA_BYTES / 4; i++) {
+		((int*)pvs->areabits)[i] = ((int*)pvs->areabits)[i] ^ -1;
+	}
+
+	return pvs;
+}
+
+/*
+=============
+SV_BuildClientSnapshot
+
+Generates the client frame for a snapshot, calling SV_BuildClientPVS to either retrieve or build the list of entities to send as well.
 
 For viewing through other player's eyes, clent can be something other than client->gentity
 =============
 */
 static void SV_BuildClientSnapshot( client_t *client ) {
-	vec3_t						org;
 	clientSnapshot_t			*frame;
-	snapshotEntityNumbers_t		entityNumbers;
-	int							i, maxSnapEnts;
+	int							i;
 	sharedEntity_t				*ent;
 	entityState_t				*state;
-	svEntity_t					*svEnt;
 	sharedEntity_t				*clent;
 	playerState_t				*ps;
-
-	// bump the counter used to prevent double adding
-	sv.snapshotCounter++;
+	clientPVS_t					*pvs;
 
 	// this is the frame we are creating
 	frame = &client->frames[ client->netchan.outgoingSequence & PACKET_MASK ];
 
-	// clear everything in this snapshot
-	entityNumbers.numSnapshotEntities = 0;
-	Com_Memset(frame->areabits, 0, sizeof(frame->areabits));
-
 	frame->num_entities = 0;
+	Com_Memset( frame->areabits, 0, sizeof(frame->areabits) );
 
 	clent = client->gentity;
 	if (!clent || client->state == CS_ZOMBIE && !client->zombified) {
@@ -768,59 +875,16 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		memcpy(&frame->ps.saberIndex, &ps15->saberIndex, (char*)&(ps15)[1] - (char*)&ps15->saberIndex);
 	}
 
+	pvs = SV_BuildClientPVS(client,ps);
 
-	int							clientNum;
-	// never send client's own entity, because it can
-	// be regenerated from the playerstate
-	clientNum = frame->ps.clientNum;
-	if (clientNum < 0 || clientNum >= MAX_GENTITIES) {
-		Com_Error(ERR_DROP, "SV_SvEntityForGentity: bad gEnt");
-	}
-	svEnt = &sv.svEntities[clientNum];
-	svEnt->snapshotCounter = sv.snapshotCounter;
-
-
-	// find the client's viewpoint
-	VectorCopy(ps->origin, org);
-	org[2] += ps->viewheight;
-
-	// add all the entities directly visible to the eye, which
-	// may include portal entities that merge other viewpoints
-	SV_AddEntitiesVisibleFromPoint(org, frame, &entityNumbers, qfalse, client - svs.clients);
-
-	maxSnapEnts = client->customSnapEntCount ? client->customSnapEntCount : MAX_SNAPSHOT_ENTITIES_SERVER;
-	if (entityNumbers.numSnapshotEntities > maxSnapEnts) {
-		// this is a normal client who would rather not receive more than the usual vanilla 256 ents per snapshot.
-		// pre-sort by priority
-		qsort(entityNumbers.snapshotEntitiesRaw, entityNumbers.numSnapshotEntities,
-			sizeof(entityNumbers.snapshotEntitiesRaw[0]), SV_QsortSnapshotEntitiesByPriority);
-		// then limit
-		entityNumbers.numSnapshotEntities = maxSnapEnts;
-	}
-
-	for (i = 0; i < entityNumbers.numSnapshotEntities; i++) {
-		entityNumbers.snapshotEntities[i] = entityNumbers.snapshotEntitiesRaw[i].number;
-	}
-
-	// if there were portals visible, there may be out of order entities
-	// in the list which will need to be resorted for the delta compression
-	// to work correctly.  This also catches the error condition
-	// of an entity being included twice.
-	// TA: this is needed now anyway since we pre-sort by priority.
-	qsort(entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities,
-		sizeof(entityNumbers.snapshotEntities[0]), SV_QsortEntityNumbers);
-
-	// now that all viewpoint's areabits have been OR'd together, invert
-	// all of them to make it a mask vector, which is what the renderer wants
-	for (i = 0; i < MAX_MAP_AREA_BYTES / 4; i++) {
-		((int*)frame->areabits)[i] = ((int*)frame->areabits)[i] ^ -1;
-	}
+	memcpy(frame->areabits,pvs->areabits,sizeof(frame->areabits));
+	frame->areabytes = pvs->areabytes;
 
 	// copy the entity states out
 	frame->num_entities = 0;
 	frame->first_entity = svs.nextSnapshotEntities;
-	for (i = 0; i < entityNumbers.numSnapshotEntities; i++) {
-		ent = SV_GentityNum(entityNumbers.snapshotEntities[i]);
+	for (i = 0; i < pvs->numbers.numSnapshotEntities; i++) {
+		ent = SV_GentityNum(pvs->numbers.snapshotEntities[i]);
 		state = &svs.snapshotEntities[svs.nextSnapshotEntities % svs.numSnapshotEntities];
 		*state = ent->s;
 		svs.nextSnapshotEntities++;
