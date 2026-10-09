@@ -23,7 +23,7 @@ static const char * const svc_strings[256] = {
 	"svc_mapchange",
 };
 
-static void SHOWNET( const msg_t *msg, const char *s) {
+void SHOWNET( const msg_t *msg, const char *s) {
 	if ( cl_shownet->integer >= 2) {
 		Com_Printf ("%3i:%s\n", msg->readcount-1, s);
 	}
@@ -290,7 +290,7 @@ for any reason, no changes to the state will be made at all.
 #ifdef RELDEBUG
 //#pragma optimize("", off)
 #endif
-void CL_ParseSnapshot( msg_t *msg ) {
+qboolean CL_ParseSnapshot( msg_t *msg ) {
 	int			len, len2;
 	clSnapshot_t	*old;
 	clSnapshot_t	newSnap;
@@ -473,7 +473,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// if not valid, dump the entire thing now that it has
 	// been properly read
 	if ( !newSnap.valid ) {
-		return;
+		return qfalse;
 	}
 
 	// clear the valid flags of any snapshots between the last
@@ -1022,6 +1022,8 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	}
 
 	cl.newSnapshots = qtrue;
+
+	return qtrue;
 }
 #ifdef RELDEBUG
 //#pragma optimize("", on)
@@ -1238,6 +1240,11 @@ void CL_ParseGamestate( msg_t *msg ) {
 	clc.clientNum = MSG_ReadLong(msg);
 	// read the checksum feed
 	clc.checksumFeed = MSG_ReadLong( msg );
+
+#ifdef USE_MULTIVIEW
+	clc.clientView = clc.clientNum;
+	//clc.zexpectDeltaSeq = 0; // that will reset compression context
+#endif
 
 #ifdef _DONETPROFILE_
 	endBytes=msg->readcount;
@@ -1595,6 +1602,7 @@ CL_ParseServerMessage
 void CL_ParseServerMessage( msg_t *msg ) {
 	int			cmd;
 	qboolean	forceEnd = qfalse;
+	qboolean	goodSnapshot = qfalse;
 	int			reliableAcknowledge;
 
 	if ( cl_shownet->integer == 1 ) {
@@ -1646,11 +1654,15 @@ void CL_ParseServerMessage( msg_t *msg ) {
 			break;
 		}
 
+		reread:
 		cmd = MSG_ReadByte( msg );
 
 		if ( cmd == svc_EOF) {
-			SHOWNET( msg, "END OF MESSAGE" );
-			break;
+			if (!CL_ParseExtensions(msg, goodSnapshot)) {
+				SHOWNET(msg, "END OF MESSAGE");
+				break;
+			}
+			goto reread;
 		}
 
 		if ( cl_shownet->integer >= 2 ) {
@@ -1675,7 +1687,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 			CL_ParseGamestate( msg );
 			break;
 		case svc_snapshot:
-			CL_ParseSnapshot( msg );
+			goodSnapshot = CL_ParseSnapshot( msg );
 			break;
 		case svc_download:
 			if (!CL_ParseUDPDownload(msg)) {

@@ -111,6 +111,15 @@ typedef struct {
 	int64_t			messageSent;		// time the message was transmitted
 	int64_t			messageAcked;		// time the message was acked
 	int				messageSize;		// used to rate drop packets
+#ifdef USE_MULTIVIEW
+	qboolean		multiview;
+	int				version;
+	//int				mergeMask;
+	int				first_psf;				// first playerState index
+	int				num_psf;				// number of playerStates to send
+	byte			psMask[MAX_CLIENTS / 8];	// playerState mask
+	int				normalSnapshotOldFrame; 
+#endif
 } clientSnapshot_t;
 
 /* do we need this for anything? original ones from the code
@@ -398,7 +407,7 @@ extern	cvar_t	*mv_httpserverport;
 //extern	int		sv_lastClientSeq;
 
 extern	cvar_t	*sv_mvClients;
-//extern	cvar_t	*sv_mvPassword;
+extern	cvar_t	*sv_mvPassword;
 //extern	cvar_t	*sv_demoFlags;
 //extern	cvar_t	*sv_autoRecord;
 
@@ -567,6 +576,11 @@ void SV_ClearAllDemoPreRecord();
 void SV_AutoRecordDemo(client_t* cl);
 void SV_StopAutoRecordDemos();
 void SV_BeginAutoRecordDemos();
+
+//
+// sv_extensions.cpp
+//
+void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgType, qboolean doingSnapshot);
 
 //
 // sv_snapshot.c

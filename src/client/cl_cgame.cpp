@@ -3,6 +3,7 @@
 #include "client.h"
 #include <chrono>
 #include <algorithm>
+#include <type_traits>
 #include "../game/botlib.h"
 
 #if !defined(FX_EXPORT_H_INC)
@@ -138,8 +139,39 @@ void	CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
 multiprotocol support
 ====================
 */
-qboolean	CL_GetSnapshot16(int snapshotNumber, snapshot_t *snapshot) {
-	clSnapshot_t	*clSnap;
+
+clSnapshot15_t *CL_GetSnapshot15from16(clSnapshot_t *snapshot) {
+	static clSnapshot15_t retn;
+
+	memset(&retn, 0, sizeof(clSnapshot15_t));
+	retn.valid = snapshot->valid;
+	retn.snapFlags = snapshot->snapFlags;
+	retn.serverTime = snapshot->serverTime;
+	retn.messageNum = snapshot->messageNum;
+	retn.deltaNum = snapshot->deltaNum;
+	retn.ping = snapshot->ping;
+	memcpy(retn.areamask, snapshot->areamask, sizeof(retn.areamask));
+	retn.cmdNum = snapshot->cmdNum;
+	retn.numEntities = snapshot->numEntities;
+	retn.parseEntitiesNum = snapshot->parseEntitiesNum;
+	retn.serverCommandNum = snapshot->serverCommandNum;
+
+#ifdef USE_MULTIVIEW
+	retn.multiview = snapshot->multiview;
+#endif
+
+	// tricky but works atleast on x86
+	memcpy(&retn.ps, &snapshot->ps, ((char *)&snapshot->ps.saberIndex) - (char *)&snapshot->ps);
+	memcpy(&retn.ps.saberIndex, &snapshot->ps.saberIndex, (char *)&(&snapshot->ps)[1] - (char *)&snapshot->ps.saberIndex);
+
+	return &retn;
+}
+
+
+template <typename T>
+qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
+	using snapshotCond_t = std::conditional_t<std::is_same_v<T, snapshot_t>, clSnapshot_t, clSnapshot15_t>;
+	snapshotCond_t	*clSnap;
 	int				i, count;
 
 	if ( snapshotNumber > cl.snap.messageNum ) {
@@ -152,7 +184,12 @@ qboolean	CL_GetSnapshot16(int snapshotNumber, snapshot_t *snapshot) {
 	}
 
 	// if the frame is not valid, we can't return it
-	clSnap = &cl.snapshots[snapshotNumber & PACKET_MASK];
+	if constexpr (std::is_same_v<T, snapshot_t>) {
+		clSnap = (snapshotCond_t*)&cl.snapshots[snapshotNumber & PACKET_MASK];
+	}
+	else if constexpr (std::is_same_v<T, snapshot15_t>) {
+		clSnap = (snapshotCond_t*)CL_GetSnapshot15from16(&cl.snapshots[snapshotNumber & PACKET_MASK]);
+	}
 	if ( !clSnap->valid ) {
 		return qfalse;
 	}
@@ -168,6 +205,101 @@ qboolean	CL_GetSnapshot16(int snapshotNumber, snapshot_t *snapshot) {
 	snapshot->serverCommandSequence = clSnap->serverCommandNum;
 	snapshot->ping = clSnap->ping;
 	snapshot->serverTime = clSnap->serverTime;
+
+#ifdef USE_MULTIVIEW
+	if ( clSnap->multiview.multiview && clc.clientView != clc.clientNum && GET_ABIT(clSnap->multiview.clientMask, clc.clientView)) {
+		clPSFrame_t* psFrame = NULL;
+		int i;
+		/*if (GET_ABIT(clSnap->multiview.clientMask, clc.clientView)) {
+			//clientView = clc.clientView;
+		}
+		else {
+			// we need to select another POV
+			if (clSnap->clps[clc.clientNum].valid) {
+				Com_DPrintf(S_COLOR_CYAN "multiview: switch POV back from %d to %d\n", clc.clientView, clc.clientNum);
+				clc.clientView = clc.clientNum; // fixup to avoid glitches
+			}
+			else {
+				// invalid primary id? search for any valid
+				for (i = 0; i < MAX_CLIENTS; i++) {
+					if (clSnap->clps[i].valid) {
+						//clientView =
+						clc.clientNum = clc.clientView = i;
+						Com_Printf(S_COLOR_CYAN "multiview: set primary client id %d\n", clc.clientNum);
+						break;
+					}
+				}
+				if (i == MAX_CLIENTS) {
+					if (!(snapshot->snapFlags & SNAPFLAG_NOT_ACTIVE)) {
+						Com_Error(ERR_DROP, "Unable to find any playerState in multiview");
+						return qfalse;
+					}
+				}
+			}
+		}*/
+
+		for (i = clSnap->multiview.parsePlayerstatesNum; i < clSnap->multiview.parsePlayerstatesNum + clSnap->multiview.numPlayerstates; i++) {
+			psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];
+			if (psFrame->number == clc.clientView) {
+				break;
+			}
+		}
+		if (psFrame->number == clc.clientView) {
+			playerState_t* ps = &psFrame->ps;
+			Com_Memcpy(snapshot->areamask, psFrame->areamask, sizeof(snapshot->areamask));
+			if constexpr (std::is_same_v<T, snapshot15_t>) {
+				// tricky but works atleast on x86
+				memcpy(&snapshot->ps, ps, ((char*)&snapshot->ps.saberIndex) - (char*)&snapshot->ps);
+				memcpy(&snapshot->ps.saberIndex, &ps->saberIndex, (char*)&(&snapshot->ps)[1] - (char*)&snapshot->ps.saberIndex);
+			}
+			else {
+				snapshot->ps = *ps;
+			}
+
+			
+			// wp glowing workaround.. this keeps yourself from glowing like a candle when and after charging the blaster pistol on high svs.time
+			if (!(cls.fixes & MVFIX_WPGLOWING) && snapshot->ps.weaponstate != WEAPON_CHARGING_ALT && snapshot->ps.weaponstate != WEAPON_CHARGING)
+				snapshot->ps.weaponChargeTime = 0;
+
+
+			count = 0;
+
+			int index, n;
+			for (index = 0; index < clSnap->numEntities; ++index) {
+				n = (clSnap->parseEntitiesNum + index) & (MAX_PARSE_ENTITIES - 1);
+				if ( GET_ABIT( psFrame->entMask, cl.parseEntities[n].number) ) {
+					int entityNum = cl.parseEntities[n].number;
+					// skip own and spectated entity
+					if ( entityNum != clc.clientView && entityNum != snapshot->ps.clientNum )
+					{
+						if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
+							Com_Error(ERR_DROP, "snapshot entities count overflow for %i", clc.clientView);
+							break;
+						}
+						snapshot->entities[count++] = cl.parseEntities[n];
+
+						// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
+						if (!(cls.fixes & MVFIX_WPGLOWING) && (snapshot->entities[count - 1].eType == ET_BODY || snapshot->entities[count - 1].eType == ET_PLAYER)) {
+							snapshot->entities[count-1].constantLight = 0;
+						}
+
+						if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
+							Com_DPrintf("CL_GetSnapshot (multiview): truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT);
+							count = MAX_ENTITIES_IN_SNAPSHOT;
+							break;
+						}
+					}
+				}
+			}
+
+			snapshot->numEntities = count;
+
+			return qtrue;
+		}
+	}
+#endif
+
+
 	Com_Memcpy( snapshot->areamask, clSnap->areamask, sizeof( snapshot->areamask ) );
 	snapshot->ps = clSnap->ps;
 
@@ -200,29 +332,7 @@ qboolean	CL_GetSnapshot16(int snapshotNumber, snapshot_t *snapshot) {
 	return qtrue;
 }
 
-clSnapshot15_t *CL_GetSnapshot15from16(clSnapshot_t *snapshot) {
-	static clSnapshot15_t retn;
-
-	memset(&retn, 0, sizeof(clSnapshot15_t));
-	retn.valid = snapshot->valid;
-	retn.snapFlags = snapshot->snapFlags;
-	retn.serverTime = snapshot->serverTime;
-	retn.messageNum = snapshot->messageNum;
-	retn.deltaNum = snapshot->deltaNum;
-	retn.ping = snapshot->ping;
-	memcpy(retn.areamask, snapshot->areamask, sizeof(retn.areamask));
-	retn.cmdNum = snapshot->cmdNum;
-	retn.numEntities = snapshot->numEntities;
-	retn.parseEntitiesNum = snapshot->parseEntitiesNum;
-	retn.serverCommandNum = snapshot->serverCommandNum;
-
-	// tricky but works atleast on x86
-	memcpy(&retn.ps, &snapshot->ps, ((char *)&snapshot->ps.saberIndex) - (char *)&snapshot->ps);
-	memcpy(&retn.ps.saberIndex, &snapshot->ps.saberIndex, (char *)&(&snapshot->ps)[1] - (char *)&snapshot->ps.saberIndex);
-
-	return &retn;
-}
-
+/*
 qboolean	CL_GetSnapshot15(int snapshotNumber, snapshot15_t *snapshot) {
 	clSnapshot15_t	*clSnap;
 	int				i, count;
@@ -283,13 +393,13 @@ qboolean	CL_GetSnapshot15(int snapshotNumber, snapshot15_t *snapshot) {
 	// FIXME: configstring changes and server commands!!!
 
 	return qtrue;
-}
+}*/
 
 qboolean	CL_GetSnapshot(int snapshotNumber, snapshot_t *snapshot) {
 	if (VM_GetGameversion(cgvm) != VERSION_1_02) {
-		return CL_GetSnapshot16(snapshotNumber, snapshot);
+		return CL_GetSnapshot<snapshot_t>(snapshotNumber, snapshot);
 	} else {
-		return CL_GetSnapshot15(snapshotNumber, (snapshot15_t *)snapshot);
+		return CL_GetSnapshot<snapshot15_t>(snapshotNumber, (snapshot15_t *)snapshot);
 	}
 }
 

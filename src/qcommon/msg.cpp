@@ -300,6 +300,25 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 }
 
 
+// adapted from quake3e multiview version
+void MSG_ReadByteMask( msg_t *msg, byte *mask, const int maxIndex, const int indexBits)
+{
+    int firstIndex;
+    int lastIndex;
+
+    while (MSG_ReadBits(msg, 1)) {
+		firstIndex = MSG_ReadBits(msg, indexBits); // 0..7
+		lastIndex = MSG_ReadBits(msg, indexBits);  // 0..7
+		for (; firstIndex < lastIndex + 1; firstIndex++) {
+			if (firstIndex >= maxIndex) {
+				Com_Error(ERR_FATAL,"MSG_ReadByteMask: Write past end of array");
+			}
+			mask[firstIndex] ^= MSG_ReadByte(msg); // delta-xor mask
+		}
+	}
+}
+
+
 
 //================================================================================
 
@@ -414,6 +433,151 @@ void MSG_WriteAngle(msg_t *sb, float f) {
 void MSG_WriteAngle16(msg_t *sb, float f) {
 	MSG_WriteShort(sb, ANGLE2SHORT(f));
 }
+
+qboolean MSG_BitCopy(msg_t* msg, msg_t* msgSrc, int bitcount, qboolean unsafe) {
+    int bitsleft = bitcount;
+    uint32_t tmp;
+	byte* dst = msg->data;
+	byte* src = msgSrc->data;
+	int bitdst = msg->bit;
+	int bitsrc = msgSrc->bit;
+
+	// Check how much space is left in each message. 
+	// Leave the last 32 bits alone for safety (we may read/write past the end otherwise with the integer casts)
+	int maxbits = MIN(msg->maxsize * 8 - msg->bit, msgSrc->maxsize * 8 - msgSrc->bit) - 32;
+
+	// this isn't an exact overflow check, but close enough
+	if (bitsleft >= maxbits) {
+		msg->overflowed = qtrue;
+		return qfalse;
+	}
+    
+    // get to an even location on the receiving side
+    for(;(bitdst& 7) && bitsleft;bitdst++,bitsrc++,bitsleft--){
+        dst[bitdst>>3] &= ~(1 << (bitdst & 7));
+        dst[bitdst>>3] |= ((src[bitsrc>>3] >> (bitsrc&7)) & 1) << (bitdst & 7);
+    }
+
+	if (!bitsleft) {
+		msg->bit = bitdst;
+		msgSrc->bit = bitsrc;
+		msg->cursize = (msg->bit >> 3) + 1;
+		msgSrc->readcount = (msgSrc->bit >> 3) + 1;
+		return qtrue;
+	}
+    
+    if(!(bitsrc &7)){
+        for(;bitsleft > 31;bitdst+=32,bitsrc+=32,bitsleft-=32){
+			// no need for LittleLong here, its just a raw memory copy anyway
+            *(uint32_t*)&dst[bitdst>>3] = *(uint32_t*)(src + (bitsrc >> 3));
+        }
+    }
+    
+	// this is unsafe and writes 1 byte past where it should. but it's fine if we know there's enough allocated at the end and we don't need to preserve data in the buffer after this.
+    for(;bitsleft > 23 && unsafe;bitdst+=24,bitsrc+=24,bitsleft-=24){
+        *(uint32_t*)&dst[bitdst>>3] = LittleLong( (LittleLong(  *(const uint32_t*)(src + (bitsrc >> 3))  ) >> (bitsrc & 7)) & 0xffffff );
+    }
+    
+    for(;bitsleft > 15;bitdst+=16,bitsrc+=16,bitsleft-=16){
+		*(uint16_t*)&dst[bitdst >> 3] = LittleShort((LittleLong(  *(const uint32_t*)(src + (bitsrc >> 3))  ) >> (bitsrc & 7)) & 0xffff);
+    }
+    
+    for(;bitsleft > 7;bitdst+=8,bitsrc+=8,bitsleft-=8){
+        dst[bitdst>>3] = (LittleLong(  *(const uint32_t*)(src + (bitsrc >> 3))  ) >> (bitsrc & 7)) & 0xff;
+    }
+    
+	dst[bitdst >> 3] = 0;
+    for(;bitsleft;bitdst++,bitsrc++){
+        dst[bitdst>>3] &= ~(1 << (bitdst & 7));
+        dst[bitdst>>3] |= ((src[bitsrc>>3] >> (bitsrc&7)) & 1) << (bitdst & 7);
+        bitsleft--;
+    }
+
+	msg->bit = bitdst;
+	msgSrc->bit = bitsrc;
+	msg->cursize = (msg->bit >> 3) + 1;
+	msgSrc->readcount = (msgSrc->bit >> 3) + 1;
+
+	return qtrue;
+}
+
+// from quake3e multiview version
+void MSG_EmitByteMask( msg_t *msg, const byte *mask, const int maxIndex, const int indexBits, qboolean ignoreFirstZero )
+{
+    int firstIndex;
+    int lastIndex;
+
+    for ( firstIndex = 0; firstIndex < maxIndex; firstIndex++ ) {
+        if ( mask[ firstIndex ] ) {
+            lastIndex = firstIndex;
+            while ( lastIndex < maxIndex-1 ) {
+                if ( mask[ lastIndex + 1 ] )
+                    lastIndex++;
+                else if ( ignoreFirstZero && lastIndex < maxIndex-2 && mask[ lastIndex + 2 ] )
+                    lastIndex += 2; // skip single zero block
+                else
+                    break;
+            }
+            //printf( "start: %i end: %i\n", firstIndex, lastIndex );
+            MSG_WriteBits( msg, 1, 1 ); // delta change
+            MSG_WriteBits( msg, firstIndex, indexBits );
+            MSG_WriteBits( msg, lastIndex, indexBits );
+            for ( ; firstIndex < lastIndex + 1 ; firstIndex++ ) {
+                MSG_WriteByte( msg, mask[ firstIndex ] );
+            }
+            firstIndex = lastIndex;
+        }
+    }
+    MSG_WriteBits( msg, 0, 1 ); // no delta
+}
+
+
+#define EXTENSION_MARKER_LENGTH 10
+typedef struct extensionTypeMap_s {
+	const char marker[EXTENSION_MARKER_LENGTH+1];
+	extensionType_t type;
+} extensionTypeMap_t;
+
+// these have to be in the same order as extensionType_t enum values.
+// the concrete enum values don't matter, but they must be consistent
+// with the array index here so we can easily write a marker based on an enum
+extensionTypeMap_t extensions[EXT_TYPES_COUNT] = {
+	{"INVALIDEXT",EXT_INVALID},
+	{"HIDDENMETA",EXT_HIDDENMETA},
+	{"HIDDENUCMD",EXT_HIDDENUCMD},
+	{"HIDDCLUCMD",EXT_HIDDCLUCMD},
+	{"COOLEXTEND",EXT_COOLEXTEND},
+};
+
+const int countExtensions = sizeof(extensions) / sizeof(extensions[0]);
+
+// call this AFTER writing svc_eof
+int MSG_WriteExtensionMarker(msg_t* msg, extensionType_t type) {
+
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	constexpr int metaMarkerLength = sizeof(((extensionTypeMap_t*)0)->marker) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	constexpr int maxBytePerByteSaved = 2;
+	constexpr int maxBitsPerByteSaved = 11;
+	constexpr int metaMarkerPresenceMinimumByteLengthExtra = (metaMarkerLength * maxBitsPerByteSaved + 7) / 8;
+
+	const int requiredCursize = msg->cursize + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	for (int i = 0; i < metaMarkerLength; i++) {
+		MSG_WriteByte(msg,extensions[type].marker[i]);
+	}
+
+	if (msg->cursize < requiredCursize) {
+		msg->cursize = requiredCursize;
+	}
+	return requiredCursize;
+}
+
 
 
 //============================================================
@@ -582,6 +746,159 @@ void MSG_SkipData(msg_t *msg, int len) {
 		MSG_ReadByte(msg);
 	}
 }
+
+qboolean MSG_SkipBits(msg_t* msg, int bitcount) {
+	if ((clampedIntAdd(msg->bit,bitcount) >> 3) > msg->cursize || bitcount < 0) {
+		return qfalse;
+	}
+	msg->bit += bitcount;
+	msg->readcount = (msg->bit >> 3) + 1;
+	if (msg->readcount > msg->cursize) {
+		return qfalse;
+	}
+	return qtrue;
+}
+
+
+
+
+
+// quick lookup. terribly wasteful memory-wise but should be a fast lookup for extension strings
+typedef struct extensionNode_s {
+#if _DEBUG
+	char letter;
+#endif
+	extensionTypeMap_t* ext; // this is only set in "leaf" nodes (only 1 possible solution)
+	struct extensionNode_s* subnodes[256];
+} extensionNode_t;
+
+// for fun, we want this to work without allocations.
+// so let's consider the worst possible case for how many nodes we need.
+// according to my mind it should be:
+// tree splits into pairs of 2 at the top (cuz any 1 will collapse into 1 node). and then we need 
+// 1+(entries/2)*(maxLetters-1)+entries. is that right? let's hope so. otherwise, just add magic constants i guess until it works :)
+static extensionNode_t freeNodes[1+ (countExtensions/2) * (sizeof(((extensionTypeMap_t*)0)->marker)-2) + countExtensions] = { 0 };
+static int freeNodeCount = sizeof(freeNodes) / sizeof(freeNodes[0]);
+static extensionNode_t* extensionTree = NULL;
+
+static extensionNode_t* MSG_BuildExtensionNodes_r(extensionTypeMap_t* extensions, int extensionCount, int charOffset) {
+	int count = 0;
+	int i;
+	int letter, letterCount = 0, lastLetter = -1;
+	extensionTypeMap_t* lastLetterExtension = NULL;
+	extensionNode_t* thisNode = freeNodeCount ? &freeNodes[--freeNodeCount] : NULL;
+	if (!thisNode) {
+		Com_Error(ERR_FATAL,"Cannot build network protocol extension nodes. Ran out of free nodes.");
+	}
+	// only one option here. this is a leaf
+#if _DEBUG
+	thisNode->letter = charOffset ? extensions->marker[charOffset-1] : 0;
+#endif
+	if (extensionCount == 1) {
+		thisNode->ext = extensions;
+		return thisNode;
+	}
+	if (charOffset && !extensions->marker[charOffset - 1]) { // reached \0 terminator
+		Com_Error(ERR_FATAL, "Cannot build network protocol extension nodes. Duplicate marker.");
+	}
+	// need to create child nodes
+	for (i = 0; i < extensionCount; i++, extensions++) {
+		letter = *(byte*)&extensions->marker[charOffset];
+		if (lastLetter != letter) {
+			if (letterCount) {
+				thisNode->subnodes[lastLetter] = MSG_BuildExtensionNodes_r(lastLetterExtension,letterCount,charOffset+1);
+			}
+			letterCount = 1;
+			lastLetterExtension = extensions;
+		}
+		else {
+			letterCount++;
+		}
+		lastLetter = letter;
+	}
+	thisNode->subnodes[letter] = MSG_BuildExtensionNodes_r(lastLetterExtension, letterCount, charOffset + 1);
+	return thisNode;
+}
+static qboolean extensionNodesBuilt = qfalse;
+void MSG_BuildExtensionNodes() {
+	if (extensionNodesBuilt) {
+		return;
+	}
+	extensionTree = MSG_BuildExtensionNodes_r(extensions,countExtensions,0);
+	extensionNodesBuilt = qtrue;
+}
+
+
+// returns -1 if nothing detected (message will be auto-rewinded) or
+// extensionType_t value, and ready to keep reading.
+int MSG_CheckForExtensions(msg_t* msg) {
+
+	usercmd_t	nullcmd;
+
+	// Normal demo readers will quit here. For all intents and purposes this demo message is over. But we're gonna put the metadata here now. Since it comes after svc_EOF, nobody will ever be bothered by it 
+	// but we can read it if we want to.
+	constexpr int metaMarkerLength = sizeof(((extensionTypeMap_t*)0)->marker) - 1;
+	// This is how the demo huffman operates. Worst case a byte can take almost 2 bytes to save, from what I understand. When reading past the end, we need to detect if we SHOULD read past the end.
+	// For each byte we need to read, thus, the message length must be at least 2 bytes longer still. Hence at the end we will artificially set the message length to be minimum that long.
+	// We will only read x amount of bytes (where x is the length of the meta marker) and see if the meta marker is present. If it is, we then proceeed to read a bigstring.
+	// This same thing is technically not true for the custom compressed types (as their size is always the real size of the data) but we'll just leave it like this to be universal and simple.
+	constexpr int maxBytePerByteSaved = 2; 
+	constexpr int maxBitsPerByteSaved = 11; 
+	constexpr int minBitsPerByteSaved = 1; 
+	constexpr int metaMarkerPresenceMinimumByteLengthExtra = (metaMarkerLength * minBitsPerByteSaved +7)/8;
+	
+	const int requiredCursize = msg->readcount + metaMarkerPresenceMinimumByteLengthExtra; // We'll just set it to this value at the end if it ends up smaller.
+
+	if (msg->cursize < requiredCursize) {
+		return -1;
+	}
+
+	extensionNode_t* node = extensionTree;
+
+	int oldbit = msg->bit;
+	int oldreadcount = msg->readcount;
+	int newbyte;
+	qboolean fail = qfalse;
+	for (int i = 0; i < metaMarkerLength; i++) {
+
+		int newbyte = MSG_ReadByte(msg);
+		//if (msg->cursize < msg->readcount + maxBytePerByteSaved)
+		if(newbyte == -1)
+		{
+			msg->bit = oldbit;
+			msg->readcount = oldreadcount;
+			return -1;
+		}
+
+		if (node->ext) { // leaf node. check text identity
+			if (node->ext->marker[i] != newbyte) {
+				fail = qtrue;
+			}
+		}
+		else {  // normal node. branch into subnode or NULL
+			node = node->subnodes[newbyte];
+			if (!node) {
+				fail = qtrue;
+			}
+		}
+		if (fail) {
+			msg->bit = oldbit;
+			msg->readcount = oldreadcount;
+			return -1;
+		}
+	}
+	return node->ext ? node->ext->type : -1;
+}
+
+
+
+
+
+
+
+
+
+
 
 /*
 =============================================================================
@@ -1590,7 +1907,7 @@ MSG_WriteDeltaPlayerstate
 =============
 */
 
-void MSG_WriteDeltaPlayerstate(msg_t *msg, struct playerState_s *from, struct playerState_s *to) {
+void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, struct playerState_s *to) {
 	int				i;
 	playerState_t	dummy;
 	int				statsbits;
@@ -1773,7 +2090,7 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, struct playerState_s *from, struct pl
 MSG_ReadDeltaPlayerstate
 ===================
 */
-void MSG_ReadDeltaPlayerstate(msg_t *msg, playerState_t *from, playerState_t *to) {
+void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState_t *to) {
 	int			i, lc;
 	int			bits;
 	netField_t	*field;

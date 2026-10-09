@@ -2761,6 +2761,8 @@ void Com_Init( char *commandLine ) {
 
 	com_initTime = Com_RealTime(NULL);
 
+	MSG_BuildExtensionNodes();
+
 	// multiprotocol support
 	// startup will be UNDEFINED
 	MV_SetCurrentGameversion(VERSION_UNDEF);

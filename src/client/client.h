@@ -17,6 +17,27 @@ extern	clientRendererInfo_t	clRenderInfo;
 // Wind
 extern vec3_t cl_windVec;
 
+#ifdef USE_MULTIVIEW
+typedef struct clPSFrame_s {
+	int				areabytes;
+	byte			areamask[MAX_MAP_AREA_BYTES]; // portalarea visibility bits
+	byte			entMask[MAX_GENTITIES / 8];
+	playerState_t	ps;
+	int				number;
+} clPSFrame_t;
+
+typedef struct snapshotMultiview_s {
+	int				numPlayerstates;		// all of the playerstates that need to be presented
+	int				parsePlayerstatesNum;		// at the time of this snapshot
+	qboolean		multiview;
+	int				version;
+	//int				mergeMask;
+	byte			clientMask[MAX_CLIENTS / 8];
+	int				multiViewDeltaNum;		// messageNum the multiview delta is from
+	qboolean		multiviewValid;
+} snapshotMultiview_t;
+#endif
+
 // snapshots are a view of the server at a given time
 typedef struct {
 	qboolean		valid;			// cleared if delta parsing was invalid
@@ -37,6 +58,9 @@ typedef struct {
 
 	int				serverCommandNum;		// execute all commands up to this before
 	// making the snapshot current
+#ifdef USE_MULTIVIEW
+	snapshotMultiview_t	multiview;
+#endif // USE_MV
 } clSnapshot_t;
 
 // snapshots are a view of the server at a given time
@@ -59,6 +83,9 @@ typedef struct {
 
 	int				serverCommandNum;		// execute all commands up to this before
 											// making the snapshot current
+#ifdef USE_MULTIVIEW
+	snapshotMultiview_t	multiview;
+#endif // USE_MV
 } clSnapshot15_t;
 
 
@@ -84,6 +111,9 @@ typedef struct {
 // it can be un-deltad from the original
 //#define	MAX_PARSE_ENTITIES	4096
 #define	MAX_PARSE_ENTITIES	16384
+#ifdef USE_MULTIVIEW
+#define	MAX_PARSE_PLAYERSTATES	2048
+#endif
 #define SERVERTIME_DELTA_SMOOTH_SAMPLES	100 // samples used for averaging
 //#define	MAX_PARSE_ENTITIES	32768
 
@@ -107,7 +137,10 @@ typedef struct {
 	gameState_t	gameState;			// configstrings
 	char		mapname[MAX_QPATH];	// extracted from CS_SERVERINFO
 
-	int			parseEntitiesNum;	// index (not anded off) into cl_parse_entities[]
+	int			parseEntitiesNum;	// index (not anded off) into cl.parseEntities[]
+#ifdef USE_MULTIVIEW
+	int			parsePlayerstatesNum;	// index (not anded off) into cl.parsePlayerstates[]
+#endif
 
 	int			mouseDx[2], mouseDy[2];	// added to by mouse events
 	int			mouseIndex;
@@ -165,6 +198,10 @@ typedef struct {
 	entityState_t	entityBaselines[MAX_GENTITIES];	// for delta compression when not in previous frame
 
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
+
+#ifdef USE_MULTIVIEW
+	clPSFrame_t		parsePlayerstates[MAX_PARSE_PLAYERSTATES];
+#endif
 
 	char			*mSharedMemory;
 
@@ -289,6 +326,11 @@ typedef struct {
 
 	qboolean	gotInfo;
 	qboolean	gotStatus;
+
+#ifdef USE_MULTIVIEW
+	int			clientView;
+	//int			zexpectDeltaSeq;			// for compressed server commands
+#endif
 } clientConnection_t;
 
 extern	clientConnection_t clc;
@@ -683,6 +725,11 @@ extern	cvar_t	*cl_traceBenchmark;
 extern	cvar_t	*cl_traceBenchmarkTimeLimitMs;
 
 //=================================================
+
+//
+// cl_extensions
+//
+qboolean CL_ParseExtensions(msg_t* msg, qboolean parsedSnapshot);
 
 //
 // cl_main

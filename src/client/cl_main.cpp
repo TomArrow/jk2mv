@@ -173,6 +173,9 @@ extern void SV_BotFrame( int time );
 void CL_CheckForResend( void );
 void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
+#ifdef USE_MULTIVIEW
+void CL_MultiviewFollow_f(void);
+#endif
 void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
 
 /*
@@ -3959,6 +3962,9 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("setenv", CL_Setenv_f );
 	Cmd_AddCommand ("ping", CL_Ping_f );
 	Cmd_AddCommand ("serverstatus", CL_ServerStatus_f );
+#ifdef USE_MULTIVIEW
+	Cmd_AddCommand ("mvfollow", CL_MultiviewFollow_f );
+#endif
 
 #ifdef CL_EZDEMO
 	Cmd_AddCommand("ezdemo", CL_Ezdemo_f); // "find cool events in a demo like dbs returns..\\<demo> [options]"},
@@ -5069,6 +5075,28 @@ void CL_ServerStatus_f(void) {
 	serverStatus->print = qtrue;
 	serverStatus->pending = qtrue;
 }
+
+#ifdef USE_MULTIVIEW
+void CL_MultiviewFollow_f(void) {
+    int clientNum;
+
+    if (!cl.snap.multiview.multiview)
+        return;
+
+	if (Cmd_Argc() < 2) {
+		clc.clientView = clc.clientNum;
+		return;
+	}
+
+    clientNum = atoi(Cmd_Argv(1));
+
+    if ((unsigned) clientNum >= MAX_CLIENTS)
+        return;
+
+    if (GET_ABIT(cl.snap.multiview.clientMask, clientNum))
+        clc.clientView = clientNum;
+}
+#endif
 
 /*
 ==================

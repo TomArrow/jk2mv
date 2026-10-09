@@ -1413,6 +1413,67 @@ void SV_UserinfoChanged( client_t *cl ) {
 		SV_DropClient( cl, "userinfo string length exceeded" );
 }
 
+
+#ifdef USE_MULTIVIEW
+/*
+=================
+void SV_MultiView_f
+=================
+*/
+void SV_MultiView_f( client_t *client ) {
+    int i, n;
+
+    if (  Q_stricmp( Cmd_Argv( 0 ), "mvjoin" ) == 0 ) {
+        if ( client->multiview.protocol > 0 ) {
+            SV_SendServerCommand( client, "print \"You are already in multiview state.\n\"" );
+            return;
+        }
+
+        // count active multiview clients
+        for ( i = 0, n = 0; i < sv_maxclients->integer; i++ ) {
+            if ( svs.clients[ i ].multiview.protocol > 0 )
+                n++;
+        }
+
+        if ( n >= sv_mvClients->integer ) {
+            SV_SendServerCommand( client, "print \"" S_COLOR_YELLOW "No free multiview slots.\n\"" );
+            return;
+        }
+
+        if ( sv_mvPassword->string[0] != '\0' ) {
+            if ( Cmd_Argc() < 2 || strcmp( sv_mvPassword->string, Cmd_Argv(1) ) ) {
+                SV_SendServerCommand( client, "print \"" S_COLOR_YELLOW "Invalid password.\n\"" );
+                return;
+            }
+		}
+
+        client->multiview.protocol = MV_PROTOCOL_VERSION;
+        //client->multiview.scoreQueryTime = 0;
+#ifdef USE_MV_ZCMD
+        client->multiview.z.deltaSeq = 0; // reset on transition to multiview
+#endif
+        // FIXME: only local print?
+        SV_SendServerCommand( client, "print \"%s " S_COLOR_WHITE "joined multiview.\n\"", client->name );
+
+    } else { // assume "mvleave" in opposition to "mvjoin"
+        if ( client->multiview.protocol == 0 ) {
+            SV_SendServerCommand( client, "print \"You are not in multiview state.\n\"" );
+        } else {
+            SV_SendServerCommand( client, "print \"%s " S_COLOR_WHITE "leaved multiview.\n\"", client->name );
+            // FIXME: broadcast?
+            client->multiview.protocol = 0;
+            //client->multiview.scoreQueryTime = 0;
+#ifdef USE_MV_ZCMD
+            client->multiview.z.deltaSeq = 0; // reset on leaving multiview state
+#endif
+        }
+    }
+}
+#endif
+
+
+
+
 #define INFO_CHANGE_MIN_INTERVAL	5000
 #define INFO_CHANGE_MAX_COUNT		4
 
@@ -1489,6 +1550,12 @@ static const ucmd_t ucmds[] = {
 	{"nextdl", SV_NextDownload_f},
 	{"stopdl", SV_StopDownload_f},
 	{"donedl", SV_DoneDownload_f},
+
+#ifdef USE_MULTIVIEW
+	{"mvjoin", SV_MultiView_f},
+	{"mvleave", SV_MultiView_f},
+#endif
+
 
 	{NULL, NULL}
 };

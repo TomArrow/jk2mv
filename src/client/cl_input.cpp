@@ -1642,7 +1642,11 @@ void CL_WritePacket( void ) {
 		}
 
 		// begin a client move command
-		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting == 2
+		if ( cl_nodelta->integer || !cl.snap.valid 
+#ifdef USE_MULTIVIEW
+			|| cl.snap.multiview.multiview && !cl.snap.multiview.multiviewValid 
+#endif
+			|| clc.demowaiting == 2
 			|| clc.serverMessageSequence != cl.snap.messageNum ) {
 			MSG_WriteByte (&buf, clc_moveNoDelta);
 		} else {

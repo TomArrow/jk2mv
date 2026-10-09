@@ -1027,6 +1027,7 @@ void SV_Init (void) {
 
 #ifdef USE_MULTIVIEW
 	sv_mvClients = Cvar_Get("sv_mvClients", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	sv_mvPassword = Cvar_Get("sv_mvPassword", "", CVAR_ARCHIVE);
 #endif
 
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);

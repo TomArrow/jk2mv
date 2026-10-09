@@ -102,6 +102,7 @@ if (BuildMVMP OR BuildMVDED)
 		"server/sv_net_chan.cpp"
 		"server/sv_snapshot.cpp"
 		"server/sv_world.cpp"
+		"server/sv_extensions.cpp"
 	)
 	source_group("server" FILES ${MVMPDEDServerFiles})
 	set(MVMPDEDFiles ${MVMPDEDFiles} ${MVMPDEDServerFiles})
@@ -376,6 +377,7 @@ if (BuildMVMP)
 		"client/cl_cin.cpp"
 		"client/cl_console.cpp"
 		"client/cl_demos_auto.cpp"
+		"client/cl_extensions.cpp"
 		"client/cl_input.cpp"
 		"client/cl_keys.cpp"
 		"client/cl_main.cpp"

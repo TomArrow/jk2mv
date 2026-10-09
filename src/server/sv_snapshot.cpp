@@ -111,6 +111,7 @@ SV_WriteSnapshotToClient
 static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_t msgType ) {
 	clientSnapshot_t	*frame, *oldframe;
 	int					lastframe;
+	int					lastframeWithoutEntityRolloff = 0;
 	int					i;
 	int					snapFlags;
 #ifdef SVDEMO
@@ -194,6 +195,8 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 		// we have a valid snapshot to delta from
 		oldframe = &client->frames[deltaMessage & PACKET_MASK ];
 		lastframe = client->netchan.outgoingSequence - deltaMessage;
+		
+		lastframeWithoutEntityRolloff = lastframe;
 
 		// the snapshot's entities may still have rolled off the buffer, though
 		if ( oldframe->first_entity <= svs.nextSnapshotEntities - svs.numSnapshotEntities ) {
@@ -206,6 +209,14 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 			lastframe = 0;
 		}
 	}
+
+#ifdef USE_MULTIVIEW
+	// why are we setting this here? because we don't per-se care about
+	// delta in main snapshot failing due to entities rolling off the buffer,
+	// as the extra data (for now) only does playerstates. so we're not gonna
+	// throw away playerstate deltaing just because the entity deltaing here won't work
+	frame->normalSnapshotOldFrame = lastframeWithoutEntityRolloff ? lastframeWithoutEntityRolloff : (oldframe ? lastframe : 0);
+#endif
 
 #ifdef SVDEMO
 	if ((!sv_demoSpaceSaving->integer || msgType == MSG_DEMO)) {
@@ -406,6 +417,9 @@ typedef struct clientPVS_s {
     int			clientNum;
     int			pm_type;
     qboolean	spectator;
+#ifdef USE_MULTIVIEW
+	qboolean	multiview;
+#endif
     int			areabytes;
     byte		areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
     snapshotEntityNumbers_t	numbers;
@@ -570,7 +584,11 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientPVS_t* pvs, qbo
 
 			// MV entities can be flagged to be sent only to specific
 			// clients (can't filter following spectators this way)
-			if (mvEnt->snapshotIgnore[pvs->clientNum])
+			if (mvEnt->snapshotIgnore[pvs->clientNum]
+#ifdef USE_MULTIVIEW
+				&& !pvs->multiview
+#endif
+				)
 			{
 				continue;
 			}
@@ -581,7 +599,11 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientPVS_t* pvs, qbo
 			}
 
 			if (com_coolApi_supported_game->integer & COOL_APIFEATURE_MVSHAREDENTITY_REALCLIENTS) {
-				if (mvEnt->snapshotIgnoreRealClient[realClientNum])
+				if (mvEnt->snapshotIgnoreRealClient[realClientNum]
+#ifdef USE_MULTIVIEW
+					&& !pvs->multiview
+#endif
+					)
 				{
 					continue;
 				}
@@ -695,7 +717,11 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientPVS_t* pvs, qbo
 		vischeckfailed:
 
 		// If server has sv_specAllEnts set, spectators receive all entities.
-		if (sv_specAllEnts->integer && pvs->spectator)
+		if (sv_specAllEnts->integer && pvs->spectator 
+#ifdef USE_MULTIVIEW
+			|| pvs->multiview
+#endif
+			)
 		{
 			snapshotEntityPriority_t priority = SSPRIO_SPECALL;
 			if (ent->s.eType == ET_PLAYER) {
@@ -779,6 +805,9 @@ static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
 	pvs->areabytes = 0;
 	Com_Memset(pvs->areabits, 0, sizeof(pvs->areabits));
 
+#ifdef USE_MULTIVIEW
+	pvs->multiview = (qboolean)( client->multiview.protocol > 0 );
+#endif
 	pvs->spectator = (qboolean)(ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || (ps->pm_flags & PMF_FOLLOW));
 	pvs->pm_type = ps->pm_type;
 
@@ -833,6 +862,23 @@ static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
 	return pvs;
 }
 
+static void SV_GetConvertedPlayerstate(client_t* client, playerState_t* out) {
+
+	playerState_t* ps;
+	// grab the current playerState_t
+	ps = SV_GameClientNum(client - svs.clients);
+	if (VM_GetGameversion(gvm) != VERSION_1_02 || mvStructConversionDisabled) {
+		*out = *ps;
+	}
+	else {
+		// tricky but works atleast on x86
+		playerState15_t* ps15 = (playerState15_t*)ps;
+
+		memcpy(out, ps15, ((char*)&ps15->saberIndex) - (char*)ps15);
+		memcpy(&out->saberIndex, &ps15->saberIndex, (char*)&(ps15)[1] - (char*)&ps15->saberIndex);
+	}
+}
+
 /*
 =============
 SV_BuildClientSnapshot
@@ -848,7 +894,6 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	sharedEntity_t				*ent;
 	entityState_t				*state;
 	sharedEntity_t				*clent;
-	playerState_t				*ps;
 	clientPVS_t					*pvs;
 
 	// this is the frame we are creating
@@ -863,19 +908,9 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	}
 
 	// grab the current playerState_t
-	ps = SV_GameClientNum(client - svs.clients);
-	if (VM_GetGameversion(gvm) != VERSION_1_02 || mvStructConversionDisabled) {
-		frame->ps = *ps;
-	}
-	else {
-		// tricky but works atleast on x86
-		playerState15_t* ps15 = (playerState15_t*)ps;
+	SV_GetConvertedPlayerstate(client,&frame->ps);
 
-		memcpy(&frame->ps, ps15, ((char*)&ps15->saberIndex) - (char*)ps15);
-		memcpy(&frame->ps.saberIndex, &ps15->saberIndex, (char*)&(ps15)[1] - (char*)&ps15->saberIndex);
-	}
-
-	pvs = SV_BuildClientPVS(client,ps);
+	pvs = SV_BuildClientPVS(client,&frame->ps);
 
 	memcpy(frame->areabits,pvs->areabits,sizeof(frame->areabits));
 	frame->areabytes = pvs->areabytes;
@@ -894,6 +929,82 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		}
 		frame->num_entities++;
 	}
+
+	// we do this a bit different than quake3e, although we are heavily copying from it.
+	// our extra data comes all after the normal svc_EOF. the normal snapshot and message remains readable to normal clients
+	// we merely provide extra data.
+#ifdef USE_MULTIVIEW
+	if (client->multiview.protocol > 0) {
+		frame->multiview = qtrue;
+		// select primary client slot
+		//if (client->multiview.recorder) {
+		//	cl = sv_demoClientID;
+		//}
+	}
+	else {
+		frame->multiview = qfalse;
+	}
+
+	if (frame->multiview) {
+		//        clientPVS_t *pvs;
+		psFrame_t* psf;
+		client_t* slotCl = svs.clients;
+		playerState_t ps;
+		int slot;
+
+		Com_Memset(frame->psMask, 0, sizeof(frame->psMask));
+		frame->first_psf = svs.nextSnapshotPSF;
+		frame->num_psf = 0;
+
+		for (slot = 0; slot < sv_maxclients->integer; slot++, slotCl++) {
+			// record only active clients that aren't the main client
+			if (slotCl != client && slotCl->state == CS_ACTIVE) {
+
+				// get current playerstate
+				SV_GetConvertedPlayerstate(slotCl,&ps);
+
+				// skip bots in spectator state
+				if ((ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || ps.pm_flags & PMF_FOLLOW) && slotCl->netchan.remoteAddress.type == NA_BOT) {
+					continue;
+				}
+
+				// allocate playerstate frame
+				psf = &svs.snapshotPSF[svs.nextSnapshotPSF % svs.numSnapshotPSF];
+				svs.nextSnapshotPSF++;
+				frame->num_psf++;
+
+				SET_ABIT(frame->psMask, slot);
+
+				psf->ps = ps;
+				psf->clientSlot = slot;
+
+				pvs = SV_BuildClientPVS(slotCl, &psf->ps);
+				psf->areabytes = pvs->areabytes;
+				memcpy(psf->areabits, pvs->areabits, sizeof(psf->areabits));
+
+				// copy generated entity mask
+				memcpy(psf->entMask, pvs->entMask, sizeof(psf->entMask));
+			}
+		}
+		/*
+		// get ALL pointers from common snapshot
+		frame->num_entities = svs.currFrame->count;
+		for (i = 0; i < frame->num_entities; i++) {
+			frame->ents[i] = svs.currFrame->ents[i];
+		}
+
+#ifdef USE_MV_ZCMD
+		// some extras
+		if (client->deltaMessage <= 0)
+			client->multiview.z.deltaSeq = 0;
+#endif
+
+		// auto score request
+		if (sv_demoFlags->integer & (SCORE_RECORDER | SCORE_CLIENT))
+			SV_QueryClientScore(client);*/
+
+	}
+#endif
 }
 
 
@@ -1374,6 +1485,17 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 			// message overflows, but let's make sure and apply the same logic we
 			// used for the entity states.
 			SV_SendMessageToClient( &msgBak, client, qfalse, qtrue, (messageType_t)msgType);
+			continue;
+		}
+
+		// Backup the msg state in case the download would overflow it
+		memcpy(&msgBak, &msg, sizeof(msgBak));
+
+		SV_WriteCoolExtensionsToClient(&msg, client, (messageType_t)msgType, qtrue);
+
+		if (sv_dynamicSnapshots->integer && msg.overflowed && !msgBak.overflowed) {
+			// Do extensions
+			SV_SendMessageToClient(&msgBak, client, qfalse, qtrue, (messageType_t)msgType);
 			continue;
 		}
 

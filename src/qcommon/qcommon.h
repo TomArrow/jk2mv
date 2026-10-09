@@ -123,6 +123,16 @@ typedef struct {
 } msg_t;
 
 
+// post-eof extensions
+typedef enum extensionType_s {
+	EXT_INVALID,
+	EXT_HIDDENMETA,
+	EXT_HIDDENUCMD,
+	EXT_HIDDCLUCMD,
+	EXT_COOLEXTEND,
+	EXT_TYPES_COUNT
+} extensionType_t;
+
 
 void MSG_Init (msg_t *buf, byte *data, int length);
 void MSG_InitRaw(msg_t* buf, std::vector<byte>* dataRaw);
@@ -147,6 +157,10 @@ void MSG_WriteString (msg_t *sb, const char *s);
 void MSG_WriteBigString (msg_t *sb, const char *s);
 void MSG_WriteAngle16 (msg_t *sb, float f);
 
+int MSG_WriteExtensionMarker(msg_t* msg, extensionType_t type);
+qboolean MSG_BitCopy(msg_t* msg, msg_t* msgSrc, int bitcount, qboolean unsafe);
+void MSG_EmitByteMask(msg_t* msg, const byte* mask, const int maxIndex, const int indexBits, qboolean ignoreFirstZero);
+
 void	MSG_BeginReading (msg_t *sb);
 void	MSG_BeginReadingOOB(msg_t *sb);
 
@@ -164,6 +178,9 @@ float	MSG_ReadAngle16 (msg_t *sb);
 void	MSG_ReadData (msg_t *sb, void *buffer, int size);
 void	MSG_SkipData (msg_t *sb, int size);
 
+int		MSG_CheckForExtensions(msg_t* msg);
+qboolean MSG_SkipBits(msg_t* msg, int bitcount);
+void MSG_ReadByteMask(msg_t* msg, byte* mask, const int maxIndex, const int indexBits);
 
 void MSG_WriteDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
 void MSG_ReadDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
@@ -176,11 +193,13 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 						 int number );
 
-void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
-void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
+void MSG_WriteDeltaPlayerstate( msg_t *msg, const struct playerState_s *from, struct playerState_s *to );
+void MSG_ReadDeltaPlayerstate( msg_t *msg, const struct playerState_s *from, struct playerState_s *to );
 
 
 void MSG_ReportChangeVectors_f( void );
+
+void MSG_BuildExtensionNodes();
 
 //============================================================================
 
@@ -409,7 +428,18 @@ enum svc_ops_e {
 	svc_snapshot,
 	svc_mapchange,
 
-	svc_EOF
+	svc_EOF,
+
+
+	// cool extensions, they can be written after MSG_WriteExtensionMarker(msg, EXT_COOLEXTEND);
+	// after each svc_ here, the amount of bits it occupies follows (see MSG_BitCopy), so that it can be
+	// safely skipped by clients that don't know it. that way we can extend with new extensions over time
+	// while keeping compatibility with the existing ones
+	// also, svc_coolNameSpace can be used to set a new namespace for commands, so that different mods using the same svc_ 
+	// numbers don't run into conflict. I hope people will respect this, but maybe at least AI bots modifying this client will.
+	svc_coolNameSpace = 20, // change namespace for adding custom non-tommyternal extensions
+	svc_coolPadding, // this is just debug padding
+	svc_coolMultiview, // multiview data
 };
 
 
