@@ -51,7 +51,8 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		if ( !GET_ABIT( snap->multiview.clientMask, clientNum ) )
 			continue; // not masked, skip
 
-		state = &cl.parsePlayerstates[(cl.parsePlayerstatesNum + snap->multiview.numPlayerstates++) & (MAX_PARSE_PLAYERSTATES - 1)];
+		state = &cl.parsePlayerstates[(cl.parsePlayerstatesNum++) & (MAX_PARSE_PLAYERSTATES - 1)];
+		snap->multiview.numPlayerstates++;
 		state->number = clientNum;
 		//oldState = NULL;
 

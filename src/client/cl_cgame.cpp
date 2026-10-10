@@ -244,7 +244,7 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 				break;
 			}
 		}
-		if (psFrame->number == clc.clientView) {
+		if (psFrame && psFrame->number == clc.clientView) {
 			playerState_t* ps = &psFrame->ps;
 			Com_Memcpy(snapshot->areamask, psFrame->areamask, sizeof(snapshot->areamask));
 			if constexpr (std::is_same_v<T, snapshot15_t>) {
@@ -256,6 +256,9 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 				snapshot->ps = *ps;
 			}
 
+			if (!clc.demoplaying) {
+				snapshot->ps.pm_flags |= PMF_FOLLOW; // avoid cgame prediction causing unintended free rotation around the player. during demo it doesn't matter since prediction is disabled anyway.
+			}
 			
 			// wp glowing workaround.. this keeps yourself from glowing like a candle when and after charging the blaster pistol on high svs.time
 			if (!(cls.fixes & MVFIX_WPGLOWING) && snapshot->ps.weaponstate != WEAPON_CHARGING_ALT && snapshot->ps.weaponstate != WEAPON_CHARGING)

@@ -323,6 +323,30 @@ void SV_BoundSnapShotPacketEntitiesBackup( int minimumPacket, int minimumEntitie
 }
 
 
+
+#ifdef USE_MULTIVIEW
+/*
+===============
+SV_ResetClientMultiview
+
+Avoid issues from trying to delta from old frames that now have the psfs lost, since multiview code is a bit delicate rn.
+===============
+*/
+void SV_ResetClientMultiview( void ) {
+	int i,j;
+	if (!svs.clients) {
+		return;
+	}
+
+	client_t* cl = svs.clients;
+	for (i = 0; i < sv_maxclients->integer; i++,cl++) {
+		for (j = 0; j < PACKET_BACKUP; j++) {
+			cl->frames[j].multiview = qfalse;
+		}
+	}
+}
+#endif
+
 /*
 ===============
 SV_Startup
@@ -593,6 +617,7 @@ Ghoul2 Insert Start
 		delete[] svs.snapshotPSF;
 		svs.snapshotPSF = NULL;
 	}
+	SV_ResetClientMultiview();
 #endif
 /*
 Ghoul2 Insert End
@@ -683,6 +708,7 @@ Ghoul2 Insert Start
 	svs.nextSnapshotPSF = 0;
 	svs.snapshotPSF = new psFrame_t[svs.numSnapshotPSF];
 	memset(svs.snapshotPSF, 0, sizeof(psFrame_t) * svs.numSnapshotPSF);
+	SV_ResetClientMultiview();
 #endif
 
 /*

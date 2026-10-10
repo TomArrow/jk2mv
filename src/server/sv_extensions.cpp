@@ -109,7 +109,7 @@ qboolean SV_CommitExtensionMessage(msg_t* msg, msg_t* extensionMessage, int svc,
 #ifdef USE_MULTIVIEW
 
 // most of this stuff is copied and adapted from quake3e multiview version, though I made a lot of changes
-static void SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *from, const clientSnapshot_t *to, msg_t *msg)
+static qboolean SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *from, const clientSnapshot_t *to, msg_t *msg)
 {
     psFrame_t *psf;
     const psFrame_t *old_psf;
@@ -172,16 +172,25 @@ static void SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *from,
                     break;
             }
             if ( oldIndex >= from->num_psf ) { // should never happen?
-                Com_Error( ERR_DROP, "oldIndex(%i) >= from->num_psf(%i), from->first_pfs=%i", oldIndex, from->num_psf, from->first_psf );
-                continue;
-            }
-            oldPs = &old_psf->ps;
-            oldEntMask = old_psf->entMask;
+				//TA: it happens on mapchanges because the global psf buffer gets cleared but our frames do not.
+				// we have 2 options: return qfalse to just avoid sending, or delta from NULL. 
+				// but current client parse code will fail from a non-existing source delta anyway (due to bitmask xoring)
+				// so i guess just avoid sending
+				// in addition, let's clear the multiview flag of all client frames during reinits of the global arrays.
+                //Com_Error( ERR_DROP, "oldIndex(%i) >= from->num_psf(%i), from->first_pfs=%i", oldIndex, from->num_psf, from->first_psf );
+                Com_DPrintf( "SV_EmitPlayerStates: Old playerstate for delta is lost (due to mapchange?): oldIndex(%i) >= from->num_psf(%i), from->first_pfs=%i", oldIndex, from->num_psf, from->first_psf );
+				return qfalse;
+				//oldPs = NULL;
+				//oldEntMask = old_psf->entMask;
+			}
+
+			oldPs = &old_psf->ps;
+			oldEntMask = old_psf->entMask;
         }
 
         // areabytes
         MSG_WriteBits( msg, psf->areabytes, 6 ); // was 8
-        MSG_WriteData( msg, psf->areabits, psf->areabytes );
+        MSG_WriteData( msg, psf->areabits, psf->areabytes & 63 );
 
         // playerstate
         MSG_WriteDeltaPlayerstate( msg, oldPs, &psf->ps );
@@ -197,6 +206,8 @@ static void SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *from,
 		MSG_WriteData( msg, psf->entMask.mask, sizeof( psf->entMask.mask ) );
 #endif
     }
+
+	return qtrue;
 }
 
 
@@ -313,7 +324,9 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 
 	//frame->mergeMask = newmask;
 
-	SV_EmitPlayerStates( client - svs.clients, oldframe, frame, extensionMsg);
+	if (!SV_EmitPlayerStates(client - svs.clients, oldframe, frame, extensionMsg)) {
+		return qfalse;
+	}
 	//MSG_entMergeMask = newmask; // emit packet entities with skipmask
 	//SV_EmitPacketEntities( oldframe, frame, msg );
 	//MSG_entMergeMask = 0; // don't forget to reset that!
