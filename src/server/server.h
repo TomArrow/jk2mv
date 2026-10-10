@@ -479,6 +479,10 @@ extern	cvar_t* sv_specAllEnts;
 
 extern	cvar_t* sv_allowNWHClients;
 
+extern	cvar_t* sv_autoRecover;
+extern	cvar_t* sv_autoRecoverWait;
+extern	cvar_t* sv_autoRecoverMap;
+
 // toggleable fixes
 extern	cvar_t	*mv_fixnamecrash;
 extern	cvar_t	*mv_fixforcecrash;

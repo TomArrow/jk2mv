@@ -434,7 +434,7 @@ Q_NORETURN void QDECL Com_Error( errorParm_t code, PRINTF_FORMAT_STRING const ch
 		code = ERR_FATAL;
 	}
 
-	if ( com_dedicated != NULL && com_dedicated->integer ) {
+	if ( com_dedicated != NULL && com_dedicated->integer && !(sv_autoRecover && sv_autoRecover->integer && com_sv_running && com_sv_running->integer) ) {
 		code = ERR_FATAL;
 	}
 

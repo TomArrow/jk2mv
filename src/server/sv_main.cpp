@@ -100,6 +100,11 @@ cvar_t* sv_specAllEnts;
 
 cvar_t* sv_allowNWHClients;
 
+cvar_t* sv_autoRecover;
+cvar_t* sv_autoRecoverWait;
+cvar_t* sv_autoRecoverMap;
+
+
 // jk2mv's toggleable fixes
 cvar_t	*mv_fixnamecrash;
 cvar_t	*mv_fixforcecrash;

@@ -2643,8 +2643,11 @@ void CL_DisconnectPacket( netadr_t from ) {
 	}
 
 	// drop the connection (FIXME: connection dropped dialog)
-	Com_Printf( "Server disconnected for unknown reason\n" );
-	CL_Disconnect( qtrue );
+	SCR_StopCinematic();
+	Cvar_Set("ui_singlePlayerActive", "0");
+	if (cls.state != CA_DISCONNECTED && cls.state != CA_CINEMATIC) {
+		Com_Error(ERR_DROP, "Server disconnected for unknown reason (likely server crashed & restarted)");
+	}
 }
 
 
@@ -3086,12 +3089,12 @@ A packet has arrived from the main event loop
 void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	int		headerBytes;
 
-	clc.lastPacketTime = cls.realtime;
-
 	if ( msg->cursize >= 4 && *(int *)msg->data == -1 ) {
 		CL_ConnectionlessPacket( from, msg );
 		return;
 	}
+
+	clc.lastPacketTime = cls.realtime;
 
 	if ( cls.state < CA_CONNECTED ) {
 		return;		// can't be a valid sequenced packet

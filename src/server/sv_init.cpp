@@ -1147,6 +1147,9 @@ void SV_Init (void) {
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 	sv_allowNWHClients = Cvar_Get("sv_allowNWHClients", "0", CVAR_ARCHIVE); // Allow nwh clients to connect, its just a server flag
+	sv_autoRecover = Cvar_Get("sv_autoRecover", "0", CVAR_ARCHIVE); // Auto restart the server on an error
+	sv_autoRecoverWait = Cvar_Get("sv_autoRecoverWait", "200", CVAR_ARCHIVE); // Adds a wait command with this value before reloading a map
+	sv_autoRecoverMap = Cvar_Get("sv_autoRecoverMap", "ffa_bespin", CVAR_ARCHIVE); // Which map to recover to
 
 //	sv_debugserver = Cvar_Get ("sv_debugserver", "0", 0);
 
@@ -1289,5 +1292,9 @@ Ghoul2 Insert Start
 
 	NET_HTTP_StopServer();
 	sv.http_port = 0;
+
+	if (com_errorEntered && sv_autoRecover->integer && *sv_autoRecoverMap->string) {
+		Cbuf_AddText(va("wait %d;map %s\n", sv_autoRecoverWait->integer, sv_autoRecoverMap->string));
+	}
 }
 
