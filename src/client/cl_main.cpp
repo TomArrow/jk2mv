@@ -41,6 +41,7 @@ cvar_t	*rcon_client_password;
 cvar_t	*rconAddress;
 
 cvar_t	*cl_timeout;
+cvar_t	*cl_autoReconnect;
 cvar_t	*cl_maxpackets;
 cvar_t	*cl_maxPacketUserCmds;
 cvar_t	*cl_dynamicUserPacket;
@@ -2642,6 +2643,14 @@ void CL_DisconnectPacket( netadr_t from ) {
 		return;
 	}
 
+	if ( cls.state == CA_ACTIVE && cl_autoReconnect->integer ) {
+		// server likely crashed and restarted
+		clc.lastPacketTime = cls.realtime; // prevent reconnect being executed a trillion times, just in case
+		Com_Printf("cl_autoReconnect: Server likely crashed and restarted. Will attempt to reconnect.\n");
+		Cbuf_AddText("reconnect\n");
+		return;
+	}
+
 	// drop the connection (FIXME: connection dropped dialog)
 	SCR_StopCinematic();
 	Cvar_Set("ui_singlePlayerActive", "0");
@@ -3786,6 +3795,7 @@ void CL_Init( void ) {
 	cl_motd = Cvar_Get ("cl_motd", "1", 0);
 
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
+	cl_autoReconnect = Cvar_Get ("cl_autoReconnect", "1", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
 	cl_timeNudgeAntiLagHack = Cvar_Get ("cl_timeNudgeAntiLagHack", "1", CVAR_CHEAT );
