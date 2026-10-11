@@ -12,6 +12,16 @@ typedef struct {
 	int		bits;		// 0 = float
 } netField_t;
 
+typedef struct {
+	char	*name;
+	size_t	offset;
+	int		bits;		// 0 = float
+	char	*name2;
+	size_t	offset2;
+	int		bits2;		// 0 = float
+	int		maskIndex;
+} netFieldMapping_t;
+
 //#define _NEWHUFFTABLE_		// Build "c:\\netchan.bin"
 //#define _USINGNEWHUFFTABLE_		// Build a new frequency table to cut and paste.
 
@@ -532,6 +542,35 @@ void MSG_EmitByteMask( msg_t *msg, const byte *mask, const int maxIndex, const i
 }
 
 
+const byte huffmanBitSizes[256] = {
+2,5,7,7,8,8,7,6,5,7,7,7,7,6,8,9,
+7,9,9,9,10,10,10,10,9,10,10,10,10,8,9,8,
+6,10,9,10,10,10,10,10,9,10,10,10,10,10,9,8,
+7,8,8,9,8,8,9,9,9,9,9,10,10,9,9,10,
+8,7,7,7,8,8,9,9,9,10,10,10,9,10,10,10,
+9,10,10,10,10,10,10,10,10,10,9,9,9,9,9,8,
+9,8,9,9,9,7,8,9,6,8,9,9,8,9,8,8,
+8,8,8,8,7,7,8,8,8,8,8,8,8,7,7,7,
+6,7,7,7,8,8,8,8,8,8,8,8,9,9,9,9,
+9,10,9,10,10,10,10,10,10,10,10,10,10,10,10,10,
+9,10,10,10,10,10,10,10,9,10,10,10,10,10,10,10,
+9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+8,9,8,6,7,10,10,8,9,10,10,10,10,10,10,10,
+9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+9,9,10,10,10,10,10,10,7,10,10,10,10,8,10,10,
+10,10,10,10,10,10,10,11,10,10,10,10,10,10,7,6 };
+
+int MSG_HuffStrlen(const char* s) {
+	int size = 0;
+	while (*s) {
+		size += huffmanBitSizes[*s];
+		s++;
+	}
+	return size;
+}
+
+
+
 #define EXTENSION_MARKER_LENGTH 10
 typedef struct extensionTypeMap_s {
 	const char marker[EXTENSION_MARKER_LENGTH+1];
@@ -547,6 +586,11 @@ extensionTypeMap_t extensions[EXT_TYPES_COUNT] = {
 	{"HIDDENUCMD",EXT_HIDDENUCMD},
 	{"HIDDCLUCMD",EXT_HIDDCLUCMD},
 	{"COOLEXTEND",EXT_COOLEXTEND},
+	// this is an alternate identifier with readable chars that uses letters that have
+	// small-ish huffman representations (<= 7 bits) and ends up with as few unique bytes
+	// of huffman-encoded data with various shifts as possible (to improve potential compression) via bruteforce testing.
+	// current pattern: 64 bits size, ~5 unique bytes in final data
+	{"AhhhCAhhhC",EXT_COOLEXTEND_SMALL}, 
 };
 
 const int countExtensions = sizeof(extensions) / sizeof(extensions[0]);
@@ -1899,6 +1943,59 @@ netField_t	playerStateFields15[] =
 	{ PSF(lastHitLoc[0]), 0 },
 	{ PSF(lastHitLoc[1]), 0 } //currently only used so client knows to orient disruptor disintegration.. seems a bit much for just that though.
 };
+
+// percentages are playerstate-based from a ctf pub game where commandtime had the most updates (587887 updates)
+// no percentage: not seen.
+// ALL-prefixed percentages are from a month of demos from end of 2023 with about 10% 1.04 and 90% 1.02 (baseline commandtime is 343074541)
+netFieldMapping_t mappings[] = {
+	{ PSF(commandTime), 32, NETF(pos.trTime), 32 }, // 587887 (reference), ALL: 100%
+	{ PSF(origin[0]), 0 ,NETF(pos.trBase[0]), 0 }, // snap // 82.8516364539444 %, ALL: 65.4142132919155 %
+	{ PSF(origin[1]), 0 ,NETF(pos.trBase[1]), 0 }, // snap // 82.6716698957453 %, ALL: 65.1445354553429 %
+	{ PSF(origin[2]), 0 ,NETF(pos.trBase[2]), 0 }, // snap // 62.0347107522364 %, ALL: 52.6944521948657 %
+	{ PSF(viewangles[1]), 0 ,NETF(apos.trBase[1]), 0 }, // snap // 70.8030624933023 %, ALL: 55.3525975569257 %
+	{ PSF(viewangles[0]), 0 ,NETF(apos.trBase[0]), 0 }, // snap // 60.0526972020133 %, ALL: 44.8286324457984 %
+	{ PSF(velocity[0]), 0 ,NETF(pos.trDelta[0]), 0 },  // 64.9325465608187 %, ALL: 49.238935803167 %
+	{ PSF(velocity[1]), 0 ,NETF(pos.trDelta[1]), 0 },  // 65.1206779534162 %, ALL: 48.6138623151288 %
+	{ PSF(velocity[2]), 0 ,NETF(pos.trDelta[2]), 0 }, // 60.6424363865845%, ALL: 41.290909429505 %
+	{ PSF(torsoAnim), 16, NETF(torsoAnim), 16 }, // 13.1435122736172 %, ALL: 15.0146985112486 %
+	{ PSF(legsAnim), 16, NETF(legsAnim), 16 }, // 11.046680739666 %, ALL: 14.6316948654024 %
+	{ PSF(fd.forceMindtrickTargetIndex4), 16, NETF(trickedentindex4), 16 }, // 14.0292267051321 %, ALL: never
+	{ PSF(movementDir), 4, NETF(angles2[1]), 0 }, // huh. inverse "snap"? // 13.5155225408965%, ALL: 14.4954749061371 %
+	{ PSF(saberEntityNum), GENTITYNUM_BITS, NETF(saberEntityNum), GENTITYNUM_BITS }, // ALL: 12.344073062536 %
+	{ PSF(eFlags), 32, NETF(eFlags), 32 }, // 3.46903401504031 %, ALL: 7.81084131800966 %
+	{ PSF(fd.saberAnimLevel), 2, NETF(fireflag), 2  }, // 1.07197471622948 %, ALL: 7.48122606975957 %
+	{ PSF(groundEntityNum), GENTITYNUM_BITS, NETF(groundEntityNum), GENTITYNUM_BITS }, // 6.92394967059996, ALL: 7.3569186819957 %
+	{ PSF(speed), 16, NETF(speed), 0  }, // huh. inverse snap? // 6.65791214978389 %, ALL: 6.84960648245828 %
+	{ PSF(weaponstate), 4, NETF(modelindex2), 8 }, // 1.06551088899738 %, ALL: 5.17442505300911 %
+	{ PSF(saberMove), 32, NETF(saberMove), 8 }, // possible truncation? // 5.39083191157484 %, ALL: 4.98815678660341 %
+	{ PSF(fd.forcePowersActive), 32, NETF(forcePowersActive), 32 }, // 3.5081571798662 %, ALL: 4.19932384315279 %
+	{ PSF(saberHolstered), 1, NETF(shouldtarget), 1 }, // 0.725989858595274 %, ALL: 3.40758395126731 %
+	{ PSF(weapon), 5, NETF(weapon), 8 }, // 0.381535907410778, ALL: 1.80182591864198 %
+	{ PSF(generic1), 8, NETF(generic1), 8  }, // 0.229806068172965 %, ALL: never
+	{ PSF(genericEnemyIndex), 32, NETF(genericenemyindex), 32 }, // ALL: 0.0946368678519925 %
+	{ PSF(lastHitLoc[0]), 0 ,NETF(origin2[0]), 0 }, // snap, ALL: 0.0532423651920007 %
+	{ PSF(lastHitLoc[1]), 0 ,NETF(origin2[1]), 0 }, // snap, ALL: 0.0532435311193785 %
+	{ PSF(lastHitLoc[2]), 0 ,NETF(origin2[2]), 0 }, // snap, ALL: 0.0527188637993397 %
+	{ PSF(activeForcePass), 6, NETF(activeForcePass), 6 }, // ALL: 0.0405159763807714 %
+	{ PSF(electrifyTime), 32, NETF(emplacedOwner), 32  }, // ALL: 0.0187419911173181 %
+	{ PSF(saberInFlight), 1, NETF(saberInFlight), 1 }, // ALL: 0.0155045022708345 %
+	{ PSF(fd.forceMindtrickTargetIndex), 16, NETF(trickedentindex), 16 }, // ALL: 0.0091767229093225 %
+	{ PSF(weaponChargeTime), 32, NETF(constantLight), 32 }, // ALL: 0.00589084807665749 %
+	{ PSF(duelInProgress), 1, NETF(bolt1), 8 }, // weird one and rly not a 1:1 mapping, and not a huge save. ALL: 0.000966262314404729 %
+	{ PSF(loopSound), 16, NETF(loopSound), 8 }, // ALL: 0.000396706790318201 %
+	{ PSF(dualBlade), 1, NETF(bolt2), GENTITYNUM_BITS }, // ALL: 0.000341033758025198 %
+	{ PSF(isJediMaster), 1, NETF(isJediMaster), 1 }, // ALL: 4.83859861813529e-05 %
+	{ PSF(fd.forceMindtrickTargetIndex2), 16, NETF(trickedentindex2), 16 }, // ALL: 4.10989400697034e-05 %
+	{ PSF(viewangles[2]), 0 ,NETF(apos.trBase[2]), 0 }, // snap // 0 %, ALL: 2.91481844465982e-06 %
+	{ PSF(emplacedIndex), GENTITYNUM_BITS, NETF(otherEntityNum2), GENTITYNUM_BITS  }, // ALL: 2.62333660019383e-06 %
+	{ PSF(holocronBits), 32, NETF(time2), 32 }, // ALL: never
+	{ PSF(fd.forceMindtrickTargetIndex3), 16, NETF(trickedentindex3), 16 }, // ALL: never
+	{ PSF(saberLockFrame), 16, NETF(forceFrame), 16 }, // ALL: never 
+	{ PSF(clientNum), 8, NETF(clientNum), 8 }, // ALL: 12.3398457013457 % (huh wtf)
+	{ PSF(usingATST), 1, NETF(teamowner), 8 }, // ALL: never
+};
+
+
 
 /*
 =============

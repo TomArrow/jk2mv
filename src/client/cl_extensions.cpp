@@ -33,7 +33,172 @@ static void CL_ParseExtensioNamespace(msg_t* msg) {
 }
 
 #ifdef USE_MULTIVIEW
-#define MAX_MULTIVIEW_VERSION 1 // max version number we can currently decode
+#define MAX_MULTIVIEW_VERSION 2 // max version number we can currently decode
+void CL_EntityStateToRescuePlayerState(entityState_t* s, playerState_t* ps) {
+	int		i;
+
+	if (s->pos.trType == TR_LINEAR_STOP) {
+		ps->commandTime = s->pos.trTime;
+	}
+
+	VectorCopy(s->pos.trBase, ps->origin);
+	VectorCopy(s->pos.trDelta, ps->velocity); 
+	VectorCopy(s->apos.trBase, ps->viewangles);
+
+	ps->fd.forceMindtrickTargetIndex = s->trickedentindex;
+	ps->fd.forceMindtrickTargetIndex2 = s->trickedentindex2;
+	ps->fd.forceMindtrickTargetIndex3 = s->trickedentindex3;
+	ps->fd.forceMindtrickTargetIndex4 = s->trickedentindex4;
+
+	ps->saberLockFrame = s->forceFrame;
+
+	ps->electrifyTime = s->emplacedOwner;
+
+	ps->speed = s->speed;
+
+	ps->genericEnemyIndex = s->genericenemyindex;
+
+	ps->activeForcePass = s->activeForcePass;
+
+	ps->movementDir = s->angles2[YAW];
+	ps->legsAnim = s->legsAnim;
+	ps->torsoAnim = s->torsoAnim;
+	ps->clientNum = s->clientNum;
+
+	ps->eFlags = s->eFlags;
+
+	ps->saberInFlight = s->saberInFlight;
+	ps->saberEntityNum = s->saberEntityNum;
+	ps->saberMove = s->saberMove;
+	ps->fd.forcePowersActive = s->forcePowersActive;
+
+	if (s->bolt1)
+	{
+		ps->duelInProgress = qtrue;
+	}
+	else
+	{
+		ps->duelInProgress = qfalse;
+	}
+
+	if (s->bolt2)
+	{
+		ps->dualBlade = qtrue;
+	}
+	else
+	{
+		ps->dualBlade = qfalse;
+	}
+
+	ps->emplacedIndex = s->otherEntityNum2;
+
+	ps->saberHolstered = s->shouldtarget;
+
+	ps->usingATST = (qboolean)s->teamowner;
+
+	if (s->eFlags & EF_SEEKERDRONE) {
+		ps->genericEnemyIndex = 0;
+	}
+	else {
+		ps->genericEnemyIndex = -1;
+	}
+
+	if (s->eFlags & EF_DEAD)
+	{
+		ps->stats[STAT_HEALTH] = 0;
+		ps->pm_type = PM_DEAD;
+	}
+	else
+	{
+		ps->stats[STAT_HEALTH] = 100;
+		ps->stats[STAT_ARMOR] = 0;
+	}
+
+	ps->externalEvent = s->event;
+	ps->externalEventParm = s->eventParm;
+
+	ps->weapon = s->weapon;
+	ps->groundEntityNum = s->groundEntityNum;
+
+	for (i = 0; i < MAX_POWERUPS; i++) {
+		if (s->powerups & (1 << i))
+		{
+			ps->powerups[i] = 30;
+		}
+		else
+		{
+			ps->powerups[i] = 0;
+		}
+	}
+
+	ps->loopSound = s->loopSound;
+	ps->generic1 = s->generic1;
+
+	ps->weaponstate = s->modelindex2;
+	ps->weaponChargeTime = s->constantLight;
+
+	VectorCopy(s->origin2, ps->lastHitLoc);
+
+	ps->isJediMaster = s->isJediMaster;
+
+	ps->holocronBits = s->time2;
+
+
+	if (s->weapon < WP_NUM_WEAPONS) {
+
+		ps->stats[STAT_WEAPONS] |= 1 << s->weapon; // To make weapon select wheel look correct
+	}
+
+	if (s->weapon == WP_SABER && s->fireflag == 0) {
+		// Server disabled sending fireflag saber style. We must deduce from animations (ugh)
+		//byte probability;
+		//ps->fd.saberDrawAnimLevel = ps->fd.saberAnimLevel = getLikelyStanceFromTorsoAnim(s->torsoAnim, demoType, &probability);
+		ps->fd.saberDrawAnimLevel = ps->fd.saberAnimLevel = 2; // meh xd
+	}
+	else {
+		ps->fd.saberDrawAnimLevel = ps->fd.saberAnimLevel = s->fireflag;
+	}
+
+	//int generalizedLegsAnim = generalizeGameValue<GMAP_ANIMATIONS, UNSAFE>(s->legsAnim, demoType);
+
+	// This is my own stuff: (restoring viewheight)
+	if (s->eFlags & EF_DEAD) {
+		ps->viewheight = DEAD_VIEWHEIGHT;
+	}
+	//else if (
+	//	(generalizedLegsAnim & ~ANIM_TOGGLEBIT) == BOTH_CROUCH1IDLE_GENERAL //|| (generalizedLegsAnim & ~ANIM_TOGGLEBIT) == BOTH_CROUCH1IDLE_15
+	//	|| (generalizedLegsAnim & ~ANIM_TOGGLEBIT) == BOTH_CROUCH1WALKBACK_GENERAL || (generalizedLegsAnim & ~ANIM_TOGGLEBIT) == BOTH_CROUCH1WALK_GENERAL
+
+	//	) {
+	//	ps->viewheight = CROUCH_VIEWHEIGHT;
+	//}
+	else {
+		ps->viewheight = DEFAULT_VIEWHEIGHT;
+	}
+
+
+
+
+}
+// we are recovering from an incomplete state. so set some reasonable bare minimum baseline for the "from"
+static playerState_t* CL_GetRescueableBasePS(clSnapshot_t* old, int clientNum) {
+	static playerState_t psLocal = { 0 };
+	psLocal.genericEnemyIndex = -1; // avoid seeker drone idiocy.
+	psLocal.stats[STAT_HEALTH] = 1; // better to assume alive to preserve angles.
+	psLocal.viewheight = DEFAULT_VIEWHEIGHT;
+	if (old && old->valid) {
+		// try to see if we can restore from an entity
+		int index, n;
+		for (index = 0; index < old->numEntities; ++index) {
+			n = (old->parseEntitiesNum + index) & (MAX_PARSE_ENTITIES - 1);
+			if (cl.parseEntities[n].number == clientNum) {
+				CL_EntityStateToRescuePlayerState(&cl.parseEntities[n], &psLocal);
+				break;
+			}
+		}
+	}
+	return &psLocal;
+}
 
 static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* msg) {
 	int clientNum;
@@ -41,6 +206,8 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 	clPSFrame_t* state;
 	int oldindex = 0;
 	playerState_t* oldPs;
+	qboolean rescuableFakeBase = qfalse;
+	msg_t rescueableMsgBkup;
 	//int i,firstIndex, lastIndex;
 
 	snap->multiview.parsePlayerstatesNum = cl.parsePlayerstatesNum;
@@ -50,6 +217,8 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 
 		if ( !GET_ABIT( snap->multiview.clientMask, clientNum ) )
 			continue; // not masked, skip
+
+		rescuableFakeBase = qfalse;
 
 		state = &cl.parsePlayerstates[(cl.parsePlayerstatesNum++) & (MAX_PARSE_PLAYERSTATES - 1)];
 		snap->multiview.numPlayerstates++;
@@ -70,7 +239,7 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		SHOWNET( msg, "playerstate" );
 		if ( old ) {
 			// not doing this. main client is never sent in his own multiview rn, but in normal snapshot
-			if (GET_ABIT(old->multiview.clientMask, clientNum)) {
+			if (GET_ABIT(old->multiview.clientMask, clientNum) && old->multiview.multiviewValid) {
 				// old snap has this client.
 				while (oldState->number < clientNum) {
 					oldindex++;
@@ -86,14 +255,33 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 				Com_Memcpy(state->entMask, oldState->entMask, sizeof(state->entMask));
 				oldPs = &oldState->ps;
 
+			} else if(!old->multiview.multiviewValid) {
+				Com_Memset(state->entMask, 0, sizeof(state->entMask));
+				oldPs = CL_GetRescueableBasePS(old,clientNum);
+				memcpy(&rescueableMsgBkup, msg, sizeof(rescueableMsgBkup));
+				rescuableFakeBase = qtrue;
 			} else {
+				Com_Memset(state->entMask, 0, sizeof(state->entMask));
 				oldPs = NULL;
 			}
 		} else {
+			Com_Memset(state->entMask, 0, sizeof(state->entMask));
 			oldPs = NULL;
 		}
 
 		MSG_ReadDeltaPlayerstate( msg, oldPs, &state->ps );
+
+		if (rescuableFakeBase && state->ps.clientNum != clientNum) {
+			// now we actually now the clientnum, so we can go back and take the proper source entitystate maybe, and then re-read the changes
+			oldPs = CL_GetRescueableBasePS(old, state->ps.clientNum);
+			memcpy(msg, &rescueableMsgBkup, sizeof(*msg));
+			MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps);
+		}
+
+		// we got a spectator's pov but didnt get updated pm_flags
+		if (rescuableFakeBase && state->ps.clientNum != clientNum && !(state->ps.pm_flags & PMF_FOLLOW)) {
+			state->ps.pm_flags |= PMF_FOLLOW;
+		}
 
 		// spectated (pramary?) playerstate ping
 		//if ( clientNum == clc.clientView ) // clc.clientNum?
@@ -102,15 +290,21 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		// entity mask
 		SHOWNET( msg, "entity mask" );
 #if 1
-		//while ( MSG_ReadBits( msg, 1 ) ) {
-		//	firstIndex = MSG_ReadBits( msg, 7 ); // 0..127
-		//	lastIndex = MSG_ReadBits( msg, 7 );  // 0..127
-		//	for ( i = firstIndex; i < lastIndex + 1; i++ ) {
-		//		//state->entMask[ i ] = MSG_ReadByte( msg ); // direct mask
-		//		state->entMask[ i ] ^= MSG_ReadByte( msg ); // delta-xor mask
-		//	}
-		//}
 		MSG_ReadByteMask(msg, state->entMask, sizeof(state->entMask), 7);
+#if 0
+		if (state->number == 2) {
+			int n;
+			int highestNum = ARRAY_LEN(state->entMask) - 1;
+			while (highestNum && state->entMask[highestNum]) {
+				highestNum--;
+			}
+			Com_Printf("client 2 entmask (client): ");
+			for (n = 0; n <= highestNum; n++) {
+				Com_Printf("%d ",(int) state->entMask[n]);
+			}
+			Com_Printf("\n");
+		}
+#endif
 #else
 		MSG_ReadData( msg, &state->entMask, sizeof( state->entMask ) );
 #endif
@@ -119,6 +313,13 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		//	Com_Memcpy( &snap->areamask, &state->areamask, sizeof( snap->areamask ) );
 		//	Com_Memcpy( &snap->ps, &state->ps, sizeof( snap->ps ) );
 		//}
+
+
+		if (snap->multiview.rescued) {
+			// snap is from a chain of invalid deltas, therefore we cannot trust its ent mask. therefore we just enable all ents.
+			memset(state->entMask, 255, sizeof(state->entMask));
+		}
+
 	} // for [all clients]
 }
 
@@ -171,18 +372,30 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 	} else {
 		SHOWNET(msg, "multiview delta");
 		old = &cl.snapshots[snap->multiview.multiViewDeltaNum & PACKET_MASK];
-		if ( !old->multiview.multiviewValid) {
-			// should never happen
-			Com_Printf ("Message %d: Multiview delta from invalid frame %d (not supposed to happen!).\n",snap->messageNum,snap->multiview.multiViewDeltaNum);
-		} else if ( old->messageNum != snap->multiview.multiViewDeltaNum) {
+		if ( old->multiview.rescued) {
+			// can happen on badly cut demos
+			Com_DPrintf("Message %d: Multiview delta from poisoned frame %d (not supposed to happen!).\n", snap->messageNum, snap->multiview.multiViewDeltaNum);
+			SHOWNET(msg, "multiview delta poisoned.");
+			snap->multiview.rescued = qtrue; // poisoned multiviews propagate into later snaps so we always know we are not in a clean chain
+		}
+
+		if (!old->multiview.multiviewValid && !snap->multiview.rescued) {
+			if(!clc.multiviewVersionFail)
+				Com_Printf("Message %d: Multiview delta from invalid frame %d (not supposed to happen!).\n", snap->messageNum, snap->multiview.multiViewDeltaNum);
+		}
+		else if ( old->messageNum != snap->multiview.multiViewDeltaNum) {
 			// The frame that the server did the delta from
 			// is too old, so we can't reconstruct it properly.
-			Com_Printf ("Message %d: Multiview delta frame %d too old.\n", snap->messageNum, snap->multiview.multiViewDeltaNum);
+			if (!clc.multiviewVersionFail)
+				Com_Printf ("Message %d: Multiview delta frame %d too old.\n", snap->messageNum, snap->multiview.multiViewDeltaNum);
+			snap->multiview.rescued = qfalse;
 		} else if ( cl.parsePlayerstatesNum - old->multiview.parsePlayerstatesNum > MAX_PARSE_PLAYERSTATES-32 ) {
-			Com_DPrintf ("Message %d: Multiview delta parsePlayerstatesNum too old.\n", snap->messageNum);
+			if (!clc.multiviewVersionFail)
+				Com_DPrintf ("Message %d: Multiview delta parsePlayerstatesNum too old.\n", snap->messageNum);
+			snap->multiview.rescued = qfalse;
 		}
 		else {
-			snap->multiview.multiviewValid = qtrue;	// valid delta parse
+			snap->multiview.multiviewValid = qtrue;	// valid or "rescued" delta parse
 		}
 		
 		// Demo recording stuff.
@@ -215,14 +428,6 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 		}*/
 	}
 
-	if (!snap->multiview.multiviewValid) {
-		// sadly multiview protocol rn makes it impossible to parse successfully if the delta fails.
-		// this is because the clientmask is delta xor'd, so we don't know how many playerstates come after it.
-		SHOWNET(msg, "invalid delta, skipping multiview");
-		MSG_SkipBits(msg, bits - (msg->bit - startbits));
-		return;
-	}
-
 	if (old && old->multiview.multiview) {
 		Com_Memcpy(snap->multiview.clientMask, old->multiview.clientMask, sizeof(snap->multiview.clientMask));
 		//newSnap.mergeMask = old->mergeMask;
@@ -240,7 +445,9 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 
 	if (snap->multiview.version > MAX_MULTIVIEW_VERSION) {
 		SHOWNET(msg, "Multiview version not supported. Skipping rest of multiview");
-		MSG_SkipBits(msg, (bits - (msg->bit - bits)));
+		clc.multiviewVersionFail = qtrue;
+		MSG_SkipBits(msg, (bits - (msg->bit - startbits)));
+		return;
 	}
 
 
@@ -250,17 +457,33 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 	//	snap->multiview.mergeMask = MSG_ReadBits(msg, SM_BITS);
 	//}
 
+	if (snap->multiview.version >= 2 && old) {
+		// server sends us a non-delta xor'd clientmask every now and then so we can "recover" with a badly cut or corrupted demo
+		if (MSG_ReadBits(msg, 1)) {
+			snap->multiview.psMaskRescue = qtrue;
+			memset(snap->multiview.clientMask,0,sizeof(snap->multiview.clientMask));
+			if (!snap->multiview.multiviewValid) {
+				snap->multiview.rescued = qtrue;
+			}
+		}
+	}
+
+	if (!snap->multiview.multiviewValid && !snap->multiview.rescued) {
+		// sadly multiview protocol rn makes it impossible to parse successfully if the delta fails.
+		// this is because the clientmask is delta xor'd, so we don't know how many playerstates come after it.
+		SHOWNET(msg, "invalid delta, skipping multiview");
+		MSG_SkipBits(msg, bits - (msg->bit - startbits));
+		return;
+	}
+
+	clc.multiviewVersionFail = qfalse;
+
+	if (snap->multiview.rescued) {
+		SHOWNET(msg, "multiview delta poisoned rescue.");
+	}
+
 	// playerstate mask
 	SHOWNET(msg, "psMask");
-	//int firstIndex;
-	//int lastIndex;
-	//while (MSG_ReadBits(msg, 1)) {
-	//	firstIndex = MSG_ReadBits(msg, 3); // 0..7
-	//	lastIndex = MSG_ReadBits(msg, 3);  // 0..7
-	//	for (; firstIndex < lastIndex + 1; firstIndex++) {
-	//		snap->multiview.clientMask[firstIndex] ^= MSG_ReadByte(msg); // delta-xor mask
-	//	}
-	//}
 	MSG_ReadByteMask(msg, snap->multiview.clientMask, sizeof(snap->multiview.clientMask), 3);
 
 	CL_ParsePlayerstates(snap,old,msg);
@@ -352,7 +575,7 @@ qboolean CL_ParseExtensions(msg_t* msg, qboolean parsedSnapshot) {
 	memcpy(&bak, msg, sizeof(bak));
 	while ((extension = MSG_CheckForExtensions(msg)) > 0) {
 
-		if (extension == EXT_COOLEXTEND) {
+		if (extension == EXT_COOLEXTEND || extension == EXT_COOLEXTEND_SMALL) {
 
 			SHOWNET(msg, "Found cool extensions marker.");
 			CL_ParseCoolExtensions(msg, parsedSnapshot);

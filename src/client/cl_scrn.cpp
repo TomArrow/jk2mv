@@ -22,6 +22,9 @@ cvar_t* cl_showVelocityAllowNegative;
 cvar_t* cl_drawPS;
 cvar_t* cl_drawPSHeight;
 cvar_t* cl_showShader;
+#ifdef USE_MULTIVIEW
+cvar_t* cl_multiviewWarnings;
+#endif
 cvar_t* cl_showMouse;
 cvar_t* cl_showMouseScale;
 cvar_t* cl_showMouseYScale;
@@ -461,6 +464,9 @@ void SCR_Init( void ) {
 	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
 	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
 	cl_showShader = Cvar_Get("cl_showShader", "0", CVAR_ARCHIVE);
+#ifdef USE_MULTIVIEW
+	cl_multiviewWarnings = Cvar_Get("cl_multiviewWarnings", "1", CVAR_TEMP);
+#endif
 	cl_showMouse = Cvar_Get("cl_showMouse", "0", CVAR_ARCHIVE);
 	cl_showMouseScale = Cvar_Get("cl_showMouseScale", "2.0", CVAR_ARCHIVE);
 	cl_showMouseYScale = Cvar_Get("cl_showMouseYScale", "2.0", CVAR_ARCHIVE);
@@ -757,6 +763,46 @@ static void SCR_DrawShowShader() {
 		SCR_DrawSmallStringExt(300, 360, va("shadertext:\n%s", shaderInfo), colorWhite, qfalse);
 	}
 }
+
+#ifdef USE_MULTIVIEW
+static void SCR_DrawMultiviewInfo() {
+	if (!clc.viewingCorruptedMultiview && !clc.multiviewVersionFail || !cl_multiviewWarnings->integer) {
+		return;
+	}
+	int y = cls.glconfig.vidHeight * 0.8f;
+	if (clc.multiviewVersionFail) {
+
+		const char* warning = "You are receiving multiview data from this server, but your client does";
+		const char* warning2 = "not support the version of the protocol. Consider updating your client.";
+		const char* warning3 = "You can temporarily disable this warning with cl_multiviewWarnings 0";
+		int strWidth = SCR_Strlen(warning) * con.charWidth;
+		int strWidth2 = SCR_Strlen(warning2) * con.charWidth;
+		int strWidth3 = SCR_Strlen(warning3) * con.charWidth;
+
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth * 0.5f, y, warning, colorYellow, qfalse);
+		y += con.charHeight;
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth2 * 0.5f, y, warning2, colorYellow, qfalse);
+		y += con.charHeight;
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth3 * 0.5f, y, warning3, colorYellow, qfalse);
+		y += con.charHeight;
+	}
+	if (clc.viewingCorruptedMultiview) {
+		const char* warning = "You are watching a corrupted multiview demo.";
+		const char* warning2 = "Glitches may be visible.";
+		const char* warning3 = "You can temporarily disable this warning with cl_multiviewWarnings 0";
+		int strWidth = SCR_Strlen(warning) * con.charWidth;
+		int strWidth2 = SCR_Strlen(warning2) * con.charWidth;
+		int strWidth3 = SCR_Strlen(warning3) * con.charWidth;
+
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth * 0.5f, y, warning, colorRed, qfalse);
+		y += con.charHeight;
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth2 * 0.5f, y, warning2, colorRed, qfalse);
+		y += con.charHeight;
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth3 * 0.5f, y, warning3, colorRed, qfalse);
+		y += con.charHeight;
+	}
+}
+#endif
 
 static void SCR_DrawShowMouse() {
 	if (!cl_showMouse->integer || !cls.showMouse.angleDeltaIndex) {
@@ -1151,6 +1197,9 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	SCR_DrawFPSGuess();
 	SCR_DrawShowMouse();
 	SCR_DrawShowShader();
+#ifdef USE_MULTIVIEW
+	SCR_DrawMultiviewInfo();
+#endif
 
 	SCR_DrawPS();
 

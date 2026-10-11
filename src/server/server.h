@@ -17,7 +17,7 @@
 #include <memory>
 
 
-#define MV_PROTOCOL_VERSION	1 // serverside multiview protocol version (client should be able to read older ones ideally)
+#define MV_PROTOCOL_VERSION	2 // serverside multiview protocol version (client should be able to read older ones ideally)
 
 //=============================================================================
 
@@ -113,6 +113,7 @@ typedef struct {
 	int				messageSize;		// used to rate drop packets
 #ifdef USE_MULTIVIEW
 	qboolean		multiview;
+	qboolean		rescueable;
 	int				version;
 	//int				mergeMask;
 	int				first_psf;				// first playerState index
@@ -296,7 +297,7 @@ typedef struct client_s {
 #ifdef USE_MULTIVIEW
     struct {
         int				protocol;
-
+		int64_t			lastFullPSMask;
         //int				scoreQueryTime;
         //int				lastRecvTime; // any received command
         //int				lastSentTime; // any sent command

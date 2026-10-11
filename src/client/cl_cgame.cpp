@@ -207,6 +207,7 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 	snapshot->serverTime = clSnap->serverTime;
 
 #ifdef USE_MULTIVIEW
+	clc.viewingCorruptedMultiview = qfalse;
 	if ( clSnap->multiview.multiview && clc.clientView != clc.clientNum && GET_ABIT(clSnap->multiview.clientMask, clc.clientView)) {
 		clPSFrame_t* psFrame = NULL;
 		int i;
@@ -237,6 +238,8 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 				}
 			}
 		}*/
+
+		clc.viewingCorruptedMultiview = clSnap->multiview.rescued;
 
 		for (i = clSnap->multiview.parsePlayerstatesNum; i < clSnap->multiview.parsePlayerstatesNum + clSnap->multiview.numPlayerstates; i++) {
 			psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];

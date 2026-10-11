@@ -108,18 +108,30 @@ qboolean SV_CommitExtensionMessage(msg_t* msg, msg_t* extensionMessage, int svc,
 
 #ifdef USE_MULTIVIEW
 
+// force retransmit of only a few fields by setting them to invalid values,
+// so that bad deltas look a bit more graceful on badly cut demos
+static const playerState_t* SV_GetRescueableBasePS(const playerState_t* srcPs) {
+	static playerState_t psLocal;
+	psLocal = *srcPs;
+	psLocal.clientNum = INT_MIN;
+	psLocal.stats[STAT_HEALTH] = INT_MIN;
+	return &psLocal;
+}
+
 // most of this stuff is copied and adapted from quake3e multiview version, though I made a lot of changes
-static qboolean SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *from, const clientSnapshot_t *to, msg_t *msg)
+static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *from, const clientSnapshot_t *to, msg_t *msg)
 {
     psFrame_t *psf;
     const psFrame_t *old_psf;
     const playerState_t *oldPs;
+	int baseClientID = client - svs.clients;
 
     int i, n;
     int clientSlot;
     int oldIndex;
 
     const byte *oldPsMask;
+    const byte *oldPsMaskForEncoding;
     byte oldPsMaskBuf[MAX_CLIENTS/8];
     byte newPsMask[MAX_CLIENTS/8];
 
@@ -135,14 +147,27 @@ static qboolean SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *f
         oldPsMask = from->psMask;
     }
 
+	oldPsMaskForEncoding = oldPsMask;
+
+	if (to->version >= 2 && from) {
+		// every now and then send out a full psmask. so oldschool demo cutters dont totally break the demos
+		if (to->rescueable && from->num_psf) {
+			MSG_WriteBits(msg, 1, 1);
+			Com_Memset(oldPsMaskBuf, 0, sizeof(oldPsMaskBuf));
+			oldPsMaskForEncoding = oldPsMaskBuf;
+		}
+		else {
+			MSG_WriteBits(msg, 0, 1);
+		}
+	}
 #if 1
-    // delta-xor playerstate bitmask
-    for ( i = 0; i < ARRAY_LEN( newPsMask ); i++ ) {
-        newPsMask[ i ] = to->psMask[ i ] ^ oldPsMask[ i ];
-    }
-    MSG_EmitByteMask( msg, newPsMask, MAX_CLIENTS/8, 3, qfalse );
+	// delta-xor playerstate bitmask
+	for ( i = 0; i < ARRAY_LEN( newPsMask ); i++ ) {
+		newPsMask[ i ] = to->psMask[ i ] ^ oldPsMaskForEncoding[ i ];
+	}
+	MSG_EmitByteMask( msg, newPsMask, MAX_CLIENTS/8, 3, qfalse );
 #else
-    MSG_WriteData( msg, to->psMask[ i ], sizeof( to->psMasks ) ); // direct playerstate mask
+	MSG_WriteData( msg, to->psMask[ i ], sizeof( to->psMasks ) ); // direct playerstate mask
 #endif
 
     oldIndex = 0;
@@ -188,6 +213,10 @@ static qboolean SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *f
 			oldEntMask = old_psf->entMask;
         }
 
+		if (oldPs && to->rescueable) {
+			oldPs = SV_GetRescueableBasePS(oldPs);
+		}
+
         // areabytes
         MSG_WriteBits( msg, psf->areabytes, 6 ); // was 8
         MSG_WriteData( msg, psf->areabits, psf->areabytes & 63 );
@@ -197,6 +226,19 @@ static qboolean SV_EmitPlayerStates( int baseClientID, const clientSnapshot_t *f
 
 #if 1
         // delta-xor mask
+#if 0
+		if (clientSlot == 2) {
+			int highestNum = ARRAY_LEN(newEntMask) - 1;
+			while (highestNum && newEntMask[highestNum]) {
+				highestNum--;
+			}
+			Com_Printf("client 2 entmask (server): ");
+			for (n = 0; n <= highestNum; n++) {
+				Com_Printf("%d ", (int)psf->entMask[n]);
+			}
+			Com_Printf("\n");
+		}
+#endif
         for ( n = 0; n < ARRAY_LEN( newEntMask ); n++ ) {
             newEntMask[ n ] = psf->entMask[ n ] ^ oldEntMask[ n ];
         }
@@ -304,8 +346,14 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 	// what we are delta'ing from
 	MSG_WriteByte( extensionMsg, lastframe );
 
+	// every now and then we send a rescuable packet
+	if (frame->version >= 2 && oldframe && (svs.time == client->multiview.lastFullPSMask || svs.time - client->multiview.lastFullPSMask >= 1000 || svs.time < client->multiview.lastFullPSMask)) { // do it on svs.time == client->multiview.lastFullPSMask cuz we may write separate snapshots for server demo
+		frame->rescueable = qtrue;
+		client->multiview.lastFullPSMask = svs.time;
+	}
+
 	// emit protocol version in first message
-	if ( oldversion != frame->version ) {
+	if ( oldversion != frame->version || frame->rescueable ) {
 		MSG_WriteBits( extensionMsg, 1, 1 );
 		MSG_WriteByte( extensionMsg, frame->version );
 	} else {
@@ -324,7 +372,7 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 
 	//frame->mergeMask = newmask;
 
-	if (!SV_EmitPlayerStates(client - svs.clients, oldframe, frame, extensionMsg)) {
+	if (!SV_EmitPlayerStates(client, oldframe, frame, extensionMsg)) {
 		return qfalse;
 	}
 	//MSG_entMergeMask = newmask; // emit packet entities with skipmask
@@ -398,7 +446,7 @@ void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgT
 
 	MSG_WriteByte(msg, svc_EOF); // EOF for normal message
 
-	int minsize = MSG_WriteExtensionMarker(msg, EXT_COOLEXTEND); // minsize says how big the message must be to be recognized by the client (it checks cursize)
+	int minsize = MSG_WriteExtensionMarker(msg, EXT_COOLEXTEND_SMALL); // minsize says how big the message must be to be recognized by the client (it checks cursize)
 
 #ifdef USE_MULTIVIEW
 	if (doingSnapshot) {

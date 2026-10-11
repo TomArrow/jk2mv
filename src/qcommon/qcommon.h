@@ -130,6 +130,7 @@ typedef enum extensionType_s {
 	EXT_HIDDENUCMD,
 	EXT_HIDDCLUCMD,
 	EXT_COOLEXTEND,
+	EXT_COOLEXTEND_SMALL, // marker optimized for small huffman size
 	EXT_TYPES_COUNT
 } extensionType_t;
 
@@ -196,6 +197,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 void MSG_WriteDeltaPlayerstate( msg_t *msg, const struct playerState_s *from, struct playerState_s *to );
 void MSG_ReadDeltaPlayerstate( msg_t *msg, const struct playerState_s *from, struct playerState_s *to );
 
+int MSG_HuffStrlen(const char* s);
 
 void MSG_ReportChangeVectors_f( void );
 

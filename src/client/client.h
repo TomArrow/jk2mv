@@ -35,6 +35,8 @@ typedef struct snapshotMultiview_s {
 	byte			clientMask[MAX_CLIENTS / 8];
 	int				multiViewDeltaNum;		// messageNum the multiview delta is from
 	qboolean		multiviewValid;
+	qboolean		rescued; // this snap is from a chain of poisoned but at least decodable multiviews (original non-delta missing). we cannot trust its data, including entmasks.
+	qboolean		psMaskRescue;
 } snapshotMultiview_t;
 #endif
 
@@ -329,6 +331,8 @@ typedef struct {
 
 #ifdef USE_MULTIVIEW
 	int			clientView;
+	qboolean	viewingCorruptedMultiview;
+	qboolean	multiviewVersionFail;
 	//int			zexpectDeltaSeq;			// for compressed server commands
 #endif
 } clientConnection_t;
@@ -632,6 +636,9 @@ extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
 extern	cvar_t	* cl_showVelocity;
 extern	cvar_t	* cl_showVelocityAllowNegative;
+#ifdef USE_MULTIVIEW
+extern	cvar_t	*cl_multiviewWarnings;
+#endif
 extern	cvar_t	* cl_showMouse;
 extern	cvar_t	* cl_showShader;
 extern	cvar_t	* cl_showMouseScale;
