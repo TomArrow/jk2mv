@@ -1054,6 +1054,12 @@ void SV_Init (void) {
 #ifdef USE_MULTIVIEW
 	sv_mvClients = Cvar_Get("sv_mvClients", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	sv_mvPassword = Cvar_Get("sv_mvPassword", "", CVAR_ARCHIVE);
+	sv_mvNonDeltaInterval = Cvar_Get("sv_mvNonDeltaInterval", "60", CVAR_ARCHIVE);
+#ifdef _DEBUG
+	sv_mvMaxVersion = Cvar_Get("sv_mvMaxVersion", QUOTEME(MV_PROTOCOL_VERSION), CVAR_TEMP);
+#else
+	sv_mvMaxVersion = Cvar_Get("sv_mvMaxVersion", QUOTEME(MV_PROTOCOL_VERSION), CVAR_ROM | CVAR_INTERNAL);
+#endif
 #endif
 
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);

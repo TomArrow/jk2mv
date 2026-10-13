@@ -80,7 +80,7 @@ void SV_DirectConnect( netadr_t from ) {
 	char		userinfo[MAX_INFO_STRING];
 	int			i;
 	client_t	*cl, *newcl;
-	client_t	temp;
+	static client_t	temp; // TA: Make this static to not cause stack overflow with all the new multiview stuff in client frames.
 	sharedEntity_t *ent;
 	int			clientNum;
 	int			version;

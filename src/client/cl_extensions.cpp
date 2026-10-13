@@ -33,7 +33,152 @@ static void CL_ParseExtensioNamespace(msg_t* msg) {
 }
 
 #ifdef USE_MULTIVIEW
-#define MAX_MULTIVIEW_VERSION 2 // max version number we can currently decode
+
+/*
+========================
+BG_PlayerStateToEntityStateExtraPolate
+
+This is done after each set of usercmd_t on the server,
+and after local prediction on the client
+========================
+*/
+void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
+	int		i;
+
+	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
+		s->eType = ET_INVISIBLE;
+	} else if ( ps->stats[STAT_HEALTH] <= GIB_HEALTH ) {
+		s->eType = ET_INVISIBLE;
+	} else {
+		s->eType = ET_PLAYER;
+	}
+
+	s->number = ps->clientNum;
+
+	s->pos.trType = TR_LINEAR_STOP;
+	VectorCopy( ps->origin, s->pos.trBase );
+	if ( snap ) {
+		SnapVector( s->pos.trBase );
+	}
+	// set the trDelta for flag direction and linear prediction
+	VectorCopy( ps->velocity, s->pos.trDelta );
+	// set the time for linear prediction
+	s->pos.trTime = time;
+	// set maximum extra polation time
+	s->pos.trDuration = 50; // 1000 / sv_fps (default = 20)
+
+	s->apos.trType = TR_INTERPOLATE;
+	VectorCopy( ps->viewangles, s->apos.trBase );
+	if ( snap ) {
+		SnapVector( s->apos.trBase );
+	}
+
+	s->trickedentindex = ps->fd.forceMindtrickTargetIndex;
+	s->trickedentindex2 = ps->fd.forceMindtrickTargetIndex2;
+	s->trickedentindex3 = ps->fd.forceMindtrickTargetIndex3;
+	s->trickedentindex4 = ps->fd.forceMindtrickTargetIndex4;
+
+	s->forceFrame = ps->saberLockFrame;
+
+	s->emplacedOwner = ps->electrifyTime;
+
+	s->speed = ps->speed;
+
+	s->genericenemyindex = ps->genericEnemyIndex;
+
+	s->activeForcePass = ps->activeForcePass;
+
+	s->angles2[YAW] = ps->movementDir;
+	s->legsAnim = ps->legsAnim;
+	s->torsoAnim = ps->torsoAnim;
+	s->clientNum = ps->clientNum;		// ET_PLAYER looks here instead of at number
+										// so corpses can also reference the proper config
+	s->eFlags = ps->eFlags;
+
+	s->saberInFlight = ps->saberInFlight;
+	s->saberEntityNum = ps->saberEntityNum;
+	s->saberMove = ps->saberMove;
+	s->forcePowersActive = ps->fd.forcePowersActive;
+
+	if (ps->duelInProgress)
+	{
+		s->bolt1 = 1;
+	}
+	else
+	{
+		s->bolt1 = 0;
+	}
+
+	if (ps->dualBlade)
+	{
+		s->bolt2 = 1;
+	}
+	else
+	{
+		s->bolt2 = 0;
+	}
+
+	s->otherEntityNum2 = ps->emplacedIndex;
+
+	s->shouldtarget = ps->saberHolstered; //reuse bool in entitystate for players differently
+	s->teamowner = ps->usingATST;
+
+	if (ps->genericEnemyIndex != -1)
+	{
+		s->eFlags |= EF_SEEKERDRONE;
+	}
+
+	if ( ps->stats[STAT_HEALTH] <= 0 ) {
+		s->eFlags |= EF_DEAD;
+	} else {
+		s->eFlags &= ~EF_DEAD;
+	}
+
+	if ( ps->externalEvent ) {
+		s->event = ps->externalEvent;
+		s->eventParm = ps->externalEventParm;
+	} else if ( ps->entityEventSequence < ps->eventSequence ) {
+		int		seq;
+
+		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS) {
+			ps->entityEventSequence = ps->eventSequence - MAX_PS_EVENTS;
+		}
+		seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
+		s->event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
+		s->eventParm = ps->eventParms[ seq ];
+		ps->entityEventSequence++;
+	}
+	s->weapon = ps->weapon;
+	s->groundEntityNum = ps->groundEntityNum;
+
+	s->powerups = 0;
+	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
+		if ( ps->powerups[ i ] ) {
+			s->powerups |= 1 << i;
+		}
+	}
+
+	s->loopSound = ps->loopSound;
+	s->generic1 = ps->generic1;
+
+	//NOT INCLUDED IN ENTITYSTATETOPLAYERSTATE:
+	s->modelindex2 = ps->weaponstate;
+	s->constantLight = ps->weaponChargeTime;
+
+	VectorCopy(ps->lastHitLoc, s->origin2);
+
+	s->isJediMaster = ps->isJediMaster;
+
+	s->time2 = ps->holocronBits;
+
+	s->fireflag = ps->fd.saberAnimLevel;
+
+#if 0
+	// bitmask float
+	i = MIN(MAX(0, ps->stats[14]), 1023) & 0x3ff;
+	s->angles2[PITCH] = *(float*)&i;
+#endif
+}
 void CL_EntityStateToRescuePlayerState(entityState_t* s, playerState_t* ps) {
 	int		i;
 
@@ -315,12 +460,135 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		//}
 
 
-		if (snap->multiview.rescued) {
-			// snap is from a chain of invalid deltas, therefore we cannot trust its ent mask. therefore we just enable all ents.
-			memset(state->entMask, 255, sizeof(state->entMask));
-		}
-
 	} // for [all clients]
+}
+
+static void CL_FixOwnPlayer(clSnapshot_t* snap) {
+	if (snap->multiview.version >= 3) {
+		return;
+	}
+
+	int i, j, n;
+	entityState_t* ent;
+	for (j = 0; j < snap->numEntities; ++j) {
+		n = (snap->parseEntitiesNum + j) & (MAX_PARSE_ENTITIES - 1);
+		ent = &cl.parseEntities[n];
+		if (ent->number > snap->ps.clientNum) {
+			break;
+		}
+		else if (snap->ps.clientNum == ent->number && ent->eType == ET_INVISIBLE && snap->ps.pm_type != PM_INTERMISSION && snap->ps.pm_type != PM_SPECTATOR && snap->ps.stats[STAT_HEALTH] > GIB_HEALTH) {
+			ent->eType = ET_PLAYER;
+			if (snap->ps.externalEvent) {
+				ent->event = snap->ps.externalEvent;
+				ent->eventParm = snap->ps.externalEventParm;
+			}
+			else {// if (snap->ps.entityEventSequence < snap->ps.eventSequence) {
+				int		seq;
+
+				//if (snap->ps.entityEventSequence < snap->ps.eventSequence - 1) {// MAX_PS_EVENTS) {
+					snap->ps.entityEventSequence = snap->ps.eventSequence - 1;//MAX_PS_EVENTS;
+				//}
+				seq = snap->ps.entityEventSequence & (MAX_PS_EVENTS - 1);
+				ent->event = snap->ps.events[seq] | ((snap->ps.entityEventSequence & 3) << 8);
+				ent->eventParm = snap->ps.eventParms[seq];
+				snap->ps.entityEventSequence++;
+			}
+			break;
+		}
+	}
+}
+
+// fixes entmasks in rescued snaps (due to bad delta), and some other things
+static void CL_FixRescuedEntmasks(clSnapshot_t* snap) {
+	int i,j,n;
+	clPSFrame_t* psFrame;
+	entityState_t* ent;
+	byte fullPSMask[MAX_CLIENTS / 8] = { 0 };
+
+	if (/*snap->multiview.version < 3 && */!snap->multiview.numPlayerstates) {
+		// nothing to do
+		return;
+	}
+	// first set all to 255
+	if (snap->multiview.version >= 3) {
+		// snap is from a chain of invalid deltas, therefore we cannot trust its ent mask. therefore we just enable all ents.
+		memset(snap->multiview.ownEntMask, 255, sizeof(snap->multiview.ownEntMask));
+		UNSET_ABIT(snap->multiview.ownEntMask, snap->ps.clientNum);
+	}
+	SET_ABIT(fullPSMask, snap->ps.clientNum); // we set this and don't reuse clientMask because we care about who this view is. if someone is a follow spectator, he himself doesn't matter.
+	for (i = snap->multiview.parsePlayerstatesNum; i < snap->multiview.parsePlayerstatesNum + snap->multiview.numPlayerstates; i++) {
+		psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];
+		memset(psFrame->entMask, 255, sizeof(psFrame->entMask));
+		SET_ABIT(fullPSMask, psFrame->ps.clientNum); 
+		UNSET_ABIT(psFrame->entMask, psFrame->ps.clientNum);
+	}
+
+	// now go through all entities in this snap and unset any player entity events in the corresponding clients' entmasks
+	for (j = 0; j < snap->numEntities; ++j) {
+		n = (snap->parseEntitiesNum + j) & (MAX_PARSE_ENTITIES - 1);
+		ent = &cl.parseEntities[n];
+		if ( ent->eFlags & EF_PLAYER_EVENT && GET_ABIT(fullPSMask, ent->otherEntityNum) ) {
+			if ( snap->multiview.version >= 3 && snap->ps.clientNum == ent->otherEntityNum) {
+				UNSET_ABIT(snap->multiview.ownEntMask, ent->number);
+			}
+
+			// this is a player event of a player we have a playerstate of. make sure he doesnt see it himself
+			for (i = snap->multiview.parsePlayerstatesNum; i < snap->multiview.parsePlayerstatesNum + snap->multiview.numPlayerstates; i++) {
+				psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];
+				if (psFrame->ps.clientNum == ent->otherEntityNum) {
+					UNSET_ABIT(psFrame->entMask, ent->number);
+				}
+			}
+		}
+	}
+}
+
+static int CL_GetPSEvent(playerState_t* ps, int type) {
+	if (type == 1) {
+		return ps->externalEvent;
+	}
+	else {
+		type -= 2;
+		int sequence = ps->eventSequence - 1 - type;
+		int seq = sequence & (MAX_PS_EVENTS - 1);
+		int relevantEvent = ps->events[seq] | ((sequence & 3) << 8);
+		return relevantEvent;
+	}
+}
+
+// to maintain compatibility with normal demo playback, the main player entity and main player events are zero'd/invisible'd out
+// but if we switch to a different view, we still want to see them, so restore them if we can.
+static void CL_RestoreOwnInfo(clSnapshot_t* snap) {
+	int j, n, counter = 0;
+	entityState_t* ent;
+	int maincl = snap->ps.clientNum;
+	for (j = 0; j < snap->numEntities; ++j) {
+		n = (snap->parseEntitiesNum + j) & (MAX_PARSE_ENTITIES - 1);
+		ent = &cl.parseEntities[n];
+
+		if (ent->number == maincl) {
+			if (snap->multiview.ownEntityEType >= 0) {
+				ent->eType = snap->multiview.ownEntityEType;
+			}
+			if (snap->multiview.ownEventInfo[counter]) {
+				int restoreEvent = CL_GetPSEvent(&snap->ps,snap->multiview.ownEventInfo[counter]);
+				ent->event = restoreEvent & ((1<<10)-1); // event netfield gets 10 bits
+			}
+			counter++;
+		}
+		else if ((ent->eFlags & EF_PLAYER_EVENT) && ent->otherEntityNum == maincl) {
+			if (snap->multiview.ownEventInfo[counter]) {
+				int restoreEvent = CL_GetPSEvent(&snap->ps, snap->multiview.ownEventInfo[counter]);
+				ent->event = restoreEvent & ((1 << 10) - 1); // event netfield gets 10 bits
+				ent->eType = (ET_EVENTS + restoreEvent) & ((1 << 8) - 1); // eType netfield gets 8 bits
+				//Com_Printf("restored player event: %d %d %d\n",ent->event,ent->eType, snap->ps.eventSequence);
+			}
+			counter++;
+		}
+		if (counter >= MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE) {
+			break;
+		}
+	}
 }
 
 static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
@@ -331,6 +599,7 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 	Com_Memset(&snap->multiview,0,sizeof(snap->multiview));
 
 	snap->multiview.multiview = qtrue;
+	snap->multiview.ownEntityEType = -1;
 
 
 	deltaNum = MSG_ReadByte(msg);
@@ -430,8 +699,11 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 
 	if (old && old->multiview.multiview) {
 		Com_Memcpy(snap->multiview.clientMask, old->multiview.clientMask, sizeof(snap->multiview.clientMask));
+		Com_Memcpy(snap->multiview.ownEntMask, old->multiview.ownEntMask, sizeof(snap->multiview.ownEntMask));
 		//newSnap.mergeMask = old->mergeMask;
 		snap->multiview.version = old->multiview.version;
+		snap->multiview.ownEntityEType = old->multiview.ownEntityEType;
+		memcpy(snap->multiview.ownEventInfo, old->multiview.ownEventInfo, sizeof(snap->multiview.ownEventInfo));
 	}
 	else {
 		// already zeroed as new snapshot
@@ -443,19 +715,37 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 		snap->multiview.version = MSG_ReadByte(msg);
 	}
 
-	if (snap->multiview.version > MAX_MULTIVIEW_VERSION) {
+	if (snap->multiview.version > MIN(MAX_MULTIVIEW_VERSION,cl_mvMaxVersion->integer)) {
 		SHOWNET(msg, "Multiview version not supported. Skipping rest of multiview");
+		snap->multiview.version = 0;
+		snap->multiview.multiview = qfalse;
+		snap->multiview.multiviewValid = qfalse;
 		clc.multiviewVersionFail = qtrue;
 		MSG_SkipBits(msg, (bits - (msg->bit - startbits)));
 		return;
 	}
 
+	if (snap->multiview.version >= 3) {
+		if (MSG_ReadBits(msg, 1)) {
+			SHOWNET(msg, "v3 ownEType & ownEntMask & ownEventInfo");
+			snap->multiview.ownEntityEType = MSG_ReadByte(msg);
+			for (int i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+				snap->multiview.ownEventInfo[i] = MSG_ReadBits(msg, 2);
+			}
+		}
+		MSG_ReadByteMask(msg,snap->multiview.ownEntMask, sizeof(snap->multiview.ownEntMask), 7);
+		CL_RestoreOwnInfo(snap);
+	}
 
 	// playerState to entityState merge mask
 	//SHOWNET(msg, "mergemask");
 	//if (MSG_ReadBits(msg, 1)) {
 	//	snap->multiview.mergeMask = MSG_ReadBits(msg, SM_BITS);
 	//}
+
+	if (old && snap->multiview.multiviewValid && snap->multiview.version != old->multiview.version) {
+		snap->multiview.multiviewValid = qfalse;
+	}
 
 	if (snap->multiview.version >= 2 && old) {
 		// server sends us a non-delta xor'd clientmask every now and then so we can "recover" with a badly cut or corrupted demo
@@ -487,6 +777,16 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 	MSG_ReadByteMask(msg, snap->multiview.clientMask, sizeof(snap->multiview.clientMask), 3);
 
 	CL_ParsePlayerstates(snap,old,msg);
+
+	if (snap->multiview.rescued) {
+		CL_FixRescuedEntmasks(snap);
+	}
+	if (!snap->hasItsOwnEntity) {
+		BG_PlayerStateToEntityStateExtraPolate(&snap->ps, &snap->multiview.reconstructedOwnEnt, snap->ps.commandTime, qfalse);
+		snap->multiview.reconstructedOwnEnt.number = snap->ps.clientNum;
+	} else if (snap->multiview.version < 3) {
+		CL_FixOwnPlayer(snap);
+	}
 
 	// update it in the buffer too
 	cl.snapshots[snap->messageNum & PACKET_MASK] = *snap;
@@ -523,6 +823,7 @@ static void CL_ParseTommyTernalNamespaceExtensions(msg_t* msg, int cmd, int bits
 
 static void CL_ParseCoolExtensions(msg_t* msg, qboolean parsedSnapshot) {
 	byte cmd;
+	msg_t msgBackup;
 	int bits;
 	parseExtensionNamespace = 0;
 	while ( 1 ) {
@@ -548,15 +849,22 @@ static void CL_ParseCoolExtensions(msg_t* msg, qboolean parsedSnapshot) {
 			break;
 		default:
 			bits = MSG_ReadLong(msg);
+			msgBackup = *msg;
 			switch (parseExtensionNamespace) {
 			case 0: // normal tommyternal extensions namespace. if you make your own extensions, MAKE YOUR OWN NAMESPACE. See comments in sv_extensions.cpp
 				CL_ParseTommyTernalNamespaceExtensions(msg,cmd,bits,parsedSnapshot);
 				break;
 			default:
 				// unknown extension. skip
-				SHOWNET(msg, va("Unknown cool extension, skipping %d bits (unknown namespace %d).", bits, parseExtensionNamespace));
+				SHOWNET(msg, va("Unknown cool extension, skipping (size %d bits, unknown namespace %d).", bits, parseExtensionNamespace));
 				MSG_SkipBits(msg, bits);
 				break;
+			}
+			// safety so that even if an extension has a parsing error, we are safe from crashes to menu, unless it does something catastrophic.
+			if (msg->bit != (msgBackup.bit+bits)) {
+				SHOWNET(msg, va("Cool extension parsing resulted in wrong amount of bits being read (expected size %d bits, read size %d bits, namespace %d).", bits, msg->bit-msgBackup.bit, parseExtensionNamespace));
+				*msg = msgBackup;
+				MSG_SkipBits(msg, bits);
 			}
 		}
 	}

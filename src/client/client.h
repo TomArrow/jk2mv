@@ -12,6 +12,8 @@
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
+#define MAX_MULTIVIEW_VERSION 3 // max version number we can currently decode
+
 extern	clientRendererInfo_t	clRenderInfo;
 
 // Wind
@@ -37,6 +39,11 @@ typedef struct snapshotMultiview_s {
 	qboolean		multiviewValid;
 	qboolean		rescued; // this snap is from a chain of poisoned but at least decodable multiviews (original non-delta missing). we cannot trust its data, including entmasks.
 	qboolean		psMaskRescue;
+
+	int				ownEntityEType;
+	byte			ownEntMask[MAX_GENTITIES / 8];
+	byte			ownEventInfo[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
+	entityState_t	reconstructedOwnEnt;
 } snapshotMultiview_t;
 #endif
 
@@ -61,6 +68,7 @@ typedef struct {
 	int				serverCommandNum;		// execute all commands up to this before
 	// making the snapshot current
 #ifdef USE_MULTIVIEW
+	qboolean			hasItsOwnEntity; // for old bugged demos
 	snapshotMultiview_t	multiview;
 #endif // USE_MV
 } clSnapshot_t;
@@ -331,7 +339,7 @@ typedef struct {
 
 #ifdef USE_MULTIVIEW
 	int			clientView;
-	qboolean	viewingCorruptedMultiview;
+	int			viewingCorruptedMultiview;
 	qboolean	multiviewVersionFail;
 	//int			zexpectDeltaSeq;			// for compressed server commands
 #endif
@@ -726,6 +734,10 @@ extern	cvar_t	*cl_ucmdDemoSave;
 extern	cvar_t	*cl_ucmdDemoSaveMinCount;
 extern	cvar_t	*cl_demoWriteMeta;
 
+#ifdef USE_MULTIVIEW
+extern	cvar_t	*cl_mvMaxVersion;
+#endif
+
 extern	cvar_t	*cl_numpadNumberBinds;
 
 extern	cvar_t	*cl_traceBenchmark;
@@ -737,6 +749,9 @@ extern	cvar_t	*cl_traceBenchmarkTimeLimitMs;
 // cl_extensions
 //
 qboolean CL_ParseExtensions(msg_t* msg, qboolean parsedSnapshot);
+#ifdef USE_MULTIVIEW
+void BG_PlayerStateToEntityStateExtraPolate(playerState_t* ps, entityState_t* s, int time, qboolean snap);
+#endif
 
 //
 // cl_main

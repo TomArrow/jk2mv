@@ -175,6 +175,9 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 	int			newnum;
 	entityState_t	*oldstate;
 	int			oldindex, oldnum;
+#ifdef USE_MULTIVIEW
+	newframe->hasItsOwnEntity = qfalse;
+#endif
 
 	newframe->parseEntitiesNum = cl.parseEntitiesNum;
 	newframe->numEntities = 0;
@@ -201,6 +204,12 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 		if ( newnum == (MAX_GENTITIES-1) ) {
 			break;
 		}
+
+#ifdef USE_MULTIVIEW
+		if (newnum == newframe->ps.clientNum) {
+			newframe->hasItsOwnEntity = qtrue;
+		}
+#endif
 
 		if ( msg->readcount > msg->cursize ) {
 			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message");

@@ -77,7 +77,7 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 			// delta update from old position
 			// because the force parm is qfalse, this will not result
 			// in any bytes being emited if the entity has not changed at all
-			MSG_WriteDeltaEntity (msg, oldent, newent, qfalse );
+			MSG_WriteDeltaEntity(msg, oldent, newent, qfalse); 
 			oldindex++;
 			newindex++;
 			continue;
@@ -297,8 +297,18 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 		MSG_WriteDeltaPlayerstate( msg, NULL, &frame->ps );
 	}
 
+#ifdef USE_MULTIVIEW
+	// hide main ps entity and entity events to avoid double events on normal clients playing back a multiview demo
+	SV_ProcessPlayerEntities(frame, oldframe,qfalse);
+#endif
+
 	// delta encode the entities
 	SV_EmitPacketEntities (oldframe, frame, msg);
+
+#ifdef USE_MULTIVIEW
+	// restore real state
+	SV_ProcessPlayerEntities(frame, oldframe, qtrue);
+#endif
 
 	// padding for rate debugging
 	if ( sv_padPackets->integer ) {
@@ -399,6 +409,7 @@ typedef enum snapshotEntityPriority_s {
 	SSPRIO_SPECALLFX,
 	SSPRIO_SPECALLSPEAKER,
 	SSPRIO_SPECALLTRIGGER,
+	SSPRIO_MULTIVIEW,
 } snapshotEntityPriority_t;
 
 typedef struct snapshotEntity_s {
@@ -429,7 +440,7 @@ typedef struct clientPVS_s {
     byte		entMask[MAX_GENTITIES/8];
 } clientPVS_t;
 
-static clientPVS_t client_pvs[ MAX_CLIENTS ];
+static clientPVS_t client_pvs[ MAX_CLIENTS + 1 ]; // +1 to get the mask of entities to send to multiview clients
 
 
 /*
@@ -809,9 +820,9 @@ static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
 	Com_Memset(pvs->areabits, 0, sizeof(pvs->areabits));
 
 #ifdef USE_MULTIVIEW
-	pvs->multiview = (qboolean)( client->multiview.protocol > 0 );
+	pvs->multiview = qfalse;// (qboolean)(client->multiview.protocol > 0);
 #endif
-	pvs->spectator = (qboolean)(ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || (ps->pm_flags & PMF_FOLLOW));
+	pvs->spectator = (qboolean)(ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || (ps->pm_flags & PMF_FOLLOW) && ps->clientNum != clientSlot);
 	pvs->pm_type = ps->pm_type;
 
 	// never send client's own entity, because it can
@@ -831,6 +842,14 @@ static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
 	// add all the entities directly visible to the eye, which
 	// may include portal entities that merge other viewpoints
 	SV_AddEntitiesVisibleFromPoint(org, pvs, qfalse, client - svs.clients);
+
+#ifdef USE_MULTIVIEW
+	// yea uh. we were setting that in order to send everything, but
+	// we now build the multiview snapshot entirely separately and instead 
+	// create the normal pvs here. so don't set this before SV_AddEntitiesVisibleFromPoint I guess.
+	// TODO Clean that up
+	pvs->multiview = (qboolean)(client->multiview.protocol > 0);
+#endif
 
 	maxSnapEnts = client->customSnapEntCount ? client->customSnapEntCount : MAX_SNAPSHOT_ENTITIES_SERVER;
 	if (pvs->numbers.numSnapshotEntities > maxSnapEnts) {
@@ -865,6 +884,76 @@ static clientPVS_t* SV_BuildClientPVS( client_t* client, playerState_t* ps) {
 	return pvs;
 }
 
+#ifdef USE_MULTIVIEW
+/*
+=============
+SV_BuildMultiviewPVS
+
+Decides which entities are going to be sent to
+multiview clients. Aka: Pretty much all. 
+We mostly just set the entMask here.
+=============
+*/
+static clientPVS_t* SV_BuildMultiviewPVS() {
+		clientPVS_t* pvs;
+	vec3_t						org;
+	int							i;
+	svEntity_t					*svEnt;
+	sharedEntity_t				*ent;
+
+	pvs = &client_pvs[MAX_CLIENTS]; // special extra slot for multiview
+
+	if (pvs->snapshotFrame == svs.snapshotFrame) {
+		return pvs;
+	}
+
+	pvs->snapshotFrame = svs.snapshotFrame;
+
+	// bump the counter used to prevent double adding
+	sv.snapshotCounter++;
+
+	// clear everything in this snapshot
+	pvs->numbers.numSnapshotEntities = 0;
+	pvs->areabytes = 0;
+	pvs->multiview = qtrue;
+	Com_Memset(pvs->areabits, 0, sizeof(pvs->areabits));
+	pvs->clientNum = -1;
+
+	memset(pvs->entMask, 0, sizeof(pvs->entMask));
+	for ( int num = 0 ; num < sv.num_entities ; num++ ) {
+		ent = SV_GentityNum( num );
+
+		// never send entities that aren't linked in
+		if ( !ent->r.linked ) {
+			continue;
+		}
+	
+		if ( ent->s.number != num ) {
+			Com_DPrintf( "FIXING ENT->S.NUMBER %i => %i\n", ent->s.number, num );
+			ent->s.number = num;
+		}
+
+		// entities can be flagged to explicitly not be sent to the client
+		if ( ent->r.svFlags & SVF_NOCLIENT ) {
+			continue;
+		}
+
+		// don't double add an entity (not sure if that can happen, relating to those ghosting fixes in SV_SvEntityForGentity and such?)
+		// can I skip this here?
+		svEnt = SV_SvEntityForGentity(ent);
+		if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
+			continue;
+		}
+		svEnt->snapshotCounter = sv.snapshotCounter;
+
+		pvs->numbers.snapshotEntities[pvs->numbers.numSnapshotEntities++] = ent->s.number;
+		SET_ABIT(pvs->entMask, ent->s.number );
+
+	}
+	return pvs;
+}
+#endif
+
 static void SV_GetConvertedPlayerstate(client_t* client, playerState_t* out) {
 
 	playerState_t* ps;
@@ -898,6 +987,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	entityState_t				*state;
 	sharedEntity_t				*clent;
 	clientPVS_t					*pvs;
+	clientPVS_t					*entityPvs; // pvs used for entities
 
 	// this is the frame we are creating
 	frame = &client->frames[ client->netchan.outgoingSequence & PACKET_MASK ];
@@ -913,7 +1003,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	// grab the current playerState_t
 	SV_GetConvertedPlayerstate(client,&frame->ps);
 
-	pvs = SV_BuildClientPVS(client,&frame->ps);
+	entityPvs = pvs = SV_BuildClientPVS(client,&frame->ps);
 
 	memcpy(frame->areabits,pvs->areabits,sizeof(frame->areabits));
 	frame->areabytes = pvs->areabytes;
@@ -921,8 +1011,34 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	// copy the entity states out
 	frame->num_entities = 0;
 	frame->first_entity = svs.nextSnapshotEntities;
-	for (i = 0; i < pvs->numbers.numSnapshotEntities; i++) {
-		ent = SV_GentityNum(pvs->numbers.snapshotEntities[i]);
+
+	// we do this a bit different than quake3e, although we are heavily copying from it.
+	// our extra data comes all after the normal svc_EOF. the normal snapshot and message remains readable to normal clients
+	// we merely provide extra data.
+#ifdef USE_MULTIVIEW
+	if (client->multiview.protocol > 0) {
+		frame->multiview = qtrue;
+		frame->ownEntityEType = -1;
+		// select primary client slot
+		//if (client->multiview.recorder) {
+		//	cl = sv_demoClientID;
+		//}
+		
+		// create the mask of actual entities to send to a multiview client
+		entityPvs = SV_BuildMultiviewPVS();
+
+		// copy off the client's actual entity visibilities so they can be restored on playback
+		// (you can argue it doesn't harm either way but he might get disruptive screenshakes or other effects not meant for him otherwise)
+		memcpy(frame->ownEntmask, pvs->entMask, sizeof(frame->ownEntmask));
+	}
+	else
+	{
+		frame->multiview = qfalse;
+	}
+#endif
+
+	for (i = 0; i < entityPvs->numbers.numSnapshotEntities; i++) {
+		ent = SV_GentityNum(entityPvs->numbers.snapshotEntities[i]);
 		state = &svs.snapshotEntities[svs.nextSnapshotEntities % svs.numSnapshotEntities];
 		*state = ent->s;
 		svs.nextSnapshotEntities++;
@@ -933,20 +1049,8 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		frame->num_entities++;
 	}
 
-	// we do this a bit different than quake3e, although we are heavily copying from it.
-	// our extra data comes all after the normal svc_EOF. the normal snapshot and message remains readable to normal clients
-	// we merely provide extra data.
+
 #ifdef USE_MULTIVIEW
-	if (client->multiview.protocol > 0) {
-		frame->multiview = qtrue;
-		// select primary client slot
-		//if (client->multiview.recorder) {
-		//	cl = sv_demoClientID;
-		//}
-	}
-	else {
-		frame->multiview = qfalse;
-	}
 
 	if (frame->multiview) {
 		//        clientPVS_t *pvs;

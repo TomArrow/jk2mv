@@ -571,6 +571,69 @@ int MSG_HuffStrlen(const char* s) {
 
 
 
+// gives a playerstate with non-0 values that are almost always set like this. why bother retransmitting those on non-delta snapshots?
+// THIS IS RIGHT NOW IN THE PREPARATION STAGE AND NOT DONE YET. DON'T USE.
+const playerState_t* MSG_GetBaselinePS() {
+	static playerState_t baselinePs[VERSION_1_04 + 1] = { 0 };
+	static qboolean isInited[VERSION_1_04 + 1] = { qfalse };
+	mvversion_t version = MV_GetCurrentGameversion();
+	playerState_t* ps = &baselinePs[version];
+	if (!isInited[version]) {
+		// Percentages indicate roughly how often that value is set based on a demo dataset of 1 month towards end of 2023
+		// the percentage point approximates how often a value appeared in ~367,911,851 playerState readings (367 million)
+		// any fields where 0 was the most common value were excluded
+		// it doesn't need to be said but: even if the percentage is below 50%, a value can still be the most common value
+		// since there can be a lot of other values that happen less often
+		ps->rocketLockIndex = 32; // 99.999%
+		ps->genericEnemyIndex = -1; // 99.99%
+		ps->saberCanThrow = qtrue; // 98%
+		ps->duelIndex = 1023; // 96%
+		ps->gravity = 800; // 94%
+		ps->viewheight = 36; // 93%
+		ps->basespeed = 250; // 90%
+		ps->fd.forcePowerSelected = 14; // 90%. FP_SEE. idk why lol
+		ps->weapon = 2; // 88% saber
+		ps->saberMove = 1; // 78%
+		ps->speed = 250; // 76%
+		ps->fd.forcePower = 100; // 70% of the time
+		ps->fd.forceSide = 1; // 60% of the time
+		ps->saberActive = qtrue; // 65%. meme field. is set to 1 after you slash and never changed again
+		ps->weaponstate = 3; // 57%. WEAPON_FIRING. it just stays on that once u slash.
+		ps->fd.saberAnimLevel = 3; // 57 %
+		ps->fd.saberDrawAnimLevel = 3; // 57 %
+		ps->groundEntityNum = 1022; // 56%
+		ps->fd.forcePowersKnown = 98306; // 55% of the time. true on most ctf servers. and its pretty much never 0 anyway so this should be better
+		ps->fd.forcePowerLevel[FP_LEVITATION] = 1; // about 50% of the time
+		ps->events[0] = 14; // 22%. EV_JUMP
+		ps->events[1] = 11; // 23%. EV_FALL. the order of these 2 is mostly arbitrary but in my sample set this one was slightly (half percentage point?) more common
+		ps->origin[2] = -39.875f; // 24.125f; // hilariously, this is true 5% of the time. (6% for 24.125f) and thus one of the 2 most common values encountered. It is the z value you get on the base floors of ctf_Yavin and the floor on ffa_bespin mid area. in my sample set, 24.125f has a slight edge due to 1.04 demos, and an emphasis on ffa_bespin back in 2023. but we wanna be more of a ctf mod anyway.
+		ps->viewangles[1] = 110.275268554688f; // true about 2 % of the time. it's the ffa_Bespin levelshot camera. yavin would be 196.030624389648f. (yes i checked that these floating point literals reproduce the exact bit-perfect value)
+		ps->stats[0] = 100; // 45%. STAT_HEALTH
+		ps->stats[4] = 5; // 78% STAT_WEAPONS: WP_NONE + WP_SABER (???)
+		ps->stats[5] = 25; // 48%. STAT_ARMOR
+		ps->stats[8] = 100; // 99.9%. STAT_MAX_HEALTH
+		//ps->persistant[2] = 2; // PERS_RANK
+		ps->persistant[4] = 1; // 22%. PERS_SPAWN_COUNT
+		ps->persistant[6] = 1022; // 20%. PERS_ATTACKER
+		ps->ammo[2] = 100; // 90%. AMMO_BLASTER. 100 even if you dont have one
+		if (version == VERSION_1_02) {
+			// alternative: 553 (BOTH_STAND2) / 550 (BOTH_STAND1)
+			ps->torsoAnim = 731; // BOTH_RUN1
+			ps->legsAnim = 731; // BOTH_RUN1
+		}
+		else {
+			// alternative: 573 (BOTH_STAND2) / 571 (BOTH_STAND1)
+			ps->torsoAnim = 833;// BOTH_RUN1
+			ps->legsAnim = 833;// BOTH_RUN1
+		}
+		//baselinePs.clientNum = 1; // funny. prolly cuz most servers block client 0?
+		isInited[version] = qtrue;
+	}
+	return ps;
+}
+
+
+
 #define EXTENSION_MARKER_LENGTH 10
 typedef struct extensionTypeMap_s {
 	const char marker[EXTENSION_MARKER_LENGTH+1];

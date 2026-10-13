@@ -794,11 +794,11 @@ static void SCR_DrawMultiviewInfo() {
 		int strWidth2 = SCR_Strlen(warning2) * con.charWidth;
 		int strWidth3 = SCR_Strlen(warning3) * con.charWidth;
 
-		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth * 0.5f, y, warning, colorRed, qfalse);
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth * 0.5f, y, warning, clc.viewingCorruptedMultiview == 2 ? colorRed : colorYellow, qfalse);
 		y += con.charHeight;
-		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth2 * 0.5f, y, warning2, colorRed, qfalse);
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth2 * 0.5f, y, warning2, clc.viewingCorruptedMultiview == 2 ? colorRed : colorYellow, qfalse);
 		y += con.charHeight;
-		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth3 * 0.5f, y, warning3, colorRed, qfalse);
+		SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - strWidth3 * 0.5f, y, warning3, clc.viewingCorruptedMultiview == 2 ? colorRed : colorYellow, qfalse);
 		y += con.charHeight;
 	}
 }

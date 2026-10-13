@@ -17,7 +17,16 @@
 #include <memory>
 
 
-#define MV_PROTOCOL_VERSION	2 // serverside multiview protocol version (client should be able to read older ones ideally)
+// serverside multiview protocol version (client should be able to read older ones ideally)
+//
+// versions:
+// 1 = initial version
+// 2 = added some robustness against badly cut demos, which made playback completely impossible on v1
+// 3 = added information to more reliably reconstruct the main player's POV
+//
+#define MV_PROTOCOL_VERSION	3 
+
+
 
 //=============================================================================
 
@@ -100,6 +109,9 @@ typedef struct {
 	qboolean		svsTimeWrapped;		// can happen, unluck
 } server_t;
 
+
+typedef byte entMask_t[MAX_GENTITIES / 8];
+
 typedef struct {
 	int				areabytes;
 	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
@@ -119,7 +131,12 @@ typedef struct {
 	int				first_psf;				// first playerState index
 	int				num_psf;				// number of playerStates to send
 	byte			psMask[MAX_CLIENTS / 8];	// playerState mask
-	int				normalSnapshotOldFrame; 
+	int				normalSnapshotOldFrame;
+
+	// stuff to restore the main player for other views:
+	int				ownEntityEType;
+	entMask_t		ownEntmask; // for main client;
+	byte			ownEventInfo[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
 #endif
 } clientSnapshot_t;
 
@@ -155,7 +172,6 @@ typedef struct {
 
 //#define MAX_MV_FILES 4096 // for directory caching
 
-typedef byte entMask_t[MAX_GENTITIES / 8];
 
 typedef struct psFrame_s {
 	int				clientSlot;
@@ -298,6 +314,7 @@ typedef struct client_s {
     struct {
         int				protocol;
 		int64_t			lastFullPSMask;
+		int64_t			lastNonDelta;
         //int				scoreQueryTime;
         //int				lastRecvTime; // any received command
         //int				lastSentTime; // any sent command
@@ -409,6 +426,8 @@ extern	cvar_t	*mv_httpserverport;
 
 extern	cvar_t	*sv_mvClients;
 extern	cvar_t	*sv_mvPassword;
+extern	cvar_t	*sv_mvMaxVersion;
+extern	cvar_t	*sv_mvNonDeltaInterval;
 //extern	cvar_t	*sv_demoFlags;
 //extern	cvar_t	*sv_autoRecord;
 
@@ -586,6 +605,9 @@ void SV_BeginAutoRecordDemos();
 // sv_extensions.cpp
 //
 void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgType, qboolean doingSnapshot);
+#ifdef USE_MULTIVIEW
+void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore);
+#endif
 
 //
 // sv_snapshot.c

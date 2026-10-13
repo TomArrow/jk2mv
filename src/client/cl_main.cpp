@@ -135,6 +135,10 @@ cvar_t	*cl_ucmdDemoSave;
 cvar_t	*cl_ucmdDemoSaveMinCount;
 cvar_t	*cl_demoWriteMeta;
 
+#ifdef USE_MULTIVIEW
+cvar_t	*cl_mvMaxVersion;
+#endif
+
 vec3_t cl_windVec;
 
 clientActive_t		cl;
@@ -3925,6 +3929,14 @@ void CL_Init( void ) {
 	cl_ucmdDemoSave = Cvar_Get ("cl_ucmdDemoSave", "2", CVAR_ARCHIVE | CVAR_GLOBAL | CVAR_LATCH );
 	cl_ucmdDemoSaveMinCount = Cvar_Get ("cl_ucmdDemoSaveMinCount", "64", CVAR_ARCHIVE | CVAR_GLOBAL );
 	cl_demoWriteMeta = Cvar_Get ("cl_demoWriteMeta", "1", CVAR_ARCHIVE | CVAR_GLOBAL );
+
+#ifdef USE_MULTIVIEW
+#ifdef _DEBUG
+	cl_mvMaxVersion = Cvar_Get("cl_mvMaxVersion", QUOTEME(MAX_MULTIVIEW_VERSION), CVAR_TEMP);
+#else
+	cl_mvMaxVersion = Cvar_Get("cl_mvMaxVersion", QUOTEME(MAX_MULTIVIEW_VERSION), CVAR_ROM|CVAR_INTERNAL );
+#endif
+#endif
 
 	// mv cvars
 	mv_slowrefresh = Cvar_Get("mv_slowrefresh", "3", CVAR_ARCHIVE | CVAR_GLOBAL);

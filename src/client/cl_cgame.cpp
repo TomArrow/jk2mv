@@ -168,11 +168,13 @@ clSnapshot15_t *CL_GetSnapshot15from16(clSnapshot_t *snapshot) {
 }
 
 
+#define IS_PLAYER_ENTITY(ent,playernum) ( (playernum) == (ent)->number || ((ent)->eFlags & EF_PLAYER_EVENT) && (ent)->otherEntityNum == (playernum) )
+
 template <typename T>
 qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 	using snapshotCond_t = std::conditional_t<std::is_same_v<T, snapshot_t>, clSnapshot_t, clSnapshot15_t>;
 	snapshotCond_t	*clSnap;
-	int				i, count;
+	int				i, n, count;
 
 	if ( snapshotNumber > cl.snap.messageNum ) {
 		Com_Error( ERR_DROP, "CL_GetSnapshot: snapshotNumber > cl.snapshot.messageNum" );
@@ -239,7 +241,9 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 			}
 		}*/
 
-		clc.viewingCorruptedMultiview = clSnap->multiview.rescued;
+		if (clSnap->multiview.rescued) {
+			clc.viewingCorruptedMultiview = 2;
+		}
 
 		for (i = clSnap->multiview.parsePlayerstatesNum; i < clSnap->multiview.parsePlayerstatesNum + clSnap->multiview.numPlayerstates; i++) {
 			psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];
@@ -271,18 +275,55 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 			count = 0;
 
 			int index, n;
+			bool foundMainPS = false;
 			for (index = 0; index < clSnap->numEntities; ++index) {
 				n = (clSnap->parseEntitiesNum + index) & (MAX_PARSE_ENTITIES - 1);
 				if ( GET_ABIT( psFrame->entMask, cl.parseEntities[n].number) ) {
 					int entityNum = cl.parseEntities[n].number;
 					// skip own and spectated entity
-					if ( entityNum != clc.clientView && entityNum != snapshot->ps.clientNum )
+					// TA: Wait, we don't rly need to do this, do we? We are testing against the entmask anyway, that should cover it.
+					//if ( !IS_PLAYER_ENTITY(&cl.parseEntities[n], snapshot->ps.clientNum ) )
 					{
 						if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
 							Com_Error(ERR_DROP, "snapshot entities count overflow for %i", clc.clientView);
 							break;
 						}
+						
+						if (!foundMainPS) {
+							if (entityNum == clSnap->ps.clientNum) {
+								foundMainPS = true;
+							} else if (entityNum > clSnap->ps.clientNum) {
+								// older demos might have the main client entity not sent at all. use reconstructed one
+
+								snapshot->entities[count++] = clSnap->multiview.reconstructedOwnEnt;
+								foundMainPS = true;
+
+								// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
+								if (!(cls.fixes & MVFIX_WPGLOWING) && (snapshot->entities[count - 1].eType == ET_BODY || snapshot->entities[count - 1].eType == ET_PLAYER)) {
+									snapshot->entities[count - 1].constantLight = 0;
+								}
+								if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
+									Com_DPrintf("CL_GetSnapshot (multiview): truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT);
+									count = MAX_ENTITIES_IN_SNAPSHOT;
+									break;
+								}
+							}
+						}
+						
+
 						snapshot->entities[count++] = cl.parseEntities[n];
+
+						// this refers to the main snapshot ps, not our multiview ps.
+						/*if (entityNum == clSnap->ps.clientNum && snapshot->entities[count - 1].eType == ET_INVISIBLE) {
+							// turn it into the proper eType again
+							if (clSnap->multiview.version >= 3 && clSnap->multiview.ownEntityEType >= 0) {
+								snapshot->entities[count - 1].eType = clSnap->multiview.ownEntityEType;
+							}
+							else 
+							if (clSnap->ps.pm_type != PM_INTERMISSION && clSnap->ps.pm_type != PM_SPECTATOR && clSnap->ps.stats[STAT_HEALTH] > GIB_HEALTH) {
+								snapshot->entities[count - 1].eType = ET_PLAYER;
+							}
+						}*/
 
 						// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
 						if (!(cls.fixes & MVFIX_WPGLOWING) && (snapshot->entities[count - 1].eType == ET_BODY || snapshot->entities[count - 1].eType == ET_PLAYER)) {
@@ -303,6 +344,10 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 			return qtrue;
 		}
 	}
+
+	if (clSnap->multiview.rescued) {
+		clc.viewingCorruptedMultiview = 1;
+	}
 #endif
 
 
@@ -318,20 +363,36 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 		Com_DPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );
 		count = MAX_ENTITIES_IN_SNAPSHOT;
 	}
-	snapshot->numEntities = count;
 
-	for ( i = 0 ; i < count ; i++ ) {
+	for ( i = 0, n = 0 ; i < clSnap->numEntities && n < count ; i++ ) {
 
 		int entNum =  ( clSnap->parseEntitiesNum + i ) & (MAX_PARSE_ENTITIES-1) ;
 
+#ifdef USE_MULTIVIEW
+		if (clSnap->multiview.multiview) {
+			if (clSnap->multiview.version >= 3) {
+				// from version 3 onwards server tells us, we don't need to guess
+				if (!GET_ABIT(clSnap->multiview.ownEntMask, cl.parseEntities[entNum].number)) {
+					continue;
+				}
+			} else if (IS_PLAYER_ENTITY(&cl.parseEntities[entNum], snapshot->ps.clientNum)) {
+				continue;
+			}
+		}
+#endif
+
 		// copy everything but the ghoul2 pointer
-		memcpy(&snapshot->entities[i], &cl.parseEntities[ entNum ], sizeof(entityState_t));
+		memcpy(&snapshot->entities[n], &cl.parseEntities[ entNum ], sizeof(entityState_t));
 
 		// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
-		if (!(cls.fixes & MVFIX_WPGLOWING) && ( snapshot->entities[i].eType == ET_BODY || snapshot->entities[i].eType == ET_PLAYER )) {
-			snapshot->entities[i].constantLight = 0;
+		if (!(cls.fixes & MVFIX_WPGLOWING) && ( snapshot->entities[n].eType == ET_BODY || snapshot->entities[n].eType == ET_PLAYER )) {
+			snapshot->entities[n].constantLight = 0;
 		}
+
+		n++;
 	}
+
+	snapshot->numEntities = n;
 
 	// FIXME: configstring changes and server commands!!!
 

@@ -7,9 +7,13 @@
 // A user mod should never modify this file
 
 #define USE_MULTIVIEW				  // multiview enabled
+#ifdef USE_MULTIVIEW
+#define MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE 3
+#endif
 
 #define GET_ABIT( byteArray, bitIndex ) ((byteArray)[ (bitIndex) / 8 ] & ( 1 << ( (bitIndex) & 7 ) ))
 #define SET_ABIT( byteArray, bitIndex ) (byteArray)[ (bitIndex) / 8 ] |= ( 1 << ( (bitIndex) & 7 ) )
+#define UNSET_ABIT( byteArray, bitIndex ) (byteArray)[ (bitIndex) / 8 ] &= ~( 1 << ( (bitIndex) & 7 ) )
 
 #define MAX_TEAMNAME 32
 

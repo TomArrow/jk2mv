@@ -106,7 +106,188 @@ qboolean SV_CommitExtensionMessage(msg_t* msg, msg_t* extensionMessage, int svc,
 	return qtrue;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 #ifdef USE_MULTIVIEW
+int SV_GetPSEventMatch(playerState_t* ps,entityState_t* es, qboolean mainPlayer) {
+	// we know that es->eType has data above 8 bits (the sequence masky thingy) but the netfield is 8 bits only so it gets stripped away.
+	// so when restoring on the client, we need to & 8 on the eType field.
+	// TODO check how this would behave with very strange things like values that exceed 8/10 bits with extremely strange custom mods?
+	if (es->event == 0 || !mainPlayer && es->event != (es->eType - ET_EVENTS)) {
+		return 0; // no event, or cannot restore due to not following the normal logic
+	}
+
+	if (es->event == ps->externalEvent) {
+		return 1;
+	}
+
+	for (int sequence = ps->eventSequence - 1, i=0; i < 2; sequence--,i++) {
+		int seq = sequence & (MAX_PS_EVENTS - 1);
+		int relevantEvent = ps->events[seq] | ((sequence & 3) << 8);
+		if (es->event == relevantEvent) {
+			return i + 2;
+		}
+	}
+
+	// no match found
+	return 0;
+}
+
+typedef struct playerEntBackups_s {
+	entityState_t ents[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
+	int nums[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
+}playerEntBackups_t;
+
+void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore) {
+	static playerEntBackups_t backupSlots[2] = { 
+		{
+			{ 0,0,0 },
+			{ -1,-1,-1 }
+		},{
+			{ 0,0,0 },
+			{ -1,-1,-1 }
+		}
+	};
+	playerEntBackups_t* backup = &backupSlots[0];
+	playerEntBackups_t* backupOld = &backupSlots[1];
+
+	if (!snap || !snap->multiview/* || snap->version < 3*/) { // need at least version 3 to properly reconstruct
+		if (snap) {
+			snap->ownEntityEType = -1;
+		}
+		return;
+	}
+	if (restore) {
+		int i,n;
+		entityState_t* ent;
+
+		for (i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+			if (backup->nums[i] < 0) {
+				continue;
+			}
+			ent = &svs.snapshotEntities[(snap->first_entity + (int64_t)backup->nums[i]) % svs.numSnapshotEntities];
+			*ent = backup->ents[i];
+		}
+		if (!oldSnap) {
+			return;
+		}
+		for (i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+			if (backupOld->nums[i] < 0) {
+				continue;
+			}
+			ent = &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)backupOld->nums[i]) % svs.numSnapshotEntities];
+			*ent = backupOld->ents[i];
+		}
+		return;
+	}
+
+	// reset stuff
+	for (int i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+		backup->nums[i] = -1;
+		backupOld->nums[i] = -1;
+		snap->ownEventInfo[i] = 0;
+	}
+	snap->ownEntityEType = -1;
+
+	//
+	// k here's the idea. 
+	// we go through all the entities in the snapshot that are related to the main player playerstate clientnum.
+	// since in multiview, we send the all entities to the client, including his player entity and EF_PLAYER_EVENT entities,
+	// we need to:
+	// - set his main player entity to ET_INVISIBLE so it doesn't conflict with his playerstate on a normal client playback
+	// - set any events and player event entities to ET_INVISIBLE and event to 0 so we don't get double events (because it's annoying)
+	// 
+	// but when switching views, we want to restore all this data. luckily, we have the main player ps anyway so:
+	// 1. we go through all entities in the snapshot and check if they are the player entity or an event entity.
+	// 2. if its a player entity, set eType to ET_INVISIBLE, and save ownEntityEType of that player entity.
+	// 3. if it's a player entity with an event or EF_PLAYER_EVENT, do the following:
+	//		- compare the value to ps.externalEvent, ps.events[0] and ps.events[1], the latter with the correct flip bits set.
+	//		- if any matches, do ownEventInfo[counter] = 1, 2 or 3 depending on which matched, as they can be restored from ps
+	//			- if matched, set its entitytype (if not a palyer entity) to ET_INVISIBLE and its event to 0
+	//		- if none matched, do 0
+	//		- make a backup
+	//		- increment counter. if counter >= 3 (MAX_PS_ENTITY_EVENT_RESTORE), break; (we can't restore more) 
+	// now here'
+	//		
+	// client will receive the ownEventInfo array as 3x 2 bits of data with a value from 0 to 3 and can use it to restore data.
+	//
+
+	int oldIndex = 0;
+	entityState_t* ent, *entOldReal = NULL, *entOld = !oldSnap ? NULL : &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)oldIndex) % svs.numSnapshotEntities];
+	int counter = 0;
+	int maincl = snap->ps.clientNum;
+	int eventmatch;
+	bool noretransmit = false;
+	for (int i = 0; i < snap->num_entities; i++) {
+		ent = &svs.snapshotEntities[(snap->first_entity + (int64_t)i) % svs.numSnapshotEntities];
+
+		// find corrresponding old entity if one exists
+		while (entOld && entOld->number < ent->number && oldIndex < oldSnap->num_entities-1) {
+			entOld = &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)++oldIndex) % svs.numSnapshotEntities];
+		}
+
+		entOldReal = (entOld && entOld->number == ent->number) ? entOld : NULL;
+
+		if (entOldReal) {
+			noretransmit = entOldReal->eType == ent->eType && entOldReal->event == ent->event;
+		}
+
+		if (ent->number == maincl) {
+			snap->ownEntityEType = ent->eType;
+			if (entOldReal) {
+				backupOld->ents[counter] = *entOldReal;
+				backupOld->nums[counter] = oldIndex;
+				// force or prevent retransmit based on what the original value would have resulted in.
+				entOldReal->eType = !noretransmit ? INT_MIN : ET_INVISIBLE;
+			}
+			backup->ents[counter] = *ent;
+			backup->nums[counter] = i;
+			ent->eType = ET_INVISIBLE;
+			eventmatch = SV_GetPSEventMatch(&snap->ps, ent, qtrue);
+			snap->ownEventInfo[counter++] = eventmatch;
+			if (eventmatch) {
+				// we are able to restore this, so zero the event
+				if (entOldReal) {
+					// force or prevent retransmit based on what the original value would have resulted in.
+					entOldReal->event = !noretransmit ? INT_MIN : 0;
+				}
+				ent->event = 0;
+			}
+		}
+		else if ((ent->eFlags & EF_PLAYER_EVENT) && ent->otherEntityNum == maincl) {
+			eventmatch = SV_GetPSEventMatch(&snap->ps, ent, qfalse);
+			if (eventmatch) {
+				// we are able to restore this, so zero the event and make it "invisible" (to avoid the ET_EVENTS path)
+				//Com_Printf("hid player event: %d %d %d\n", ent->event, ent->eType, snap->ps.eventSequence);
+				backup->ents[counter] = *ent;
+				backup->nums[counter] = i;
+				if (entOldReal) {
+					backupOld->ents[counter] = *entOldReal;
+					backupOld->nums[counter] = oldIndex;
+					// force or prevent retransmit based on what the original values would have resulted in.
+					entOldReal->eType = !noretransmit ? INT_MIN : ET_INVISIBLE;
+					entOldReal->event = !noretransmit ? INT_MIN : 0;
+				}
+				ent->eType = ET_INVISIBLE;
+				ent->event = 0;
+			}
+			snap->ownEventInfo[counter++] = eventmatch;
+		}
+		if (counter >= MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE) {
+			break;
+		}
+	}
+}
 
 // force retransmit of only a few fields by setting them to invalid values,
 // so that bad deltas look a bit more graceful on badly cut demos
@@ -116,6 +297,21 @@ static const playerState_t* SV_GetRescueableBasePS(const playerState_t* srcPs) {
 	psLocal.clientNum = INT_MIN;
 	psLocal.stats[STAT_HEALTH] = INT_MIN;
 	return &psLocal;
+}
+
+static void SV_EmitEntMask(msg_t* msg, const byte* newEntMask, const byte* oldEntMask) {
+
+	int n;
+	static const byte nullMaskBuf[MAX_GENTITIES / 8] = { 0 };
+	byte xorEntMask[MAX_GENTITIES / 8];
+
+	if (!oldEntMask) {
+		oldEntMask = nullMaskBuf;
+	}
+	for (n = 0; n < ARRAY_LEN(xorEntMask); n++) {
+		xorEntMask[n] = newEntMask[n] ^ oldEntMask[n];
+	}
+	MSG_EmitByteMask(msg, xorEntMask, sizeof(xorEntMask), 7, qtrue);
 }
 
 // most of this stuff is copied and adapted from quake3e multiview version, though I made a lot of changes
@@ -136,8 +332,6 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
     byte newPsMask[MAX_CLIENTS/8];
 
     const byte *oldEntMask;
-    byte oldEntMaskBuf[MAX_GENTITIES/8];
-    byte newEntMask[MAX_GENTITIES/8];
 
     // generate playerstate mask
     if ( !from || !from->num_psf ) {
@@ -185,8 +379,7 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
             else
                 oldPs = NULL; // new playerstate
             // empty entity mask
-            Com_Memset( oldEntMaskBuf, 0, sizeof( oldEntMaskBuf ) );
-            oldEntMask = oldEntMaskBuf;
+            oldEntMask = NULL;
         } else {
             // masked in previous frame so MUST exist
             old_psf = NULL;
@@ -239,10 +432,7 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
 			Com_Printf("\n");
 		}
 #endif
-        for ( n = 0; n < ARRAY_LEN( newEntMask ); n++ ) {
-            newEntMask[ n ] = psf->entMask[ n ] ^ oldEntMask[ n ];
-        }
-        MSG_EmitByteMask( msg, newEntMask, sizeof( newEntMask ), 7, qtrue );
+		SV_EmitEntMask(msg, psf->entMask, oldEntMask);
 #else
         // direct mask
 		MSG_WriteData( msg, psf->entMask.mask, sizeof( psf->entMask.mask ) );
@@ -271,10 +461,12 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 		return qfalse;
 	}
 
+
 	// we already checked which oldframe to use in the normal snapshot writing, so just copy it over
-	if (!frame->normalSnapshotOldFrame) {
+	if (!frame->normalSnapshotOldFrame || sv_mvNonDeltaInterval->integer && (svs.time == client->multiview.lastNonDelta || svs.time - client->multiview.lastNonDelta >= clampedIntMult(sv_mvNonDeltaInterval->integer,1000) || svs.time < client->multiview.lastNonDelta)) {
 		oldframe = NULL;
 		lastframe = 0;
+		client->multiview.lastNonDelta = svs.time;
 	}
 	else {
 		lastframe = frame->normalSnapshotOldFrame;
@@ -331,9 +523,9 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 	//int oldmask;
 	int	oldversion;
 
-	frame->version = MV_PROTOCOL_VERSION;
+	frame->version = MIN(client->multiview.protocol,sv_mvMaxVersion->integer);
 
-	if ( !oldframe || !oldframe->multiview ) {
+	if ( !oldframe || !oldframe->multiview || oldframe->version != frame->version ) {
 		oldversion = 0;
 		lastframe = 0;
 		oldframe = NULL;
@@ -351,6 +543,9 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 		frame->rescueable = qtrue;
 		client->multiview.lastFullPSMask = svs.time;
 	}
+	else {
+		frame->rescueable = qfalse;
+	}
 
 	// emit protocol version in first message
 	if ( oldversion != frame->version || frame->rescueable ) {
@@ -358,6 +553,22 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 		MSG_WriteByte( extensionMsg, frame->version );
 	} else {
 		MSG_WriteBits( extensionMsg, 0, 1 );
+	}
+
+	if (frame->version >= 3) {
+		// we may have sent the main player's own entity, but turned it to ET_INVISIBLE to avoid conflicts
+		// if we did, tell the client what the correct eType is
+		if ( !oldframe || frame->ownEntityEType != oldframe->ownEntityEType || memcmp(frame->ownEventInfo,oldframe->ownEventInfo,sizeof(frame->ownEventInfo)) ) {
+			MSG_WriteBits( extensionMsg, 1, 1 );
+			MSG_WriteByte( extensionMsg, frame->ownEntityEType );
+			for (int i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+				MSG_WriteBits(extensionMsg, frame->ownEventInfo[i], 2);
+			}
+		}
+		else {
+			MSG_WriteBits( extensionMsg, 0, 1 );
+		}
+		SV_EmitEntMask(extensionMsg, frame->ownEntmask, oldframe ? oldframe->ownEntmask : NULL);
 	}
 
 	//newmask = SM_ALL & ~SV_GetMergeMaskEntities( frame );

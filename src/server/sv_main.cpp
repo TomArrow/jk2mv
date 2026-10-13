@@ -31,6 +31,8 @@ cvar_t	*mv_httpserverport;
 
 cvar_t	*sv_mvClients;
 cvar_t	*sv_mvPassword;
+cvar_t	*sv_mvMaxVersion;
+cvar_t	*sv_mvNonDeltaInterval;
 //cvar_t	*sv_demoFlags;
 //cvar_t	*sv_autoRecord;
 
