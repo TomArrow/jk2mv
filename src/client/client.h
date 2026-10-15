@@ -12,7 +12,7 @@
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
-#define MAX_MULTIVIEW_VERSION 3 // max version number we can currently decode
+#define MAX_MULTIVIEW_VERSION 4 // max version number we can currently decode
 
 extern	clientRendererInfo_t	clRenderInfo;
 
@@ -26,6 +26,7 @@ typedef struct clPSFrame_s {
 	byte			entMask[MAX_GENTITIES / 8];
 	playerState_t	ps;
 	int				number;
+	int				dedupeSuccessMask;
 } clPSFrame_t;
 
 typedef struct snapshotMultiview_s {
@@ -39,6 +40,7 @@ typedef struct snapshotMultiview_s {
 	qboolean		multiviewValid;
 	qboolean		rescued; // this snap is from a chain of poisoned but at least decodable multiviews (original non-delta missing). we cannot trust its data, including entmasks.
 	qboolean		psMaskRescue;
+	int				dedupeSuccessMaskMerged;
 
 	int				ownEntityEType;
 	byte			ownEntMask[MAX_GENTITIES / 8];
@@ -126,6 +128,8 @@ typedef struct {
 #endif
 #define SERVERTIME_DELTA_SMOOTH_SAMPLES	100 // samples used for averaging
 //#define	MAX_PARSE_ENTITIES	32768
+
+#define PACKETSIZE_AVG_SAMPLES 64
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
@@ -248,6 +252,9 @@ typedef struct {
 
 	refdef_t	lastRefdef;
 	int			lastRefDefFrameNumber;
+	int			packetSizes[PACKETSIZE_AVG_SAMPLES];
+	int64_t		packetSizesCount;
+	int			gametype;
 } clientActive_t;
 
 extern	clientActive_t		cl;
@@ -642,8 +649,9 @@ extern	cvar_t	*cl_nodelta;
 extern	cvar_t	*cl_debugMove;
 extern	cvar_t	*cl_noprint;
 extern	cvar_t	*cl_timegraph;
-extern	cvar_t	* cl_showVelocity;
-extern	cvar_t	* cl_showVelocityAllowNegative;
+extern	cvar_t	*cl_showVelocity;
+extern	cvar_t	*cl_showVelocityAllowNegative;
+extern	cvar_t	*cl_drawPacketSize;
 #ifdef USE_MULTIVIEW
 extern	cvar_t	*cl_multiviewWarnings;
 #endif
@@ -751,6 +759,7 @@ extern	cvar_t	*cl_traceBenchmarkTimeLimitMs;
 qboolean CL_ParseExtensions(msg_t* msg, qboolean parsedSnapshot);
 #ifdef USE_MULTIVIEW
 void BG_PlayerStateToEntityStateExtraPolate(playerState_t* ps, entityState_t* s, int time, qboolean snap);
+playerState_t* CL_GetActivePlayerState();
 #endif
 
 //

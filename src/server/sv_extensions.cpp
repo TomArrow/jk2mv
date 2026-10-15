@@ -143,11 +143,217 @@ int SV_GetPSEventMatch(playerState_t* ps,entityState_t* es, qboolean mainPlayer)
 	return 0;
 }
 
+typedef struct playerEntDedupeBackup_s {
+	entityState_t ents[MAX_CLIENTS];
+	int nums[MAX_CLIENTS];
+	int numBackups;
+}playerEntDedupeBackup_t;
+
+
+// dedupe some fields that are shared by entitystate and playerstate
+void SV_ProcessMultiviewPlayerEntityDedupe(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore) {
+	const netFieldMapping_t* maps;
+	const int mapCount = sizeof(playerStateEntityStateMappings) / sizeof(playerStateEntityStateMappings[0]);
+	static playerEntDedupeBackup_t backupSlots[2] = { 0 };
+	int i, n;
+
+	if (!snap->multiview || snap->version < 4 || !snap->num_psf) {
+		return;
+	}
+	playerEntDedupeBackup_t* backup = &backupSlots[0];
+	playerEntDedupeBackup_t* backupOld = &backupSlots[1];
+
+	
+	if (restore) {
+		int i,n;
+		entityState_t* ent;
+
+		for (i = 0; i < backup->numBackups; i++) {
+			if (backup->nums[i] < 0) {
+				Com_Error(ERR_DROP, "SV_ProcessMultiviewPlayerEntityDedupe: Some extreme weirdnes...");
+				continue;
+			}
+			ent = &svs.snapshotEntities[(snap->first_entity + (int64_t)backup->nums[i]) % svs.numSnapshotEntities];
+			*ent = backup->ents[i];
+		}
+		if (!oldSnap) {
+			return;
+		}
+		for (i = 0; i < backupOld->numBackups; i++) {
+			if (backupOld->nums[i] < 0) {
+				Com_Error(ERR_DROP, "SV_ProcessMultiviewPlayerEntityDedupe: Some extreme weirdnes #2...");
+				continue;
+			}
+			ent = &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)backupOld->nums[i]) % svs.numSnapshotEntities];
+			*ent = backupOld->ents[i];
+		}
+		return;
+	}
+
+	// reset stuff
+	backup->numBackups = backupOld->numBackups = 0;
+	snap->dedupeSuccessMaskMerged = 0;
+	//for (int i = 0; i < MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE; i++) {
+	//	backup->nums[i] = -1;
+	//	backupOld->nums[i] = -1;
+	//	snap->ownEventInfo[i] = 0;
+	//}
+	//snap->ownEntityEType = -1;
+
+	int oldIndex = 0;
+	int psIndex = 0;
+	int oldPsIndex = 0;
+	entityState_t* ent, *entOldReal = NULL, *entOld = (!oldSnap || !oldSnap->num_entities) ? NULL : &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)oldIndex) % svs.numSnapshotEntities];
+	int oldIndexPS = 0;
+	psFrame_t	
+		*psReal, 
+		*ps = &svs.snapshotPSF[(snap->first_psf + (int64_t)psIndex) % svs.numSnapshotPSF],
+		*psOldReal = NULL, 
+		*psOld = (!oldSnap || !oldSnap->num_psf) ? NULL : &svs.snapshotPSF[(oldSnap->first_psf + (int64_t)oldPsIndex) % svs.numSnapshotPSF];
+	int *psField,*esField;
+	int *psFieldOld,*esFieldOld;
+	vec3_t	tmpVec;
+
+#define FINDMATCH(var,numprop,svsarray,firstindex,index,svsmodulo,numtotal,finalvar) while ((var) && (var)->numprop < ent->number && (index) < (numtotal) - 1) {\
+			(var) = &(svsarray)[((firstindex) + (int64_t)++(index)) % (svsmodulo)];\
+		}\
+		(finalvar) = ((var) && (var)->numprop == ent->number) ? (var) : NULL;
+
+	for (i = 0; i < snap->num_entities; i++) {
+		ent = &svs.snapshotEntities[(snap->first_entity + (int64_t)i) % svs.numSnapshotEntities];
+
+		if (ent->number >= MAX_CLIENTS) {
+			break;
+		}
+
+		// find corrresponding playerstate if one exists
+		FINDMATCH(ps, clientSlot, svs.snapshotPSF, snap->first_psf, psIndex, svs.numSnapshotPSF, snap->num_psf, psReal);
+
+		if (psReal) {
+			// found a match
+
+			// generate a fail mask of any mappings that WON'T work.
+			int failMask = 0; 
+			maps = playerStateEntityStateMappings;
+			for (int j = 0; j < mapCount; j++, maps++) {
+
+				psField = (int*)((byte*)&psReal->ps + maps->offset);
+				esField = (int*)((byte*)ent + maps->offset2);
+
+				if (*psField != *esField) {
+					if ((maps->bits == 0) != (maps->bits2 == 0)) { // if one is float and other is not, check that esField can be converted into psField without loss
+						if (!maps->bits) {
+							if ((float)*esField != *(float*)psField) {
+								failMask |= (1 << maps->maskIndex);
+							}
+						}
+						else {
+							if ((int)*(float*)esField != *psField) {
+								failMask |= (1 << maps->maskIndex);
+							}
+						}
+					}
+					else {
+						failMask |= (1 << maps->maskIndex);
+					}
+				}
+				// can't nest this, gotta always check because even with snapping, the previous condition might hold for some values. e.g. someone might have position 0 which will match snapped and unsnapped
+				if (maps->type == NFMT_MAYBESNAP) {
+					if ((float)(int)*(float*)psField != *(float*)esField) {
+						failMask |= (1 << (maps->maskIndex + 1));
+					}
+				}
+			}
+
+			int successMask = (~failMask) & ((1<<MAPPING_GROUPS_COUNT)-1);
+
+			psReal->dedupeSuccessMask = successMask;
+			snap->dedupeSuccessMaskMerged |= successMask;
+
+			if (!(successMask & mappingsSnapped) || (successMask & (mappingsSnapped >> 1))) {
+				// nothing that needs snapping.
+				continue;
+			}
+
+			// now check for the special snapped values case
+			// in which case we will overwrite the entity values to have the unsnapped value so we can avoid sending it in ps,
+			// and then reverse this on client.
+			maps = playerStateEntityStateMappings;
+			for (int j = 0; j < mapCount; j++, maps++) {
+				if (maps->type != NFMT_MAYBESNAP) { // just a normal value
+					continue;
+				}
+				if (successMask & (1<<maps->maskIndex)) { // we don't need to snap it i guess
+					continue;
+				}
+				if (failMask & (1<<(maps->maskIndex+1))) { // snapping won't work either. :/
+					continue;
+				}
+
+				// alright, the entitystate contains a snapped version of the playerstate value.
+				// we will transfer the unsnapped version to the entitystate.
+				psField = (int*)((byte*)&psReal->ps + maps->offset);
+				esField = (int*)((byte*)ent + maps->offset2);
+
+				// first things first, make a backup of the ent if we don't have one yet
+				if (!backup->numBackups || backup->nums[backup->numBackups-1] != i) {
+					backup->ents[backup->numBackups] = *ent;
+					backup->nums[backup->numBackups] = i;
+					backup->numBackups++;
+					if (backup->numBackups > MAX_CLIENTS) {
+						Com_Error(ERR_DROP, "SV_ProcessMultiviewPlayerEntityDedupe: Some extreme weirdnes #3...");
+					}
+				}
+
+				// check for old PS match
+				FINDMATCH(psOld, clientSlot, svs.snapshotPSF, oldSnap->first_psf, oldPsIndex, svs.numSnapshotPSF, oldSnap->num_psf, psOldReal);
+				// check for old entity match
+				FINDMATCH(entOld, number, svs.snapshotEntities, oldSnap->first_entity, oldIndex, svs.numSnapshotEntities, oldSnap->num_entities, entOldReal);
+
+				bool canSkipRetransmit = false;
+
+				psFieldOld = psOldReal ? (int*)((byte*)&psOldReal->ps + maps->offset) : NULL;
+				esFieldOld = entOldReal ? (int*)((byte*)entOldReal + maps->offset2) : NULL;
+				canSkipRetransmit = psFieldOld && esFieldOld && *psFieldOld == *psField && *esFieldOld == *esField;
+
+				if (!canSkipRetransmit && entOldReal && *esFieldOld == *psField) {
+					// game wouldn't retransmit as delta compression would recognize the values as unchanged, but we need to retransmit.
+					// therefore, make a backup of the old entity as well, and set its value to something dumb
+					if (!backupOld->numBackups || backupOld->nums[backupOld->numBackups - 1] != oldIndex) {
+						backupOld->ents[backupOld->numBackups] = *entOldReal;
+						backupOld->nums[backupOld->numBackups] = oldIndex;
+						backupOld->numBackups++;
+						if (backupOld->numBackups > MAX_CLIENTS) {
+							Com_Error(ERR_DROP, "SV_ProcessMultiviewPlayerEntityDedupe: Some extreme weirdnes #4...");
+						}
+					}
+					*esFieldOld = ~*psField; // we set it to something ridiculous, we just need to make sure it's not the same value.
+				}
+
+				*esField = *psField;
+
+			}
+
+
+
+
+
+
+
+		}
+
+
+	}
+
+}
+
+
 typedef struct playerEntBackups_s {
 	entityState_t ents[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
 	int nums[MULTIVIEW_MAX_PS_ENTITY_EVENT_RESTORE];
 }playerEntBackups_t;
 
+// hide events and player's own entity from himself in multiview
 void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore) {
 	static playerEntBackups_t backupSlots[2] = { 
 		{
@@ -223,7 +429,7 @@ void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap,
 	//
 
 	int oldIndex = 0;
-	entityState_t* ent, *entOldReal = NULL, *entOld = !oldSnap ? NULL : &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)oldIndex) % svs.numSnapshotEntities];
+	entityState_t* ent, *entOldReal = NULL, *entOld = (!oldSnap || !oldSnap->num_entities) ? NULL : &svs.snapshotEntities[(oldSnap->first_entity + (int64_t)oldIndex) % svs.numSnapshotEntities];
 	int counter = 0;
 	int maincl = snap->ps.clientNum;
 	int eventmatch;
@@ -321,6 +527,7 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
     const psFrame_t *old_psf;
     const playerState_t *oldPs;
 	int baseClientID = client - svs.clients;
+	const playerState_t* nullPs = to->version >= 4 ? MSG_GetBaselinePS(sv_gametype->integer,MV_GetCurrentGameversion()) : NULL;
 
     int i, n;
     int clientSlot;
@@ -374,10 +581,11 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
         clientSlot = psf->clientSlot;
         // check if masked in previous frame:
         if ( !GET_ABIT( oldPsMask, clientSlot ) ) {
+			// TA: I dont think we really need this check anymor since base client is excluded anyway? meh
             if ( from && clientSlot == baseClientID ) // FIXME: ps->clientNum?
                 oldPs = &from->ps; // transition from legacy to multiview mode
             else
-                oldPs = NULL; // new playerstate
+                oldPs = nullPs; // new playerstate
             // empty entity mask
             oldEntMask = NULL;
         } else {
@@ -414,8 +622,27 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
         MSG_WriteBits( msg, psf->areabytes, 6 ); // was 8
         MSG_WriteData( msg, psf->areabits, psf->areabytes & 63 );
 
+		if (to->version >= 4) {
+			if (psf->dedupeSuccessMask != to->dedupeSuccessMaskMerged) {
+				MSG_WriteBits(msg, 1, 1);
+				MSG_WriteBits(msg, psf->dedupeSuccessMask ^ to->dedupeSuccessMaskMerged, MAPPING_GROUPS_COUNT);
+			}
+			else
+			{
+				MSG_WriteBits(msg, 0, 1);
+			}
+		}
+
+		// the snapped mappings refer to the same values. netcode only needs to know to skip these values, it doesn't need to distinguish between snapped or unsnapped
+		int netMask = psf->dedupeSuccessMask | ((psf->dedupeSuccessMask & mappingsSnapped) >> 1);
+
         // playerstate
-        MSG_WriteDeltaPlayerstate( msg, oldPs, &psf->ps );
+		if (to->version >= 4) {
+			MSG_WriteDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &psf->ps, netMask, sv.time);
+		}
+		else {
+			MSG_WriteDeltaPlayerstate(msg, oldPs, &psf->ps);
+		}
 
 #if 1
         // delta-xor mask
@@ -522,16 +749,19 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 	//int newmask;
 	//int oldmask;
 	int	oldversion;
+	int	olddedupeSuccessMaskMerged;
 
 	frame->version = MIN(client->multiview.protocol,sv_mvMaxVersion->integer);
 
 	if ( !oldframe || !oldframe->multiview || oldframe->version != frame->version ) {
 		oldversion = 0;
+		olddedupeSuccessMaskMerged = 0;
 		lastframe = 0;
 		oldframe = NULL;
 		//oldmask = 0;
 	} else {
 		oldversion = oldframe->version;
+		olddedupeSuccessMaskMerged = oldframe->dedupeSuccessMaskMerged;
 		//oldmask = oldframe->mergeMask;
 	}
 
@@ -571,17 +801,17 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 		SV_EmitEntMask(extensionMsg, frame->ownEntmask, oldframe ? oldframe->ownEntmask : NULL);
 	}
 
-	//newmask = SM_ALL & ~SV_GetMergeMaskEntities( frame );
-
 	// emit skip-merge mask
-	//if ( oldmask != newmask ) {
-	//	MSG_WriteBits( msg, 1, 1 );
-	//	MSG_WriteBits( msg, newmask, SM_BITS );
-	//} else {
-	//	MSG_WriteBits( msg, 0, 1 );
-	//}
-
-	//frame->mergeMask = newmask;
+	if (frame->version >= 4) {
+		if (olddedupeSuccessMaskMerged != frame->dedupeSuccessMaskMerged || frame->rescueable) {
+			MSG_WriteBits(extensionMsg, 1, 1 );
+			MSG_WriteBits(extensionMsg, frame->dedupeSuccessMaskMerged, MAPPING_GROUPS_COUNT);
+		}
+		else
+		{
+			MSG_WriteBits(extensionMsg, 0, 1 );
+		}
+	}
 
 	if (!SV_EmitPlayerStates(client, oldframe, frame, extensionMsg)) {
 		return qfalse;

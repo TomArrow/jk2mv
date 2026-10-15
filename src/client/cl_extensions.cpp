@@ -34,6 +34,32 @@ static void CL_ParseExtensioNamespace(msg_t* msg) {
 
 #ifdef USE_MULTIVIEW
 
+playerState_t* CL_GetActivePlayerState() {
+	clSnapshot_t* clSnap = &cl.snap;
+
+	if (clSnap->multiview.multiview && clc.clientView != clc.clientNum && GET_ABIT(clSnap->multiview.clientMask, clc.clientView)) {
+		clPSFrame_t* psFrame = NULL;
+		int i;
+
+		if (clSnap->multiview.rescued) {
+			clc.viewingCorruptedMultiview = 2;
+		}
+
+		for (i = clSnap->multiview.parsePlayerstatesNum; i < clSnap->multiview.parsePlayerstatesNum + clSnap->multiview.numPlayerstates; i++) {
+			psFrame = &cl.parsePlayerstates[i & (MAX_PARSE_PLAYERSTATES - 1)];
+			if (psFrame->number == clc.clientView) {
+				break;
+			}
+		}
+		if (psFrame && psFrame->number == clc.clientView) {
+
+			return &psFrame->ps;
+		}
+	}
+
+	return &clSnap->ps;
+}
+
 /*
 ========================
 BG_PlayerStateToEntityStateExtraPolate
@@ -345,15 +371,88 @@ static playerState_t* CL_GetRescueableBasePS(clSnapshot_t* old, int clientNum) {
 	return &psLocal;
 }
 
+static void CL_RestorePlayerStateFromEntityState(msg_t* msg, playerState_t* ps, entityState_t* ent, int successMask) {
+	const netFieldMapping_t* maps;
+	const int mapCount = sizeof(playerStateEntityStateMappings) / sizeof(playerStateEntityStateMappings[0]);
+	int failMask = ~successMask & ((1 << MAPPING_GROUPS_COUNT) - 1);
+	int *psField,*esField;
+	int print = 0;
+
+	// shownet 2/3 will interleave with other printed info, -2 will
+	// just print the delta records
+	if (cl_shownet->integer >= 2 || cl_shownet->integer == -2) {
+		print = 1;
+		Com_Printf("%3i: playerstate from entitystate restore: ", msg->readcount);
+	}
+	else {
+		print = 0;
+	}
+
+	maps = playerStateEntityStateMappings;
+	for (int j = 0; j < mapCount; j++, maps++) {
+
+		if (failMask & (1 << maps->maskIndex)) { // we don't need to snap it i guess
+			if (maps->type == NFMT_MAYBESNAP) {
+				if (failMask & (1 << (maps->maskIndex+1))) {
+					continue;
+				}
+			}
+			else {
+				continue;
+			}
+		}
+
+		psField = (int*)((byte*)ps + maps->offset);
+		esField = (int*)((byte*)ent + maps->offset2);
+
+		if ((maps->bits == 0) != (maps->bits2 == 0)) { // if one is float and other is not, check that esField can be converted into psField without loss
+			if (!maps->bits) {
+				*(float*)psField = (float)*esField;
+			}
+			else {
+				*psField = (int)*(float*)esField;
+			}
+		}
+		else {
+			*psField = *esField;
+		}
+		if (print) {
+			if (!maps->bits) {
+				Com_Printf("%s:%f ", maps->name, *(float*)psField);
+			}
+			else {
+				Com_Printf("%s:%d ", maps->name, *psField);
+			}
+		}
+	}
+	if (print) {
+		Com_Printf("\n");
+	}
+}
+
+#define FINDMATCH(var,numprop,svsarray,firstindex,index,svsmodulo,numtotal,finalvar) while ((var) && (var)->numprop < state->number && (index) < (numtotal) - 1) {\
+			(var) = &(svsarray)[((firstindex) + (int64_t)++(index)) % (svsmodulo)];\
+		}\
+		(finalvar) = ((var) && (var)->numprop == state->number) ? (var) : NULL;
+
 static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* msg) {
 	int clientNum;
 	clPSFrame_t* oldState= old ?  &cl.parsePlayerstates[(old->multiview.parsePlayerstatesNum) & (MAX_PARSE_PLAYERSTATES - 1)] : NULL;
 	clPSFrame_t* state;
 	int oldindex = 0;
-	playerState_t* oldPs;
+	const playerState_t* nullPs = snap->multiview.version >= 4 ? MSG_GetBaselinePS(cl.gametype, MV_GetCurrentGameversion()) : NULL;
+	const playerState_t* oldPs;
 	qboolean rescuableFakeBase = qfalse;
 	msg_t rescueableMsgBkup;
+
+	int entIndex = 0;
+	entityState_t *entReal=NULL,*ent = snap->numEntities ? &cl.parseEntities[(snap->parseEntitiesNum + entIndex) & (MAX_PARSE_ENTITIES - 1)] : NULL;
+
 	//int i,firstIndex, lastIndex;
+
+	//for (j = 0; j < snap->numEntities; ++j) {
+	//	n = (snap->parseEntitiesNum + j) & (MAX_PARSE_ENTITIES - 1);
+	//	ent = &cl.parseEntities[n];
 
 	snap->multiview.parsePlayerstatesNum = cl.parsePlayerstatesNum;
 	snap->multiview.numPlayerstates = 0;
@@ -407,20 +506,50 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 				rescuableFakeBase = qtrue;
 			} else {
 				Com_Memset(state->entMask, 0, sizeof(state->entMask));
-				oldPs = NULL;
+				oldPs = nullPs;
 			}
 		} else {
 			Com_Memset(state->entMask, 0, sizeof(state->entMask));
-			oldPs = NULL;
+			oldPs = nullPs;
 		}
 
-		MSG_ReadDeltaPlayerstate( msg, oldPs, &state->ps );
+		state->dedupeSuccessMask = 0;
+		if (snap->multiview.version >= 4) {
+			state->dedupeSuccessMask = snap->multiview.dedupeSuccessMaskMerged;
+			if (MSG_ReadBits(msg, 1)) {
+				SHOWNET(msg, "v4 ps dedupe successmask xor");
+				state->dedupeSuccessMask ^= MSG_ReadBits(msg, MAPPING_GROUPS_COUNT);
+			}
+		}
+
+		// the snapped mappings refer to the same values. netcode only needs to know to skip these values, it doesn't need to distinguish between snapped or unsnapped
+		int netMask = state->dedupeSuccessMask | ((state->dedupeSuccessMask & mappingsSnapped) >> 1);
+
+		if (snap->multiview.version >= 4) {
+			MSG_ReadDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &state->ps, netMask, snap->serverTime);
+		}
+		else {
+			MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps);
+		}
 
 		if (rescuableFakeBase && state->ps.clientNum != clientNum) {
 			// now we actually now the clientnum, so we can go back and take the proper source entitystate maybe, and then re-read the changes
 			oldPs = CL_GetRescueableBasePS(old, state->ps.clientNum);
 			memcpy(msg, &rescueableMsgBkup, sizeof(*msg));
-			MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps);
+			if (snap->multiview.version >= 4) {
+				MSG_ReadDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &state->ps, netMask, snap->serverTime );
+			}
+			else {
+				MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps );
+			}
+		}
+
+		if (netMask) {
+			FINDMATCH(ent, number, cl.parseEntities, snap->parseEntitiesNum, entIndex, MAX_PARSE_ENTITIES, snap->numEntities, entReal);
+			if (!entReal) {
+				Com_Error(ERR_DROP,"CL_ParsePlayerstates: playerstate with netmask received, but no matching entity found");
+			}
+			CL_RestorePlayerStateFromEntityState(msg,&state->ps, entReal, state->dedupeSuccessMask);
 		}
 
 		// we got a spectator's pov but didnt get updated pm_flags
@@ -461,6 +590,15 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 
 
 	} // for [all clients]
+}
+
+void CL_AdjustMultiviewEntity(entityState_t* ent, snapshotMultiview_t* mv, int mainPSClientNum, int targetClientNum) {
+	if (mainPSClientNum != targetClientNum) {
+		// restore main player stuff for other viewpoint
+		if (mainPSClientNum == ent->number) {
+
+		}
+	}
 }
 
 static void CL_FixOwnPlayer(clSnapshot_t* snap) {
@@ -703,6 +841,7 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 		//newSnap.mergeMask = old->mergeMask;
 		snap->multiview.version = old->multiview.version;
 		snap->multiview.ownEntityEType = old->multiview.ownEntityEType;
+		snap->multiview.dedupeSuccessMaskMerged = old->multiview.dedupeSuccessMaskMerged;
 		memcpy(snap->multiview.ownEventInfo, old->multiview.ownEventInfo, sizeof(snap->multiview.ownEventInfo));
 	}
 	else {
@@ -735,6 +874,12 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 		}
 		MSG_ReadByteMask(msg,snap->multiview.ownEntMask, sizeof(snap->multiview.ownEntMask), 7);
 		CL_RestoreOwnInfo(snap);
+	}
+	if (snap->multiview.version >= 4) {
+		if (MSG_ReadBits(msg, 1)) {
+			SHOWNET(msg, "v4 dedupe successmask merged");
+			snap->multiview.dedupeSuccessMaskMerged = MSG_ReadBits(msg, MAPPING_GROUPS_COUNT);
+		}
 	}
 
 	// playerState to entityState merge mask

@@ -5,22 +5,27 @@
 #endif
 
 #include <vector>
+#include <array>
+
+// offsetof is MSVC
+#ifndef offsetof
+#define offsetof(a,b) __builtin_offsetof(a,b)
+#endif
+
+
+typedef enum netFieldType_s {
+	NETFIELD_NORMAL,
+	NETFIELD_RELATIVECMDTIME, // we check if difference between commandtime and servertime is under 512. if so, send as -9 bits
+	NETFIELD_ANGLE16, // we check if angle goes losslessly through ANGLE2SHORT and SHORT2ANGLE. if so, we send as short.
+} netFieldType_t;
 
 typedef struct {
-	char	*name;
+	const char* name;
 	size_t	offset;
 	int		bits;		// 0 = float
+	int		fieldType; // only for multiview ps
+	const netFieldMapping_t* mapping;
 } netField_t;
-
-typedef struct {
-	char	*name;
-	size_t	offset;
-	int		bits;		// 0 = float
-	char	*name2;
-	size_t	offset2;
-	int		bits2;		// 0 = float
-	int		maskIndex;
-} netFieldMapping_t;
 
 //#define _NEWHUFFTABLE_		// Build "c:\\netchan.bin"
 //#define _USINGNEWHUFFTABLE_		// Build a new frequency table to cut and paste.
@@ -49,7 +54,7 @@ netField_t ammoField = { "ammo" };
 netField_t powerupsField = { "powerups" };
 
 netField_t noField = { "<none>" };
-netField_t *gLastField = &noField;
+const netField_t *gLastField = &noField;
 
 int	fieldIndex;
 int oldsize = 0;
@@ -573,12 +578,12 @@ int MSG_HuffStrlen(const char* s) {
 
 // gives a playerstate with non-0 values that are almost always set like this. why bother retransmitting those on non-delta snapshots?
 // THIS IS RIGHT NOW IN THE PREPARATION STAGE AND NOT DONE YET. DON'T USE.
-const playerState_t* MSG_GetBaselinePS() {
-	static playerState_t baselinePs[VERSION_1_04 + 1] = { 0 };
-	static qboolean isInited[VERSION_1_04 + 1] = { qfalse };
-	mvversion_t version = MV_GetCurrentGameversion();
-	playerState_t* ps = &baselinePs[version];
-	if (!isInited[version]) {
+const playerState_t* MSG_GetBaselinePS(int gameType, mvversion_t version) {
+	static playerState_t baselinePs[VERSION_1_04 + 1][2] = { 0 };
+	static qboolean isInited[VERSION_1_04 + 1][2] = { qfalse };
+	qboolean isCtf = (qboolean)(gameType >= 7); // i know this technically doesnt need to be true for all mods but the only real purpose here is to design netcode that will give a decent baseline in a deterministic way. 
+	playerState_t* ps = &baselinePs[version][isCtf];
+	if (!isInited[version][isCtf]) {
 		// Percentages indicate roughly how often that value is set based on a demo dataset of 1 month towards end of 2023
 		// the percentage point approximates how often a value appeared in ~367,911,851 playerState readings (367 million)
 		// any fields where 0 was the most common value were excluded
@@ -603,11 +608,23 @@ const playerState_t* MSG_GetBaselinePS() {
 		ps->fd.saberDrawAnimLevel = 3; // 57 %
 		ps->groundEntityNum = 1022; // 56%
 		ps->fd.forcePowersKnown = 98306; // 55% of the time. true on most ctf servers. and its pretty much never 0 anyway so this should be better
-		ps->fd.forcePowerLevel[FP_LEVITATION] = 1; // about 50% of the time
 		ps->events[0] = 14; // 22%. EV_JUMP
 		ps->events[1] = 11; // 23%. EV_FALL. the order of these 2 is mostly arbitrary but in my sample set this one was slightly (half percentage point?) more common
-		ps->origin[2] = -39.875f; // 24.125f; // hilariously, this is true 5% of the time. (6% for 24.125f) and thus one of the 2 most common values encountered. It is the z value you get on the base floors of ctf_Yavin and the floor on ffa_bespin mid area. in my sample set, 24.125f has a slight edge due to 1.04 demos, and an emphasis on ffa_bespin back in 2023. but we wanna be more of a ctf mod anyway.
-		ps->viewangles[1] = 110.275268554688f; // true about 2 % of the time. it's the ffa_Bespin levelshot camera. yavin would be 196.030624389648f. (yes i checked that these floating point literals reproduce the exact bit-perfect value)
+
+		// ps->origin[2] is true about 7% of the time, hilariously
+		if (isCtf) {
+			// usually ctf_yavin
+			ps->origin[2] = -39.875f; // base floor ctf_yavin and ffa_bespin mid area floor
+			ps->viewangles[1] = -163.970947265625f; // true about 0.7 % of the time. it's the ctf_yavin levelshot camera. (yes i checked that these floating point literals reproduce the exact bit-perfect value). there's also 196.030624389648, which is almost the exact same angle, but that one we only get during the actual intermission (direct copy instead of distortion through SetClientViewAngle)
+			ps->fd.forcePowerLevel[FP_LEVITATION] = 1; // about 50% of the time in global data
+		}
+		else {
+			// usually ffa_bespin
+			ps->origin[2] = 24.125f; // ffa_bespin most floors around main fighting area
+			ps->viewangles[1] = 110.275268554688f; // true about 3 % of the time. it's the ffa_Bespin levelshot camera.  (yes i checked that these floating point literals reproduce the exact bit-perfect value)
+			ps->fd.forcePowerLevel[FP_LEVITATION] = 3;
+		}
+
 		ps->stats[0] = 100; // 45%. STAT_HEALTH
 		ps->stats[4] = 5; // 78% STAT_WEAPONS: WP_NONE + WP_SABER (???)
 		ps->stats[5] = 25; // 48%. STAT_ARMOR
@@ -627,7 +644,7 @@ const playerState_t* MSG_GetBaselinePS() {
 			ps->legsAnim = 833;// BOTH_RUN1
 		}
 		//baselinePs.clientNum = 1; // funny. prolly cuz most servers block client 0?
-		isInited[version] = qtrue;
+		isInited[version][isCtf] = qtrue;
 	}
 	return ps;
 }
@@ -1311,9 +1328,9 @@ void MSG_ReportChangeVectors_f(void) {
 }
 
 // using the stringizing operator to save typing...
-#define	NETF(x) #x,(size_t)&((entityState_t*)0)->x
+//#define	NETF(x) #x,(size_t)&((entityState_t*)0)->x
 
-netField_t	entityStateFields16[] =
+constexpr const netField_t	entityStateFields16[] =
 {
 	{ NETF(pos.trTime), 32 },
 	{ NETF(pos.trBase[0]), 0 },
@@ -1390,7 +1407,7 @@ netField_t	entityStateFields16[] =
 	{ NETF(isJediMaster), 1 }
 };
 
-netField_t	entityStateFields15[] =
+constexpr const netField_t	entityStateFields15[] =
 {
 	{ NETF(pos.trTime), 32 },
 	{ NETF(pos.trBase[0]), 0 },
@@ -1487,7 +1504,7 @@ void MSG_WriteDeltaEntity(msg_t *msg, struct entityState_s *from, struct entityS
 	qboolean force) {
 	int			i, lc;
 	int			numFields;
-	netField_t	*field;
+	const netField_t	*field;
 	int			trunc;
 	float		fullFloat;
 	int			*fromF, *toF;
@@ -1619,11 +1636,13 @@ Can go from either a baseline or a previous packet_entity
 */
 extern	cvar_t	*cl_shownet;
 
+#define FIXREADSIZES 1
+
 void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 	int number) {
 	int			i, lc;
 	int			numFields;
-	netField_t	*field;
+	const netField_t	*field;
 	int			*fromF, *toF;
 	int			print;
 	int			trunc;
@@ -1633,11 +1652,15 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 		Com_Error(ERR_DROP, "Bad delta entity number: %i", number);
 	}
 
+#if FIXREADSIZES
+	startBit = msg->bit;
+#else
 	if (msg->bit == 0) {
 		startBit = msg->readcount * 8 - GENTITYNUM_BITS;
 	} else {
 		startBit = (msg->readcount - 1) * 8 + msg->bit - GENTITYNUM_BITS;
 	}
+#endif
 
 	// check for a remove
 	if (MSG_ReadBits(msg, 1) == 1) {
@@ -1748,11 +1771,15 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 	}
 
 	if (print) {
+#if FIXREADSIZES
+		endBit = msg->bit;
+#else
 		if (msg->bit == 0) {
 			endBit = msg->readcount * 8 - GENTITYNUM_BITS;
 		} else {
 			endBit = (msg->readcount - 1) * 8 + msg->bit - GENTITYNUM_BITS;
 		}
+#endif
 		Com_Printf(" (%i bits)\n", endBit - startBit);
 	}
 }
@@ -1766,18 +1793,25 @@ plyer_state_t communication
 */
 
 // using the stringizing operator to save typing...
-#define	PSF(x) #x,(size_t)&((playerState_t*)0)->x
+//#define	PSF(x) #x,(size_t)&((playerState_t*)0)->x
 
-netField_t	playerStateFields16[] =
+
+
+
+
+
+
+
+constexpr const netField_t	playerStateFields16raw[] =
 {
-	{ PSF(commandTime), 32 },
+	{ PSF(commandTime), 32, NETFIELD_RELATIVECMDTIME },
 	{ PSF(origin[0]), 0 },
 	{ PSF(origin[1]), 0 },
 	{ PSF(bobCycle), 8 },
 	{ PSF(velocity[0]), 0 },
 	{ PSF(velocity[1]), 0 },
-	{ PSF(viewangles[1]), 0 },
-	{ PSF(viewangles[0]), 0 },
+	{ PSF(viewangles[1]), 0, NETFIELD_ANGLE16 },
+	{ PSF(viewangles[0]), 0, NETFIELD_ANGLE16 },
 	{ PSF(weaponTime), -16 },
 	{ PSF(weaponChargeTime), 32 }, //? really need 32 bits??
 	{ PSF(weaponChargeSubtractTime), 32 }, //? really need 32 bits??
@@ -1816,7 +1850,7 @@ netField_t	playerStateFields16[] =
 	{ PSF(eventParms[1]), 8 },
 	{ PSF(clientNum), 8 },
 	{ PSF(weapon), 5 },
-	{ PSF(viewangles[2]), 0 },
+	{ PSF(viewangles[2]), 0, NETFIELD_ANGLE16 },
 	{ PSF(jumppad_ent), 10 },
 	{ PSF(loopSound), 16 },
 
@@ -1889,16 +1923,16 @@ netField_t	playerStateFields16[] =
 	{ PSF(lastHitLoc[1]), 0 } //currently only used so client knows to orient disruptor disintegration.. seems a bit much for just that though.
 };
 
-netField_t	playerStateFields15[] =
+constexpr const netField_t	playerStateFields15raw[] =
 {
-	{ PSF(commandTime), 32 },
+	{ PSF(commandTime), 32, NETFIELD_RELATIVECMDTIME },
 	{ PSF(origin[0]), 0 },
 	{ PSF(origin[1]), 0 },
 	{ PSF(bobCycle), 8 },
 	{ PSF(velocity[0]), 0 },
 	{ PSF(velocity[1]), 0 },
-	{ PSF(viewangles[1]), 0 },
-	{ PSF(viewangles[0]), 0 },
+	{ PSF(viewangles[1]), 0, NETFIELD_ANGLE16 },
+	{ PSF(viewangles[0]), 0, NETFIELD_ANGLE16 },
 	{ PSF(weaponTime), -16 },
 	{ PSF(weaponChargeTime), 32 }, //? really need 32 bits??
 	{ PSF(weaponChargeSubtractTime), 32 }, //? really need 32 bits??
@@ -1937,7 +1971,7 @@ netField_t	playerStateFields15[] =
 	{ PSF(eventParms[1]), 8 },
 	{ PSF(clientNum), 8 },
 	{ PSF(weapon), 5 },
-	{ PSF(viewangles[2]), 0 },
+	{ PSF(viewangles[2]), 0, NETFIELD_ANGLE16 },
 	{ PSF(jumppad_ent), 10 },
 	{ PSF(loopSound), 16 },
 
@@ -2007,56 +2041,45 @@ netField_t	playerStateFields15[] =
 	{ PSF(lastHitLoc[1]), 0 } //currently only used so client knows to orient disruptor disintegration.. seems a bit much for just that though.
 };
 
-// percentages are playerstate-based from a ctf pub game where commandtime had the most updates (587887 updates)
-// no percentage: not seen.
-// ALL-prefixed percentages are from a month of demos from end of 2023 with about 10% 1.04 and 90% 1.02 (baseline commandtime is 343074541)
-netFieldMapping_t mappings[] = {
-	{ PSF(commandTime), 32, NETF(pos.trTime), 32 }, // 587887 (reference), ALL: 100%
-	{ PSF(origin[0]), 0 ,NETF(pos.trBase[0]), 0 }, // snap // 82.8516364539444 %, ALL: 65.4142132919155 %
-	{ PSF(origin[1]), 0 ,NETF(pos.trBase[1]), 0 }, // snap // 82.6716698957453 %, ALL: 65.1445354553429 %
-	{ PSF(origin[2]), 0 ,NETF(pos.trBase[2]), 0 }, // snap // 62.0347107522364 %, ALL: 52.6944521948657 %
-	{ PSF(viewangles[1]), 0 ,NETF(apos.trBase[1]), 0 }, // snap // 70.8030624933023 %, ALL: 55.3525975569257 %
-	{ PSF(viewangles[0]), 0 ,NETF(apos.trBase[0]), 0 }, // snap // 60.0526972020133 %, ALL: 44.8286324457984 %
-	{ PSF(velocity[0]), 0 ,NETF(pos.trDelta[0]), 0 },  // 64.9325465608187 %, ALL: 49.238935803167 %
-	{ PSF(velocity[1]), 0 ,NETF(pos.trDelta[1]), 0 },  // 65.1206779534162 %, ALL: 48.6138623151288 %
-	{ PSF(velocity[2]), 0 ,NETF(pos.trDelta[2]), 0 }, // 60.6424363865845%, ALL: 41.290909429505 %
-	{ PSF(torsoAnim), 16, NETF(torsoAnim), 16 }, // 13.1435122736172 %, ALL: 15.0146985112486 %
-	{ PSF(legsAnim), 16, NETF(legsAnim), 16 }, // 11.046680739666 %, ALL: 14.6316948654024 %
-	{ PSF(fd.forceMindtrickTargetIndex4), 16, NETF(trickedentindex4), 16 }, // 14.0292267051321 %, ALL: never
-	{ PSF(movementDir), 4, NETF(angles2[1]), 0 }, // huh. inverse "snap"? // 13.5155225408965%, ALL: 14.4954749061371 %
-	{ PSF(saberEntityNum), GENTITYNUM_BITS, NETF(saberEntityNum), GENTITYNUM_BITS }, // ALL: 12.344073062536 %
-	{ PSF(eFlags), 32, NETF(eFlags), 32 }, // 3.46903401504031 %, ALL: 7.81084131800966 %
-	{ PSF(fd.saberAnimLevel), 2, NETF(fireflag), 2  }, // 1.07197471622948 %, ALL: 7.48122606975957 %
-	{ PSF(groundEntityNum), GENTITYNUM_BITS, NETF(groundEntityNum), GENTITYNUM_BITS }, // 6.92394967059996, ALL: 7.3569186819957 %
-	{ PSF(speed), 16, NETF(speed), 0  }, // huh. inverse snap? // 6.65791214978389 %, ALL: 6.84960648245828 %
-	{ PSF(weaponstate), 4, NETF(modelindex2), 8 }, // 1.06551088899738 %, ALL: 5.17442505300911 %
-	{ PSF(saberMove), 32, NETF(saberMove), 8 }, // possible truncation? // 5.39083191157484 %, ALL: 4.98815678660341 %
-	{ PSF(fd.forcePowersActive), 32, NETF(forcePowersActive), 32 }, // 3.5081571798662 %, ALL: 4.19932384315279 %
-	{ PSF(saberHolstered), 1, NETF(shouldtarget), 1 }, // 0.725989858595274 %, ALL: 3.40758395126731 %
-	{ PSF(weapon), 5, NETF(weapon), 8 }, // 0.381535907410778, ALL: 1.80182591864198 %
-	{ PSF(generic1), 8, NETF(generic1), 8  }, // 0.229806068172965 %, ALL: never
-	{ PSF(genericEnemyIndex), 32, NETF(genericenemyindex), 32 }, // ALL: 0.0946368678519925 %
-	{ PSF(lastHitLoc[0]), 0 ,NETF(origin2[0]), 0 }, // snap, ALL: 0.0532423651920007 %
-	{ PSF(lastHitLoc[1]), 0 ,NETF(origin2[1]), 0 }, // snap, ALL: 0.0532435311193785 %
-	{ PSF(lastHitLoc[2]), 0 ,NETF(origin2[2]), 0 }, // snap, ALL: 0.0527188637993397 %
-	{ PSF(activeForcePass), 6, NETF(activeForcePass), 6 }, // ALL: 0.0405159763807714 %
-	{ PSF(electrifyTime), 32, NETF(emplacedOwner), 32  }, // ALL: 0.0187419911173181 %
-	{ PSF(saberInFlight), 1, NETF(saberInFlight), 1 }, // ALL: 0.0155045022708345 %
-	{ PSF(fd.forceMindtrickTargetIndex), 16, NETF(trickedentindex), 16 }, // ALL: 0.0091767229093225 %
-	{ PSF(weaponChargeTime), 32, NETF(constantLight), 32 }, // ALL: 0.00589084807665749 %
-	{ PSF(duelInProgress), 1, NETF(bolt1), 8 }, // weird one and rly not a 1:1 mapping, and not a huge save. ALL: 0.000966262314404729 %
-	{ PSF(loopSound), 16, NETF(loopSound), 8 }, // ALL: 0.000396706790318201 %
-	{ PSF(dualBlade), 1, NETF(bolt2), GENTITYNUM_BITS }, // ALL: 0.000341033758025198 %
-	{ PSF(isJediMaster), 1, NETF(isJediMaster), 1 }, // ALL: 4.83859861813529e-05 %
-	{ PSF(fd.forceMindtrickTargetIndex2), 16, NETF(trickedentindex2), 16 }, // ALL: 4.10989400697034e-05 %
-	{ PSF(viewangles[2]), 0 ,NETF(apos.trBase[2]), 0 }, // snap // 0 %, ALL: 2.91481844465982e-06 %
-	{ PSF(emplacedIndex), GENTITYNUM_BITS, NETF(otherEntityNum2), GENTITYNUM_BITS  }, // ALL: 2.62333660019383e-06 %
-	{ PSF(holocronBits), 32, NETF(time2), 32 }, // ALL: never
-	{ PSF(fd.forceMindtrickTargetIndex3), 16, NETF(trickedentindex3), 16 }, // ALL: never
-	{ PSF(saberLockFrame), 16, NETF(forceFrame), 16 }, // ALL: never 
-	{ PSF(clientNum), 8, NETF(clientNum), 8 }, // ALL: 12.3398457013457 % (huh wtf)
-	{ PSF(usingATST), 1, NETF(teamowner), 8 }, // ALL: never
-};
+
+// compile time add the fitting mappings to the playerstatefields
+template<int size,int mappingsSize, int entityFieldsSize>
+static inline constexpr std::array<netField_t, size> netFieldsWithMapping(const netField_t* oldFields ,const netField_t* entFields, const netFieldMapping_t* mappings) {
+	std::array<netField_t, size> newNetFields{};
+	for (int i = 0; i < size; i++) {
+		newNetFields[i] = oldFields[i];
+		for (int j = 0; j < mappingsSize; j++) {
+			if (mappings[j].offset == oldFields[i].offset) {
+				if (mappings[j].bits != oldFields[i].bits) {
+					throw std::invalid_argument("playerState to entityState mappings have wrong bits set");
+				}
+				newNetFields[i].mapping = &mappings[j];
+				for (int k = 0; k < entityFieldsSize; k++) {
+					if (mappings[j].offset2 == entFields[k].offset) {
+						if (mappings[j].bits2 != entFields[k].bits) {
+							throw std::invalid_argument("playerState to entityState mappings have wrong bits set #2");
+						}
+					}
+				}
+			}
+		}
+	}
+	return newNetFields;
+}
+constexpr const auto  playerStateFields16{ []() constexpr {
+	constexpr size_t size = sizeof(playerStateFields16raw) / sizeof(playerStateFields16raw[0]);
+	constexpr size_t size2 = sizeof(entityStateFields16) / sizeof(entityStateFields16[0]);
+	constexpr size_t mappingsSize = sizeof(playerStateEntityStateMappings) / sizeof(playerStateEntityStateMappings[0]);
+	return netFieldsWithMapping<size, mappingsSize, size2>(playerStateFields16raw, entityStateFields16, playerStateEntityStateMappings);
+}()};
+constexpr const auto  playerStateFields15{ []() constexpr {
+	constexpr size_t size = sizeof(playerStateFields15raw) / sizeof(playerStateFields15raw[0]);
+	constexpr size_t size2 = sizeof(entityStateFields15) / sizeof(entityStateFields15[0]);
+	constexpr size_t mappingsSize = sizeof(playerStateEntityStateMappings) / sizeof(playerStateEntityStateMappings[0]);
+	return netFieldsWithMapping<size, mappingsSize, size2>(playerStateFields15raw, entityStateFields15, playerStateEntityStateMappings);
+}()};
+
+
 
 
 
@@ -2067,7 +2090,8 @@ MSG_WriteDeltaPlayerstate
 =============
 */
 
-void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, struct playerState_s *to) {
+template<qboolean useSkipMask,qboolean useFieldTypes>
+void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, struct playerState_s *to, int mappingSkipMask, int serverTime) {
 	int				i;
 	playerState_t	dummy;
 	int				statsbits;
@@ -2076,10 +2100,11 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, str
 	int				powerupbits;
 	int				numFields;
 	int				c;
-	netField_t		*field;
+	const netField_t		*field;
 	int				*fromF, *toF;
 	float			fullFloat;
 	int				trunc, lc;
+	bool			usedFieldType = false;
 
 	if (!from) {
 		from = &dummy;
@@ -2089,16 +2114,16 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, str
 	c = msg->cursize;
 
 	if (MV_GetCurrentGameversion() == VERSION_1_02) {
-		numFields = sizeof(playerStateFields15) / sizeof(playerStateFields15[0]);
+		numFields = playerStateFields15.size();
 	} else {
-		numFields = sizeof(playerStateFields16) / sizeof(playerStateFields16[0]);
+		numFields = playerStateFields16.size();
 	}
 
 	lc = 0;
 	if (MV_GetCurrentGameversion() == VERSION_1_02)
-		field = playerStateFields15;
+		field = playerStateFields15.data();
 	else
-		field = playerStateFields16;
+		field = playerStateFields16.data();
 
 	for (i = 0; i < numFields; i++, field++) {
 		fromF = (int *)((byte *)from + field->offset);
@@ -2113,14 +2138,20 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, str
 	oldsize += numFields - lc;
 
 	if (MV_GetCurrentGameversion() == VERSION_1_02)
-		field = playerStateFields15;
+		field = playerStateFields15.data();
 	else
-		field = playerStateFields16;
+		field = playerStateFields16.data();
 
 	for (i = 0; i < lc; i++, field++) {
 		gLastField = field;
 		fromF = (int *)((byte *)from + field->offset);
 		toF = (int *)((byte *)to + field->offset);
+
+		if constexpr (useSkipMask) {
+			if (mappingSkipMask && field->mapping && mappingSkipMask & (1 << field->mapping->maskIndex)) {
+				continue;
+			}
+		}
 
 		if (*fromF == *toF) {
 			MSG_WriteBits(msg, 0, 1);	// no change
@@ -2130,24 +2161,49 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, str
 		MSG_WriteBits(msg, 1, 1);	// changed
 		//		pcount[i]++;
 
-		if (field->bits == 0) {
-			// float
-			fullFloat = *(float *)toF;
-			trunc = (int)fullFloat;
-
-			if (trunc == fullFloat && trunc + FLOAT_INT_BIAS >= 0 &&
-				trunc + FLOAT_INT_BIAS < (1 << FLOAT_INT_BITS)) {
-				// send as small integer
-				MSG_WriteBits(msg, 0, 1);
-				MSG_WriteBits(msg, trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS);
-			} else {
-				// send as full floating point value
-				MSG_WriteBits(msg, 1, 1);
-				MSG_WriteBits(msg, *toF, 32);
+		if constexpr (useFieldTypes) {
+			usedFieldType = true;
+			if (!useFieldTypes || field->fieldType == NETFIELD_NORMAL) {
+				usedFieldType = false;
 			}
-		} else {
-			// integer
-			MSG_WriteBits(msg, *toF, field->bits);
+			else if (useFieldTypes && field->fieldType == NETFIELD_RELATIVECMDTIME && *toF >= serverTime - 512 && *toF <= serverTime + 511) {
+				int diff = serverTime - *toF;
+				MSG_WriteBits(msg, 1, 1);	// using netfield type
+				MSG_WriteBits(msg, diff, -10); // 1 bit fo sign, 9 bits for -511 to 512
+			}
+			else if (useFieldTypes && field->fieldType == NETFIELD_ANGLE16 && *(float*)toF == AngleNormalize180(SHORT2ANGLE(ANGLE2SHORT(*(float*)toF)))) {
+				// view angles usually conform to this.
+				MSG_WriteBits(msg, 1, 1);	// using netfield type
+				MSG_WriteBits(msg, ANGLE2SHORT(*(float*)toF), 16);
+			}
+			else {
+				usedFieldType = false;
+				MSG_WriteBits(msg, 0, 1);	// not using netfield type
+			}
+		}
+
+		if (!usedFieldType) {
+			if (field->bits == 0) {
+				// float
+				fullFloat = *(float*)toF;
+				trunc = (int)fullFloat;
+
+				if (trunc == fullFloat && trunc + FLOAT_INT_BIAS >= 0 &&
+					trunc + FLOAT_INT_BIAS < (1 << FLOAT_INT_BITS)) {
+					// send as small integer
+					MSG_WriteBits(msg, 0, 1);
+					MSG_WriteBits(msg, trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS);
+				}
+				else {
+					// send as full floating point value
+					MSG_WriteBits(msg, 1, 1);
+					MSG_WriteBits(msg, *toF, 32);
+				}
+			}
+			else {
+				// integer
+				MSG_WriteBits(msg, *toF, field->bits);
+			}
 		}
 	}
 	c = msg->cursize - c;
@@ -2244,16 +2300,20 @@ void MSG_WriteDeltaPlayerstate(msg_t *msg, const struct playerState_s *from, str
 	}
 }
 
+// instantiate the variants we need.
+template void MSG_WriteDeltaPlayerstate<qtrue, qtrue>(msg_t*, const struct playerState_s*, struct playerState_s*, int, int);
+template void MSG_WriteDeltaPlayerstate<qfalse, qfalse>(msg_t*, const struct playerState_s*, struct playerState_s*, int, int);
 
 /*
 ===================
 MSG_ReadDeltaPlayerstate
 ===================
 */
-void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState_t *to) {
+template<qboolean useSkipMask, qboolean useFieldTypes>
+void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState_t *to, int mappingSkipMask, int serverTime) {
 	int			i, lc;
 	int			bits;
-	netField_t	*field;
+	const netField_t	*field;
 	int			numFields;
 	int			startBit, endBit;
 	int			print;
@@ -2267,11 +2327,15 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 	}
 	*to = *from;
 
+#if FIXREADSIZES
+	startBit = msg->bit;
+#else
 	if (msg->bit == 0) {
 		startBit = msg->readcount * 8 - GENTITYNUM_BITS;
 	} else {
 		startBit = (msg->readcount - 1) * 8 + msg->bit - GENTITYNUM_BITS;
 	}
+#endif
 
 	// shownet 2/3 will interleave with other printed info, -2 will
 	// just print the delta records
@@ -2283,9 +2347,9 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 	}
 
 	if (MV_GetCurrentGameversion() == VERSION_1_02) {
-		numFields = sizeof(playerStateFields15) / sizeof(playerStateFields15[0]);
+		numFields = playerStateFields15.size();
 	} else {
-		numFields = sizeof(playerStateFields16) / sizeof(playerStateFields16[0]);
+		numFields = playerStateFields16.size();
 	}
 	lc = MSG_ReadByte(msg);
 
@@ -2294,13 +2358,19 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 #endif
 
 	if (MV_GetCurrentGameversion() == VERSION_1_02)
-		field = playerStateFields15;
+		field = playerStateFields15.data();
 	else
-		field = playerStateFields16;
+		field = playerStateFields16.data();
 
 	for (i = 0; i < lc; i++, field++) {
 		fromF = (int *)((byte *)from + field->offset);
 		toF = (int *)((byte *)to + field->offset);
+
+		if (useSkipMask) {
+			if (mappingSkipMask && field->mapping && mappingSkipMask & (1 << field->mapping->maskIndex)) {
+				continue;
+			}
+		}
 
 #ifdef _DONETPROFILE_
 		startBytes = msg->readcount;
@@ -2309,7 +2379,28 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 			// no change
 			*toF = *fromF;
 		} else {
-			if (field->bits == 0) {
+
+			if (useFieldTypes && field->fieldType != NETFIELD_NORMAL && MSG_ReadBits(msg, 1)) {
+				// special field type being used
+				switch (field->fieldType) {
+					default:
+						Com_Error(ERR_DROP, "Attempting to decode unknown fieldtype");
+						break;
+					case NETFIELD_RELATIVECMDTIME:
+						*toF = serverTime + MSG_ReadBits(msg,-10);
+						if (print) {
+							Com_Printf("%s:%i ", field->name, *toF);
+						}
+						break;
+					case NETFIELD_ANGLE16:
+						*(float*)toF = AngleNormalize180(SHORT2ANGLE(MSG_ReadBits(msg,16)));
+						if (print) {
+							Com_Printf("%s:%f ", field->name, *(float*)toF);
+						}
+						break;
+				}
+			}
+			else if (field->bits == 0) {
 				// float
 				if (MSG_ReadBits(msg, 1) == 0) {
 					// integral float
@@ -2342,9 +2433,9 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 	}
 
 	if (MV_GetCurrentGameversion() == VERSION_1_02)
-		field = &playerStateFields15[lc];
+		field = &playerStateFields15.data()[lc];
 	else
-		field = &playerStateFields16[lc];
+		field = &playerStateFields16.data()[lc];
 
 	for (i = lc; i<numFields; i++, field++) {
 		fromF = (int *)((byte *)from + field->offset);
@@ -2429,14 +2520,22 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 #endif
 
 	if (print) {
+#if FIXREADSIZES
+		endBit = msg->bit;
+#else
 		if (msg->bit == 0) {
 			endBit = msg->readcount * 8 - GENTITYNUM_BITS;
 		} else {
 			endBit = (msg->readcount - 1) * 8 + msg->bit - GENTITYNUM_BITS;
 		}
+#endif
 		Com_Printf(" (%i bits)\n", endBit - startBit);
 	}
 }
+
+// instantiate the variants we need.
+template void MSG_ReadDeltaPlayerstate<qtrue,qtrue>(msg_t*, const struct playerState_s*, struct playerState_s*, int, int );
+template void MSG_ReadDeltaPlayerstate<qfalse, qfalse>(msg_t*, const struct playerState_s*, struct playerState_s*, int, int );
 
 // Huffman code data structure serialization
 

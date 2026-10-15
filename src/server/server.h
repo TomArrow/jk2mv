@@ -23,8 +23,9 @@
 // 1 = initial version
 // 2 = added some robustness against badly cut demos, which made playback completely impossible on v1
 // 3 = added information to more reliably reconstruct the main player's POV
+// 4 = deduplication of identical values in entityState and playerState
 //
-#define MV_PROTOCOL_VERSION	3 
+#define MV_PROTOCOL_VERSION	4 
 
 
 
@@ -132,6 +133,7 @@ typedef struct {
 	int				num_psf;				// number of playerStates to send
 	byte			psMask[MAX_CLIENTS / 8];	// playerState mask
 	int				normalSnapshotOldFrame;
+	int				dedupeSuccessMaskMerged;
 
 	// stuff to restore the main player for other views:
 	int				ownEntityEType;
@@ -179,6 +181,7 @@ typedef struct psFrame_s {
 	byte			areabits[MAX_MAP_AREA_BYTES]; // portalarea visibility bits
 	playerState_t	ps;
 	entMask_t		entMask;
+	int				dedupeSuccessMask;
 } psFrame_t;
 
 #endif // USE_MV
@@ -606,6 +609,7 @@ void SV_BeginAutoRecordDemos();
 //
 void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgType, qboolean doingSnapshot);
 #ifdef USE_MULTIVIEW
+void SV_ProcessMultiviewPlayerEntityDedupe(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore);
 void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore);
 #endif
 

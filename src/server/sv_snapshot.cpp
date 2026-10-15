@@ -196,10 +196,18 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 		oldframe = &client->frames[deltaMessage & PACKET_MASK ];
 		lastframe = client->netchan.outgoingSequence - deltaMessage;
 		
+#ifdef USE_MULTIVIEW 
+		if (oldframe->multiview != frame->multiview || frame->multiview && oldframe->version != frame->version) {
+			Com_DPrintf("%s: Delta request from other multiview state. (msgType %d)\n", client->name, msgType);
+			oldframe = NULL;
+			lastframe = 0;
+		}
+#endif 
+
 		lastframeWithoutEntityRolloff = lastframe;
 
 		// the snapshot's entities may still have rolled off the buffer, though
-		if ( oldframe->first_entity <= svs.nextSnapshotEntities - svs.numSnapshotEntities ) {
+		if ( oldframe && oldframe->first_entity <= svs.nextSnapshotEntities - svs.numSnapshotEntities ) {
 			if (com_developer->integer > 5 || !(client->deltaMessageWarning & 2) || client->deltaMessageWarningLast < (svs.time - 1000) || svs.time < client->deltaMessageWarningLast) { // debug spam reduction
 				Com_DPrintf("%s: Delta request from out of date entities. (msgType %d)\n", client->name, msgType);
 				client->deltaMessageWarning |= 2;
@@ -298,16 +306,24 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 	}
 
 #ifdef USE_MULTIVIEW
-	// hide main ps entity and entity events to avoid double events on normal clients playing back a multiview demo
-	SV_ProcessPlayerEntities(frame, oldframe,qfalse);
+	if(frame->multiview){
+		// hide main ps entity and entity events to avoid double events on normal clients playing back a multiview demo
+		SV_ProcessPlayerEntities(frame, oldframe,qfalse);
+		// check for duplicate values between entity and playerstates in multiview
+		SV_ProcessMultiviewPlayerEntityDedupe(frame, oldframe,qfalse);
+	}
 #endif
 
 	// delta encode the entities
 	SV_EmitPacketEntities (oldframe, frame, msg);
 
 #ifdef USE_MULTIVIEW
-	// restore real state
-	SV_ProcessPlayerEntities(frame, oldframe, qtrue);
+	if (frame->multiview) {
+		// restore real state
+		SV_ProcessPlayerEntities(frame, oldframe, qtrue);
+		// check for duplicate values between entity and playerstates in multiview
+		SV_ProcessMultiviewPlayerEntityDedupe(frame, oldframe, qtrue);
+	}
 #endif
 
 	// padding for rate debugging
@@ -1019,6 +1035,8 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	if (client->multiview.protocol > 0) {
 		frame->multiview = qtrue;
 		frame->ownEntityEType = -1;
+		frame->dedupeSuccessMaskMerged = 0;
+		frame->version = MIN(client->multiview.protocol, sv_mvMaxVersion->integer);
 		// select primary client slot
 		//if (client->multiview.recorder) {
 		//	cl = sv_demoClientID;
@@ -1034,6 +1052,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	else
 	{
 		frame->multiview = qfalse;
+		frame->version = 0;
 	}
 #endif
 
@@ -1082,6 +1101,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 
 				SET_ABIT(frame->psMask, slot);
 
+				psf->dedupeSuccessMask = 0;
 				psf->ps = ps;
 				psf->clientSlot = slot;
 

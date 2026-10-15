@@ -22,6 +22,7 @@ cvar_t* cl_showVelocityAllowNegative;
 cvar_t* cl_drawPS;
 cvar_t* cl_drawPSHeight;
 cvar_t* cl_showShader;
+cvar_t* cl_drawPacketSize;
 #ifdef USE_MULTIVIEW
 cvar_t* cl_multiviewWarnings;
 #endif
@@ -464,6 +465,7 @@ void SCR_Init( void ) {
 	cl_showVelocity = Cvar_Get("cl_showVelocity", "0", CVAR_ARCHIVE);
 	cl_showVelocityAllowNegative = Cvar_Get("cl_showVelocityAllowNegative", "1", CVAR_ARCHIVE);
 	cl_showShader = Cvar_Get("cl_showShader", "0", CVAR_ARCHIVE);
+	cl_drawPacketSize = Cvar_Get("cl_drawPacketSize", "0", CVAR_ARCHIVE);
 #ifdef USE_MULTIVIEW
 	cl_multiviewWarnings = Cvar_Get("cl_multiviewWarnings", "1", CVAR_TEMP);
 #endif
@@ -524,11 +526,15 @@ static void SCR_DrawPS() {
 	}
 	startY = cl_drawPSHeight->value * 480;
 	ps = &cl.snap.ps;
+#ifdef USE_MULTIVIEW
+	ps = CL_GetActivePlayerState();
+#endif
+
 	SCR_FillRect(0, startY, 640, 240, transparentBlack);
 
 	startYLetters = startY + 5;
 
-	SCR_DrawSmallStringExt(x,startYLetters/ cls.yadjust,						   va("     X %.2f",ps->origin[0]), white,qtrue);
+	SCR_DrawSmallStringExt(x,startYLetters/ cls.yadjust,						 va("     X %.2f",ps->origin[0]), white,qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight,      va("     Y %.2f",ps->origin[1]), white,qtrue);
 	SCR_DrawSmallStringExt(x, startYLetters / cls.yadjust + con.charHeight * 2,  va("     Z %.2f",ps->origin[2]), white,qtrue);
 
@@ -762,6 +768,24 @@ static void SCR_DrawShowShader() {
 	if (shaderInfo && cl_showShader->integer > 1) {
 		SCR_DrawSmallStringExt(300, 360, va("shadertext:\n%s", shaderInfo), colorWhite, qfalse);
 	}
+}
+
+static void SCR_DrawPacketSizeStats() {
+	int sum = 0;
+
+	if (!cl_drawPacketSize->integer) {
+		return;
+	}
+	if (cl.packetSizesCount < PACKETSIZE_AVG_SAMPLES) {
+		return;
+	}
+	
+	for (int i = 0; i < PACKETSIZE_AVG_SAMPLES; i++) {
+		sum += cl.packetSizes[i];
+	}
+
+	int avg = sum / PACKETSIZE_AVG_SAMPLES;
+	SCR_DrawSmallStringExt(cls.glconfig.vidWidth * 0.5f - 15 * con.charWidth * 0.5f, cls.glconfig.vidHeight * 0.8f - con.charHeight*2, va("Average packet size: %d bytes (%dKB)", avg, avg/1024), colorYellow, qfalse);
 }
 
 #ifdef USE_MULTIVIEW
@@ -1197,6 +1221,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	SCR_DrawFPSGuess();
 	SCR_DrawShowMouse();
 	SCR_DrawShowShader();
+	SCR_DrawPacketSizeStats();
 #ifdef USE_MULTIVIEW
 	SCR_DrawMultiviewInfo();
 #endif
