@@ -275,11 +275,14 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 			count = 0;
 
 			int index, n;
-			bool foundMainPS = false;
+			bool foundMainPS = clSnap->ps.clientNum == clc.clientView;
 			for (index = 0; index < clSnap->numEntities; ++index) {
 				n = (clSnap->parseEntitiesNum + index) & (MAX_PARSE_ENTITIES - 1);
-				if ( GET_ABIT( psFrame->entMask, cl.parseEntities[n].number) ) {
-					int entityNum = cl.parseEntities[n].number;
+				int entityNum = cl.parseEntities[n].number;
+				if (entityNum == clSnap->ps.clientNum) {
+					foundMainPS = true;
+				}
+				if ( GET_ABIT( psFrame->entMask, entityNum) ) {
 					// skip own and spectated entity
 					// TA: Wait, we don't rly need to do this, do we? We are testing against the entmask anyway, that should cover it.
 					//if ( !IS_PLAYER_ENTITY(&cl.parseEntities[n], snapshot->ps.clientNum ) )
@@ -289,24 +292,21 @@ qboolean	CL_GetSnapshot(int snapshotNumber, T *snapshot) {
 							break;
 						}
 						
-						if (!foundMainPS) {
-							if (entityNum == clSnap->ps.clientNum) {
-								foundMainPS = true;
-							} else if (entityNum > clSnap->ps.clientNum) {
-								// older demos might have the main client entity not sent at all. use reconstructed one
+						if (!foundMainPS && entityNum > clSnap->ps.clientNum) {
 
-								snapshot->entities[count++] = clSnap->multiview.reconstructedOwnEnt;
-								foundMainPS = true;
+							// older demos might have the main client entity not sent at all. use reconstructed one
 
-								// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
-								if (!(cls.fixes & MVFIX_WPGLOWING) && (snapshot->entities[count - 1].eType == ET_BODY || snapshot->entities[count - 1].eType == ET_PLAYER)) {
-									snapshot->entities[count - 1].constantLight = 0;
-								}
-								if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
-									Com_DPrintf("CL_GetSnapshot (multiview): truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT);
-									count = MAX_ENTITIES_IN_SNAPSHOT;
-									break;
-								}
+							snapshot->entities[count++] = clSnap->multiview.reconstructedOwnEnt;
+							foundMainPS = true;
+
+							// wp glowing workaround.. this keeps others from glowing like a candle when and after charging the blaster pistol on high svs.time
+							if (!(cls.fixes & MVFIX_WPGLOWING) && (snapshot->entities[count - 1].eType == ET_BODY || snapshot->entities[count - 1].eType == ET_PLAYER)) {
+								snapshot->entities[count - 1].constantLight = 0;
+							}
+							if (count >= MAX_ENTITIES_IN_SNAPSHOT) {
+								Com_DPrintf("CL_GetSnapshot (multiview): truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT);
+								count = MAX_ENTITIES_IN_SNAPSHOT;
+								break;
 							}
 						}
 						
