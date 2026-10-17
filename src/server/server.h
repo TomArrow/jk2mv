@@ -24,8 +24,9 @@
 // 2 = added some robustness against badly cut demos, which made playback completely impossible on v1
 // 3 = added information to more reliably reconstruct the main player's POV
 // 4 = deduplication of identical values in entityState and playerState
+// 5 = deduplication of multiple playerstates with the same clientnum (spectators)
 //
-#define MV_PROTOCOL_VERSION	4 
+#define MV_PROTOCOL_VERSION	5 
 
 
 

@@ -520,6 +520,36 @@ static void SV_EmitEntMask(msg_t* msg, const byte* newEntMask, const byte* oldEn
 	MSG_EmitByteMask(msg, xorEntMask, sizeof(xorEntMask), 7, qtrue);
 }
 
+static int CountByteDifferences(byte* a, byte*b, int length) {
+
+	int sixtyfours = length / 8;
+	int matches = 0;
+	uint64_t* a64 = (uint64_t*)a;
+	uint64_t* b64 = (uint64_t*)b;
+	for (int i = 0; i < sixtyfours; i++, a64++, b64++) {
+		if (*a64 == *b64) {
+			matches += 8;
+		}
+		else {
+			a = (byte*)a64;
+			b = (byte*)b64;
+			for (int j = 0; j < 8; j++,a++,b++) {
+				matches += (*a == *b);
+			}
+		}
+	}
+
+	a = (byte*)a64;
+	b = (byte*)b64;
+
+	int remainder = length % 8;
+	for (int i = 0; i < remainder; i++, a++, b++) {
+		matches += (*a == *b);
+	}
+
+	return length - matches;
+}
+
 // most of this stuff is copied and adapted from quake3e multiview version, though I made a lot of changes
 static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *from, const clientSnapshot_t *to, msg_t *msg)
 {
@@ -528,6 +558,9 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
     const playerState_t *oldPs;
 	int baseClientID = client - svs.clients;
 	const playerState_t* nullPs = to->version >= 4 ? MSG_GetBaselinePS(sv_gametype->integer,MV_GetCurrentGameversion()) : NULL;
+	const playerState_t* playerStateClientnumFroms[MAX_CLIENTS] = { 0 }; // if multiple people have the same ps clientnum, we can check a spectator relationship. so just delta from the old one if it looks similar enough
+
+	playerStateClientnumFroms[to->ps.clientNum] = &to->ps;
 
     int i, n;
     int clientSlot;
@@ -636,12 +669,48 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
 		// the snapped mappings refer to the same values. netcode only needs to know to skip these values, it doesn't need to distinguish between snapped or unsnapped
 		int netMask = psf->dedupeSuccessMask | ((psf->dedupeSuccessMask & mappingsSnapped) >> 1);
 
+		assert(psf->ps.clientNum >= 0 && psf->ps.clientNum < MAX_CLIENTS);
+
+		if (to->version >= 5) {
+			// prefer to remember one with PMF_FOLLOW to delta from, since a player can have many spectators and then we don't have to transmit the different pm_flags
+			bool usePrevious = false;
+			if (playerStateClientnumFroms[psf->ps.clientNum] && playerStateClientnumFroms[psf->ps.clientNum]->commandTime == psf->ps.commandTime) {
+
+				int differences = CountByteDifferences((byte*)playerStateClientnumFroms[psf->ps.clientNum], (byte*)&psf->ps, sizeof(playerState_t));
+				if (differences < 16) { 
+					// typically it will only be 2 bytes or so (eFlags difference), but lets be generous
+					// typically it will only be pm_flags (PMF_FOLLOW) and ping, but it can also be eFlags (cuz it gets adjusted for having voted)
+					// and mods could ostensibly make changes.
+					// we can increase this limit or otherwise change the condition serverside without really affecting the decodability (client only needs to know whether we are doing this)
+					// so it's safe to just keep it like this for now and change later when better judgment arrives
+					usePrevious = true;
+				}
+			}
+
+			if (usePrevious) {
+				oldPs = playerStateClientnumFroms[psf->ps.clientNum];
+				MSG_WriteBits(msg, 1, 1);
+				// TODO potential improvement: send index into psframes so far, and reduce the bits accordingly. e.g. if only 3 ps were sent so far, we only need 2 bits to uniquely identify each. but maybe overcomplicates?
+				MSG_WriteBits(msg, psf->ps.clientNum, 5); // we don't know the actual ps clientnum until we read it on the client :/
+			}
+			else {
+				MSG_WriteBits(msg, 0, 1);
+			}
+		}
+
         // playerstate
 		if (to->version >= 4) {
 			MSG_WriteDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &psf->ps, netMask, sv.time);
 		}
 		else {
 			MSG_WriteDeltaPlayerstate(msg, oldPs, &psf->ps);
+		}
+
+		if (to->version >= 5) {
+			if (!playerStateClientnumFroms[psf->ps.clientNum] || !(playerStateClientnumFroms[psf->ps.clientNum]->pm_flags & PMF_FOLLOW)) {
+				// prefer to remember one with PMF_FOLLOW to delta from, since a player can have many spectators and then we don't have to transmit the different pm_flags
+				playerStateClientnumFroms[psf->ps.clientNum] = &psf->ps;
+			}
 		}
 
 #if 1

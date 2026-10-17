@@ -12,7 +12,7 @@
 
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
-#define MAX_MULTIVIEW_VERSION 4 // max version number we can currently decode
+#define MAX_MULTIVIEW_VERSION 5 // max version number we can currently decode
 
 extern	clientRendererInfo_t	clRenderInfo;
 

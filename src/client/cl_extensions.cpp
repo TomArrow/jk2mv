@@ -444,6 +444,9 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 	const playerState_t* oldPs;
 	qboolean rescuableFakeBase = qfalse;
 	msg_t rescueableMsgBkup;
+	playerState_t* playerStateClientnumFroms[MAX_CLIENTS] = { 0 }; // if multiple people have the same ps clientnum, we can check a spectator relationship. so just delta from the old one if it looks similar enough
+
+	playerStateClientnumFroms[snap->ps.clientNum] = &snap->ps;
 
 	int entIndex = 0;
 	entityState_t *entReal=NULL,*ent = snap->numEntities ? &cl.parseEntities[(snap->parseEntitiesNum + entIndex) & (MAX_PARSE_ENTITIES - 1)] : NULL;
@@ -502,7 +505,6 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 			} else if(!old->multiview.multiviewValid) {
 				Com_Memset(state->entMask, 0, sizeof(state->entMask));
 				oldPs = CL_GetRescueableBasePS(old,clientNum);
-				memcpy(&rescueableMsgBkup, msg, sizeof(rescueableMsgBkup));
 				rescuableFakeBase = qtrue;
 			} else {
 				Com_Memset(state->entMask, 0, sizeof(state->entMask));
@@ -525,6 +527,27 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		// the snapped mappings refer to the same values. netcode only needs to know to skip these values, it doesn't need to distinguish between snapped or unsnapped
 		int netMask = state->dedupeSuccessMask | ((state->dedupeSuccessMask & mappingsSnapped) >> 1);
 
+
+		bool referencingPreviousPs = false;
+		if (snap->multiview.version >= 5) {
+			if (MSG_ReadBits(msg, 1)) {
+				SHOWNET(msg, "v5 ps spec dedupe oldPs");
+				int clientNumSrc = MSG_ReadBits(msg, 5);
+				if (clientNumSrc < 0 || clientNumSrc >= MAX_CLIENTS) {
+					Com_Error(ERR_DROP, "CL_ParsePlayerstates: Trying to reference impossible parsed playerstate number.");
+				}
+				if (!playerStateClientnumFroms[clientNumSrc]) {
+					Com_Error(ERR_DROP, "CL_ParsePlayerstates: Trying to reference previously parsed playerstate we didn't get.");
+				}
+				oldPs = playerStateClientnumFroms[clientNumSrc];
+				referencingPreviousPs = true;
+			}
+		}
+
+		if (rescuableFakeBase) {
+			memcpy(&rescueableMsgBkup, msg, sizeof(rescueableMsgBkup));
+		}
+
 		if (snap->multiview.version >= 4) {
 			MSG_ReadDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &state->ps, netMask, snap->serverTime);
 		}
@@ -532,7 +555,7 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 			MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps);
 		}
 
-		if (rescuableFakeBase && state->ps.clientNum != clientNum) {
+		if (rescuableFakeBase && !referencingPreviousPs && state->ps.clientNum != clientNum) {
 			// now we actually now the clientnum, so we can go back and take the proper source entitystate maybe, and then re-read the changes
 			oldPs = CL_GetRescueableBasePS(old, state->ps.clientNum);
 			memcpy(msg, &rescueableMsgBkup, sizeof(*msg));
@@ -541,6 +564,13 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 			}
 			else {
 				MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps );
+			}
+		}
+
+		if (snap->multiview.version >= 5) {
+			if (!playerStateClientnumFroms[state->ps.clientNum] || !(playerStateClientnumFroms[state->ps.clientNum]->pm_flags & PMF_FOLLOW)) {
+				// prefer to remember one with PMF_FOLLOW to delta from, since a player can have many spectators and then we don't have to transmit the different pm_flags
+				playerStateClientnumFroms[state->ps.clientNum] = &state->ps;
 			}
 		}
 
