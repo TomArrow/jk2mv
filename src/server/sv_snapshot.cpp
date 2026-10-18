@@ -4,14 +4,14 @@
 #include <string>
 
 #ifdef SVDEMO
-std::vector<std::unique_ptr<bufferedMessageContainer_t>> demoPreRecordBuffer[MAX_CLIENTS];
-std::map<std::string, std::string> demoMetaData[MAX_CLIENTS];
+std::vector<std::unique_ptr<bufferedMessageContainer_t>> demoPreRecordBuffer[MAX_CLIENTS+GHOSTCLIENTS];
+std::map<std::string, std::string> demoMetaData[MAX_CLIENTS+GHOSTCLIENTS];
 #endif
 
 extern void SV_WriteEOFAndHiddenUcmdMarker(msg_t* buf, int* requiredCurSizeRet);
 
-std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
-int userStoredUcmdCounts[MAX_CLIENTS];
+std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS+GHOSTCLIENTS];
+int userStoredUcmdCounts[MAX_CLIENTS+GHOSTCLIENTS];
 /*
 =============================================================================
 
@@ -117,6 +117,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 #ifdef SVDEMO
 	int					deltaMessage;
 #endif
+	qboolean			forInstaAckDemo = (qboolean)(msgType == MSG_DEMO || client->demo.isBot);
 
 	// this is the snapshot we are creating
 	frame = &client->frames[ client->netchan.outgoingSequence & PACKET_MASK ];
@@ -128,7 +129,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 	if (client->demo.isBot || client->state == CS_ZOMBIE) { // sometimes we keep zombies around to finish things up. make them acknowledge :)
 		deltaMessage = client->deltaMessage = client->netchan.outgoingSequence-1;
 	}
-	if (msgType == MSG_DEMO) {
+	if (forInstaAckDemo) {
 		if (client->demo.demowaiting || (sv_demoPreRecord->integer && client->demo.preRecord.keyframeWaiting)) {
 			deltaMessage = 0;
 		}
@@ -166,7 +167,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 	// when activated, demos get snapshots separate from the clients, with tighter deltas.
 	// which means, we no longer have to force clients to also receive the non-deltas when starting demos/keyframing pre-record
 	// and minDeltaFrame becomes completely irrelevant because we only need a single non-delta at the start of the demo.
-	else if ((!sv_demoSpaceSaving->integer || msgType == MSG_DEMO) && client->demo.demorecording && client->demo.demowaiting) {
+	else if ((!sv_demoSpaceSaving->integer || forInstaAckDemo) && client->demo.demorecording && client->demo.demowaiting) {
 		// demo is waiting for a non-delta-compressed frame for this client, so don't delta compress
 		oldframe = NULL;
 		lastframe = 0;
@@ -178,7 +179,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 		oldframe = NULL;
 		lastframe = 0;
 	}
-	else if ((!sv_demoSpaceSaving->integer || msgType == MSG_DEMO) && sv_demoPreRecord->integer && client->demo.preRecord.keyframeWaiting) {
+	else if ((!sv_demoSpaceSaving->integer || forInstaAckDemo) && sv_demoPreRecord->integer && client->demo.preRecord.keyframeWaiting) {
 		// demo is waiting for a non-delta-compressed frame for this client, so don't delta compress
 		oldframe = NULL;
 		lastframe = 0;
@@ -227,7 +228,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 #endif
 
 #ifdef SVDEMO
-	if ((!sv_demoSpaceSaving->integer || msgType == MSG_DEMO)) {
+	if ((!sv_demoSpaceSaving->integer || forInstaAckDemo)) {
 		if (oldframe == NULL) {
 			if (client->demo.demowaiting) {
 				// this is a non-delta frame, so we can delta against it in the demo
@@ -373,7 +374,7 @@ qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean
 	}
 
 	// write any unacknowledged serverCommands
-	for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++, countSent++) {
+	for ( i = reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++, countSent++) {
 		// msg overflow checks for 4 byte internally; we want to write svc_servercommand (1 byte), the index (4 byte) and the string and 0 terminator (1 byte)
 		// also, multiply with 2 because worst theoretical case each byte might end up 2 bytes with huffman
 		// here's an alternative for the future but think it through first. in any case: need to pretty much double 
@@ -456,7 +457,7 @@ typedef struct clientPVS_s {
     byte		entMask[MAX_GENTITIES/8];
 } clientPVS_t;
 
-static clientPVS_t client_pvs[ MAX_CLIENTS + 1 ]; // +1 to get the mask of entities to send to multiview clients
+static clientPVS_t client_pvs[ MAX_CLIENTS + GHOSTCLIENTS + 1 ]; // +1 to get the mask of entities to send to multiview clients
 
 
 /*
@@ -917,7 +918,7 @@ static clientPVS_t* SV_BuildMultiviewPVS() {
 	svEntity_t					*svEnt;
 	sharedEntity_t				*ent;
 
-	pvs = &client_pvs[MAX_CLIENTS]; // special extra slot for multiview
+	pvs = &client_pvs[MAX_CLIENTS+GHOSTCLIENTS]; // special extra slot for multiview
 
 	if (pvs->snapshotFrame == svs.snapshotFrame) {
 		return pvs;
@@ -968,13 +969,97 @@ static clientPVS_t* SV_BuildMultiviewPVS() {
 	}
 	return pvs;
 }
+
+
+/*
+==================
+SV_FindActiveClient
+
+find client whose view we can use for fake multiview recorder client
+==================
+*/
+int SV_FindActiveClient( ) {
+    playerState_t *ps;
+    client_t *cl;
+    int bestIndex;
+    int i, nactive;
+	int penalty;
+	int bestPenalty = INT_MAX;
+
+    bestIndex = -1;
+
+    for ( i = 0, cl = svs.clients; i < sv_maxclients->integer ; i++, cl++ ) {
+
+        if ( cl->state != CS_ACTIVE || cl->gentity == NULL )
+            continue;
+
+		if (i == MV_AUTORECORD_CLIENT) {
+			// the client we are pretending to be actually exists so pick him.
+			return i;
+		}
+
+		penalty = 0;
+
+		if (cl->gentity->r.svFlags & SVF_BOT) {
+			penalty += 9;
+		}
+		else {
+			if (svs.time - cl->lastSeenActive >= 10000) {
+				penalty++;
+			}
+			if (svs.time - cl->lastSeenActive >= 60000) {
+				penalty++;
+			}
+			if (svs.time - cl->lastSeenActive >= 60000 * 5) {
+				penalty++;
+			}
+		}
+
+		ps = SV_GameClientNum(cl - svs.clients);
+
+		if (ps->persistant[PERS_TEAM] == TEAM_SPECTATOR) {
+			penalty += 3;
+		}
+		else if (ps->clientNum != i && (ps->pm_flags & PMF_FOLLOW)) {
+			penalty += 4; // followers get double penalty. why get their pov when we can get the real deal?
+		}
+
+
+		if (penalty < bestPenalty) {
+			bestIndex = i;
+			bestPenalty = penalty;
+		}
+    }
+
+    return bestIndex;
+}
+
+
 #endif
 
-static void SV_GetConvertedPlayerstate(client_t* client, playerState_t* out) {
+static int SV_GetConvertedPlayerstate(client_t* client, playerState_t* out) {
 
+	static playerState_t nullPlayerState = { 0 };
 	playerState_t* ps;
+	int actualClient = client - svs.clients;
 	// grab the current playerState_t
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder) {
+		actualClient = SV_FindActiveClient();
+		if (actualClient == -1) {
+			*out = nullPlayerState;
+			return -1;
+		}
+		else {
+			ps = SV_GameClientNum(actualClient);
+		}
+	}
+	else {
+#endif
 	ps = SV_GameClientNum(client - svs.clients);
+#ifdef USE_MULTIVIEW
+	}
+#endif
 	if (VM_GetGameversion(gvm) != VERSION_1_02 || mvStructConversionDisabled) {
 		*out = *ps;
 	}
@@ -985,6 +1070,12 @@ static void SV_GetConvertedPlayerstate(client_t* client, playerState_t* out) {
 		memcpy(out, ps15, ((char*)&ps15->saberIndex) - (char*)ps15);
 		memcpy(&out->saberIndex, &ps15->saberIndex, (char*)&(ps15)[1] - (char*)&ps15->saberIndex);
 	}
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder && actualClient != MV_AUTORECORD_CLIENT) {
+		//ps->pm_flags |= PMF_FOLLOW; // actually dont lol, it messes up game
+	}
+#endif
+	return actualClient;
 }
 
 /*
@@ -1004,6 +1095,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	sharedEntity_t				*clent;
 	clientPVS_t					*pvs;
 	clientPVS_t					*entityPvs; // pvs used for entities
+	int							actualClient;
 
 	// this is the frame we are creating
 	frame = &client->frames[ client->netchan.outgoingSequence & PACKET_MASK ];
@@ -1012,14 +1104,27 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	Com_Memset( frame->areabits, 0, sizeof(frame->areabits) );
 
 	clent = client->gentity;
-	if (!clent || client->state == CS_ZOMBIE && !client->zombified) {
+	if (!clent 
+#ifdef USE_MULTIVIEW
+		&& !client->isMultiviewRecorder
+#endif
+		|| client->state == CS_ZOMBIE && !client->zombified) {
 		return;
 	}
 
 	// grab the current playerState_t
-	SV_GetConvertedPlayerstate(client,&frame->ps);
+	actualClient = SV_GetConvertedPlayerstate(client,&frame->ps);
 
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder && actualClient >= 0) {
+		entityPvs = pvs = SV_BuildClientPVS(svs.clients + actualClient, &frame->ps);
+	}
+	else {
+#endif
 	entityPvs = pvs = SV_BuildClientPVS(client,&frame->ps);
+#ifdef USE_MULTIVIEW
+	}
+#endif
 
 	memcpy(frame->areabits,pvs->areabits,sizeof(frame->areabits));
 	frame->areabytes = pvs->areabytes;
@@ -1084,7 +1189,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 
 		for (slot = 0; slot < sv_maxclients->integer; slot++, slotCl++) {
 			// record only active clients that aren't the main client
-			if (slotCl != client && slotCl->state == CS_ACTIVE) {
+			if (slotCl != client && !(client->isMultiviewRecorder && slot == MV_AUTORECORD_CLIENT) && slotCl->state == CS_ACTIVE) {
 
 				// get current playerstate
 				SV_GetConvertedPlayerstate(slotCl,&ps);
@@ -1161,7 +1266,8 @@ static int SV_RateMsec(client_t* client, int messageSize) {
 
 int SV_GetClientSnapshotMsec(client_t* client) {
 	playerState_t* ps = SV_GameClientNum(client - svs.clients);
-	qboolean spectator = (qboolean)(ps && ((ps->pm_flags & PMF_FOLLOW) || ps->persistant[PERS_TEAM] == TEAM_SPECTATOR));
+	// TODO DM_15 COMPATIBILITY
+	qboolean spectator = (qboolean)(ps && ((ps->pm_flags & PMF_FOLLOW) && ps->clientNum != (client-svs.clients) || ps->persistant[PERS_TEAM] == TEAM_SPECTATOR));
 
 	if (com_coolApi_supported_game_vmflags && (com_coolApi_supported_game_vmflags->integer & COOL_APIFEATURE_VMGAME_FLAG_SEGMENTEDREPLAY)){
 		if (ps->eFlags & EF_SEGMENTEDREPLAY) {
@@ -1329,6 +1435,23 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 	if (client->demo.isBot) {
 		client->netchan.outgoingSequence++;
 		client->demo.botReliableAcknowledge = client->reliableSent;
+#ifdef USE_MULTIVIEW
+		if (client->isMultiviewRecorder) { // we do wanna be able to control the snaps for the multiview demos
+			//  // normal rate / snapshotMsec calculation
+			//rateMsec = SV_RateMsec(client, msg->cursize);
+
+			//if (rateMsec < snapshotMsec) {
+			//	// never send more packets than this, no matter what the rate is at
+			//	rateMsec = snapshotMsec;
+			//	client->rateDelayed = qfalse;
+			//}
+			//else {
+			//	client->rateDelayed = qtrue;
+			//}
+
+			client->nextSnapshotTime = svs.time + snapshotMsec;
+		}
+#endif
 		return;
 	}
 
@@ -1541,6 +1664,11 @@ void SV_SendClientSnapshot( client_t *client, qboolean dontSend) {
 
 #ifdef SVDEMO
 	if (!client->demo.demorecording) { //dont think this needs to be done with singledemo option
+#ifdef USE_MULTIVIEW
+		if (sv_mvAutoRecord->integer && client->isMultiviewRecorder && svs.shouldMultiviewRecord) {
+			SV_BeginAutoRecordDemos();
+		}
+#endif
 		if (sv_autoDemo->integer == 2) {
 			if (client->netchan.remoteAddress.type == NA_BOT && !Q_stricmp(client->name, "RECORDER")) {
 				SV_BeginAutoRecordDemos();
@@ -1695,18 +1823,34 @@ void SV_SendClientMessages( void ) {
 	client_t	*c;
 
 	// send a message to each connected client
-	for (i=0, c = svs.clients ; i < sv_maxclients->integer ; i++, c++) {
+	for (i=0, c = svs.clients ; i < sv_maxclients->integer + GHOSTCLIENTS ; i++, c++) {
 		if (!c->state) {
 			continue;		// not connected
 		}
 
+
+#ifdef USE_MULTIVIEW
+		if (c->isMultiviewRecorder && !sv_mvAutoRecord->integer) {
+			// don't bother with making a snapshot for it if we're not recording.
+			continue;
+		}
+#endif
 		qboolean softLimit = qfalse;
 		if ( svs.time < c->nextSnapshotTime ) {
 			if (sv_enforceSnapsDebug->integer) {
 				softLimit = qtrue;
 			}
 			else {
+#ifdef USE_MULTIVIEW
+				if (c->isMultiviewRecorder && c->demo.botReliableAcknowledge != c->reliableSequence) { // multiview recorder should get cmds immediately, to make sure we don't overflow on low snaps
+					Com_DPrintf("^3Forcing multiview snapshot due to unsent commands.\n");
+				} 
+				else {
+#endif
 				continue;		// not time yet
+#ifdef USE_MULTIVIEW
+				}
+#endif
 			}
 		}
 
@@ -1718,6 +1862,10 @@ void SV_SendClientMessages( void ) {
 			SV_Netchan_TransmitNextFragment( &c->netchan );
 			continue;
 		}
+
+#ifdef USE_MULTIVIEW
+		if(!c->isMultiviewRecorder){
+#endif
 
 		if ( sv.vmPlayerSnapshots && !VM_Call(gvm, GAME_MVAPI_PLAYERSNAPSHOT, i) ) {
 			continue;
@@ -1731,6 +1879,10 @@ void SV_SendClientMessages( void ) {
 				c->nwhClientNotified = qtrue;
 			}
 		}
+
+#ifdef USE_MULTIVIEW
+		}
+#endif
 
 		// generate and send a new message
 		SV_SendClientSnapshot( c, softLimit);

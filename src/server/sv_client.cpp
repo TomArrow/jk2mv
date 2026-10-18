@@ -521,7 +521,16 @@ void SV_CreateClientGameStateMessage(client_t* client, msg_t* msg) {
 
 	MSG_WriteByte(msg, svc_EOF);
 
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder) {
+		MSG_WriteLong(msg, MV_AUTORECORD_CLIENT);
+	}
+	else {
+#endif
 	MSG_WriteLong(msg, client - svs.clients);
+#ifdef USE_MULTIVIEW
+	}
+#endif
 
 	// write the checksum feed
 	MSG_WriteLong(msg, sv.checksumFeed);
@@ -653,6 +662,11 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 
 	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
 	client->state = CS_ACTIVE;
+	client->lastSeenActive = svs.time;
+
+#ifdef USE_MULTIVIEW
+	if(!client->isMultiviewRecorder){
+#endif
 
 	if (sv_autoWhitelist->integer) {
 		SVC_WhitelistAdr( client->netchan.remoteAddress );
@@ -664,6 +678,10 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	ent->s.number = clientNum;
 	client->gentity = ent;
 
+#ifdef USE_MULTIVIEW
+	}
+#endif
+
 	client->lastUserInfoChange = 0; //reset the delay
 	client->lastUserInfoCount = 0; //reset the count
 
@@ -672,11 +690,22 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 	client->lastUsercmd = *cmd;
 
+#ifdef USE_MULTIVIEW
+	if (!client->isMultiviewRecorder) {
+#endif
+
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
 
 #ifdef SVDEMO
 	if (sv_autoDemo->integer == 1) { //Bots dont trigger this so whatever
+		SV_BeginAutoRecordDemos();
+	}
+#endif
+
+#ifdef USE_MULTIVIEW
+	}
+	else {
 		SV_BeginAutoRecordDemos();
 	}
 #endif
@@ -1737,6 +1766,14 @@ static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
 //==================================================================================
 
 
+void SV_CheckAFK(client_t* client, const usercmd_t* cmd) {
+	const usercmd_t* oldCmd = &client->lastUsercmd;
+	int buttonDiff = (cmd->buttons ^ oldCmd->buttons) & ~(65536 | BUTTON_TALK);  // netcode for usercmds is a bit weird. encoding does 1 bit less than decoding. buttons is a 16 bit val so 16th bit ends up "random", so we can't use it for afk detection
+	if ( cmd->forwardmove || cmd->rightmove || cmd->upmove || buttonDiff ) {
+		client->lastSeenActive = svs.time;
+	}
+}
+
 /*
 ==================
 SV_ClientThink
@@ -1748,6 +1785,10 @@ void SV_ClientThink (int client, const usercmd_t *cmd) {
 	if (client < 0 || sv_maxclients->integer <= client) {
 		Com_DPrintf( S_COLOR_YELLOW "SV_ClientThink: bad clientNum %i\n", client );
 		return;
+	}
+
+	if( svs.clients[client].state == CS_ACTIVE ){
+		SV_CheckAFK(&svs.clients[client], cmd);
 	}
 
 	svs.clients[client].lastUsercmd = *cmd;
@@ -1908,6 +1949,7 @@ void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg) {
 		client_t* clOther = svs.clients + o;
 		if (clOther->state == CS_ACTIVE) {
 			playerState_t* ps = SV_GameClientNum(o);
+			// TODO DM_15 COMPATIBILITY
 			if (ps->clientNum != o && (ps->pm_flags & PMF_FOLLOW) && ps->clientNum == myCl) { // spectators :)
 				userMessage_t* messageDupe = new userMessage_t();
 				*messageDupe = *umsg;
@@ -1917,6 +1959,7 @@ void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg) {
 		}
 	}
 	playerState_t* myps = SV_GameClientNum(myCl);
+	// TODO DM_15 COMPATIBILITY
 	if (myps->clientNum == myCl){// && !(myps->pm_flags & PMF_FOLLOW)) {
 		userStoredUcmdCounts[myCl] += umsg->cmds.size();
 		userMessages[myCl].push_back(std::move(std::unique_ptr<userMessage_t>(umsg)));
@@ -2114,12 +2157,30 @@ int SV_ClientRate( client_t *client )
 
 int SV_ClientSnaps( client_t *client, qboolean spec )
 {
-	int maxSnaps = Com_Clampi( 1, sv_fps->integer, sv_maxSnaps->integer );
-	int minSnaps = Com_Clampi( 1, maxSnaps, spec ? sv_minSnapsSpec->integer : sv_minSnaps->integer );
+	int baseMaxSnaps = sv_maxSnaps->integer;
+	int baseMinSnaps = spec ? sv_minSnapsSpec->integer : sv_minSnaps->integer;
+
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder) {
+		// fake-client multiview recorder can set his own snaps.
+		baseMaxSnaps = 1000;
+		baseMinSnaps = 1;
+	}
+#endif
+
+	int maxSnaps = Com_Clampi( 1, sv_fps->integer, baseMaxSnaps );
+	int minSnaps = Com_Clampi( 1, maxSnaps, baseMinSnaps );
 
 	// Get the desired snaps value (either sv_fps or the value from the userinfo)
 	//int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : atoi(Info_ValueForKey(client->userinfo, "snaps"));
 	int wishSnaps = sv_enforceSnaps->integer ? sv_fps->integer : client->snaps;
+
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder) {
+		// fake-client multiview recorder can set his own snaps.
+		wishSnaps = client->snaps;
+	}
+#endif
 
 	// Ensure the snaps value is within the allowed range
 	return Com_Clampi( minSnaps, maxSnaps, wishSnaps );

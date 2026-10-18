@@ -76,7 +76,7 @@ void SV_SetConfigstring (int index, const char *val) {
 	if ( sv.state == SS_GAME || sv.restarting ) {
 
 		// send the data to all relevent clients
-		for (i = 0, client = svs.clients; i < sv_maxclients->integer ; i++, client++) {
+		for (i = 0, client = svs.clients; i < sv_maxclients->integer + GHOSTCLIENTS ; i++, client++) {
 			if ( client->state < CS_PRIMED ) {
 				continue;
 			}
@@ -339,12 +339,57 @@ void SV_ResetClientMultiview( void ) {
 	}
 
 	client_t* cl = svs.clients;
-	for (i = 0; i < sv_maxclients->integer; i++,cl++) {
+	for (i = 0; i < sv_maxclients->integer+GHOSTCLIENTS; i++,cl++) {
 		for (j = 0; j < PACKET_BACKUP; j++) {
 			cl->frames[j].multiview = qfalse;
 		}
 	}
 }
+
+void SV_InitMultiviewFakeBot( void ) {
+
+	int clientNum = sv_maxclients->integer;
+	client_t* cl = svs.clients + clientNum;
+
+	SV_ClearClientDemoPreRecord(cl);
+	SV_ClearClientDemoMeta(cl);
+
+	if (cl->isMultiviewRecorder) {
+		// was already inited. but might have changed client slot.
+	}
+	else {
+		cl->reliableAcknowledge = 0;
+		cl->reliableSequence = 0;
+
+		userMessages[clientNum].clear();
+		userStoredUcmdCounts[clientNum] = 0;
+
+		cl->state = CS_ACTIVE;
+		cl->nextSnapshotTime = svs.time;
+		cl->lastPacketTime = svs.time;
+		cl->lastConnectTime = svs.time;
+
+		cl->gamestateMessageNum = -1;
+		cl->lastUserInfoChange = 0; //reset the delay
+		cl->lastUserInfoCount = 0; //reset the count
+		cl->gentity = NULL;
+
+		cl->userinfoPostponed[0] = 0;
+		cl->lastUserInfoCount = 0;
+
+		cl->demo.isBot = qtrue;
+		cl->netchan.remoteAddress.type = NA_BOT;
+
+		cl->lastPacketTime = svs.time;
+		cl->rate = 200000;
+		cl->snaps = 1000;
+
+		cl->multiview.protocol = MV_PROTOCOL_VERSION;
+		cl->isMultiviewRecorder = qtrue;
+		Q_strncpyz(cl->name,"mvRecorder",sizeof(cl->name));
+	}
+}
+
 #endif
 
 /*
@@ -367,9 +412,10 @@ void SV_Startup( void ) {
 #endif
 	SV_BoundSnapShotPacketEntitiesBackup( 1, 1 );
 
-	svs.clients = (struct client_s *)Z_Malloc (sizeof(client_t) * sv_maxclients->integer, TAG_CLIENTS, qtrue );
+	int maxClientCount = sv_maxclients->integer + GHOSTCLIENTS;
+	svs.clients = (struct client_s *)Z_Malloc (sizeof(client_t) * maxClientCount, TAG_CLIENTS, qtrue );
 	if ( com_dedicated->integer ) {
-		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = maxClientCount * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
 		svs.numSnapshotPSF = sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
 #endif
@@ -378,7 +424,7 @@ void SV_Startup( void ) {
 
 	} else {
 		// we don't need nearly as many when playing locally
-		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = maxClientCount * 4 * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
 		svs.numSnapshotPSF = sv_mvClients->integer * 4 * sv_maxclients->integer;
 #endif
@@ -387,9 +433,11 @@ void SV_Startup( void ) {
 #ifdef USE_MULTIVIEW
 	// reserve 2 additional frames for recorder slot
 	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+
+	SV_InitMultiviewFakeBot();
 #endif
 
-	for (int i = 0; i < MAX_CLIENTS; i++) {
+	for (int i = 0; i < MAX_CLIENTS+GHOSTCLIENTS; i++) {
 		userMessages[i].clear();
 		userStoredUcmdCounts[i] = 0;
 	}
@@ -429,6 +477,7 @@ void SV_ChangeMaxClients( void ) {
 		}
 	}
 	count++;
+	count += GHOSTCLIENTS;
 
 	oldMaxClients = sv_maxclients->integer;
 	oldPacketBackup = sv_snapShotPacketBackup->integer;
@@ -450,13 +499,23 @@ void SV_ChangeMaxClients( void ) {
 	oldClients = (struct client_s *)Hunk_AllocateTempMemory( count * sizeof(client_t) );
 	// copy the clients to hunk memory
 	for ( i = 0 ; i < count ; i++ ) {
-		if ( svs.clients[i].state >= CS_CONNECTED ) {
-			oldClients[i] = svs.clients[i];
+		int clNum = i;
+#ifdef USE_MULTIVIEW
+		if (GHOSTCLIENTS && i == count - 1) {
+			clNum = oldMaxClients;
+			userMessages[clNum].clear();
+			userStoredUcmdCounts[clNum] = 0;
+			SV_ClearClientDemoMeta(&svs.clients[clNum]);
+			SV_ClearClientDemoPreRecord(&svs.clients[clNum]);
+		}
+#endif
+		if ( svs.clients[clNum].state >= CS_CONNECTED ) {
+			oldClients[i] = svs.clients[clNum];
 		}
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
-			userMessages[i].clear();
-			userStoredUcmdCounts[i] = 0;
+			userMessages[clNum].clear();
+			userStoredUcmdCounts[clNum] = 0;
 		}
 	}
 
@@ -464,13 +523,20 @@ void SV_ChangeMaxClients( void ) {
 	Z_Free( svs.clients );
 
 	// allocate new clients
-	svs.clients = (struct client_s *)Z_Malloc ( sv_maxclients->integer * sizeof(client_t), TAG_CLIENTS, qtrue );
-	Com_Memset( svs.clients, 0, sv_maxclients->integer * sizeof(client_t) );
+	int maxClientCount = sv_maxclients->integer + GHOSTCLIENTS;
+	svs.clients = (struct client_s *)Z_Malloc ( maxClientCount * sizeof(client_t), TAG_CLIENTS, qtrue );
+	Com_Memset( svs.clients, 0, maxClientCount * sizeof(client_t) );
 
 	// copy the clients over
 	for ( i = 0 ; i < count ; i++ ) {
+		int clNum = i;
+#ifdef USE_MULTIVIEW
+		if (GHOSTCLIENTS && i == count - 1) {
+			clNum = sv_maxclients->integer;
+		}
+#endif
 		if ( oldClients[i].state >= CS_CONNECTED ) {
-			svs.clients[i] = oldClients[i];
+			svs.clients[clNum] = oldClients[i];
 		}
 	}
 
@@ -494,6 +560,8 @@ void SV_ChangeMaxClients( void ) {
 #ifdef USE_MULTIVIEW
 	// reserve 2 additional frames for recorder slot
 	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+
+	SV_InitMultiviewFakeBot();
 #endif
 }
 
@@ -543,7 +611,7 @@ void SV_SendMapChange(void)
 
 	if (svs.clients)
 	{
-		for (i=0 ; i<sv_maxclients->integer ; i++)
+		for (i=0 ; i<sv_maxclients->integer+GHOSTCLIENTS ; i++)
 		{
 			if (svs.clients[i].state >= CS_CONNECTED)
 			{
@@ -724,7 +792,7 @@ Ghoul2 Insert End
 	Cvar_Set( "nextmap", "map_restart 0");
 //	Cvar_Set( "nextmap", va("map %s", server) );
 
-	for (i = 0; i < sv_maxclients->integer; i++) {
+	for (i = 0; i < sv_maxclients->integer+GHOSTCLIENTS; i++) {
 		// save when the server started for each client already connected
 		if (svs.clients[i].state >= CS_CONNECTED) {
 			svs.clients[i].oldServerTime = sv.time;
@@ -732,7 +800,7 @@ Ghoul2 Insert End
 	}
 
 	// close all filehandles before FS_Restart
-	for (i = 0; i < sv_maxclients->integer; i++) {
+	for (i = 0; i < sv_maxclients->integer+GHOSTCLIENTS; i++) {
 		SV_CloseDownload( &svs.clients[i] );
 	}
 
@@ -851,14 +919,20 @@ Ghoul2 Insert End
 	// create a baseline for more efficient communications
 	SV_CreateBaseline ();
 
-	for (i=0 ; i<sv_maxclients->integer ; i++) {
+	for (i=0 ; i<sv_maxclients->integer+GHOSTCLIENTS ; i++) {
 		// send the new gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
 			const char	*denied;
 
 			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
 				if ( killBots ) {
+#ifdef USE_MULTIVIEW
+					if(!svs.clients[i].isMultiviewRecorder){
+#endif
 					SV_DropClient( &svs.clients[i], "" );
+#ifdef USE_MULTIVIEW
+					}
+#endif
 					continue;
 				}
 				isBot = qtrue;
@@ -868,7 +942,11 @@ Ghoul2 Insert End
 			}
 
 			// connect the client again
+#ifdef USE_MULTIVIEW
+			denied = svs.clients[i].isMultiviewRecorder ? NULL : (const char *)VM_ExplicitArgString( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
+#else
 			denied = (const char *)VM_ExplicitArgString( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
+#endif
 			if ( denied ) {
 				// this generally shouldn't happen, because the client
 				// was connected before the level change
@@ -885,15 +963,28 @@ Ghoul2 Insert End
 
 					client = &svs.clients[i];
 					client->state = CS_ACTIVE;
+
+#ifdef USE_MULTIVIEW
+					if(!client->isMultiviewRecorder){
+#endif
 					ent = SV_GentityNum( i );
 					ent->s.number = i;
 					client->gentity = ent;
+#ifdef USE_MULTIVIEW
+					}
+#endif
 
 					client->deltaMessage = -1;
 					client->deltaMessageWarning = 0;
 					client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
-
+#ifdef USE_MULTIVIEW
+					if (!client->isMultiviewRecorder) {
+#endif
 					VM_Call( gvm, GAME_CLIENT_BEGIN, i );
+#ifdef USE_MULTIVIEW
+					}
+#endif
+
 				}
 			}
 		}
@@ -955,7 +1046,7 @@ Ghoul2 Insert End
 	Hunk_SetMark();
 
 #ifdef SVDEMO
-	for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
+	for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer+GHOSTCLIENTS; client++) {
 		// bots will not request gamestate, so it must be manually sent
 		// cannot do this above where it says it will because mapname is not set at that time
 		if (client->netchan.remoteAddress.type == NA_BOT && client->demo.demorecording) {
@@ -1055,6 +1146,10 @@ void SV_Init (void) {
 	sv_mvClients = Cvar_Get("sv_mvClients", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	sv_mvPassword = Cvar_Get("sv_mvPassword", "", CVAR_ARCHIVE);
 	sv_mvNonDeltaInterval = Cvar_Get("sv_mvNonDeltaInterval", "60", CVAR_ARCHIVE);
+	sv_mvAutoRecord = Cvar_Get("sv_mvAutoRecord", "1", CVAR_ARCHIVE);
+	sv_mvAutoRecordSnaps = Cvar_Get("sv_mvAutoRecordSnaps", "1000", CVAR_ARCHIVE);
+	sv_mvAutoRecordMinActiveClients = Cvar_Get("sv_mvAutoRecordMinActiveClients", "1", CVAR_ARCHIVE);
+	sv_mvAutoRecordAfkStopDelay = Cvar_Get("sv_mvAutoRecordAfkStopDelay", "600", CVAR_ARCHIVE);
 #ifdef _DEBUG
 	sv_mvMaxVersion = Cvar_Get("sv_mvMaxVersion", QUOTEME(MV_PROTOCOL_VERSION), CVAR_TEMP);
 #else
@@ -1203,10 +1298,14 @@ void SV_FinalMessage( char *message ) {
 
 	// send it twice, ignoring rate
 	for ( j = 0 ; j < 2 ; j++ ) {
-		for (i=0, cl = svs.clients ; i < sv_maxclients->integer ; i++, cl++) {
+		for (i=0, cl = svs.clients ; i < sv_maxclients->integer+GHOSTCLIENTS ; i++, cl++) {
 			if (cl->state >= CS_CONNECTED) {
 				// don't send a disconnect to a local client
+#ifdef USE_MULTIVIEW
+				if ( cl->netchan.remoteAddress.type != NA_LOOPBACK && !cl->isMultiviewRecorder ) {
+#else
 				if ( cl->netchan.remoteAddress.type != NA_LOOPBACK ) {
+#endif
 					SV_SendServerCommand( cl, "print \"%s\n\"", message );
 					SV_SendServerCommand( cl, "disconnect" );
 				}

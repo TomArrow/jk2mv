@@ -27,7 +27,13 @@
 // 5 = deduplication of multiple playerstates with the same clientnum (spectators)
 //
 #define MV_PROTOCOL_VERSION	5 
+#define MV_AUTORECORD_CLIENT 31 // the default client used for recording serverside multiview demos. it's always fixed even if that client slot isn't actually used. this is so the reading client has a clc.clientnum he can rely on.
 
+#ifdef USE_MULTIVIEW
+#define GHOSTCLIENTS 1 // count of fake pseudo-clients that are slapped behind svs.clients[sv_maxclients->integer-1] for convenience. e.g. to record demos to.
+#else
+#define GHOSTCLIENTS 0
+#endif
 
 
 //=============================================================================
@@ -314,6 +320,8 @@ typedef struct client_s {
 	qboolean		nwhClient; // if sv_allowNWHClients 1, NWH clients may connect. They have hexcolors, so do some magic with that.
 	qboolean		nwhClientNotified; // send the user a quick message that this is not an nwh server
 
+	int64_t			lastSeenActive;
+
 #ifdef USE_MULTIVIEW
     struct {
         int				protocol;
@@ -333,6 +341,7 @@ typedef struct client_s {
         //qboolean		recorder;
 
     } multiview;
+	qboolean	isMultiviewRecorder; // is a post-maxclients ghost client specifically to record multiview demos to serverside
 #endif // USE_MV
 } client_t;
 
@@ -386,6 +395,9 @@ typedef struct {
 	//int			modSnapshotPSF;				// clamp value
 	psFrame_t	*snapshotPSF;				// [numSnapshotPS]
 	//qboolean	emptyFrame;					// true if no game logic run during SV_Frame()
+	int64_t		lastTimeActivePlayers;
+	qboolean	shouldMultiviewRecord;
+	int			multiviewActiveClient;
 #endif // USE_MV
 
 	struct {
@@ -433,7 +445,10 @@ extern	cvar_t	*sv_mvPassword;
 extern	cvar_t	*sv_mvMaxVersion;
 extern	cvar_t	*sv_mvNonDeltaInterval;
 //extern	cvar_t	*sv_demoFlags;
-//extern	cvar_t	*sv_autoRecord;
+extern	cvar_t	*sv_mvAutoRecord;
+extern	cvar_t	*sv_mvAutoRecordSnaps;
+extern	cvar_t	*sv_mvAutoRecordMinActiveClients;
+extern	cvar_t	*sv_mvAutoRecordAfkStopDelay;
 
 //extern	cvar_t	*sv_mvFileCount;
 //extern	cvar_t	*sv_mvFolderSize;
@@ -604,6 +619,9 @@ void SV_ClearAllDemoPreRecord();
 void SV_AutoRecordDemo(client_t* cl);
 void SV_StopAutoRecordDemos();
 void SV_BeginAutoRecordDemos();
+#ifdef USE_MULTIVIEW
+void SV_StopMVAutoRecordDemo();
+#endif
 
 //
 // sv_extensions.cpp
@@ -612,6 +630,7 @@ void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgT
 #ifdef USE_MULTIVIEW
 void SV_ProcessMultiviewPlayerEntityDedupe(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore);
 void SV_ProcessPlayerEntities(clientSnapshot_t* snap, clientSnapshot_t* oldSnap, qboolean restore);
+void SV_CheckMultiviewAutoRecord();
 #endif
 
 //
@@ -624,6 +643,7 @@ void SV_WriteFrameToClient (client_t *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend = qfalse, qboolean isSnapshot = qfalse, messageType_t msgType = MSG_ALL);
 void SV_SendClientMessages( void );
 void SV_SendClientSnapshot( client_t *client, qboolean dontSend=qfalse );
+int SV_FindActiveClient();
 
 //
 // sv_game.c
@@ -724,8 +744,8 @@ void SV_Netchan_Transmit( client_t *client, msg_t *msg, qboolean fakeSend = qfal
 void SV_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
 
-extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS];
-extern int userStoredUcmdCounts[MAX_CLIENTS];
+extern std::vector<std::unique_ptr<userMessage_t>> userMessages[MAX_CLIENTS + GHOSTCLIENTS];
+extern int userStoredUcmdCounts[MAX_CLIENTS + GHOSTCLIENTS];
 
 
 #endif // SERVER_H_INC

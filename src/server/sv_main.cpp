@@ -34,7 +34,10 @@ cvar_t	*sv_mvPassword;
 cvar_t	*sv_mvMaxVersion;
 cvar_t	*sv_mvNonDeltaInterval;
 //cvar_t	*sv_demoFlags;
-//cvar_t	*sv_autoRecord;
+cvar_t	*sv_mvAutoRecord;
+cvar_t	*sv_mvAutoRecordSnaps;
+cvar_t	*sv_mvAutoRecordMinActiveClients;
+cvar_t	*sv_mvAutoRecordAfkStopDelay;
 
 //cvar_t	*sv_mvFileCount;
 //cvar_t	*sv_mvFolderSize;
@@ -216,6 +219,7 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 //		return;
 //	}
 
+
 	client->reliableSequence++;
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
@@ -244,6 +248,7 @@ the client game module: "cp", "print", "chat", etc
 A NULL client will broadcast to all clients
 =================
 */
+#define EC		"\x19"
 void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *fmt, ...) {
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
@@ -262,6 +267,17 @@ void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *f
 
 	if ( cl != NULL ) {
 		SV_AddServerCommand( cl, (char *)message );
+#ifdef USE_MULTIVIEW
+		if (svs.multiviewActiveClient == (cl-svs.clients)) {
+			// conservative way to get public chats into multiview while avoiding private chats for privacy
+			client_t* recorder = svs.clients + sv_maxclients->integer;
+			if (recorder->isMultiviewRecorder && recorder->demo.demorecording && !Q_stricmpn((char*)message, "chat ", 5) && !Q_stristr((char*)message, EC "]" EC)) {
+
+				Com_DPrintf("^3forwarding public chat to multiview: %s\n",(char*)message);
+				SV_AddServerCommand(recorder, (char*)message);
+			}
+		}
+#endif
 		return;
 	}
 
@@ -271,7 +287,7 @@ void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *f
 	}
 
 	// send the data to all relevent clients
-	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
+	for (j = 0, client = svs.clients; j < sv_maxclients->integer + GHOSTCLIENTS ; j++, client++) {
 		if ( client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified) ) {
 			continue;
 		}
@@ -318,6 +334,7 @@ void QDECL SV_SendServerCommandIncludingFollowers(client_t* cl, PRINTF_FORMAT_ST
 				continue;
 			}
 			ps = SV_GameClientNum(j);
+			// TODO DM_15 COMPATIBILITY
 			if ((ps->pm_flags & PMF_FOLLOW) && ps->clientNum == (cl-svs.clients)) {
 				SV_AddServerCommand(client, (char*)message);
 			}
@@ -331,7 +348,7 @@ void QDECL SV_SendServerCommandIncludingFollowers(client_t* cl, PRINTF_FORMAT_ST
 	}
 
 	// send the data to all relevent clients
-	for (j = 0, client = svs.clients; j < sv_maxclients->integer; j++, client++) {
+	for (j = 0, client = svs.clients; j < sv_maxclients->integer + GHOSTCLIENTS; j++, client++) {
 		if (client->state < CS_PRIMED && !(client->state == CS_ZOMBIE && client->zombified)) {
 			continue;
 		}
@@ -593,6 +610,7 @@ void SVC_Status( netadr_t from ) {
 		cl = &svs.clients[i];
 		if ( cl->state >= CS_CONNECTED ) {
 			ps = SV_GameClientNum( i );
+			// TODO DM_15 COMPATIBILITY
 			Com_sprintf (player, sizeof(player), "%i %i \"%s\"\n",
 				ps->persistant[PERS_SCORE], cl->ping, cl->name);
 			playerLength = strlen(player);
@@ -1286,6 +1304,7 @@ void SV_CalcPings( void ) {
 
 		// let the game dll know about the ping
 		ps = SV_GameClientNum( i );
+		// TODO DM_15 COMPATIBILITY
 		ps->ping = cl->ping;
 	}
 }
@@ -1449,7 +1468,7 @@ void SV_CheckCvars(void) {
 		lastModSnapsMax = sv_maxSnaps->modificationCount;
 		lastModEnforceSnaps = sv_enforceSnaps->modificationCount;
 
-		for (i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++) {
+		for (i = 0, cl = svs.clients; i < sv_maxclients->integer + GHOSTCLIENTS; i++, cl++) {
 			if ( cl->state >= CS_CONNECTED ) {
 				SV_ClientUpdateSnaps( cl );
 			}
@@ -1489,6 +1508,7 @@ static void MV_FixSaberStealing( void )
 
 		for ( i = 0; i < sv_maxclients->integer; i++ ) {
 			ps = SV_GameClientNum( i );
+			// TODO DM_15 COMPATIBILITY
 
 			if ( ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 				ps->saberEntityNum = ENTITYNUM_NONE;
@@ -1506,6 +1526,7 @@ static void SV_UpdateFollowers() {
 		if (svs.clients[i].state == CS_ACTIVE) {
 
 			ps = SV_GameClientNum(i);
+			// TODO DM_15 COMPATIBILITY
 
 			if ((ps->pm_flags & PMF_FOLLOW) && ps->clientNum != i && svs.clients[ps->clientNum].state == CS_ACTIVE) {
 				int		clientNum, flags;
@@ -1513,6 +1534,7 @@ static void SV_UpdateFollowers() {
 
 				// this guy is a spectator, update him
 				psOther = SV_GameClientNum(ps->clientNum);
+				// TODO DM_15 COMPATIBILITY
 				flags = (psOther->eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ps->eFlags & (EF_VOTED | EF_TEAMVOTED));
 				savedPing = ps->ping;
 				*ps = *psOther;
@@ -1792,6 +1814,10 @@ void SV_Frame( int msec ) {
 	SV_CheckTimeouts();
 
 	svs.snapshotFrame++;
+
+#ifdef USE_MULTIVIEW
+	SV_CheckMultiviewAutoRecord();
+#endif
 
 	// send messages back to the clients
 	SV_SendClientMessages();

@@ -119,6 +119,88 @@ qboolean SV_CommitExtensionMessage(msg_t* msg, msg_t* extensionMessage, int svc,
 
 
 #ifdef USE_MULTIVIEW
+
+
+
+
+void SV_CheckMultiviewAutoRecord() {
+	playerState_t* ps;
+	client_t* cl;
+	int ingame = 0;
+	int ingameNonAfk = 0;
+	int activeClients = 0;
+	int spectators = 0;
+	int i;
+	client_t* recorderClient;
+
+	if (!svs.clients) {
+		return;
+	}
+
+	svs.multiviewActiveClient = SV_FindActiveClient();
+
+	recorderClient = svs.clients + sv_maxclients->integer;
+	if (!recorderClient->isMultiviewRecorder || !GHOSTCLIENTS) {
+		return;
+	}
+
+	for (i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++) {
+
+		if (cl->state != CS_ACTIVE || cl->gentity == NULL)
+			continue;
+
+		if (cl->gentity->r.svFlags & SVF_BOT) {
+			continue;
+		}
+
+		activeClients++;
+
+		ps = SV_GameClientNum(cl - svs.clients);
+
+		if (ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || ps->clientNum != i && (ps->pm_flags & PMF_FOLLOW)) {
+			spectators++;
+		}
+		else {
+			ingame++;
+			if (svs.time - cl->lastSeenActive < 10000) {
+				ingameNonAfk++;
+			}
+		}
+
+	}
+
+	if (ingameNonAfk >= sv_mvAutoRecordMinActiveClients->integer) {
+		svs.lastTimeActivePlayers = svs.time;
+		if (recorderClient->snaps != sv_mvAutoRecordSnaps->integer) {
+			recorderClient->snaps = sv_mvAutoRecordSnaps->integer;
+			Com_DPrintf("^3Changing multiview recorder snaps to %d\n", recorderClient->snaps);
+			SV_ClientUpdateSnaps(recorderClient);
+		}
+		svs.shouldMultiviewRecord = qtrue;
+	}
+	else {
+		int64_t timeSinceAnyActive = svs.time - svs.lastTimeActivePlayers;
+		if (sv_mvAutoRecordAfkStopDelay->integer && timeSinceAnyActive > clampedIntMult(sv_mvAutoRecordAfkStopDelay->integer,1000)) { // after 5 minutes just stop recording
+			svs.shouldMultiviewRecord = qfalse;
+			SV_StopMVAutoRecordDemo();
+		}
+		if (timeSinceAnyActive > 20000) {
+			if (recorderClient->snaps != 1) {
+				recorderClient->snaps = 1;
+				Com_DPrintf("^3Changing multiview recorder snaps to %d\n", recorderClient->snaps);
+				SV_ClientUpdateSnaps(recorderClient);
+			}
+		}
+	}
+
+}
+
+
+
+
+
+
+
 int SV_GetPSEventMatch(playerState_t* ps,entityState_t* es, qboolean mainPlayer) {
 	// we know that es->eType has data above 8 bits (the sequence masky thingy) but the netfield is 8 bits only so it gets stripped away.
 	// so when restoring on the client, we need to & 8 on the eType field.
@@ -556,7 +638,7 @@ static qboolean SV_EmitPlayerStates( client_t* client, const clientSnapshot_t *f
     psFrame_t *psf;
     const psFrame_t *old_psf;
     const playerState_t *oldPs;
-	int baseClientID = client - svs.clients;
+	int baseClientID = client->isMultiviewRecorder ? MV_AUTORECORD_CLIENT : client - svs.clients;
 	const playerState_t* nullPs = to->version >= 4 ? MSG_GetBaselinePS(sv_gametype->integer,MV_GetCurrentGameversion()) : NULL;
 	const playerState_t* playerStateClientnumFroms[MAX_CLIENTS] = { 0 }; // if multiple people have the same ps clientnum, we can check a spectator relationship. so just delta from the old one if it looks similar enough
 

@@ -329,7 +329,7 @@ static void SV_MapRestart_f( void ) {
 	// if a map_restart occurs while a client is changing maps, we need
 	// to give them the correct time so that when they finish loading
 	// they don't violate the backwards time check in cl_cgame.c
-	for (i=0 ; i<sv_maxclients->integer ; i++) {
+	for (i=0 ; i<sv_maxclients->integer+ GHOSTCLIENTS; i++) {
 		if (svs.clients[i].state == CS_PRIMED) {
 			svs.clients[i].oldServerTime = sv.restartTime;
 		}
@@ -354,7 +354,7 @@ static void SV_MapRestart_f( void ) {
 	sv.restarting = qfalse;
 
 	// connect and begin all the clients
-	for (i=0 ; i<sv_maxclients->integer ; i++) {
+	for (i=0 ; i<sv_maxclients->integer + GHOSTCLIENTS; i++) {
 		client = &svs.clients[i];
 
 		// send the new gamestate to all connected clients
@@ -370,6 +370,10 @@ static void SV_MapRestart_f( void ) {
 
 		// add the map_restart command
 		SV_AddServerCommand( client, "map_restart\n" );
+		
+#ifdef USE_MULTIVIEW
+		if(!client->isMultiviewRecorder){
+#endif
 
 		// connect the client again, without the firstTime flag
 		denied = (const char *)VM_ExplicitArgString( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
@@ -380,6 +384,11 @@ static void SV_MapRestart_f( void ) {
 			Com_Printf( "SV_MapRestart_f(%d): dropped client %i - denied!\n", delay, i ); // bk010125
 			continue;
 		}
+
+
+#ifdef USE_MULTIVIEW
+		}
+#endif
 
 		client->state = CS_ACTIVE;
 
@@ -1066,14 +1075,29 @@ void SV_ClearClientDemoPreRecord(client_t* cl) {
 void SV_ClearAllDemoPreRecord() {
 
 	if (svs.clients) {
-		for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
+		for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer+GHOSTCLIENTS; client++) {
 			SV_ClearClientDemoPreRecord(client);
 		}
 	}
 }
 
+#ifdef USE_MULTIVIEW
+void SV_StopMVAutoRecordDemo() {
+	if (svs.clients && GHOSTCLIENTS) {
+		client_t* client = svs.clients + sv_maxclients->integer;
+		if (client->isMultiviewRecorder && client->demo.demorecording) {
+			Com_DPrintf("^3Stopping multiview recorder.\n");
+			SV_StopRecordDemo(client, &client->demo, qfalse);
+		}
+	}
+}
+#endif
+
 // stops all recording demos
 void SV_StopAutoRecordDemos() {
+#ifdef USE_MULTIVIEW
+	SV_StopMVAutoRecordDemo();
+#endif
 	if (svs.clients && sv_autoDemo->integer) {
 		for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer; client++) {
 			if (client->demo.demorecording) {
@@ -1158,7 +1182,7 @@ list demos being recorded
 void SV_ListRecording_f(void) {
 	int i;
 	Com_Printf("Demos currently being recorded:\n");
-	for (i = 0; i < sv_maxclients->integer; i++) {
+	for (i = 0; i < sv_maxclients->integer+GHOSTCLIENTS; i++) {
 		if (svs.clients[i].demo.demorecording) {
 			Com_Printf("Client %i (%s)\n", i, svs.clients[i].demo.demoName);
 		}
@@ -1462,7 +1486,7 @@ void SV_AutoRecordDemo(client_t* cl) {
 	for (char** start = demoNames; start - demoNames < (ptrdiff_t)ARRAY_LEN(demoNames); start++) {
 		Q_strstrip(*start, "\n\r;:.?*<>|\\/\"", NULL);
 	}
-	Com_sprintf(demoName, sizeof(demoName), "autorecord/%s/%s/%s", folderTreeDate, demoFolderName, demoFileName);
+	Com_sprintf(demoName, sizeof(demoName), "%s/%s/%s/%s", cl->isMultiviewRecorder ? "autorecord_mv" : "autorecord", folderTreeDate, demoFolderName, demoFileName);
 	SV_RecordDemo(cl, demoName, qfalse, qfalse, UINT_MAX);
 }
 
@@ -1547,6 +1571,15 @@ static int SV_FindLeafFolders(const char* baseFolder, char* result, int maxResul
 
 // starts demo recording on all active clients
 void SV_BeginAutoRecordDemos() {
+#ifdef USE_MULTIVIEW
+	if (sv_mvAutoRecord->integer && GHOSTCLIENTS && svs.shouldMultiviewRecord) {
+		client_t* client = svs.clients + sv_maxclients->integer; // this is not a mistake. we have an extra ghost client slot attached there that we can do multiview recordings with
+		if (client->isMultiviewRecorder && client->state == CS_ACTIVE && !client->demo.demorecording && client->netchan.remoteAddress.type == NA_BOT) {
+			Com_DPrintf("^3Starting multiview recorder.\n");
+			SV_AutoRecordDemo(client);
+		}
+	}
+#endif
 	if (sv_autoDemo->integer) {
 		if (sv_autoDemo->integer == 2) { //Record a bot in spec named "RECORDER" only (to be used with cvar that networks spectators all player info)
 			qboolean humans = qfalse;
@@ -1809,7 +1842,7 @@ static void SV_DemoClearPreRecord_f(void) {
 	}
 
 	int clIndex = atoi(Cmd_Argv(1));
-	if (clIndex < 0 || clIndex >= sv_maxclients->integer) {
+	if (clIndex < 0 || clIndex >= sv_maxclients->integer+GHOSTCLIENTS) {
 		Com_Printf("Unknown client number %d.\n", clIndex);
 		return;
 	}
