@@ -567,19 +567,19 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 			}
 		}
 
-		if (snap->multiview.version >= 5) {
-			if (!playerStateClientnumFroms[state->ps.clientNum] || !(playerStateClientnumFroms[state->ps.clientNum]->pm_flags & PMF_FOLLOW)) {
-				// prefer to remember one with PMF_FOLLOW to delta from, since a player can have many spectators and then we don't have to transmit the different pm_flags
-				playerStateClientnumFroms[state->ps.clientNum] = &state->ps;
-			}
-		}
-
 		if (netMask) {
 			FINDMATCH(ent, number, cl.parseEntities, snap->parseEntitiesNum, entIndex, MAX_PARSE_ENTITIES, snap->numEntities, entReal);
 			if (!entReal) {
 				Com_Error(ERR_DROP,"CL_ParsePlayerstates: playerstate with netmask received, but no matching entity found");
 			}
 			CL_RestorePlayerStateFromEntityState(msg,&state->ps, entReal, state->dedupeSuccessMask);
+		}
+
+		if (snap->multiview.version >= 5) {
+			if (!playerStateClientnumFroms[state->ps.clientNum] || !(playerStateClientnumFroms[state->ps.clientNum]->pm_flags & PMF_FOLLOW)) {
+				// prefer to remember one with PMF_FOLLOW to delta from, since a player can have many spectators and then we don't have to transmit the different pm_flags
+				playerStateClientnumFroms[state->ps.clientNum] = &state->ps;
+			}
 		}
 
 		// we got a spectator's pov but didnt get updated pm_flags
