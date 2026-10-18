@@ -1346,7 +1346,15 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 			}
 
 			// Now put the current messsage in the buffer.
-			if (client->netchan.remoteAddress.type != NA_BOT || sv_demoPreRecordBots->integer) {
+			if ((client->netchan.remoteAddress.type != NA_BOT || sv_demoPreRecordBots->integer 
+#ifdef USE_MULTIVIEW
+				|| client->isMultiviewRecorder
+#endif
+				)
+#ifdef USE_MULTIVIEW
+				&& (!client->isMultiviewRecorder || sv_mvAutoRecord->integer)
+#endif
+				) {
 				std::unique_ptr<bufferedMessageContainer_t> bmtPtr(new bufferedMessageContainer_t(msg));
 				bufferedMessageContainer_t* bmt = bmtPtr.get();
 				//static bufferedMessageContainer_t bmt; // I make these static so they don't sit on the stack.
@@ -1368,7 +1376,15 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 		}
 
 		// Check for whether a new keyframe must be written in pre recording, and if so, do it.
-		if (sv_demoPreRecord->integer && (client->netchan.remoteAddress.type != NA_BOT || sv_demoPreRecordBots->integer)) {
+		if (sv_demoPreRecord->integer && (client->netchan.remoteAddress.type != NA_BOT || sv_demoPreRecordBots->integer
+#ifdef USE_MULTIVIEW
+			|| client->isMultiviewRecorder
+#endif
+			)
+#ifdef USE_MULTIVIEW
+			&& (!client->isMultiviewRecorder || sv_mvAutoRecord->integer )
+#endif
+			) {
 			//if (client->demo.preRecord.lastKeyframeTime + (1000 * sv_demoPreRecordKeyframeDistance->integer) < sv.time) {
 			if (client->demo.preRecord.lastKeyframeTime + (1000 * sv_demoPreRecordKeyframeDistance->integer) < sv.time || client->demo.preRecord.lastKeyframeTime > sv.time) { // See if it's time for a new keyframe, or if the last keyframe was made before a serverTime restart.
 				// Save a keyframe.
@@ -1435,6 +1451,11 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 	if (client->demo.isBot) {
 		client->netchan.outgoingSequence++;
 		client->demo.botReliableAcknowledge = client->reliableSent;
+#ifdef USE_MULTIVIEW
+		if (client->isMultiviewRecorder) {
+			client->reliableAcknowledge = client->reliableSent; // avoid server command overflow?
+		}
+#endif
 #ifdef USE_MULTIVIEW
 		if (client->isMultiviewRecorder) { // we do wanna be able to control the snaps for the multiview demos
 			//  // normal rate / snapshotMsec calculation

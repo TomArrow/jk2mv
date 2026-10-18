@@ -382,6 +382,16 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		return;		// already dropped
 	}
 
+#ifdef USE_MULTIVIEW
+	if (drop->isMultiviewRecorder) {
+		Com_Printf("^1ERROR. THIS SHOULD NEVER HAPPEN. Reiniting multiview recorder fake-client due to DropClient call: %s.\n",reason);
+		SV_InitMultiviewFakeBot(qtrue); // stop possible demo recording and clear the client and reinit it.
+		return;
+	}
+#endif
+
+	// TODO Should we be ending demo recording here? hm. I guess defo not for the zombified ones but eh. Idk.
+
 	if (com_developer->integer) {
 		Com_Printf("Dropping client with userinfo: %s\n",drop->userinfo);
 	}

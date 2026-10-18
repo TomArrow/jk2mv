@@ -219,6 +219,13 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 //		return;
 //	}
 
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder && !sv_mvAutoRecord->integer) {
+		// he doesn't need this and we don't wanna contribute to a potential server command overflow (?), although there should be some safeguards now.
+		return;
+	}
+#endif
+
 
 	client->reliableSequence++;
 	// if we would be losing an old command that hasn't been acknowledged,
@@ -231,7 +238,17 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
 		Com_Printf( "cmd %5d: %s\n", i, cmd );
+#ifdef USE_MULTIVIEW
+		if (client->isMultiviewRecorder) {
+			Com_Printf("^1Reiniting multiview recorder fake-client due to server command overflow.\n");
+			SV_InitMultiviewFakeBot(qtrue); // stop possible demo recording and clear the client and reinit it.
+		}
+		else {
+#endif
 		SV_DropClient( client, "Server command overflow" );
+#ifdef USE_MULTIVIEW
+		}
+#endif
 		return;
 	}
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );

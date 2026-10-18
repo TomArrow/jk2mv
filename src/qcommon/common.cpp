@@ -2965,6 +2965,43 @@ void Com_Init( char *commandLine ) {
 	Com_Printf ("--- Common Initialization Complete ---\n");
 }
 
+
+
+
+int CountByteDifferences(byte* a, byte*b, int length) {
+
+	int sixtyfours = length / 8;
+	int matches = 0;
+	uint64_t* a64 = (uint64_t*)a;
+	uint64_t* b64 = (uint64_t*)b;
+	for (int i = 0; i < sixtyfours; i++, a64++, b64++) {
+		if (*a64 == *b64) {
+			matches += 8;
+		}
+		else {
+			a = (byte*)a64;
+			b = (byte*)b64;
+			for (int j = 0; j < 8; j++,a++,b++) {
+				matches += (*a == *b);
+			}
+		}
+	}
+
+	a = (byte*)a64;
+	b = (byte*)b64;
+
+	int remainder = length % 8;
+	for (int i = 0; i < remainder; i++, a++, b++) {
+		matches += (*a == *b);
+	}
+
+	return length - matches;
+}
+
+
+
+
+
 //==================================================================
 
 void Com_WriteConfigToFile(const char *localfile, const char *globalfile) {

@@ -248,6 +248,15 @@ void SV_CreateBaseline( void ) {
 		// take current state as baseline
 		//
 		sv.svEntities[entnum].baseline = svent->s;
+
+#if _DEBUG
+		static entityState_t nullState = { 0 };
+		nullState.number = svent->s.number;
+		int zerodiffs = CountByteDifferences((byte*)&nullState, (byte*)&svent->s, sizeof(entityState_t));
+		if (zerodiffs <= 4) {
+			Com_DPrintf("^3Entity %d baseline is all zeros\n", entnum);
+		}
+#endif
 	}
 }
 
@@ -346,13 +355,22 @@ void SV_ResetClientMultiview( void ) {
 	}
 }
 
-void SV_InitMultiviewFakeBot( void ) {
+void SV_InitMultiviewFakeBot( qboolean pseudoReconnect ) {
 
 	int clientNum = sv_maxclients->integer;
 	client_t* cl = svs.clients + clientNum;
 
 	SV_ClearClientDemoPreRecord(cl);
 	SV_ClearClientDemoMeta(cl);
+
+	if (pseudoReconnect) { // maybe we encountered some error condition. do an "as if" reconnect
+		// Kill any download
+		SV_CloseDownload(cl);
+		if (cl->demo.demorecording) {
+			SV_StopMVAutoRecordDemo();
+		}
+		Com_Memset(cl, 0, sizeof(*cl));
+	}
 
 	if (cl->isMultiviewRecorder) {
 		// was already inited. but might have changed client slot.
@@ -434,7 +452,7 @@ void SV_Startup( void ) {
 	// reserve 2 additional frames for recorder slot
 	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
 
-	SV_InitMultiviewFakeBot();
+	SV_InitMultiviewFakeBot(qfalse);
 #endif
 
 	for (int i = 0; i < MAX_CLIENTS+GHOSTCLIENTS; i++) {
@@ -561,7 +579,7 @@ void SV_ChangeMaxClients( void ) {
 	// reserve 2 additional frames for recorder slot
 	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
 
-	SV_InitMultiviewFakeBot();
+	SV_InitMultiviewFakeBot(qfalse);
 #endif
 }
 
