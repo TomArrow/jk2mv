@@ -517,6 +517,7 @@ extern	cvar_t* sv_crossServerCommandIdent;
 extern	cvar_t* sv_specAllEnts;
 
 extern	cvar_t* sv_allowNWHClients;
+extern	cvar_t* sv_allowNWHClientsShortPrefix;
 
 extern	cvar_t* sv_autoRecover;
 extern	cvar_t* sv_autoRecoverWait;

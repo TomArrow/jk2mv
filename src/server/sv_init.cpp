@@ -1164,7 +1164,7 @@ void SV_Init (void) {
 	sv_mvClients = Cvar_Get("sv_mvClients", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	sv_mvPassword = Cvar_Get("sv_mvPassword", "", CVAR_ARCHIVE);
 	sv_mvNonDeltaInterval = Cvar_Get("sv_mvNonDeltaInterval", "60", CVAR_ARCHIVE);
-	sv_mvAutoRecord = Cvar_Get("sv_mvAutoRecord", "1", CVAR_ARCHIVE);
+	sv_mvAutoRecord = Cvar_Get("sv_mvAutoRecord", "0", CVAR_ARCHIVE);
 	sv_mvAutoRecordSnaps = Cvar_Get("sv_mvAutoRecordSnaps", "1000", CVAR_ARCHIVE);
 	sv_mvAutoRecordMinActiveClients = Cvar_Get("sv_mvAutoRecordMinActiveClients", "1", CVAR_ARCHIVE);
 	sv_mvAutoRecordAfkStopDelay = Cvar_Get("sv_mvAutoRecordAfkStopDelay", "600", CVAR_ARCHIVE);
@@ -1266,6 +1266,7 @@ void SV_Init (void) {
 
 	sv_specAllEnts = Cvar_Get("sv_specAllEnts", "1", CVAR_ARCHIVE | CVAR_SERVERINFO); // Send all entities to spectators
 	sv_allowNWHClients = Cvar_Get("sv_allowNWHClients", "0", CVAR_ARCHIVE); // Allow nwh clients to connect, its just a server flag
+	sv_allowNWHClientsShortPrefix = Cvar_Get("sv_allowNWHClientsShortPrefix", "1", CVAR_ARCHIVE); // Allow nwh clients to connect, its just a server flag
 	sv_autoRecover = Cvar_Get("sv_autoRecover", "0", CVAR_ARCHIVE); // Auto restart the server on an error
 	sv_autoRecoverWait = Cvar_Get("sv_autoRecoverWait", "200", CVAR_ARCHIVE); // Adds a wait command with this value before reloading a map
 	sv_autoRecoverMap = Cvar_Get("sv_autoRecoverMap", "ffa_bespin", CVAR_ARCHIVE); // Which map to recover to

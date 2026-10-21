@@ -104,6 +104,7 @@ cvar_t* sv_crossServerCommandIdent;
 cvar_t* sv_specAllEnts;
 
 cvar_t* sv_allowNWHClients;
+cvar_t* sv_allowNWHClientsShortPrefix;
 
 cvar_t* sv_autoRecover;
 cvar_t* sv_autoRecoverWait;
@@ -617,7 +618,12 @@ void SVC_Status( netadr_t from ) {
 		// allow nwh clients to connect, no hacking involved :)
 		// prefix the nwh-specific hostname with [not nwh] as well to not mislead people
 		Info_SetValueForKey(infostring, "nwh", "1");
-		Info_SetValueForKey(infostring, "sv_hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+		if (sv_allowNWHClientsShortPrefix->integer) {
+			Info_SetValueForKey(infostring, "sv_hostnamenwh", va("[nonwh] %s", sv_hostname->string));
+		}
+		else {
+			Info_SetValueForKey(infostring, "sv_hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+		}
 	}
 
 	status[0] = 0;
@@ -679,7 +685,12 @@ void SVC_Info( netadr_t from ) {
 		// allow nwh clients to connect, no hacking involved :)
 		// prefix the nwh-specific hostname with [not nwh] as well to not mislead people
 		Info_SetValueForKey(infostring, "nwh", "1");
-		Info_SetValueForKey(infostring, "hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+		if (sv_allowNWHClientsShortPrefix->integer) {
+			Info_SetValueForKey(infostring, "hostnamenwh", va("[nonwh] %s", sv_hostname->string));
+		}
+		else {
+			Info_SetValueForKey(infostring, "hostnamenwh", va("^y9999[not nwh]^7 %s", sv_hostname->string));
+		}
 	}
 
 	Info_SetValueForKey( infostring, "protocol", va("%i", MV_GetCurrentProtocol()) );
