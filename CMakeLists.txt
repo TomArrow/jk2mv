@@ -298,6 +298,10 @@ elseif ((${CMAKE_C_COMPILER_ID} STREQUAL GNU) OR (${CMAKE_C_COMPILER_ID} MATCHES
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
 	endif()
 	
+	# let us compile on newer ubuntu/gcc/g++ without being forced to include stdint.h in a shitton of files
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include stdint.h")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include stdint.h")
+	
 	if(WITH_ANALYSIS)
 		# C++ not supported by this rn according to https://gcc.gnu.org/onlinedocs/gcc/Static-Analyzer-Options.html
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fanalyzer")
