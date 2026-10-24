@@ -700,21 +700,22 @@ jobs:
     - name: Create Build Environment
       run: |
         podman pull docker.io/${{ matrix.container_image }}
-        podman run --name buildenv -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
+        podman run --name buildenv --security-opt seccomp=unconfined -v ${{github.workspace}}:/jk2mv -td docker.io/${{ matrix.container_image }} /bin/bash
         podman exec buildenv apt-get update
-        PACKAGES="git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev cmake file"
+        PACKAGES="git zip wget libfuse2 build-essential libsdl2-dev libgl1-mesa-dev libopenal-dev libjpeg-dev libpng-dev file"
         if [[ "${{ matrix.container_image }}" != i386* ]]; then
           PACKAGES="$PACKAGES libminizip-dev rpm"
         fi
         podman exec buildenv bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $PACKAGES"
         mkdir -p ${{github.workspace}}/build/actions
 
-    
-    - name: Downgrade CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.31.6'
-        
+    - name: Downgrade Cmake
+      run: |
+        podman exec buildenv bash -c "DEBIAN_FRONTEND=noninteractive apt-get remove -y cmake"
+        podman exec buildenv bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential libssl-dev"
+        podman exec buildenv bash -c "mkdir -p /tmp/cmakedown && cd /tmp/cmakedown && wget https://github.com/Kitware/CMake/releases/download/v3.31.12/cmake-3.31.12.tar.gz && tar -xzf cmake-3.31.12.tar.gz && cd cmake-3.31.12 && ./bootstrap && make -j$(nproc) && make install && cd .."
+        podman exec buildenv bash -c "cmake --version"
+
     - name: Configure CMake
       shell: bash
       run: podman exec -w /jk2mv/build/actions buildenv cmake -G "Unix Makefiles" ${{ steps.parameters.outputs.OPTIONS }} -DWITH_ANALYSIS=ON -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} /jk2mv
