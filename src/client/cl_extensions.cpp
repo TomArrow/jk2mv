@@ -977,6 +977,28 @@ static void CL_ParseMultiview(msg_t* msg, int bits, int startbits) {
 	cl.snapshots[snap->messageNum & PACKET_MASK] = *snap;
 
 }
+
+#define MULTIVIEWCOMMANDRECIPIENTS_VERSION 0
+static void CL_ParseMultiviewCommandRecipients(msg_t* msg, int bits, int startbits) {
+	
+	int version = MSG_ReadByte(msg);
+	if (version != MULTIVIEWCOMMANDRECIPIENTS_VERSION) {
+		SHOWNET(msg, "Found unsupported multiview command recipients version. Skipping rest.\n");
+		MSG_SkipBits(msg, (bits - (msg->bit - startbits)));
+		return;
+	}
+	while (MSG_ReadBits(msg, 1)) {
+		int seq = MSG_ReadLong(msg);
+		int recipients = MSG_ReadLong(msg);
+		if (clc.serverCommandSequence < seq) {
+			Com_Printf("CL_ParseMultiviewCommandRecipients: Receiving recipients for serverCommand that wasn't received yet.");
+			continue;
+		}
+		int index = seq & (MAX_RELIABLE_COMMANDS - 1);
+		clc.serverCommandRecipients[index] = recipients;
+	}
+}
+
 #endif
 
 static void CL_ParseTommyTernalNamespaceExtensions(msg_t* msg, int cmd, int bits, qboolean parsedSnapshot) {
@@ -996,6 +1018,10 @@ static void CL_ParseTommyTernalNamespaceExtensions(msg_t* msg, int cmd, int bits
 			SHOWNET(msg, "Found svc_coolMultiview. Trying to parse.");
 			CL_ParseMultiview(msg,bits,msg->bit);
 		}
+		break;
+	case svc_coolMultiviewCommandRecipients:
+		SHOWNET(msg, "Found svc_coolMultiviewCommandRecipients. Trying to parse.");
+		CL_ParseMultiviewCommandRecipients(msg, bits, msg->bit);
 		break;
 #endif
 	default:

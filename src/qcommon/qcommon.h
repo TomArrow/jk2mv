@@ -535,6 +535,7 @@ enum svc_ops_e {
 	svc_coolNameSpace = 20, // change namespace for adding custom non-tommyternal extensions
 	svc_coolPadding, // this is just debug padding
 	svc_coolMultiview, // multiview data
+	svc_coolMultiviewCommandRecipients, // tell the client who should see which servercommands
 };
 
 

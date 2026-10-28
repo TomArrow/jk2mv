@@ -250,6 +250,10 @@ typedef struct client_s {
 	char			userinfoPostponed[MAX_INFO_STRING];
 
 	char			reliableCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
+#ifdef USE_MULTIVIEW
+	int				reliableCommandRecipients[MAX_RELIABLE_COMMANDS]; // for the multiview recorder fake client. we collect commands intended for various players, and then remember via extension in the netcode which command is for who. this is a bitmask of players receiving this.
+	int				reliableCommandHashes[MAX_RELIABLE_COMMANDS]; // also for the multiview recorder. to quickly compare whether a command was already recorded, we check the hash.
+#endif
 	int				reliableSequence;		// last added reliable message, not necesarily sent or acknowledged yet
 	int				reliableAcknowledge;	// last acknowledged reliable message
 	int				reliableSent;			// last sent reliable message, not necesarily acknowledged yet
@@ -639,7 +643,7 @@ void SV_CheckMultiviewAutoRecord();
 //
 // sv_snapshot.c
 //
-void SV_AddServerCommand( client_t *client, const char *cmd );
+void SV_AddServerCommand( client_t *client, const char *cmd, client_t *originalClient = NULL );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, messageType_t msgType);
 qboolean SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg, qboolean allowPartial, messageType_t msgType);
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);

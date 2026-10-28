@@ -786,6 +786,9 @@ qboolean CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
 	static char bigConfigString[BIG_INFO_STRING];
+#ifdef USE_MULTIVIEW
+	int recipients;
+#endif
 
 	// if we have irretrievably lost a reliable command, drop the connection
 	if ( serverCommandNumber <= clc.serverCommandSequence - MAX_RELIABLE_COMMANDS ) {
@@ -804,6 +807,14 @@ qboolean CL_GetServerCommand( int serverCommandNumber ) {
 
 	s = clc.serverCommands[ serverCommandNumber & ( MAX_RELIABLE_COMMANDS - 1 ) ];
 	clc.lastExecutedServerCommand = serverCommandNumber;
+
+#ifdef USE_MULTIVIEW
+	recipients = clc.serverCommandRecipients[ serverCommandNumber & ( MAX_RELIABLE_COMMANDS - 1 ) ];
+	if (!(recipients & (1<<clc.clientView))) {
+		Com_DPrintf( "serverCommand (multiview recipient skipped): %i : %s\n", serverCommandNumber, s );
+		return qfalse;
+	}
+#endif
 
 	Com_DPrintf( "serverCommand: %i : %s\n", serverCommandNumber, s );
 

@@ -1386,11 +1386,14 @@ Ghoul2 Insert Start
 	}
 #endif
 
+#ifdef SVDEMO
+	SV_StopAutoRecordDemos();
+#endif
+
 	// free current level
 	SV_ClearServer();
 
 #ifdef SVDEMO
-	SV_StopAutoRecordDemos();
 	SV_ClearAllDemoPreRecord();
 #endif
 

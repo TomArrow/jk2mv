@@ -954,6 +954,88 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 
 	return qtrue;
 }
+
+// mirrors SV_UpdateServerCommandsToClient in sv_snapshot.cpp
+qboolean SV_EmtiMultiviewCommandRecipients( client_t *client, msg_t *msg, qboolean allowPartial, messageType_t msgType, int* countSent) {
+	int		i;
+	int		reliableAcknowledge;
+
+#ifdef SVDEMO
+	if (client->demo.isBot && client->demo.demorecording) {
+		reliableAcknowledge = client->demo.botReliableAcknowledge;
+	}
+	else if (msgType == MSG_DEMO) {
+		reliableAcknowledge = client->demo.clientDemoReliableAcknowledge;
+		if (client->demo.clientDemoReliableAcknowledge < client->reliableAcknowledge) {
+			reliableAcknowledge = client->reliableAcknowledge; // in case we somehow didn't properly update client->demo.clientDemoReliableAcknowledge when we needed to.
+		}
+		if (reliableAcknowledge > client->reliableSequence) {
+			reliableAcknowledge = client->reliableSequence; // just in case client (for whatever reason) sends malicious numbers here or it somehow gets confused otherwise.
+			Com_Printf("^1reliableAcknowledge > client->reliableSequence for demo message. How tf.");
+			// TODO Cleint could still cause us to drop servercommands from demo? not nice. fix somehow?
+		}
+	}
+	else
+#endif
+	{
+		reliableAcknowledge = client->reliableAcknowledge;
+	}
+
+	// write any unacknowledged serverCommands
+	for ( i = reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++) {
+		
+		if (client->reliableCommandRecipients[ i & (MAX_RELIABLE_COMMANDS-1) ] == -1) { // everyone may read this one, no need to inform about anything.
+			continue;
+		}
+		MSG_WriteBits( msg, 1, 1 );
+		MSG_WriteLong( msg, i );
+		MSG_WriteLong( msg, client->reliableCommandRecipients[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+		if (countSent) {
+			(*countSent)++;
+		}
+	}
+
+	MSG_WriteBits( msg, 0, 1 );
+	return qtrue;
+}
+
+#define MULTIVIEWCOMMANDRECIPIENTS_VERSION 0
+qboolean SV_WriteMultiviewCommandRecipients(client_t* client, msg_t* msg, qboolean allowPartial, messageType_t msgType) {
+	clientSnapshot_t* frame, * oldframe;
+	int					lastframe;
+	int					i;
+	int					snapFlags;
+	int					countSent = 0;
+#ifdef SVDEMO
+	int					deltaMessage;
+#endif
+
+	if (!client->isMultiviewRecorder) {
+		return qfalse;
+	}
+
+	// this is the snapshot we are creating
+	//frame = &client->frames[client->netchan.outgoingSequence & PACKET_MASK];
+
+	//if (!frame->multiview) {
+	//	return qfalse;
+	//}
+
+	msg_t* extensionMsg = SV_InitExtensionMessage();
+
+
+	MSG_WriteByte(extensionMsg, MULTIVIEWCOMMANDRECIPIENTS_VERSION); // so we can upgrade it in the future.
+	SV_EmtiMultiviewCommandRecipients(client, extensionMsg, qfalse, msgType, &countSent);
+	
+	if(!countSent){
+		return qfalse; // nothing sent.
+	}
+
+
+	SV_CommitExtensionMessage(msg, extensionMsg, svc_coolMultiviewCommandRecipients,0);
+
+	return qtrue;
+}
 #endif
 qboolean SV_WriteCoolPadding(msg_t* msg) {
 	msg_t			*extensionMsg = SV_InitExtensionMessage();
@@ -1011,8 +1093,9 @@ void SV_WriteCoolExtensionsToClient(msg_t* msg, client_t* cl, messageType_t msgT
 	int minsize = MSG_WriteExtensionMarker(msg, EXT_COOLEXTEND_SMALL); // minsize says how big the message must be to be recognized by the client (it checks cursize)
 
 #ifdef USE_MULTIVIEW
+	anythingImportantWritten = (qboolean)(SV_WriteMultiviewCommandRecipients(cl, msg, qfalse, msgType) || anythingImportantWritten);
 	if (doingSnapshot) {
-		anythingImportantWritten = (qboolean)(anythingImportantWritten || SV_WriteMultiview(cl,msg,msgType));
+		anythingImportantWritten = (qboolean)(SV_WriteMultiview(cl,msg,msgType) || anythingImportantWritten);
 	}
 #endif
 	//anythingImportantWritten = (qboolean)(anythingImportantWritten || SV_WriteCoolPadding(msg));

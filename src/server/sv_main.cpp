@@ -211,8 +211,11 @@ The given command will be transmitted to the client, and is guaranteed to
 not have future snapshot_t executed before it is executed
 ======================
 */
-void SV_AddServerCommand( client_t *client, const char *cmd ) {
+void SV_AddServerCommand( client_t *client, const char *cmd, client_t* originalClient ) {
 	int		index, i;
+#ifdef USE_MULTIVIEW
+	int		hash;
+#endif
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
 	// for the same config string index in one snapshot
@@ -221,9 +224,23 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 //	}
 
 #ifdef USE_MULTIVIEW
-	if (client->isMultiviewRecorder && !sv_mvAutoRecord->integer) {
-		// he doesn't need this and we don't wanna contribute to a potential server command overflow (?), although there should be some safeguards now.
-		return;
+	if (client->isMultiviewRecorder) {
+		if (!sv_mvAutoRecord->integer) {
+			// he doesn't need this and we don't wanna contribute to a potential server command overflow (?), although there should be some safeguards now.
+			return;
+		}
+		hash = Com_HashKey( cmd, MAX_STRING_CHARS ); // pretty dumb and simple but might be good enough, we just need a quick prefilter
+
+		if( originalClient ){
+			for (i = client->reliableSequence; i > client->reliableSent; i--) {
+				index = i & (MAX_RELIABLE_COMMANDS - 1);
+				if (client->reliableCommandHashes[ index ] == hash && !strcmp(client->reliableCommands[index],cmd) && !(client->reliableCommandRecipients[index] & (1 << (originalClient-svs.clients)))) {
+					// this is the same command (hopefully). 
+					client->reliableCommandRecipients[ index ] |= (1 << ( originalClient - svs.clients ));
+					return;
+				}
+			}
+		}
 	}
 #endif
 
@@ -254,6 +271,18 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	}
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
 	Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
+#ifdef USE_MULTIVIEW
+	if (client->isMultiviewRecorder) {
+		client->reliableCommandRecipients[ index ] = 0;
+		client->reliableCommandHashes[ index ] = hash;
+		if ( originalClient ) {
+			client->reliableCommandRecipients[ index ] = (1 << ( originalClient - svs.clients ));
+		}
+		else {
+			client->reliableCommandRecipients[ index ] = -1; // everyone
+		}
+	}
+#endif
 }
 
 
@@ -286,13 +315,22 @@ void QDECL SV_SendServerCommand(client_t *cl, PRINTF_FORMAT_STRING const char *f
 	if ( cl != NULL ) {
 		SV_AddServerCommand( cl, (char *)message );
 #ifdef USE_MULTIVIEW
-		if (svs.multiviewActiveClient == (cl-svs.clients)) {
+		//if (svs.multiviewActiveClient == (cl-svs.clients)) 
+		{
 			// conservative way to get public chats into multiview while avoiding private chats for privacy
 			client_t* recorder = svs.clients + sv_maxclients->integer;
-			if (recorder->isMultiviewRecorder && recorder->demo.demorecording && !Q_stricmpn((char*)message, "chat ", 5) && !Q_stristr((char*)message, EC "]" EC)) {
+			if (recorder->isMultiviewRecorder && recorder->demo.demorecording && 
+				(!Q_stricmpn((char*)message, "chat ", 5) && !Q_stristr((char*)message, EC "]" EC))
+				|| (!Q_stricmpn((char*)message, "tchat ", 6))
+				|| (!Q_stricmpn((char*)message, "scores ", 7))
+				|| (!Q_stricmpn((char*)message, "tinfo ", 6))
+				|| (!Q_stricmpn((char*)message, "tstats ", 7))
+				|| (!Q_stricmpn((char*)message, "cp ", 3))
+				|| (!Q_stricmpn((char*)message, "print ", 6))
+				) {
 
-				Com_DPrintf("^3forwarding public chat to multiview: %s\n",(char*)message);
-				SV_AddServerCommand(recorder, (char*)message);
+				Com_DPrintf("^3forwarding command to multiview: %s\n",(char*)message);
+				SV_AddServerCommand(recorder, (char*)message, cl);
 			}
 		}
 #endif

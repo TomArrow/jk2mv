@@ -1506,6 +1506,9 @@ void CL_ParseCommandString( msg_t *msg ) {
 
 	index = seq & (MAX_RELIABLE_COMMANDS-1);
 	Q_strncpyz( clc.serverCommands[ index ], s, sizeof( clc.serverCommands[ index ] ) );
+#ifdef USE_MULTIVIEW
+	clc.serverCommandRecipients[index] = -1; // default all get it
+#endif
 
 	if (ezdemoActive) {
 		const char* cmd;
