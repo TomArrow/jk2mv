@@ -345,7 +345,6 @@ SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest, int p
 		{
 			int iCharsToCopy = (psLineEnd - psParsePos);
 			Q_strnncpyz(psDest, psParsePos, iCharsToCopy, psDestSize);
-					psDest[iCharsToCopy] = '\0';
 			psParsePos += iCharsToCopy;
 			while (*psParsePos && strchr("\r\n",*psParsePos))
 			{
@@ -356,7 +355,7 @@ SE_BOOL CStringEdPackage::ReadLine( const char* &psParsePos, char *psDest, int p
 		{
 			// last line...
 			//
-			Q_strncpyz(psDest, psParsePos, sizeof(psDest));
+			Q_strncpyz(psDest, psParsePos, psDestSize);
 			psParsePos += strlen(psParsePos);
 		}
 

@@ -1686,6 +1686,10 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 
 	lc = MSG_ReadByte(msg);
 
+	if ( lc > numFields || lc < 0 ) {
+		Com_Error( ERR_DROP, "invalid entityState field count" );
+	}
+
 	// shownet 2/3 will interleave with other printed info, -1 will
 	// just print the delta records`
 	if (cl_shownet->integer >= 2 || cl_shownet->integer == -1) {
@@ -2353,6 +2357,10 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 	}
 	lc = MSG_ReadByte(msg);
 
+	if (lc > numFields || lc < 0) {
+		Com_Error(ERR_DROP, "invalid playerState field count");
+	}
+
 #ifdef _DONETPROFILE_
 	int startBytes, endBytes;
 #endif
@@ -2530,6 +2538,10 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 		}
 #endif
 		Com_Printf(" (%i bits)\n", endBit - startBit);
+	}
+
+	if (to->clientNum < 0 || to->clientNum >= MAX_CLIENTS) {
+		Com_Error(ERR_DROP, "MSG_ReadDeltaPlayerState: Invalid playerstate clientNum.\n");
 	}
 }
 

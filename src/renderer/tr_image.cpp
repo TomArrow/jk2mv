@@ -582,7 +582,7 @@ static void R_MipMapBilinear( byte *in, int inWidth, int inHeight ) {
 		}
 	}
 
-	Com_Memcpy( in, temp, outWidth * outHeight * s );
+	Com_Memcpy( in, temp, (size_t)outWidth * outHeight * s );
 	ri.Hunk_FreeTempMemory( temp );
 }
 
@@ -2208,7 +2208,8 @@ static void ReadTGAData_BGRA(const byte * __restrict in, byte * __restrict out, 
 void LoadTGA ( const char *name, byte **pic, int *width, int *height, pixelFormat_t *format, qboolean skipJKA)
 {
 	char sErrorString[1024];
-	bool bFormatErrors = false;
+	bool bFormatErrors = false; 
+	size_t allocSize;
 
 	// these don't need to be declared or initialised until later, but the compiler whines that 'goto' skips them.
 	//
@@ -2262,6 +2263,11 @@ void LoadTGA ( const char *name, byte **pic, int *width, int *height, pixelForma
 	if (pHeader->byImagePlanes != 24 && pHeader->byImagePlanes != 32 && pHeader->byImagePlanes != 8)
 	{
 		TGA_FORMAT_ERROR("LoadTGA: Only 8, 24 and 32 bit TGA images supported\n");
+	}
+
+	if (pHeader->wImageWidth <= 0 || pHeader->wImageHeight <= 0)
+	{
+		TGA_FORMAT_ERROR("LoadTGA: Image dimensions must be positive\n");
 	}
 
 	if ((pHeader->byScanLineOrder&0x30)!=0x00 &&
@@ -2321,7 +2327,14 @@ void LoadTGA ( const char *name, byte **pic, int *width, int *height, pixelForma
 		break;
 	}
 
-	pRGBA	= (byte *) ri.Malloc (pHeader->wImageWidth * pHeader->wImageHeight * samples, TAG_TEMP_WORKSPACE, qfalse);
+	allocSize = (size_t)pHeader->wImageWidth * (size_t)pHeader->wImageHeight * (size_t)samples;
+
+	if (allocSize >= INT_MAX)
+	{
+		TGA_FORMAT_ERROR("LoadTGA: Image allocation size exceeded INT_MAX\n");
+	}
+
+	pRGBA	= (byte *) ri.Malloc (allocSize, TAG_TEMP_WORKSPACE, qfalse);
 	*pic	= pRGBA;
 	pOut	= pRGBA;
 	pIn		= pTempLoadedBuffer + sizeof(*pHeader);
@@ -2863,7 +2876,7 @@ void SaveJPG(const char * filename, int quality, int image_width, int image_heig
 	byte *out;
 	size_t bufSize;
 
-	bufSize = image_width * image_height * 3;
+	bufSize = (size_t)image_width * image_height * 3;
 	out = (byte *)Hunk_AllocateTempMemory((int)bufSize);
 
 	bufSize = SaveJPGToBuffer(out, bufSize, quality, image_width, image_height, image_buffer, padding);

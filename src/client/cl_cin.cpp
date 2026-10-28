@@ -1120,7 +1120,7 @@ redump:
 			cinTable[currentHandle].buf = cin.linbuf;
 		}
 		if (cinTable[currentHandle].numQuads == 0) {		// first frame
-			Com_Memcpy(cin.linbuf + cinTable[currentHandle].screenDelta, cin.linbuf, cinTable[currentHandle].samplesPerLine*cinTable[currentHandle].ysize);
+			Com_Memcpy(cin.linbuf + cinTable[currentHandle].screenDelta, cin.linbuf, (size_t)cinTable[currentHandle].samplesPerLine*cinTable[currentHandle].ysize);
 		}
 		cinTable[currentHandle].numQuads++;
 		cinTable[currentHandle].dirty = qtrue;

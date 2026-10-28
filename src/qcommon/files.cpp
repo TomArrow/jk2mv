@@ -16,6 +16,9 @@
 #include "qcommon.h"
 #include <unzip.h>	// minizip
 #include <mv_setup.h>
+#ifdef SUBPROCESS_PIPE
+#include "../../../libs/subprocess/subprocess.h"
+#endif
 
 #include "../qcommon/files_lzma.hpp"
 
@@ -309,6 +312,11 @@ typedef struct fileHandleData_s  {
 		zipFilePos(0),
 		zipFileLen(0),
 		zipFile(qfalse),
+#ifdef SUBPROCESS_PIPE
+		subProcess({}),
+		isSubProcess(qfalse),
+		subProcessDrainThread(nullptr),
+#endif
 		module((module_t)0) {
 		ospath[0] = '\0';
 		name[0] = '\0';
@@ -324,6 +332,11 @@ typedef struct fileHandleData_s  {
 	std::deque<std::vector<byte> > writes;
 	qboolean	closed;
 	char		ospath[MAX_OSPATH];
+#endif
+#ifdef SUBPROCESS_PIPE
+	subprocess_s subProcess;
+	qboolean	isSubProcess;
+	std::thread* subProcessDrainThread;
 #endif
 	int			baseOffset;
 	int			fileSize;
@@ -368,6 +381,11 @@ static void FS_ResetFileHandleData(fileHandleData_t* f) {
 	f->zipFilePos = 0;
 	f->zipFileLen = 0;
 	f->zipFile = qfalse;
+#ifdef SUBPROCESS_PIPE
+	f->subProcess = {};
+	f->isSubProcess = qfalse;
+	f->subProcessDrainThread = nullptr;
+#endif
 	f->name[0] = '\0';
 	f->module = MODULE_MAIN; // 0
 	f->baseOffset = 0; // idk what this is tbh
@@ -1430,6 +1448,12 @@ void FS_FCloseFile( fileHandle_t f, module_t module ) {
 		}
 	}
 
+
+#ifdef SUBPROCESS_PIPE
+	if (fsh[f].isSubProcess) {
+		FS_PipeClose(f);
+	} else
+#endif
 	// we didn't find it as a pak, so close it as a unique file
 #ifdef ASYNCIO
 	if (!handleWasNull || fsh[f].handleAsync) {
@@ -1897,11 +1921,11 @@ separate file or a ZIP file.
 */
 extern qboolean		com_fullyInitialized;
 
-int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean compressedType, qboolean skipJKA) {
-	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module,compressedType, skipJKA);
+int FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueFILE, module_t module, qboolean compressedType, qboolean skipJKA, int openFileFlags) {
+	return FS_FOpenFileReadHash(filename, file, uniqueFILE, NULL, module,compressedType, skipJKA, openFileFlags);
 }
 
-int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean compressedType, qboolean skipJKA) {
+int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module, qboolean compressedType, qboolean skipJKA, int openFileFlags) {
 
 	bool			isLocalConfig;
 	searchpath_t	*search;
@@ -1963,6 +1987,11 @@ int FS_FOpenFileReadHash(const char *filename, fileHandle_t *file, qboolean uniq
 		if ( isLocalConfig && search->pack ) {
 			continue;
 		}
+
+		if ( search->pack && ( (openFileFlags & OPENFILE_NOPACKS) || (openFileFlags & OPENFILE_NODLPACKS) && !Q_stricmpn(search->pack->pakBasename, "dl_", 3))) {
+			continue;
+		}
+
 		// Skip JKA assets if desired
 		if ( search->pack && search->pack->isJKA && skipJKA ) {
 			continue;
@@ -2466,7 +2495,7 @@ Filename are relative to the quake search path
 a null buffer will just return the file length without loading
 ============
 */
-int FS_ReadFile_real( const char *qpath, void **buffer, qboolean skipJKA ) {
+int FS_ReadFile_real( const char *qpath, void **buffer, qboolean skipJKA, int openFileFlags) {
 	fileHandle_t	h;
 	byte*			buf;
 	qboolean		isConfig;
@@ -2528,7 +2557,7 @@ int FS_ReadFile_real( const char *qpath, void **buffer, qboolean skipJKA ) {
 	}
 
 	// look for it in the filesystem or pack files
-	len = FS_FOpenFileRead( qpath, &h, qfalse, MODULE_MAIN, qfalse, skipJKA );
+	len = FS_FOpenFileRead( qpath, &h, qfalse, MODULE_MAIN, qfalse, skipJKA, openFileFlags );
 	if ( h == 0 ) {
 		if ( buffer ) {
 			*buffer = NULL;
@@ -2581,12 +2610,16 @@ int FS_ReadFile_real( const char *qpath, void **buffer, qboolean skipJKA ) {
 	return len;
 }
 
-int FS_ReadFile( const char *qpath, void **buffer ) {
-	return FS_ReadFile_real( qpath, buffer, qfalse );
+int FS_ReadFile( const char *qpath, void **buffer, int openFileFlags) {
+	return FS_ReadFile_real( qpath, buffer, qfalse, openFileFlags);
+}
+
+int FS_ReadFileSimple( const char *qpath, void **buffer) {
+	return FS_ReadFile_real( qpath, buffer, qfalse, 0);
 }
 
 int FS_ReadFileSkipJKA( const char *qpath, void **buffer ) {
-	return FS_ReadFile_real( qpath, buffer, qtrue );
+	return FS_ReadFile_real( qpath, buffer, qtrue, 0 );
 }
 
 /*
@@ -5293,11 +5326,102 @@ uint32_t FS_GetFileVersion(const char *fileName, module_t module) {
 	return FILE_VERSION_UNKNOWN;
 }
 
+int FS_MakeCMDArgvArray(const char* cmd, char*** argvA) {
+	char* token;
+	const char* s = cmd;
+	char** argv;
+	int countArgs = 0;
+	int len;
+	while (*COM_ParseExt(&s, qtrue)) {
+		countArgs++;
+	}
+
+	if (countArgs < 1) {
+		*argvA = NULL;
+		return 0;
+	}
+
+	argv = new char* [countArgs+1];
+	s = cmd;
+	argv[countArgs] = NULL;
+	countArgs = 0;
+	while (*(token = COM_ParseExt(&s, qtrue))) {
+		len = strlen(token);
+		argv[countArgs] = new char[len+1];
+		Q_strncpyz(argv[countArgs],token,len+1);
+		countArgs++;
+	}
+	*argvA = argv;
+	return countArgs;
+}
+
+int FS_DestroyCMDArgvArray(char** argvA, int count) {
+	if (!argvA) {
+		Com_Error(ERR_FATAL, "Trying to destroy NULL CMD Argv array.\n");
+	}
+	for (int i = 0; i < count; i++) {
+		delete[] argvA[i];
+	}
+	delete[] argvA;
+}
+
+#ifdef SUBPROCESS_PIPE
+// drain stderr/stdout output to make sure the buffer isn't filled up
+void FS_PipeDrain(fileHandle_t f) {
+	if (!fs_searchpaths)
+		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
+
+	if (fsh[f].zipFile)
+		return;
+
+	if (!fsh[f].isSubProcess)
+		Com_Error(ERR_FATAL, "FS_PipeDrain on a non-subprocess");
+
+
+}
+
+void FS_AsyncPipeDrainThread(fileHandle_t h) {
+	qboolean fileOpenFailed = qfalse;
+	if (com_developer->integer > 1) {
+		Com_Printf("Async pipe drain thread started ...");
+	}
+	fileHandleData_t* f = &fsh[h];
+	if (f->handleFiles.file.o == nullptr) {
+		Com_Printf("Warning: failed to open file %s\n", f->name);
+		fileOpenFailed = qtrue;
+		//return;
+		// Don't return here, it's likely to cause issues.
+	}
+	while (qtrue) {
+		char buffer[MAX_STRING_CHARS];
+		unsigned int read = subprocess_read_stdout(&f->subProcess, buffer, sizeof(buffer)-1);
+
+		if (!read) {
+			if (com_developer->integer > 1) {
+				Com_Printf("Async pipe drain thread ending ...");
+			}
+			return;
+		}
+
+		buffer[read] = '\0';
+		if (com_developer->integer) {
+			Com_DPrintf("%s\n", buffer);
+		}
+
+	}
+}
+#endif
+
 
 fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename) {
 	fileHandleData_t* fd;
 	fileHandle_t f;
 	char* ospath;
+#ifdef SUBPROCESS_PIPE
+	char** argv = NULL;
+	int argc;
+	int result;
+#endif
 
 	if (!fs_searchpaths) {
 		Com_Error(ERR_FATAL, "Filesystem call made without initialization");
@@ -5320,11 +5444,37 @@ fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename) {
 		return FS_INVALID_HANDLE;
 	}
 
+
+#ifdef SUBPROCESS_PIPE
+	argc = FS_MakeCMDArgvArray(cmd, &argv);
+
+	if (!argc || !argv) {
+		Com_Printf("FS_PipeOpenWrite: Failure to parse cmd %s\n", cmd);
+		return FS_INVALID_HANDLE;
+	}
+	result = subprocess_create(argv,subprocess_option_inherit_environment | subprocess_option_combined_stdout_stderr | subprocess_option_enable_async,&fd->subProcess);
+	if (result) {
+		Com_Printf("FS_PipeOpenWrite: Failure to open pipe.\n");
+		FS_DestroyCMDArgvArray(argv, argc);
+		return FS_INVALID_HANDLE;
+	}
+	fd->handleFiles.file.o = subprocess_stdin(&fd->subProcess);
+	if (!fd->handleFiles.file.o) {
+		Com_Printf("FS_PipeOpenWrite: Failure to open pipe (2).\n");
+		FS_DestroyCMDArgvArray(argv, argc);
+		return FS_INVALID_HANDLE;
+	}
+	fd->isSubProcess = qtrue;
+	fd->subProcessDrainThread = new std::thread(FS_AsyncPipeDrainThread, f);
+	FS_DestroyCMDArgvArray(argv, argc);
+#else
 #ifdef _WIN32
 	fd->handleFiles.file.o = _popen(cmd, "wb");
 #else
 	fd->handleFiles.file.o = popen(cmd, "w");
 #endif
+#endif
+
 
 	if (fd->handleFiles.file.o == NULL) {
 		return FS_INVALID_HANDLE;
@@ -5337,7 +5487,6 @@ fileHandle_t FS_PipeOpenWrite(const char* cmd, const char* filename) {
 	return f;
 }
 
-
 void FS_PipeClose(fileHandle_t f)
 {
 	if (!fs_searchpaths)
@@ -5347,14 +5496,28 @@ void FS_PipeClose(fileHandle_t f)
 		return;
 
 	if (fsh[f].handleFiles.file.o) {
+#ifdef SUBPROCESS_PIPE
+		int returnCode = 0;
+		if (!fsh[f].isSubProcess)
+			Com_Error(ERR_FATAL, "FS_PipeClose on a non-subprocess.\n");
+		if (!fsh[f].subProcessDrainThread)
+			Com_Error(ERR_FATAL, "FS_PipeClose with no drainn thread.\n");
+
+		int result = subprocess_join(&fsh[f].subProcess,&returnCode);
+		fsh[f].subProcessDrainThread->join();
+		if (0 != result) {
+			Com_Printf("^3Error destroying subprocess pipe: %d\n",result);
+		}
+#else
 #ifdef _WIN32
 		_pclose(fsh[f].handleFiles.file.o);
 #else
 		pclose(fsh[f].handleFiles.file.o);
 #endif
+#endif
 	}
 
-	Com_Memset(&fsh[f], 0, sizeof(fsh[f]));
+	//Com_Memset(&fsh[f], 0, sizeof(fsh[f]));
 }
 
 

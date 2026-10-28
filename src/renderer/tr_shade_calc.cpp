@@ -239,7 +239,7 @@ void RB_CalcBulgeVertexes( deformStage_t *ds )
 
 		for ( i = 0; i < tess.numVertexes; i++, xyz += 4, normal += 4 )
 		{
-			off = ( FUNCTABLE_SIZE / (M_PI * 2) ) * ( tess.texCoords[0][i][0] * ds->bulgeWidth + now );
+			off = ( FUNCTABLE_SIZE / (M_PI * 2) ) * ( (double)tess.texCoords[0][i][0] * ds->bulgeWidth + now );
 
 			scale = tr.sinTable[ off & FUNCTABLE_MASK ] * ds->bulgeHeight;
 

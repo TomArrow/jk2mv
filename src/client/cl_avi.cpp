@@ -363,7 +363,11 @@ qboolean CL_OpenAVIForWriting( const char *fileName, qboolean pipe )
 	if (pipe)
 	{
 		char cmd[MAX_OSPATH * 4];
+#ifdef SUBPROCESS_PIPE
+		const char* cmd_fmt = "ffmpeg -f avi -i - -threads 0  -report -loglevel verbose -y %s \"%s\"";
+#else
 		const char* cmd_fmt = "ffmpeg -f avi -i - -threads 0 -y %s \"%s\" 2> \"%s-log.txt\"";
+#endif
 		const char* ospath;
 
 		if (!CL_ValidatePipeFormat(cl_aviPipeFormat->string)) {

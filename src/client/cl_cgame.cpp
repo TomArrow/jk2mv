@@ -899,7 +899,7 @@ rescan:
 			}
 			chat[l] = '\0';
 
-			CL_LogPrintf(cls.log.chat, chat);
+			CL_LogPrintf(cls.log.chat, "%s", chat);
 		}
 
 		stampColor = COLOR_WHITE;
@@ -1890,13 +1890,19 @@ Ghoul2 Insert End
 			int ezDemoMaxEventCount = args[3];
 			int* ezDemoEventCount = VMAP(4, int, 1);
 			//ezDemoEvent_t* ezDemoBufferCgame = VMAP(1, ezDemoEvent_t, ezDemoMaxEventCount);
+			if (ezDemoEventSize * ezDemoMaxEventCount > INT_MAX) {
+				Com_Error( ERR_DROP, "CG_COOL_API_SET_EZDEMO_BUFFER: ezDemoEventSize * ezDemoMaxEventCount overflows int32.");
+				return 0;
+			}
 			void* ezDemoBufferCgame = VM_ArgPtr(args[0], args[1], ezDemoEventSize * ezDemoMaxEventCount); // is this gonna work right always? idk
 			int communicatedEventCount = MIN(ezDemoBuffer.eventCount, ezDemoMaxEventCount);
 			ezDemoEventSize = MIN(ezDemoEventSize,sizeof(ezDemoEvent_t));
 			for (i = 0; i < communicatedEventCount; i++) {
 				Com_Memcpy((char*)ezDemoBufferCgame + (i * ezDemoEventSize), &ezDemoBuffer.events[i], ezDemoEventSize);
 			}
-			*ezDemoEventCount = communicatedEventCount;
+			if (ezDemoEventCount) {
+				*ezDemoEventCount = communicatedEventCount;
+			}
 			return 0;
 		}
 		}

@@ -690,7 +690,7 @@ int RE_CaptureFrameJPEG( byte *buffer, int bufSize, int quality )
 
 	width = glConfig.vidWidth;
 	height = glConfig.vidHeight;
-	memcount = width * height * 3;
+	memcount = (size_t)width * height * 3;
 
 	captureBuffer = (byte *)ri.Hunk_AllocateTempMemory(memcount);
 

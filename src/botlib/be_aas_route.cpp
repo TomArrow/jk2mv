@@ -504,7 +504,7 @@ void AAS_CalculateAreaTravelTimes(void)
 		//
 		size += settings->numreachableareas * sizeof(unsigned short *);
 		//
-		size += settings->numreachableareas * revreach->numlinks * sizeof(unsigned short);
+		size += (size_t)settings->numreachableareas * revreach->numlinks * sizeof(unsigned short);
 	} //end for
 	//allocate memory for the area travel times
 	ptr = (char *) GetClearedMemory(size);

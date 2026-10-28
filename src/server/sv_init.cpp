@@ -433,24 +433,24 @@ void SV_Startup( void ) {
 	int maxClientCount = sv_maxclients->integer + GHOSTCLIENTS;
 	svs.clients = (struct client_s *)Z_Malloc (sizeof(client_t) * maxClientCount, TAG_CLIENTS, qtrue );
 	if ( com_dedicated->integer ) {
-		svs.numSnapshotEntities = maxClientCount * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = (int64_t)maxClientCount * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
-		svs.numSnapshotPSF = sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
+		svs.numSnapshotPSF = (int64_t)sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
 #endif
 		Cvar_Set( "r_ghoul2animsmooth", "0");
 		Cvar_Set( "r_ghoul2unsqashaftersmooth", "0");
 
 	} else {
 		// we don't need nearly as many when playing locally
-		svs.numSnapshotEntities = maxClientCount * 4 * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = (int64_t)maxClientCount * 4 * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
-		svs.numSnapshotPSF = sv_mvClients->integer * 4 * sv_maxclients->integer;
+		svs.numSnapshotPSF = (int64_t)sv_mvClients->integer * 4 * sv_maxclients->integer;
 #endif
 	}
 
 #ifdef USE_MULTIVIEW
 	// reserve 2 additional frames for recorder slot
-	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+	svs.numSnapshotPSF += 2 * (int64_t)sv_maxclients->integer;
 
 	SV_InitMultiviewFakeBot(qfalse);
 #endif
@@ -563,21 +563,21 @@ void SV_ChangeMaxClients( void ) {
 
 	// allocate new snapshot entities
 	if ( com_dedicated->integer ) {
-		svs.numSnapshotEntities = sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = (int64_t)sv_maxclients->integer * sv_snapShotPacketBackup->integer * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
-		svs.numSnapshotPSF = sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
+		svs.numSnapshotPSF = (int64_t)sv_mvClients->integer * sv_snapShotPacketBackup->integer * sv_maxclients->integer;
 #endif
 	} else {
 		// we don't need nearly as many when playing locally
-		svs.numSnapshotEntities = sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
+		svs.numSnapshotEntities = (int64_t)sv_maxclients->integer * 4 * sv_snapShotEntitiesBackup->integer;
 #ifdef USE_MULTIVIEW
-		svs.numSnapshotPSF = sv_mvClients->integer * 4 * sv_maxclients->integer;
+		svs.numSnapshotPSF = (int64_t)sv_mvClients->integer * 4 * sv_maxclients->integer;
 #endif
 	}
 
 #ifdef USE_MULTIVIEW
 	// reserve 2 additional frames for recorder slot
-	svs.numSnapshotPSF += 2 * sv_maxclients->integer;
+	svs.numSnapshotPSF += 2 * (int64_t)sv_maxclients->integer;
 
 	SV_InitMultiviewFakeBot(qfalse);
 #endif
@@ -779,7 +779,7 @@ Ghoul2 Insert Start
 	// allocate the snapshot entities on the hunk
 //	svs.snapshotEntities = (struct entityState_s *)Hunk_Alloc( sizeof(entityState_t)*svs.numSnapshotEntities, h_high );
 #if _DEBUG
-	svs.nextSnapshotEntities = (int64_t)UINT32_MAX - svs.numSnapshotEntities * 10; //0x7FFFFFFE - svs.numSnapshotEntities * 10;
+	svs.nextSnapshotEntities = (int64_t)UINT32_MAX - (int64_t)svs.numSnapshotEntities * 10; //0x7FFFFFFE - svs.numSnapshotEntities * 10;
 #else
 	svs.nextSnapshotEntities = 0;
 #endif

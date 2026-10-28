@@ -14,6 +14,7 @@
 #include <stdexcept>
 	
 
+#define SUBPROCESS_PIPE
 #define ASYNCIO
 
 //============================================================================
@@ -960,13 +961,16 @@ fileHandle_t	FS_FOpenFileWrite( const char *qpath, module_t module = MODULE_MAIN
 fileHandle_t FS_FOpenBaseFileWrite(const char *filename, module_t module = MODULE_MAIN);
 // will properly create any needed paths and deal with seperater character issues
 
+#define OPENFILE_NOPACKS	(1<<0)
+#define OPENFILE_NODLPACKS	(1<<1)
+
 fileHandle_t FS_SV_FOpenFileWrite( const char *filename, module_t module = MODULE_MAIN );
 fileHandle_t FS_SV_FOpenFileAppend( const char *filename, module_t module = MODULE_MAIN );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp, module_t module = MODULE_MAIN );
 void	FS_SV_Rename( const char *from, const char *to );
 
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
-int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse);
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse, int openFileFlags = 0);
+int		FS_FOpenFileReadHash( const char *filename, fileHandle_t *file, qboolean uniqueFILE, unsigned long *filehash, module_t module = MODULE_MAIN, qboolean compressedType = qfalse, qboolean skipJKA = qfalse, int openFileFlags = 0);
 int		FS_WhichPack_f(fileHandle_t f); // returns checksum
 
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
@@ -987,7 +991,8 @@ int		FS_Read( void *buffer, int len, fileHandle_t f, module_t module = MODULE_MA
 void	FS_FCloseFile( fileHandle_t f, module_t module = MODULE_MAIN );
 // note: you can't just fclose from another DLL, due to MS libc issues
 
-int		FS_ReadFile( const char *qpath, void **buffer );
+int		FS_ReadFile( const char *qpath, void **buffer, int openFileFlags = 0);
+int		FS_ReadFileSimple( const char *qpath, void **buffer);
 // returns the length of the file
 // a null buffer will just return the file length without loading
 // as a quick check for existance. -1 length == not present

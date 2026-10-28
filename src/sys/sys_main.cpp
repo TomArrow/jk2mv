@@ -139,7 +139,7 @@ void Sys_RegisterPowerNotifications(SDL_Window* window) {
 		notifyIds[win] = id;
 	}
 	if (id2) {
-		notifyIds2[win] = id;
+		notifyIds2[win] = id2;
 	}
 }
 void Sys_UnRegisterPowerNotifications(SDL_Window* window) {

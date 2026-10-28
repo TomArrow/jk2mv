@@ -459,8 +459,15 @@ qboolean MiniMap_Load(const char* name) {
 		free(minimapBspCache);
 		minimapBspCache = NULL;
 
-		Com_Error(ERR_DROP, "CM_LoadMap: %s has wrong version number (%i should be %i)"
+		Com_Error(ERR_DROP, "CM_LoadMiniMap: %s has wrong version number (%i should be %i)"
 			, name, header.version, BSP_VERSION);
+	}
+
+	for (size_t i = 0; i < sizeof(header.lumps) / sizeof(header.lumps[0]); i++) {
+		if (header.lumps[i].fileofs < 0 || header.lumps[i].filelen < 0 || header.lumps[i].fileofs >= iBSPLen || header.lumps[i].fileofs + header.lumps[i].filelen > iBSPLen) {
+			Com_Error(ERR_DROP, "CM_LoadMiniMap: %s has invalid lump at index %i (offset %i, len %i, file len %i)",
+				name, (int)i, header.lumps[i].fileofs, header.lumps[i].filelen, iBSPLen);
+		}
 	}
 
 	minimap_base = (byte*)buf;

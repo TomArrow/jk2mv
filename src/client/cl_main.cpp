@@ -3597,7 +3597,7 @@ void CL_InitRef( void ) {
 	ri.Hunk_AllocateTempMemory = Hunk_AllocateTempMemory;
 	ri.Hunk_FreeTempMemory = Hunk_FreeTempMemory;
 	ri.CM_DrawDebugSurface = CM_DrawDebugSurface;
-	ri.FS_ReadFile = FS_ReadFile;
+	ri.FS_ReadFile = FS_ReadFileSimple;
 	ri.FS_ReadFileSkipJKA = FS_ReadFileSkipJKA;
 	ri.FS_FreeFile = FS_FreeFile;
 	ri.FS_WriteFile = FS_WriteFile;
@@ -3828,8 +3828,8 @@ void CL_Init( void ) {
 	cl_aviPipeFormat = Cvar_Get("cl_aviPipeFormat",
 		"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420p "
 		"-bf 2 -max_muxing_queue_size 4096 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart",
-		CVAR_ARCHIVE);
-	cl_aviPipeExtension = Cvar_Get("cl_aviPipeExtension","mp4",	CVAR_ARCHIVE);
+		CVAR_ARCHIVE | CVAR_VM_NOWRITE);
+	cl_aviPipeExtension = Cvar_Get("cl_aviPipeExtension","mp4",	CVAR_ARCHIVE | CVAR_VM_NOWRITE);
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 

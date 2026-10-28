@@ -446,6 +446,10 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 	msg_t rescueableMsgBkup;
 	playerState_t* playerStateClientnumFroms[MAX_CLIENTS] = { 0 }; // if multiple people have the same ps clientnum, we can check a spectator relationship. so just delta from the old one if it looks similar enough
 
+	if (snap->ps.clientNum < 0 || snap->ps.clientNum >= MAX_CLIENTS) {
+		Com_Error(ERR_DROP, "CL_ParsePlayerstates: Main playerstate clientnum outside of valid range.\n");
+	}
+
 	playerStateClientnumFroms[snap->ps.clientNum] = &snap->ps;
 
 	int entIndex = 0;
@@ -677,6 +681,12 @@ static void CL_FixRescuedEntmasks(clSnapshot_t* snap) {
 		// nothing to do
 		return;
 	}
+
+	if (snap->ps.clientNum < 0 || snap->ps.clientNum >= MAX_CLIENTS) {
+		Com_Error(ERR_DROP, "CL_FixRescuedEntmasks: snap->ps.clientNum < 0 || snap->ps.clientNum >= MAX_CLIENTS\n");
+		return;
+	}
+
 	// first set all to 255
 	if (snap->multiview.version >= 3) {
 		// snap is from a chain of invalid deltas, therefore we cannot trust its ent mask. therefore we just enable all ents.
