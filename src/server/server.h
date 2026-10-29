@@ -450,6 +450,8 @@ extern	cvar_t	*sv_mvMaxVersion;
 extern	cvar_t	*sv_mvNonDeltaInterval;
 //extern	cvar_t	*sv_demoFlags;
 extern	cvar_t	*sv_mvAutoRecord;
+extern	cvar_t	*sv_mvAutoRecordUcmds;
+extern	cvar_t	*sv_mvAutoRecordUcmdBufferLimit;
 extern	cvar_t	*sv_mvAutoRecordSnaps;
 extern	cvar_t	*sv_mvAutoRecordMinActiveClients;
 extern	cvar_t	*sv_mvAutoRecordAfkStopDelay;

@@ -1969,6 +1969,31 @@ void SV_AddUserMessageForClient(int myCl, userMessage_t* umsg) {
 		}
 	}
 	playerState_t* myps = SV_GameClientNum(myCl);
+
+#ifdef USE_MULTIVIEW
+	if (sv_mvAutoRecord->integer && (sv_mvAutoRecordUcmds->integer > 1 || sv_mvAutoRecordUcmds->integer && myps->clientNum == myCl && myps->persistant[PERS_TEAM] != TEAM_SPECTATOR)) {
+		client_t* recorder = svs.clients + sv_maxclients->integer;
+		if (recorder->isMultiviewRecorder) {
+			// do 
+			client_t* ucmdClient = svs.clients + myCl;
+			if (svs.time - ucmdClient->lastSeenActive < 10000) { // dont bother recording for afk clients
+				if (sv_mvAutoRecordUcmdBufferLimit->integer && (userStoredUcmdCounts[sv_maxclients->integer] + umsg->cmds.size()) > sv_mvAutoRecordUcmdBufferLimit->integer) {
+					if (com_developer->integer > 1) {
+						Com_Printf("Discarding ucmds for multiview recorder due to sv_mvAutoRecordUcmdBufferLimit: current count %d new count %d for client %d\n", userStoredUcmdCounts[sv_maxclients->integer], (int)umsg->cmds.size(), myCl);
+					}
+				}
+				else {
+					userMessage_t* messageDupe = new userMessage_t();
+					*messageDupe = *umsg;
+					userStoredUcmdCounts[sv_maxclients->integer] += messageDupe->cmds.size();
+					userMessages[sv_maxclients->integer].push_back(std::move(std::unique_ptr<userMessage_t>(messageDupe)));
+				}
+			}
+		}
+		// forward cmds to multiview recorder
+	}
+#endif
+
 	// TODO DM_15 COMPATIBILITY
 	if (myps->clientNum == myCl){// && !(myps->pm_flags & PMF_FOLLOW)) {
 		userStoredUcmdCounts[myCl] += umsg->cmds.size();

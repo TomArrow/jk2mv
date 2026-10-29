@@ -35,6 +35,8 @@ cvar_t	*sv_mvMaxVersion;
 cvar_t	*sv_mvNonDeltaInterval;
 //cvar_t	*sv_demoFlags;
 cvar_t	*sv_mvAutoRecord;
+cvar_t	*sv_mvAutoRecordUcmds;
+cvar_t	*sv_mvAutoRecordUcmdBufferLimit;
 cvar_t	*sv_mvAutoRecordSnaps;
 cvar_t	*sv_mvAutoRecordMinActiveClients;
 cvar_t	*sv_mvAutoRecordAfkStopDelay;

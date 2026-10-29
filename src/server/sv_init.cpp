@@ -1165,6 +1165,8 @@ void SV_Init (void) {
 	sv_mvPassword = Cvar_Get("sv_mvPassword", "", CVAR_ARCHIVE);
 	sv_mvNonDeltaInterval = Cvar_Get("sv_mvNonDeltaInterval", "60", CVAR_ARCHIVE);
 	sv_mvAutoRecord = Cvar_Get("sv_mvAutoRecord", "0", CVAR_ARCHIVE);
+	sv_mvAutoRecordUcmds = Cvar_Get("sv_mvAutoRecordUcmds", "0", CVAR_ARCHIVE); // record the ucmd sendback for each client in the mv demo. 1 = only for ingame clients. 2 = for spectators too. ignores afk players.
+	sv_mvAutoRecordUcmdBufferLimit = Cvar_Get("sv_mvAutoRecordUcmdBufferLimit", "256", CVAR_ARCHIVE); // record the ucmd sendback for each client in the mv demo. 1 = only for ingame clients. 2 = for spectators too. ignores afk players.
 	sv_mvAutoRecordSnaps = Cvar_Get("sv_mvAutoRecordSnaps", "1000", CVAR_ARCHIVE);
 	sv_mvAutoRecordMinActiveClients = Cvar_Get("sv_mvAutoRecordMinActiveClients", "1", CVAR_ARCHIVE);
 	sv_mvAutoRecordAfkStopDelay = Cvar_Get("sv_mvAutoRecordAfkStopDelay", "600", CVAR_ARCHIVE);
