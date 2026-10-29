@@ -84,6 +84,8 @@ cvar_t	*sv_snapShotEntitiesBackup;
 #ifdef SVDEMO
 cvar_t* sv_autoDemo;
 cvar_t* sv_autoDemoBots;
+cvar_t* sv_autoDemoNewPaths;
+cvar_t* sv_autoDemoShortPaths;
 cvar_t* sv_autoDemoMaxMaps;
 cvar_t* sv_demoSpaceSaving;
 cvar_t* sv_demoPreRecord;

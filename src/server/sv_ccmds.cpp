@@ -1476,17 +1476,41 @@ void SV_AutoRecordDemo(client_t* cl) {
 	strftime(folderTreeDate, sizeof(folderTreeDate), "%Y/%m/%d", timeinfo);
 	Q_strncpyz(demoPlayerName, cl->name, sizeof(demoPlayerName));
 	Q_CleanStr(demoPlayerName,qtrue, serverIsTommyTernal);
-	if (sv_autoDemo->integer == 2)
-		Com_sprintf(demoFileName, sizeof(demoFileName), "%s %s", Cvar_VariableString("mapname"), date);
-	else
-		Com_sprintf(demoFileName, sizeof(demoFileName), "%d %s %s %s",
-			(int)(cl - svs.clients), demoPlayerName, Cvar_VariableString("mapname"), date);
-	Com_sprintf(demoFolderName, sizeof(demoFolderName), "%s %s", Cvar_VariableString("mapname"), folderDate);
+	if (sv_autoDemo->integer == 2) {
+		if (sv_autoDemoNewPaths->integer) {
+			Com_sprintf(demoFileName, sizeof(demoFileName), "%s_%s", date, Cvar_VariableString("mapname"));
+		}
+		else {
+			Com_sprintf(demoFileName, sizeof(demoFileName), "%s %s", Cvar_VariableString("mapname"), date);
+		}
+	}
+	else {
+		if (sv_autoDemoNewPaths->integer) {
+			Com_sprintf(demoFileName, sizeof(demoFileName), "%s_%s_%d_%s",
+				date, Cvar_VariableString("mapname"), (int)(cl - svs.clients), demoPlayerName);
+		}
+		else {
+			Com_sprintf(demoFileName, sizeof(demoFileName), "%d %s %s %s",
+				(int)(cl - svs.clients), demoPlayerName, Cvar_VariableString("mapname"), date);
+		}
+	}
+	if (sv_autoDemoNewPaths->integer) {
+		Com_sprintf(demoFolderName, sizeof(demoFolderName), "%s_%s", folderDate, Cvar_VariableString("mapname"));
+	}
+	else {
+		Com_sprintf(demoFolderName, sizeof(demoFolderName), "%s %s", Cvar_VariableString("mapname"), folderDate);
+	}
 	// sanitize filename
 	for (char** start = demoNames; start - demoNames < (ptrdiff_t)ARRAY_LEN(demoNames); start++) {
-		Q_strstrip(*start, "\n\r;:.?*<>|\\/\"", NULL);
+		Q_strstrip(*start, "\n\r!;:.?*<>|\\/\"", NULL);
+		sanitizeFilename(*start, *start, qfalse);
 	}
-	Com_sprintf(demoName, sizeof(demoName), "%s/%s/%s/%s", cl->isMultiviewRecorder ? "autorecord_mv" : "autorecord", folderTreeDate, demoFolderName, demoFileName);
+	if (sv_autoDemoShortPaths->integer) {
+		Com_sprintf(demoName, sizeof(demoName), "%s/%s/%s", cl->isMultiviewRecorder ? "autorecord_mv" : "autorecord", demoFolderName, demoFileName);
+	}
+	else {
+		Com_sprintf(demoName, sizeof(demoName), "%s/%s/%s/%s", cl->isMultiviewRecorder ? "autorecord_mv" : "autorecord", folderTreeDate, demoFolderName, demoFileName);
+	}
 	SV_RecordDemo(cl, demoName, qfalse, qfalse, UINT_MAX);
 }
 
@@ -1504,8 +1528,13 @@ static time_t SV_ExtractTimeFromDemoFolder(char* folder) {
 	int numMatched = sscanf(folder + (strlen(folder) - timeLen), "%4d-%2d-%2d_%2d-%2d-%2d",
 		&timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday, &timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec);
 	if (numMatched < 6) {
-		// parsing failed
-		return 0;
+		// try variant with date at start
+		numMatched = sscanf(folder, "%4d-%2d-%2d_%2d-%2d-%2d",
+			&timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday, &timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec);
+		if (numMatched < 0) {
+			// parsing failed
+			return 0;
+		}
 	}
 	timeinfo.tm_year -= 1900;
 	timeinfo.tm_mon--;

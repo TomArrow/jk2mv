@@ -1248,6 +1248,8 @@ void SV_Init (void) {
 #ifdef SVDEMO
 	sv_autoDemo = Cvar_Get("sv_autoDemo", "0", CVAR_ARCHIVE | CVAR_SERVERINFO); // , "Automatically take server-side demos"
 	sv_autoDemoBots = Cvar_Get("sv_autoDemoBots", "1", CVAR_ARCHIVE); // , "Record server-side demos for bots"
+	sv_autoDemoNewPaths = Cvar_Get("sv_autoDemoNewPaths", "1", CVAR_ARCHIVE); // , "Record server-side demos for bots"
+	sv_autoDemoShortPaths = Cvar_Get("sv_autoDemoShortPaths", "1", CVAR_ARCHIVE); // , "Record server-side demos for bots"
 	sv_autoDemoMaxMaps = Cvar_Get("sv_autoDemoMaxMaps", "0", CVAR_ARCHIVE);
 	sv_demoSpaceSaving = Cvar_Get("sv_demoSpaceSaving", "1", CVAR_ARCHIVE | CVAR_LATCH);// write separate, smaller messages (due to tighter deltas) for serverside demos
 	sv_demoPreRecord = Cvar_Get("sv_demoPreRecord", "1", CVAR_ARCHIVE);// , "Activate server demo pre-recording so demos can be retroactively recorded for duration sv_demoPreRecordTime (seconds)");
@@ -1358,6 +1360,10 @@ void SV_Shutdown( char *finalmsg )
 		SV_FinalMessage( finalmsg );
 	}
 
+#ifdef SVDEMO
+	SV_StopAutoRecordDemos();
+#endif
+
 	SV_RemoveOperatorCommands();
 	SV_MasterShutdown();
 	SV_ShutdownGameProgs();
@@ -1384,10 +1390,6 @@ Ghoul2 Insert Start
 		delete G2VertSpaceServer;
 		G2VertSpaceServer = 0;
 	}
-#endif
-
-#ifdef SVDEMO
-	SV_StopAutoRecordDemos();
 #endif
 
 	// free current level

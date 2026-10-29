@@ -501,6 +501,8 @@ extern	cvar_t	*sv_snapShotEntitiesBackup;
 #ifdef SVDEMO
 extern	cvar_t* sv_autoDemo;
 extern	cvar_t* sv_autoDemoBots;
+extern	cvar_t* sv_autoDemoNewPaths;
+extern	cvar_t* sv_autoDemoShortPaths;
 extern	cvar_t* sv_autoDemoMaxMaps;
 extern	cvar_t* sv_demoSpaceSaving;
 extern	cvar_t* sv_demoPreRecord;
