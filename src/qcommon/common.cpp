@@ -3260,7 +3260,7 @@ void Com_Frame( qboolean noDelay) {
 			else if (com_screensaverActive->integer && com_maxfpsScreenSaver->integer > 0) 
 				minMsec = 1000 / com_maxfpsScreenSaver->integer;
 #endif
-			if (com_minimized->integer && com_maxfpsMinimized->integer > 0)
+			else if (com_minimized->integer && com_maxfpsMinimized->integer > 0)
 				minMsec = 1000 / com_maxfpsMinimized->integer;
 			else if (com_unfocused->integer && com_maxfpsUnfocused->integer > 0)
 				minMsec = 1000 / com_maxfpsUnfocused->integer;
