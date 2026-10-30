@@ -576,7 +576,7 @@ jobs:
 
   macos-arm:
     name: Build macOS ARM (${{ matrix.portable }}), ${{ matrix.build_type }}, ${{ matrix.arch }}
-    runs-on: macos-14
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
