@@ -1208,6 +1208,8 @@ void R_Register( void )
 	                                                            // because that is how they have been used by maps and serverside mods for
 	                                                            // more than 20 years. Servers can set a configstring for "mvremap" now.
 
+	r_smp = ri.Cvar_Get("r_smp", "0", CVAR_ARCHIVE | CVAR_LATCH );
+
 	//
 	// temporary latched variables that can only change over a restart
 	//
@@ -1280,7 +1282,8 @@ void R_Register( void )
 
 	r_flareSize = ri.Cvar_Get ("r_flareSize", "40", CVAR_CHEAT);
 	r_flareFade = ri.Cvar_Get ("r_flareFade", "7", CVAR_CHEAT);
-
+	
+	r_showSmp = ri.Cvar_Get ("r_showSmp", "0", CVAR_CHEAT);
 	r_skipBackEnd = ri.Cvar_Get ("r_skipBackEnd", "0", CVAR_CHEAT);
 
 	r_newDLights = ri.Cvar_Get ("r_newDLights", "0", 0);

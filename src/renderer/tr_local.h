@@ -1247,6 +1247,10 @@ extern cvar_t	*r_texturebits;			// number of desired texture bits
 										// all else = error
 extern cvar_t	*r_texturebitslm;		// number of desired lightmap texture bits
 
+extern cvar_t	*r_smp;
+extern cvar_t	*r_showSmp;
+extern cvar_t	*r_skipBackEnd;
+
 extern cvar_t	*r_measureOverdraw;		// enables stencil buffer overdraw measurement
 
 extern cvar_t	*r_lodbias;				// push/pull LOD transitions
