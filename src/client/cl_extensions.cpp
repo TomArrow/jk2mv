@@ -440,9 +440,11 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 	clPSFrame_t* oldState= old ?  &cl.parsePlayerstates[(old->multiview.parsePlayerstatesNum) & (MAX_PARSE_PLAYERSTATES - 1)] : NULL;
 	clPSFrame_t* state;
 	int oldindex = 0;
+	int psretries = 0;
 	const playerState_t* nullPs = snap->multiview.version >= 4 ? MSG_GetBaselinePS(cl.gametype, MV_GetCurrentGameversion()) : NULL;
 	const playerState_t* oldPs;
 	qboolean rescuableFakeBase = qfalse;
+	qboolean basePSClientNumRecovered = qfalse;
 	msg_t rescueableMsgBkup;
 	playerState_t* playerStateClientnumFroms[MAX_CLIENTS] = { 0 }; // if multiple people have the same ps clientnum, we can check a spectator relationship. so just delta from the old one if it looks similar enough
 
@@ -490,7 +492,7 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 		SHOWNET( msg, "playerstate" );
 		if ( old ) {
 			// not doing this. main client is never sent in his own multiview rn, but in normal snapshot
-			if (GET_ABIT(old->multiview.clientMask, clientNum) && old->multiview.multiviewValid) {
+			if (GET_ABIT(old->multiview.clientMask, clientNum) && (old->multiview.multiviewValid || old->multiview.rescued && snap->multiview.multiviewValid)) {
 				// old snap has this client.
 				while (oldState->number < clientNum) {
 					oldindex++;
@@ -541,7 +543,15 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 					Com_Error(ERR_DROP, "CL_ParsePlayerstates: Trying to reference impossible parsed playerstate number.");
 				}
 				if (!playerStateClientnumFroms[clientNumSrc]) {
-					Com_Error(ERR_DROP, "CL_ParsePlayerstates: Trying to reference previously parsed playerstate we didn't get.");
+					if (snap->multiview.rescued && !basePSClientNumRecovered) { // ugly because i forgot to make the clientnum in main ps rescuable force send'd too
+						Com_Printf("CL_ParsePlayerstates: Recovered base ps clientNum (Guess).\n");
+						basePSClientNumRecovered = qtrue;
+						snap->ps.clientNum = clientNumSrc;
+						playerStateClientnumFroms[clientNumSrc] = &snap->ps;
+					}
+					else {
+						Com_Error(ERR_DROP, "CL_ParsePlayerstates: Trying to reference previously parsed playerstate we didn't get.");
+					}
 				}
 				oldPs = playerStateClientnumFroms[clientNumSrc];
 				referencingPreviousPs = true;
@@ -552,23 +562,13 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 			memcpy(&rescueableMsgBkup, msg, sizeof(rescueableMsgBkup));
 		}
 
+		psretries = 0;
+		rereadps:
 		if (snap->multiview.version >= 4) {
 			MSG_ReadDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &state->ps, netMask, snap->serverTime);
 		}
 		else {
 			MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps);
-		}
-
-		if (rescuableFakeBase && !referencingPreviousPs && state->ps.clientNum != clientNum) {
-			// now we actually now the clientnum, so we can go back and take the proper source entitystate maybe, and then re-read the changes
-			oldPs = CL_GetRescueableBasePS(old, state->ps.clientNum);
-			memcpy(msg, &rescueableMsgBkup, sizeof(*msg));
-			if (snap->multiview.version >= 4) {
-				MSG_ReadDeltaPlayerstate<qtrue, qtrue>(msg, oldPs, &state->ps, netMask, snap->serverTime );
-			}
-			else {
-				MSG_ReadDeltaPlayerstate(msg, oldPs, &state->ps );
-			}
 		}
 
 		if (netMask) {
@@ -577,6 +577,15 @@ static void CL_ParsePlayerstates(clSnapshot_t* snap, clSnapshot_t* old, msg_t* m
 				Com_Error(ERR_DROP,"CL_ParsePlayerstates: playerstate with netmask received, but no matching entity found");
 			}
 			CL_RestorePlayerStateFromEntityState(msg,&state->ps, entReal, state->dedupeSuccessMask);
+		}
+
+
+		if (rescuableFakeBase && !referencingPreviousPs && state->ps.clientNum != clientNum && !psretries) {
+			// now we actually now the clientnum, so we can go back and take the proper source entitystate maybe, and then re-read the changes
+			oldPs = CL_GetRescueableBasePS(old, state->ps.clientNum);
+			memcpy(msg, &rescueableMsgBkup, sizeof(*msg));
+			psretries++;
+			goto rereadps;
 		}
 
 		if (snap->multiview.version >= 5) {

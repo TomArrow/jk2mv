@@ -935,6 +935,7 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 	}
 
 	if (!SV_EmitPlayerStates(client, oldframe, frame, extensionMsg)) {
+		frame->multiview = qfalse;
 		return qfalse;
 	}
 	//MSG_entMergeMask = newmask; // emit packet entities with skipmask
@@ -950,7 +951,10 @@ qboolean SV_WriteMultiview(client_t* client, msg_t* msg, messageType_t msgType) 
 
 
 
-	SV_CommitExtensionMessage(msg, extensionMsg,svc_coolMultiview,0);
+	if(!SV_CommitExtensionMessage(msg, extensionMsg, svc_coolMultiview, 0)) {
+		frame->multiview = qfalse;
+		return qfalse;
+	}
 
 	return qtrue;
 }
