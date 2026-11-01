@@ -5143,7 +5143,7 @@ static void FS_StripTrailingPathSeparator( char *path ) {
 	}
 }
 
-void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt, callbackFunc_t callback ) { // for auto-complete (copied from OpenJK)
+void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt, callbackFunc_t callback, qboolean subFolders, const char* attachPath) { // for auto-complete (copied from OpenJK)
 	int nfiles;
 	const char **filenames;
 	char filename[MAX_STRING_CHARS];
@@ -5152,10 +5152,36 @@ void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt,
 	// add: if ext is like "cfg|txt|bsp", we will first use a list of cfg files, then txt files, then bsp files
 	const char *pch = strchr(ext, '|');
 
+
+	if (subFolders) {
+		char fullFolder[MAX_OSPATH];
+		char attachPathFull[MAX_OSPATH];
+		int maxResults = 9999;
+		char* fileList = (char*)Z_Malloc(MAX_OSPATH * maxResults, TAG_FILESYS); // too big for stack since this is recursive
+		int numFiles = FS_GetFileList(dir, "/", fileList, MAX_OSPATH * maxResults);
+		char* fileName;
+		fileName = fileList;
+		for (int i = 0; i < numFiles; i++) {
+			if (Q_stricmp(fileName, ".") && Q_stricmp(fileName, "..")) {
+				Com_sprintf(fullFolder, sizeof(fullFolder), "%s/%s", dir, fileName);
+				if (attachPath) {
+					Com_sprintf(attachPathFull, sizeof(attachPathFull), "%s/%s", attachPath, fileName);
+				}
+				else {
+					Q_strncpyz(attachPathFull, fileName, sizeof(attachPathFull));
+				}
+				FS_FilenameCompletion(fullFolder,ext,stripExt,callback,subFolders, attachPathFull);
+			}
+			fileName += strlen(fileName) + 1;
+		}
+		Z_Free(fileList);
+	}
+
 	if (pch)
 		Q_strncpyz(realExt, ext , pch - ext + 1);	//parse out the ext before the '|', i.e. "txt|cfg" will turn to "txt"
 	else
 		Q_strncpyz(realExt, ext, sizeof(realExt));
+
 
 	filenames = FS_ListFilteredFiles( dir, realExt, NULL, &nfiles, qfalse );
 
@@ -5172,7 +5198,14 @@ void FS_FilenameCompletion( const char *dir, const char *ext, qboolean stripExt,
 			Q_strncpyz( filename, converted, sizeof( filename ) );
 		}
 
-		callback( filename, qfalse );
+		if (attachPath) {
+			char fullRelativePath[MAX_OSPATH];
+			Com_sprintf(fullRelativePath,sizeof(fullRelativePath),"%s/%s",attachPath,filename);
+			callback(fullRelativePath, qfalse);
+		}
+		else {
+			callback(filename, qfalse);
+		}
 	}
 	FS_FreeFileList( filenames );
 

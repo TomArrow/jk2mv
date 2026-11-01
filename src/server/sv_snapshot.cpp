@@ -266,7 +266,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg, messageType_
 	// its view of time to try to match
 	if( client->oldServerTime 
 #ifdef SVDEMO
-		&& !(client->demo.demorecording && client->demo.isBot)
+		&& !((client->demo.demorecording || sv_demoPreRecord->integer) && client->demo.isBot)
 #endif
 		) {
 		// The server has not yet got an acknowledgement of the
@@ -1384,6 +1384,7 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client, qboolean fakeSend, qb
 #ifdef USE_MULTIVIEW
 			&& (!client->isMultiviewRecorder || sv_mvAutoRecord->integer )
 #endif
+			&& sv.configstrings[0]
 			) {
 			//if (client->demo.preRecord.lastKeyframeTime + (1000 * sv_demoPreRecordKeyframeDistance->integer) < sv.time) {
 			if (client->demo.preRecord.lastKeyframeTime + (1000 * sv_demoPreRecordKeyframeDistance->integer) < sv.time || client->demo.preRecord.lastKeyframeTime > sv.time) { // See if it's time for a new keyframe, or if the last keyframe was made before a serverTime restart.

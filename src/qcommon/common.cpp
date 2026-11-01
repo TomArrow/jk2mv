@@ -3934,16 +3934,16 @@ void Field_CompleteModelname( void )
 Field_CompleteFilename
 ===============
 */
-void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt )
+void Field_CompleteFilename( const char *dir, const char *ext, qboolean stripExt, qboolean subFolders)
 {
 	matchCount = 0;
 	perfectMatch = qfalse;
 	shortestMatch[ 0 ] = 0;
 
-	FS_FilenameCompletion( dir, ext, stripExt, FindMatches );
+	FS_FilenameCompletion( dir, ext, stripExt, FindMatches, subFolders);
 
 	if ( !Field_Complete() )
-		FS_FilenameCompletion( dir, ext, stripExt, PrintFileMatches );
+		FS_FilenameCompletion( dir, ext, stripExt, PrintFileMatches, subFolders);
 }
 
 /*

@@ -636,6 +636,7 @@ void SV_SendMapChange(void)
 				if ( svs.clients[i].netchan.remoteAddress.type != NA_BOT 
 #ifdef SVDEMO
 					|| svs.clients[i].demo.demorecording
+					|| sv_demoPreRecord->integer
 #endif
 					)
 				{
@@ -1067,7 +1068,7 @@ Ghoul2 Insert End
 	for (client_t* client = svs.clients; client - svs.clients < sv_maxclients->integer+GHOSTCLIENTS; client++) {
 		// bots will not request gamestate, so it must be manually sent
 		// cannot do this above where it says it will because mapname is not set at that time
-		if (client->netchan.remoteAddress.type == NA_BOT && client->demo.demorecording) {
+		if (client->netchan.remoteAddress.type == NA_BOT && (client->demo.demorecording || sv_demoPreRecord->integer)) {
 			SV_SendClientGameState(client);
 		}
 	}
