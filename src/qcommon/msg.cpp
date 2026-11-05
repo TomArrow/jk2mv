@@ -159,7 +159,7 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 	oldsize += bits;
 
 	// this isn't an exact overflow check, but close enough
-	if (msg->maxsize - msg->cursize < 4) {
+	if (msg->overflowed || msg->maxsize - msg->cursize < 4 ) {
 		msg->overflowed = qtrue;
 		return;
 	}
@@ -203,6 +203,10 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 		return;
 	}
 	else if (msg->oob) {
+		if ( msg->cursize + ( bits >> 3 ) > msg->maxsize ) {
+			msg->overflowed = qtrue;
+			return;
+		}
 		if (bits == 8) {
 			msg->data[msg->cursize] = value;
 			msg->cursize += 1;
@@ -225,6 +229,10 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 		if (bits & 7) {
 			int nbits;
 			nbits = bits & 7;
+			if ( msg->bit + nbits >= msg->maxsize << 3 ) {
+				msg->overflowed = qtrue;
+				return;
+			}
 			for (i = 0; i<nbits; i++) {
 				Huff_putBit((value & 1), msg->data, &msg->bit);
 				value = (value >> 1);
@@ -236,8 +244,13 @@ void MSG_WriteBits(msg_t *msg, int value, int bits) {
 #ifdef _NEWHUFFTABLE_
 				fwrite(&value, 1, 1, fp);
 #endif // _NEWHUFFTABLE_
-				Huff_offsetTransmit(&msgHuff.compressor, (value & 0xff), msg->data, &msg->bit);
+				Huff_offsetTransmit(&msgHuff.compressor, (value & 0xff), msg->data, &msg->bit, msg->maxsize << 3);
 				value = (value >> 8);
+
+				if (msg->bit >= msg->maxsize << 3) {
+					msg->overflowed = qtrue;
+					return;
+				}
 			}
 		}
 		msg->cursize = (msg->bit >> 3) + 1;
@@ -249,6 +262,11 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 	int			get;
 	qboolean	sgn;
 	int			i, nbits;
+
+	if (msg->readcount > msg->cursize) {
+		return 0;
+	}
+
 	value = 0;
 
 	if (bits < 0) {
@@ -267,6 +285,10 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 		msg->readcount += bitsToDo >> 3;
 	}
 	else if (msg->oob) {
+		if (msg->readcount + (bits >> 3) > msg->cursize) {
+			msg->readcount = msg->cursize + 1;
+			return 0;
+		}
 		if (bits == 8) {
 			value = msg->data[msg->readcount];
 			msg->readcount += 1;
@@ -288,6 +310,10 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 		nbits = 0;
 		if (bits & 7) {
 			nbits = bits & 7;
+			if (msg->bit + nbits > msg->cursize << 3) {
+				msg->readcount = msg->cursize + 1;
+				return 0;
+			}
 			for (i = 0; i<nbits; i++) {
 				value |= (Huff_getBit(msg->data, &msg->bit) << i);
 			}
@@ -295,11 +321,16 @@ int MSG_ReadBits(msg_t *msg, int bits) {
 		}
 		if (bits) {
 			for (i = 0; i<bits; i += 8) {
-				Huff_offsetReceive(msgHuff.decompressor.tree, &get, msg->data, &msg->bit);
+				Huff_offsetReceive(msgHuff.decompressor.tree, &get, msg->data, &msg->bit, msg->cursize << 3);
 #ifdef _NEWHUFFTABLE_
 				fwrite(&get, 1, 1, fp);
 #endif // _NEWHUFFTABLE_
-				value |= (get << (i + nbits));
+				value = (unsigned int)value | ((unsigned int)get << (i + nbits));
+
+				if (msg->bit > msg->cursize << 3) {
+					msg->readcount = msg->cursize + 1;
+					return 0;
+				}
 			}
 		}
 		msg->readcount = (msg->bit >> 3) + 1;
@@ -789,9 +820,12 @@ char *MSG_ReadString(msg_t *msg) {
 			c = '.';
 		}
 
-		string[l] = c;
-		l++;
-	} while (l <= sizeof(string) - 1);
+		// break only after reading all expected data from bitstream
+		if (l >= sizeof(string) - 1) {
+			break;
+		}
+		string[l++] = c;
+	} while (1);
 
 	// some bonus protection, shouldn't occur cause server doesn't write such things
 	if (l <= sizeof(string) - 1)
@@ -820,10 +854,13 @@ char *MSG_ReadBigString(msg_t *msg) {
 		if (c == '%') {
 			c = '.';
 		}
-
-		string[l] = c;
-		l++;
-	} while (l < sizeof(string) - 1);
+		
+		// break only after reading all expected data from bitstream
+		if ( l >= sizeof(string)-1 ) {
+			break;
+		}
+		string[l++] = c;
+	} while (1);
 
 	string[l] = 0;
 
@@ -843,9 +880,13 @@ char *MSG_ReadStringLine(msg_t *msg) {
 		if (c == '%') {
 			c = '.';
 		}
-		string[l] = c;
-		l++;
-	} while (l < (int)sizeof(string) - 1);
+		
+		// break only after reading all expected data from bitstream
+		if (l >= sizeof(string) - 1) {
+			break;
+		}
+		string[l++] = c;
+	} while (1);
 
 	string[l] = 0;
 	return string;
@@ -1036,7 +1077,7 @@ extern cvar_t *cl_snapOrderTolerance;
 extern cvar_t *cl_snapOrderToleranceDemoSkipPackets;
 extern cvar_t *cl_shownet;
 
-#define	LOG(x) if( cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
+#define	LOG(x) if( cl_shownet && cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
 
 void MSG_WriteDelta(msg_t *msg, int oldV, int newV, int bits) {
 	if (oldV == newV) {
@@ -1666,7 +1707,7 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 	if (MSG_ReadBits(msg, 1) == 1) {
 		Com_Memset(to, 0, sizeof(*to));
 		to->number = MAX_GENTITIES - 1;
-		if (cl_shownet->integer >= 2 || cl_shownet->integer == -1) {
+		if (cl_shownet && (cl_shownet->integer >= 2 || cl_shownet->integer == -1)) {
 			Com_Printf("%3i: #%-3i remove\n", msg->readcount, number);
 		}
 		return;
@@ -1692,7 +1733,7 @@ void MSG_ReadDeltaEntity(msg_t *msg, entityState_t *from, entityState_t *to,
 
 	// shownet 2/3 will interleave with other printed info, -1 will
 	// just print the delta records`
-	if (cl_shownet->integer >= 2 || cl_shownet->integer == -1) {
+	if ( cl_shownet && (cl_shownet->integer >= 2 || cl_shownet->integer == -1)) {
 		print = 1;
 		Com_Printf("%3i: #%-3i ", msg->readcount, number);
 	} else {
@@ -2343,7 +2384,7 @@ void MSG_ReadDeltaPlayerstate(msg_t *msg, const playerState_t *from, playerState
 
 	// shownet 2/3 will interleave with other printed info, -2 will
 	// just print the delta records
-	if (cl_shownet->integer >= 2 || cl_shownet->integer == -2) {
+	if ( cl_shownet && (cl_shownet->integer >= 2 || cl_shownet->integer == -2)) {
 		print = 1;
 		Com_Printf("%3i: playerstate ", msg->readcount);
 	} else {
