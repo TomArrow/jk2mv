@@ -858,6 +858,13 @@ typedef struct backtrace_s {
 	void *buf[100];
 } backtrace_t;
 
+typedef struct processMappings_s {
+	int len;
+	char data[65536];
+} processMappings_t;
+
+static processMappings_t processMappings;
+
 static int Sys_CrashBacktrace(void **buffer, int size, const ucontext_t *context);
 static qboolean Sys_CrashWrite(const void *buf, size_t len);
 static void Sys_CrashWriteVm(void);
@@ -868,12 +875,37 @@ static void Sys_SigHandlerFatal(int sig, siginfo_t *info, void *context) {
 
 	if (!signalcaught) {
 		backtrace_t trace = { 0 };
+		int maps;
 
 		signalcaught = 1;
 
 		Sys_CrashWrite(info, sizeof(*info));
 		Sys_CrashWriteVm();
 		Sys_CrashWriteContext(ucontext);
+		
+		processMappings.len = 0;
+		maps = open("/proc/self/maps", O_RDONLY);
+		if(maps >= 0){
+			size_t toread = sizeof(processMappings.data)-1;
+			size_t readed = 0;
+			ssize_t result;
+			while(toread > 0){
+				result = read(maps, processMappings.data+readed,toread);
+				if(result > 0){
+					readed += result;
+					toread -= result;
+				} else if(result < 0 && errno == EINTR){
+					continue;
+				} else{
+					break;
+				}
+			}
+			processMappings.len = readed;
+			processMappings.data[readed] = '\0';
+			close(maps);
+		}
+		Sys_CrashWrite(&processMappings, sizeof(processMappings));
+		
 		trace.size = Sys_CrashBacktrace(trace.buf, ARRAY_LEN(trace.buf), ucontext);
 		Sys_CrashWrite(&trace, sizeof(trace));
 		Sys_CrashWrite(&consoleLog, sizeof(consoleLog));
@@ -1241,12 +1273,12 @@ static Q_NORETURN void Sys_CrashLogger(int argc, char *argv[]) {
 		Sys_BacktraceSymbol(f, info.si_addr);
 		fprintf(f, "\n");
 	}
-
+	
 	maps = fopen("/proc/self/maps", "r");
 	if(maps){
 		char inbuf[1024];
 		fprintf(f, "\n");
-		fprintf(f, "---Process Mappings----------------------\n");
+		fprintf(f, "---Process Mappings (fork)----------------------\n");
 		fprintf(f, "\n");
 		while(fgets(inbuf,sizeof(inbuf), maps)){
 			fprintf(f, "%s",inbuf);
@@ -1344,6 +1376,22 @@ static Q_NORETURN void Sys_CrashLogger(int argc, char *argv[]) {
 		(unsigned)(fpregs->datasel & 0xff), (unsigned)fpregs->dataoff);
 #endif
 #endif // __GNU_LIBRARY__
+
+
+	if (!Sys_CrashRead(&processMappings, sizeof(processMappings))) {
+		goto exit_failure;
+	}
+
+	if(processMappings.len > 0){
+		fprintf(f, "\n");
+		fprintf(f, "---Process Mappings (main process)----------------------\n");
+		fprintf(f, "\n");
+		if(processMappings.len >= sizeof(processMappings.data)){
+			processMappings.len = sizeof(processMappings.data)-1;
+		}
+		processMappings.data[processMappings.len] = '\0';
+		fprintf(f, "%s",processMappings.data);
+	}
 
 	fprintf(f, "\n");
 	fprintf(f, "---Backtrace----------------------------\n");
