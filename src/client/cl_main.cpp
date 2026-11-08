@@ -49,6 +49,7 @@ cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
 cvar_t	*cl_timeNudgeAntiLagHack;
 cvar_t	*cl_timeNudgeSafeServerTime;
+cvar_t	*cl_pingify;
 cvar_t	*cl_smoothenSnapLag;
 cvar_t	*cl_smoothenSnapLagMaxComp;
 cvar_t	*cl_smoothenSnapLagMedianPercentile;
@@ -1536,6 +1537,8 @@ void CL_ClearState (void) {
 
 //	S_StopAllSounds();
 	Com_Memset( &cl, 0, sizeof( cl ) );
+
+	cl_pingify = Cvar_Get("cl_pingify", "0", CVAR_TEMP | CVAR_LATCH); // update latched value
 }
 
 extern std::map<int, std::map<int, std::map<int, fragmentAssemblyBuffer_t>>> fragmentBuffers;
@@ -3804,6 +3807,7 @@ void CL_Init( void ) {
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
 	cl_timeNudgeAntiLagHack = Cvar_Get ("cl_timeNudgeAntiLagHack", "1", CVAR_CHEAT );
 	cl_timeNudgeSafeServerTime = Cvar_Get("cl_timeNudgeSafeServerTime", "-1", CVAR_ROM | CVAR_VM_NOWRITE | CVAR_INTERNAL);
+	cl_pingify = Cvar_Get("cl_pingify", "0", CVAR_TEMP | CVAR_LATCH);
 	cl_smoothenSnapLag = Cvar_Get("cl_smoothenSnapLag", "1", CVAR_ARCHIVE);
 	cl_smoothenSnapLagMaxComp = Cvar_Get("cl_smoothenSnapLagMaxComp", "3000", CVAR_ARCHIVE);
 	cl_smoothenSnapLagMedianPercentile = Cvar_Get("cl_smoothenSnapLagMedianPercentile", "94", CVAR_ARCHIVE);

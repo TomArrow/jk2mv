@@ -1418,6 +1418,30 @@ void CL_CreateNewCommands( void ) {
 
 }
 
+
+
+// get the latest cmdnumber that should be sent. it's usually just cl.cmdNumber, except when cl_pingify is used, we then add a delay to them being sent to simulate a higher ping experience for the player.
+int CL_GetAdjustedLatestCmdNumber() {
+
+	if (cl_pingify->integer > 0) {
+		int		i, j;
+		int		clServerTime = CL_GetClientCommandServerTime();
+		int		maxServerTime = clServerTime - (cl_pingify->integer >> 1);
+		int		EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
+		int		minCmdNumber = MAX(0, cl.cmdNumber - EFFECTIVE_CMD_BACKUP + 1);
+		int		latestCmdNumber = cl.cmdNumber;
+
+		j = latestCmdNumber % EFFECTIVE_CMD_BACKUP;
+		while (cl.cmds[latestCmdNumber % EFFECTIVE_CMD_BACKUP].serverTime > maxServerTime && latestCmdNumber > minCmdNumber) {
+			latestCmdNumber--;
+		}
+		return latestCmdNumber;
+	}
+	else {
+		return cl.cmdNumber;
+	}
+}
+
 /*
 =================
 CL_ReadyToSendPacket
@@ -1433,10 +1457,22 @@ qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no ne
 	int		oldPacketNum;
 	int		delta;
 
-	if (!cl.newCmdsGenerated && cls.state >= CA_PRIMED) {
+	if (cls.state >= CA_PRIMED) {
 		// When using com_physicsFps we may/will not generate new commands on every frame.
 		// If no new ones were generated, don't send a packet
-		return qfalse;
+		if (cl_pingify->integer > 0) {
+			// 2026-11-08: special handling for cl_pingify. we aren't purely interested whether new cmds were generated this frame, but whether the timing requires us to send out new cmds
+			// check whether the latest to-be-sent cmd 
+			int		adjustedCmdNumber = CL_GetAdjustedLatestCmdNumber();
+			int		oldPacketNum = (clc.netchan.outgoingSequence - 1) & PACKET_MASK;
+			int		umsgLastUcmd = oldPacketNum < 0 ? -1 : cl.outPackets[oldPacketNum].p_cmdNumber;
+			if (adjustedCmdNumber <= umsgLastUcmd) {
+				return qfalse;
+			}
+		}
+		else if (!cl.newCmdsGenerated) {
+			return qfalse;
+		}
 	}
 
 	// don't send anything if playing back a demo
@@ -1492,6 +1528,7 @@ qboolean CL_ReadyToSendPacket( void ) { // TODO Don't send a new packet if no ne
 	return qtrue;
 }
 
+
 /*
 ===================
 CL_WritePacket
@@ -1524,9 +1561,10 @@ void CL_WritePacket( void ) {
 	int			count, key;
 	int			MAX_PACKET_USERCMDS = MIN(MAX_PACKET_USERCMDS_MAX, MAX(MAX_PACKET_USERCMDS_MIN, cl_maxPacketUserCmds->integer));
 	int			EFFECTIVE_CMD_BACKUP = (cl_commandsize->integer >= 4 && cl_commandsize->integer <= 512) ? cl_commandsize->integer : CMD_BACKUP;
-	bool		commandTimeBasedUserCmds = cl_dynamicUserPacket->integer && cl.playerCommandTimeValid && cl.playerCommandTime < cl.cmds[cl.cmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
 	userMessage_t* umsg = NULL;
 	int			umsgLastUcmd = -1;
+	int			latestCmdNumber = CL_GetAdjustedLatestCmdNumber();
+	bool		commandTimeBasedUserCmds = cl_dynamicUserPacket->integer && cl.playerCommandTimeValid && cl.playerCommandTime < cl.cmds[latestCmdNumber % EFFECTIVE_CMD_BACKUP].serverTime;
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
@@ -1589,16 +1627,16 @@ void CL_WritePacket( void ) {
 		Cvar_Set( "cl_packetdup", "5" ); // I need MOAR
 	}*/
 	oldPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
-	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
+	count = latestCmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
 		count = MAX_PACKET_USERCMDS;
 		Com_Printf("MAX_PACKET_USERCMDS\n");
 	}
 
 	if (commandTimeBasedUserCmds) { // only send cmds the server actually needs. may mean more or less than usual.
-		if (count >= cl.cmdNumber) count = cl.cmdNumber - 1;
+		if (count >= latestCmdNumber) count = latestCmdNumber - 1;
 		if (count > EFFECTIVE_CMD_BACKUP) count = EFFECTIVE_CMD_BACKUP;
-		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+		j = (latestCmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
 
 		// increase count so that the entire duration from current server's commandTime to now is covered. 
 		while (cl.cmds[j].serverTime > cl.playerCommandTime) {
@@ -1606,14 +1644,14 @@ void CL_WritePacket( void ) {
 				count = EFFECTIVE_CMD_BACKUP;
 				break;
 			}
-			if (count >= cl.cmdNumber) {
-				count = cl.cmdNumber - 1;
+			if (count >= latestCmdNumber) {
+				count = latestCmdNumber - 1;
 				break;
 			}
 			count++;
-			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+			j = (latestCmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
 		}
-		j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+		j = (latestCmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
 		// reduce count to only as much as necessary. we will never need to send cmds <= what server already has
 		while (cl.cmds[j].serverTime <= cl.playerCommandTime) {
 			if (count <= 0) {
@@ -1621,7 +1659,7 @@ void CL_WritePacket( void ) {
 				break;
 			}
 			count--;
-			j = (cl.cmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
+			j = (latestCmdNumber - count + 1) % EFFECTIVE_CMD_BACKUP;
 		}
 		if (count > MAX_PACKET_USERCMDS) {
 			count = MAX_PACKET_USERCMDS;
@@ -1665,9 +1703,9 @@ void CL_WritePacket( void ) {
 
 		// write all the commands, including the predicted command
 		for ( i = 0 ; i < count ; i++ ) {
-			j = (cl.cmdNumber - count + i + 1) % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
+			j = (latestCmdNumber - count + i + 1) % EFFECTIVE_CMD_BACKUP;//Loda - FPS UNLOCK ENGINE
 			cmd = &cl.cmds[j];
-			if (umsg && (cl.cmdNumber - count + i + 1) > umsgLastUcmd) { // save this for saving to demo
+			if (umsg && (latestCmdNumber - count + i + 1) > umsgLastUcmd) { // save this for saving to demo
 				std::unique_ptr<usercmd_t> tmp = std::make_unique<usercmd_t>();
 				*tmp = *cmd;
 				umsg->cmds.push_back(std::move(tmp));
@@ -1683,7 +1721,7 @@ void CL_WritePacket( void ) {
 	packetNum = clc.netchan.outgoingSequence & PACKET_MASK;
 	cl.outPackets[ packetNum ].p_realtime = cls.realtime;
 	cl.outPackets[ packetNum ].p_serverTime = oldcmd->serverTime;
-	cl.outPackets[ packetNum ].p_cmdNumber = cl.cmdNumber;
+	cl.outPackets[ packetNum ].p_cmdNumber = latestCmdNumber;
 	cl.outPackets[ packetNum ].p_reliableSequence = clc.reliableSequence;
 	clc.lastPacketSentTime = cls.realtime;
 

@@ -2496,7 +2496,7 @@ void CL_SetCGameTime( void ) {
 		// smoothness or better responsiveness.
 		int tn;
 
-		tn = cl_timeNudge->integer;
+		tn = cl_timeNudge->integer + MAX(0,cl_pingify->integer>>1);
 
 		if (tn < 0 && (cl.snap.ps.pm_type == PM_SPECTATOR || cl.snap.ps.pm_flags & PMF_FOLLOW || clc.demoplaying))
 			tn = 0; // JAPRO ENGINE - disable negative timenudge when spectating
